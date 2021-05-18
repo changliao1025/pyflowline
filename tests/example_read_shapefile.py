@@ -1,0 +1,4 @@
+from pystream.format.read_flowline_shapefile import read_flowline_shapefile
+
+sFilename_shapefile_in = '/qfs/people/liao313/data/hexwatershed/columbia_river_basin/vector/mesh_id/crb_flowline_remove_small_line_split.shp'
+read_flowline_shapefile(sFilename_shapefile_in)

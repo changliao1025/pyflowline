@@ -21,10 +21,8 @@ from pystream.split.split_flowline import split_flowline
 #
 from pystream.split.find_flowline_vertex import find_flowline_vertex
 #from hexwatershed.preprocess.stream.split.find_flowline_vertex2 import find_flowline_vertex2
-#
-#from hexwatershed.preprocess.stream.simplification.remove_flowline_loop import remove_flowline_loop
-#from hexwatershed.preprocess.stream.simplification.remove_flowline_loop2 import remove_flowline_loop2
-#from hexwatershed.preprocess.stream.simplification.remove_flowline_loop3 import remove_flowline_loop3
+
+from pystream.simplification.remove_flowline_loop import remove_flowline_loop
 #
 #from hexwatershed.preprocess.stream.simplification.remove_small_river import remove_small_river
 #

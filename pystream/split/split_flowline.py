@@ -1,62 +1,62 @@
 import os, sys
 from osgeo import ogr, osr, gdal, gdalconst
 import numpy as np
+from pystream.shared.vertex import pyvertex
+from pystream.shared.edge import pyedge
+from pystream.shared.flowline import pyflowline
+from pystream.find_vertex_in_list import find_vertex_in_list
 
-def split_flowline(sFilename_in, sFilename_out):
+def split_flowline(aFlowline_in, aVertex_in):
+    aFlowline_out = list()
+    nFlowline = len(aFlowline_in)
 
-    if  os.path.exists(sFilename_in): 
-        pass
-    else:
-        print('The input file does not exist')
-        return
+    for i in range(nFlowline):
+        pFlowline = aFlowline_in[i]
+        nVertex = pFlowline.nVertex
 
-    if os.path.exists(sFilename_out): 
-        #delete it if it exists
-        os.remove(sFilename_out)
+        iPart = 0
+        
+        aVertex  = list()
 
-    pDriver = ogr.GetDriverByName('GeoJSON')
-    #geojson
-    pDataset_out = pDriver.CreateDataSource(sFilename_out)
-    pDataset_in = pDriver.Open(sFilename_in, gdal.GA_ReadOnly)
-    pLayer_in = pDataset_in.GetLayer(0)
-    pSpatialRef_in = pLayer_in.GetSpatialRef()
-    
-
-    pLayer_out = pDataset_out.CreateLayer('flowline', pSpatialRef_in, ogr.wkbMultiLineString)
-    # Add one attribute
-    pLayer_out.CreateField(ogr.FieldDefn('id', ogr.OFTInteger64)) #long type for high resolution
-    
-    pLayerDefn_out = pLayer_out.GetLayerDefn()
-    pFeature_out = ogr.Feature(pLayerDefn_out)
-
-    
-    lID =0
-    for pFeature_in in pLayer_in:
-        pGeometry_in = pFeature_in.GetGeometryRef()
-
-        sGeometry_type = pGeometry_in.GetGeometryName()
-        if(sGeometry_type == 'MULTILINESTRING'):
-            aLine = ogr.ForceToLineString(pGeometry_in)
-            for Line in aLine: 
-                pFeature_out.SetGeometry(Line)
-                pFeature_out.SetField("id", lID)
-                lID = lID + 1
-                # Add new pFeature_shapefile to output Layer
-                pLayer_out.CreateFeature(pFeature_out)    
-        else:
-            if sGeometry_type =='LINESTRING':
-                pFeature_out.SetGeometry(pGeometry_in)
-                pFeature_out.SetField("id", lID)
-                lID = lID + 1
-                # Add new pFeature_shapefile to output Layer
-                pLayer_out.CreateFeature(pFeature_out)    
-            else:
-                print(sGeometry_type)
+        for j in range(nVertex):
+            pVertex = pFlowline.aVertex[j]
+            iFlag_exist, lIndex = find_vertex_in_list( aVertex_in,  pVertex)
+            if iFlag_exist == 1:
+                iPart = iPart + 1
+                aVertex.append(j)
                 pass
-            
-    
-    pDataset_out.FlushCache()
-    pDataset_out = pLayer_out = pFeature_out = None    
+            else:
+                pass
+        if iPart < 2:
+            print('Something is wrong')
+            pass
 
-    return 
+        if iPart ==2:
+            aFlowline_out.append(pFlowline)
+            pass
+        else:
+
+            nLine = iPart-1
+            for k in range(nLine):
+                t = aVertex[k]
+                s = aVertex[k+1]
+                aEdge=list()
+                for l in range(t,s):
+                    pVertex0 = pFlowline.aVertex[l]
+                    pVertex1 = pFlowline.aVertex[l+1]
+                    pEdge = pyedge(pVertex0, pVertex1)
+                    aEdge.append(pEdge)
+                    pass
+
+                pFlowline1 = pyflowline(aEdge)
+                aFlowline_out.append(pFlowline1)
+                pass
+    
+            pass
+
+
+
+        pass   
+
+    return aFlowline_out
 

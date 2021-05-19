@@ -9,35 +9,31 @@ class pyflowline(object):
     __metaclass__ = ABCMeta 
     aEdge=None
     aVertex=None
+
     dLength=0.0
 
     lIndex=-1
     lIndex_upstream=-1
     lIndex_downstream=-1
 
-    #def __init__(self, aEdge):    
-    #    self.aEdge = aEdge
-    #    nEdge  = len(aEdge)
-    #    self.nEdge = nEdge
-    #    self.pVertex_start = aEdge[0].pVertex_start
-    #    self.pVertex_end =  aEdge[ nEdge-1  ].pVertex_end
-    #    return
+    nEdge=0
+    nVertex=0
 
-    def __init__(self, aCoordinate):
-        
+    def __init__(self, aEdge):    
+        self.aEdge = aEdge
+        nEdge  = len(aEdge)
+        self.nEdge = nEdge
+        self.pVertex_start = aEdge[0].pVertex_start
+        self.pVertex_end =  aEdge[ nEdge-1  ].pVertex_end
 
-        self.aVertex = aCoordinate
-        nVertex  = len(aCoordinate)
-        self.nVertex = nVertex
-        self.nEdge = nVertex-1
-        self.aEdge=list()
-        for i in range(nVertex-1):
-            pEdge = pyedge( aCoordinate[i], aCoordinate[i+1] )
-            self.aEdge.append(pEdge)
+        nVertex = nEdge +1
+        self.aVertex=list()
+        for i in range(nEdge):
+            self.aVertex.append( aEdge[i].pVertex_start )
             pass
 
-        self.pVertex_start = self.aEdge[0].pVertex_start
-        self.pVertex_end =  self.aEdge[nVertex-2  ].pVertex_end
+        self.aVertex.append( aEdge[nEdge-1].pVertex_end )
+        self.nVertex = nVertex
 
         return
 
@@ -83,3 +79,29 @@ class pyflowline(object):
             iFlag_downstream=0
 
         return iFlag_downstream
+    
+    def reverse(self):
+        '''
+        reverse the direction of a flowline
+        '''
+        aVertex = self.aVertex 
+        nVertex = self.nVertex
+        aVertex_new = list()
+        for i in range(nVertex-1,-1,-1) :
+            aVertex_new.append( aVertex[i] )
+
+        self.aVertex = aVertex_new
+        nVertex  = len(aVertex)
+        aEdge = list()
+        for i in range(nVertex-1):
+            pEdge = pyedge( self.aVertex[i], self.aVertex[i+1] )
+            aEdge.append(pEdge)
+            pass
+        
+        self.aEdge = aEdge
+        nEdge = len(aEdge)
+        self.pVertex_start = aEdge[0].pVertex_start
+        self.pVertex_end =  aEdge[ nEdge-1  ].pVertex_end
+
+     
+        

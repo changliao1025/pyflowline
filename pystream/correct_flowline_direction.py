@@ -1,170 +1,122 @@
 import os, sys
+from pystream.shared.flowline import pyflowline
 import numpy as np 
 from osgeo import ogr, osr, gdal, gdalconst
 from shapely.geometry import Point, LineString
 from shapely.ops import split
 from shapely.wkt import loads
-from hexwatershed.preprocess.stream.check_same_point  import check_same_point
 
 lID=0
 aFlag_process=None
-def correct_flowline_direction(sFilename_in, sFilename_out):
-    if  os.path.exists(sFilename_in): 
-        pass
-    else: 
-        print('The input file does not exist')
-        return
+
+def correct_flowline_direction(aFlowline_in, pVertex_outlet):
         
-    if os.path.exists(sFilename_out): 
-        #delete it if it exists
-        os.remove(sFilename_out)
+    #we have to go reversely    
+    aFlowline_out= list()   
 
-    pDriver = ogr.GetDriverByName('GeoJSON')
-    pDriver2 = ogr.GetDriverByName('ESRI Shapefile')
-    pDataset_out = pDriver.CreateDataSource(sFilename_out)
-    pDataset_in = pDriver.Open(sFilename_in, gdal.GA_ReadOnly)
-    pLayer_in = pDataset_in.GetLayer(0)
-    pSpatialRef_in = pLayer_in.GetSpatialRef()
-    
+    global lID    
+    global aFlag_process
 
-    pLayer_out = pDataset_out.CreateLayer('flowline', pSpatialRef_in, ogr.wkbLineString)
-    # Add one attribute
-    pLayer_out.CreateField(ogr.FieldDefn('id', ogr.OFTInteger64)) #long type for high resolution
-    
-    pLayerDefn_out = pLayer_out.GetLayerDefn()
-    pFeature_out = ogr.Feature(pLayerDefn_out)
-    nfeature = pLayer_in.GetFeatureCount()
-    lOutlet = 1
+    nFlowline = len(aFlowline_in)
+    aFlag_process=np.full(nFlowline, 0, dtype =int)
 
-    #we have to go reversely
-    iFeature_current= lOutlet
+    for i in range(nFlowline):
+        pFlowline = aFlowline_in[i]
+        pVertex_start = pFlowline.pVertex_start
+        pVertex_end = pFlowline.pVertex_end
+        dDiatance = pVertex_end.calculate_distance( pVertex_outlet)
+        if  dDiatance < 100.0:
+            pFlowline.lIndex = lID
+            aFlowline_out.append(pFlowline)
+            lID = lID +1
+            break
+            pass    
+        else:
+            #print(dDiatance)
+            pass
+            
+        pass     
 
-    pFeature_in = pLayer_in.GetFeature(iFeature_current)
-
-    pGeometry_in = pFeature_in.GetGeometryRef()
-    npt = pGeometry_in.GetPointCount()
-    pt_start = pGeometry_in.GetPoint(0)
-    pt_end = pGeometry_in.GetPoint(npt-1)
-
-    global lID
-    pFeature_out.SetGeometry(pGeometry_in)
-    pFeature_out.SetField("id", lID)
-        
-    # Add new pFeature_shapefile to output Layer
-    pLayer_out.CreateFeature(pFeature_out)    
-
-    def check_head_water(pt):
-        iFlag= -1
-        iCount=0
-        for i in range(0, nfeature):
-            pFeature_in2 = pLayer_in.GetFeature(i)
-            pGeometry_in2 = pFeature_in2.GetGeometryRef()
-            npt2 = pGeometry_in2.GetPointCount()
-            pt1 = pGeometry_in2.GetPoint(0)
-            pt2 = pGeometry_in2.GetPoint(npt2-1)
-            if (check_same_point(pt, pt1)==1):
-                iCount = iCount +1
-            else:
-                pass
-            if (check_same_point(pt, pt2)==1):
-                iCount = iCount +1
+    def check_head_water(pVertex_start_in):
+        iFlag_head_water = -1
+        iCount = 0
+        for i in range(nFlowline):
+            pFlowline = aFlowline_in[i]
+            pVerter_start = pFlowline.pVertex_start
+            pVerter_end = pFlowline.pVertex_end
+            if pVertex_start_in == pVerter_end:
+                iCount = iCount + 1
                 pass
 
-        if iCount ==1:
-            iFlag=1
+            if  pVertex_start_in == pVerter_start:
+                iCount = iCount + 1
+                pass
 
-        return iFlag
+            pass
+        if iCount == 1:
+            iFlag_head_water=1
+            
+        return iFlag_head_water
 
     #we might find more than 1 upstream
-    global aFlag_process
-    aFlag_process=np.full(nfeature, 0, dtype =int)
-    def find_upstream_flowline(pt_start_in, pt_end_in):
 
-        nupstream=0
-        aUpstream=[]
-        aFlag_reverse=[]
-        global aFlag_process
-
-       
-        for i in range(0, nfeature):
-            pFeature_in2 = pLayer_in.GetFeature(i)
-            pGeometry_in2 = pFeature_in2.GetGeometryRef()
-            npt2 = pGeometry_in2.GetPointCount()
-            pt1 = pGeometry_in2.GetPoint(0)
-            pt2 = pGeometry_in2.GetPoint(npt2-1)
-            if (check_same_point(pt_start_in, pt1)==1  and check_same_point(pt_end_in, pt2)!=1):
-                #this one should be reversed
+    
+    def find_upstream_flowline(pVertex_start_in, pVertex_end_in):
+        nUpstream = 0 
+        aUpstream=list()
+        aReverse=list()
+        for i in range(nFlowline):
+            pFlowline = aFlowline_in[i]
+            pVerter_start = pFlowline.pVertex_start
+            pVerter_end = pFlowline.pVertex_end
+            if pVerter_end == pVertex_start_in  and pVerter_start!=pVertex_end_in:
                 if aFlag_process[i] !=1:
-                    aUpstream.append(i )
-                    aFlag_reverse.append(1)
-                    aFlag_process[i] =1
-            else:
-                if (check_same_point(pt_start_in, pt2)==1 ):
-                    #this is the one we are
-                    if aFlag_process[i] !=1:
-                        aUpstream.append(i )
-                        aFlag_reverse.append(0)
-                        aFlag_process[i] =1
-                    
-                else:
-                    
+                    nUpstream = nUpstream + 1
+                    aUpstream.append(i)
+                    aReverse.append(0)
+                    aFlag_process[i] = 1
                     pass
-        nupstream = len(aUpstream)
-        return nupstream, aUpstream, aFlag_reverse
+            else:
+                if pVerter_start == pVertex_start_in and pVerter_end !=pVertex_end_in :
+                    if aFlag_process[i] !=1:
+                        nUpstream = nUpstream + 1
+                        aUpstream.append(i)
+                        aReverse.append(1)
+                        aFlag_process[i] = 1
+                        pass
+                pass
+
+            pass
+
+        print(aUpstream)
+        return nUpstream, aUpstream, aReverse
     
-    lID= lID+1
-    def tag_upstream(pt_start, pt_end):
-        if(check_head_water(pt_start)!=1):
-            #print(pt_start, pt_end)
-            #find the next flowline get to this 
-            nUp, aUp, aReverse = find_upstream_flowline(pt_start, pt_end)
-            if nUp > 0:
+    
+    def tag_upstream(pVertex_start_in, pVertex_end_in):
+        if(check_head_water(pVertex_start_in)==1):            
+            pass
+        else:
+            nUpstream, aUpstream, aReverse = find_upstream_flowline(pVertex_start_in, pVertex_end_in)
+            if nUpstream > 0:
                 global lID
-                #if nUp==2:
-                    #print('care')
-                for j in range(nUp):
-                    if (aReverse[j]==1):
-                        pFeature_in2 = pLayer_in.GetFeature(  aUp[j] )
 
-                        pGeometry_in2 = pFeature_in2.GetGeometryRef()
-                        npt2 = pGeometry_in2.GetPointCount()
-
-                        line = loads( pGeometry_in2.ExportToWkt() )
-                        coords = line.coords
-                        line2= LineString( coords[::-1 ] )
-
-                        pGeometry_out = ogr.CreateGeometryFromWkb(line2.wkb)
-
-                        pFeature_out.SetGeometry(pGeometry_out)
-                        pFeature_out.SetField("id", lID)
-                        pLayer_out.CreateFeature(pFeature_out) 
-                        lID = lID +1
-
-                        #pt_start = pGeometry_in2.GetPoint(0)
-                        pt_start = pGeometry_in2.GetPoint(npt2-1)
-                        pt_end = pGeometry_in2.GetPoint(0)
-                    
-                        tag_upstream(pt_start, pt_end)
-                        
+                for j in range(nUpstream):
+                    pFlowline = aFlowline_in[ aUpstream[j] ] 
+                    if (aReverse[j]==1):             
+                        pFlowline.reverse()                    
+                        pass
                     else:
-                        pFeature_in2 = pLayer_in.GetFeature(  aUp[j] )
+                        pass                                  
+                    
+                    pFlowline.lIndex = lID
+                    aFlowline_out.append(pFlowline)
+                    lID = lID + 1
+                    tag_upstream(  pFlowline.pVertex_start, pFlowline.pVertex_end  )            
 
-                        pGeometry_in2 = pFeature_in2.GetGeometryRef()
-                        npt2 = pGeometry_in2.GetPointCount()
-
-                        pFeature_out.SetGeometry(pGeometry_in2)
-                        pFeature_out.SetField("id", lID)
-                        pLayer_out.CreateFeature(pFeature_out) 
-                        lID = lID +1
-                        pt_start = pGeometry_in2.GetPoint(0)
-                        pt_end = pGeometry_in2.GetPoint(npt2-1)
-                        tag_upstream(pt_start, pt_end)
                 pass
             else:
                 pass
 
-    tag_upstream(pt_start, pt_end)
-    pDataset_out.FlushCache()
+    tag_upstream(pVertex_start, pVertex_end)
     
-    pDataset_out = pLayer_out = pFeature_out = None    
-    return
+    return aFlowline_out

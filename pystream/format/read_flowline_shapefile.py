@@ -1,11 +1,36 @@
 import os
 import json
+from pystream.shared.edge import pyedge
 from osgeo import ogr, osr, gdal, gdalconst
+import numpy as np
 
 from shapely.geometry import Point, LineString, MultiLineString
 from shapely.wkt import loads
 
+from pystream.shared.vertex import pyvertex
 from pystream.shared.flowline import pyflowline
+
+def convert_coordinates_to_flowline(aCoordinates):
+    npoint = len(aCoordinates)
+    
+    aVertex=list()
+    for i in range(npoint):
+        x = aCoordinates[i][0]
+        y = aCoordinates[i][1]
+        dummy = dict()
+        dummy['x'] =x
+        dummy['y'] =y
+        pVertex = pyvertex(dummy)
+        aVertex.append(pVertex)
+        
+    aEdge=list()
+    for j in range(npoint-1):
+        pEdge = pyedge( aVertex[j], aVertex[j+1] )
+        aEdge.append(pEdge)
+    
+    pLine = pyflowline( aEdge)
+    
+    return pLine
 
 def read_flowline_shapefile(sFilename_shapefile_in):
     """
@@ -30,15 +55,13 @@ def read_flowline_shapefile(sFilename_shapefile_in):
         if(sGeometry_type == 'MULTILINESTRING'):
             aLine = ogr.ForceToLineString(pGeometry_in)
             for Line in aLine: 
-                dummy = loads( pGeometry_in.ExportToWkt() )
+                dummy = loads( Line.ExportToWkt() )
                 aCoords = dummy.coords
                 #pLine= LineString( aCoords[::-1 ] )
 
-                #aEdge = 
-                pLine = pyflowline( aCoords)
+                dummy1= np.array(aCoords)
+                pLine = convert_coordinates_to_flowline(dummy1)
                 pLine.lIndex = lID
-
-
                 aFlowline.append(pLine)
                 lID = lID + 1
                
@@ -47,7 +70,8 @@ def read_flowline_shapefile(sFilename_shapefile_in):
                 dummy = loads( pGeometry_in.ExportToWkt() )
                 aCoords = dummy.coords
                 #pLine= LineString( aCoords[::-1 ] )
-                pLine = pyflowline( aCoords)
+                dummy1= np.array(aCoords)
+                pLine = convert_coordinates_to_flowline(dummy1)
                 pLine.lIndex = lID
                 aFlowline.append(pLine)
                 lID = lID + 1

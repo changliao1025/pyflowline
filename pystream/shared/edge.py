@@ -82,3 +82,10 @@ class pyedge(object):
             iFlag_downstream=0
 
         return iFlag_downstream
+
+    def reverse(self):
+        v0 = self.pVertex_start
+        v1 = self.pVertex_end
+
+        self.pVertex_start = v1
+        self.pVertex_end = v0

@@ -1,15 +1,26 @@
-import os, sys
-from osgeo import ogr, osr, gdal, gdalconst
+
 import numpy as np
-from hexwatershed.preprocess.stream.check_same_point  import check_same_point
-def find_vertex_in_list(aPt, pt):
-    index= -1
-    npt= len(aPt)
-    if npt>0:
-        for i in range(npt):
-            if( check_same_point(pt, aPt[i]) ==1 ):
-                index = i
-                break
+
+def find_vertex_in_list(aVertex, pVertex_in):
+
+    iFlag_exist = 0
+    lIndex= -1
+    nVertex= len(aVertex)
+
+    if nVertex > 0 :
+        for i in np.arange( nVertex):
+            pVertex = aVertex[i]
+            if pVertex == pVertex_in:
+                iFlag_exist = 1      
+                lIndex = i 
+                pass
+            else:
+                pass
+
+        pass        
+        
     else:
-        return -1
-    return index
+        pass
+    
+    return iFlag_exist, lIndex
+   

@@ -1,7 +1,6 @@
 import os, sys
 import numpy as np 
 from osgeo import ogr, osr, gdal, gdalconst
-from hexwatershed.preprocess.stream.check_same_point  import check_same_point
 def define_stream_order(sFilename_flowline_in, sFilename_flowline_out):
     if  os.path.exists(sFilename_flowline_in)  : 
         pass

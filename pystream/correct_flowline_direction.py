@@ -9,6 +9,8 @@ from shapely.wkt import loads
 lID=0
 aFlag_process=None
 
+from pystream.check_head_water import check_head_water
+
 def correct_flowline_direction(aFlowline_in, pVertex_outlet):
         
     #we have to go reversely    
@@ -37,26 +39,7 @@ def correct_flowline_direction(aFlowline_in, pVertex_outlet):
             
         pass     
 
-    def check_head_water(pVertex_start_in):
-        iFlag_head_water = -1
-        iCount = 0
-        for i in range(nFlowline):
-            pFlowline = aFlowline_in[i]
-            pVerter_start = pFlowline.pVertex_start
-            pVerter_end = pFlowline.pVertex_end
-            if pVertex_start_in == pVerter_end:
-                iCount = iCount + 1
-                pass
-
-            if  pVertex_start_in == pVerter_start:
-                iCount = iCount + 1
-                pass
-
-            pass
-        if iCount == 1:
-            iFlag_head_water=1
-            
-        return iFlag_head_water
+    
 
     #we might find more than 1 upstream
 
@@ -88,12 +71,12 @@ def correct_flowline_direction(aFlowline_in, pVertex_outlet):
 
             pass
 
-        print(aUpstream)
+        #print(aUpstream)
         return nUpstream, aUpstream, aReverse
     
     
     def tag_upstream(pVertex_start_in, pVertex_end_in):
-        if(check_head_water(pVertex_start_in)==1):            
+        if(check_head_water(aFlowline_in, pVertex_start_in)==1):            
             pass
         else:
             nUpstream, aUpstream, aReverse = find_upstream_flowline(pVertex_start_in, pVertex_end_in)

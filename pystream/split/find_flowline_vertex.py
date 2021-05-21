@@ -8,7 +8,7 @@ def find_flowline_vertex(aFlowline_in):
    
     
     nFlowline = len(aFlowline_in)
-    #build dictionary
+ 
     aVertex=list()
     for i in range(0, nFlowline):      
         pFlowline = aFlowline_in[i]

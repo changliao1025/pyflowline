@@ -1,6 +1,7 @@
 from abc import ABCMeta, abstractmethod
 import json
-
+from numpy.lib.function_base import average
+import copy
 from osgeo import gdal, osr, ogr
 from pystream.shared.vertex import pyvertex
 from pystream.shared.edge import pyedge
@@ -41,6 +42,7 @@ class pyflowline(object):
         dLength =0.0
         #loop though
         for edge in self.aEdge:
+            edge.calculate_length()
             dLength = dLength + edge.dLength
 
         #assing
@@ -103,5 +105,46 @@ class pyflowline(object):
         self.pVertex_start = aEdge[0].pVertex_start
         self.pVertex_end =  aEdge[ nEdge-1  ].pVertex_end
 
-     
+    def merge_upstream(self, other):
+        pFlowline_out = copy.deepcopy(other)    
+
+        pVertex_start1 = other.pVertex_start
+        pVertex_end1 = other.pVertex_end
+        nVertex1 = other.nVertex
+        nEdge1 = other.nEdge
+
+        pVertex_start2 = self.pVertex_start
+        pVertex_end2 = self.pVertex_end
+        nVertex2 = self.nVertex
+        nEdge2 = self.nEdge
+
+
+        if pVertex_end1 == pVertex_start2:
+            #this is the supposed operation because they should connect
+
+            nVertex = nVertex1 + nVertex2 - 1
+            nEdge = nVertex -1 
+            aEdge = copy.deepcopy(other.aEdge )
+            for i in range(nEdge2):
+                aEdge.append( self.aEdge[i] )
+                pass
+
+            aVertex = copy.deepcopy(other.aVertex)
+            for i in range(1, nVertex2):
+                aVertex.append( self.aVertex[i] )
+                pass
+
+            pFlowline_out.aEdge = aEdge
+            pFlowline_out.aVertex = aVertex
+            pFlowline_out.nEdge = nEdge
+            pFlowline_out.nVertex = nVertex
+            pFlowline_out.dLength = self.dLength + other.dLength
+            pFlowline_out.pVertex_start = pVertex_start1
+            pFlowline_out.pVertex_end = pVertex_end2
+
+            pass
+        else:
+            pass
+
+        return pFlowline_out
         

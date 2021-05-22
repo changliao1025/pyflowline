@@ -1,11 +1,9 @@
 ---
-title: 'HexWatershed: A watershed delineation model based on hexagon mesh grid'
+title: 'PyStream: A Python package for stream networks processing'
 
 tags:
-  - C/C++
+  - Python
   - Hydrology
-  - watershed delineation
-  - terrain analysis
   - geographic information system
 
 authors:
@@ -16,7 +14,7 @@ authors:
 affiliations:
  - name: Atmospheric Sciences and Global Change, Pacific Northwest National Laboratory, Richland, WA, USA
    index: 1 
-date: 15 October 2020
+date: 20 May 2021
 
 bibliography: paper.bib
 ---

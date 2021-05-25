@@ -22,6 +22,7 @@ def remove_flowline_loop(aFlowline_in):
                 pass
                 
         return ndownstream, aDownstream
+
     lID=0
     aFlag = np.full(nFlowline, 0, dtype=int)
     for i in range(nFlowline):
@@ -49,7 +50,7 @@ def remove_flowline_loop(aFlowline_in):
 
                 #set all to treated
                 for k in range(ndownstream):
-                    aFlag[  aDownstream[k]] = 1
+                    aFlag[ aDownstream[k] ] = 1
             pass
         
         pass 

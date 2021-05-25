@@ -13,7 +13,7 @@ def find_vertex_in_list(aVertex, pVertex_in):
             if pVertex == pVertex_in:
                 iFlag_exist = 1      
                 lIndex = i 
-                pass
+                break                
             else:
                 pass
 

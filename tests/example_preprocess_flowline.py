@@ -26,8 +26,8 @@ from pystream.split.find_flowline_confluence import find_flowline_confluence
 from pystream.loop.remove_flowline_loop import remove_flowline_loop
 #
 from pystream.simplification.remove_small_river import remove_small_river
-#from pystream.define_stream_order import define_stream_order
-#from hexwatershed.preprocess.mesh.intersect_flowline_with_mesh import intersect_flowline_with_mesh
+from pystream.define_stream_order import define_stream_order
+
 
 
 """
@@ -38,6 +38,8 @@ sFilename_shapefile_in = '/qfs/people/liao313/data/hexwatershed/columbia_river_b
 sFilename_mesh = 'hexagon.json'
 
 sWorkspace_out = '/compyfs/liao313/04model/pyhexwatershed/columbia_river_basin'
+sWorkspace_out = '/qfs/people/liao313/tmp/columbia_river_basin'
+
 
 sFilename_mesh_in = os.path.join(sWorkspace_out, sFilename_mesh)
 
@@ -109,33 +111,28 @@ export_vertex_to_json( aVertex, pSpatialRef, sFilename_out, aAttribute_in=aConne
 aFlowline = merge_flowline( aFlowline,aVertex, pVertex_outlet, aIndex_headwater,aIndex_middle, aIndex_confluence  )  
 sFilename_out = 'flowline_merge.json'
 sFilename_out = os.path.join(sWorkspace_out, sFilename_out)
-
+export_flowline_to_json( aFlowline, pSpatialRef, sFilename_out)
 
 aFlowline = remove_small_river(aFlowline, dThreshold)
 sFilename_out = 'flowline_large2.json'
 sFilename_out =os.path.join(sWorkspace_out, sFilename_out)
+export_flowline_to_json( aFlowline, pSpatialRef, sFilename_out)
 
-aVertex, lIndex_outlet, aIndex_headwater,aIndex_middle, aIndex_confluence = find_flowline_confluence(aFlowline,  pVertex_outlet)
+
+aVertex, lIndex_outlet, aIndex_headwater,aIndex_middle, aIndex_confluence, aConnectivity = find_flowline_confluence(aFlowline,  pVertex_outlet)
 sFilename_out = 'flowline_vertex_with_confluence2.json'
 sFilename_out = os.path.join(sWorkspace_out, sFilename_out)
+export_vertex_to_json( aVertex, pSpatialRef, sFilename_out, aAttribute_in=aConnectivity)
+
+aFlowline = merge_flowline( aFlowline,aVertex, pVertex_outlet, aIndex_headwater,aIndex_middle, aIndex_confluence  )  
+sFilename_out = 'flowline_merge2.json'
+sFilename_out = os.path.join(sWorkspace_out, sFilename_out)
+export_flowline_to_json( aFlowline, pSpatialRef, sFilename_out)
 
 #build stream order 
 
-#define_stream_order(aFlowline)
+aStream_order = define_stream_order(aFlowline)
 sFilename_out = 'flowline_order.json'
 sFilename_out = os.path.join(sWorkspace_out, sFilename_out)
 
-
-#step 6: intersect with mesh and simplify
-
-sFilename_flowline = 'flowline_intersect.json'
-sFilename_out =  os.path.join(sWorkspace_out, sFilename_out)
-#intersect_flowline_with_mesh(sFilename_mesh, sFilename_flowline, sFilename_out)
-#step 7: rebuild index and order
-
 print('Finished')
-
-
-
-
-    

@@ -9,16 +9,20 @@ def merge_flowline(aFlowline_in, aVertex, \
         aIndex_headwater,\
             aIndex_middle, \
                 aIndex_confluence ):
+
     nVertex=len(aVertex)
     nFlowline = len(aFlowline_in)
     aFlowline_out=list()           
     
-    #aVertex_headwater=aVertex[aIndex_headwater]
-    aVertex_headwater=aVertex[ aIndex_headwater[0]:aIndex_headwater[len(aIndex_headwater)-1] ]
-    #aVertex_middle=aVertex[aIndex_middle]
-    aVertex_middle=aVertex[ aIndex_middle[0]:aIndex_middle[len(aIndex_middle)-1] ]
-    #aVertex_confluence=aVertex[aIndex_confluence]
-    aVertex_confluence=aVertex[ aIndex_confluence[0]:aIndex_confluence[len(aIndex_confluence)-1] ]
+    aVertex = np.array(aVertex)
+    aIndex_headwater = np.array(aIndex_headwater)
+    aIndex_middle = np.array(aIndex_middle)
+    aIndex_confluence = np.array(aIndex_confluence)
+    
+    aVertex_headwater=aVertex[aIndex_headwater]    
+    aVertex_middle=aVertex[aIndex_middle]    
+    aVertex_confluence=aVertex[aIndex_confluence]
+    
     
     def merge_flowline_reach(lIndex, pVertex_start_in, pVertex_end_in):
         global lID
@@ -35,7 +39,7 @@ def merge_flowline(aFlowline_in, aVertex, \
                     #this is the upstream, merge them 
                     pFlowline = pFlowline.merge_upstream(pFlowline2)
                     pVertex_current = pVertex_start
-                    print(j)
+                    #print(j)
                     break
                 else:
                     pass
@@ -46,17 +50,21 @@ def merge_flowline(aFlowline_in, aVertex, \
         
         lID = lID + 1        
         #go to next 
-        if find_vertex_in_list(aVertex_headwater, pVertex_current)[0] !=1: 
+        if find_vertex_in_list(aVertex_headwater, pVertex_current)[0] ==1: 
             pass
         else:
             #it must be confluence
-            for j in range(0, nFlowline):                      
-                pFlowline3 = aFlowline_in[j]                
-                pVertex_start = pFlowline3.pVertex_start
-                pVertex_end = pFlowline3.pVertex_end
-                if pVertex_end == pVertex_current:
-                    merge_flowline_reach(j, pVertex_start, pVertex_end)
-                    pass
+            if find_vertex_in_list(aVertex_confluence, pVertex_current)[0] ==1: 
+                for j in range(0, nFlowline):                      
+                    pFlowline3 = aFlowline_in[j]                
+                    pVertex_start = pFlowline3.pVertex_start
+                    pVertex_end = pFlowline3.pVertex_end
+                    if pVertex_end == pVertex_current:
+                        merge_flowline_reach(j, pVertex_start, pVertex_end)
+                        pass
+            else:
+                print('something is wrong?')
+                pass
             
     
     
@@ -75,4 +83,4 @@ def merge_flowline(aFlowline_in, aVertex, \
 
 
 
-    return 
+    return aFlowline_out

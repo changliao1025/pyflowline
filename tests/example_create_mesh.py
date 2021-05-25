@@ -41,8 +41,8 @@ sFilename_shapefile = '/qfs/people/liao313/data/hexwatershed/columbia_river_basi
 sFilename_output_latlon = os.path.join(sWorkspace_out, 'lat_lon.json')
 sFilename_output_square = os.path.join(sWorkspace_out, 'square.json')
 sFilename_output_hexagon = os.path.join(sWorkspace_out, 'hexagon.json')
-#sFilename_output_mpas
-#sFilename_output_tin
+#sFilename_output_mpas = os.path.join(sWorkspace_out, 'mpas.json')
+#sFilename_output_tin = os.path.join(sWorkspace_out, 'tin.json')
 
 ncolumn= int( (dLongitude_right - dLongitude_left) / dResolution )
 nrow= int( (dLatitude_top - dLatitude_bot) / dResolution )

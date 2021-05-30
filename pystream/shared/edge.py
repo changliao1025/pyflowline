@@ -1,5 +1,6 @@
 from abc import ABCMeta, abstractmethod
 import json
+from numpy.lib.financial import pv
 
 from osgeo import gdal, osr, ogr
 
@@ -89,3 +90,37 @@ class pyedge(object):
 
         self.pVertex_start = v1
         self.pVertex_end = v0
+    
+    def is_overlap(self, pEdge_in):
+        iFlag_overlap = 0
+        pVertex_start1 = self.pVertex_start
+        pVertex_end1 = self.pVertex_end
+
+        pVertex_start2 = pEdge_in.pVertex_start
+        pVertex_end2 = pEdge_in.pVertex_end
+
+        if pVertex_start1 == pVertex_start2 and pVertex_end1 == pVertex_end2:
+            iFlag_overlap =1
+        else:
+            if  pVertex_start1 == pVertex_end2 and pVertex_end1 == pVertex_start2:
+                iFlag_overlap =1
+            else:
+                iFlag_overlap = 0
+
+        return iFlag_overlap
+
+    def check_vertex_on_edge(self, pVertex_in):
+        iFlag =0 
+
+        pVertex_start = self.pVertex_start
+        pVertex_end = self.pVertex_end
+        self.dLength = pVertex_start.calculate_distance(pVertex_end)
+        d1 = pVertex_start.calculate_distance(pVertex_in)
+        d2 = pVertex_end.calculate_distance(pVertex_in)
+        d3 = d1 +d2 -self.dLength
+        if ( d3 < 0.0001   ):
+            iFlag = 1
+        else:
+            iFlag = 0 
+        return iFlag 
+

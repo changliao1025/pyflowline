@@ -10,27 +10,7 @@ from shapely.wkt import loads
 from pystream.shared.vertex import pyvertex
 from pystream.shared.flowline import pyflowline
 
-def convert_coordinates_to_flowline(aCoordinates):
-    npoint = len(aCoordinates)
-    
-    aVertex=list()
-    for i in range(npoint):
-        x = aCoordinates[i][0]
-        y = aCoordinates[i][1]
-        dummy = dict()
-        dummy['x'] =x
-        dummy['y'] =y
-        pVertex = pyvertex(dummy)
-        aVertex.append(pVertex)
-        
-    aEdge=list()
-    for j in range(npoint-1):
-        pEdge = pyedge( aVertex[j], aVertex[j+1] )
-        aEdge.append(pEdge)
-    
-    pLine = pyflowline( aEdge)
-    
-    return pLine
+from pystream.format.convert_coordinates_to_flowline import convert_coordinates_to_flowline
 
 def read_flowline_shapefile(sFilename_shapefile_in):
     """

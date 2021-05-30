@@ -9,9 +9,7 @@ def remove_small_river(aFlowline_in, dThreshold):
     nFlowline = len(aFlowline_in)
     aFlowline_out=list()        
 
-    lID = 0
-
-    
+    lID = 0    
     
     for i in range(nFlowline):
         pFlowline = aFlowline_in[i]      

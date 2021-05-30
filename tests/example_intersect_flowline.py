@@ -12,11 +12,11 @@ sFilename_flowline = os.path.join(sWorkspace_out, sFilename_out)
 #lat-lon
 sFilename_mesh=sFilename_output_latlon
 sFilename_output= os.path.join(sWorkspace_out, 'lat_lon_intersect.json')
-intersect_flowline_with_mesh(sFilename_mesh, sFilename_flowline, sFilename_output)
+#intersect_flowline_with_mesh(sFilename_mesh, sFilename_flowline, sFilename_output)
 
 sFilename_mesh=sFilename_output_square
 sFilename_output= os.path.join(sWorkspace_out, 'square_intersect.json')
-intersect_flowline_with_mesh(sFilename_mesh, sFilename_flowline, sFilename_output)
+#intersect_flowline_with_mesh(sFilename_mesh, sFilename_flowline, sFilename_output)
 
 sFilename_mesh=sFilename_output_hexagon
 sFilename_output= os.path.join(sWorkspace_out, 'hexagon_intersect.json')

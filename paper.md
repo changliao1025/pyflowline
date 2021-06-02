@@ -39,18 +39,23 @@ PyStream takes advantage of Python language's object oriented programming (OOP) 
 4. It provides several algorithms to automate the river network simplification, generalization, etc.
 
 * Overall model structure
+
 ![The workflow of PyStream. \label{fig:workflow}](https://github.com/changliao1025/pystream/blob/main/pystream/figure/workflow.png?raw=true)
 
 * Connect disconnected flowline
+
 ![Disconnect flowline. \label{fig:disconnected}](https://github.com/changliao1025/pystream/blob/main/pystream/figure/disconnect_flowline.png?raw=true)
 
 * Correct flow direction
+
 ![Flow direction. \label{fig:direction}](https://github.com/changliao1025/pystream/blob/main/pystream/figure/flow_direction.png?raw=true)
 
 * Remove small river
+
 ![Small river. \label{fig:small_river}](https://github.com/changliao1025/pystream/blob/main/pystream/figure/small_river.png?raw=true)
 
 * Remove braided loop
+
 ![Remove loops. \label{fig:loops}](https://github.com/changliao1025/pystream/blob/main/pystream/figure/remove_loop.png?raw=true)
 
 * Find critical vertex

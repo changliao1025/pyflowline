@@ -39,7 +39,7 @@ PyStream takes advantage of Python language's object oriented programming (OOP) 
 4. It provides several algorithms to automate the river network simplification, generalization, etc.
 
 * Overall model structure
-![The workflow of PyStream. \label{fig:workflow}](https://github.com/changliao1025/pystream/blob/master/figure/workflow.png?raw=true)
+![The workflow of PyStream. \label{fig:workflow}](https://github.com/changliao1025/pystream/blob/main/pystream/figure/workflow.png?raw=true)
 
 # Example results
 

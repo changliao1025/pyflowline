@@ -32,7 +32,7 @@ Computational hydrologic simulation often requires high quality river network in
 
 # Algorithms and implementation
 
-PyStream takes advantage of Python language's object oriented programming (OOP) architect. The river network and all its elements (i.e. segment, reach, confluence.) are described as objects. These objects are processed throughout the package when applicable. 
+PyStream takes advantage of Python language's object oriented programming (OOP) architect. The river network and all of its elements (i.e. segment, reach, confluence.) are described as objects. These objects are processed throughout the package when applicable. 
 
 ![The data model. \label{fig:oop}](https://github.com/changliao1025/pystream/blob/main/pystream/figure/data_mode.png?raw=true)
 
@@ -64,6 +64,9 @@ A brief overview of the features provided by PyStream is list in Table 1.
 ![Remove loops. \label{fig:loops}](https://github.com/changliao1025/pystream/blob/main/pystream/figure/remove_loop_matrix.png?raw=true)
 
 * Find critical vertex
+
+![Remove loops. \label{fig:loops}](https://github.com/changliao1025/pystream/blob/main/pystream/figure/find_vertex.png?raw=true)
+
 
 * Merge flowlinw
 

@@ -71,11 +71,50 @@ A brief overview of the features provided by PyStream is list in Table 1.
 
 * Mesh generation
 
-* Mesh intersect
+* Mesh and flowline intersection
+
+* Topology simplification
+
+![Merge flowline. \label{fig:merge}](https://github.com/changliao1025/pystream/blob/main/pystream/figure/simplification01.png?raw=true)
+
+
+
 
 # Example results
 
+A case study was performed for the Columbia River Basin (CRB).
 
+Screenshot of before and after river networks at zoom-in regions are used to illustrate the effects of algorithms. Attribute tables is used when applicable.
+
+* Flow direction correction
+
+* Remove loop
+![Merge flowline. \label{fig:merge}](https://github.com/changliao1025/pystream/blob/main/pystream/figure/before_loop.png?raw=true)
+
+![Merge flowline. \label{fig:merge}](https://github.com/changliao1025/pystream/blob/main/pystream/figure/after_loop.png?raw=true)
+
+* Merge flowline
+
+![Merge flowline. \label{fig:merge}](https://github.com/changliao1025/pystream/blob/main/pystream/figure/before_merge.png?raw=true)
+
+![Merge flowline. \label{fig:merge}](https://github.com/changliao1025/pystream/blob/main/pystream/figure/after_merge.png?raw=true)
+
+* Mesh generation
+![Merge flowline. \label{fig:merge}](https://github.com/changliao1025/pystream/blob/main/pystream/figure/lat_lon.png?raw=true)
+
+![Merge flowline. \label{fig:merge}](https://github.com/changliao1025/pystream/blob/main/pystream/figure/square.png?raw=true)
+
+![Merge flowline. \label{fig:merge}](https://github.com/changliao1025/pystream/blob/main/pystream/figure/hexagon.png?raw=true)
+
+![Merge flowline. \label{fig:merge}](https://github.com/changliao1025/pystream/blob/main/pystream/figure/meshes.png?raw=true)
+
+
+* Mesh and flowline intersection
+![Merge flowline. \label{fig:merge}](https://github.com/changliao1025/pystream/blob/main/pystream/figure/lat_lon_intersect.png?raw=true)
+
+![Merge flowline. \label{fig:merge}](https://github.com/changliao1025/pystream/blob/main/pystream/figure/square_intersect.png?raw=true)
+
+![Merge flowline. \label{fig:merge}](https://github.com/changliao1025/pystream/blob/main/pystream/figure/hexagon_intersect.png?raw=true)
 
 # Acknowledgement
 

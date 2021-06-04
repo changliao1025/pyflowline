@@ -98,6 +98,8 @@ This algorithm merge flowlines so there is only 2 types of flowlines:
 1. headwater
 2. flowline between confluence
 
+If multiple flowlines are within the same confluence bound, they are merged as one.
+
 ![Merge flowline. \label{fig:merge}](https://github.com/changliao1025/pystream/blob/main/pystream/figure/merge_flowline.png?raw=true)
 
 * Mesh generation

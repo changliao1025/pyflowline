@@ -53,7 +53,7 @@ A brief overview of the features provided by PyStream is list in Table 1.
 
 * Correct flow direction
 
-![Flow direction. \label{fig:direction}](https://github.com/changliao1025/pystream/blob/main/pystream/figure/flow_direction.png?raw=true)
+![Flow direction. \label{fig:direction}](https://github.com/changliao1025/pystream/blob/main/pystream/figure/flow_direction_matrix.png?raw=true)
 
 * Remove small river
 
@@ -61,7 +61,7 @@ A brief overview of the features provided by PyStream is list in Table 1.
 
 * Remove braided loop
 
-![Remove loops. \label{fig:loops}](https://github.com/changliao1025/pystream/blob/main/pystream/figure/remove_loop.png?raw=true)
+![Remove loops. \label{fig:loops}](https://github.com/changliao1025/pystream/blob/main/pystream/figure/remove_loop_matrix.png?raw=true)
 
 * Find critical vertex
 

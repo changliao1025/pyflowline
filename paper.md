@@ -62,7 +62,7 @@ If two flowlines are disconnected more than the threshold of floating data type 
 
 * Correct flow direction
 
-Due to data quality, existing flowline may have incorrect flow direction, which leads to multiple downstream flow direction. The corresponding node connection matrix has rows with multiple 1s. This algorithm scans from the outlet node and searches reversely, once such a row was detected, the corresponding flow direction is flipped.
+Due to data quality issue, existing flowline may have incorrect flow direction, which leads to multiple downstream flow direction. The corresponding node connection matrix has rows with multiple 1s. This algorithm scans from the outlet node and searches reversely, once such a row was detected, the corresponding flow direction is flipped.
 
 ![Flow direction. \label{fig:direction}](https://github.com/changliao1025/pystream/blob/main/pystream/figure/flow_direction_matrix.png?raw=true)
 

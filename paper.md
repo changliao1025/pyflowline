@@ -118,7 +118,12 @@ Based on the intersection results, this algorithm build the upstream-downstream 
 
 This algorithm simpify the topology information for several unusual scenarios. For example, if a flowline leaves and re-enter the same mesh cell through the same edge, this creates a loop in topology and will be simplified. 
 
+
+
 ![Topology simplification. \label{fig:topology_simplification}](https://github.com/changliao1025/pystream/blob/main/pystream/figure/simplification01.png?raw=true)
+
+In this example, the flowline AH is represented by a list of edges after the intersection. Each edge defines a topology relationship between two cells. For example, edge AB defines flow direction from cell a to cell c.
+Because the topology contains loops: cb-bc-cb-bc, it is simplified as acd, which means the final flow direction is from cell a to c, then to d.
 
 
 

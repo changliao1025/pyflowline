@@ -32,7 +32,12 @@ Computational hydrologic simulation often requires high quality river network in
 
 # Algorithms and implementation
 
-PyStream takes advantage of Python language's object oriented programming (OOP) architect. The river network and all its elements (i.e. segment, reach, confluence.) are described as objects. These objects are processed throughout the package when applicable. A brief overview of the features provided by PyStream is list in Table 1.
+PyStream takes advantage of Python language's object oriented programming (OOP) architect. The river network and all its elements (i.e. segment, reach, confluence.) are described as objects. These objects are processed throughout the package when applicable. 
+
+![The data model. \label{fig:oop}](https://github.com/changliao1025/pystream/blob/main/pystream/figure/data_mode.png?raw=true)
+
+
+A brief overview of the features provided by PyStream is list in Table 1.
 1. It uses JSON/GeoJSON as the internal exchange file format. Most objects within the package can be imported and exported during runtime;
 2. It relies on the open source Geospatial Data Abstraction Library (GDAL) and a few other Python packages to process geospatial data type;
 3. It supports traditional projected coordinate system (PCS), geographic coordinate system (GCS), hexagon and other unstructured mesh for spatially distributed simulations;

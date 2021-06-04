@@ -1,4 +1,5 @@
 
+
 import imp
 import os
 import json
@@ -15,71 +16,21 @@ from pystream.format.convert_coordinates_to_flowline import convert_coordinates_
 from pystream.find_hexagon_through_edge import find_hexagon_through_edge
 
 from pystream.shared.link import pyhexagonlink
-def intersect_flowline_with_mesh(sFilename_mesh, sFilename_flowline, sFilename_output):
-
-    if  os.path.exists(sFilename_mesh) and  os.path.exists(sFilename_flowline) : 
-        pass
-    else:
-        print('The input file does not exist')
-        return
-
-    if os.path.exists(sFilename_output): 
-        #delete it if it exists
-        os.remove(sFilename_output)
-
-    sDriverName = "GeoJSON"
-    pDriver = ogr.GetDriverByName( sDriverName )
-
-    #geojson
-    aHexagon=list()
+def build_hexagon_grid_topology(aHexagon_in):
     
-   
-    pDataset_mesh = pDriver.Open(sFilename_mesh, 0)
-    pDataset_flowline = pDriver.Open(sFilename_flowline, 0)   
-
-    pLayer_mesh = pDataset_mesh.GetLayer(0)
-    pSpatialRef_mesh = pLayer_mesh.GetSpatialRef()
-    nfeature_mesh = pLayer_mesh.GetFeatureCount()
-    print( pSpatialRef_mesh)
-    pLayer_flowline = pDataset_flowline.GetLayer(0)
-    pSpatialRef_flowline = pLayer_flowline.GetSpatialRef()
-    nfeature_flowline = pLayer_flowline.GetFeatureCount()
     
-    print( pSpatialRef_flowline)
-    comparison = pSpatialRef_mesh.IsSame(pSpatialRef_flowline)
-    if(comparison != 1):
-        iFlag_transform =1
-        transform = osr.CoordinateTransformation(pSpatialRef_mesh, pSpatialRef_flowline)
-    else:
-        iFlag_transform =0
 
-    pDataset_out = pDriver.CreateDataSource(sFilename_output)
-
-    pLayerOut = pDataset_out.CreateLayer('flowline', pSpatialRef_flowline, ogr.wkbMultiLineString)
-    # Add one attribute
-    pLayerOut.CreateField(ogr.FieldDefn('id', ogr.OFTInteger64)) #long type for high resolution
-    
-    pLayerDefn = pLayerOut.GetLayerDefn()
-    pFeatureOut = ogr.Feature(pLayerDefn)
+    nHexagon = len(aHexagon_in)
 
     
     lID_mesh = 0
     lID_flowline =0 
-    
+    #create mesh list first
+
+    #use confluence information
+    for i in range (nHexagon):
         
-
-
-    for i in range (nfeature_mesh):
-    #for pFeature_mesh in pLayer_mesh:       
-        pFeature_mesh= pLayer_mesh.GetFeature(i)
-        pGeometry_mesh = pFeature_mesh.GetGeometryRef()
-        if (iFlag_transform ==1): #projections are different
-            pGeometry_mesh.Transform(transform)
-
-        if (pGeometry_mesh.IsValid()):
-            pass
-        else:
-            print('Geometry issue')
+        
 
         #convert geometry to edge
         pGeometrytype_mesh = pGeometry_mesh.GetGeometryName()
@@ -121,6 +72,21 @@ def intersect_flowline_with_mesh(sFilename_mesh, sFilename_flowline, sFilename_o
                         pLine.lIndex = lID_flowline
                         aFlowline_intersect.append(pLine)
                         lID_flowline = lID_flowline + 1
+
+                        #link
+                        #1:find start and end of flowlie
+                        pVertex_start = pLine.pVertex_start
+                        pVertex_end = pLine.pVertex_end
+                        pHexagon_start = pHexagon
+                        #the start vertex must be on the enterance edge
+                        iFlag_found, aEdge_shared = aHexagon.which_edge_cross_this_vertex(pVertex_start)
+                        if iFlag_found ==1:
+                            #find the other hexagon
+                            aHexagon_shared = find_hexagon_through_edge(aHexagon, aEdge_shared)
+                            pass
+                        else:
+                            pass
+                        
                     
                     else:
                         if(pGeometrytype_intersect == 'MULTILINESTRING'):

@@ -1,6 +1,8 @@
 import os
 from pystream.intersect.intersect_flowline_with_mesh import intersect_flowline_with_mesh
 
+from pystream.simplification.remove_returning_flowline import remove_returning_flowline
+
 sWorkspace_out = '/compyfs/liao313/04model/pyhexwatershed/columbia_river_basin'
 sFilename_output_latlon = os.path.join(sWorkspace_out, 'lat_lon.json')
 sFilename_output_square = os.path.join(sWorkspace_out, 'square.json')
@@ -20,4 +22,10 @@ sFilename_output= os.path.join(sWorkspace_out, 'square_intersect.json')
 
 sFilename_mesh=sFilename_output_hexagon
 sFilename_output= os.path.join(sWorkspace_out, 'hexagon_intersect.json')
-intersect_flowline_with_mesh(sFilename_mesh, sFilename_flowline, sFilename_output)
+aHexagon = intersect_flowline_with_mesh(sFilename_mesh, sFilename_flowline, sFilename_output)
+
+#simplify flowline
+
+aHexagon_out = remove_returning_flowline(aHexagon, aFlowline_in)
+
+

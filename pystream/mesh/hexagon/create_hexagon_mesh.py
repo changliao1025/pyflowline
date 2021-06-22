@@ -6,9 +6,10 @@
 import os, sys
 import numpy as np
 from osgeo import ogr, osr, gdal, gdalconst
-
-
-
+from shapely.geometry import Point, LineString, MultiLineString
+from shapely.wkt import loads
+from pystream.shared.hexagon import pyhexagon
+from pystream.format.convert_coordinates_to_hexagon import convert_coordinates_to_hexagon
 
 def create_hexagon_mesh(dX_left, dY_bot, dResolution_meter, ncolumn, nrow, sFilename_output, sFilename_shapefile):
 
@@ -48,6 +49,9 @@ def create_hexagon_mesh(dX_left, dY_bot, dResolution_meter, ncolumn, nrow, sFile
     dY_spacing = dLength_edge * np.sqrt(3.0)
 
     lID =0 
+
+    #geojson
+    aHexagon=list()
     #.........
     #(x2,y2)-----(x3,y3)
     #   |           |
@@ -97,13 +101,19 @@ def create_hexagon_mesh(dX_left, dY_bot, dResolution_meter, ncolumn, nrow, sFile
 
             lID = lID + 1
 
+            dummy = loads( ring.ExportToWkt() )
+            aCoords = dummy.exterior.coords
+            dummy1= np.array(aCoords)
+            pHexagon = convert_coordinates_to_hexagon(dummy1)
+            aHexagon.append(pHexagon)
 
             pass
+        
     pDataset = pLayer = pFeature  = None      
 
 
 
-    return
+    return aHexagon
 
 
 

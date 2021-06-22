@@ -135,4 +135,9 @@ aStream_order = define_stream_order(aFlowline)
 sFilename_out = 'flowline_order.json'
 sFilename_out = os.path.join(sWorkspace_out, sFilename_out)
 
+
+#simplify flowline after intersect
+
+
+
 print('Finished')

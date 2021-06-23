@@ -1,0 +1,19 @@
+from pystream.shared.flowline import pyflowline
+def define_stream_segment_index(aFlowline_in):
+    nFlowline = len(aFlowline_in)
+    aFlowline_out = list()
+    aStream_segment=list()
+    # Check to see if shapefile is found.
+    if nFlowline == 0 :
+        print ('data incomplete')
+    else:  
+
+        for i in range(nFlowline):
+            pFlowline = aFlowline_in[i]
+            pFlowline.iSegment = nFlowline - i  
+            aStream_segment.append(pFlowline.iSegment)
+            aFlowline_out.append(pFlowline)
+
+
+        pass
+    return aFlowline_out, aStream_segment

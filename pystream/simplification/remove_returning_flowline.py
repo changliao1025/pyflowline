@@ -28,9 +28,28 @@ def remove_returning_flowline(aHexagon_intersect_in, pVertex_outlet_in):
             return aHexagon_flowline_in
         else:
             for i in range(nHexagon):
+                elem=aHexagon_flowline_in[i]
+                if aHexagon_flowline_in.count(elem) > 1:
+                    dummy = aHexagon_flowline_in.index(elem)
+                    start = dummy[0]
+                    end = dummy[-1]
+                    del aHexagon_flowline_in[start, end-1] 
+                    aHexagon_flowline_in = aHexagon_flowline_in
+                    break
+                    pass
+                else:
+                    pass
 
                 pass 
-            return aHexagon_flowline_out
+
+            #check again
+            iFlag_unique = checkIfDuplicates(aHexagon_flowline_in)
+            if iFlag_unique == True:
+                return aHexagon_flowline_in
+            else:
+                simplify_list(aHexagon_flowline_in)
+
+            
 
     def retrieve_flowline_intersect_index(iSegment_in, lID_in, pVertex_end_in):
 

@@ -1,4 +1,5 @@
 from abc import ABCMeta, abstractmethod
+import numpy as np
 from pystream.add_unique_vertex import add_unique_vertex
 from osgeo import gdal, osr, ogr
 from pystream.shared.vertex import pyvertex
@@ -55,3 +56,13 @@ class pyhexagon(pycell):
                 pass
 
         return iFlag_found, pEdge
+    
+    def calculate_cell_area(self):
+        dLength_edge = self.dLength
+
+        #dLength_edge = np.sqrt(  2.0 * dArea / (3.0* np.sqrt(3.0))  )
+        dArea = dLength_edge * dLength_edge * (3.0* np.sqrt(3.0)) /2.0
+
+        self.dArea = dArea
+        return dArea
+

@@ -42,9 +42,11 @@ def intersect_flowline_with_mesh(sFilename_mesh, sFilename_flowline, sFilename_o
     pSpatialRef_mesh = pLayer_mesh.GetSpatialRef()
     nfeature_mesh = pLayer_mesh.GetFeatureCount()
     print( pSpatialRef_mesh)
+
     pLayer_flowline = pDataset_flowline.GetLayer(0)
     pSpatialRef_flowline = pLayer_flowline.GetSpatialRef()
     nfeature_flowline = pLayer_flowline.GetFeatureCount()
+    pLayerDefinition = pLayer_flowline.GetLayerDefn()
     
     print( pSpatialRef_flowline)
     comparison = pSpatialRef_mesh.IsSame(pSpatialRef_flowline)

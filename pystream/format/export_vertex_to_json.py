@@ -4,7 +4,7 @@ from osgeo import ogr, osr, gdal, gdalconst
 from shapely.geometry import Point, LineString, MultiLineString
 from shapely.wkt import loads
 def export_vertex_to_json(aVertex_in, pSpatial_reference_in, sFilename_json_out,\
-    aAttribute_in=None):
+    aAttribute_data=None):
     """
     convert a shpefile to json format.
     This function should be used for stream flowline only.
@@ -15,8 +15,8 @@ def export_vertex_to_json(aVertex_in, pSpatial_reference_in, sFilename_json_out,
         os.remove(sFilename_json_out)
         pass
 
-    if aAttribute_in is not None:
-        aAttribute= aAttribute_in
+    if aAttribute_data is not None:
+        aAttribute= aAttribute_data
         iFlag_attribute =1
     else:
         iFlag_attribute=0

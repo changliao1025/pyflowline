@@ -22,10 +22,12 @@ def export_flowline_to_json(aFlowline_in, pSpatial_reference_in, \
 
     if aAttribute_field is not None and aAttribute_data is not None and aAttribute_dtype is not None:
         iFlag_attribute = 1
+
         nAttribute1 = len(aAttribute_field)
         nAttribute2 = len(aAttribute_data)
         nAttribute3 = len(aAttribute_dtype)
-        if nFlowline != nAttribute1 or nFlowline != nAttribute2 or nFlowline!= nAttribute3:
+        nAttribute4 = len(aAttribute_data[0])
+        if nAttribute3 != nAttribute1 or nAttribute1 != nAttribute2 or nFlowline!= nAttribute4:
             print('The attribute is not correct, please check!')
             return
         else:
@@ -79,10 +81,11 @@ def export_flowline_to_json(aFlowline_in, pSpatial_reference_in, \
             for k in range(nAttribute1):
                 sField = aAttribute_field[k]
                 dtype = aAttribute_dtype[k]
+                dummy = aAttribute_data[k]
                 if dtype == 'int':
-                    pFeature_out.SetField(sField, int(aAttribute_data[i]))
+                    pFeature_out.SetField(sField, int(dummy[i]))
                 else:
-                    pFeature_out.SetField(sField, float(aAttribute_data[i]))
+                    pFeature_out.SetField(sField, float(dummy[i]))
         
         # Add new pFeature_shapefile to output Layer
         pLayer_json.CreateFeature(pFeature_out)        

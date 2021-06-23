@@ -4,7 +4,7 @@ from osgeo import ogr, osr, gdal, gdalconst
 from pystream.check_head_water import check_head_water
 def define_stream_order(aFlowline_in):
     nFlowline = len(aFlowline_in)
-
+    aFlowline_out = list()
     # Check to see if shapefile is found.
     if nFlowline == 0 :
         print ('data incomplete')
@@ -52,4 +52,9 @@ def define_stream_order(aFlowline_in):
                     else:
                         aStream_order[i] = np.max(dummy)    
 
-    return aStream_order
+        for i in range(nFlowline):
+            pFlowline = aFlowline_in[i]      
+            pFlowline.iStream_order =    aStream_order[i]   
+            aFlowline_out.append(pFlowline)
+
+    return aFlowline_out, aStream_order

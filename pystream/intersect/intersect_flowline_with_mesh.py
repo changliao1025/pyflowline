@@ -32,6 +32,7 @@ def intersect_flowline_with_mesh(sFilename_mesh, sFilename_flowline, sFilename_o
 
     #geojson
     aHexagon=list()
+    aHexagon_intersect=list()
     
    
     pDataset_mesh = pDriver.Open(sFilename_mesh, 0)
@@ -92,6 +93,7 @@ def intersect_flowline_with_mesh(sFilename_mesh, sFilename_flowline, sFilename_o
                      
             #print(pGeometry_mesh.GetGeometryName())
             aFlowline_intersect = list()
+            iFlag_intersected = 0 
             for j in range (nfeature_flowline):
             #for pFeature_flowline in pLayer_flowline:
                 pFeature_flowline = pLayer_flowline.GetFeature(j)
@@ -105,6 +107,8 @@ def intersect_flowline_with_mesh(sFilename_mesh, sFilename_flowline, sFilename_o
 
                 iFlag_intersect = pGeometry_flowline.Intersects( pGeometry_mesh )
                 if( iFlag_intersect == True):
+
+                    iFlag_intersected = 1
                     pGeometry_intersect = pGeometry_flowline.Intersection(pGeometry_mesh) 
                     pFeatureOut.SetGeometry(pGeometry_intersect)
                     pFeatureOut.SetField("id", lID_flowline)                
@@ -136,17 +140,30 @@ def intersect_flowline_with_mesh(sFilename_mesh, sFilename_flowline, sFilename_o
                             pass
                         else:
                             pass
+                    
+
+                    
 
                 else:
                     pass
 
+            #only save the intersected hexagon to output? 
             #now add back to the cell object
             pHexagon.aFlowline = aFlowline_intersect
             pHexagon.nFlowline = len(aFlowline_intersect)
+            if iFlag_intersected ==1:     
+                pHexagon.iFlag_intersected = 1                       
+                aHexagon_intersect.append(pHexagon)
+            else:
+                pHexagon.iFlag_intersected = 0   
+                pass
+
+
+            
             aHexagon.append(pHexagon)
             lID_mesh = lID_mesh + 1   
         else:
             pass
 
     
-    return aHexagon
+    return aHexagon, aHexagon_intersect

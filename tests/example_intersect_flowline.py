@@ -1,4 +1,5 @@
 import os
+from pystream.shared.vertex import pyvertex
 from pystream.intersect.intersect_flowline_with_mesh import intersect_flowline_with_mesh
 
 from pystream.simplification.remove_returning_flowline import remove_returning_flowline
@@ -22,10 +23,14 @@ sFilename_output= os.path.join(sWorkspace_out, 'square_intersect.json')
 
 sFilename_mesh=sFilename_output_hexagon
 sFilename_output= os.path.join(sWorkspace_out, 'hexagon_intersect.json')
-aHexagon = intersect_flowline_with_mesh(sFilename_mesh, sFilename_flowline, sFilename_output)
+aHexagon, aHexagon_intersect = intersect_flowline_with_mesh(sFilename_mesh, sFilename_flowline, sFilename_output)
 
 #simplify flowline
+point= dict()
+point['x'] = -2136506.345
+point['y'] = 2901799.219
+pVertex_outlet=pyvertex(point)
 
-aHexagon_out = remove_returning_flowline(aHexagon, aFlowline_in)
+aHexagon_out = remove_returning_flowline(aHexagon_intersect, pVertex_outlet)
 
 

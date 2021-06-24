@@ -24,6 +24,7 @@ def correct_flowline_direction(aFlowline_in, pVertex_outlet):
 
     for i in range(nFlowline):
         pFlowline = aFlowline_in[i]
+        iStream_order = pFlowline.iStream_order
         pVertex_start = pFlowline.pVertex_start
         pVertex_end = pFlowline.pVertex_end
         dDiatance = pVertex_end.calculate_distance( pVertex_outlet)

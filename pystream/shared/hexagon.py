@@ -1,6 +1,6 @@
 from abc import ABCMeta, abstractmethod
 import numpy as np
-from pystream.add_unique_vertex import add_unique_vertex
+
 from osgeo import gdal, osr, ogr
 from pystream.shared.vertex import pyvertex
 from pystream.shared.edge import pyedge
@@ -8,10 +8,12 @@ from pystream.shared.cell import pycell
 from pystream.add_unique_vertex import add_unique_vertex
 
 class pyhexagon(pycell):
-    lIndex=0
+    lIndex=0    
     nFlowline=0
     dLength=0.0
     dArea=0.0
+    dX_center=0.0
+    dY_center=0.0
     aEdge=None
     aVertex=None
     aFlowline=None
@@ -28,6 +30,16 @@ class pyhexagon(pycell):
             self.aVertex = aVertex #the first one and last one are the same
             self.nEdge = 6
             self.nVertex = 6
+
+            dx=0.0
+            dy=0.0
+            for i in range(6):
+                dx = dx + aVertex[i].dx
+                dy = dy + aVertex[i].dy
+                pass
+
+            self.dX_center = dx/6.0
+            self.dY_center = dy/6.0
 
             pass
         pass
@@ -55,7 +67,7 @@ class pyhexagon(pycell):
             else:
                 pass
 
-        return iFlag_found, pEdge
+        return iFlag_found, pEdge_out
     
     def calculate_cell_area(self):
         dLength_edge = self.dLength
@@ -65,4 +77,9 @@ class pyhexagon(pycell):
 
         self.dArea = dArea
         return dArea
+    def calculate_edge_length(self):
+        dArea = self.dArea
+        dLength_edge = np.sqrt(  2.0 * dArea / (3.0* np.sqrt(3.0))  )
+        self.dLength = dLength_edge
+        return dLength_edge
 

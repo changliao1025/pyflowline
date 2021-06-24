@@ -9,19 +9,21 @@ def remove_flowline_loop(aFlowline_in):
     nFlowline = len(aFlowline_in)
         
     
-    def find_paralle_stream(i, pVertex_start_in):        
+    def find_paralle_stream( pVertex_start_in):        
         ndownstream=0
         aDownstream=list()
+        aStream_order_out=list()
         for j in range(nFlowline):
             pFlowline = aFlowline_in[j]
             pVertex_start = pFlowline.pVertex_start
             pVertex_end = pFlowline.pVertex_end
-            if pVertex_start == pVertex_start_in and i !=j :
+            if pVertex_start == pVertex_start_in: # and i !=j :
                 ndownstream= ndownstream+1
                 aDownstream.append(j)
+                aStream_order_out.append(  pFlowline.iStream_order  )
                 pass
                 
-        return ndownstream, aDownstream
+        return ndownstream, aDownstream, aStream_order_out
 
     lID=0
     aFlag = np.full(nFlowline, 0, dtype=int)
@@ -29,9 +31,10 @@ def remove_flowline_loop(aFlowline_in):
         pFlowline = aFlowline_in[i]      
         pVertex_start = pFlowline.pVertex_start
         pVertex_end = pFlowline.pVertex_end
+        iStream_order = pFlowline.iStream_order
         
-        ndownstream , aDownstream = find_paralle_stream(i, pVertex_start)
-        if ndownstream == 0:
+        ndownstream , aDownstream, aStream_order = find_paralle_stream( pVertex_start)
+        if ndownstream == 1:
             if aFlag[i] !=1:
                 pFlowline.lIndex = lID
                 aFlowline_out.append(pFlowline)
@@ -39,13 +42,18 @@ def remove_flowline_loop(aFlowline_in):
                 aFlag[i]=1
             pass
         else:                     
-            #more than one, so we only take the current one
-            if(ndownstream>0):                
-                if aFlag[i] !=1:
-                    pFlowline.lIndex = lID
-                    aFlowline_out.append(pFlowline)
+            #more than one, so we only take the current one or high order one
+            
+            if(ndownstream>1):    
+                sort_index = np.argsort(aStream_order)            
+                sort_index = sort_index[::-1]
+                lIndex = aDownstream[ sort_index[0] ]
+                pFlowline_down =  aFlowline_in[lIndex]          
+                if aFlag[ lIndex ]  !=1:
+                    pFlowline_down.lIndex = lID
+                    aFlowline_out.append(pFlowline_down)
                     lID = lID + 1
-                    aFlag[i]=1
+                    aFlag[lIndex]=1
                     pass
 
                 #set all to treated

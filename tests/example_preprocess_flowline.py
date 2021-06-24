@@ -139,10 +139,10 @@ export_flowline_to_json( aFlowline, pSpatialRef, sFilename_out, \
 #build stream order 
 
 aFlowline, aStream_order = define_stream_order(aFlowline)
-sFilename_out = 'flowline_order.json'
+sFilename_out = 'flowline_segment_order.json'
 sFilename_out = os.path.join(sWorkspace_out, sFilename_out)
 export_flowline_to_json( aFlowline, pSpatialRef, sFilename_out, \
-    aAttribute_data=[aStream_order], aAttribute_field=['iord'], aAttribute_dtype=['int'])
+    aAttribute_data=[aStream_segment, aStream_order], aAttribute_field=['iseg','iord'], aAttribute_dtype=['int','int'])
 
 #simplify flowline after intersect
 

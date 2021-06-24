@@ -61,7 +61,8 @@ def intersect_flowline_with_mesh(sFilename_mesh, sFilename_flowline, sFilename_o
     pLayerOut = pDataset_out.CreateLayer('flowline', pSpatialRef_flowline, ogr.wkbMultiLineString)
     # Add one attribute
     pLayerOut.CreateField(ogr.FieldDefn('id', ogr.OFTInteger64)) #long type for high resolution
-    
+    pLayerOut.CreateField(ogr.FieldDefn('iseg', ogr.OFTInteger)) #long type for high resolution
+    pLayerOut.CreateField(ogr.FieldDefn('iord', ogr.OFTInteger)) #long type for high resolution
     pLayerDefn = pLayerOut.GetLayerDefn()
     pFeatureOut = ogr.Feature(pLayerDefn)
 
@@ -92,6 +93,8 @@ def intersect_flowline_with_mesh(sFilename_mesh, sFilename_flowline, sFilename_o
             dummy1= np.array(aCoords)
             pHexagon = convert_coordinates_to_hexagon(dummy1)
             pHexagon.lIndex = lID_mesh
+            pHexagon.dArea = pGeometry_mesh.GetArea() 
+            pHexagon.dLength = pHexagon.calculate_edge_length()
                      
             #print(pGeometry_mesh.GetGeometryName())
             aFlowline_intersect = list()
@@ -100,6 +103,9 @@ def intersect_flowline_with_mesh(sFilename_mesh, sFilename_flowline, sFilename_o
             #for pFeature_flowline in pLayer_flowline:
                 pFeature_flowline = pLayer_flowline.GetFeature(j)
                 pGeometry_flowline = pFeature_flowline.GetGeometryRef()
+
+                iSegment = pFeature_flowline.GetField("iseg")
+                iStream_order = pFeature_flowline.GetField("iord")
 
                 if (pGeometry_flowline.IsValid()):
                     pass
@@ -112,19 +118,25 @@ def intersect_flowline_with_mesh(sFilename_mesh, sFilename_flowline, sFilename_o
 
                     iFlag_intersected = 1
                     pGeometry_intersect = pGeometry_flowline.Intersection(pGeometry_mesh) 
-                    pFeatureOut.SetGeometry(pGeometry_intersect)
-                    pFeatureOut.SetField("id", lID_flowline)                
-                    pLayerOut.CreateFeature(pFeatureOut)    
+                    
 
                     #add more process here to 
                     pGeometrytype_intersect = pGeometry_intersect.GetGeometryName()
                     if pGeometrytype_intersect == 'LINESTRING':
+                        pFeatureOut.SetGeometry(pGeometry_intersect)
+                        pFeatureOut.SetField("id", lID_flowline)         
+                        pFeatureOut.SetField("iseg", iSegment)    
+                        pFeatureOut.SetField("iord", iStream_order)           
+                        pLayerOut.CreateFeature(pFeatureOut)    
 
                         dummy = loads( pGeometry_intersect.ExportToWkt() )
                         aCoords = dummy.coords                
                         dummy1= np.array(aCoords)
                         pLine = convert_coordinates_to_flowline(dummy1)
+                        pLine.calculate_length()
                         pLine.lIndex = lID_flowline
+                        pLine.iSegment = iSegment
+                        pLine.iStream_order = iStream_order
                         aFlowline_intersect.append(pLine)
                         lID_flowline = lID_flowline + 1
                     
@@ -132,11 +144,19 @@ def intersect_flowline_with_mesh(sFilename_mesh, sFilename_flowline, sFilename_o
                         if(pGeometrytype_intersect == 'MULTILINESTRING'):
                             aLine = ogr.ForceToLineString(pGeometry_intersect)
                             for Line in aLine: 
+                                pFeatureOut.SetGeometry(Line)
+                                pFeatureOut.SetField("id", lID_flowline)         
+                                pFeatureOut.SetField("iseg", iSegment)    
+                                pFeatureOut.SetField("iord", iStream_order)           
+                                pLayerOut.CreateFeature(pFeatureOut)    
+
                                 dummy = loads( Line.ExportToWkt() )
                                 aCoords = dummy.coords
                                 dummy1= np.array(aCoords)
                                 pLine = convert_coordinates_to_flowline(dummy1)
                                 pLine.lIndex = lID_flowline
+                                pLine.iSegment = iSegment
+                                pLine.iStream_order = iStream_order
                                 aFlowline_intersect.append(pLine)
                                 lID_flowline = lID_flowline + 1
                             pass
@@ -168,4 +188,4 @@ def intersect_flowline_with_mesh(sFilename_mesh, sFilename_flowline, sFilename_o
             pass
 
     
-    return aHexagon, aHexagon_intersect
+    return aHexagon, aHexagon_intersect, aFlowline_intersect

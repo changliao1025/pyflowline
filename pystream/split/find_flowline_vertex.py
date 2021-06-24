@@ -18,4 +18,20 @@ def find_flowline_vertex(aFlowline_in):
         aVertex, dummy = add_unique_vertex(aVertex, pVertex_end)
         pass
 
+
+    aVertex_middle=list()
+    for i in range(0, nFlowline):      
+        pFlowline = aFlowline_in[i]
+        aVertex2 = pFlowline.aVertex
+        nVertex = pFlowline.nVertex
+        for j in range(1, nVertex-1):   
+            pVertex= aVertex2[j]
+            aVertex_middle.append( pVertex)
+
+    for elem in aVertex_middle:
+        if aVertex_middle.count(elem) > 1:
+            aVertex, dummy = add_unique_vertex(aVertex, elem)            
+        else:
+            pass
+
     return aVertex

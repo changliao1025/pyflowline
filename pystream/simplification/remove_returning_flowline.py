@@ -6,8 +6,8 @@ from pystream.format.convert_coordinates_to_flowline import convert_coordinates_
 from pystream.add_unique_vertex import add_unique_vertex
 
 from pystream.find_vertex_in_list import find_vertex_in_list
-def remove_returning_flowline(aHexagon_in, aHexagon_intersect_in, pVertex_outlet_in):
-    aHexagon_out = list()
+def remove_returning_flowline(aCell_in, aCell_intersect_in, pVertex_outlet_in):
+    aCell_out = list()
     aFlowline_out=list()
     #checking input data 
 
@@ -16,7 +16,7 @@ def remove_returning_flowline(aHexagon_in, aHexagon_intersect_in, pVertex_outlet
     #input flowline should have order information and segment index?
 
     
-    nHexagon=  len(aHexagon_intersect_in)
+    nCell=  len(aCell_intersect_in)
 
     def checkIfDuplicates(listOfElems):
         ''' Check if given list contains any duplicates '''    
@@ -31,23 +31,23 @@ def remove_returning_flowline(aHexagon_in, aHexagon_intersect_in, pVertex_outlet
         return iFlag_unique
 
 
-    def simplify_list(aHexagon_flowline_in):
-        aHexagon_flowline_out = copy.deepcopy(aHexagon_flowline_in)
+    def simplify_list(aCell_flowline_in):
+        aCell_flowline_out = copy.deepcopy(aCell_flowline_in)
 
-        nHexagon = len(aHexagon_flowline_out)        
+        nCell2 = len(aCell_flowline_out)        
         #check unique
-        iFlag_unique = checkIfDuplicates(aHexagon_flowline_out)
+        iFlag_unique = checkIfDuplicates(aCell_flowline_out)
         if iFlag_unique == 1:
-            return aHexagon_flowline_out
+            return aCell_flowline_out
         else:
-            for i in range(nHexagon):
-                elem=aHexagon_flowline_out[i]
-                if aHexagon_flowline_out.count(elem) > 1:
-                    dummy = [i for i, x in enumerate(aHexagon_flowline_out) if x == elem]
+            for i in range(nCell2):
+                elem=aCell_flowline_out[i]
+                if aCell_flowline_out.count(elem) > 1:
+                    dummy = [i for i, x in enumerate(aCell_flowline_out) if x == elem]
                     
                     start = dummy[0]
                     end = dummy[-1]
-                    del aHexagon_flowline_out[start: end]                     
+                    del aCell_flowline_out[start: end]                     
                     break
                     pass
                 else:
@@ -55,25 +55,26 @@ def remove_returning_flowline(aHexagon_in, aHexagon_intersect_in, pVertex_outlet
 
                 pass             
             
-            aHexagon_flowline_out = simplify_list(aHexagon_flowline_out)
+            aCell_flowline_out = simplify_list(aCell_flowline_out)
 
-        return   aHexagon_flowline_out
+        return   aCell_flowline_out
 
     def retrieve_flowline_intersect_index(iSegment_in, iStream_order_in, pVertex_end_in):
 
         iFlag_found = 1
         pVertex_end_current = pVertex_end_in
-        aHexagon_flowline=list()
-        #aHexagon_flowline.append(lID_in)
+        aCell_flowline=list()
+  
         aSegment_upstream = list()
         aVertex_end_upstream = list()
         aStream_order = list()
+        iFlag_skip = 0
         while iFlag_found == 1:
             iFlag_found = 0 
-            for j in range(nHexagon):
-                pHexagon = aHexagon_intersect_in[j]
-                lID = pHexagon.lIndex
-                aFlowline= pHexagon.aFlowline
+            for j in range(nCell):
+                pCell = aCell_intersect_in[j]
+                lID = pCell.lIndex
+                aFlowline= pCell.aFlowline
                 nFlowline = len(aFlowline)
                 for i in range(nFlowline):
                     pFlowline = aFlowline[i]
@@ -87,34 +88,65 @@ def remove_returning_flowline(aHexagon_in, aHexagon_intersect_in, pVertex_outlet
                             # #check length as well
                             dLength = pFlowline.dLength
 
-                            iFlag_found2, dummy = pHexagon.which_edge_cross_this_vertex(pVertex_start)
-                            iFlag_found3, dummy = pHexagon.which_edge_cross_this_vertex(pVertex_end)
+                            iFlag_found2, dummy2 = pCell.which_edge_cross_this_vertex(pVertex_start)
+                            iFlag_found3, dummy3 = pCell.which_edge_cross_this_vertex(pVertex_end)
 
                             if iFlag_found2 == 1 and iFlag_found3 == 1: #on the edge
-                                if dLength < pHexagon.dLength :
-                                    pVertex_end_current = pVertex_start  
-                                    aHexagon_flowline.append(lID)
-                                    iFlag_found = 1
+                                #same edge
+                                if dummy2.is_overlap(dummy3) ==1:
+                                    if dLength < 0.5*pCell.dLength : 
+                                        pVertex_end_current = pVertex_start   
+                                        iFlag_found = 1
+                                        if iFlag_skip == 0:                                        
+                                            iFlag_skip = 1 
+                                        else:
+                                            aCell_flowline.append(lID)
+                                            iFlag_skip == 0
+                                            pass
+                                        pass
+                                        pass
+                                    else:
+                                        pVertex_end_current = pVertex_start    
+                                        aCell_flowline.append(lID)
+                                        iFlag_found = 1
+                                        pass                                   
+
+                                    
                                     pass
                                 else:
-                                    pVertex_end_current = pVertex_start    
-                                    aHexagon_flowline.append(lID)
-                                    iFlag_found = 1
+                                    if dLength < 0.5*pCell.dLength : #because it taks a short cut
+                                        
+                                        pVertex_end_current = pVertex_start   
+                                        iFlag_found = 1
+                                        if iFlag_skip == 0:                                        
+                                            iFlag_skip = 1 
+                                        else:
+                                            aCell_flowline.append(lID)
+                                            iFlag_skip == 0
+                                            pass
+                                        pass
+                                    else:
+                                        pVertex_end_current = pVertex_start    
+                                        aCell_flowline.append(lID)
+                                        iFlag_found = 1
+                                        pass
+
                                     pass
+                                
 
                                 pass
 
                             else:
                                 pVertex_end_current = pVertex_start    
-                                aHexagon_flowline.append(lID)
+                                aCell_flowline.append(lID)                                
                                 iFlag_found = 1
                                 pass                            
                                 
                             break
                             pass
                         else:
-                            iFlag_found2, dummy = pHexagon.which_edge_cross_this_vertex(pVertex_start)
-                            iFlag_found3, dummy = pHexagon.which_edge_cross_this_vertex(pVertex_end)
+                            iFlag_found2, dummy2 = pCell.which_edge_cross_this_vertex(pVertex_start)
+                            iFlag_found3, dummy3 = pCell.which_edge_cross_this_vertex(pVertex_end)
                             if pVertex_end == pVertex_end_in: 
                                 iFlag_found = 1
                                 pass
@@ -138,18 +170,18 @@ def remove_returning_flowline(aHexagon_in, aHexagon_intersect_in, pVertex_outlet
         if iFlag_found == 0:
 
             #reverse 
-            aHexagon_flowline = aHexagon_flowline[::-1]
+            aCell_flowline = aCell_flowline[::-1]
             #simplify list
-            #print(aHexagon_flowline)
-            aHexagon_simple = simplify_list(aHexagon_flowline)
+         
+            aCell_simple = simplify_list(aCell_flowline)
             #save the output
-            nHexagon2 = len(aHexagon_simple)
+            nCell3 = len(aCell_simple)
             aCoordinates = list()
-            if nHexagon2 >1:
-                for i in range(nHexagon2):
-                    lIndex = aHexagon_simple[i]
-                    x = aHexagon_in[lIndex].dX_center
-                    y = aHexagon_in[lIndex].dY_center
+            if nCell3 >1:
+                for i in range(nCell3):
+                    lIndex = aCell_simple[i]
+                    x = aCell_in[lIndex].dX_center
+                    y = aCell_in[lIndex].dY_center
                     aCoordinates.append([x,y])
                     pass
 
@@ -158,7 +190,7 @@ def remove_returning_flowline(aHexagon_in, aHexagon_intersect_in, pVertex_outlet
                 pFlowline.iStream_order=iStream_order_in
                 aFlowline_out.append(pFlowline)
 
-            print(iSegment_in, ': ',aHexagon_simple)
+            print(iSegment_in, ': ',aCell_simple)
 
             sort_index = np.argsort(aStream_order)
             
@@ -173,23 +205,33 @@ def remove_returning_flowline(aHexagon_in, aHexagon_intersect_in, pVertex_outlet
         return 
 
     #starting from the outlet
-    
-    for j in range(nHexagon):
-        pHexagon = aHexagon_intersect_in[j]
-        aFlowline= pHexagon.aFlowline
+    dDiatance_min=0.0
+    iFlag_first=1
+    for j in range(nCell):
+        pCell = aCell_intersect_in[j]
+        aFlowline= pCell.aFlowline
         nFlowline = len(aFlowline)
         for i in range(nFlowline):
             pFlowline = aFlowline[i]
             pVertex_start = pFlowline.pVertex_start
             pVertex_end = pFlowline.pVertex_end
             dDiatance = pVertex_end.calculate_distance( pVertex_outlet_in)
-            if  dDiatance < 100.0:
+            if iFlag_first ==1:
+                dDiatance_min = dDiatance
+                nsegment = pFlowline.iSegment
+                iStream_order = pFlowline.iStream_order
+                lID_outlet = pCell.lIndex
+                pVertex_outlet = pVertex_end
+                iFlag_first=0
+
+
+            if  dDiatance < dDiatance_min:
+                dDiatance_min = dDiatance
                 #found it
                 nsegment = pFlowline.iSegment
                 iStream_order = pFlowline.iStream_order
-                lID_outlet = pHexagon.lIndex
-                pVertex_outlet = pVertex_end
-                break
+                lID_outlet = pCell.lIndex
+                pVertex_outlet = pVertex_end                
                 pass    
             else:
                 #print(dDiatance)
@@ -260,4 +302,4 @@ def remove_returning_flowline(aHexagon_in, aHexagon_intersect_in, pVertex_outlet
 
 
 
-    return aHexagon_out, aFlowline_out, aFlowline_out_no_parallel
+    return aCell_out, aFlowline_out, aFlowline_out_no_parallel

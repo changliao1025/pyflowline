@@ -5,7 +5,7 @@ from osgeo import gdal, osr, ogr
 from pystream.shared.vertex import pyvertex
 from pystream.shared.edge import pyedge
 from pystream.shared.cell import pycell
-from pystream.add_unique_vertex import add_unique_vertex
+
 
 class pyhexagon(pycell):
     lIndex=0    
@@ -51,10 +51,10 @@ class pyhexagon(pycell):
                 iFlag_found =1 
                 break
             else:
-                pass
-        
+                pass       
         
         return iFlag_found
+
     def which_edge_cross_this_vertex(self, pVertex_in):
         iFlag_found = 0
         pEdge_out = None
@@ -82,4 +82,15 @@ class pyhexagon(pycell):
         dLength_edge = np.sqrt(  2.0 * dArea / (3.0* np.sqrt(3.0))  )
         self.dLength = dLength_edge
         return dLength_edge
+    
+    def share_edge(self, other):
+        iFlag_share = 0
+        for pEdge in self.aEdge:
+            for pEdge2 in other.aEdge:
+                if pEdge.is_overlap(pEdge2) ==1 :
+                    iFlag_share = 1 
+                    break
+
+
+        return iFlag_share
 

@@ -3,7 +3,7 @@ from osgeo import gdal, osr, ogr
 from pystream.shared.vertex import pyvertex
 from pystream.shared.edge import pyedge
 from pystream.shared.cell import pycell
-class pyhexagon(pycell):
+class pytin(pycell):
     dLength=0.0
     dArea=0.0
     aEdge=None

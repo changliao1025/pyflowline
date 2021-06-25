@@ -10,12 +10,12 @@ from shapely.geometry import Point, LineString, MultiLineString
 from shapely.wkt import loads
 from pystream.shared.hexagon import pyhexagon
 
-from pystream.format.convert_coordinates_to_hexagon import convert_coordinates_to_hexagon
+from pystream.format.convert_coordinates_to_cell import convert_coordinates_to_cell
 from pystream.format.convert_coordinates_to_flowline import convert_coordinates_to_flowline
 from pystream.find_hexagon_through_edge import find_hexagon_through_edge
 
 from pystream.shared.link import pyhexagonlink
-def intersect_flowline_with_mesh(sFilename_mesh, sFilename_flowline, sFilename_output):
+def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh, sFilename_flowline, sFilename_output):
 
     if  os.path.exists(sFilename_mesh) and  os.path.exists(sFilename_flowline) : 
         pass
@@ -31,8 +31,8 @@ def intersect_flowline_with_mesh(sFilename_mesh, sFilename_flowline, sFilename_o
     pDriver = ogr.GetDriverByName( sDriverName )
 
     #geojson
-    aHexagon=list()
-    aHexagon_intersect=list()
+    aCell=list()
+    aCell_intersect=list()
     
    
     pDataset_mesh = pDriver.Open(sFilename_mesh, 0)
@@ -91,10 +91,10 @@ def intersect_flowline_with_mesh(sFilename_mesh, sFilename_flowline, sFilename_o
             dummy = loads( pGeometry_mesh.ExportToWkt() )
             aCoords = dummy.exterior.coords
             dummy1= np.array(aCoords)
-            pHexagon = convert_coordinates_to_hexagon(dummy1)
-            pHexagon.lIndex = lID_mesh
-            pHexagon.dArea = pGeometry_mesh.GetArea() 
-            pHexagon.dLength = pHexagon.calculate_edge_length()
+            pCell = convert_coordinates_to_cell(iMesh_type_in, dummy1)
+            pCell.lIndex = lID_mesh
+            pCell.dArea = pGeometry_mesh.GetArea() 
+            pCell.dLength = pCell.calculate_edge_length()
                      
             #print(pGeometry_mesh.GetGeometryName())
             aFlowline_intersect = list()
@@ -171,21 +171,21 @@ def intersect_flowline_with_mesh(sFilename_mesh, sFilename_flowline, sFilename_o
 
             #only save the intersected hexagon to output? 
             #now add back to the cell object
-            pHexagon.aFlowline = aFlowline_intersect
-            pHexagon.nFlowline = len(aFlowline_intersect)
+            pCell.aFlowline = aFlowline_intersect
+            pCell.nFlowline = len(aFlowline_intersect)
             if iFlag_intersected ==1:     
-                pHexagon.iFlag_intersected = 1                       
-                aHexagon_intersect.append(pHexagon)
+                pCell.iFlag_intersected = 1                       
+                aCell_intersect.append(pCell)
             else:
-                pHexagon.iFlag_intersected = 0   
+                pCell.iFlag_intersected = 0   
                 pass
 
 
             
-            aHexagon.append(pHexagon)
+            aCell.append(pCell)
             lID_mesh = lID_mesh + 1   
         else:
             pass
 
     
-    return aHexagon, aHexagon_intersect, aFlowline_intersect
+    return aCell, aCell_intersect, aFlowline_intersect

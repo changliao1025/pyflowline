@@ -22,18 +22,18 @@ sFilename_out = 'flowline_segment_order.json'
 sFilename_flowline = os.path.join(sWorkspace_out, sFilename_out)
 aFlowline0, pSpatialRef = read_flowline_geojson(sFilename_flowline)
 
-#lat-lon
-sFilename_mesh=sFilename_output_latlon
-sFilename_output= os.path.join(sWorkspace_out, 'lat_lon_intersect.json')
-#intersect_flowline_with_mesh(sFilename_mesh, sFilename_flowline, sFilename_output)
+sFilename_mesh=sFilename_output_hexagon
+sFilename_output= os.path.join(sWorkspace_out, 'hexagon_intersect.json')
+aCell, aCell_intersect, aFlowline_intersect = intersect_flowline_with_mesh(1, sFilename_mesh, sFilename_flowline, sFilename_output)
 
 sFilename_mesh=sFilename_output_square
 sFilename_output= os.path.join(sWorkspace_out, 'square_intersect.json')
-#intersect_flowline_with_mesh(sFilename_mesh, sFilename_flowline, sFilename_output)
+#aCell, aCell_intersect, aFlowline_intersect = intersect_flowline_with_mesh(2, sFilename_mesh, sFilename_flowline, sFilename_output)
 
-sFilename_mesh=sFilename_output_hexagon
-sFilename_output= os.path.join(sWorkspace_out, 'hexagon_intersect.json')
-aHexagon, aHexagon_intersect, aFlowline_intersect = intersect_flowline_with_mesh(sFilename_mesh, sFilename_flowline, sFilename_output)
+#lat-lon
+sFilename_mesh=sFilename_output_latlon
+sFilename_output= os.path.join(sWorkspace_out, 'lat_lon_intersect.json')
+#aCell, aCell_intersect, aFlowline_intersect = intersect_flowline_with_mesh(3, sFilename_mesh, sFilename_flowline, sFilename_output)
 
 
 #simplify flowline
@@ -44,7 +44,7 @@ point['x'] = -2136506.345
 point['y'] = 2901799.219
 pVertex_outlet=pyvertex(point)
 
-aHexagon_out, aFlowline, aFlowline_no_parallel = remove_returning_flowline(aHexagon, aHexagon_intersect, pVertex_outlet)
+aCell, aFlowline, aFlowline_no_parallel = remove_returning_flowline(aCell, aCell_intersect, pVertex_outlet)
 sFilename_out = 'flowline_simplified.json'
 sFilename_out = os.path.join(sWorkspace_out, sFilename_out)
 export_flowline_to_json( aFlowline, pSpatialRef, sFilename_out)

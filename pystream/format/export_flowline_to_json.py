@@ -39,6 +39,7 @@ def export_flowline_to_json(aFlowline_in, pSpatial_reference_in, \
     
 
     pDriver = ogr.GetDriverByName('GeoJSON')
+    pDriver = ogr.GetDriverByName('ESRI Shapefile')
     #geojson
     pDataset_json = pDriver.CreateDataSource(sFilename_json_out)  
     

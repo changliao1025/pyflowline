@@ -20,7 +20,7 @@ def read_flowline_geojson(sFilename_geojson_in):
 
     aFlowline=list()
 
-    pDriver_geojson = ogr.GetDriverByName('GeoJSON')
+    pDriver_geojson =  ogr.GetDriverByName('ESRI Shapefile')# ogr.GetDriverByName('GeoJSON')
    
     pDataset_geojson = pDriver_geojson.Open(sFilename_geojson_in, gdal.GA_ReadOnly)
     pLayer_geojson = pDataset_geojson.GetLayer(0)

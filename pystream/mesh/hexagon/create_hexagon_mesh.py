@@ -9,7 +9,7 @@ from osgeo import ogr, osr, gdal, gdalconst
 from shapely.geometry import Point, LineString, MultiLineString
 from shapely.wkt import loads
 from pystream.shared.hexagon import pyhexagon
-from pystream.format.convert_coordinates_to_hexagon import convert_coordinates_to_hexagon
+from pystream.format.convert_coordinates_to_cell import convert_coordinates_to_cell
 
 def create_hexagon_mesh(dX_left, dY_bot, dResolution_meter, ncolumn, nrow, sFilename_output, sFilename_shapefile):
 
@@ -104,7 +104,7 @@ def create_hexagon_mesh(dX_left, dY_bot, dResolution_meter, ncolumn, nrow, sFile
             dummy = loads( ring.ExportToWkt() )
             aCoords = dummy.exterior.coords
             dummy1= np.array(aCoords)
-            pHexagon = convert_coordinates_to_hexagon(dummy1)
+            pHexagon = convert_coordinates_to_cell(1, dummy1)
             aHexagon.append(pHexagon)
 
             pass

@@ -13,18 +13,20 @@ from pystream.split.split_flowline import split_flowline
 from pystream.format.export_vertex_to_json import export_vertex_to_json
 
 sWorkspace_out = '/compyfs/liao313/04model/pyhexwatershed/columbia_river_basin'
+sWorkspace_out = '/people/liao313/tmp/susquehanna'
 sFilename_output_latlon = os.path.join(sWorkspace_out, 'lat_lon.json')
 sFilename_output_square = os.path.join(sWorkspace_out, 'square.json')
 sFilename_output_hexagon = os.path.join(sWorkspace_out, 'hexagon.json')
+sFilename_output_mpas = os.path.join(sWorkspace_out, 'mpas.json')
 
 sFilename_out = 'flowline_merge2.json'
-sFilename_out = 'flowline_segment_order.json'
+sFilename_out = 'flowline_segment_order.shp'
 sFilename_flowline = os.path.join(sWorkspace_out, sFilename_out)
 aFlowline0, pSpatialRef = read_flowline_geojson(sFilename_flowline)
 
 sFilename_mesh=sFilename_output_hexagon
 sFilename_output= os.path.join(sWorkspace_out, 'hexagon_intersect.json')
-aCell, aCell_intersect, aFlowline_intersect = intersect_flowline_with_mesh(1, sFilename_mesh, sFilename_flowline, sFilename_output)
+#aCell, aCell_intersect, aFlowline_intersect = intersect_flowline_with_mesh(1, sFilename_mesh, sFilename_flowline, sFilename_output)
 
 sFilename_mesh=sFilename_output_square
 sFilename_output= os.path.join(sWorkspace_out, 'square_intersect.json')
@@ -35,6 +37,11 @@ sFilename_mesh=sFilename_output_latlon
 sFilename_output= os.path.join(sWorkspace_out, 'lat_lon_intersect.json')
 #aCell, aCell_intersect, aFlowline_intersect = intersect_flowline_with_mesh(3, sFilename_mesh, sFilename_flowline, sFilename_output)
 
+#mpas
+sFilename_mesh=sFilename_output_mpas
+sFilename_output= os.path.join(sWorkspace_out, 'mpas_intersect.shp')
+aCell, aCell_intersect, aFlowline_intersect = intersect_flowline_with_mesh(4, sFilename_mesh, sFilename_flowline, sFilename_output)
+
 
 #simplify flowline
 
@@ -42,10 +49,15 @@ sFilename_output= os.path.join(sWorkspace_out, 'lat_lon_intersect.json')
 point= dict()
 point['x'] = -2136506.345
 point['y'] = 2901799.219
+#susquehanna -76.08247,39.55600,1683240.965,2014539.724
+point['x'] = 1683240.965
+point['y'] = 2014539.724
+
+
 pVertex_outlet=pyvertex(point)
 
 aCell, aFlowline, aFlowline_no_parallel = remove_returning_flowline(aCell, aCell_intersect, pVertex_outlet)
-sFilename_out = 'flowline_simplified.json'
+sFilename_out = 'flowline_simplified.shp'
 sFilename_out = os.path.join(sWorkspace_out, sFilename_out)
 export_flowline_to_json( aFlowline, pSpatialRef, sFilename_out)
 #sFilename_out = 'flowline_simplified_no_parallel.json'
@@ -54,19 +66,19 @@ export_flowline_to_json( aFlowline, pSpatialRef, sFilename_out)
 
 pVertex_outlet=aFlowline[0].pVertex_end
 aVertex = find_flowline_vertex(aFlowline)
-sFilename_out = 'flowline_vertex_without_confluence2.json'
+sFilename_out = 'flowline_vertex_without_confluence2.shp'
 sFilename_out = os.path.join(sWorkspace_out, sFilename_out)
 export_vertex_to_json( aVertex,pSpatialRef, sFilename_out)
 
 aFlowline = split_flowline(aFlowline, aVertex)
-sFilename_out = 'flowline_split_by_point2.json'
+sFilename_out = 'flowline_split_by_point2.shp'
 sFilename_out = os.path.join(sWorkspace_out, sFilename_out)
 export_flowline_to_json( aFlowline,pSpatialRef, sFilename_out)
 
 aFlowline= correct_flowline_direction(aFlowline,  pVertex_outlet )
 
 aFlowline = remove_flowline_loop(  aFlowline)    
-sFilename_out = 'flowline_loop_no_parallel.json'
+sFilename_out = 'flowline_loop_no_parallel.shp'
 sFilename_out = os.path.join(sWorkspace_out, sFilename_out)
 export_flowline_to_json( aFlowline,pSpatialRef, sFilename_out)
 

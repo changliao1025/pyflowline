@@ -217,30 +217,29 @@ def remove_returning_flowline(aCell_in, aCell_intersect_in, pVertex_outlet_in):
             pVertex_end = pFlowline.pVertex_end
             dDiatance = pVertex_end.calculate_distance( pVertex_outlet_in)
             if iFlag_first ==1:
-                dDiatance_min = dDiatance
-                nsegment = pFlowline.iSegment
-                iStream_order = pFlowline.iStream_order
-                lID_outlet = pCell.lIndex
-                pVertex_outlet = pVertex_end
+                dDiatance_min = dDiatance               
+                lID_outlet = pCell.lIndex               
+                lID_outlet2 = j
+                lID_outlet3 = i
                 iFlag_first=0
-
-
-            if  dDiatance < dDiatance_min:
-                dDiatance_min = dDiatance
-                #found it
-                nsegment = pFlowline.iSegment
-                iStream_order = pFlowline.iStream_order
-                lID_outlet = pCell.lIndex
-                pVertex_outlet = pVertex_end                
-                pass    
             else:
-                #print(dDiatance)
-                pass
+                if  dDiatance < dDiatance_min:
+                    dDiatance_min = dDiatance                
+                    lID_outlet = pCell.lIndex                
+                    lID_outlet2 = j
+                    lID_outlet3 = i
+                    pass    
+                else:
+                    #print(dDiatance)
+                    pass
 
             pass     
 
     #loop through       
-    iSegment = nsegment
+    pFlowline = aCell_intersect_in[lID_outlet2].aFlowline[lID_outlet3]
+    iSegment =pFlowline.iSegment
+    iStream_order=pFlowline.iStream_order
+    pVertex_outlet=pFlowline.pVertex_end
         
     retrieve_flowline_intersect_index(iSegment, iStream_order,  pVertex_outlet)
 

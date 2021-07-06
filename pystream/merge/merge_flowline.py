@@ -67,17 +67,31 @@ def merge_flowline(aFlowline_in, aVertex, \
                 pass
             
     
-    
+    iFlag_first=1
     for i in range(nFlowline):        
         pFlowline = aFlowline_in[i]                
         pVertex_start = pFlowline.pVertex_start
         pVertex_end = pFlowline.pVertex_end
         dDiatance = pVertex_end.calculate_distance( pVertex_outlet_in)
-        if  dDiatance < 100.0:                
-            lIndex_outlet = i
-            break
-            pass
+        
+
+        if iFlag_first ==1:
+            dDiatance_min = dDiatance                
+            lIndex_outlet = i            
+            iFlag_first=0    
+        else:            
+            if  dDiatance < dDiatance_min:
+                dDiatance_min = dDiatance
+                #found it
+                lIndex_outlet = i                
+                pass    
+            else:
+                #print(dDiatance)
+                pass
             
+    pFlowline = aFlowline_in[lIndex_outlet]            
+    pVertex_start = pFlowline.pVertex_start
+    pVertex_end = pFlowline.pVertex_end      
 
     merge_flowline_reach(lIndex_outlet, pVertex_start, pVertex_end)   
 

@@ -27,16 +27,17 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh, sFilename_flowli
         #delete it if it exists
         os.remove(sFilename_output)
 
-    sDriverName = "GeoJSON"
-    pDriver = ogr.GetDriverByName( sDriverName )
+    sDriverName = "GeoJSON" #('ESRI Shapefile') #
+    pDriver_geojson = ogr.GetDriverByName( "GeoJSON")
+    pDriver_shapefile = ogr.GetDriverByName('ESRI Shapefile' )
 
     #geojson
     aCell=list()
     aCell_intersect=list()
     
    
-    pDataset_mesh = pDriver.Open(sFilename_mesh, 0)
-    pDataset_flowline = pDriver.Open(sFilename_flowline, 0)   
+    pDataset_mesh = pDriver_geojson.Open(sFilename_mesh, 0)
+    pDataset_flowline = pDriver_shapefile.Open(sFilename_flowline, 0)   
 
     pLayer_mesh = pDataset_mesh.GetLayer(0)
     pSpatialRef_mesh = pLayer_mesh.GetSpatialRef()
@@ -56,7 +57,7 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh, sFilename_flowli
     else:
         iFlag_transform =0
 
-    pDataset_out = pDriver.CreateDataSource(sFilename_output)
+    pDataset_out = pDriver_shapefile.CreateDataSource(sFilename_output)
 
     pLayerOut = pDataset_out.CreateLayer('flowline', pSpatialRef_flowline, ogr.wkbMultiLineString)
     # Add one attribute
@@ -162,9 +163,7 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh, sFilename_flowli
                             pass
                         else:
                             pass
-                    
-
-                    
+                            
 
                 else:
                     pass

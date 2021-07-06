@@ -28,10 +28,17 @@ def find_flowline_vertex(aFlowline_in):
             pVertex= aVertex2[j]
             aVertex_middle.append( pVertex)
 
-    for elem in aVertex_middle:
-        if aVertex_middle.count(elem) > 1:
-            aVertex, dummy = add_unique_vertex(aVertex, elem)            
-        else:
-            pass
+    #aVertex_middle2 = list()
+    #for elem in aVertex_middle:
+    #    if aVertex_middle.count(elem) > 1:
+    #        aVertex_middle2, dummy = add_unique_vertex(aVertex_middle2, elem)            
+    #    else:
+    #        pass
+
+    #aVertex_middle2 =  [x for n, x in enumerate(aVertex_middle) if x in aVertex_middle[:n]] #[item for item, count in collections.Counter(aVertex_middle).items() if count > 1]
+    
+    #merge
+    #aVertex = list(set().union(aVertex, aVertex_middle2))
+
 
     return aVertex

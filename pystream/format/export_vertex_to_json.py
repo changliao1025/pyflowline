@@ -24,13 +24,12 @@ def export_vertex_to_json(aVertex_in, pSpatial_reference_in, sFilename_json_out,
     nVertex = len(aVertex_in)
 
     pDriver = ogr.GetDriverByName('GeoJSON')
+    pDriver = ogr.GetDriverByName('ESRI Shapefile')
     #geojson
     pDataset_json = pDriver.CreateDataSource(sFilename_json_out)
 
-   
-    
 
-    pLayer_json = pDataset_json.CreateLayer('vertex', pSpatial_reference_in, ogr.wkbMultiLineString)
+    pLayer_json = pDataset_json.CreateLayer('vertex', pSpatial_reference_in, ogr.wkbPoint)
     # Add one attribute
     pLayer_json.CreateField(ogr.FieldDefn('id', ogr.OFTInteger64)) #long type for high resolution
     if iFlag_attribute ==1:        

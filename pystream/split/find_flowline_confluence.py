@@ -6,7 +6,7 @@ from pystream.find_vertex_in_list import find_vertex_in_list
 from pystream.add_unique_vertex import add_unique_vertex
 
 from pystream.check_head_water import check_head_water
-def find_flowline_confluence(aFlowline_in, pVertex_outlet):
+def find_flowline_confluence(aFlowline_in, pVertex_outlet_in):
     
     nFlowline = len(aFlowline_in)
  
@@ -24,15 +24,27 @@ def find_flowline_confluence(aFlowline_in, pVertex_outlet):
 
     nVertex=len(aVertex)
     aConnectivity  = np.full(  nVertex , 0, dtype=int )
-    
+    iFlag_first=1
     for i in range(nVertex):        
         pVertex = aVertex[i]
-        dDiatance = pVertex.calculate_distance( pVertex_outlet)
-        if  dDiatance < 100.0:    
-            aConnectivity[i] = 0
-            lIndex_outlet = i
-            break
-            pass
+        dDiatance = pVertex.calculate_distance( pVertex_outlet_in)
+        
+
+        if iFlag_first ==1:
+            dDiatance_min = dDiatance                
+            lIndex_outlet = i            
+            iFlag_first=0
+        else:
+            if  dDiatance < dDiatance_min:
+                dDiatance_min = dDiatance
+                #found it
+                lIndex_outlet = i        
+                pass    
+            else:
+                #print(dDiatance)
+                pass
+        
+    aConnectivity[lIndex_outlet] =0 
 
     for i in range(0, nFlowline):      
         pFlowline = aFlowline_in[i]

@@ -21,24 +21,35 @@ def correct_flowline_direction(aFlowline_in, pVertex_outlet):
 
     nFlowline = len(aFlowline_in)
     aFlag_process=np.full(nFlowline, 0, dtype =int)
-
+    iFlag_first = 1
     for i in range(nFlowline):
         pFlowline = aFlowline_in[i]
         iStream_order = pFlowline.iStream_order
         pVertex_start = pFlowline.pVertex_start
         pVertex_end = pFlowline.pVertex_end
-        dDiatance = pVertex_end.calculate_distance( pVertex_outlet)
-        if  dDiatance < 100.0:
-            pFlowline.lIndex = lID
-            aFlowline_out.append(pFlowline)
-            lID = lID +1
-            break
-            pass    
-        else:
-            #print(dDiatance)
-            pass
-            
-        pass     
+        dDiatance = pVertex_end.calculate_distance( pVertex_outlet)             
+
+        if iFlag_first ==1:
+            dDiatance_min = dDiatance                
+            lIndex_outlet = i            
+            iFlag_first=0    
+        else:            
+            if  dDiatance < dDiatance_min:
+                dDiatance_min = dDiatance
+                #found it
+                lIndex_outlet = i      
+                pass    
+            else:
+                #print(dDiatance)
+                pass
+        
+    lID = 0 
+    pFlowline = aFlowline_in[lIndex_outlet]
+    pFlowline.lIndex = lID
+    aFlowline_out.append(pFlowline)
+    pVertex_start = pFlowline.pVertex_start
+    pVertex_end = pFlowline.pVertex_end
+    lID = lID + 1
 
     
 

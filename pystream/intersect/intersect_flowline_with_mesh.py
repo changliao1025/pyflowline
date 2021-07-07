@@ -12,7 +12,7 @@ from pystream.shared.hexagon import pyhexagon
 
 from pystream.format.convert_coordinates_to_cell import convert_coordinates_to_cell
 from pystream.format.convert_coordinates_to_flowline import convert_coordinates_to_flowline
-from pystream.find_hexagon_through_edge import find_hexagon_through_edge
+
 
 from pystream.shared.link import pyhexagonlink
 def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh, sFilename_flowline, sFilename_output):

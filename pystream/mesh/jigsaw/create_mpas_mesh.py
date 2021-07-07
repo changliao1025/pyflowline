@@ -11,20 +11,30 @@ from pyearth.gis.location.convert_lat_lon_range import convert_180_to_360,conver
 
 from pystream.format.convert_coordinates_to_cell import convert_coordinates_to_cell
 
-def create_mpas_mesh(sFilename_mesh_in, dLatitude_top, dLatitude_bot, dLongitude_left, dLongitude_right,sFilename_output):
+def create_mpas_mesh(oModel_in):
+    #sFilename_mesh_netcdf, dLatitude_top, dLatitude_bot, dLongitude_left, dLongitude_right,sFilename_mesh):
    
+    iMesh_type = oModel_in.iMesh_type
+    sFilename_mesh  = oModel_in.sFilename_mesh
+    sWorkspace_out = oModel_in.sWorkspace_simulation_case
+    dLongitude_left = oModel_in.dLongitude_left
+    dLatitude_bot = oModel_in.dLatitude_bot
 
+    dLongitude_right = oModel_in.dLongitude_right
+    dLatitude_top = oModel_in.dLatitude_top
     #read netcdf
-    if (os.path.exists(sFilename_mesh_in)):
+    sFilename_mesh_netcdf = oModel_in.sFilename_mesh_netcdf
+    if (os.path.exists(sFilename_mesh_netcdf)):
         pass
     else:
         print('Mesh file does not exist!')
         exit
     
-    if os.path.exists(sFilename_output): 
+    if os.path.exists(sFilename_mesh): 
         #delete it if it exists
-        os.remove(sFilename_output)
-    pDatasets_in = Dataset(sFilename_mesh_in)
+        os.remove(sFilename_mesh)
+
+    pDatasets_in = Dataset(sFilename_mesh_netcdf)
 
     netcdf_format = pDatasets_in.file_format
 
@@ -37,7 +47,7 @@ def create_mpas_mesh(sFilename_mesh_in, dLatitude_top, dLatitude_bot, dLongitude
 
     pDriver = ogr.GetDriverByName('GeoJSON')
     #geojson
-    pDataset = pDriver.CreateDataSource(sFilename_output)
+    pDataset = pDriver.CreateDataSource(sFilename_mesh)
 
     pLayer = pDataset.CreateLayer('cell', pSrs, ogr.wkbPolygon)
     # Add one attribute
@@ -99,13 +109,8 @@ def create_mpas_mesh(sFilename_mesh_in, dLatitude_top, dLatitude_bot, dLongitude
     aLatitudeCell = latCell0[:] / math.pi * 180
     aLongitudeCell = lonCell0[:] / math.pi * 180
 
-    #dLongitude_left = convert_180_to_360(dLongitude_left)
-    #dLongitude_right = convert_180_to_360(dLongitude_right)
+    
 
-    #aIndex = np.where( ( dLatitude_bot<aLatitude ) \
-    #    & (  aLatitude<dLatitude_top) \
-    #    & (  dLongitude_left<aLongitude) \
-    #    & (  aLongitude<dLongitude_right) )
     aEdgesOnCell= edgesOnCell0[:]
     aVertexOnCell = verticesOnCell0[:]
     
@@ -117,8 +122,6 @@ def create_mpas_mesh(sFilename_mesh_in, dLatitude_top, dLatitude_bot, dLongitude
     for i in range(ncell):
         dLat = convert_360_to_180 ( aLatitudeCell[i-1])
         dLon = convert_360_to_180 (aLongitudeCell[i-1])
-
-
 
         if dLat > dLatitude_bot and dLat < dLatitude_top and dLon > dLongitude_left and dLon < dLongitude_right:
 
@@ -166,18 +169,9 @@ def create_mpas_mesh(sFilename_mesh_in, dLatitude_top, dLatitude_bot, dLongitude
             dummy1= np.array(aCoords)
             pmpas = convert_coordinates_to_cell(4, dummy1)
             aMpas.append(pmpas)
-        
-            
-        
-
-
+    
             #get vertex
 
         pass
-
-    
-
-
-
 
     return aMpas

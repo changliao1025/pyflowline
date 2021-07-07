@@ -6,10 +6,16 @@ sDate_default = "{:04d}".format(pDate.year) + "{:02d}".format(pDate.month) + "{:
 
 class streamcase(object):
     __metaclass__ = ABCMeta
-    iCase_index=0
-    iMesh_type = 1
+    iCase_index= 0
+    sMesh_type = 1
     
     iFlag_mode=0    
+
+    dLongitude_left = -79.44374
+    dLongitude_right = -74.24774 
+
+    dLatitude_bot = 39.00 #,1399152.687,1978258.386
+    dLatitude_top = 43.00334 # ,1748363.409,2424316.881
 
 
     sFilename_model_configuration=''
@@ -24,17 +30,19 @@ class streamcase(object):
     
     sRegion=''
     sModel=''
+    iMesh_type ='hexagon'
 
     sCase=''
     sDate=''
     
 
-    
+    sFilename_spatial_reference=''
 
     #before intersect
 
     #intersect
     sFilename_mesh=''
+    sFilename_mesh_netcdf=''
     sFilename_intersect = ''
     #after intersect
     sFilename_flowline_simplified_after_intersect=''
@@ -45,17 +53,16 @@ class streamcase(object):
         self.sFilename_model_configuration    = aParameter[ 'sFilename_model_configuration']
 
         self.sWorkspace_data = aParameter[ 'sWorkspace_data']
-       
         self.sWorkspace_scratch    = aParameter[ 'sWorkspace_scratch']
-        sWorkspace_scratch = self.sWorkspace_scratch
+        self.sWorkspace_project= aParameter[ 'sWorkspace_project']
+        self.sWorkspace_bin= aParameter[ 'sWorkspace_bin']
+        
         
         self.sRegion               = aParameter[ 'sRegion']
         self.sModel                = aParameter[ 'sModel']
        
-        self.sWorkspace_project= aParameter[ 'sWorkspace_project']
-        self.sWorkspace_bin= aParameter[ 'sWorkspace_bin']
-
-        self.sWorkspace_simulation = sWorkspace_scratch + slash + '04model' + slash \
+    
+        self.sWorkspace_simulation = self.sWorkspace_scratch + slash + '04model' + slash \
             + self.sModel + slash + self.sRegion +  slash + 'simulation'
         sPath = self.sWorkspace_simulation
         Path(sPath).mkdir(parents=True, exist_ok=True)
@@ -70,20 +77,45 @@ class streamcase(object):
             self.sDate = sDate_default
 
         self.iCase_index =   iCase_index
-        sCase = self.sModel + self.sDate + sCase_index
+        sCase = self.sModel  + self.sDate + sCase_index
         self.sCase = sCase
-        
 
-        self.sWorkspace_simulation_case = self.sWorkspace_simulation + slash + sCase
+        self.sMesh_type =  aParameter['sMesh_type']
+        
+        sMesh_type = self.sMesh_type
+        if sMesh_type =='hexagon': #hexagon
+            self.iMesh_type = 1
+        else:
+            if sMesh_type =='sqaure': #sqaure
+                self.iMesh_type = 2
+            else:
+                if sMesh_type =='latlon': #latlon
+                    self.iMesh_type = 3
+                else:
+                    if sMesh_type =='mpas': #mpas
+                        self.iMesh_type = 4
+                    else:
+                        if sMesh_type =='tin': #tin
+                            self.iMesh_type = 5
+                        else:
+                            print('Unsupported mesh type?')
+        
+        self.sWorkspace_simulation_case = self.sWorkspace_simulation + slash + self.sMesh_type + slash + sCase
         sPath = self.sWorkspace_simulation_case
         Path(sPath).mkdir(parents=True, exist_ok=True)
-      
+
+
        
         self.iFlag_simulation =  int(aParameter['iFlag_simulation']) 
-     
-
         self.iFlag_mode =  int(aParameter['iFlag_mode']) 
-      
+        
+        self.dLongitude_left = float(aParameter['dLongitude_left']) 
+        self.dLongitude_right = float(aParameter['dLongitude_right']) 
+        self.dLatitude_bot = float(aParameter['dLatitude_bot']) 
+        self.dLatitude_top = float(aParameter['dLatitude_top']) 
+
+        self.sFilename_mesh_netcdf = aParameter['sFilename_mesh_netcdf']
+        self.sFilename_mesh = self.sWorkspace_simulation_case + slash + aParameter['sFilename_mesh']
 
         self.sJob =  aParameter['sJob'] 
 

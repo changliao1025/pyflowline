@@ -11,17 +11,12 @@ from pystream.loop.remove_flowline_loop import remove_flowline_loop
 from pystream.split.find_flowline_vertex import find_flowline_vertex
 from pystream.split.split_flowline import split_flowline
 from pystream.format.export_vertex_to_json import export_vertex_to_json
-from pystream.pystream_read_model_configuration_file import pystream_read_model_configuration_file
+from pystream.case.pystream_read_model_configuration_file import pystream_read_model_configuration_file
 from pystream.case import streamcase
 
 
 sFilename_configuration_in = '/qfs/people/liao313/workspace/python/pystream/pystream/case.xml'
-
-    #step 1
 aParameter = pystream_read_model_configuration_file(sFilename_configuration_in)
-
-       # iCase_index_in=iCase_index_in, sJob_in=sJob_in, iFlag_mode_in=iFlag_mode_in)
-
 aParameter['sFilename_model_configuration'] = sFilename_configuration_in
 oModel = streamcase(aParameter)
 

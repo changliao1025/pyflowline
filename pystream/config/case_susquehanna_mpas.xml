@@ -1,0 +1,148 @@
+<file id="model.xml" version="2.0">
+  <header>
+    This file is used to control the pystream process.
+  </header>  
+  <group id="model">
+
+<entry id="iFlag_simulation" value="1">
+      <type>int</type>
+      <desc>
+        The scratch workspace
+      </desc>
+    </entry>
+
+    <entry id="iFlag_mode" value="1">
+      <type>int</type>
+      <desc>
+        The scratch workspace
+      </desc>
+    </entry>
+
+  <entry id="sMesh_type" value="mpas">
+      <type>char</type>
+      <desc>
+        The scratch workspace
+      </desc>
+    </entry>
+
+     <entry id="iCase_index" value="1">
+      <type>int</type>
+      <desc>
+        The scratch workspace
+      </desc>
+    </entry>
+    
+   <entry id="sWorkspace_bin" value="/people/liao313/bin">
+      <type>char</type>
+      <desc>
+        The scratch workspace
+      </desc>
+    </entry>
+    <entry id="sWorkspace_data" value="/people/liao313/data">
+      <type>char</type>
+      <desc>
+        The scratch workspace
+      </desc>
+    </entry>
+    <entry id="sWorkspace_models" value="/compyfs/liao313/04model">
+      <type>char</type>
+      <desc>
+        The scratch workspace
+      </desc>
+    </entry>
+    <entry id="sWorkspace_project" value="/pystream/susquehanna">
+      <type>char</type>
+      <desc>
+        The scratch workspace
+      </desc>
+    </entry>
+
+    <entry id="sWorkspace_scratch" value="/compyfs/liao313/">
+      <type>char</type>
+      <desc>
+        The scratch workspace
+      </desc>
+    </entry>
+
+    <entry id="sWorkspace_simulation" value="/04model/pystream/susquehanna/simulation">
+      <type>char</type>
+      <desc>
+        The scratch workspace
+      </desc>
+    </entry>
+
+   
+
+    <entry id="sRegion" value="susquehanna">
+      <type>char</type>
+      <desc>
+        The scratch workspace
+      </desc>
+    </entry>
+    <entry id="sModel" value="pystream">
+      <type>char</type>
+      <desc>
+        The scratch workspace
+      </desc>
+    </entry>
+    <entry id="sDate" value="202100707">
+      <type>char</type>
+      <desc>
+        The scratch workspace
+      </desc>
+    </entry>
+   
+   
+    
+   
+
+    
+  <entry id="sJob" value="test">
+      <type>char</type>
+      <desc>
+        The scratch workspace
+      </desc>
+    </entry>
+    
+    <entry id="sFilename_mesh_netcdf" value="/qfs/people/liao313/workspace/python/jigsaw/icom-mesh/mesh/delaware_60_30_5_2_w_boundary/out/invert_mesh.nc">
+      <type>char</type>
+      <desc>
+        The scratch workspace
+      </desc>
+    </entry>
+    <entry id="sFilename_mesh" value="mpas.json">
+      <type>char</type>
+      <desc>
+        The scratch workspace
+      </desc>
+    </entry>
+
+<entry id="dLongitude_left" value="-79.44374">
+      <type>real</type>
+      <desc>
+        The scratch workspace
+      </desc>
+    </entry>
+    <entry id="dLongitude_right" value="-74.24774 ">
+      <type>real</type>
+      <desc>
+        The scratch workspace
+      </desc>
+    </entry>
+    <entry id="dLatitude_bot" value="39.00">
+      <type>real</type>
+      <desc>
+        The scratch workspace
+      </desc>
+    </entry>
+    <entry id="dLatitude_top" value="43.00334">
+      <type>real</type>
+      <desc>
+        The scratch workspace
+      </desc>
+    </entry>
+    
+  </group>
+
+
+</file>

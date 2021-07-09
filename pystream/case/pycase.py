@@ -10,6 +10,8 @@ class streamcase(object):
     sMesh_type = 1
     
     iFlag_mode=0    
+    iFlag_use_dem = 0
+    dResolution=0.0
 
     dLongitude_left = -79.44374
     dLongitude_right = -74.24774 
@@ -37,6 +39,7 @@ class streamcase(object):
     
 
     sFilename_spatial_reference=''
+    sFilename_dem=''
 
     #before intersect
 
@@ -108,6 +111,9 @@ class streamcase(object):
        
         self.iFlag_simulation =  int(aParameter['iFlag_simulation']) 
         self.iFlag_mode =  int(aParameter['iFlag_mode']) 
+        self.iFlag_use_dem =  int(aParameter['iFlag_use_dem']) 
+
+        self.dResolution = float(aParameter['dResolution']) 
         
         self.dLongitude_left = float(aParameter['dLongitude_left']) 
         self.dLongitude_right = float(aParameter['dLongitude_right']) 

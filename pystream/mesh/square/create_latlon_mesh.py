@@ -7,17 +7,17 @@ import os, sys
 from osgeo import ogr, osr, gdal, gdalconst
 
 
-from hexwatershed.auxiliary.gdal_function import obtain_raster_metadata
-from hexwatershed.auxiliary.gdal_function import reproject_coordinates
 
-os.environ['PROJ_LIB'] = '/qfs/people/liao313/.conda/envs/gdalenv/share/proj'
+#os.environ['PROJ_LIB'] = '/qfs/people/liao313/.conda/envs/gdalenv/share/proj'
 
-def create_lat_lon_mesh(dLongitude_left, dLatitude_bot, dResolution, ncolumn, nrow, sFilename_output):
+def create_latlon_mesh(dLongitude_left, dLatitude_bot, dResolution, ncolumn, nrow, sFilename_output):
 
    
     if os.path.exists(sFilename_output): 
         #delete it if it exists
         os.remove(sFilename_output)
+
+
     #pDriver = ogr.GetDriverByName('Esri Shapefile')
     pDriver = ogr.GetDriverByName('GeoJSON')
     #geojson
@@ -84,7 +84,7 @@ def create_lat_lon_mesh(dLongitude_left, dLatitude_bot, dResolution, ncolumn, nr
 
     return
 
-if __name__ == '__main__':
+
 
 
     #dLongitude_left= -124 

@@ -24,6 +24,7 @@ def create_mpas_mesh(oModel_in):
     dLatitude_top = oModel_in.dLatitude_top
     #read netcdf
     sFilename_mesh_netcdf = oModel_in.sFilename_mesh_netcdf
+    
     if (os.path.exists(sFilename_mesh_netcdf)):
         pass
     else:

@@ -6,16 +6,16 @@ from pystream.simplification.remove_returning_flowline import remove_returning_f
 
 from pystream.format.read_flowline_geojson import read_flowline_geojson
 from pystream.format.export_flowline_to_json import export_flowline_to_json
-from pystream.correct_flowline_direction import correct_flowline_direction
+from pystream.direction.correct_flowline_direction import correct_flowline_direction
 from pystream.loop.remove_flowline_loop import remove_flowline_loop
 from pystream.split.find_flowline_vertex import find_flowline_vertex
 from pystream.split.split_flowline import split_flowline
 from pystream.format.export_vertex_to_json import export_vertex_to_json
 from pystream.case.pystream_read_model_configuration_file import pystream_read_model_configuration_file
-from pystream.case import streamcase
+from pystream.case.pycase import streamcase
 
 
-sFilename_configuration_in = '/qfs/people/liao313/workspace/python/pystream/pystream/case.xml'
+sFilename_configuration_in = '/qfs/people/liao313/workspace/python/pystream/pystream/config/case_susquehanna_mpas.xml'
 aParameter = pystream_read_model_configuration_file(sFilename_configuration_in)
 aParameter['sFilename_model_configuration'] = sFilename_configuration_in
 oModel = streamcase(aParameter)
@@ -42,19 +42,7 @@ aFlowline0, pSpatialRef = read_flowline_geojson(sFilename_flowline)
 
 sFilename_mesh=oModel.sFilename_mesh
 sFilename_intersect = oModel.sFilename_intersect
-#sFilename_output= os.path.join(sWorkspace_simulation_case, 'hexagon_intersect.json')
-#aCell, aCell_intersect, aFlowline_intersect = intersect_flowline_with_mesh(1, sFilename_mesh, sFilename_flowline, sFilename_output)
 
-#sFilename_mesh=sFilename_output_square
-#sFilename_output= os.path.join(sWorkspace_simulation_case, 'square_intersect.json')
-#aCell, aCell_intersect, aFlowline_intersect = intersect_flowline_with_mesh(2, sFilename_mesh, sFilename_flowline, sFilename_output)
-
-#lat-lon
-#sFilename_mesh=sFilename_output_latlon
-#sFilename_output= os.path.join(sWorkspace_simulation_case, 'lat_lon_intersect.json')
-#aCell, aCell_intersect, aFlowline_intersect = intersect_flowline_with_mesh(3, sFilename_mesh, sFilename_flowline, sFilename_output)
-
-#mpas
 #sFilename_output= os.path.join(sWorkspace_simulation_case, 'mpas_intersect.shp')
 aCell, aCell_intersect, aFlowline_intersect = intersect_flowline_with_mesh(4, sFilename_mesh, sFilename_flowline, sFilename_intersect)
 

@@ -18,6 +18,15 @@
       </desc>
     </entry>
 
+    <entry id="iFlag_use_dem" value="1">
+      <type>int</type>
+      <desc>
+        The scratch workspace
+      </desc>
+    </entry>
+
+    
+
   <entry id="sMesh_type" value="mpas">
       <type>char</type>
       <desc>

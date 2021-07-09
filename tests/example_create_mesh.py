@@ -10,8 +10,19 @@ from pyearth.gis.gdal.gdal_function import obtain_raster_metadata
 from pyearth.gis.gdal.gdal_function import reproject_coordinates
 from pyearth.gis.projection.degree_to_meter import degree_to_meter
 
+from pystream.case.pycase import streamcase
+from pystream.case.pystream_read_model_configuration_file import pystream_read_model_configuration_file
+from pystream.operation.create_mesh import create_mesh
+
 dResolution=0.5
 
+sFilename_configuration_in = '/qfs/people/liao313/workspace/python/pystream/pystream/config/case_susquehanna_mpas.xml'
+aParameter = pystream_read_model_configuration_file(sFilename_configuration_in)
+aParameter['sFilename_model_configuration'] = sFilename_configuration_in
+oModel = streamcase(aParameter)
+aMpas = create_mesh(oModel)
+
+exit
 #we can use the dem extent to setup 
 sFilename_geotiff = '/qfs/people/liao313/data/hexwatershed/columbia_river_basin/raster/dem/crbdem.tif'
 dPixelWidth, dOriginX, dOriginY, nrow, ncolumn, pSpatialRef, pProjection, pGeotransform = obtain_raster_metadata(sFilename_geotiff)

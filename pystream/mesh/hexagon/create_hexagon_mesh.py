@@ -83,6 +83,7 @@ def create_hexagon_mesh(dX_left, dY_bot, dResolution_meter, ncolumn, nrow, sFile
             x6 = x1 + dLength_edge
             y6 = y1         
            
+            aCoords = np.full((7,2), -9999.0, dtype=float)
 
             ring = ogr.Geometry(ogr.wkbLinearRing)
             ring.AddPoint(x1, y1)
@@ -101,8 +102,26 @@ def create_hexagon_mesh(dX_left, dY_bot, dResolution_meter, ncolumn, nrow, sFile
 
             lID = lID + 1
 
-            dummy = loads( ring.ExportToWkt() )
-            aCoords = dummy.exterior.coords
+            #dummy = loads( ring.ExportToWkt() )
+            #aCoords = dummy.exterior.coords
+            aCoords[0,0] = x1
+            aCoords[0,1] = y1
+            aCoords[1,0] = x2
+            aCoords[1,1] = y2
+            aCoords[2,0] = x3
+            aCoords[2,1] = y3
+            aCoords[3,0] = x4
+            aCoords[3,1] = y4
+            aCoords[4,0] = x5
+            aCoords[4,1] = y5
+            aCoords[5,0] = x6
+            aCoords[5,1] = y6
+            aCoords[6,0] = x1
+            aCoords[6,1] = y1
+            
+
+
+
             dummy1= np.array(aCoords)
             pHexagon = convert_coordinates_to_cell(1, dummy1)
             aHexagon.append(pHexagon)

@@ -12,6 +12,7 @@ class streamcase(object):
     iFlag_mode=0    
     iFlag_use_dem = 0
     dResolution=0.0
+    dResolution_meter=0.0
 
     dLongitude_left = -79.44374
     dLongitude_right = -74.24774 
@@ -60,7 +61,6 @@ class streamcase(object):
         self.sWorkspace_project= aParameter[ 'sWorkspace_project']
         self.sWorkspace_bin= aParameter[ 'sWorkspace_bin']
         
-        
         self.sRegion               = aParameter[ 'sRegion']
         self.sModel                = aParameter[ 'sModel']
        
@@ -89,7 +89,7 @@ class streamcase(object):
         if sMesh_type =='hexagon': #hexagon
             self.iMesh_type = 1
         else:
-            if sMesh_type =='sqaure': #sqaure
+            if sMesh_type =='square': #sqaure
                 self.iMesh_type = 2
             else:
                 if sMesh_type =='latlon': #latlon
@@ -114,14 +114,20 @@ class streamcase(object):
         self.iFlag_use_dem =  int(aParameter['iFlag_use_dem']) 
 
         self.dResolution = float(aParameter['dResolution']) 
+        self.dResolution_meter = float(aParameter['dResolution_meter']) 
+        
         
         self.dLongitude_left = float(aParameter['dLongitude_left']) 
         self.dLongitude_right = float(aParameter['dLongitude_right']) 
         self.dLatitude_bot = float(aParameter['dLatitude_bot']) 
         self.dLatitude_top = float(aParameter['dLatitude_top']) 
 
+        self.sFilename_spatial_reference = aParameter['sFilename_spatial_reference']
+        self.sFilename_dem = aParameter['sFilename_dem']
+
         self.sFilename_mesh_netcdf = aParameter['sFilename_mesh_netcdf']
         self.sFilename_mesh = self.sWorkspace_simulation_case + slash + aParameter['sFilename_mesh']
+        
 
         self.sJob =  aParameter['sJob'] 
 

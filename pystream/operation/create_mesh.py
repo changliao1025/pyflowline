@@ -17,7 +17,9 @@ def create_mesh(oModel_in):
 
 
     #we can use the dem extent to setup 
+    iMesh_type = oModel_in.iMesh_type
     dResolution = oModel_in.dResolution
+    dResolution_meter = oModel_in.dResolution_meter
     sFilename_dem = oModel_in.sFilename_dem
     sFilename_spatial_reference = oModel_in.sFilename_spatial_reference
     sFilename_mesh = oModel_in.sFilename_mesh
@@ -37,44 +39,52 @@ def create_mesh(oModel_in):
 
     dLongitude_right, dLatitude_top= reproject_coordinates(dX_right, dOriginY,pSpatialRef,spatial_reference_target)
     dLatitude_mean = 0.5 * (dLatitude_top + dLatitude_bot)
-    dResolution_meter = degree_to_meter(dLatitude_mean, dResolution )
+
+
+    
+        
+
     dX_left = dOriginX
     dY_top = dOriginY
-    dArea = np.power(dResolution_meter,2.0)
+   
+    
+    if iMesh_type ==1: #hexagon
 
-    ncolumn= int( (dLongitude_right - dLongitude_left) / dResolution )
-    nrow= int( (dLatitude_top - dLatitude_bot) / dResolution )
-   
-    ncolumn= int( (dX_right - dX_left) / dResolution_meter )
-    nrow= int( (dY_top - dY_bot) / dResolution_meter )
-   
-    #hexagon edge
-    dLength_edge = np.sqrt(  2.0 * dArea / (3.0* np.sqrt(3.0))  )
-    dLength_shift = 0.5 * dLength_edge * np.sqrt(3.0)
-    dX_spacing = dLength_edge * 1.5
-    dY_spacing = dLength_edge * np.sqrt(3.0)
+        #hexagon edge
+        dResolution_meter = degree_to_meter(dLatitude_mean, dResolution )
+        dArea = np.power(dResolution_meter,2.0)
+        dLength_edge = np.sqrt(  2.0 * dArea / (3.0* np.sqrt(3.0))  )
+        dLength_shift = 0.5 * dLength_edge * np.sqrt(3.0)
+        dX_spacing = dLength_edge * 1.5
+        dY_spacing = dLength_edge * np.sqrt(3.0)
 
-    ncolumn= int( (dX_right - dX_left) / dX_spacing )
-    nrow= int( (dY_top - dY_bot) / dY_spacing )
-   
-    iMesh_type = oModel_in.iMesh_type
-    if iMesh_type =='hexagon': #hexagon
+        ncolumn= int( (dX_right - dX_left) / dX_spacing )
+        nrow= int( (dY_top - dY_bot) / dY_spacing )
+
         aHexagon = create_hexagon_mesh(dX_left, dY_bot, dResolution_meter, ncolumn, nrow, sFilename_mesh, sFilename_spatial_reference)
         return aHexagon
     else:
-        if iMesh_type =='sqaure': #sqaure
+        if iMesh_type ==2: #sqaure
+            ncolumn= int( (dX_right - dX_left) / dResolution_meter )
+            nrow= int( (dY_top - dY_bot) / dResolution_meter )
+            
             aSquare = create_square_mesh(dX_left, dY_bot, dResolution_meter, ncolumn, nrow, sFilename_mesh, sFilename_spatial_reference)
             return aSquare
         else:
-            if iMesh_type =='latlon': #latlon
+            if iMesh_type ==3: #latlon
+                dResolution_meter = degree_to_meter(dLatitude_mean, dResolution )
+                dArea = np.power(dResolution_meter,2.0)
+                ncolumn= int( (dLongitude_right - dLongitude_left) / dResolution )
+                nrow= int( (dLatitude_top - dLatitude_bot) / dResolution )
                 aLatlon = create_latlon_mesh(dLongitude_left, dLatitude_bot, dResolution, ncolumn, nrow, sFilename_mesh)
                 return aLatlon
             else:
-                if iMesh_type =='mpas': #mpas
-                    aMpas = create_mpas_mesh(oModel_in)
+                if iMesh_type ==4: #mpas
+                    sFilename_mesh_netcdf = oModel_in.sFilename_mesh_netcdf
+                    aMpas = create_mpas_mesh(sFilename_mesh_netcdf, dLatitude_top, dLatitude_bot, dLongitude_left, dLongitude_right,sFilename_mesh)
                     return aMpas
                 else:
-                    if iMesh_type =='tin': #tin
+                    if iMesh_type ==5: #tin
                         aTin = create_tin_mesh(oModel_in)
                         return aTin
                     else:

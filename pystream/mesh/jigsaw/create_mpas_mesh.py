@@ -11,20 +11,11 @@ from pyearth.gis.location.convert_lat_lon_range import convert_180_to_360,conver
 
 from pystream.format.convert_coordinates_to_cell import convert_coordinates_to_cell
 
-def create_mpas_mesh(oModel_in):
-    #sFilename_mesh_netcdf, dLatitude_top, dLatitude_bot, dLongitude_left, dLongitude_right,sFilename_mesh):
+def create_mpas_mesh(sFilename_mesh_netcdf, dLatitude_top, dLatitude_bot, dLongitude_left, dLongitude_right,sFilename_mesh):
+  
    
-    iMesh_type = oModel_in.iMesh_type
-    sFilename_mesh  = oModel_in.sFilename_mesh
-    sWorkspace_out = oModel_in.sWorkspace_simulation_case
-    dLongitude_left = oModel_in.dLongitude_left
-    dLatitude_bot = oModel_in.dLatitude_bot
+   
 
-    dLongitude_right = oModel_in.dLongitude_right
-    dLatitude_top = oModel_in.dLatitude_top
-    #read netcdf
-    sFilename_mesh_netcdf = oModel_in.sFilename_mesh_netcdf
-    
     if (os.path.exists(sFilename_mesh_netcdf)):
         pass
     else:

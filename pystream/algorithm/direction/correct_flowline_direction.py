@@ -9,7 +9,7 @@ from shapely.wkt import loads
 lID=0
 aFlag_process=None
 
-from pystream.check_head_water import check_head_water
+from pystream.algorithm.auxiliary.check_head_water import check_head_water
 
 def correct_flowline_direction(aFlowline_in, pVertex_outlet):
         

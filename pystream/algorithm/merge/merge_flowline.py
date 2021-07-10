@@ -2,7 +2,7 @@ import os, sys
 from osgeo import ogr, osr, gdal, gdalconst
 import numpy as np
 
-from pystream.find_vertex_in_list import find_vertex_in_list
+from pystream.algorithm.auxiliary.find_vertex_in_list import find_vertex_in_list
 lID = 0
 def merge_flowline(aFlowline_in, aVertex, \
     pVertex_outlet_in, \

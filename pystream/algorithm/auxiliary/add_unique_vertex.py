@@ -1,7 +1,7 @@
 import numpy as np
 from pystream.shared.vertex import pyvertex
 
-from pystream.find_vertex_in_list import find_vertex_in_list
+from pystream.algorithm.auxiliary.find_vertex_in_list import find_vertex_in_list
 def add_unique_vertex(aVertex, pVertex_in):
     iFlag_exist = 0
     nVertex = len(aVertex)     

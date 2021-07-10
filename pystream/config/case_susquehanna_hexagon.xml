@@ -18,6 +18,13 @@
       </desc>
     </entry>
 
+    <entry id="iFlag_disconnected" value="0">
+      <type>int</type>
+      <desc>
+        The scratch workspace
+      </desc>
+    </entry>
+
     <entry id="iFlag_use_dem" value="1">
       <type>int</type>
       <desc>
@@ -128,7 +135,12 @@
     </entry>
 
 
-
+    <entry id="sFilename_flowlinw_raw" value="'/qfs/people/liao313/data/hexwatershed/susquehanna/vector/hydrology/flowline.shp'">
+      <type>char</type>
+      <desc>
+        The scratch workspace
+      </desc>
+    </entry>
 
 
     <entry id="sFilename_mesh_netcdf" value="/qfs/people/liao313/workspace/python/jigsaw/icom-mesh/mesh/delaware_60_30_5_2_w_boundary/out/invert_mesh.nc">
@@ -163,6 +175,18 @@
       </desc>
     </entry>
     <entry id="dLatitude_top" value="43.00334">
+      <type>real</type>
+      <desc>
+        The scratch workspace
+      </desc>
+    </entry>
+    <entry id="dx_outlet" value="1691654.168">
+      <type>real</type>
+      <desc>
+        The scratch workspace
+      </desc>
+    </entry>
+    <entry id="dy_outlet" value="2005654.678">
       <type>real</type>
       <desc>
         The scratch workspace

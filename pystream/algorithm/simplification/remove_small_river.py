@@ -2,7 +2,7 @@ import sys, os
 import numpy as np
 
 
-from pystream.check_head_water import check_head_water
+from pystream.algorithm.auxiliary.check_head_water import check_head_water
 
 def remove_small_river(aFlowline_in, dThreshold):
 

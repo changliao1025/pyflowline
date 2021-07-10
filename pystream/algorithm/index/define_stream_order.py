@@ -1,7 +1,7 @@
 import os, sys
 import numpy as np 
 from osgeo import ogr, osr, gdal, gdalconst
-from pystream.check_head_water import check_head_water
+from pystream.algorithm.auxiliary.check_head_water import check_head_water
 def define_stream_order(aFlowline_in):
     nFlowline = len(aFlowline_in)
     aFlowline_out = list()

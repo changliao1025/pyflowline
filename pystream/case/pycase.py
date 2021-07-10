@@ -11,8 +11,10 @@ class streamcase(object):
     
     iFlag_mode=0    
     iFlag_use_dem = 0
+    iFlag_disconnected =0
     dResolution=0.0
     dResolution_meter=0.0
+    dThreshold_small_river=0.0
 
     dLongitude_left = -79.44374
     dLongitude_right = -74.24774 
@@ -41,7 +43,7 @@ class streamcase(object):
 
     sFilename_spatial_reference=''
     sFilename_dem=''
-
+    sFilename_flowlinw_raw=''
     #before intersect
 
     #intersect
@@ -112,9 +114,12 @@ class streamcase(object):
         self.iFlag_simulation =  int(aParameter['iFlag_simulation']) 
         self.iFlag_mode =  int(aParameter['iFlag_mode']) 
         self.iFlag_use_dem =  int(aParameter['iFlag_use_dem']) 
-
+        self.iFlag_disconnected =  int(aParameter['iFlag_disconnected'])
         self.dResolution = float(aParameter['dResolution']) 
         self.dResolution_meter = float(aParameter['dResolution_meter']) 
+
+        self.dThreshold_small_river =  float(aParameter['dThreshold_small_river']) 
+
         
         
         self.dLongitude_left = float(aParameter['dLongitude_left']) 
@@ -122,12 +127,15 @@ class streamcase(object):
         self.dLatitude_bot = float(aParameter['dLatitude_bot']) 
         self.dLatitude_top = float(aParameter['dLatitude_top']) 
 
+        self.dx_outlet = float(aParameter['dx_outlet']) 
+        self.dy_outlet = float(aParameter['dy_outlet']) 
+
         self.sFilename_spatial_reference = aParameter['sFilename_spatial_reference']
         self.sFilename_dem = aParameter['sFilename_dem']
 
         self.sFilename_mesh_netcdf = aParameter['sFilename_mesh_netcdf']
         self.sFilename_mesh = self.sWorkspace_simulation_case + slash + aParameter['sFilename_mesh']
-        
+        self.sFilename_flowlinw_raw = aParameter['sFilename_flowlinw_raw']
 
         self.sJob =  aParameter['sJob'] 
 

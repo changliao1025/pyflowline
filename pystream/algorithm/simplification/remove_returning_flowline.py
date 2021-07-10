@@ -3,9 +3,8 @@ import numpy as np
 from pystream.shared.hexagon import pyhexagon
 from pystream.shared.flowline import pyflowline
 from pystream.format.convert_coordinates_to_flowline import convert_coordinates_to_flowline
-from pystream.add_unique_vertex import add_unique_vertex
 
-from pystream.find_vertex_in_list import find_vertex_in_list
+from pystream.algorithm.auxiliary.find_vertex_in_list import find_vertex_in_list
 def remove_returning_flowline(aCell_in, aCell_intersect_in, pVertex_outlet_in):
     aCell_out = list()
     aFlowline_out=list()

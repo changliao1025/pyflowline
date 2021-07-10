@@ -29,17 +29,17 @@ def create_mpas_mesh(sFilename_mesh_netcdf, dLatitude_top, dLatitude_bot, dLongi
     pDatasets_in = Dataset(sFilename_mesh_netcdf)
 
     netcdf_format = pDatasets_in.file_format
-
-    #pDriver_shapefile = ogr.GetDriverByName('ESRI Shapefile')
+    pDriver_geojson = ogr.GetDriverByName('GeoJSON')
+    pDriver_shapefile = ogr.GetDriverByName('ESRI Shapefile')
     #pDataset_shapefile = pDriver_shapefile.Open(sFilename_shapefile, 0)
     #pLayer_shapefile = pDataset_shapefile.GetLayer(0)
     #pSrs = pLayer_shapefile.GetSpatialRef()
     pSrs = osr.SpatialReference()  
     pSrs.ImportFromEPSG(4326)    # WGS84 lat/lon
 
-    pDriver = ogr.GetDriverByName('GeoJSON')
+    
     #geojson
-    pDataset = pDriver.CreateDataSource(sFilename_mesh)
+    pDataset = pDriver_shapefile.CreateDataSource(sFilename_mesh)
 
     pLayer = pDataset.CreateLayer('cell', pSrs, ogr.wkbPolygon)
     # Add one attribute

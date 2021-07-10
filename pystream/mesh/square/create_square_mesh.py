@@ -8,7 +8,7 @@ from osgeo import ogr, osr, gdal, gdalconst
 
 from hexwatershed.auxiliary.gdal_function import obtain_raster_metadata
 
-os.environ['PROJ_LIB'] = '/qfs/people/liao313/.conda/envs/gdalenv/share/proj'
+#os.environ['PROJ_LIB'] = '/qfs/people/liao313/.conda/envs/gdalenv/share/proj'
 
 def create_square_mesh(dX_left, dY_bot, dResolution, ncolumn, nrow, sFilename_output, sFilename_shapefile):
 
@@ -17,18 +17,16 @@ def create_square_mesh(dX_left, dY_bot, dResolution, ncolumn, nrow, sFilename_ou
         #delete it if it exists
         os.remove(sFilename_output)
 
-    #pDriver = ogr.GetDriverByName('Esri Shapefile')
-    pDriver = ogr.GetDriverByName('GeoJSON')
-    #geojson
-    pDataset = pDriver.CreateDataSource(sFilename_output)
-    #pSpatialRef = osr.SpatialReference(wkt=pProjection)
+    pDriver_shapefile = ogr.GetDriverByName('Esri Shapefile')
+    #pDriver_geojson = ogr.GetDriverByName('GeoJSON')
+
+    pDataset = pDriver_shapefile.CreateDataSource(sFilename_output)
+    
 
     pDriver_shapefile = ogr.GetDriverByName('ESRI Shapefile')
     pDataset_shapefile = pDriver_shapefile.Open(sFilename_shapefile, 0)
     pLayer_shapefile = pDataset_shapefile.GetLayer(0)
-    pSrs = pLayer_shapefile.GetSpatialRef()
-
-    
+    pSrs = pLayer_shapefile.GetSpatialRef()    
 
     pLayer = pDataset.CreateLayer('cell', pSrs, ogr.wkbPolygon)
     # Add one attribute

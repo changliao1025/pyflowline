@@ -120,7 +120,7 @@
       </desc>
     </entry>
 
-    <entry id="sFilename_spatial_reference" value="/qfs/people/liao313/data/hexwatershed/susquehanna/vector/hydrology/boundary.shp">
+    <entry id="sFilename_spatial_reference" value="/qfs/people/liao313/data/hexwatershed/susquehanna/vector/hydrology/boundary_proj.shp">
       <type>char</type>
       <desc>
         The scratch workspace
@@ -137,7 +137,7 @@
         The scratch workspace
       </desc>
     </entry>
-    <entry id="sFilename_mesh" value="latlon.json">
+    <entry id="sFilename_mesh" value="latlon.shp">
       <type>char</type>
       <desc>
         The scratch workspace

@@ -18,15 +18,17 @@ def create_hexagon_mesh(dX_left, dY_bot, dResolution_meter, ncolumn, nrow, sFile
         #delete it if it exists
         os.remove(sFilename_output)
 
-    #pDriver = ogr.GetDriverByName('Esri Shapefile')
-    pDriver = ogr.GetDriverByName('GeoJSON')
-    #geojson
-    pDataset = pDriver.CreateDataSource(sFilename_output)
+    pDriver_shapefile = ogr.GetDriverByName('Esri Shapefile')
+    #pDriver_geojson = ogr.GetDriverByName('GeoJSON')
     
-    pDriver_shapefile = ogr.GetDriverByName('ESRI Shapefile')
+    pDataset = pDriver_shapefile.CreateDataSource(sFilename_output)
+    
     pDataset_shapefile = pDriver_shapefile.Open(sFilename_shapefile, 0)
     pLayer_shapefile = pDataset_shapefile.GetLayer(0)
     pSrs = pLayer_shapefile.GetSpatialRef()
+
+    #pSrs = osr.SpatialReference()  
+    #pSrs.ImportFromEPSG(4326)    # WGS84 lat/lon
 
     pLayer = pDataset.CreateLayer('cell', pSrs, ogr.wkbPolygon)
     # Add one attribute

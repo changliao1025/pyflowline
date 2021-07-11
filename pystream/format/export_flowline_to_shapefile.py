@@ -3,7 +3,7 @@ import json
 from osgeo import ogr, osr, gdal, gdalconst
 from shapely.geometry import Point, LineString, MultiLineString
 from shapely.wkt import loads
-def export_flowline_to_json(aFlowline_in, pSpatial_reference_in, \
+def export_flowline_to_shapefile(aFlowline_in, pSpatial_reference_in, \
     sFilename_json_out, \
     aAttribute_field=None,\
     aAttribute_data=None,\
@@ -38,7 +38,7 @@ def export_flowline_to_json(aFlowline_in, pSpatial_reference_in, \
 
     
 
-    pDriver = ogr.GetDriverByName('GeoJSON')
+    #pDriver = ogr.GetDriverByName('GeoJSON')
     pDriver = ogr.GetDriverByName('ESRI Shapefile')
     #geojson
     pDataset_json = pDriver.CreateDataSource(sFilename_json_out)  

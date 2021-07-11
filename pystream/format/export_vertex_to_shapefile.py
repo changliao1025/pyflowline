@@ -3,7 +3,7 @@ import json
 from osgeo import ogr, osr, gdal, gdalconst
 from shapely.geometry import Point, LineString, MultiLineString
 from shapely.wkt import loads
-def export_vertex_to_json(aVertex_in, pSpatial_reference_in, sFilename_json_out,\
+def export_vertex_to_shapefile(aVertex_in, pSpatial_reference_in, sFilename_json_out,\
     aAttribute_data=None):
     """
     convert a shpefile to json format.
@@ -23,7 +23,7 @@ def export_vertex_to_json(aVertex_in, pSpatial_reference_in, sFilename_json_out,
 
     nVertex = len(aVertex_in)
 
-    pDriver = ogr.GetDriverByName('GeoJSON')
+    #pDriver = ogr.GetDriverByName('GeoJSON')
     pDriver = ogr.GetDriverByName('ESRI Shapefile')
     #geojson
     pDataset_json = pDriver.CreateDataSource(sFilename_json_out)

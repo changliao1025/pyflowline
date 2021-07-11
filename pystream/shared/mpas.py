@@ -8,6 +8,8 @@ from pystream.shared.cell import pycell
 class pympas(pycell):
     lIndex=0    
     nFlowline=0
+    nVertex =0 
+    nEdge=0
     dLength=0.0
     dArea=0.0
     dX_center=0.0
@@ -18,7 +20,7 @@ class pympas(pycell):
 
     def __init__(self, aEdge,aVertex):    
         nEdge = len(aEdge)
-        if nEdge < 5 or nEdge > 7:
+        if nEdge < 3 or nEdge > 7:
             pass
         else:
             

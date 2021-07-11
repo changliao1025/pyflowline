@@ -36,7 +36,7 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh, sFilename_flowli
     aCell_intersect=list()
     
    
-    pDataset_mesh = pDriver_geojson.Open(sFilename_mesh, 0)
+    pDataset_mesh = pDriver_shapefile.Open(sFilename_mesh, 0)
     pDataset_flowline = pDriver_shapefile.Open(sFilename_flowline, 0)   
 
     pLayer_mesh = pDataset_mesh.GetLayer(0)
@@ -92,6 +92,7 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh, sFilename_flowli
             dummy = loads( pGeometry_mesh.ExportToWkt() )
             aCoords = dummy.exterior.coords
             dummy1= np.array(aCoords)
+            
             pCell = convert_coordinates_to_cell(iMesh_type_in, dummy1)
             pCell.lIndex = lID_mesh
             pCell.dArea = pGeometry_mesh.GetArea() 

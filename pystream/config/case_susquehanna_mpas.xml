@@ -155,6 +155,27 @@
         The scratch workspace
       </desc>
     </entry>
+    <entry id="sFilename_flowline_segment_index_before_intersect" value="flowline_segment_index_before_intersect.shp">
+      <type>char</type>
+      <desc>
+        The scratch workspace
+      </desc>
+    </entry>
+    <entry id="sFilename_flowline_segment_order_before_intersect" value="flowline_segment_order_before_intersect.shp">
+      <type>char</type>
+      <desc>
+        The scratch workspace
+      </desc>
+    </entry>
+     <entry id="sFilename_flowline_intersect" value="flowline_intersect.shp">
+      <type>char</type>
+      <desc>
+        The scratch workspace
+      </desc>
+    </entry>
+
+
+    
 
     <entry id="dLongitude_left" value="-79.44374">
       <type>real</type>

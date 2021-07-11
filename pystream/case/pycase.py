@@ -45,11 +45,13 @@ class streamcase(object):
     sFilename_dem=''
     sFilename_flowlinw_raw=''
     #before intersect
+    sFilename_flowline_segment_order_before_intersect=''
+    sFilename_flowline_segment_index_before_intersect=''
 
     #intersect
     sFilename_mesh=''
     sFilename_mesh_netcdf=''
-    sFilename_intersect = ''
+    sFilename_flowline_intersect = ''
     #after intersect
     sFilename_flowline_simplified_after_intersect=''
     sFilename_vertex_without_confluence_after_intersect=''
@@ -134,9 +136,15 @@ class streamcase(object):
         self.sFilename_dem = aParameter['sFilename_dem']
 
         self.sFilename_mesh_netcdf = aParameter['sFilename_mesh_netcdf']
-        self.sFilename_mesh = self.sWorkspace_simulation_case + slash + aParameter['sFilename_mesh']
         self.sFilename_flowlinw_raw = aParameter['sFilename_flowlinw_raw']
 
+
+        self.sFilename_mesh = self.sWorkspace_simulation_case + slash + aParameter['sFilename_mesh']
+        
+        self.sFilename_flowline_segment_index_before_intersect = self.sWorkspace_simulation_case + slash + aParameter['sFilename_flowline_segment_index_before_intersect']
+        self.sFilename_flowline_segment_order_before_intersect = self.sWorkspace_simulation_case + slash + aParameter['sFilename_flowline_segment_order_before_intersect']
+        
+        self.sFilename_flowline_intersect  = self.sWorkspace_simulation_case + slash + aParameter['sFilename_flowline_intersect']
         self.sJob =  aParameter['sJob'] 
 
         self.sWorkspace_data_project = self.sWorkspace_data +  slash + self.sWorkspace_project

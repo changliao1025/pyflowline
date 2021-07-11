@@ -1,10 +1,11 @@
 from abc import ABCMeta, abstractmethod
-from pystream.add_unique_vertex import add_unique_vertex
+
 from osgeo import gdal, osr, ogr
+
 from pystream.shared.vertex import pyvertex
 from pystream.shared.edge import pyedge
 from pystream.shared.cell import pycell
-from pystream.add_unique_vertex import add_unique_vertex
+
 
 class pyhexagonlink(object):
     lIndex=0

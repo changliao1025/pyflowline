@@ -24,6 +24,12 @@
         The scratch workspace
       </desc>
     </entry>
+    <entry id="iFlag_disconnected" value="0">
+      <type>int</type>
+      <desc>
+        The scratch workspace
+      </desc>
+    </entry>
 
 
 
@@ -130,6 +136,12 @@
 
 
 
+    <entry id="sFilename_flowlinw_raw" value="/qfs/people/liao313/data/hexwatershed/susquehanna/vector/hydrology/flowline.shp">
+      <type>char</type>
+      <desc>
+        The scratch workspace
+      </desc>
+    </entry>
 
     <entry id="sFilename_mesh_netcdf" value="/qfs/people/liao313/workspace/python/jigsaw/icom-mesh/mesh/delaware_60_30_5_2_w_boundary/out/invert_mesh.nc">
       <type>char</type>
@@ -143,7 +155,24 @@
         The scratch workspace
       </desc>
     </entry>
-
+    <entry id="sFilename_flowline_segment_index_before_intersect" value="flowline_segment_index_before_intersect.shp">
+      <type>char</type>
+      <desc>
+        The scratch workspace
+      </desc>
+    </entry>
+    <entry id="sFilename_flowline_segment_order_before_intersect" value="flowline_segment_order_before_intersect.shp">
+      <type>char</type>
+      <desc>
+        The scratch workspace
+      </desc>
+    </entry>
+     <entry id="sFilename_flowline_intersect" value="flowline_intersect.shp">
+      <type>char</type>
+      <desc>
+        The scratch workspace
+      </desc>
+    </entry>
     <entry id="dLongitude_left" value="-79.44374">
       <type>real</type>
       <desc>
@@ -168,7 +197,18 @@
         The scratch workspace
       </desc>
     </entry>
-
+ <entry id="dx_outlet" value="1691654.168">
+      <type>real</type>
+      <desc>
+        The scratch workspace
+      </desc>
+    </entry>
+    <entry id="dy_outlet" value="2005654.678">
+      <type>real</type>
+      <desc>
+        The scratch workspace
+      </desc>
+    </entry>
     <entry id="dResolution" value="0.125">
       <type>real</type>
       <desc>
@@ -177,6 +217,12 @@
     </entry>
 
     <entry id="dResolution_meter" value="10000">
+      <type>real</type>
+      <desc>
+        The scratch workspace
+      </desc>
+    </entry>
+     <entry id="dThreshold_small_river" value="30000">
       <type>real</type>
       <desc>
         The scratch workspace

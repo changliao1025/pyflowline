@@ -19,6 +19,8 @@ from pystream.format.export_vertex_to_shapefile import export_vertex_to_shapefil
 
 def intersect_flowline_with_mesh_with_postprocess_op(oModel_in):
 
+    iMesh_type = oModel_in.iMesh_type
+
     sWorkspace_simulation_case = oModel_in.sWorkspace_simulation_case  
 
     sFilename_flowlinw_raw = oModel_in.sFilename_flowlinw_raw
@@ -33,7 +35,7 @@ def intersect_flowline_with_mesh_with_postprocess_op(oModel_in):
     sFilename_flowline_intersect = oModel_in.sFilename_flowline_intersect
 
     
-    aCell, aCell_intersect, aFlowline_intersect = intersect_flowline_with_mesh(4, sFilename_mesh, sFilename_flowline, sFilename_flowline_intersect)
+    aCell, aCell_intersect, aFlowline_intersect = intersect_flowline_with_mesh(iMesh_type, sFilename_mesh, sFilename_flowline, sFilename_flowline_intersect)
 
 
     point= dict()

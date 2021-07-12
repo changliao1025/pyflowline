@@ -72,23 +72,18 @@
         The scratch workspace
       </desc>
     </entry>
-
     <entry id="sWorkspace_scratch" value="/compyfs/liao313/">
       <type>char</type>
       <desc>
         The scratch workspace
       </desc>
     </entry>
-
     <entry id="sWorkspace_simulation" value="/04model/pystream/susquehanna/simulation">
       <type>char</type>
       <desc>
         The scratch workspace
       </desc>
     </entry>
-
-
-
     <entry id="sRegion" value="susquehanna">
       <type>char</type>
       <desc>
@@ -107,35 +102,25 @@
         The scratch workspace
       </desc>
     </entry>
-
-
-
-
-
-
     <entry id="sJob" value="test">
       <type>char</type>
       <desc>
         The scratch workspace
       </desc>
     </entry>
-
     <entry id="sFilename_dem" value="/qfs/people/liao313/data/hexwatershed/susquehanna/raster/dem/dem_ext.tif">
       <type>char</type>
       <desc>
         The scratch workspace
       </desc>
     </entry>
-
     <entry id="sFilename_spatial_reference" value="/qfs/people/liao313/data/hexwatershed/susquehanna/vector/hydrology/boundary_proj.shp">
       <type>char</type>
       <desc>
         The scratch workspace
       </desc>
     </entry>
-
-
-    <entry id="sFilename_flowlinw_raw" value="'/qfs/people/liao313/data/hexwatershed/susquehanna/vector/hydrology/flowline.shp'">
+    <entry id="sFilename_flowlinw_raw" value="/qfs/people/liao313/data/hexwatershed/susquehanna/vector/hydrology/flowline.shp">
       <type>char</type>
       <desc>
         The scratch workspace
@@ -155,7 +140,24 @@
         The scratch workspace
       </desc>
     </entry>
-
+ <entry id="sFilename_flowline_segment_index_before_intersect" value="flowline_segment_index_before_intersect.shp">
+      <type>char</type>
+      <desc>
+        The scratch workspace
+      </desc>
+    </entry>
+    <entry id="sFilename_flowline_segment_order_before_intersect" value="flowline_segment_order_before_intersect.shp">
+      <type>char</type>
+      <desc>
+        The scratch workspace
+      </desc>
+    </entry>
+     <entry id="sFilename_flowline_intersect" value="flowline_intersect.shp">
+      <type>char</type>
+      <desc>
+        The scratch workspace
+      </desc>
+    </entry>
     <entry id="dLongitude_left" value="-79.44374">
       <type>real</type>
       <desc>
@@ -192,22 +194,23 @@
         The scratch workspace
       </desc>
     </entry>
-
     <entry id="dResolution" value="0.125">
       <type>real</type>
       <desc>
         The scratch workspace
       </desc>
     </entry>
-
     <entry id="dResolution_meter" value="10000">
       <type>real</type>
       <desc>
         The scratch workspace
       </desc>
     </entry>
-
+       <entry id="dThreshold_small_river" value="30000">
+      <type>real</type>
+      <desc>
+        The scratch workspace
+      </desc>
+    </entry>
   </group>
-
-
 </file>

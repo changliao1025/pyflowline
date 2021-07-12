@@ -31,6 +31,7 @@ class streamcase(object):
     sWorkspace_project=''
     
     sWorkspace_simulation=''
+    sWorkspace_simulation_flowline=''
     sWorkspace_simulation_case=''
     
     sRegion=''
@@ -107,7 +108,11 @@ class streamcase(object):
                         else:
                             print('Unsupported mesh type?')
         
-        self.sWorkspace_simulation_case = self.sWorkspace_simulation + slash + self.sMesh_type + slash + sCase
+        self.sWorkspace_simulation_flowline = self.sWorkspace_simulation + slash + sCase + slash + 'flowline'
+        sPath = self.sWorkspace_simulation_flowline
+        Path(sPath).mkdir(parents=True, exist_ok=True)
+
+        self.sWorkspace_simulation_case = self.sWorkspace_simulation + slash + sCase + slash + self.sMesh_type 
         sPath = self.sWorkspace_simulation_case
         Path(sPath).mkdir(parents=True, exist_ok=True)
 
@@ -141,8 +146,8 @@ class streamcase(object):
 
         self.sFilename_mesh = self.sWorkspace_simulation_case + slash + aParameter['sFilename_mesh']
         
-        self.sFilename_flowline_segment_index_before_intersect = self.sWorkspace_simulation_case + slash + aParameter['sFilename_flowline_segment_index_before_intersect']
-        self.sFilename_flowline_segment_order_before_intersect = self.sWorkspace_simulation_case + slash + aParameter['sFilename_flowline_segment_order_before_intersect']
+        self.sFilename_flowline_segment_index_before_intersect = self.sWorkspace_simulation_flowline + slash + aParameter['sFilename_flowline_segment_index_before_intersect']
+        self.sFilename_flowline_segment_order_before_intersect = self.sWorkspace_simulation_flowline + slash + aParameter['sFilename_flowline_segment_order_before_intersect']
         
         self.sFilename_flowline_intersect  = self.sWorkspace_simulation_case + slash + aParameter['sFilename_flowline_intersect']
         self.sJob =  aParameter['sJob'] 

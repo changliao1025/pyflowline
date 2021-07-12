@@ -13,7 +13,7 @@ from pystream.mesh.jigsaw.create_mpas_mesh import create_mpas_mesh
 from pystream.mesh.tin.create_tin_mesh import create_tin_mesh
 
 
-def create_mesh(oModel_in):
+def create_mesh_op(oModel_in):
 
 
     #we can use the dem extent to setup 

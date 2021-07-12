@@ -32,7 +32,7 @@ class pyvertex(object):
         iFlag = -1
         
         c = self.calculate_distance(other)
-        if( c < 1.0E-10 ):
+        if( c < 1.0E-6 ): #be careful
             iFlag = 1
         else:
             iFlag = 0       

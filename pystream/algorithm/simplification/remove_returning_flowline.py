@@ -5,7 +5,7 @@ from pystream.shared.flowline import pyflowline
 from pystream.format.convert_coordinates_to_flowline import convert_coordinates_to_flowline
 
 from pystream.algorithm.auxiliary.find_vertex_in_list import find_vertex_in_list
-def remove_returning_flowline(aCell_in, aCell_intersect_in, pVertex_outlet_in):
+def remove_returning_flowline(iMesh_type, aCell_in, aCell_intersect_in, pVertex_outlet_in):
     aCell_out = list()
     aFlowline_out=list()
     #checking input data 
@@ -68,8 +68,10 @@ def remove_returning_flowline(aCell_in, aCell_intersect_in, pVertex_outlet_in):
         aVertex_end_upstream = list()
         aStream_order = list()
         iFlag_skip = 0
+        iFlag_previous_overlap=0
         while iFlag_found == 1:
             iFlag_found = 0 
+            
             for j in range(nCell):
                 pCell = aCell_intersect_in[j]
                 lID = pCell.lIndex
@@ -93,41 +95,32 @@ def remove_returning_flowline(aCell_in, aCell_intersect_in, pVertex_outlet_in):
                             if iFlag_found2 == 1 and iFlag_found3 == 1: #on the edge
                                 #same edge
                                 if dummy2.is_overlap(dummy3) ==1:
-                                    if dLength < 0.5*pCell.dLength : 
-                                        pVertex_end_current = pVertex_start   
-                                        iFlag_found = 1
-                                        if iFlag_skip == 0:                                        
-                                            iFlag_skip = 1 
-                                        else:
-                                            aCell_flowline.append(lID)
-                                            iFlag_skip == 0
-                                            pass
-                                        pass
-                                        pass
-                                    else:
-                                        pVertex_end_current = pVertex_start    
-                                        aCell_flowline.append(lID)
-                                        iFlag_found = 1
-                                        pass                                   
-
+                                    
+                                    pVertex_end_current = pVertex_start    
+                                    aCell_flowline.append(lID)
+                                    iFlag_found = 1                                                                       
+                                    iFlag_previous_overlap =1
                                     
                                     pass
                                 else:
-                                    if dLength < 0.5*pCell.dLength : #because it taks a short cut
-                                        
+                                    if dLength < 0.5*pCell.dLength : #because it taks a short cut                                        
                                         pVertex_end_current = pVertex_start   
-                                        iFlag_found = 1
-                                        if iFlag_skip == 0:                                        
-                                            iFlag_skip = 1 
-                                        else:
-                                            aCell_flowline.append(lID)
-                                            iFlag_skip == 0
+                                        iFlag_found = 1  
+
+                                        if iMesh_type ==1 or iMesh_type ==4:
                                             pass
+                                        else:
+                                            if iFlag_previous_overlap ==1: 
+                                                aCell_flowline.append(lID)              
+                                        
+                                        iFlag_previous_overlap=0
+                                        
                                         pass
                                     else:
                                         pVertex_end_current = pVertex_start    
                                         aCell_flowline.append(lID)
                                         iFlag_found = 1
+                                        iFlag_previous_overlap=0
                                         pass
 
                                     pass
@@ -139,6 +132,7 @@ def remove_returning_flowline(aCell_in, aCell_intersect_in, pVertex_outlet_in):
                                 pVertex_end_current = pVertex_start    
                                 aCell_flowline.append(lID)                                
                                 iFlag_found = 1
+                                iFlag_previous_overlap=0
                                 pass                            
                                 
                             break

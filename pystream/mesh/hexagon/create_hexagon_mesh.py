@@ -11,19 +11,19 @@ from shapely.wkt import loads
 from pystream.shared.hexagon import pyhexagon
 from pystream.format.convert_coordinates_to_cell import convert_coordinates_to_cell
 
-def create_hexagon_mesh(dX_left, dY_bot, dResolution_meter, ncolumn, nrow, sFilename_output, sFilename_shapefile):
+def create_hexagon_mesh(dX_left, dY_bot, dResolution_meter, ncolumn, nrow, sFilename_mesh_out, sFilename_spatial_reference_in):
 
     
-    if os.path.exists(sFilename_output): 
+    if os.path.exists(sFilename_mesh_out): 
         #delete it if it exists
-        os.remove(sFilename_output)
+        os.remove(sFilename_mesh_out)
 
     pDriver_shapefile = ogr.GetDriverByName('Esri Shapefile')
     #pDriver_geojson = ogr.GetDriverByName('GeoJSON')
     
-    pDataset = pDriver_shapefile.CreateDataSource(sFilename_output)
+    pDataset = pDriver_shapefile.CreateDataSource(sFilename_mesh_out)
     
-    pDataset_shapefile = pDriver_shapefile.Open(sFilename_shapefile, 0)
+    pDataset_shapefile = pDriver_shapefile.Open(sFilename_spatial_reference_in, 0)
     pLayer_shapefile = pDataset_shapefile.GetLayer(0)
     pSrs = pLayer_shapefile.GetSpatialRef()
 

@@ -107,7 +107,7 @@ def remove_returning_flowline(iMesh_type, aCell_in, aCell_intersect_in, pVertex_
                                         pVertex_end_current = pVertex_start   
                                         iFlag_found = 1  
 
-                                        if iMesh_type ==1 or iMesh_type ==4:
+                                        if iMesh_type ==1 or iMesh_type ==4 or iMesh_type==5:
                                             pass
                                         else:
                                             if iFlag_previous_overlap ==1: 

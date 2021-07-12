@@ -93,7 +93,16 @@ def create_mesh_op(oModel_in):
                     return aMpas
                 else:
                     if iMesh_type ==5: #tin
-                        aTin = create_tin_mesh(oModel_in)
+                        #tin edge
+                        dArea = np.power(dResolution_meter,2.0)
+                        dLength_edge = np.sqrt(  4.0 * dArea /  np.sqrt(3.0) )  
+                        dX_shift = 0.5 * dLength_edge
+                        dY_shift = 0.5 * dLength_edge * np.sqrt(3.0) 
+                        dX_spacing = dX_shift * 2
+                        dY_spacing = dY_shift
+                        ncolumn= int( (dX_right - dX_left) / dX_shift )
+                        nrow= int( (dY_top - dY_bot) / dY_spacing ) 
+                        aTin = create_tin_mesh(dX_left, dY_bot, dResolution_meter, ncolumn, nrow,sFilename_mesh, sFilename_spatial_reference)
                         return aTin
                     else:
                         print('Unsupported mesh type?')

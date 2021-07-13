@@ -33,7 +33,6 @@ from pystream.algorithm.index.define_stream_segment_index import define_stream_s
 prepare the flowline using multiple step approach
 """
 
-
 def preprocess_flowline_op(oModel_in):
     
     #read shapefile and store information in the list
@@ -54,6 +53,8 @@ def preprocess_flowline_op(oModel_in):
     export_flowline_to_shapefile( aFlowline, pSpatialRef, sFilename_out)
 
     if iFlag_disconnected ==1:
+        #need a better way to include this capability
+        
         #aVertex=list()
         #point= dict()
         #point['x'] = -1589612.188

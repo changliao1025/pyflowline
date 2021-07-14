@@ -12,6 +12,7 @@ class streamcase(object):
     iFlag_mode=0    
     iFlag_use_dem = 0
     iFlag_disconnected =0
+    iFlag_rotation=0
     dResolution=0.0
     dResolution_meter=0.0
     dThreshold_small_river=0.0

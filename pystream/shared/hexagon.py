@@ -8,7 +8,8 @@ from pystream.shared.cell import pycell
 
 
 class pyhexagon(pycell):
-    lIndex=0    
+    #lIndex=-1  
+    
     nFlowline=0
     dLength=0.0
     dArea=0.0
@@ -17,6 +18,8 @@ class pyhexagon(pycell):
     aEdge=None
     aVertex=None
     aFlowline=None
+    lCellID  = -1
+    aNeighbor=None #the global ID of all neighbors
 
     def __init__(self, aEdge, aVertex):    
 
@@ -77,6 +80,7 @@ class pyhexagon(pycell):
 
         self.dArea = dArea
         return dArea
+
     def calculate_edge_length(self):
         dArea = self.dArea
         dLength_edge = np.sqrt(  2.0 * dArea / (3.0* np.sqrt(3.0))  )

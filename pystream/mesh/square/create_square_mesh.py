@@ -6,7 +6,7 @@
 import os, sys
 from osgeo import ogr, osr, gdal, gdalconst
 
-from hexwatershed.auxiliary.gdal_function import obtain_raster_metadata
+from pyearth.gis.gdal.gdal_function import obtain_raster_metadata
 
 #os.environ['PROJ_LIB'] = '/qfs/people/liao313/.conda/envs/gdalenv/share/proj'
 

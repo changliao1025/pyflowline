@@ -6,7 +6,7 @@ from pystream.shared.edge import pyedge
 from pystream.shared.cell import pycell
 
 class pympas(pycell):
-    lIndex=0    
+    #lIndex=0    
     nFlowline=0
     nVertex =0 
     nEdge=0
@@ -17,6 +17,9 @@ class pympas(pycell):
     aEdge=None
     aVertex=None
     aFlowline=None
+    lCellID  = -1
+    nNeighbor=-1
+    aNeighbor=None #the global ID of all neighbors
 
     def __init__(self, aEdge,aVertex):    
         nEdge = len(aEdge)

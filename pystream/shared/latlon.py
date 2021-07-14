@@ -6,7 +6,7 @@ from pystream.shared.edge import pyedge
 from pystream.shared.cell import pycell
 
 class pylatlon(pycell):
-    lIndex=0 
+    #lIndex=0 
     nFlowline=0
     dLength=0.0
     dArea=0.0
@@ -15,6 +15,10 @@ class pylatlon(pycell):
     aEdge=None
     aVertex=None
     aFlowline=None
+
+    lCellID  = -1
+    aNeighbor=None #the global ID of all neighbors
+    nNeighbor=-1
 
     def __init__(self, aEdge, aVertex):    
         nEdge = len(aEdge)

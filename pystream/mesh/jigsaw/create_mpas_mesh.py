@@ -66,6 +66,11 @@ def create_mpas_mesh(sFilename_mesh_netcdf, dLatitude_top, dLatitude_bot, dLongi
         else:
             pass
             
+        if sKey == 'cellsOnCell':
+            cellsOnCell0 = aValue 
+        else:
+            pass
+            
         if sKey == 'verticesOnCell':
             verticesOnCell0 = aValue
         else:
@@ -98,29 +103,32 @@ def create_mpas_mesh(sFilename_mesh_netcdf, dLatitude_top, dLatitude_bot, dLongi
     aLatitudeCell = latCell0[:] / math.pi * 180
     aLongitudeCell = lonCell0[:] / math.pi * 180
 
-    
+    aCellsOnCell = cellsOnCell0[:]
 
     aEdgesOnCell= edgesOnCell0[:]
     aVertexOnCell = verticesOnCell0[:]
     
     aIndexToCellID = indexToCellID0[:]
     ncell = len(aIndexToCellID)
-
-    lID = 0
+    
+ 
     aMpas = list()
     for i in range(ncell):
-        dLat = convert_360_to_180 ( aLatitudeCell[i-1])
-        dLon = convert_360_to_180 (aLongitudeCell[i-1])
+        dLat = convert_360_to_180 (aLatitudeCell[i])
+        dLon = convert_360_to_180 (aLongitudeCell[i])
 
         if dLat > dLatitude_bot and dLat < dLatitude_top and dLon > dLongitude_left and dLon < dLongitude_right:
 
 
             #get cell edge
-            aEdgeIndex = aEdgesOnCell[i-1,:]
-            aVertexIndex0 = aVertexOnCell[i-1,:]
+            lCellID = aIndexToCellID[i]
+            aCellOnCellIndex = aCellsOnCell[i,:]
+            aEdgesOnCellIndex = aEdgesOnCell[i,:]
+            aVertexOnCellIndex = aVertexOnCell[i,:]
 
-            dummy0 = np.where(aVertexIndex0 > 0)
-            aVertexIndex = aVertexIndex0[dummy0]
+            dummy0 = np.where(aVertexOnCellIndex > 0)
+            aVertexIndex = aVertexOnCellIndex[dummy0]
+            aNeighborIndex=aCellOnCellIndex[dummy0]
 
             aLonVertex = aLongitudeVertex[aVertexIndex-1]
             aLatVertex = aLatitudeVertex[aVertexIndex-1]
@@ -149,14 +157,17 @@ def create_mpas_mesh(sFilename_mesh_netcdf, dLatitude_top, dLatitude_bot, dLongi
             pPolygon.AddGeometry(ring)
 
             pFeature.SetGeometry(pPolygon)
-            pFeature.SetField("id", lID)
+            pFeature.SetField("id", int(lCellID) )
             pLayer.CreateFeature(pFeature)
 
-            lID = lID + 1
+          
             #dummy = loads( ring.ExportToWkt() )
             #aCoords = dummy.exterior.coords
             dummy1= np.array(aCoords)
             pmpas = convert_coordinates_to_cell(4, dummy1)
+            pmpas.lCellID = lCellID
+            pmpas.aNeighbor=aNeighborIndex
+            pmpas.nNeighbor=nVertex
             aMpas.append(pmpas)
     
             #get vertex

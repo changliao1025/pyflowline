@@ -50,7 +50,7 @@ def create_hexagon_mesh(dX_left, dY_bot, dResolution_meter, ncolumn, nrow, sFile
     dX_spacing = dLength_edge * 1.5
     dY_spacing = dLength_edge * np.sqrt(3.0)
 
-    lID =0 
+    
 
     #geojson
     aHexagon=list()
@@ -59,6 +59,8 @@ def create_hexagon_mesh(dX_left, dY_bot, dResolution_meter, ncolumn, nrow, sFile
     #   |           |
     #(x1,y1)-----(x4,y4)
     #...............
+  
+    lCellID = 1
     for column in range(0, ncolumn):
         for row in range(0, nrow):
             if column % 2 == 0 :
@@ -99,10 +101,10 @@ def create_hexagon_mesh(dX_left, dY_bot, dResolution_meter, ncolumn, nrow, sFile
             pPolygon.AddGeometry(ring)
 
             pFeature.SetGeometry(pPolygon)
-            pFeature.SetField("id", lID)
+            pFeature.SetField("id", lCellID)
             pLayer.CreateFeature(pFeature)
+            
 
-            lID = lID + 1
 
             #dummy = loads( ring.ExportToWkt() )
             #aCoords = dummy.exterior.coords
@@ -126,11 +128,23 @@ def create_hexagon_mesh(dX_left, dY_bot, dResolution_meter, ncolumn, nrow, sFile
 
             dummy1= np.array(aCoords)
             pHexagon = convert_coordinates_to_cell(1, dummy1)
+            pHexagon.lCellID = lCellID
             aHexagon.append(pHexagon)
+            lCellID= lCellID +1
 
             pass
         
     pDataset = pLayer = pFeature  = None      
+    
+
+    #build topoloy
+    #nCell = len(aHexagon)
+    #aNeighbor=np.full((nCell,6), -1, dtype=int)
+    #for column in range(0, ncolumn):
+    #    for row in range(0, nrow):
+    #        index_dummy = 
+    #        aNeighbor[]
+    #        pass
 
 
 

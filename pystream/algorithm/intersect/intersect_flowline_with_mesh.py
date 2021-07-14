@@ -68,7 +68,7 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh, sFilename_flowli
     pFeatureOut = ogr.Feature(pLayerDefn)
 
     
-    lID_mesh = 0
+   
     lID_flowline =0 
     
         
@@ -78,6 +78,7 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh, sFilename_flowli
     #for pFeature_mesh in pLayer_mesh:       
         pFeature_mesh= pLayer_mesh.GetFeature(i)
         pGeometry_mesh = pFeature_mesh.GetGeometryRef()
+        lCellID = pFeature_mesh.GetField("id")
         if (iFlag_transform ==1): #projections are different
             pGeometry_mesh.Transform(transform)
 
@@ -94,7 +95,7 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh, sFilename_flowli
             dummy1= np.array(aCoords)
             
             pCell = convert_coordinates_to_cell(iMesh_type_in, dummy1)
-            pCell.lIndex = lID_mesh
+            pCell.lCellID = lCellID
             pCell.dArea = pGeometry_mesh.GetArea() 
             pCell.dLength = pCell.calculate_edge_length()
                      
@@ -183,7 +184,7 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh, sFilename_flowli
 
             
             aCell.append(pCell)
-            lID_mesh = lID_mesh + 1   
+            
         else:
             pass
 

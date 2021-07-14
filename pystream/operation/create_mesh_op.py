@@ -18,6 +18,7 @@ def create_mesh_op(oModel_in):
 
     #we can use the dem extent to setup 
     iMesh_type = oModel_in.iMesh_type
+    iFlag_rotation = oModel_in.iFlag_rotation
     dResolution = oModel_in.dResolution
     dResolution_meter = oModel_in.dResolution_meter
     sFilename_dem = oModel_in.sFilename_dem
@@ -61,7 +62,7 @@ def create_mesh_op(oModel_in):
         ncolumn= int( (dX_right - dX_left) / dX_spacing )
         nrow= int( (dY_top - dY_bot) / dY_spacing )
 
-        aHexagon = create_hexagon_mesh(dX_left, dY_bot, dResolution_meter, ncolumn, nrow, sFilename_mesh, sFilename_spatial_reference)
+        aHexagon = create_hexagon_mesh(iFlag_rotation, dX_left, dY_bot, dResolution_meter, ncolumn, nrow, sFilename_mesh, sFilename_spatial_reference)
         return aHexagon
     else:
         if iMesh_type ==2: #sqaure

@@ -24,6 +24,12 @@
         The scratch workspace
       </desc>
     </entry>
+     <entry id="iFlag_rotation" value="0">
+      <type>int</type>
+      <desc>
+        The scratch workspace
+      </desc>
+    </entry>
 
     <entry id="iFlag_use_dem" value="1">
       <type>int</type>

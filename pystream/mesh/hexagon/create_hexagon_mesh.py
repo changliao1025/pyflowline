@@ -11,7 +11,7 @@ from shapely.wkt import loads
 from pystream.shared.hexagon import pyhexagon
 from pystream.format.convert_coordinates_to_cell import convert_coordinates_to_cell
 
-def create_hexagon_mesh(dX_left, dY_bot, dResolution_meter, ncolumn, nrow, sFilename_mesh_out, sFilename_spatial_reference_in):
+def create_hexagon_mesh(iFlag_rotation, dX_left, dY_bot, dResolution_meter, ncolumn, nrow, sFilename_mesh_out, sFilename_spatial_reference_in):
 
     
     if os.path.exists(sFilename_mesh_out): 
@@ -45,10 +45,7 @@ def create_hexagon_mesh(dX_left, dY_bot, dResolution_meter, ncolumn, nrow, sFile
     dArea = np.power(dResolution_meter,2.0)
     #hexagon edge
     dLength_edge = np.sqrt(  2.0 * dArea / (3.0* np.sqrt(3.0))  )
-    dX_shift = 0.5 * dLength_edge
-    dY_shift = 0.5 * dLength_edge * np.sqrt(3.0)
-    dX_spacing = dLength_edge * 1.5
-    dY_spacing = dLength_edge * np.sqrt(3.0)
+    
 
     
 
@@ -61,78 +58,164 @@ def create_hexagon_mesh(dX_left, dY_bot, dResolution_meter, ncolumn, nrow, sFile
     #...............
   
     lCellID = 1
-    for column in range(0, ncolumn):
+    if iFlag_rotation ==0:
+        dX_shift = 0.5 * dLength_edge * np.sqrt(3.0)
+        dY_shift = 0.5 * dLength_edge
+        dX_spacing = dLength_edge * np.sqrt(3.0)
+        dY_spacing = dLength_edge * 1.5
         for row in range(0, nrow):
-            if column % 2 == 0 :
-            #define a polygon here
-                x1 = xleft + (column * dX_spacing)
-                y1 = ybottom + (row * dY_spacing)
-            else:
-                x1 = xleft + (column * dX_spacing) #- dX_shift
-                y1 = ybottom + (row * dY_spacing) - dY_shift
+            for column in range(0, ncolumn):
+                if row % 2 == 0 :
+                #define a polygon here
+                    x1 = xleft + (column * dX_spacing)
+                    y1 = ybottom + (row * dY_spacing)
+                else:
+                    x1 = xleft + (column * dX_spacing) + dX_shift
+                    y1 = ybottom + (row * dY_spacing) 
+    
+    
+                x2 = x1 
+                y2 = y1 + dLength_edge
+    
+                x3 = x1 + dX_shift
+                y3 = y2 + dY_shift
+    
+                x4 = x1 + dX_spacing
+                y4 = y2
+    
+                x5 = x4 
+                y5 = y1 
+    
+                x6 = x3
+                y6 = y1  -   dY_shift     
+               
+                aCoords = np.full((7,2), -9999.0, dtype=float)
+    
+                ring = ogr.Geometry(ogr.wkbLinearRing)
+                ring.AddPoint(x1, y1)
+                ring.AddPoint(x2, y2)
+                ring.AddPoint(x3, y3)
+                ring.AddPoint(x4, y4)
+                ring.AddPoint(x5, y5)
+                ring.AddPoint(x6, y6)
+                ring.AddPoint(x1, y1)
+                pPolygon = ogr.Geometry(ogr.wkbPolygon)
+                pPolygon.AddGeometry(ring)
+    
+                pFeature.SetGeometry(pPolygon)
+                pFeature.SetField("id", lCellID)
+                pLayer.CreateFeature(pFeature)
+                
+    
+    
+                #dummy = loads( ring.ExportToWkt() )
+                #aCoords = dummy.exterior.coords
+                aCoords[0,0] = x1
+                aCoords[0,1] = y1
+                aCoords[1,0] = x2
+                aCoords[1,1] = y2
+                aCoords[2,0] = x3
+                aCoords[2,1] = y3
+                aCoords[3,0] = x4
+                aCoords[3,1] = y4
+                aCoords[4,0] = x5
+                aCoords[4,1] = y5
+                aCoords[5,0] = x6
+                aCoords[5,1] = y6
+                aCoords[6,0] = x1
+                aCoords[6,1] = y1
+                
+    
+    
+    
+                dummy1= np.array(aCoords)
+                pHexagon = convert_coordinates_to_cell(1, dummy1)
+                pHexagon.lCellID = lCellID
+                aHexagon.append(pHexagon)
+                lCellID= lCellID + 1    
+                pass
+       
+        pass
+    else:
+        dX_shift = 0.5 * dLength_edge
+        dY_shift = 0.5 * dLength_edge * np.sqrt(3.0)
+        dX_spacing = dLength_edge * 1.5
+        dY_spacing = dLength_edge * np.sqrt(3.0)
+        for column in range(0, ncolumn):
+            for row in range(0, nrow):
+                if column % 2 == 0 :
+                #define a polygon here
+                    x1 = xleft + (column * dX_spacing)
+                    y1 = ybottom + (row * dY_spacing)
+                else:
+                    x1 = xleft + (column * dX_spacing) #- dX_shift
+                    y1 = ybottom + (row * dY_spacing) - dY_shift
+    
+    
+                x2 = x1 - dX_shift
+                y2 = y1 + dY_shift
+    
+                x3 = x1 
+                y3 = y1 + dY_shift * 2.0
+    
+                x4 = x1 + dLength_edge
+                y4 = y1 + dY_shift * 2.0
+    
+                x5 = x4 + dX_shift
+                y5 = y1 + dY_shift
+    
+                x6 = x1 + dLength_edge
+                y6 = y1         
+               
+                aCoords = np.full((7,2), -9999.0, dtype=float)
+    
+                ring = ogr.Geometry(ogr.wkbLinearRing)
+                ring.AddPoint(x1, y1)
+                ring.AddPoint(x2, y2)
+                ring.AddPoint(x3, y3)
+                ring.AddPoint(x4, y4)
+                ring.AddPoint(x5, y5)
+                ring.AddPoint(x6, y6)
+                ring.AddPoint(x1, y1)
+                pPolygon = ogr.Geometry(ogr.wkbPolygon)
+                pPolygon.AddGeometry(ring)
+    
+                pFeature.SetGeometry(pPolygon)
+                pFeature.SetField("id", lCellID)
+                pLayer.CreateFeature(pFeature)
+                
+    
+    
+                #dummy = loads( ring.ExportToWkt() )
+                #aCoords = dummy.exterior.coords
+                aCoords[0,0] = x1
+                aCoords[0,1] = y1
+                aCoords[1,0] = x2
+                aCoords[1,1] = y2
+                aCoords[2,0] = x3
+                aCoords[2,1] = y3
+                aCoords[3,0] = x4
+                aCoords[3,1] = y4
+                aCoords[4,0] = x5
+                aCoords[4,1] = y5
+                aCoords[5,0] = x6
+                aCoords[5,1] = y6
+                aCoords[6,0] = x1
+                aCoords[6,1] = y1
+                
+    
+    
+    
+                dummy1= np.array(aCoords)
+                pHexagon = convert_coordinates_to_cell(1, dummy1)
+                pHexagon.lCellID = lCellID
+                aHexagon.append(pHexagon)
+                lCellID= lCellID +1
+    
+                pass
+        pass
 
-
-            x2 = x1 - dX_shift
-            y2 = y1 + dY_shift
-
-            x3 = x1 
-            y3 = y1 + dY_shift * 2.0
-
-            x4 = x1 + dLength_edge
-            y4 = y1 + dY_shift * 2.0
-
-            x5 = x4 + dX_shift
-            y5 = y1 + dY_shift
-
-            x6 = x1 + dLength_edge
-            y6 = y1         
-           
-            aCoords = np.full((7,2), -9999.0, dtype=float)
-
-            ring = ogr.Geometry(ogr.wkbLinearRing)
-            ring.AddPoint(x1, y1)
-            ring.AddPoint(x2, y2)
-            ring.AddPoint(x3, y3)
-            ring.AddPoint(x4, y4)
-            ring.AddPoint(x5, y5)
-            ring.AddPoint(x6, y6)
-            ring.AddPoint(x1, y1)
-            pPolygon = ogr.Geometry(ogr.wkbPolygon)
-            pPolygon.AddGeometry(ring)
-
-            pFeature.SetGeometry(pPolygon)
-            pFeature.SetField("id", lCellID)
-            pLayer.CreateFeature(pFeature)
-            
-
-
-            #dummy = loads( ring.ExportToWkt() )
-            #aCoords = dummy.exterior.coords
-            aCoords[0,0] = x1
-            aCoords[0,1] = y1
-            aCoords[1,0] = x2
-            aCoords[1,1] = y2
-            aCoords[2,0] = x3
-            aCoords[2,1] = y3
-            aCoords[3,0] = x4
-            aCoords[3,1] = y4
-            aCoords[4,0] = x5
-            aCoords[4,1] = y5
-            aCoords[5,0] = x6
-            aCoords[5,1] = y6
-            aCoords[6,0] = x1
-            aCoords[6,1] = y1
-            
-
-
-
-            dummy1= np.array(aCoords)
-            pHexagon = convert_coordinates_to_cell(1, dummy1)
-            pHexagon.lCellID = lCellID
-            aHexagon.append(pHexagon)
-            lCellID= lCellID +1
-
-            pass
+        
         
     pDataset = pLayer = pFeature  = None      
     

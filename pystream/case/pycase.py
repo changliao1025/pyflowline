@@ -123,6 +123,9 @@ class streamcase(object):
         self.iFlag_mode =  int(aParameter['iFlag_mode']) 
         self.iFlag_use_dem =  int(aParameter['iFlag_use_dem']) 
         self.iFlag_disconnected =  int(aParameter['iFlag_disconnected'])
+
+        self.iFlag_rotation = int(aParameter['iFlag_rotation'])
+        
         self.dResolution = float(aParameter['dResolution']) 
         self.dResolution_meter = float(aParameter['dResolution_meter']) 
 

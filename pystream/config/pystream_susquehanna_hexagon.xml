@@ -24,7 +24,7 @@
         The scratch workspace
       </desc>
     </entry>
-     <entry id="iFlag_rotation" value="0">
+     <entry id="iFlag_rotation" value="1">
       <type>int</type>
       <desc>
         The scratch workspace
@@ -47,7 +47,7 @@
       </desc>
     </entry>
 
-    <entry id="iCase_index" value="1">
+    <entry id="iCase_index" value="2">
       <type>int</type>
       <desc>
         The scratch workspace

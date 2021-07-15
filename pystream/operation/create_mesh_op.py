@@ -55,12 +55,16 @@ def create_mesh_op(oModel_in):
         dResolution_meter = degree_to_meter(dLatitude_mean, dResolution )
         dArea = np.power(dResolution_meter,2.0)
         dLength_edge = np.sqrt(  2.0 * dArea / (3.0* np.sqrt(3.0))  )
-        dLength_shift = 0.5 * dLength_edge * np.sqrt(3.0)
-        dX_spacing = dLength_edge * 1.5
-        dY_spacing = dLength_edge * np.sqrt(3.0)
-
-        ncolumn= int( (dX_right - dX_left) / dX_spacing )
-        nrow= int( (dY_top - dY_bot) / dY_spacing )
+        if iFlag_rotation ==0:            
+            dX_spacing = dLength_edge * np.sqrt(3.0)
+            dY_spacing = dLength_edge * 1.5
+            ncolumn= int( (dX_right - dX_left) / dX_spacing )
+            nrow= int( (dY_top - dY_bot) / dY_spacing )
+        else:            
+            dX_spacing = dLength_edge * 1.5
+            dY_spacing = dLength_edge * np.sqrt(3.0)    
+            ncolumn= int( (dX_right - dX_left) / dX_spacing )
+            nrow= int( (dY_top - dY_bot) / dY_spacing )
 
         aHexagon = create_hexagon_mesh(iFlag_rotation, dX_left, dY_bot, dResolution_meter, ncolumn, nrow, sFilename_mesh, sFilename_spatial_reference)
         return aHexagon

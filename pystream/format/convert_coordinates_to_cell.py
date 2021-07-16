@@ -59,7 +59,3 @@ def convert_coordinates_to_cell(iMesh_type, aCoordinates):
                         print('What mesh type are you using?')
                         return None
 
-
-    
-    
-

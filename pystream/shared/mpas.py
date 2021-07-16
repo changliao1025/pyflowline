@@ -1,21 +1,46 @@
 from abc import ABCMeta, abstractmethod
 from osgeo import gdal, osr, ogr
 import numpy as np
+import json
+
 from pystream.shared.vertex import pyvertex
 from pystream.shared.edge import pyedge
 from pystream.shared.cell import pycell
+from pystream.shared.flowline import pyflowline
+
+import numpy as np
+import json
+from json import JSONEncoder
+class CellClassEncoder(JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        if isinstance(obj, pyedge):
+            return obj.lEdgeID
+        if isinstance(obj, pyvertex):
+            return obj.lVertexID
+        if isinstance(obj, pyflowline):
+            return obj.lFlowlineID
+        return JSONEncoder.default(self, obj)
+
 
 class pympas(pycell):
-    #lIndex=0    
+    
     nFlowline=0
     nVertex =0 
     nEdge=0
     dLength=0.0
     dArea=0.0
-    dX_center=0.0
-    dY_center=0.0
+    dx_center=0.0
+    dy_center=0.0
+    dz_center=0.0
+    dLon_center=0.0
+    dLat_center=0.0
+
     aEdge=None
+    aEdgeID=None
     aVertex=None
+    aVertexID=None
     aFlowline=None
     lCellID  = -1
     nNeighbor=-1
@@ -23,7 +48,7 @@ class pympas(pycell):
 
     def __init__(self, aEdge,aVertex):    
         nEdge = len(aEdge)
-        if nEdge < 3 or nEdge > 7:
+        if nEdge < 3 or nEdge > 8:
             pass
         else:
             
@@ -31,17 +56,17 @@ class pympas(pycell):
             self.aEdge = aEdge
             self.aVertex = aVertex #the first one and last one are the same
             self.nEdge = len(aEdge)
-            self.nVertex = len(aVertex) - 1
+            self.nVertex = len(aVertex) 
 
-            dx=0.0
-            dy=0.0
+            dLon=0.0
+            dLat=0.0
             for i in range(self.nVertex):
-                dx = dx + aVertex[i].dx
-                dy = dy + aVertex[i].dy
+                dLon = dLon + aVertex[i].dLongitude
+                dLat = dLat + aVertex[i].dLatitude
                 pass
 
-            self.dX_center = dx/self.nVertex
-            self.dY_center = dy/self.nVertex
+            self.dLon_center = dLon/self.nVertex
+            self.dLat_center = dLat/self.nVertex
 
             pass
         pass
@@ -92,3 +117,8 @@ class pympas(pycell):
 
 
         return iFlag_share
+    
+    def export_to_json(self):
+        #sJson = json.dumps(self.__dict__, f, ensure_ascii=False, indent=4, cls=CellClassEncoder) 
+        sJson = json.dumps(self.__dict__, ensure_ascii=True, indent=4, cls=CellClassEncoder)
+        return sJson

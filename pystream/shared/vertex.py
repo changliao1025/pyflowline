@@ -1,11 +1,12 @@
 from abc import ABCMeta, abstractmethod
 import numpy as np
-
+from pyearth.gis.location.calculate_distance_based_on_lon_lat import calculate_distance_based_on_lon_lat
 class pyvertex(object):
     __metaclass__ = ABCMeta  
-    dx=0.0
-    dy=0.0
-    dz=0.0
+    lVertexID=-1
+    dx=-9999
+    dy=-9999
+    dz=-9999
     dLongitude=0.0
     dLatitude=0.0
     dElevation=0.0
@@ -46,11 +47,24 @@ class pyvertex(object):
         
         x1 = self.dx
         y1 = self.dy
+        z1 = self.dz
+        lon1 = self.dLongitude
+        lat1 = self.dLatitude
+        
         x2 = other.dx
         y2 = other.dy
-        a = (x1-x2) * (x1-x2)
-        b = (y1-y2) * (y1-y2)
-        c = np.sqrt(a+b)
+        z2 = other.dz
+        lon2 = other.dLongitude
+        lat2 = other.dLatitude
+
+        if x1!=-9999 and x2!=-9999:
+
+            a = (x1-x2) * (x1-x2)
+            b = (y1-y2) * (y1-y2)
+            c = np.sqrt(a+b)
+        else:
+            #use latitude longitude
+            c= calculate_distance_based_on_lon_lat(lon1,  lat1,lon2, lat2)
 
         dDistance = c
 

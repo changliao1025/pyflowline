@@ -8,6 +8,8 @@ from pystream.shared.edge import pyedge
 
 class pyflowline(object):
     __metaclass__ = ABCMeta 
+
+    lFlowlineID=-1
     aEdge=None
     aVertex=None
 

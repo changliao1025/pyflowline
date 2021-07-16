@@ -31,7 +31,13 @@
         The scratch workspace
       </desc>
     </entry>
-
+    
+<entry id="iFlag_rotation" value="0">
+      <type>int</type>
+      <desc>
+        The scratch workspace
+      </desc>
+    </entry>
 
     <entry id="sMesh_type" value="mpas">
       <type>char</type>
@@ -100,17 +106,12 @@
         The scratch workspace
       </desc>
     </entry>
-    <entry id="sDate" value="202100707">
+    <entry id="sDate" value="20210707">
       <type>char</type>
       <desc>
         The scratch workspace
       </desc>
     </entry>
-
-
-
-
-
 
     <entry id="sJob" value="test">
       <type>char</type>
@@ -155,6 +156,13 @@
         The scratch workspace
       </desc>
     </entry>
+<entry id="sFilename_mesh_info" value="mpas_info.json">
+      <type>char</type>
+      <desc>
+        The scratch workspace
+      </desc>
+    </entry>
+    
     <entry id="sFilename_flowline_segment_index_before_intersect" value="flowline_segment_index_before_intersect.shp">
       <type>char</type>
       <desc>

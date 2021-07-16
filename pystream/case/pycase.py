@@ -52,6 +52,7 @@ class streamcase(object):
 
     #intersect
     sFilename_mesh=''
+    sFilename_mesh_info=''
     sFilename_mesh_netcdf=''
     sFilename_flowline_intersect = ''
     #after intersect
@@ -152,6 +153,9 @@ class streamcase(object):
         
         self.sFilename_flowline_segment_index_before_intersect = self.sWorkspace_simulation_flowline + slash + aParameter['sFilename_flowline_segment_index_before_intersect']
         self.sFilename_flowline_segment_order_before_intersect = self.sWorkspace_simulation_flowline + slash + aParameter['sFilename_flowline_segment_order_before_intersect']
+
+
+        self.sFilename_mesh_info= self.sWorkspace_simulation_case + slash + aParameter['sFilename_mesh_info']
         
         self.sFilename_flowline_intersect  = self.sWorkspace_simulation_case + slash + aParameter['sFilename_flowline_intersect']
         self.sJob =  aParameter['sJob'] 

@@ -1,11 +1,18 @@
 from abc import ABCMeta, abstractmethod
 import numpy as np
-
+import json
 from osgeo import gdal, osr, ogr
 from pystream.shared.vertex import pyvertex
 from pystream.shared.edge import pyedge
 from pystream.shared.cell import pycell
-
+import numpy as np
+import json
+from json import JSONEncoder
+class NumpyArrayEncoder(JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        return JSONEncoder.default(self, obj)
 
 class pyhexagon(pycell):
     #lIndex=-1  
@@ -97,4 +104,8 @@ class pyhexagon(pycell):
 
 
         return iFlag_share
+    
+    def export_to_json(self):
+        sJson = json.dumps(self.__dict__, ensure_ascii=False, indent=4, cls=NumpyArrayEncoder) 
+        return sJson
 

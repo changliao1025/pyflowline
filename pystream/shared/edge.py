@@ -8,6 +8,7 @@ from pystream.shared.vertex import pyvertex
 
 class pyedge(object):
     __metaclass__ = ABCMeta 
+    lEdgeID=-1
     pVertex_start = None
     pVertex_end = None
     dLength=0.0

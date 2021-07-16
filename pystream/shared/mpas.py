@@ -36,6 +36,7 @@ class pympas(pycell):
     dz_center=0.0
     dLon_center=0.0
     dLat_center=0.0
+    dElevation=0.0
 
     aEdge=None
     aEdgeID=None

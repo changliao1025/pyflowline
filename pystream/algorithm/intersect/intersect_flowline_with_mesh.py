@@ -27,14 +27,13 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh, sFilename_flowli
         #delete it if it exists
         os.remove(sFilename_output)
 
-    sDriverName = "GeoJSON" #('ESRI Shapefile') #
-    pDriver_geojson = ogr.GetDriverByName( "GeoJSON")
+    
+    #pDriver_geojson = ogr.GetDriverByName( "GeoJSON")
     pDriver_shapefile = ogr.GetDriverByName('ESRI Shapefile' )
 
     #geojson
     aCell=list()
-    aCell_intersect=list()
-    
+    aCell_intersect=list()    
    
     pDataset_mesh = pDriver_shapefile.Open(sFilename_mesh, 0)
     pDataset_flowline = pDriver_shapefile.Open(sFilename_flowline, 0)   
@@ -65,13 +64,9 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh, sFilename_flowli
     pLayerOut.CreateField(ogr.FieldDefn('iseg', ogr.OFTInteger)) #long type for high resolution
     pLayerOut.CreateField(ogr.FieldDefn('iord', ogr.OFTInteger)) #long type for high resolution
     pLayerDefn = pLayerOut.GetLayerDefn()
-    pFeatureOut = ogr.Feature(pLayerDefn)
-
-    
+    pFeatureOut = ogr.Feature(pLayerDefn)    
    
-    lID_flowline =0 
-    
-        
+    lID_flowline = 0           
 
 
     for i in range (nfeature_mesh):
@@ -91,11 +86,12 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh, sFilename_flowli
         pGeometrytype_mesh = pGeometry_mesh.GetGeometryName()
         if(pGeometrytype_mesh == 'POLYGON'):
             dummy = loads( pGeometry_mesh.ExportToWkt() )
+            #be careful with this part, it may not have the same order as the original mpas structure
             aCoords = dummy.exterior.coords
             dummy1= np.array(aCoords)
             
             pCell = convert_coordinates_to_cell(iMesh_type_in, dummy1)
-            pCell.lCellID = lCellID
+            pCell.lCellID = lCellID #this informatio is not saved in shapefile
             pCell.dArea = pGeometry_mesh.GetArea() 
             pCell.dLength = pCell.calculate_edge_length()
                      

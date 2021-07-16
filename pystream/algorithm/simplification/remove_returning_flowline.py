@@ -15,7 +15,7 @@ def remove_returning_flowline(iMesh_type, aCell_in, aCell_intersect_in, pVertex_
     #input flowline should have order information and segment index?
 
     
-    nCell=  len(aCell_intersect_in)
+    nCell =  len(aCell_intersect_in)
 
     def checkIfDuplicates(listOfElems):
         ''' Check if given list contains any duplicates '''    
@@ -74,7 +74,7 @@ def remove_returning_flowline(iMesh_type, aCell_in, aCell_intersect_in, pVertex_
             
             for j in range(nCell):
                 pCell = aCell_intersect_in[j]
-                lID = pCell.lIndex
+                lID = pCell.lCellID
                 aFlowline= pCell.aFlowline
                 nFlowline = len(aFlowline)
                 for i in range(nFlowline):
@@ -173,8 +173,13 @@ def remove_returning_flowline(iMesh_type, aCell_in, aCell_intersect_in, pVertex_
             if nCell3 >1:
                 for i in range(nCell3):
                     lIndex = aCell_simple[i]
-                    x = aCell_in[lIndex].dX_center
-                    y = aCell_in[lIndex].dY_center
+                    if iMesh_type == 4:
+                        x = aCell_in[lIndex].dLon_center
+                        y = aCell_in[lIndex].dLat_center
+                        
+                    else:
+                        x = aCell_in[lIndex].dx_center
+                        y = aCell_in[lIndex].dy_center
                     aCoordinates.append([x,y])
                     pass
 
@@ -254,7 +259,6 @@ def remove_returning_flowline(iMesh_type, aCell_in, aCell_intersect_in, pVertex_
     #            for k in aVertex:
     #                add_unique_vertex(aVertex_all, k)
     #                pass
-#
     #            aFlowline_out_no_parallel.append(pFlowline)
     #            pass
     #        else:
@@ -269,24 +273,20 @@ def remove_returning_flowline(iMesh_type, aCell_in, aCell_intersect_in, pVertex_
     #                            #so we will abandon the whole flowline and its upstream?
     #                            break
     #                            pass
-#
     #                        pass
-#
     #                    if iFlag_exist ==1:                            
     #                        pass
     #                    else:
     #                        aFlowline_out_no_parallel.append(pFlowline)
     #                        for m in range( nVertex):
     #                            add_unique_vertex(aVertex_all, pVertex)
-#
+
     #                else:
     #                    add_unique_vertex(aVertex_all, pVertex_start)
     #                    add_unique_vertex(aVertex_all, pVertex_end)
     #                    aFlowline_out_no_parallel.append(pFlowline)
     #                    pass
-#
     #                pass
-#
     #        pass
     #    
     #    pass

@@ -20,22 +20,25 @@ def convert_coordinates_to_cell(iMesh_type, aCoordinates):
     npoint = len(aCoordinates)
     
     aVertex=list()
-    for i in range(npoint):
-        x = aCoordinates[i][0]
-        y = aCoordinates[i][1]
-        dummy = dict()
-        dummy['x'] =x
-        dummy['y'] =y
-        pVertex = pyvertex(dummy)
-        aVertex.append(pVertex)
+        
         
     aEdge=list()
-    for j in range(npoint-1):
-        pEdge = pyedge( aVertex[j], aVertex[j+1] )
-        aEdge.append(pEdge)
+    
 
     
     if iMesh_type ==1: #hexagon
+        for i in range(npoint):
+            x = aCoordinates[i][0]
+            y = aCoordinates[i][1]
+            dummy = dict()
+            dummy['x'] =x
+            dummy['y'] =y
+            pVertex = pyvertex(dummy)
+            aVertex.append(pVertex)
+        for j in range(npoint-1):
+            pEdge = pyedge( aVertex[j], aVertex[j+1] )
+            aEdge.append(pEdge)
+
         pHexagon = pyhexagon( aEdge, aVertex)
         return pHexagon
     else:
@@ -48,6 +51,18 @@ def convert_coordinates_to_cell(iMesh_type, aCoordinates):
                 return pLatlon
             else:
                 if iMesh_type ==4: #mpas
+                    for i in range(npoint):
+                        dLon = aCoordinates[i][0]
+                        dLat = aCoordinates[i][1]
+                        dummy = dict()
+                        dummy['lon'] = dLon
+                        dummy['lat'] = dLat
+                        pVertex = pyvertex(dummy)
+                        aVertex.append(pVertex)
+                    for j in range(npoint-1):
+                        pEdge = pyedge( aVertex[j], aVertex[j+1] )
+                        aEdge.append(pEdge)
+                        
                     pMpas = pympas( aEdge, aVertex)
                     return pMpas
                 else:

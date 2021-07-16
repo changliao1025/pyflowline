@@ -63,7 +63,7 @@ def intersect_flowline_with_mesh_with_postprocess_op(oModel_in):
     
     aFlowline= correct_flowline_direction(aFlowline,  pVertex_outlet )
     
-    aFlowline = remove_flowline_loop(  aFlowline)    
+    aFlowline = remove_flowline_loop(  aFlowline )    
     sFilename_out = 'flowline_after_intersect.shp'
     sFilename_out = os.path.join(sWorkspace_simulation_case, sFilename_out)
     export_flowline_to_shapefile( aFlowline,pSpatialRef, sFilename_out)

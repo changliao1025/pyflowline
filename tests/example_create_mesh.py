@@ -1,5 +1,5 @@
 import os, sys
-from pystream.format.export_mesh_to_json import export_mesh_to_json
+from pystream.format.export_mesh_info_to_json import export_mesh_info_to_json
 import numpy as np
 
 
@@ -17,7 +17,7 @@ aParameter['sFilename_model_configuration'] = sFilename_configuration_in
 oModel = streamcase(aParameter)
 aCell = create_mesh_op(oModel)
 
-#export_mesh_to_json(aCell, sFilename_json_out=oModel.sFilename_mesh_info)
+#export_mesh_info_to_json(aCell, sFilename_json_out=oModel.sFilename_mesh_info)
 #
 #sFilename_configuration_in = '/qfs/people/liao313/workspace/python/pystream/pystream/config/case_susquehanna_square.xml'
 #aParameter = pystream_read_model_configuration_file(sFilename_configuration_in)

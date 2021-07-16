@@ -42,6 +42,8 @@ class pympas(pycell):
     aEdgeID=None
     aVertex=None
     aVertexID=None
+
+    pVertex_center = None
     aFlowline=None
     lCellID  = -1
     nNeighbor=-1
@@ -51,9 +53,7 @@ class pympas(pycell):
         nEdge = len(aEdge)
         if nEdge < 3 or nEdge > 8:
             pass
-        else:
-            
-                
+        else:                          
             self.aEdge = aEdge
             self.aVertex = aVertex #the first one and last one are the same
             self.nEdge = len(aEdge)
@@ -68,6 +68,10 @@ class pympas(pycell):
 
             self.dLon_center = dLon/self.nVertex
             self.dLat_center = dLat/self.nVertex
+            pVertex = dict()        
+            pVertex['lon'] =self.dLon_center
+            pVertex['lat'] =self.dLat_center           
+            self.pVertex_center = pyvertex(pVertex)
 
             pass
         pass

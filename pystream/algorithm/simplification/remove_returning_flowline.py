@@ -1,41 +1,28 @@
 import copy
+from posixpath import join
 import numpy as np
+
+from pyearth.toolbox.data.check_if_duplicates import check_if_duplicates
 from pystream.shared.hexagon import pyhexagon
 from pystream.shared.flowline import pyflowline
 from pystream.format.convert_coordinates_to_flowline import convert_coordinates_to_flowline
 
 from pystream.algorithm.auxiliary.find_vertex_in_list import find_vertex_in_list
-def remove_returning_flowline(iMesh_type, aCell_in, aCell_intersect_in, pVertex_outlet_in):
-    aCell_out = list()
+def remove_returning_flowline(iMesh_type, aCell_intersect_in, pVertex_outlet_in):
+    
     aFlowline_out=list()
     #checking input data 
-
     #input hexagon should have at least one flowline inside
-
     #input flowline should have order information and segment index?
-
     
     nCell =  len(aCell_intersect_in)
-
-    def checkIfDuplicates(listOfElems):
-        ''' Check if given list contains any duplicates '''    
-        iFlag_unique = 1
-        for elem in listOfElems:
-            if listOfElems.count(elem) > 1:
-                iFlag_unique = 0
-                break
-            else:
-                pass
-        
-        return iFlag_unique
-
 
     def simplify_list(aCell_flowline_in):
         aCell_flowline_out = copy.deepcopy(aCell_flowline_in)
 
         nCell2 = len(aCell_flowline_out)        
         #check unique
-        iFlag_unique = checkIfDuplicates(aCell_flowline_out)
+        iFlag_unique = check_if_duplicates(aCell_flowline_out)
         if iFlag_unique == 1:
             return aCell_flowline_out
         else:
@@ -74,7 +61,7 @@ def remove_returning_flowline(iMesh_type, aCell_in, aCell_intersect_in, pVertex_
             
             for j in range(nCell):
                 pCell = aCell_intersect_in[j]
-                lID = pCell.lCellID
+                lCellID = pCell.lCellID
                 aFlowline= pCell.aFlowline
                 nFlowline = len(aFlowline)
                 for i in range(nFlowline):
@@ -97,7 +84,7 @@ def remove_returning_flowline(iMesh_type, aCell_in, aCell_intersect_in, pVertex_
                                 if dummy2.is_overlap(dummy3) ==1:
                                     
                                     pVertex_end_current = pVertex_start    
-                                    aCell_flowline.append(lID)
+                                    aCell_flowline.append(lCellID)
                                     iFlag_found = 1                                                                       
                                     iFlag_previous_overlap =1
                                     
@@ -111,14 +98,14 @@ def remove_returning_flowline(iMesh_type, aCell_in, aCell_intersect_in, pVertex_
                                             pass
                                         else:
                                             if iFlag_previous_overlap ==1: 
-                                                aCell_flowline.append(lID)              
+                                                aCell_flowline.append(lCellID)              
                                         
                                         iFlag_previous_overlap=0
                                         
                                         pass
                                     else:
                                         pVertex_end_current = pVertex_start    
-                                        aCell_flowline.append(lID)
+                                        aCell_flowline.append(lCellID)
                                         iFlag_found = 1
                                         iFlag_previous_overlap=0
                                         pass
@@ -130,7 +117,7 @@ def remove_returning_flowline(iMesh_type, aCell_in, aCell_intersect_in, pVertex_
 
                             else:
                                 pVertex_end_current = pVertex_start    
-                                aCell_flowline.append(lID)                                
+                                aCell_flowline.append(lCellID)                                
                                 iFlag_found = 1
                                 iFlag_previous_overlap=0
                                 pass                            
@@ -172,15 +159,16 @@ def remove_returning_flowline(iMesh_type, aCell_in, aCell_intersect_in, pVertex_
             aCoordinates = list()
             if nCell3 >1:
                 for i in range(nCell3):
-                    lIndex = aCell_simple[i]
-                    if iMesh_type == 4:
-                        x = aCell_in[lIndex].dLon_center
-                        y = aCell_in[lIndex].dLat_center
-                        
-                    else:
-                        x = aCell_in[lIndex].dx_center
-                        y = aCell_in[lIndex].dy_center
-                    aCoordinates.append([x,y])
+                    lCellID = aCell_simple[i]
+                    for j in range( nCell):
+                        if aCell_intersect_in[i].lCellID == lCellID:    
+                            if iMesh_type == 4:                            
+                                x = aCell_intersect_in[j].dLon_center
+                                y = aCell_intersect_in[j].dLat_center
+                            else:
+                                x = aCell_intersect_in[j].dx_center
+                                y = aCell_intersect_in[j].dy_center
+                            aCoordinates.append([x,y])
                     pass
 
                 pFlowline = convert_coordinates_to_flowline(aCoordinates)
@@ -294,4 +282,4 @@ def remove_returning_flowline(iMesh_type, aCell_in, aCell_intersect_in, pVertex_
 
 
 
-    return aCell_out, aFlowline_out, aFlowline_out_no_parallel
+    return aFlowline_out, aFlowline_out_no_parallel

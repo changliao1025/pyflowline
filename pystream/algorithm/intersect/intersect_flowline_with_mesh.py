@@ -32,7 +32,7 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh, sFilename_flowli
     pDriver_shapefile = ogr.GetDriverByName('ESRI Shapefile' )
 
     #geojson
-    aCell=list()
+    #aCell=list()
     aCell_intersect=list()    
    
     pDataset_mesh = pDriver_shapefile.Open(sFilename_mesh, 0)
@@ -179,10 +179,10 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh, sFilename_flowli
 
 
             
-            aCell.append(pCell)
+            
             
         else:
             pass
 
     
-    return aCell, aCell_intersect, aFlowline_intersect
+    return  aCell_intersect, aFlowline_intersect

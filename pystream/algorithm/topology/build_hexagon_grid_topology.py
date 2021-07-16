@@ -11,8 +11,8 @@ from shapely.geometry import Point, LineString, MultiLineString
 from shapely.wkt import loads
 from pystream.shared.hexagon import pyhexagon
 
-from pystream.format.convert_coordinates_to_cell import convert_coordinates_to_cell
-from pystream.format.convert_coordinates_to_flowline import convert_coordinates_to_flowline
+from pystream.format.convert_coordinates_to_cell import convert_pcs_coordinates_to_cell
+from pystream.format.convert_coordinates_to_flowline import convert_pcs_coordinates_to_flowline
 from pystream.find_hexagon_through_edge import find_hexagon_through_edge
 
 from pystream.shared.link import pyhexagonlink

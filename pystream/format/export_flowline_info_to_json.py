@@ -16,7 +16,7 @@ def export_flowline_info_to_json(aCell_intersect_in, aFlowline_in, sFilename_jso
 
         for i in range(1, nflowline+1):
 
-            pFlowline = aFlowline_in[i]
+            pFlowline = aFlowline_in[i-1]
 
             nVertex = pFlowline.nVertex
             nEdge = pFlowline.nEdge

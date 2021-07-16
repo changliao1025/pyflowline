@@ -9,8 +9,8 @@ from pystream.shared.mpas import pympas
 from shapely.wkt import loads
 from pyearth.gis.location.convert_lat_lon_range import convert_180_to_360,convert_360_to_180
 
-from pystream.format.convert_coordinates_to_cell import convert_coordinates_to_cell
-from pystream.format.convert_attribute_to_cell import convert_attribute_to_cell
+from pystream.format.convert_coordinates_to_cell import convert_pcs_coordinates_to_cell
+from pystream.format.convert_attribute_to_cell import convert_gcs_attribute_to_cell
 
 def create_mpas_mesh(sFilename_mesh_netcdf, dLatitude_top, dLatitude_bot, dLongitude_left, dLongitude_right,sFilename_mesh):
     
@@ -177,7 +177,7 @@ def create_mpas_mesh(sFilename_mesh_netcdf, dLatitude_top, dLatitude_bot, dLongi
             pFeature.SetField("id", int(lCellID) )
             pLayer.CreateFeature(pFeature)
             
-            pmpas = convert_attribute_to_cell(4, aVertexIndex, aEdgeIndex, aVertexIndexOnEdge ,aCoords)
+            pmpas = convert_gcs_attribute_to_cell(4, aVertexIndex, aEdgeIndex, aVertexIndexOnEdge ,aCoords)
            
             pmpas.lCellID = lCellID
             

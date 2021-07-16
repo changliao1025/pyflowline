@@ -10,7 +10,7 @@ from shapely.wkt import loads
 from pystream.shared.vertex import pyvertex
 from pystream.shared.flowline import pyflowline
 
-from pystream.format.convert_coordinates_to_flowline import convert_coordinates_to_flowline
+from pystream.format.convert_coordinates_to_flowline import convert_pcs_coordinates_to_flowline
 
 def read_flowline_shapefile(sFilename_shapefile_in):
     """
@@ -40,7 +40,7 @@ def read_flowline_shapefile(sFilename_shapefile_in):
                 #pLine= LineString( aCoords[::-1 ] )
 
                 dummy1= np.array(aCoords)
-                pLine = convert_coordinates_to_flowline(dummy1)
+                pLine = convert_pcs_coordinates_to_flowline(dummy1)
                 pLine.lIndex = lID
                 aFlowline.append(pLine)
                 lID = lID + 1
@@ -51,7 +51,7 @@ def read_flowline_shapefile(sFilename_shapefile_in):
                 aCoords = dummy.coords
                 #pLine= LineString( aCoords[::-1 ] )
                 dummy1= np.array(aCoords)
-                pLine = convert_coordinates_to_flowline(dummy1)
+                pLine = convert_pcs_coordinates_to_flowline(dummy1)
                 pLine.lIndex = lID
                 aFlowline.append(pLine)
                 lID = lID + 1

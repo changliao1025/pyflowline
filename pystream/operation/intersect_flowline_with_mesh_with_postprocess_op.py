@@ -39,6 +39,7 @@ def intersect_flowline_with_mesh_with_postprocess_op(oModel_in):
 
 
     point= dict()
+    
     point['x'] = oModel_in.dx_outlet
     point['y'] = oModel_in.dy_outlet
     pVertex_outlet=pyvertex(point)

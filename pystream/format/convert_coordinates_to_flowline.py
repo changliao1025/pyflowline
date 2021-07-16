@@ -10,8 +10,29 @@ from shapely.wkt import loads
 from pystream.shared.vertex import pyvertex
 from pystream.shared.flowline import pyflowline
 
+def convert_gcs_coordinates_to_flowline(aCoordinates):
+    npoint = len(aCoordinates)
+    
+    aVertex=list()
+    for i in range(npoint):
+        x = aCoordinates[i][0]
+        y = aCoordinates[i][1]
+        dummy = dict()
+        dummy['lon'] =x
+        dummy['lat'] =y
+        pVertex = pyvertex(dummy)
+        aVertex.append(pVertex)
+        
+    aEdge=list()
+    for j in range(npoint-1):
+        pEdge = pyedge( aVertex[j], aVertex[j+1] )
+        aEdge.append(pEdge)
+    
+    pLine = pyflowline( aEdge)
+    
+    return pLine
 
-def convert_coordinates_to_flowline(aCoordinates):
+def convert_pcs_coordinates_to_flowline(aCoordinates):
     npoint = len(aCoordinates)
     
     aVertex=list()

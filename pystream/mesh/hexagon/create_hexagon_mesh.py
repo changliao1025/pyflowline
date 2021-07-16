@@ -9,19 +9,10 @@ from osgeo import ogr, osr, gdal, gdalconst
 from shapely.geometry import Point, LineString, MultiLineString
 from shapely.wkt import loads
 from pystream.shared.hexagon import pyhexagon
-from pystream.format.convert_coordinates_to_cell import convert_coordinates_to_cell
+from pystream.format.convert_coordinates_to_cell import convert_pcs_coordinates_to_cell
 
-def checkIfDuplicates(listOfElems):
-    ''' Check if given list contains any duplicates '''    
-    iFlag_unique = 1
-    for elem in listOfElems:
-        if listOfElems.count(elem) > 1:
-            iFlag_unique = 0
-            break
-        else:
-            pass
-    
-    return iFlag_unique
+from pyearth.toolbox.data.check_if_duplicates import check_if_duplicates
+ 
 
 def create_hexagon_mesh(iFlag_rotation, dX_left, dY_bot, dResolution_meter, ncolumn, nrow, sFilename_mesh_out, sFilename_spatial_reference_in):
 
@@ -138,7 +129,7 @@ def create_hexagon_mesh(iFlag_rotation, dX_left, dY_bot, dResolution_meter, ncol
                 aCoords[6,1] = y1
            
                 dummy1= np.array(aCoords)
-                pHexagon = convert_coordinates_to_cell(1, dummy1)
+                pHexagon = convert_pcs_coordinates_to_cell(1, dummy1)
                 pHexagon.lCellID = lCellID
                 lCellID_center = lCellID
                 #build topoloy
@@ -184,7 +175,7 @@ def create_hexagon_mesh(iFlag_rotation, dX_left, dY_bot, dResolution_meter, ncol
                             aNeighbor.append(lCellID4)
 
 
-                if checkIfDuplicates(aNeighbor) == 0:
+                if chekc_if_duplicates(aNeighbor) == 0:
                     print('error')        
 
 
@@ -264,7 +255,7 @@ def create_hexagon_mesh(iFlag_rotation, dX_left, dY_bot, dResolution_meter, ncol
                 aCoords[6,1] = y1
                     
                 dummy1= np.array(aCoords)
-                pHexagon = convert_coordinates_to_cell(1, dummy1)
+                pHexagon = convert_pcs_coordinates_to_cell(1, dummy1)
                 pHexagon.lCellID = lCellID
                 #build topoloy
                 lCellID_center = lCellID
@@ -308,7 +299,7 @@ def create_hexagon_mesh(iFlag_rotation, dX_left, dY_bot, dResolution_meter, ncol
                             lCellID4 = nrow * iColumn + iRow  +1
                             aNeighbor.append(lCellID4)
                                                    
-                if checkIfDuplicates(aNeighbor) == 0:
+                if chekc_if_duplicates(aNeighbor) == 0:
                     print('error')   
                 pHexagon.aNeighbor = aNeighbor
                 print(lCellID_center,aNeighbor)

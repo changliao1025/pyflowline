@@ -5,7 +5,7 @@ import numpy as np
 from pyearth.toolbox.data.check_if_duplicates import check_if_duplicates
 from pystream.shared.hexagon import pyhexagon
 from pystream.shared.flowline import pyflowline
-from pystream.format.convert_coordinates_to_flowline import convert_coordinates_to_flowline
+from pystream.format.convert_coordinates_to_flowline import convert_gcs_coordinates_to_flowline, convert_pcs_coordinates_to_flowline
 
 from pystream.algorithm.auxiliary.find_vertex_in_list import find_vertex_in_list
 def remove_returning_flowline(iMesh_type, aCell_intersect_in, pVertex_outlet_in):
@@ -157,24 +157,38 @@ def remove_returning_flowline(iMesh_type, aCell_intersect_in, pVertex_outlet_in)
             #save the output
             nCell3 = len(aCell_simple)
             aCoordinates = list()
-            if nCell3 >1:
-                for i in range(nCell3):
-                    lCellID = aCell_simple[i]
-                    for j in range( nCell):
-                        if aCell_intersect_in[i].lCellID == lCellID:    
-                            if iMesh_type == 4:                            
+
+            if iMesh_type == 4: 
+                if nCell3 >1:
+                    for i in range(nCell3):
+                        lCellID = aCell_simple[i]
+                        for j in range( nCell):
+                            if aCell_intersect_in[j].lCellID == lCellID:    
                                 x = aCell_intersect_in[j].dLon_center
-                                y = aCell_intersect_in[j].dLat_center
-                            else:
+                                y = aCell_intersect_in[j].dLat_center                                
+                                aCoordinates.append([x,y])
+                        pass
+
+                    pFlowline = convert_gcs_coordinates_to_flowline(aCoordinates)
+                    pFlowline.iSegment = iSegment_in
+                    pFlowline.iStream_order=iStream_order_in
+                    aFlowline_out.append(pFlowline)
+            else:
+                if nCell3 >1:
+                    for i in range(nCell3):
+                        lCellID = aCell_simple[i]
+                        for j in range( nCell):
+                            if aCell_intersect_in[j].lCellID == lCellID:                                    
                                 x = aCell_intersect_in[j].dx_center
                                 y = aCell_intersect_in[j].dy_center
-                            aCoordinates.append([x,y])
-                    pass
+                                aCoordinates.append([x,y])
+                        pass
 
-                pFlowline = convert_coordinates_to_flowline(aCoordinates)
-                pFlowline.iSegment = iSegment_in
-                pFlowline.iStream_order=iStream_order_in
-                aFlowline_out.append(pFlowline)
+                    pFlowline = convert_pcs_coordinates_to_flowline(aCoordinates)
+                    pFlowline.iSegment = iSegment_in
+                    pFlowline.iStream_order=iStream_order_in
+                    aFlowline_out.append(pFlowline)
+            
 
             print(iSegment_in, ': ',aCell_simple)
 
@@ -204,14 +218,14 @@ def remove_returning_flowline(iMesh_type, aCell_intersect_in, pVertex_outlet_in)
             dDiatance = pVertex_end.calculate_distance( pVertex_outlet_in)
             if iFlag_first ==1:
                 dDiatance_min = dDiatance               
-                lID_outlet = pCell.lIndex               
+                lID_outlet = pCell.lCellID               
                 lID_outlet2 = j
                 lID_outlet3 = i
                 iFlag_first=0
             else:
                 if  dDiatance < dDiatance_min:
                     dDiatance_min = dDiatance                
-                    lID_outlet = pCell.lIndex                
+                    lID_outlet = pCell.lCellID                
                     lID_outlet2 = j
                     lID_outlet3 = i
                     pass    

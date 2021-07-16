@@ -9,7 +9,7 @@ from pystream.shared.mpas import pympas
 from shapely.wkt import loads
 from pyearth.gis.location.convert_lat_lon_range import convert_180_to_360,convert_360_to_180
 
-from pystream.format.convert_coordinates_to_cell import convert_coordinates_to_cell
+from pystream.format.convert_coordinates_to_cell import convert_pcs_coordinates_to_cell
 
 def create_tin_mesh(dX_left, dY_bot, dResolution_meter, ncolumn, nrow,sFilename_mesh_out, sFilename_spatial_reference_in):
      
@@ -133,7 +133,7 @@ def create_tin_mesh(dX_left, dY_bot, dResolution_meter, ncolumn, nrow,sFilename_
 
 
             dummy1= np.array(aCoords)
-            pHexagon = convert_coordinates_to_cell(1, dummy1)
+            pHexagon = convert_pcs_coordinates_to_cell(1, dummy1)
             aTin.append(pHexagon)
 
             pass

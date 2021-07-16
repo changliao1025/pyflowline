@@ -10,8 +10,8 @@ from shapely.geometry import Point, LineString, MultiLineString
 from shapely.wkt import loads
 from pystream.shared.hexagon import pyhexagon
 
-from pystream.format.convert_coordinates_to_cell import convert_coordinates_to_cell
-from pystream.format.convert_coordinates_to_flowline import convert_coordinates_to_flowline
+from pystream.format.convert_coordinates_to_cell import convert_gcs_coordinates_to_cell, convert_pcs_coordinates_to_cell
+from pystream.format.convert_coordinates_to_flowline import convert_gcs_coordinates_to_flowline,convert_pcs_coordinates_to_flowline
 
 
 from pystream.shared.link import pyhexagonlink
@@ -73,6 +73,12 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh, sFilename_flowli
     #for pFeature_mesh in pLayer_mesh:       
         pFeature_mesh= pLayer_mesh.GetFeature(i)
         pGeometry_mesh = pFeature_mesh.GetGeometryRef()
+        if iMesh_type_in ==4:
+            dummy0 = loads( pGeometry_mesh.ExportToWkt() )
+            aCoords_gcs = dummy0.exterior.coords
+            aCoords_gcs= np.array(aCoords_gcs)
+        else:
+            pass
         lCellID = pFeature_mesh.GetField("id")
         if (iFlag_transform ==1): #projections are different
             pGeometry_mesh.Transform(transform)
@@ -87,15 +93,18 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh, sFilename_flowli
         if(pGeometrytype_mesh == 'POLYGON'):
             dummy = loads( pGeometry_mesh.ExportToWkt() )
             #be careful with this part, it may not have the same order as the original mpas structure
-            aCoords = dummy.exterior.coords
-            dummy1= np.array(aCoords)
-            
-            pCell = convert_coordinates_to_cell(iMesh_type_in, dummy1)
+            aCoords_pcs = dummy.exterior.coords
+            aCoords_pcs= np.array(aCoords_pcs)
+            #convert lat/lon to projection because of intersect function
+            if iMesh_type_in ==4:                
+                pCell = convert_gcs_coordinates_to_cell(iMesh_type_in, aCoords_gcs)
+            else:
+                pCell = convert_pcs_coordinates_to_cell(iMesh_type_in, aCoords_pcs)
+
             pCell.lCellID = lCellID #this informatio is not saved in shapefile
             pCell.dArea = pGeometry_mesh.GetArea() 
             pCell.dLength = pCell.calculate_edge_length()
                      
-            #print(pGeometry_mesh.GetGeometryName())
             aFlowline_intersect = list()
             iFlag_intersected = 0 
             for j in range (nfeature_flowline):
@@ -131,7 +140,7 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh, sFilename_flowli
                         dummy = loads( pGeometry_intersect.ExportToWkt() )
                         aCoords = dummy.coords                
                         dummy1= np.array(aCoords)
-                        pLine = convert_coordinates_to_flowline(dummy1)
+                        pLine = convert_pcs_coordinates_to_flowline(dummy1)
                         pLine.calculate_length()
                         pLine.lIndex = lID_flowline
                         pLine.iSegment = iSegment
@@ -152,7 +161,7 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh, sFilename_flowli
                                 dummy = loads( Line.ExportToWkt() )
                                 aCoords = dummy.coords
                                 dummy1= np.array(aCoords)
-                                pLine = convert_coordinates_to_flowline(dummy1)
+                                pLine = convert_pcs_coordinates_to_flowline(dummy1)
                                 pLine.lIndex = lID_flowline
                                 pLine.iSegment = iSegment
                                 pLine.iStream_order = iStream_order

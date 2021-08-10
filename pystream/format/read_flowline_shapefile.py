@@ -20,7 +20,7 @@ def read_flowline_shapefile(sFilename_shapefile_in):
 
     aFlowline=list()
 
-    pDriver = ogr.GetDriverByName('GeoJSON')
+    pDriver_json = ogr.GetDriverByName('GeoJSON')
     pDriver_shapefile = ogr.GetDriverByName('ESRI Shapefile')
    
     pDataset_shapefile = pDriver_shapefile.Open(sFilename_shapefile_in, gdal.GA_ReadOnly)

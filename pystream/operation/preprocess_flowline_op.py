@@ -36,6 +36,7 @@ prepare the flowline using multiple step approach
 def preprocess_flowline_op(oModel_in):
     
     #read shapefile and store information in the list
+    iMesh_type = oModel_in.iMesh_type
     iFlag_disconnected = oModel_in.iFlag_disconnected
     dThreshold = oModel_in.dThreshold_small_river
 
@@ -50,7 +51,7 @@ def preprocess_flowline_op(oModel_in):
 
     sFilename_out = 'flowline_before_intersect.shp'
     sFilename_out = os.path.join(sWorkspace_simulation_flowline, sFilename_out)
-    export_flowline_to_shapefile( aFlowline, pSpatialRef, sFilename_out)
+    export_flowline_to_shapefile(iMesh_type, aFlowline, pSpatialRef, sFilename_out)
 
     if iFlag_disconnected ==1:
         #need a better way to include this capability
@@ -71,7 +72,7 @@ def preprocess_flowline_op(oModel_in):
         #aFlowline = connect_disconnect_flowline(aFlowline, aVertex, aThreshold)
         sFilename_out = 'flowline_connect.json'
         sFilename_out = os.path.join(sWorkspace_simulation_flowline, sFilename_out)
-        export_flowline_to_shapefile( aFlowline,pSpatialRef, sFilename_out)
+        export_flowline_to_shapefile(iMesh_type, aFlowline,pSpatialRef, sFilename_out)
     else:
         pass
 
@@ -79,12 +80,12 @@ def preprocess_flowline_op(oModel_in):
     aVertex = find_flowline_vertex(aFlowline)
     sFilename_out = 'flowline_vertex_without_confluence_before_intersect.shp'
     sFilename_out = os.path.join(sWorkspace_simulation_flowline, sFilename_out)
-    export_vertex_to_shapefile( aVertex,pSpatialRef, sFilename_out)
+    export_vertex_to_shapefile(iMesh_type, aVertex,pSpatialRef, sFilename_out)
 
     aFlowline = split_flowline(aFlowline, aVertex)
     sFilename_out = 'flowline_split_by_point_before_intersect.shp'
     sFilename_out = os.path.join(sWorkspace_simulation_flowline, sFilename_out)
-    export_flowline_to_shapefile( aFlowline,pSpatialRef, sFilename_out)
+    export_flowline_to_shapefile(iMesh_type, aFlowline,pSpatialRef, sFilename_out)
 
     #ues location to find outlet
   
@@ -99,59 +100,59 @@ def preprocess_flowline_op(oModel_in):
 
     sFilename_out = 'flowline_direction_before_intersect.shp'
     sFilename_out = os.path.join(sWorkspace_simulation_flowline, sFilename_out)
-    export_flowline_to_shapefile( aFlowline,pSpatialRef, sFilename_out)
+    export_flowline_to_shapefile(iMesh_type, aFlowline,pSpatialRef, sFilename_out)
 
     #step 4: remove loops
 
     aFlowline = remove_flowline_loop(aFlowline)    
     sFilename_out = 'flowline_loop_before_intersect.shp'
     sFilename_out = os.path.join(sWorkspace_simulation_flowline, sFilename_out)
-    export_flowline_to_shapefile( aFlowline,pSpatialRef, sFilename_out)
+    export_flowline_to_shapefile(iMesh_type, aFlowline,pSpatialRef, sFilename_out)
 
     
     aFlowline = remove_small_river(aFlowline, dThreshold)
     sFilename_out = 'flowline_large_step1_before_intersect.shp'
     sFilename_out =os.path.join(sWorkspace_simulation_flowline, sFilename_out)
-    export_flowline_to_shapefile( aFlowline, pSpatialRef, sFilename_out)
+    export_flowline_to_shapefile(iMesh_type, aFlowline, pSpatialRef, sFilename_out)
 
     aVertex, lIndex_outlet, aIndex_headwater,aIndex_middle, aIndex_confluence, aConnectivity = find_flowline_confluence(aFlowline,  pVertex_outlet)
     sFilename_out = 'flowline_vertex_with_confluence_step1_before_intersect.shp'
     sFilename_out = os.path.join(sWorkspace_simulation_flowline, sFilename_out)
-    export_vertex_to_shapefile( aVertex, pSpatialRef, sFilename_out, aAttribute_data=aConnectivity)
+    export_vertex_to_shapefile(iMesh_type, aVertex, pSpatialRef, sFilename_out, aAttribute_data=aConnectivity)
 
     aFlowline = merge_flowline( aFlowline,aVertex, pVertex_outlet, aIndex_headwater,aIndex_middle, aIndex_confluence  )  
     sFilename_out = 'flowline_merge_step1_before_intersect.shp'
     sFilename_out = os.path.join(sWorkspace_simulation_flowline, sFilename_out)
-    export_flowline_to_shapefile( aFlowline, pSpatialRef, sFilename_out)
+    export_flowline_to_shapefile(iMesh_type, aFlowline, pSpatialRef, sFilename_out)
 
     aFlowline = remove_small_river(aFlowline, dThreshold)
     sFilename_out = 'flowline_large_step2_before_intersect.shp'
     sFilename_out =os.path.join(sWorkspace_simulation_flowline, sFilename_out)
-    export_flowline_to_shapefile( aFlowline, pSpatialRef, sFilename_out)
+    export_flowline_to_shapefile(iMesh_type, aFlowline, pSpatialRef, sFilename_out)
 
 
     aVertex, lIndex_outlet, aIndex_headwater,aIndex_middle, aIndex_confluence, aConnectivity = find_flowline_confluence(aFlowline,  pVertex_outlet)
     sFilename_out = 'flowline_vertex_with_confluence_step2_before_intersect.shp'
     sFilename_out = os.path.join(sWorkspace_simulation_flowline, sFilename_out)
-    export_vertex_to_shapefile( aVertex, pSpatialRef, sFilename_out, aAttribute_data=aConnectivity)
+    export_vertex_to_shapefile(iMesh_type, aVertex, pSpatialRef, sFilename_out, aAttribute_data=aConnectivity)
 
     aFlowline = merge_flowline( aFlowline,aVertex, pVertex_outlet, aIndex_headwater,aIndex_middle, aIndex_confluence  )  
     sFilename_out = 'flowline_merge_step2_before_intersect.shp'
     sFilename_out = os.path.join(sWorkspace_simulation_flowline, sFilename_out)
-    export_flowline_to_shapefile( aFlowline, pSpatialRef, sFilename_out)
+    export_flowline_to_shapefile(iMesh_type, aFlowline, pSpatialRef, sFilename_out)
 
     #build segment index
     aFlowline, aStream_segment = define_stream_segment_index(aFlowline)
     sFilename_out = oModel_in.sFilename_flowline_segment_index_before_intersect
     sFilename_out = os.path.join(sWorkspace_simulation_flowline, sFilename_out)
-    export_flowline_to_shapefile( aFlowline, pSpatialRef, sFilename_out, \
+    export_flowline_to_shapefile(iMesh_type, aFlowline, pSpatialRef, sFilename_out, \
         aAttribute_data=[aStream_segment], aAttribute_field=['iseg'], aAttribute_dtype=['int'])
 
     #build stream order 
     aFlowline, aStream_order = define_stream_order(aFlowline)
     sFilename_out = oModel_in.sFilename_flowline_segment_order_before_intersect
     
-    export_flowline_to_shapefile( aFlowline, pSpatialRef, sFilename_out, \
+    export_flowline_to_shapefile(iMesh_type, aFlowline, pSpatialRef, sFilename_out, \
         aAttribute_data=[aStream_segment, aStream_order], aAttribute_field=['iseg','iord'], aAttribute_dtype=['int','int'])
 
     

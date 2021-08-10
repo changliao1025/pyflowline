@@ -47,7 +47,7 @@
       </desc>
     </entry>
 
-    <entry id="iCase_index" value="2">
+    <entry id="iCase_index" value="1">
       <type>int</type>
       <desc>
         The scratch workspace
@@ -102,7 +102,7 @@
         The scratch workspace
       </desc>
     </entry>
-    <entry id="sDate" value="202100707">
+    <entry id="sDate" value="20210716">
       <type>char</type>
       <desc>
         The scratch workspace
@@ -141,6 +141,12 @@
       </desc>
     </entry>
     <entry id="sFilename_mesh" value="hexagon.shp">
+      <type>char</type>
+      <desc>
+        The scratch workspace
+      </desc>
+    </entry>
+    <entry id="sFilename_mesh_info" value="hexagon_info.json">
       <type>char</type>
       <desc>
         The scratch workspace

@@ -68,7 +68,7 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh, sFilename_flowli
    
     lID_flowline = 0           
 
-
+    aFlowline_intersect_all=list()
     for i in range (nfeature_mesh):
     #for pFeature_mesh in pLayer_mesh:       
         pFeature_mesh= pLayer_mesh.GetFeature(i)
@@ -146,6 +146,7 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh, sFilename_flowli
                         pLine.iSegment = iSegment
                         pLine.iStream_order = iStream_order
                         aFlowline_intersect.append(pLine)
+                        aFlowline_intersect_all.append(pLine)
                         lID_flowline = lID_flowline + 1
                     
                     else:
@@ -166,6 +167,7 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh, sFilename_flowli
                                 pLine.iSegment = iSegment
                                 pLine.iStream_order = iStream_order
                                 aFlowline_intersect.append(pLine)
+                                aFlowline_intersect_all.append(pLine)
                                 lID_flowline = lID_flowline + 1
                             pass
                         else:
@@ -194,4 +196,4 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh, sFilename_flowli
             pass
 
     
-    return  aCell_intersect, aFlowline_intersect
+    return  aCell_intersect, aFlowline_intersect_all

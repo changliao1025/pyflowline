@@ -145,11 +145,13 @@ def create_mpas_mesh(sFilename_mesh_netcdf, dLatitude_top, dLatitude_bot, dLongi
 
             dummy0 = np.where(aVertexOnCellIndex > 0)
             aVertexIndex = aVertexOnCellIndex[dummy0]
-            aEdgeIndex= aEdgesOnCellIndex[dummy0]
-            aNeighborIndex= aCellOnCellIndex[dummy0]
+            dummy1 = np.where(aEdgesOnCellIndex > 0)
+            aEdgeIndex= aEdgesOnCellIndex[dummy1]
+            dummy2 = np.where(aCellOnCellIndex > 0)
+            aNeighborIndex= (aCellOnCellIndex[dummy2]).astype(int)
 
             #
-            aVertexIndexOnEdge = np.array(aVertexOnEdge0[aEdgeIndex-1,:]).astype((np.int))
+            aVertexIndexOnEdge = np.array(aVertexOnEdge0[aEdgeIndex-1,:]).astype((int))
 
             aLonVertex = aLongitudeVertex[aVertexIndex-1]
             aLatVertex = aLatitudeVertex[aVertexIndex-1]
@@ -182,11 +184,39 @@ def create_mpas_mesh(sFilename_mesh_netcdf, dLatitude_top, dLatitude_bot, dLongi
             pmpas.lCellID = lCellID
             
             pmpas.aNeighbor=aNeighborIndex
-            pmpas.nNeighbor=nVertex
+            pmpas.nNeighbor=len(aNeighborIndex)
+            
+
             aMpas.append(pmpas)
     
             #get vertex
 
         pass
 
-    return aMpas
+    #for maps we need to clean some cell because they were not actually in the domain
+    aMpas_out = list()
+    ncell = len(aMpas)
+    aCellID  = list()
+    for i in range(ncell):
+        pCell = aMpas[i]
+        lCellID = pCell.lCellID
+        aCellID.append(lCellID)
+    
+    for i in range(ncell):
+        pCell = aMpas[i]
+        aNeighbor = pCell.aNeighbor
+        nNeighbor = pCell.nNeighbor
+        aNeighbor_new = list()
+        nNeighbor_new = 0 
+        for j in range(nNeighbor):
+            lNeighbor = int(aNeighbor[j])
+            if lNeighbor in aCellID:
+                nNeighbor_new = nNeighbor_new +1 
+                aNeighbor_new.append(lNeighbor)
+                
+        pCell.nNeighbor= len(aNeighbor_new)
+        pCell.aNeighbor = aNeighbor_new
+        aMpas_out.append(pCell)
+
+
+    return aMpas_out

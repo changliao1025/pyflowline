@@ -3,8 +3,8 @@ import json
 from osgeo import ogr, osr, gdal, gdalconst
 from shapely.geometry import Point, LineString, MultiLineString
 from shapely.wkt import loads
-def export_flowline_to_shapefile(aFlowline_in, pSpatial_reference_in, \
-    sFilename_json_out, \
+def export_flowline_to_shapefile(iMesh_type_in, aFlowline_in, pSpatial_reference_in, \
+    sFilename_shapefile_out, \
     aAttribute_field=None,\
     aAttribute_data=None,\
         aAttribute_dtype=None):
@@ -13,9 +13,9 @@ def export_flowline_to_shapefile(aFlowline_in, pSpatial_reference_in, \
     This function should be used for stream flowline only.
     """
 
-    if os.path.exists(sFilename_json_out): 
+    if os.path.exists(sFilename_shapefile_out): 
         #delete it if it exists
-        os.remove(sFilename_json_out)
+        os.remove(sFilename_shapefile_out)
         pass
 
     nFlowline = len(aFlowline_in)
@@ -38,15 +38,15 @@ def export_flowline_to_shapefile(aFlowline_in, pSpatial_reference_in, \
 
     
 
-    #pDriver = ogr.GetDriverByName('GeoJSON')
-    pDriver = ogr.GetDriverByName('ESRI Shapefile')
+    #pDriver_json = ogr.GetDriverByName('GeoJSON')
+    pDriver_shapefile = ogr.GetDriverByName('ESRI Shapefile')
     #geojson
-    pDataset_json = pDriver.CreateDataSource(sFilename_json_out)  
+    pDataset_shapefile = pDriver_shapefile.CreateDataSource(sFilename_shapefile_out)  
     
 
-    pLayer_json = pDataset_json.CreateLayer('flowline', pSpatial_reference_in, ogr.wkbMultiLineString)
+    pLayer_shapefile = pDataset_shapefile.CreateLayer('flowline', pSpatial_reference_in, ogr.wkbLineString)
     # Add one attribute
-    pLayer_json.CreateField(ogr.FieldDefn('id', ogr.OFTInteger64)) #long type for high resolution
+    pLayer_shapefile.CreateField(ogr.FieldDefn('id', ogr.OFTInteger64)) #long type for high resolution
 
     #add the other fields
     if iFlag_attribute ==1:
@@ -54,14 +54,14 @@ def export_flowline_to_shapefile(aFlowline_in, pSpatial_reference_in, \
             sField = aAttribute_field[i]
             dtype = aAttribute_dtype[i]
             if dtype == 'int':
-                pLayer_json.CreateField(ogr.FieldDefn(sField, ogr.OFTInteger64))
+                pLayer_shapefile.CreateField(ogr.FieldDefn(sField, ogr.OFTInteger64))
                 pass
             else:
-                pLayer_json.CreateField(ogr.FieldDefn(sField, ogr.OFTReal))
+                pLayer_shapefile.CreateField(ogr.FieldDefn(sField, ogr.OFTReal))
                 pass
         
     
-    pLayerDefn = pLayer_json.GetLayerDefn()
+    pLayerDefn = pLayer_shapefile.GetLayerDefn()
     pFeature_out = ogr.Feature(pLayerDefn)
 
     lID = 0
@@ -70,8 +70,12 @@ def export_flowline_to_shapefile(aFlowline_in, pSpatial_reference_in, \
         dummy =pFlowline.aVertex
         aPoint=list()
         for j in dummy:
-            aPoint.append( Point( j.dx, j.dy ) )
-            pass
+            if iMesh_type_in ==4:
+                aPoint.append( Point( j.dLongitude, j.dLatitude ) )
+                pass
+            else:
+                aPoint.append( Point( j.dx, j.dy ) )
+                pass
 
         dummy1= LineString( aPoint )
         pGeometry_out = ogr.CreateGeometryFromWkb(dummy1.wkb)
@@ -89,12 +93,12 @@ def export_flowline_to_shapefile(aFlowline_in, pSpatial_reference_in, \
                     pFeature_out.SetField(sField, float(dummy[i]))
         
         # Add new pFeature_shapefile to output Layer
-        pLayer_json.CreateFeature(pFeature_out)        
+        pLayer_shapefile.CreateFeature(pFeature_out)        
         lID =  lID + 1
         pass
         
-    pDataset_json.FlushCache()
-    pDataset_json = pLayer_json = pFeature_out  = None    
+    pDataset_shapefile.FlushCache()
+    pDataset_shapefile = pLayer_shapefile = pFeature_out  = None    
 
     return
 

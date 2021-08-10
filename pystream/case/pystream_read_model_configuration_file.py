@@ -45,7 +45,7 @@ def pystream_read_model_configuration_file(sFilename_configuration_in,\
     if sDate_in is not None:
         sDate = sDate_in
     else:
-        sDate = sDate_default
+        sDate = config['sDate']
         pass
 
     if iCase_index_in is not None:        
@@ -56,7 +56,7 @@ def pystream_read_model_configuration_file(sFilename_configuration_in,\
     
 
     config['iCase_index'] = iCase_index
-    
+    config['sDate'] = sDate
    
    
     

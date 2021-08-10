@@ -197,10 +197,10 @@ def create_hexagon_mesh(iFlag_rotation, dX_left, dY_bot, dResolution_meter, ncol
                 if iColumn % 2 == 0 :
                 #define a polygon here
                     x1 = xleft + (iColumn-1) * dX_spacing
-                    y1 = ybottom + (iRow-1) * dY_spacing
+                    y1 = ybottom + (iRow-1) * dY_spacing + dY_shift
                 else:
                     x1 = xleft + (iColumn-1) * dX_spacing #- dX_shift
-                    y1 = ybottom + (iRow-1) * dY_spacing + dY_shift
+                    y1 = ybottom + (iRow-1) * dY_spacing 
     
     
                 x2 = x1 - dX_shift
@@ -299,7 +299,7 @@ def create_hexagon_mesh(iFlag_rotation, dX_left, dY_bot, dResolution_meter, ncol
                             lCellID4 = nrow * iColumn + iRow  +1
                             aNeighbor.append(lCellID4)
                                                    
-                if chekc_if_duplicates(aNeighbor) == 0:
+                if check_if_duplicates(aNeighbor) == 0:
                     print('error')   
                 pHexagon.aNeighbor = aNeighbor
                 print(lCellID_center,aNeighbor)

@@ -9,8 +9,7 @@ class streamcase(object):
     iCase_index= 0
     sMesh_type = 1
     
-    iFlag_mode=0    
-    iFlag_use_dem = 0
+   
     iFlag_disconnected =0
     iFlag_rotation=0
     dResolution=0.0
@@ -27,13 +26,12 @@ class streamcase(object):
     sFilename_model_configuration=''
 
     sWorkspace_data=''
-    sWorkspace_scratch=''
+ 
     
     sWorkspace_project=''
     
-    sWorkspace_simulation=''
-    sWorkspace_simulation_flowline=''
-    sWorkspace_simulation_case=''
+    sWorkspace_output=''
+    
     
     sRegion=''
     sModel=''
@@ -63,18 +61,18 @@ class streamcase(object):
     def __init__(self, aParameter):
         self.sFilename_model_configuration    = aParameter[ 'sFilename_model_configuration']
 
-        self.sWorkspace_data = aParameter[ 'sWorkspace_data']
-        self.sWorkspace_scratch    = aParameter[ 'sWorkspace_scratch']
-        self.sWorkspace_project= aParameter[ 'sWorkspace_project']
         self.sWorkspace_bin= aParameter[ 'sWorkspace_bin']
+        self.sWorkspace_data = aParameter[ 'sWorkspace_data']
+        
+        self.sWorkspace_project= aParameter[ 'sWorkspace_project']
+        self.sWorkspace_output = aParameter[ 'sWorkspace_output']
         
         self.sRegion               = aParameter[ 'sRegion']
         self.sModel                = aParameter[ 'sModel']
        
     
-        self.sWorkspace_simulation = self.sWorkspace_scratch + slash + '04model' + slash \
-            + self.sModel + slash + self.sRegion +  slash + 'simulation'
-        sPath = self.sWorkspace_simulation
+        
+        sPath = self.sWorkspace_output
         Path(sPath).mkdir(parents=True, exist_ok=True)
 
        
@@ -110,19 +108,14 @@ class streamcase(object):
                         else:
                             print('Unsupported mesh type?')
         
-        self.sWorkspace_simulation_flowline = self.sWorkspace_simulation + slash + sCase + slash + 'flowline'
-        sPath = self.sWorkspace_simulation_flowline
-        Path(sPath).mkdir(parents=True, exist_ok=True)
+        
+        
 
-        self.sWorkspace_simulation_case = self.sWorkspace_simulation + slash + sCase + slash + self.sMesh_type 
-        sPath = self.sWorkspace_simulation_case
-        Path(sPath).mkdir(parents=True, exist_ok=True)
+        
 
 
-       
-        self.iFlag_simulation =  int(aParameter['iFlag_simulation']) 
-        self.iFlag_mode =  int(aParameter['iFlag_mode']) 
-        self.iFlag_use_dem =  int(aParameter['iFlag_use_dem']) 
+    
+     
         self.iFlag_disconnected =  int(aParameter['iFlag_disconnected'])
 
         self.iFlag_rotation = int(aParameter['iFlag_rotation'])
@@ -148,16 +141,16 @@ class streamcase(object):
         self.sFilename_mesh_netcdf = aParameter['sFilename_mesh_netcdf']
         self.sFilename_flowlinw_raw = aParameter['sFilename_flowlinw_raw']
 
-
-        self.sFilename_mesh = self.sWorkspace_simulation_case + slash + aParameter['sFilename_mesh']
+        ##model generated files
+        self.sFilename_mesh = self.sWorkspace_output + slash  + sMesh_type + ".shp"
         
-        self.sFilename_flowline_segment_index_before_intersect = self.sWorkspace_simulation_flowline + slash + aParameter['sFilename_flowline_segment_index_before_intersect']
-        self.sFilename_flowline_segment_order_before_intersect = self.sWorkspace_simulation_flowline + slash + aParameter['sFilename_flowline_segment_order_before_intersect']
+        self.sFilename_flowline_segment_index_before_intersect = self.sWorkspace_output + slash + 'flowline_segment_index_before_intersect.shp'
+        self.sFilename_flowline_segment_order_before_intersect = self.sWorkspace_output + slash + 'flowline_segment_order_before_intersect.shp'
 
 
-        self.sFilename_mesh_info= self.sWorkspace_simulation_case + slash + aParameter['sFilename_mesh_info']
+        self.sFilename_mesh_info= self.sWorkspace_output + slash + sMesh_type + "_mesh_info.json"  
         
-        self.sFilename_flowline_intersect  = self.sWorkspace_simulation_case + slash + aParameter['sFilename_flowline_intersect']
+        self.sFilename_flowline_intersect  = self.sWorkspace_output + slash + 'flowline_intersect.shp'
         self.sJob =  aParameter['sJob'] 
 
         self.sWorkspace_data_project = self.sWorkspace_data +  slash + self.sWorkspace_project

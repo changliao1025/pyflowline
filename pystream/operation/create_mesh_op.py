@@ -13,19 +13,19 @@ from pystream.mesh.jigsaw.create_mpas_mesh import create_mpas_mesh
 from pystream.mesh.tin.create_tin_mesh import create_tin_mesh
 
 
-def create_mesh_op(oModel_in):
+def create_mesh_op(oPystream_in):
 
 
     #we can use the dem extent to setup 
-    iMesh_type = oModel_in.iMesh_type
-    iFlag_rotation = oModel_in.iFlag_rotation
-    dResolution = oModel_in.dResolution
-    dResolution_meter = oModel_in.dResolution_meter
-    sFilename_dem = oModel_in.sFilename_dem
-    sFilename_spatial_reference = oModel_in.sFilename_spatial_reference
-    sFilename_mesh = oModel_in.sFilename_mesh
+    iMesh_type = oPystream_in.iMesh_type
+    iFlag_rotation = oPystream_in.iFlag_rotation
+    dResolution = oPystream_in.dResolution
+    dResolution_meter = oPystream_in.dResolution_meter
+    sFilename_dem = oPystream_in.sFilename_dem
+    sFilename_spatial_reference = oPystream_in.sFilename_spatial_reference
+    sFilename_mesh = oPystream_in.sFilename_mesh
 
-    sWorkspace_simulation_case = oModel_in.sWorkspace_simulation_case
+    
 
 
     dPixelWidth, dOriginX, dOriginY, nrow, ncolumn, pSpatialRef, pProjection, pGeotransform = obtain_raster_metadata(sFilename_dem)
@@ -79,21 +79,21 @@ def create_mesh_op(oModel_in):
             if iMesh_type ==3: #latlon
                 dResolution_meter = degree_to_meter(dLatitude_mean, dResolution )
                 dArea = np.power(dResolution_meter,2.0)
-                dLatitude_top    = oModel_in.dLatitude_top   
-                dLatitude_bot    = oModel_in.dLatitude_bot   
-                dLongitude_left  = oModel_in.dLongitude_left 
-                dLongitude_right = oModel_in.dLongitude_right
+                dLatitude_top    = oPystream_in.dLatitude_top   
+                dLatitude_bot    = oPystream_in.dLatitude_bot   
+                dLongitude_left  = oPystream_in.dLongitude_left 
+                dLongitude_right = oPystream_in.dLongitude_right
                 ncolumn= int( (dLongitude_right - dLongitude_left) / dResolution )
                 nrow= int( (dLatitude_top - dLatitude_bot) / dResolution )
                 aLatlon = create_latlon_mesh(dLongitude_left, dLatitude_bot, dResolution, ncolumn, nrow, sFilename_mesh)
                 return aLatlon
             else:
                 if iMesh_type ==4: #mpas
-                    sFilename_mesh_netcdf = oModel_in.sFilename_mesh_netcdf
-                    dLatitude_top    = oModel_in.dLatitude_top   
-                    dLatitude_bot    = oModel_in.dLatitude_bot   
-                    dLongitude_left  = oModel_in.dLongitude_left 
-                    dLongitude_right = oModel_in.dLongitude_right
+                    sFilename_mesh_netcdf = oPystream_in.sFilename_mesh_netcdf
+                    dLatitude_top    = oPystream_in.dLatitude_top   
+                    dLatitude_bot    = oPystream_in.dLatitude_bot   
+                    dLongitude_left  = oPystream_in.dLongitude_left 
+                    dLongitude_right = oPystream_in.dLongitude_right
                     aMpas = create_mpas_mesh(sFilename_mesh_netcdf, dLatitude_top, dLatitude_bot, dLongitude_left, dLongitude_right,sFilename_mesh)
                     return aMpas
                 else:

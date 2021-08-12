@@ -20,14 +20,15 @@ from pystream.format.export_vertex_to_shapefile import export_vertex_to_shapefil
 
 def intersect_flowline_with_mesh_with_postprocess_op(oModel_in):
 
+    iFlag_projected = 0
+
     iMesh_type = oModel_in.iMesh_type
 
-    sWorkspace_simulation_case = oModel_in.sWorkspace_simulation_case  
+    sWorkspace_output = oModel_in.sWorkspace_output  
 
     sFilename_flowlinw_raw = oModel_in.sFilename_flowlinw_raw
 
 
-    sWorkspace_simulation_case = oModel_in.sWorkspace_simulation_case
     aFlowline, pSpatialRef_flowline = read_flowline_shapefile(sFilename_flowlinw_raw)
     
 
@@ -49,7 +50,7 @@ def intersect_flowline_with_mesh_with_postprocess_op(oModel_in):
     
     aFlowline, aFlowline_no_parallel = remove_returning_flowline(iMesh_type, aCell_intersect, pVertex_outlet)
     sFilename_out = 'flowline_simplified_after_intersect.shp'
-    sFilename_out = os.path.join(sWorkspace_simulation_case, sFilename_out)  
+    sFilename_out = os.path.join(sWorkspace_output, sFilename_out)  
 
 
     if iMesh_type ==4:
@@ -59,26 +60,26 @@ def intersect_flowline_with_mesh_with_postprocess_op(oModel_in):
         pSpatialRef = pSpatialRef_flowline
         pass
 
-    export_flowline_to_shapefile(iMesh_type, aFlowline, pSpatialRef, sFilename_out)
+    export_flowline_to_shapefile(iFlag_projected, aFlowline, pSpatialRef, sFilename_out)
     
     pVertex_outlet=aFlowline[0].pVertex_end
     aVertex = find_flowline_vertex(aFlowline)
     
     sFilename_out = 'flowline_vertex_without_confluence_after_intersect.shp'
-    sFilename_out = os.path.join(sWorkspace_simulation_case, sFilename_out)
-    export_vertex_to_shapefile(iMesh_type, aVertex, pSpatialRef, sFilename_out)
+    sFilename_out = os.path.join(sWorkspace_output, sFilename_out)
+    export_vertex_to_shapefile(iFlag_projected, aVertex, pSpatialRef, sFilename_out)
     
     aFlowline = split_flowline(aFlowline, aVertex)
     sFilename_out = 'flowline_split_by_point_after_intersect.shp'
-    sFilename_out = os.path.join(sWorkspace_simulation_case, sFilename_out)
-    export_flowline_to_shapefile(iMesh_type, aFlowline, pSpatialRef, sFilename_out)
+    sFilename_out = os.path.join(sWorkspace_output, sFilename_out)
+    export_flowline_to_shapefile(iFlag_projected, aFlowline, pSpatialRef, sFilename_out)
     
     aFlowline= correct_flowline_direction(aFlowline,  pVertex_outlet )
     
     aFlowline = remove_flowline_loop(  aFlowline )    
     sFilename_out = 'flowline_after_intersect.shp'
-    sFilename_out = os.path.join(sWorkspace_simulation_case, sFilename_out)
-    export_flowline_to_shapefile(iMesh_type, aFlowline, pSpatialRef, sFilename_out)
+    sFilename_out = os.path.join(sWorkspace_output, sFilename_out)
+    export_flowline_to_shapefile(iFlag_projected, aFlowline, pSpatialRef, sFilename_out)
 
     return aCell_intersect, aFlowline
 

@@ -3,7 +3,7 @@ import json
 from osgeo import ogr, osr, gdal, gdalconst
 from shapely.geometry import Point, LineString, MultiLineString
 from shapely.wkt import loads
-def export_flowline_to_shapefile(iMesh_type_in, aFlowline_in, pSpatial_reference_in, \
+def export_flowline_to_shapefile(iFlag_projected_in, aFlowline_in, pSpatial_reference_in, \
     sFilename_shapefile_out, \
     aAttribute_field=None,\
     aAttribute_data=None,\
@@ -70,11 +70,11 @@ def export_flowline_to_shapefile(iMesh_type_in, aFlowline_in, pSpatial_reference
         dummy =pFlowline.aVertex
         aPoint=list()
         for j in dummy:
-            if iMesh_type_in ==4:
-                aPoint.append( Point( j.dLongitude, j.dLatitude ) )
+            if iFlag_projected_in ==1:
+                aPoint.append( Point( j.dx, j.dy ) )                
                 pass
             else:
-                aPoint.append( Point( j.dx, j.dy ) )
+                aPoint.append( Point( j.dLongitude, j.dLatitude ) )
                 pass
 
         dummy1= LineString( aPoint )

@@ -125,5 +125,5 @@ class pympas(pycell):
     
     def export_to_json(self):
         #sJson = json.dumps(self.__dict__, f, ensure_ascii=False, indent=4, cls=CellClassEncoder) 
-        sJson = json.dumps(self.__dict__, ensure_ascii=True, indent=4, cls=CellClassEncoder)
+        sJson = json.dumps(self.__dict__, sort_keys=True, ensure_ascii=True, indent=4, cls=CellClassEncoder)
         return sJson

@@ -11,7 +11,7 @@ from pystream.algorithm.intersect.intersect_flowline_with_mesh import intersect_
 def intersect_flowline_with_mesh_op(oModel_in):
 
     
-    sWorkspace_simulation_case = oModel_in.sWorkspace_simulation_case  
+    sWorkspace_output_case = oModel_in.sWorkspace_output_case  
 
 
 

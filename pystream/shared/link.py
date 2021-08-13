@@ -53,8 +53,8 @@ class pympaslink(object):
         self.pEdge_link = pEdge_link_in
         return
 
-    def export_to_json(self):
-        #sJson = json.dumps(self.__dict__, f, ensure_ascii=False, indent=4, cls=CellClassEncoder) 
+    def dumps(self):
+        
         sJson = json.dumps(self.__dict__, ensure_ascii=True, indent=4, cls=LinkClassEncoder)
         return sJson
    

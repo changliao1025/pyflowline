@@ -6,7 +6,7 @@ from osgeo import gdal, osr, ogr
 
 from pystream.shared.vertex import pyvertex
 
-class pyedge(object):
+class pyedge(dict):
     __metaclass__ = ABCMeta 
     lEdgeID=-1
     pVertex_start = None
@@ -25,6 +25,8 @@ class pyedge(object):
         else:
             self.pVertex_start = pVertex_start_in
             self.pVertex_end = pVertex_end_in
+
+            dict.__init__(self, pVertex_start_in=pVertex_start_in, pVertex_end_in=pVertex_end_in)
 
         return
 

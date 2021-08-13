@@ -15,7 +15,7 @@
     "iFlag_resample_method": 2,
     "iCase_index": 1,
     "iMesh_type": 4,
-    "lMeshID_outlet": -1,    
+    "lCellCellID_outlet": -1,    
     "dAccumulation_threshold": 100000,
     "dLongitude_left": -79.44374,
     "dLongitude_right": -74.24774,

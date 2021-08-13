@@ -11,17 +11,17 @@ from pystream.shared.flowline import pyflowline
 import numpy as np
 import json
 from json import JSONEncoder
-class CellClassEncoder(JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, np.ndarray):
-            return obj.tolist()
-        if isinstance(obj, pyedge):
-            return obj.lEdgeID
-        if isinstance(obj, pyvertex):
-            return obj.lVertexID
-        if isinstance(obj, pyflowline):
-            return obj.lFlowlineID
-        return JSONEncoder.default(self, obj)
+#class CellClassEncoder(JSONEncoder):
+#    def default(self, obj):
+#        if isinstance(obj, np.ndarray):
+#            return obj.tolist()
+#        if isinstance(obj, pyedge):
+#            return obj.lEdgeID
+#        if isinstance(obj, pyvertex):
+#            return obj.lVertexID
+#        if isinstance(obj, pyflowline):
+#            return obj.lFlowlineID
+#        return JSONEncoder.default(self, obj)
 
 
 class pympas(pycell):
@@ -122,8 +122,8 @@ class pympas(pycell):
 
 
         return iFlag_share
+
     
-    def export_to_json(self):
-        #sJson = json.dumps(self.__dict__, f, ensure_ascii=False, indent=4, cls=CellClassEncoder) 
-        sJson = json.dumps(self.__dict__, sort_keys=True, ensure_ascii=True, indent=4, cls=CellClassEncoder)
-        return sJson
+    #def dumps(self):
+    #    sJson = json.dumps(self.__dict__, sort_keys=True, indent = 4,#ensure_ascii=True, cls=CellClassEncoder)
+    #    return sJson

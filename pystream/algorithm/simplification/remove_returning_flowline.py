@@ -218,16 +218,16 @@ def remove_returning_flowline(iMesh_type, aCell_intersect_in, pVertex_outlet_in)
             dDiatance = pVertex_end.calculate_distance( pVertex_outlet_in)
             if iFlag_first ==1:
                 dDiatance_min = dDiatance               
-                lID_outlet = pCell.lCellID               
-                lID_outlet2 = j
-                lID_outlet3 = i
+                lCellID_outlet = pCell.lCellID               
+                lCellID_outlet2 = j
+                lCellID_outlet3 = i
                 iFlag_first=0
             else:
                 if  dDiatance < dDiatance_min:
                     dDiatance_min = dDiatance                
-                    lID_outlet = pCell.lCellID                
-                    lID_outlet2 = j
-                    lID_outlet3 = i
+                    lCellID_outlet = pCell.lCellID                
+                    lCellID_outlet2 = j
+                    lCellID_outlet3 = i
                     pass    
                 else:
                     #print(dDiatance)
@@ -236,7 +236,7 @@ def remove_returning_flowline(iMesh_type, aCell_intersect_in, pVertex_outlet_in)
             pass     
 
     #loop through       
-    pFlowline = aCell_intersect_in[lID_outlet2].aFlowline[lID_outlet3]
+    pFlowline = aCell_intersect_in[lCellID_outlet2].aFlowline[lCellID_outlet3]
     iSegment =pFlowline.iSegment
     iStream_order=pFlowline.iStream_order
     pVertex_outlet=pFlowline.pVertex_end
@@ -296,4 +296,4 @@ def remove_returning_flowline(iMesh_type, aCell_intersect_in, pVertex_outlet_in)
 
 
 
-    return aFlowline_out, aFlowline_out_no_parallel
+    return aFlowline_out, aFlowline_out_no_parallel, lCellID_outlet

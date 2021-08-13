@@ -48,7 +48,7 @@ def intersect_flowline_with_mesh_with_postprocess_op(oModel_in):
     point['y'] = oModel_in.dy_outlet
     pVertex_outlet=pyvertex(point)
     
-    aFlowline, aFlowline_no_parallel = remove_returning_flowline(iMesh_type, aCell_intersect, pVertex_outlet)
+    aFlowline, aFlowline_no_parallel, lCellID_outlet = remove_returning_flowline(iMesh_type, aCell_intersect, pVertex_outlet)
     sFilename_out = 'flowline_simplified_after_intersect.shp'
     sFilename_out = os.path.join(sWorkspace_output, sFilename_out)  
 
@@ -81,7 +81,7 @@ def intersect_flowline_with_mesh_with_postprocess_op(oModel_in):
     sFilename_out = os.path.join(sWorkspace_output, sFilename_out)
     export_flowline_to_shapefile(iFlag_projected, aFlowline, pSpatialRef, sFilename_out)
 
-    return aCell_intersect, aFlowline
+    return aCell_intersect, aFlowline, lCellID_outlet
 
 
 

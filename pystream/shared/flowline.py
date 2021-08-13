@@ -3,10 +3,11 @@ import json
 from numpy.lib.function_base import average
 import copy
 from osgeo import gdal, osr, ogr
+
 from pystream.shared.vertex import pyvertex
 from pystream.shared.edge import pyedge
 
-class pyflowline(object):
+class pyflowline(dict):
     __metaclass__ = ABCMeta 
 
     lFlowlineID=-1
@@ -40,6 +41,8 @@ class pyflowline(object):
 
         self.aVertex.append( aEdge[nEdge-1].pVertex_end )
         self.nVertex = nVertex
+
+        dict.__init__(self, aEdge=aEdge)
 
         return
 

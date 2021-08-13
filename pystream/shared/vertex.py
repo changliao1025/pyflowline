@@ -2,7 +2,7 @@ from abc import ABCMeta, abstractmethod
 import numpy as np
 
 from pyearth.gis.location.calculate_distance_based_on_lon_lat import calculate_distance_based_on_lon_lat
-class pyvertex(dict):
+class pyvertex(object):
     __metaclass__ = ABCMeta  
     lVertexID=-1
     dx=-9999
@@ -28,7 +28,7 @@ class pyvertex(dict):
         if 'lat' in aParameter:            
             self.dLatitude       = float(aParameter['lat'])
 
-        dict.__init__(self)
+        #dict.__init__(self)
         return
     
     def __eq__(self, other):

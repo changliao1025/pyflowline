@@ -7,7 +7,7 @@ from osgeo import gdal, osr, ogr
 from pystream.shared.vertex import pyvertex
 from pystream.shared.edge import pyedge
 
-class pyflowline(dict):
+class pyflowline(object):
     __metaclass__ = ABCMeta 
 
     lFlowlineID=-1
@@ -42,7 +42,7 @@ class pyflowline(dict):
         self.aVertex.append( aEdge[nEdge-1].pVertex_end )
         self.nVertex = nVertex
 
-        dict.__init__(self, aEdge=aEdge)
+        #dict.__init__(self, aEdge=aEdge)
 
         return
 

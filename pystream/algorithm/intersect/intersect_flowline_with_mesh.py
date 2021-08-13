@@ -14,7 +14,7 @@ from pystream.format.convert_coordinates_to_cell import convert_gcs_coordinates_
 from pystream.format.convert_coordinates_to_flowline import convert_gcs_coordinates_to_flowline,convert_pcs_coordinates_to_flowline
 
 
-from pystream.shared.link import pyhexagonlink
+#from pystream.shared.link import pyhexagonlink
 def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh, sFilename_flowline, sFilename_output):
 
     if  os.path.exists(sFilename_mesh) and  os.path.exists(sFilename_flowline) : 

@@ -13,9 +13,9 @@ from pystream.shared.hexagon import pyhexagon
 
 from pystream.format.convert_coordinates_to_cell import convert_pcs_coordinates_to_cell
 from pystream.format.convert_coordinates_to_flowline import convert_pcs_coordinates_to_flowline
-from pystream.find_hexagon_through_edge import find_hexagon_through_edge
+from pystream.algorithm.auxiliary.find_hexagon_through_edge import find_hexagon_through_edge
 
-from pystream.shared.link import pyhexagonlink
+#from pystream.shared.link import pyhexagonlink
 def build_hexagon_grid_topology(aHexagon_in):
     
     

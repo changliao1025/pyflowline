@@ -136,7 +136,6 @@ def create_mpas_mesh(sFilename_mesh_netcdf, dLatitude_top, dLatitude_bot, dLongi
 
         if dLat > dLatitude_bot and dLat < dLatitude_top and dLon > dLongitude_left and dLon < dLongitude_right:
 
-
             #get cell edge
             lCellID = int(aIndexToCellID[i])
             aCellOnCellIndex = np.array(aCellsOnCell[i,:])
@@ -150,7 +149,6 @@ def create_mpas_mesh(sFilename_mesh_netcdf, dLatitude_top, dLatitude_bot, dLongi
             dummy2 = np.where(aCellOnCellIndex > 0)
             aNeighborIndex= (aCellOnCellIndex[dummy2]).astype(int)
 
-            #
             aVertexIndexOnEdge = np.array(aVertexOnEdge0[aEdgeIndex-1,:]).astype((int))
 
             aLonVertex = aLongitudeVertex[aVertexIndex-1]

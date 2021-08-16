@@ -80,6 +80,9 @@ class pympas(pycell):
             pVertex['lon'] =self.dLon_center
             pVertex['lat'] =self.dLat_center           
             self.pVertex_center = pyvertex(pVertex)
+            self.lCellID_downstream_burned=-1
+            self.iStream_order_burned=-1
+            self.iStream_segment_burned=-1
 
             pass
         pass

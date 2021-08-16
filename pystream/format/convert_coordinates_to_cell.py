@@ -20,7 +20,7 @@ def convert_gcs_coordinates_to_cell(iMesh_type, aCoordinates_gcs):
     npoint = len(aCoordinates_gcs)    
     aVertex=list()              
     aEdge=list()    
-    for i in range(npoint):
+    for i in range(npoint-1):
         x = aCoordinates_gcs[i][0]
         y = aCoordinates_gcs[i][1]
         dummy = dict()
@@ -28,9 +28,15 @@ def convert_gcs_coordinates_to_cell(iMesh_type, aCoordinates_gcs):
         dummy['lat'] = y
         pVertex = pyvertex(dummy)
         aVertex.append(pVertex)
-    for j in range(npoint-1):
+
+    npoint2 = len(aVertex) 
+    for j in range(npoint2-1):
         pEdge = pyedge( aVertex[j], aVertex[j+1] )
         aEdge.append(pEdge)
+    
+    #add the last one    
+    pEdge = pyedge( aVertex[npoint2-1], aVertex[0] )
+    aEdge.append(pEdge)
 
     if iMesh_type ==1: #hexagon
         

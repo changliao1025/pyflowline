@@ -103,10 +103,10 @@ class pyedge(object):
         pVertex_end2 = pEdge_in.pVertex_end
 
         if pVertex_start1 == pVertex_start2 and pVertex_end1 == pVertex_end2:
-            iFlag_overlap =1
+            iFlag_overlap = 1
         else:
             if  pVertex_start1 == pVertex_end2 and pVertex_end1 == pVertex_start2:
-                iFlag_overlap =1
+                iFlag_overlap = 1
             else:
                 iFlag_overlap = 0
 
@@ -126,4 +126,12 @@ class pyedge(object):
         else:
             iFlag = 0 
         return iFlag 
+    
+    def __eq__(self, other):                
+        iFlag_overlap = self.is_overlap(other)          
+
+        return iFlag_overlap
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
 

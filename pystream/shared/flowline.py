@@ -1,5 +1,6 @@
 from abc import ABCMeta, abstractmethod
 import json
+import numpy as np
 from numpy.lib.function_base import average
 import copy
 from osgeo import gdal, osr, ogr
@@ -156,3 +157,26 @@ class pyflowline(object):
 
         return pFlowline_out
         
+    def __eq__(self, other):  
+                     
+        iFlag_overlap = 0 
+
+        nEdge1 = self.nEdge
+        nEdge2 = other.nEdge
+        if nEdge1 == nEdge2:
+            for i in np.arange( nEdge1):
+                pEdge1 = self.aEdge[i]
+                pEdge2 = other.aEdge[i]
+                if pEdge1 == pEdge2:
+                    iFlag_overlap =1 
+                else:
+                    iFlag_overlap =0 
+                    break                
+            
+        else:
+            iFlag_overlap = 0
+
+        return iFlag_overlap
+
+    def __ne__(self, other):
+        return not self.__eq__(other)

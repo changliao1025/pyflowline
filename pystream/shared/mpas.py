@@ -38,6 +38,12 @@ class pympas(pycell):
     dLat_center=0.0
     dElevation=0.0
 
+    iFlag_intersected=-1
+
+    lCellID_downstream_burned=-1
+    iStream_order_burned=-1
+    iStream_segment_burned=-1
+
     aEdge=None
     aEdgeID=None
     aVertex=None

@@ -9,12 +9,13 @@ from pystream.format.export_flowline_to_shapefile import export_flowline_to_shap
 from pystream.algorithm.intersect.intersect_flowline_with_mesh import intersect_flowline_with_mesh
 
 from pystream.algorithm.simplification.remove_returning_flowline import remove_returning_flowline
-
+from pystream.algorithm.simplification.remove_duplicate_flowline import remove_duplicate_flowline
 
 from pystream.algorithm.direction.correct_flowline_direction import correct_flowline_direction
 from pystream.algorithm.loop.remove_flowline_loop import remove_flowline_loop
 from pystream.algorithm.split.find_flowline_vertex import find_flowline_vertex
 from pystream.algorithm.split.split_flowline import split_flowline
+from pystream.algorithm.split.split_flowline_to_reach import split_flowline_to_reach
 from pystream.format.export_vertex_to_shapefile import export_vertex_to_shapefile
 
 
@@ -39,7 +40,7 @@ def intersect_flowline_with_mesh_with_postprocess_op(oModel_in):
     sFilename_flowline_intersect = oModel_in.sFilename_flowline_intersect
 
     
-    aCell_intersect, aFlowline_intersect_all = intersect_flowline_with_mesh(iMesh_type, sFilename_mesh, sFilename_flowline, sFilename_flowline_intersect)
+    aCell, aCell_intersect, aFlowline_intersect_all = intersect_flowline_with_mesh(iMesh_type, sFilename_mesh, sFilename_flowline, sFilename_flowline_intersect)
 
 
     point= dict()
@@ -73,15 +74,20 @@ def intersect_flowline_with_mesh_with_postprocess_op(oModel_in):
     sFilename_out = 'flowline_split_by_point_after_intersect.shp'
     sFilename_out = os.path.join(sWorkspace_output, sFilename_out)
     export_flowline_to_shapefile(iFlag_projected, aFlowline, pSpatialRef, sFilename_out)
-    
     aFlowline= correct_flowline_direction(aFlowline,  pVertex_outlet )
+
+
     
     aFlowline = remove_flowline_loop(  aFlowline )    
-    sFilename_out = 'flowline_after_intersect.shp'
+    sFilename_out = 'flowline_remove_loop_after_intersect.shp'
     sFilename_out = os.path.join(sWorkspace_output, sFilename_out)
     export_flowline_to_shapefile(iFlag_projected, aFlowline, pSpatialRef, sFilename_out)
 
-    return aCell_intersect, aFlowline, lCellID_outlet
+
+    aFlowline = split_flowline_to_reach(aFlowline)
+
+
+    return aCell, aCell_intersect, aFlowline, lCellID_outlet
 
 
 

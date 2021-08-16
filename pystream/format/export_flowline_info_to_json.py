@@ -3,7 +3,7 @@ from pystream.shared.edge import pyedge
 from pystream.shared.flowline import pyflowline
 #from pystream.shared.link import pympaslink
 from pystream.shared.link import pycelllink
-def export_flowline_info_to_json(aCell_intersect_in, aFlowline_in, sFilename_json_out):
+def export_flowline_info_to_json(aCell, aCell_intersect_in, aFlowline_in, sFilename_json_out):
     
     #export the flowline topology to json
 

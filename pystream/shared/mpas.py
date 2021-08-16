@@ -14,6 +14,8 @@ from json import JSONEncoder
 
 class CellClassEncoder(JSONEncoder):
     def default(self, obj):
+        if isinstance(obj, np.integer):
+            return int(obj)
         if isinstance(obj, np.ndarray):
             return obj.tolist()
         if isinstance(obj, pyedge):

@@ -112,7 +112,7 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh, sFilename_flowli
                 pFeature_flowline = pLayer_flowline.GetFeature(j)
                 pGeometry_flowline = pFeature_flowline.GetGeometryRef()
 
-                iSegment = pFeature_flowline.GetField("iseg")
+                iStream_segment = pFeature_flowline.GetField("iseg")
                 iStream_order = pFeature_flowline.GetField("iord")
 
                 if (pGeometry_flowline.IsValid()):
@@ -133,7 +133,7 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh, sFilename_flowli
                     if pGeometrytype_intersect == 'LINESTRING':
                         pFeatureOut.SetGeometry(pGeometry_intersect)
                         pFeatureOut.SetField("id", lID_flowline)         
-                        pFeatureOut.SetField("iseg", iSegment)    
+                        pFeatureOut.SetField("iseg", iStream_segment)    
                         pFeatureOut.SetField("iord", iStream_order)           
                         pLayerOut.CreateFeature(pFeatureOut)    
 
@@ -143,7 +143,7 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh, sFilename_flowli
                         pLine = convert_pcs_coordinates_to_flowline(dummy1)
                         pLine.calculate_length()
                         pLine.lIndex = lID_flowline
-                        pLine.iSegment = iSegment
+                        pLine.iStream_segment = iStream_segment
                         pLine.iStream_order = iStream_order
                         aFlowline_intersect.append(pLine)
                         aFlowline_intersect_all.append(pLine)
@@ -155,7 +155,7 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh, sFilename_flowli
                             for Line in aLine: 
                                 pFeatureOut.SetGeometry(Line)
                                 pFeatureOut.SetField("id", lID_flowline)         
-                                pFeatureOut.SetField("iseg", iSegment)    
+                                pFeatureOut.SetField("iseg", iStream_segment)    
                                 pFeatureOut.SetField("iord", iStream_order)           
                                 pLayerOut.CreateFeature(pFeatureOut)    
 
@@ -164,7 +164,7 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh, sFilename_flowli
                                 dummy1= np.array(aCoords)
                                 pLine = convert_pcs_coordinates_to_flowline(dummy1)
                                 pLine.lIndex = lID_flowline
-                                pLine.iSegment = iSegment
+                                pLine.iStream_segment = iStream_segment
                                 pLine.iStream_order = iStream_order
                                 aFlowline_intersect.append(pLine)
                                 aFlowline_intersect_all.append(pLine)

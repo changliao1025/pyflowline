@@ -10,14 +10,18 @@ from pystream.algorithm.intersect.intersect_flowline_with_mesh import intersect_
 
 from pystream.algorithm.simplification.remove_returning_flowline import remove_returning_flowline
 from pystream.algorithm.simplification.remove_duplicate_flowline import remove_duplicate_flowline
-
+from pystream.algorithm.simplification.remove_duplicate_edge import remove_duplicate_edge
 from pystream.algorithm.direction.correct_flowline_direction import correct_flowline_direction
 from pystream.algorithm.loop.remove_flowline_loop import remove_flowline_loop
 from pystream.algorithm.split.find_flowline_vertex import find_flowline_vertex
+from pystream.algorithm.split.find_flowline_confluence import find_flowline_confluence
 from pystream.algorithm.split.split_flowline import split_flowline
-from pystream.algorithm.split.split_flowline_to_reach import split_flowline_to_reach
+from pystream.algorithm.split.split_flowline_to_edge import split_flowline_to_edge
 from pystream.format.export_vertex_to_shapefile import export_vertex_to_shapefile
+from pystream.algorithm.merge.merge_flowline import merge_flowline
 
+from pystream.algorithm.index.define_stream_order import define_stream_order
+from pystream.algorithm.index.define_stream_segment_index import define_stream_segment_index
 
 def intersect_flowline_with_mesh_with_postprocess_op(oModel_in):
 
@@ -84,8 +88,20 @@ def intersect_flowline_with_mesh_with_postprocess_op(oModel_in):
     export_flowline_to_shapefile(iFlag_projected, aFlowline, pSpatialRef, sFilename_out)
 
 
-    aFlowline = split_flowline_to_reach(aFlowline)
+    aFlowline, aEdge = split_flowline_to_edge(aFlowline)
+    #aEdge = remove_duplicate_edge(aEdge)
+    aFlowline = remove_duplicate_flowline(aFlowline)
 
+    aVertex, lIndex_outlet, aIndex_headwater,aIndex_middle, aIndex_confluence, aConnectivity\
+        = find_flowline_confluence(aFlowline,  pVertex_outlet)
+
+    aFlowline = merge_flowline( aFlowline,aVertex, pVertex_outlet, aIndex_headwater,aIndex_middle, aIndex_confluence  )  
+    aFlowline, aStream_segment = define_stream_segment_index(aFlowline)
+    aFlowline, aStream_order = define_stream_order(aFlowline)
+    
+    sFilename_out = 'flowline_final.shp'
+    sFilename_out = os.path.join(sWorkspace_output, sFilename_out)
+    export_flowline_to_shapefile(iFlag_projected, aFlowline, pSpatialRef, sFilename_out)
 
     return aCell, aCell_intersect, aFlowline, lCellID_outlet
 

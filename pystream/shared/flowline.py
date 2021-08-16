@@ -17,7 +17,7 @@ class pyflowline(object):
 
     dLength=0.0
 
-    iSegment=-1
+    iStream_segment=-1
     iStream_order =-1
 
     lIndex=-1

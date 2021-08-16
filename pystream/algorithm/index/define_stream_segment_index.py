@@ -10,8 +10,8 @@ def define_stream_segment_index(aFlowline_in):
 
         for i in range(nFlowline):
             pFlowline = aFlowline_in[i]
-            pFlowline.iSegment = nFlowline - i  
-            aStream_segment.append(pFlowline.iSegment)
+            pFlowline.iStream_segment = nFlowline - i  
+            aStream_segment.append(pFlowline.iStream_segment)
             aFlowline_out.append(pFlowline)
 
 

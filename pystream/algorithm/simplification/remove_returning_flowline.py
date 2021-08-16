@@ -70,10 +70,10 @@ def remove_returning_flowline(iMesh_type, aCell_intersect_in, pVertex_outlet_in)
                     pFlowline = aFlowline[i]
                     pVertex_start = pFlowline.pVertex_start
                     pVertex_end = pFlowline.pVertex_end
-                    iSegment = pFlowline.iSegment
+                    iStream_segment = pFlowline.iStream_segment
                     iStream_order = pFlowline.iStream_order
                     if pVertex_end == pVertex_end_current:
-                        if iSegment == iSegment_in:
+                        if iStream_segment == iSegment_in:
                             #found it
                             # #check length as well
                             dLength = pFlowline.dLength
@@ -136,7 +136,7 @@ def remove_returning_flowline(iMesh_type, aCell_intersect_in, pVertex_outlet_in)
                                 #this is a new upstream segment location
                                 iFlag_found = 0
                                 #save the upstream information for new step
-                                aSegment_upstream.append(iSegment)
+                                aSegment_upstream.append(iStream_segment)
                                 aVertex_end_upstream.append(pVertex_end)
                                 aStream_order.append(iStream_order)
                                
@@ -172,7 +172,7 @@ def remove_returning_flowline(iMesh_type, aCell_intersect_in, pVertex_outlet_in)
                         pass
 
                     pFlowline = convert_gcs_coordinates_to_flowline(aCoordinates)
-                    pFlowline.iSegment = iSegment_in
+                    pFlowline.iStream_segment = iSegment_in
                     pFlowline.iStream_order=iStream_order_in
                     aFlowline_out.append(pFlowline)
             else:
@@ -187,7 +187,7 @@ def remove_returning_flowline(iMesh_type, aCell_intersect_in, pVertex_outlet_in)
                         pass
 
                     pFlowline = convert_pcs_coordinates_to_flowline(aCoordinates)
-                    pFlowline.iSegment = iSegment_in
+                    pFlowline.iStream_segment = iSegment_in
                     pFlowline.iStream_order=iStream_order_in
                     aFlowline_out.append(pFlowline)
             
@@ -239,11 +239,11 @@ def remove_returning_flowline(iMesh_type, aCell_intersect_in, pVertex_outlet_in)
 
     #loop through       
     pFlowline = aCell_intersect_in[lCellID_outlet2].aFlowline[lCellID_outlet3]
-    iSegment =pFlowline.iSegment
+    iStream_segment =pFlowline.iStream_segment
     iStream_order=pFlowline.iStream_order
     pVertex_outlet=pFlowline.pVertex_end
         
-    retrieve_flowline_intersect_index(iSegment, iStream_order,  pVertex_outlet)
+    retrieve_flowline_intersect_index(iStream_segment, iStream_order,  pVertex_outlet)
 
     #remove parallel
 

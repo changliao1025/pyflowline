@@ -83,6 +83,7 @@ class pympas(pycell):
             self.lCellID_downstream_burned=-1
             self.iStream_order_burned=-1
             self.iStream_segment_burned=-1
+            self.dElevation=-9999.0
 
             pass
         pass
@@ -120,7 +121,7 @@ class pympas(pycell):
 
     def calculate_edge_length(self):
         
-        self.dLength_edge =0.0
+        self.dLength_edge = np.sqrt( self.dArea )
         return self.dLength_edge
     
     def share_edge(self, other):

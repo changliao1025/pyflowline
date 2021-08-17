@@ -66,6 +66,7 @@ class pympas(pycell):
             self.aVertex = aVertex #the first one and last one are the same
             self.nEdge = len(aEdge)
             self.nVertex = len(aVertex) 
+            self.nNeighbor = -1
 
             dLon=0.0
             dLat=0.0

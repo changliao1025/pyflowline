@@ -17,6 +17,8 @@ sDate_default = "{:04d}".format(pDate.year) + "{:02d}".format(pDate.month) + "{:
 
 def pystream_read_model_configuration_file(sFilename_configuration_in,\
      iCase_index_in=None, \
+         dResolution_in = None,\
+         dResolution_meter_in = None,\
          sJob_in=None,\
          aVariable_in = None, \
              aValue_in = None, \
@@ -40,6 +42,18 @@ def pystream_read_model_configuration_file(sFilename_configuration_in,\
         sDate = data['sDate']
         pass
 
+    if dResolution_in is not None:
+        dResolution = dResolution_in
+    else:
+        dResolution = data['dResolution']
+        pass
+
+    if dResolution_meter_in is not None:
+        dResolution_meter = dResolution_meter_in
+    else:
+        dResolution_meter = data['dResolution_meter']
+        pass
+
     if sWorkspace_output_in is not None:
         sWorkspace_output = sWorkspace_output_in
     else:
@@ -49,6 +63,9 @@ def pystream_read_model_configuration_file(sFilename_configuration_in,\
     
 
     data['iCase_index'] = iCase_index
+    data['dResolution'] = dResolution
+    data['dResolution_meter'] = dResolution_meter
+
     data['sDate'] = sDate
     data['sWorkspace_output'] = sWorkspace_output
    

@@ -10,8 +10,8 @@ class pysquare(pycell):
     nFlowline=0
     dLength=0.0
     dArea=0.0
-    dX_center=0.0
-    dY_center=0.0
+    dx_center=0.0
+    dy_center=0.0
     aEdge=None
     aVertex=None
     aFlowline=None
@@ -38,8 +38,8 @@ class pysquare(pycell):
                 dy = dy + aVertex[i].dy
                 pass
 
-            self.dX_center = dx/4.0
-            self.dY_center = dy/4.0
+            self.dx_center = dx/4.0
+            self.dy_center = dy/4.0
 
             pass
         pass

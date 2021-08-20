@@ -5,7 +5,7 @@ from osgeo import ogr, osr, gdal, gdalconst
 from pyearth.gis.gdal.gdal_function import obtain_raster_metadata
 from pyearth.gis.gdal.gdal_function import reproject_coordinates
 from pyearth.gis.projection.degree_to_meter import degree_to_meter
-
+from pyearth.gis.projection.meter_to_degree import meter_to_degree
 from pystream.mesh.hexagon.create_hexagon_mesh import create_hexagon_mesh
 from pystream.mesh.square.create_latlon_mesh import create_latlon_mesh
 from pystream.mesh.square.create_square_mesh import create_square_mesh
@@ -21,6 +21,8 @@ def create_mesh_op(oPystream_in):
     iFlag_rotation = oPystream_in.iFlag_rotation
     dResolution = oPystream_in.dResolution
     dResolution_meter = oPystream_in.dResolution_meter
+    
+
     sFilename_dem = oPystream_in.sFilename_dem
     sFilename_spatial_reference = oPystream_in.sFilename_spatial_reference
     sFilename_mesh = oPystream_in.sFilename_mesh
@@ -42,7 +44,11 @@ def create_mesh_op(oPystream_in):
     dLatitude_mean = 0.5 * (dLatitude_top + dLatitude_bot)
 
 
-    
+    if dResolution_meter < 0:
+        #not used
+        pass
+    else:
+        dResolution = meter_to_degree(dResolution_meter, dLatitude_mean)
         
 
     dX_left = dOriginX
@@ -59,11 +65,11 @@ def create_mesh_op(oPystream_in):
             dX_spacing = dLength_edge * np.sqrt(3.0)
             dY_spacing = dLength_edge * 1.5
             ncolumn= int( (dX_right - dX_left) / dX_spacing )
-            nrow= int( (dY_top - dY_bot) / dY_spacing )
+            nrow= int( (dY_top - dY_bot) / dY_spacing ) 
         else:            
             dX_spacing = dLength_edge * 1.5
             dY_spacing = dLength_edge * np.sqrt(3.0)    
-            ncolumn= int( (dX_right - dX_left) / dX_spacing )
+            ncolumn= int( (dX_right - dX_left) / dX_spacing )+1
             nrow= int( (dY_top - dY_bot) / dY_spacing )
 
         aHexagon = create_hexagon_mesh(iFlag_rotation, dX_left, dY_bot, dResolution_meter, ncolumn, nrow, sFilename_mesh, sFilename_spatial_reference)
@@ -77,7 +83,7 @@ def create_mesh_op(oPystream_in):
             return aSquare
         else:
             if iMesh_type ==3: #latlon
-                dResolution_meter = degree_to_meter(dLatitude_mean, dResolution )
+                dResolution_meter = degree_to_meter(dLatitude_mean, dResolution)
                 dArea = np.power(dResolution_meter,2.0)
                 dLatitude_top    = oPystream_in.dLatitude_top   
                 dLatitude_bot    = oPystream_in.dLatitude_bot   

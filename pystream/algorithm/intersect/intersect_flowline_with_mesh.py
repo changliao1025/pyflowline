@@ -73,7 +73,7 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh, sFilename_flowli
     #for pFeature_mesh in pLayer_mesh:       
         pFeature_mesh= pLayer_mesh.GetFeature(i)
         pGeometry_mesh = pFeature_mesh.GetGeometryRef()
-        if iMesh_type_in ==4:
+        if iMesh_type_in ==4 or iMesh_type_in ==3 :
             dummy0 = loads( pGeometry_mesh.ExportToWkt() )
             aCoords_gcs = dummy0.exterior.coords
             aCoords_gcs= np.array(aCoords_gcs)
@@ -96,7 +96,7 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh, sFilename_flowli
             aCoords_pcs = dummy.exterior.coords
             aCoords_pcs= np.array(aCoords_pcs)
             #convert lat/lon to projection because of intersect function
-            if iMesh_type_in ==4:                
+            if iMesh_type_in ==4 or iMesh_type_in ==3:                
                 pCell = convert_gcs_coordinates_to_cell(iMesh_type_in, aCoords_gcs)
             else:
                 pCell = convert_pcs_coordinates_to_cell(iMesh_type_in, aCoords_pcs)

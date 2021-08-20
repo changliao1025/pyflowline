@@ -87,7 +87,7 @@ def remove_returning_flowline(iMesh_type, aCell_intersect_in, pVertex_outlet_in)
                                     
                                     pVertex_end_current = pVertex_start    
                                     aCell_flowline.append(lCellID)
-                                    iFlag_found = 1                                                                       
+                                    iFlag_found = 1                
                                     iFlag_previous_overlap =1
                                     
                                     pass
@@ -160,7 +160,7 @@ def remove_returning_flowline(iMesh_type, aCell_intersect_in, pVertex_outlet_in)
             nCell3 = len(aCell_simple)
             aCoordinates = list()
 
-            if iMesh_type == 4: 
+            if iMesh_type == 4 or iMesh_type==3: 
                 if nCell3 >1:
                     for i in range(nCell3):
                         lCellID = aCell_simple[i]
@@ -192,12 +192,12 @@ def remove_returning_flowline(iMesh_type, aCell_intersect_in, pVertex_outlet_in)
                     aFlowline_out.append(pFlowline)
             
 
-            print(iSegment_in, ': ',aCell_simple)
+            #print(iSegment_in, ': ',aCell_simple)
 
             sort_index = np.argsort(aStream_order)
             
             sort_index = sort_index[::-1]
-            print(sort_index)
+            #print(sort_index)
             nUpstream = len(aSegment_upstream)
             for i in sort_index:
                 retrieve_flowline_intersect_index(aSegment_upstream[i], aStream_order[i], aVertex_end_upstream[i])

@@ -12,8 +12,8 @@ class pytin(pycell):
     nEdge=0
     dLength=0.0
     dArea=0.0
-    dX_center=0.0
-    dY_center=0.0
+    dx_center=0.0
+    dy_center=0.0
     aEdge=None
     aVertex=None
     aFlowline=None
@@ -40,8 +40,8 @@ class pytin(pycell):
                 dy = dy + aVertex[i].dy
                 pass
 
-            self.dX_center = dx/self.nVertex
-            self.dY_center = dy/self.nVertex
+            self.dx_center = dx/self.nVertex
+            self.dy_center = dy/self.nVertex
 
             pass
         pass

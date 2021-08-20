@@ -12,10 +12,10 @@ from pystream.operation.intersect_flowline_with_mesh_with_postprocess_op import 
 
 
 
-def full_op(oModel_in):
-    preprocess_flowline_op(oModel_in)
-    create_mesh_op(oModel_in)
-    intersect_flowline_with_mesh_with_postprocess_op(oModel_in)
+def full_op(oPystream_in):
+    preprocess_flowline_op(oPystream_in)
+    create_mesh_op(oPystream_in)
+    intersect_flowline_with_mesh_with_postprocess_op(oPystream_in)
 
 
     

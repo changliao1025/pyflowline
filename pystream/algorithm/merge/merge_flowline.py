@@ -18,6 +18,9 @@ def merge_flowline(aFlowline_in, aVertex, \
     aIndex_headwater = np.array(aIndex_headwater)
     aIndex_middle = np.array(aIndex_middle)
     aIndex_confluence = np.array(aIndex_confluence)
+
+    if aIndex_middle.size == 0:
+        return aFlowline_in
     
     aVertex_headwater=aVertex[aIndex_headwater]    
     aVertex_middle=aVertex[aIndex_middle]    

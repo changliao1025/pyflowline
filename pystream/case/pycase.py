@@ -69,13 +69,11 @@ class streamcase(object):
         
         self.sRegion               = aParameter[ 'sRegion']
         self.sModel                = aParameter[ 'sModel']
-       
-    
-        
-        sPath = self.sWorkspace_output
-        Path(sPath).mkdir(parents=True, exist_ok=True)
 
        
+        iFlag_standalone = int(aParameter['iFlag_standalone'])
+        
+               
         iCase_index = int(aParameter['iCase_index'])
         sCase_index = "{:03d}".format( iCase_index )
         sDate   = aParameter[ 'sDate']
@@ -87,6 +85,15 @@ class streamcase(object):
         self.iCase_index =   iCase_index
         sCase = self.sModel  + self.sDate + sCase_index
         self.sCase = sCase
+
+        #the model can be run as part of hexwatershed or standalone
+        if iFlag_standalone ==1:
+            sPath = self.sWorkspace_output + slash + sCase
+            self.sWorkspace_output = sPath
+        else:
+            sPath = self.sWorkspace_output
+        
+        Path(sPath).mkdir(parents=True, exist_ok=True)
 
         self.sMesh_type =  aParameter['sMesh_type']
         
@@ -107,14 +114,7 @@ class streamcase(object):
                             self.iMesh_type = 5
                         else:
                             print('Unsupported mesh type?')
-        
-        
-        
-
-        
-
-
-    
+         
      
         self.iFlag_disconnected =  int(aParameter['iFlag_disconnected'])
 
@@ -138,7 +138,9 @@ class streamcase(object):
         self.sFilename_spatial_reference = aParameter['sFilename_spatial_reference']
         self.sFilename_dem = aParameter['sFilename_dem']
 
-        self.sFilename_mesh_netcdf = aParameter['sFilename_mesh_netcdf']
+        if 'sFilename_mesh_netcdf' in aParameter:
+            self.sFilename_mesh_netcdf = aParameter['sFilename_mesh_netcdf']
+
         self.sFilename_flowlinw_raw = aParameter['sFilename_flowlinw_raw']
 
         ##model generated files

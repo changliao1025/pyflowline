@@ -10,8 +10,8 @@ class pylatlon(pycell):
     nFlowline=0
     dLength=0.0
     dArea=0.0
-    dX_center=0.0
-    dY_center=0.0
+    dx_center=0.0
+    dy_center=0.0
     aEdge=None
     aVertex=None
     aFlowline=None
@@ -32,15 +32,25 @@ class pylatlon(pycell):
             self.nEdge = 4
             self.nVertex = 4
 
-            dx=0.0
-            dy=0.0
-            for i in range(4):
-                dx = dx + aVertex[i].dx
-                dy = dy + aVertex[i].dy
+            #dx=0.0
+            #dy=0.0
+            #for i in range(4):
+            #    dx = dx + aVertex[i].dx
+            #    dy = dy + aVertex[i].dy
+            #    pass
+
+            dLon=0.0
+            dLat=0.0
+            for i in range(self.nVertex):
+                dLon = dLon + aVertex[i].dLongitude
+                dLat = dLat + aVertex[i].dLatitude
                 pass
 
-            self.dX_center = dx/4.0
-            self.dY_center = dy/4.0
+            self.dLon_center = dLon/self.nVertex
+            self.dLat_center = dLat/self.nVertex
+
+            #self.dx_center = dx/4.0
+            #self.dy_center = dy/4.0
 
             pass
         pass

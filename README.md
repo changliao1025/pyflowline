@@ -12,5 +12,10 @@ This work was supported by the Earth System Model Development program areas of t
 # Install
 1. pip install pystream
 
+
+# Usage
+
+See readme file.
+
 # Contact
 Please contact Chang Liao (chang.liao@pnnl.gov) if you have any questions.

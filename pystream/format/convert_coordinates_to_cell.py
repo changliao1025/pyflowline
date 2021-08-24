@@ -16,6 +16,10 @@ from pystream.shared.latlon import pylatlon
 from pystream.shared.mpas import pympas
 from pystream.shared.tin import pytin
 
+from pyearth.gis.gdal.gdal_function import reproject_coordinates
+
+
+
 def convert_gcs_coordinates_to_cell(iMesh_type, aCoordinates_gcs):
     npoint = len(aCoordinates_gcs)    
     aVertex=list()              
@@ -64,16 +68,20 @@ def convert_gcs_coordinates_to_cell(iMesh_type, aCoordinates_gcs):
                         print('What mesh type are you using?')
                         return None
 
-def convert_pcs_coordinates_to_cell(iMesh_type, aCoordinates_pcs):
+def convert_pcs_coordinates_to_cell(iMesh_type, aCoordinates_pcs, pSpatialRef_in):
     npoint = len(aCoordinates_pcs)    
     aVertex=list()              
     aEdge=list()    
+
+
     for i in range(npoint):
         x = aCoordinates_pcs[i][0]
         y = aCoordinates_pcs[i][1]
         dummy = dict()
         dummy['x'] = x
         dummy['y'] = y
+
+        dummy['lon'], dummy['lat'] = reproject_coordinates(x, y , pSpatialRef_in)
         pVertex = pyvertex(dummy)
         aVertex.append(pVertex)
     for j in range(npoint-1):

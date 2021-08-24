@@ -11,6 +11,7 @@ from pystream.shared.vertex import pyvertex
 from pystream.shared.flowline import pyflowline
 
 from pystream.format.convert_coordinates_to_flowline import convert_pcs_coordinates_to_flowline
+from pystream.format.convert_coordinates_to_flowline import convert_gcs_coordinates_to_flowline
 
 def read_flowline_shapefile(sFilename_shapefile_in):
     """
@@ -20,18 +21,40 @@ def read_flowline_shapefile(sFilename_shapefile_in):
 
     aFlowline=list()
 
-    pDriver_json = ogr.GetDriverByName('GeoJSON')
+    #pDriver_json = ogr.GetDriverByName('GeoJSON')
     pDriver_shapefile = ogr.GetDriverByName('ESRI Shapefile')
    
     pDataset_shapefile = pDriver_shapefile.Open(sFilename_shapefile_in, gdal.GA_ReadOnly)
     pLayer_shapefile = pDataset_shapefile.GetLayer(0)
     pSpatialRef_shapefile = pLayer_shapefile.GetSpatialRef()
 
+    pSpatialRef_gcs = osr.SpatialReference()
+    pSpatialRef_gcs.ImportFromEPSG(4326)
+    pSpatialRef_gcs.SetAxisMappingStrategy(osr.OAMS_TRADITIONAL_GIS_ORDER)
+
+    comparison = pSpatialRef_shapefile.IsSame(pSpatialRef_gcs)
+    if(comparison != 1):
+        iFlag_transform =1
+        pTransform = osr.CoordinateTransformation(pSpatialRef_shapefile, pSpatialRef_gcs)
+    else:
+        iFlag_transform =0
+
+    
+
     lID = 0
     for pFeature_shapefile in pLayer_shapefile:
-        pGeometry_shapefile = pFeature_shapefile.GetGeometryRef()
+        
         pGeometry_in = pFeature_shapefile.GetGeometryRef()
         sGeometry_type = pGeometry_in.GetGeometryName()
+        if (iFlag_transform ==1): #projections are different
+            pGeometry_in.Transform(pTransform)
+
+        if (pGeometry_in.IsValid()):
+            pass
+        else:
+            print('Geometry issue')
+
+
         if(sGeometry_type == 'MULTILINESTRING'):
             aLine = ogr.ForceToLineString(pGeometry_in)
             for Line in aLine: 
@@ -40,7 +63,7 @@ def read_flowline_shapefile(sFilename_shapefile_in):
                 #pLine= LineString( aCoords[::-1 ] )
 
                 dummy1= np.array(aCoords)
-                pLine = convert_pcs_coordinates_to_flowline(dummy1)
+                pLine = convert_gcs_coordinates_to_flowline(dummy1)
                 pLine.lIndex = lID
                 aFlowline.append(pLine)
                 lID = lID + 1
@@ -51,7 +74,7 @@ def read_flowline_shapefile(sFilename_shapefile_in):
                 aCoords = dummy.coords
                 #pLine= LineString( aCoords[::-1 ] )
                 dummy1= np.array(aCoords)
-                pLine = convert_pcs_coordinates_to_flowline(dummy1)
+                pLine = convert_gcs_coordinates_to_flowline(dummy1)
                 pLine.lIndex = lID
                 aFlowline.append(pLine)
                 lID = lID + 1

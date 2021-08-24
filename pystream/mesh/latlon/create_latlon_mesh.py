@@ -20,12 +20,13 @@ def create_latlon_mesh(dLongitude_left, dLatitude_bot, dResolution, ncolumn, nro
 
     pDriver_shapefile = ogr.GetDriverByName('Esri Shapefile')
     #pDriver_geojson = ogr.GetDriverByName('GeoJSON')
-    #geojson
+    
     pDataset = pDriver_shapefile.CreateDataSource(sFilename_output)
-    pSrs = osr.SpatialReference()  
-    pSrs.ImportFromEPSG(4326)    # WGS84 lat/lon
+    pSpatialRef_gcs = osr.SpatialReference()  
+    pSpatialRef_gcs.ImportFromEPSG(4326)    # WGS84 lat/lon
+    pSpatialRef_gcs.SetAxisMappingStrategy(osr.OAMS_TRADITIONAL_GIS_ORDER)
 
-    pLayer = pDataset.CreateLayer('cell', pSrs, ogr.wkbPolygon)
+    pLayer = pDataset.CreateLayer('cell', pSpatialRef_gcs, ogr.wkbPolygon)
     # Add one attribute
     pLayer.CreateField(ogr.FieldDefn('id', ogr.OFTInteger64)) #long type for high resolution
     

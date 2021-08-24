@@ -8,9 +8,9 @@ from osgeo import ogr, osr, gdal, gdalconst
 
 from pyearth.gis.gdal.gdal_function import obtain_raster_metadata
 
-#os.environ['PROJ_LIB'] = '/qfs/people/liao313/.conda/envs/gdalenv/share/proj'
+from pyearth.gis.gdal.gdal_function import reproject_coordinates, reproject_coordinates_batch
 
-def create_square_mesh(dX_left, dY_bot, dResolution, ncolumn, nrow, sFilename_output, sFilename_shapefile):
+def create_square_mesh(dX_left, dY_bot, dResolution, ncolumn, nrow, sFilename_output, sFilename_spatial_reference_in):
 
    
     if os.path.exists(sFilename_output): 
@@ -20,15 +20,18 @@ def create_square_mesh(dX_left, dY_bot, dResolution, ncolumn, nrow, sFilename_ou
     pDriver_shapefile = ogr.GetDriverByName('Esri Shapefile')
     #pDriver_geojson = ogr.GetDriverByName('GeoJSON')
 
+    pDataset_shapefile = pDriver_shapefile.Open(sFilename_spatial_reference_in, 0)
+    pLayer_shapefile = pDataset_shapefile.GetLayer(0)
+    pSpatialRef_pcs = pLayer_shapefile.GetSpatialRef()   
+        
+
     pDataset = pDriver_shapefile.CreateDataSource(sFilename_output)
     
+    pSpatialRef_gcs = osr.SpatialReference()  
+    pSpatialRef_gcs.ImportFromEPSG(4326)    # WGS84 lat/lon     
+    pSpatialRef_gcs.SetAxisMappingStrategy(osr.OAMS_TRADITIONAL_GIS_ORDER)
 
-    pDriver_shapefile = ogr.GetDriverByName('ESRI Shapefile')
-    pDataset_shapefile = pDriver_shapefile.Open(sFilename_shapefile, 0)
-    pLayer_shapefile = pDataset_shapefile.GetLayer(0)
-    pSrs = pLayer_shapefile.GetSpatialRef()    
-
-    pLayer = pDataset.CreateLayer('cell', pSrs, ogr.wkbPolygon)
+    pLayer = pDataset.CreateLayer('cell', pSpatialRef_gcs, ogr.wkbPolygon)
     # Add one attribute
     pLayer.CreateField(ogr.FieldDefn('id', ogr.OFTInteger64)) #long type for high resolution
     
@@ -62,6 +65,34 @@ def create_square_mesh(dX_left, dY_bot, dResolution, ncolumn, nrow, sFilename_ou
 
             x4 = xleft + ((column + 1) * xspacing)
             y4 = ybottom + (row * yspacing)
+
+            #x1,y1 = reproject_coordinates(x1, y1, pSpatialRef_pcs)
+            #x2,y2 = reproject_coordinates(x2, y2, pSpatialRef_pcs)
+            #x3,y3 = reproject_coordinates(x3, y3, pSpatialRef_pcs)
+            #x4,y4 = reproject_coordinates(x4, y4, pSpatialRef_pcs)
+            x = list()
+            x.append(x1)
+            x.append(x2)
+            x.append(x3)
+            x.append(x4)
+          
+            y = list()
+            y.append(y1)
+            y.append(y2)
+            y.append(y3)
+            y.append(y4)
+           
+            x_new , y_new = reproject_coordinates_batch(x, y, pSpatialRef_pcs)
+            x1=x_new[0]
+            x2=x_new[1]
+            x3=x_new[2]
+            x4=x_new[3]
+          
+            y1=y_new[0]
+            y2=y_new[1]
+            y3=y_new[2]
+            y4=y_new[3]
+          
            
 
             ring = ogr.Geometry(ogr.wkbLinearRing)
@@ -86,39 +117,4 @@ def create_square_mesh(dX_left, dY_bot, dResolution, ncolumn, nrow, sFilename_ou
 
 
     return
-
-if __name__ == '__main__':
-
-
-    
-    dResolution=40*1000.0
-    
-    
-
-    #we can use the dem extent to setup 
-    sFilename_geotiff = '/qfs/people/liao313/data/hexwatershed/columbia_river_basin/raster/dem/crbdem.tif'
-    dPixelWidth, dOriginX, dOriginY, nrow, ncolumn, pSpatialRef, pPrejection = obtain_raster_metadata(sFilename_geotiff)
-    
-  
-
-    
-    dX_left = dOriginX
-
-    dX_right = dOriginX + (ncolumn +1)* dPixelWidth
-
-    dY_top = dOriginY
-
-    dY_bot = dOriginY - (nrow +1)* dPixelWidth
-
-    ncolumn= int( (dX_right - dX_left) / dResolution )
-    nrow= int( (dY_top - dY_bot) / dResolution )
-
-    
-    sFilename_output = 'square_40k' + '.json'
-    sWorkspace_out = '/compyfs/liao313/04model/pyhexwatershed/columbia_river_basin'
-
-    sFilename_output = os.path.join(sWorkspace_out, sFilename_output)
-    sFilename_shapefile = '/qfs/people/liao313/data/hexwatershed/columbia_river_basin/vector/mesh_id/crb_flowline_remove_small_line_split.shp'
-
-    create_square_mesh(dX_left, dY_bot, dResolution, ncolumn, nrow, sFilename_output, sFilename_shapefile)
 

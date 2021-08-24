@@ -1,9 +1,10 @@
 import os
 from pystream.shared.vertex import pyvertex
-
+from pyearth.gis.gdal.gdal_function import reproject_coordinates
 from pystream.format.read_flowline_shapefile import read_flowline_shapefile
 from pystream.format.read_mesh_shapefile import read_mesh_shapefile
 from pystream.format.read_flowline_geojson import read_flowline_geojson
+
 from pystream.format.export_flowline_to_shapefile import export_flowline_to_shapefile
 
 from pystream.algorithm.intersect.intersect_flowline_with_mesh import intersect_flowline_with_mesh
@@ -29,10 +30,9 @@ def intersect_flowline_with_mesh_with_postprocess_op(oPystream_in):
     
 
     iMesh_type = oPystream_in.iMesh_type
-    if iMesh_type ==4 or iMesh_type ==3:
-        iFlag_projected = 0
-    else:
-        iFlag_projected = 1
+    
+    iFlag_projected = 0
+    
 
 
     sWorkspace_output = oPystream_in.sWorkspace_output  
@@ -50,30 +50,35 @@ def intersect_flowline_with_mesh_with_postprocess_op(oPystream_in):
     sFilename_flowline_intersect = oPystream_in.sFilename_flowline_intersect
 
     
-    aCell, aCell_intersect, aFlowline_intersect_all = intersect_flowline_with_mesh(iMesh_type, sFilename_mesh, sFilename_flowline, sFilename_flowline_intersect)
+    aCell, aCell_intersect, aFlowline_intersect_all = intersect_flowline_with_mesh(\
+        iMesh_type, sFilename_mesh, sFilename_flowline, sFilename_flowline_intersect)
 
 
     point= dict()
     
     point['x'] = oPystream_in.dx_outlet
     point['y'] = oPystream_in.dy_outlet
+    lon, lat = reproject_coordinates(oPystream_in.dx_outlet, oPystream_in.dy_outlet, pSpatialRef_flowline)
+    point['lon'] = lon
+    point['lat'] = lat
     pVertex_outlet=pyvertex(point)
     
     aFlowline, aFlowline_no_parallel, lCellID_outlet = remove_returning_flowline(iMesh_type, aCell_intersect, pVertex_outlet)
     sFilename_out = 'flowline_simplified_after_intersect.shp'
     sFilename_out = os.path.join(sWorkspace_output, sFilename_out)  
-    if iMesh_type ==4 or iMesh_type==3:
-        pSpatialRef=  pSpatialRef_mesh
-        pass
-    else:
-        pSpatialRef = pSpatialRef_flowline
-        pass
+    
+    pSpatialRef=  pSpatialRef_mesh
+       
     export_flowline_to_shapefile(iFlag_projected, aFlowline, pSpatialRef, sFilename_out)
 
     #added start
     aFlowline, aEdge = split_flowline_to_edge(aFlowline)
     
     aFlowline = remove_duplicate_flowline(aFlowline)
+
+    sFilename_out = 'flowline_debug.shp'
+    sFilename_out = os.path.join(sWorkspace_output, sFilename_out)
+    export_flowline_to_shapefile(iFlag_projected, aFlowline, pSpatialRef, sFilename_out)
 
     aVertex, lIndex_outlet, aIndex_headwater,aIndex_middle, aIndex_confluence, aConnectivity\
         = find_flowline_confluence(aFlowline,  pVertex_outlet)

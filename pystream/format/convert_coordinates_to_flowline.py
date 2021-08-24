@@ -3,9 +3,13 @@ import json
 from pystream.shared.edge import pyedge
 from osgeo import ogr, osr, gdal, gdalconst
 import numpy as np
+from pyearth.gis.gdal.gdal_function import reproject_coordinates
+
 
 from shapely.geometry import Point, LineString, MultiLineString
 from shapely.wkt import loads
+
+
 
 from pystream.shared.vertex import pyvertex
 from pystream.shared.flowline import pyflowline
@@ -32,7 +36,7 @@ def convert_gcs_coordinates_to_flowline(aCoordinates):
     
     return pLine
 
-def convert_pcs_coordinates_to_flowline(aCoordinates):
+def convert_pcs_coordinates_to_flowline(aCoordinates, pSpatialRef_shapefile_in):
     npoint = len(aCoordinates)
     
     aVertex=list()
@@ -42,6 +46,10 @@ def convert_pcs_coordinates_to_flowline(aCoordinates):
         dummy = dict()
         dummy['x'] =x
         dummy['y'] =y
+
+        lon, lat = reproject_coordinates(x, y, pSpatialRef_shapefile_in)
+        dummy['lon'] = lon
+        dummy['lat'] = lat
         pVertex = pyvertex(dummy)
         aVertex.append(pVertex)
         

@@ -22,20 +22,20 @@ class pyvertex(object):
         if 'z' in aParameter:            
             self.dz             = float(aParameter['z'])
         
-        if 'lon' in aParameter:            
-            self.dLongitude      = float(aParameter['lon'])
+        #if 'lon' in aParameter:            
+        self.dLongitude      = float(aParameter['lon'])
         
-        if 'lat' in aParameter:            
-            self.dLatitude       = float(aParameter['lat'])
+        #if 'lat' in aParameter:            
+        self.dLatitude       = float(aParameter['lat'])
 
-        #dict.__init__(self)
+        
         return
     
     def __eq__(self, other):
         iFlag = -1
         
         c = self.calculate_distance(other)
-        if( c < 1.0E-6 ): #be careful
+        if( c < 1.0E-3 ): #be careful
             iFlag = 1
         else:
             iFlag = 0       
@@ -59,14 +59,15 @@ class pyvertex(object):
         lon2 = other.dLongitude
         lat2 = other.dLatitude
 
-        if x1!=-9999 and x2!=-9999:
+        #if x1!=-9999 and x2!=-9999:
+        #    a = (x1-x2) * (x1-x2)
+        #    b = (y1-y2) * (y1-y2)
+        #    c = np.sqrt(a+b)
+        #else:
+        #    #use latitude longitude
+        #    pass
 
-            a = (x1-x2) * (x1-x2)
-            b = (y1-y2) * (y1-y2)
-            c = np.sqrt(a+b)
-        else:
-            #use latitude longitude
-            c= calculate_distance_based_on_lon_lat(lon1,  lat1,lon2, lat2)
+        c= calculate_distance_based_on_lon_lat(lon1,  lat1, lon2, lat2)
 
         dDistance = c
 

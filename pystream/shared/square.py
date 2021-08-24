@@ -4,6 +4,7 @@ from osgeo import gdal, osr, ogr
 from pystream.shared.vertex import pyvertex
 from pystream.shared.edge import pyedge
 from pystream.shared.cell import pycell
+from pyearth.gis.location.calculate_polygon_area import calculate_polygon_area
 
 class pysquare(pycell):
     #lIndex=0 
@@ -12,12 +13,15 @@ class pysquare(pycell):
     dArea=0.0
     dx_center=0.0
     dy_center=0.0
+    dLon_center=0.0
+    dLat_center=0.0
     aEdge=None
     aVertex=None
     aFlowline=None
     lCellID  = -1
     aNeighbor=None #the global ID of all neighbors
     nNeighbor=-1
+    pVertex_center = None
 
     def __init__(self, aEdge, aVertex):    
         nEdge = len(aEdge)
@@ -31,15 +35,24 @@ class pysquare(pycell):
             self.nEdge = 4
             self.nVertex = 4
 
-            dx=0.0
-            dy=0.0
-            for i in range(4):
-                dx = dx + aVertex[i].dx
-                dy = dy + aVertex[i].dy
+            dLon=0.0
+            dLat=0.0
+            for i in range(self.nVertex):
+                dLon = dLon + aVertex[i].dLongitude
+                dLat = dLat + aVertex[i].dLatitude
                 pass
 
-            self.dx_center = dx/4.0
-            self.dy_center = dy/4.0
+            self.dLon_center = dLon/self.nVertex
+            self.dLat_center = dLat/self.nVertex
+            pVertex = dict()        
+            pVertex['lon'] =self.dLon_center
+            pVertex['lat'] =self.dLat_center           
+            self.pVertex_center = pyvertex(pVertex)
+
+            self.lCellID_downstream_burned=-1
+            self.iStream_order_burned=-1
+            self.iStream_segment_burned=-1
+            self.dElevation=-9999.0
 
             pass
         pass
@@ -70,12 +83,19 @@ class pysquare(pycell):
         return iFlag_found, pEdge_out
 
     def calculate_cell_area(self):
-        dLength_edge = self.dLength
+        lons=list()
+        lats=list()
+        
+        for i in range(self.nVertex):
+            
+            lons.append( self.aVertex[i].dLongitude )
+            lats.append( self.aVertex[i].dLatitude )
 
-        dArea = dLength_edge * dLength_edge 
 
-        self.dArea = dArea
-        return dArea
+        self.dArea = calculate_polygon_area(lats, lons)
+
+        
+        return self.dArea
     def calculate_edge_length(self):
         dArea = self.dArea
         dLength_edge = np.sqrt(   dArea   )

@@ -4,6 +4,7 @@ from osgeo import gdal, osr, ogr
 from pystream.shared.vertex import pyvertex
 from pystream.shared.edge import pyedge
 from pystream.shared.cell import pycell
+from pyearth.gis.location.calculate_polygon_area import calculate_polygon_area
 
 class pylatlon(pycell):
     #lIndex=0 
@@ -12,9 +13,13 @@ class pylatlon(pycell):
     dArea=0.0
     dx_center=0.0
     dy_center=0.0
+    dLon_center=0.0
+    dLat_center=0.0
     aEdge=None
     aVertex=None
     aFlowline=None
+
+    pVertex_center = None
 
     lCellID  = -1
     aNeighbor=None #the global ID of all neighbors
@@ -49,8 +54,15 @@ class pylatlon(pycell):
             self.dLon_center = dLon/self.nVertex
             self.dLat_center = dLat/self.nVertex
 
-            #self.dx_center = dx/4.0
-            #self.dy_center = dy/4.0
+            pVertex = dict()        
+            pVertex['lon'] =self.dLon_center
+            pVertex['lat'] =self.dLat_center           
+            self.pVertex_center = pyvertex(pVertex)
+
+            self.lCellID_downstream_burned=-1
+            self.iStream_order_burned=-1
+            self.iStream_segment_burned=-1
+            self.dElevation=-9999.0
 
             pass
         pass
@@ -81,12 +93,20 @@ class pylatlon(pycell):
         return iFlag_found, pEdge_out
 
     def calculate_cell_area(self):
-        dLength_edge = self.dLength
+        lons=list()
+        lats=list()
+        
+        for i in range(self.nVertex):
+            
+            lons.append( self.aVertex[i].dLongitude )
+            lats.append( self.aVertex[i].dLatitude )
 
-        dArea = dLength_edge * dLength_edge 
 
-        self.dArea = dArea
-        return dArea
+        self.dArea = calculate_polygon_area(lats, lons)
+
+        
+        return self.dArea
+
     def calculate_edge_length(self):
         dArea = self.dArea
         dLength_edge = np.sqrt(   dArea   )

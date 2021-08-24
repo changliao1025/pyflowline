@@ -92,24 +92,24 @@ def remove_returning_flowline(iMesh_type, aCell_intersect_in, pVertex_outlet_in)
                                     
                                     pass
                                 else:
-                                    if dLength < 0.5*pCell.dLength : #because it taks a short cut                                        
+                                    if dLength < 0.1*pCell.dLength : #because it taks a short cut                                        
                                         pVertex_end_current = pVertex_start   
-                                        iFlag_found = 1  
-
-                                        if iMesh_type ==1 or iMesh_type ==4 or iMesh_type==5:
+                                        iFlag_found = 1                                          
+                                        if iFlag_previous_overlap ==1: 
+                                            aCell_flowline.append(lCellID)              
+                                            iFlag_previous_overlap=0
                                             pass
                                         else:
-                                            if iFlag_previous_overlap ==1: 
-                                                aCell_flowline.append(lCellID)              
+                                            iFlag_previous_overlap=1
+                                            pass                                      
                                         
-                                        iFlag_previous_overlap=0
                                         
                                         pass
                                     else:
                                         pVertex_end_current = pVertex_start    
                                         aCell_flowline.append(lCellID)
                                         iFlag_found = 1
-                                        iFlag_previous_overlap=0
+                                        #iFlag_previous_overlap=0
                                         pass
 
                                     pass
@@ -160,36 +160,23 @@ def remove_returning_flowline(iMesh_type, aCell_intersect_in, pVertex_outlet_in)
             nCell3 = len(aCell_simple)
             aCoordinates = list()
 
-            if iMesh_type == 4 or iMesh_type==3: 
-                if nCell3 >1:
-                    for i in range(nCell3):
-                        lCellID = aCell_simple[i]
-                        for j in range( nCell):
-                            if aCell_intersect_in[j].lCellID == lCellID:    
-                                x = aCell_intersect_in[j].dLon_center
-                                y = aCell_intersect_in[j].dLat_center                                
-                                aCoordinates.append([x,y])
-                        pass
+            
+            if nCell3 >1:
+                for i in range(nCell3):
+                    lCellID = aCell_simple[i]
+                    for j in range( nCell):
+                        if aCell_intersect_in[j].lCellID == lCellID:    
+                            x = aCell_intersect_in[j].dLon_center
+                            y = aCell_intersect_in[j].dLat_center                                
+                            aCoordinates.append([x,y])
+                    pass
+                pFlowline = convert_gcs_coordinates_to_flowline(aCoordinates)
+                pFlowline.iStream_segment = iSegment_in
+                pFlowline.iStream_order=iStream_order_in
+                aFlowline_out.append(pFlowline)
+            
 
-                    pFlowline = convert_gcs_coordinates_to_flowline(aCoordinates)
-                    pFlowline.iStream_segment = iSegment_in
-                    pFlowline.iStream_order=iStream_order_in
-                    aFlowline_out.append(pFlowline)
-            else:
-                if nCell3 >1:
-                    for i in range(nCell3):
-                        lCellID = aCell_simple[i]
-                        for j in range( nCell):
-                            if aCell_intersect_in[j].lCellID == lCellID:                                    
-                                x = aCell_intersect_in[j].dx_center
-                                y = aCell_intersect_in[j].dy_center
-                                aCoordinates.append([x,y])
-                        pass
-
-                    pFlowline = convert_pcs_coordinates_to_flowline(aCoordinates)
-                    pFlowline.iStream_segment = iSegment_in
-                    pFlowline.iStream_order=iStream_order_in
-                    aFlowline_out.append(pFlowline)
+             
             
 
             #print(iSegment_in, ': ',aCell_simple)

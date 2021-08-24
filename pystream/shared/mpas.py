@@ -8,6 +8,8 @@ from pystream.shared.edge import pyedge
 from pystream.shared.cell import pycell
 from pystream.shared.flowline import pyflowline
 
+from pyearth.gis.location.calculate_polygon_area import calculate_polygon_area
+
 import numpy as np
 import json
 from json import JSONEncoder
@@ -116,8 +118,16 @@ class pympas(pycell):
         return iFlag_found, pEdge_out
     
     def calculate_cell_area(self):
-           
-        self.dArea = 0.0
+        lons=list()
+        lats=list()
+        
+        for i in range(self.nVertex):
+            
+            lons.append( self.aVertex[i].dLongitude )
+            lats.append( self.aVertex[i].dLatitude )
+
+
+        self.dArea = calculate_polygon_area(lats, lons)
         return self.dArea
 
     def calculate_edge_length(self):

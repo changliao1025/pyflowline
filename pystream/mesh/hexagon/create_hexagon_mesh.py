@@ -9,10 +9,10 @@ from osgeo import ogr, osr, gdal, gdalconst
 from shapely.geometry import Point, LineString, MultiLineString
 from shapely.wkt import loads
 from pystream.shared.hexagon import pyhexagon
-from pystream.format.convert_coordinates_to_cell import convert_pcs_coordinates_to_cell
+from pystream.format.convert_coordinates_to_cell import convert_gcs_coordinates_to_cell, convert_pcs_coordinates_to_cell
 
 from pyearth.toolbox.data.check_if_duplicates import check_if_duplicates
- 
+from pyearth.gis.gdal.gdal_function import reproject_coordinates, reproject_coordinates_batch
 
 def create_hexagon_mesh(iFlag_rotation, dX_left, dY_bot, dResolution_meter, ncolumn, nrow, sFilename_mesh_out, sFilename_spatial_reference_in):
 
@@ -23,24 +23,26 @@ def create_hexagon_mesh(iFlag_rotation, dX_left, dY_bot, dResolution_meter, ncol
 
     pDriver_shapefile = ogr.GetDriverByName('Esri Shapefile')
     #pDriver_geojson = ogr.GetDriverByName('GeoJSON')
+
+
+    pDataset_shapefile = pDriver_shapefile.Open(sFilename_spatial_reference_in, 0)
+    pLayer_shapefile = pDataset_shapefile.GetLayer(0)
+    pSpatialRef_pcs = pLayer_shapefile.GetSpatialRef()
     
     pDataset = pDriver_shapefile.CreateDataSource(sFilename_mesh_out)
     
-    pDataset_shapefile = pDriver_shapefile.Open(sFilename_spatial_reference_in, 0)
-    pLayer_shapefile = pDataset_shapefile.GetLayer(0)
-    pSrs = pLayer_shapefile.GetSpatialRef()
+    
+    pSpatialRef_gcs = osr.SpatialReference()  
+    pSpatialRef_gcs.ImportFromEPSG(4326)    # WGS84 lat/lon
+    pSpatialRef_gcs.SetAxisMappingStrategy(osr.OAMS_TRADITIONAL_GIS_ORDER)
 
-    #pSrs = osr.SpatialReference()  
-    #pSrs.ImportFromEPSG(4326)    # WGS84 lat/lon
-
-    pLayer = pDataset.CreateLayer('cell', pSrs, ogr.wkbPolygon)
+    pLayer = pDataset.CreateLayer('cell', pSpatialRef_gcs, ogr.wkbPolygon)
     # Add one attribute
     pLayer.CreateField(ogr.FieldDefn('id', ogr.OFTInteger64)) #long type for high resolution
     
     pLayerDefn = pLayer.GetLayerDefn()
     pFeature = ogr.Feature(pLayerDefn)
 
-    
 
     xleft = dX_left
     ybottom = dY_bot
@@ -48,9 +50,6 @@ def create_hexagon_mesh(iFlag_rotation, dX_left, dY_bot, dResolution_meter, ncol
     dArea = np.power(dResolution_meter,2.0)
     #hexagon edge
     dLength_edge = np.sqrt(  2.0 * dArea / (3.0* np.sqrt(3.0))  )
-    
-
-    
 
     #geojson
     aHexagon=list()
@@ -93,6 +92,43 @@ def create_hexagon_mesh(iFlag_rotation, dX_left, dY_bot, dResolution_meter, ncol
                 y6 = y1  -   dY_shift     
                
                 aCoords = np.full((7,2), -9999.0, dtype=float)
+
+                #x1,y1 = reproject_coordinates(x1, y1, pSpatialRef_pcs)
+                #x2,y2 = reproject_coordinates(x2, y2, pSpatialRef_pcs)
+                #x3,y3 = reproject_coordinates(x3, y3, pSpatialRef_pcs)
+                #x4,y4 = reproject_coordinates(x4, y4, pSpatialRef_pcs)
+                #x5,y5 = reproject_coordinates(x5, y5, pSpatialRef_pcs)
+                #x6,y6 = reproject_coordinates(x6, y6, pSpatialRef_pcs)
+                x = list()
+                x.append(x1)
+                x.append(x2)
+                x.append(x3)
+                x.append(x4)
+                x.append(x5)
+                x.append(x6)
+
+                y = list()
+                y.append(y1)
+                y.append(y2)
+                y.append(y3)
+                y.append(y4)
+                y.append(y5)
+                y.append(y6)
+
+                x_new , y_new = reproject_coordinates_batch(x, y, pSpatialRef_pcs)
+                x1=x_new[0]
+                x2=x_new[1]
+                x3=x_new[2]
+                x4=x_new[3]
+                x5=x_new[4]
+                x6=x_new[5]
+
+                y1=y_new[0]
+                y2=y_new[1]
+                y3=y_new[2]
+                y4=y_new[3]
+                y5=y_new[4]
+                y6=y_new[5]
     
                 ring = ogr.Geometry(ogr.wkbLinearRing)
                 ring.AddPoint(x1, y1)
@@ -102,6 +138,8 @@ def create_hexagon_mesh(iFlag_rotation, dX_left, dY_bot, dResolution_meter, ncol
                 ring.AddPoint(x5, y5)
                 ring.AddPoint(x6, y6)
                 ring.AddPoint(x1, y1)
+
+                
                 pPolygon = ogr.Geometry(ogr.wkbPolygon)
                 pPolygon.AddGeometry(ring)
     
@@ -129,7 +167,7 @@ def create_hexagon_mesh(iFlag_rotation, dX_left, dY_bot, dResolution_meter, ncol
                 aCoords[6,1] = y1
            
                 dummy1= np.array(aCoords)
-                pHexagon = convert_pcs_coordinates_to_cell(1, dummy1)
+                pHexagon = convert_pcs_coordinates_to_cell(1, dummy1, pSpatialRef_pcs)
                 pHexagon.lCellID = lCellID
                 lCellID_center = lCellID
                 #build topoloy
@@ -180,7 +218,7 @@ def create_hexagon_mesh(iFlag_rotation, dX_left, dY_bot, dResolution_meter, ncol
 
 
                 pHexagon.aNeighbor = aNeighbor
-                print(lCellID_center,aNeighbor)
+                #print(lCellID_center,aNeighbor)
                 pHexagon.nNeighbor = len(aNeighbor)
                 aHexagon.append(pHexagon)
                 lCellID= lCellID + 1    
@@ -219,6 +257,44 @@ def create_hexagon_mesh(iFlag_rotation, dX_left, dY_bot, dResolution_meter, ncol
                 y6 = y1         
                
                 aCoords = np.full((7,2), -9999.0, dtype=float)
+
+                #x1,y1 = reproject_coordinates(x1, y1, pSpatialRef_pcs)
+                #x2,y2 = reproject_coordinates(x2, y2, pSpatialRef_pcs)
+                #x3,y3 = reproject_coordinates(x3, y3, pSpatialRef_pcs)
+                #x4,y4 = reproject_coordinates(x4, y4, pSpatialRef_pcs)
+                #x5,y5 = reproject_coordinates(x5, y5, pSpatialRef_pcs)
+                #x6,y6 = reproject_coordinates(x6, y6, pSpatialRef_pcs)
+
+                x = list()
+                x.append(x1)
+                x.append(x2)
+                x.append(x3)
+                x.append(x4)
+                x.append(x5)
+                x.append(x6)
+
+                y = list()
+                y.append(y1)
+                y.append(y2)
+                y.append(y3)
+                y.append(y4)
+                y.append(y5)
+                y.append(y6)
+
+                x_new , y_new = reproject_coordinates_batch(x, y, pSpatialRef_pcs)
+                x1=x_new[0]
+                x2=x_new[1]
+                x3=x_new[2]
+                x4=x_new[3]
+                x5=x_new[4]
+                x6=x_new[5]
+
+                y1=y_new[0]
+                y2=y_new[1]
+                y3=y_new[2]
+                y4=y_new[3]
+                y5=y_new[4]
+                y6=y_new[5]
     
                 ring = ogr.Geometry(ogr.wkbLinearRing)
                 ring.AddPoint(x1, y1)
@@ -255,7 +331,7 @@ def create_hexagon_mesh(iFlag_rotation, dX_left, dY_bot, dResolution_meter, ncol
                 aCoords[6,1] = y1
                     
                 dummy1= np.array(aCoords)
-                pHexagon = convert_pcs_coordinates_to_cell(1, dummy1)
+                pHexagon = convert_gcs_coordinates_to_cell(1, dummy1)
                 pHexagon.lCellID = lCellID
                 #build topoloy
                 lCellID_center = lCellID
@@ -302,7 +378,7 @@ def create_hexagon_mesh(iFlag_rotation, dX_left, dY_bot, dResolution_meter, ncol
                 if check_if_duplicates(aNeighbor) == 0:
                     print('error')   
                 pHexagon.aNeighbor = aNeighbor
-                print(lCellID_center,aNeighbor)
+                #print(lCellID_center,aNeighbor)
                 pHexagon.nNeighbor = len(aNeighbor)
                 aHexagon.append(pHexagon)
                 lCellID= lCellID +1

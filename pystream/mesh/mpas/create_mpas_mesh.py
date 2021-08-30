@@ -12,7 +12,7 @@ from pyearth.gis.location.convert_lat_lon_range import convert_180_to_360,conver
 from pystream.format.convert_coordinates_to_cell import convert_pcs_coordinates_to_cell
 from pystream.format.convert_attribute_to_cell import convert_gcs_attribute_to_cell
 
-def create_mpas_mesh(sFilename_mesh_netcdf, dLatitude_top, dLatitude_bot, dLongitude_left, dLongitude_right,sFilename_mesh):
+def create_mpas_mesh(iFlag_use_mpas_dem, sFilename_mesh_netcdf, dLatitude_top, dLatitude_bot, dLongitude_left, dLongitude_right,sFilename_mesh):
     
     if (os.path.exists(sFilename_mesh_netcdf)):
         pass
@@ -40,6 +40,11 @@ def create_mpas_mesh(sFilename_mesh_netcdf, dLatitude_top, dLatitude_bot, dLongi
     pLayer = pDataset.CreateLayer('cell', pSpatialRef_gcs, ogr.wkbPolygon)
     # Add one attribute
     pLayer.CreateField(ogr.FieldDefn('id', ogr.OFTInteger64)) #long type for high resolution
+    if iFlag_use_mpas_dem == 1:
+        pLayer.CreateField(ogr.FieldDefn('elev', ogr.OFTReal)) #float type for high resolution
+    else:
+
+        pass
     
     pLayerDefn = pLayer.GetLayerDefn()
     pFeature = ogr.Feature(pLayerDefn)
@@ -103,8 +108,14 @@ def create_mpas_mesh(sFilename_mesh_netcdf, dLatitude_top, dLatitude_bot, dLongi
             latVertex0 = aValue 
         else:
             pass
+
         if sKey == 'areaCell':
             areaCell0 = aValue 
+        else:
+            pass
+
+        if sKey == 'bed_elevation':
+            bed_elevation0 = aValue 
         else:
             pass
 
@@ -124,7 +135,12 @@ def create_mpas_mesh(sFilename_mesh_netcdf, dLatitude_top, dLatitude_bot, dLongi
     aIndexToCellID = indexToCellID0[:]
     aIndexToEdgeID = indexToEdgeID0[:]
     aIndexToVertexID = indexToVertexID0[:]
+
+    aBed_elevation = bed_elevation0[:]
+    
     ncell = len(aIndexToCellID)
+
+
     
  
     aMpas = list()
@@ -136,6 +152,8 @@ def create_mpas_mesh(sFilename_mesh_netcdf, dLatitude_top, dLatitude_bot, dLongi
 
             #get cell edge
             lCellID = int(aIndexToCellID[i])
+
+            dElevation = float(aBed_elevation[i])
             aCellOnCellIndex = np.array(aCellsOnCell[i,:])
             aEdgesOnCellIndex = np.array(aEdgesOnCell[i,:])
             aVertexOnCellIndex = np.array(aVertexOnCell[i,:])
@@ -173,11 +191,16 @@ def create_mpas_mesh(sFilename_mesh_netcdf, dLatitude_top, dLatitude_bot, dLongi
 
             pFeature.SetGeometry(pPolygon)
             pFeature.SetField("id", int(lCellID) )
+            if iFlag_use_mpas_dem == 1:
+                pFeature.SetField("elev", dElevation )
+                
             pLayer.CreateFeature(pFeature)
             
             pmpas = convert_gcs_attribute_to_cell(4, aVertexIndex, aEdgeIndex, aVertexIndexOnEdge ,aCoords)
            
             pmpas.lCellID = lCellID
+
+            pmpas.dElevation  = dElevation
             
             pmpas.aNeighbor=aNeighborIndex
             pmpas.nNeighbor=len(aNeighborIndex)

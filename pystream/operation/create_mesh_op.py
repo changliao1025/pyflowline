@@ -19,6 +19,7 @@ def create_mesh_op(oPystream_in):
     #we can use the dem extent to setup 
     iMesh_type = oPystream_in.iMesh_type
     iFlag_rotation = oPystream_in.iFlag_rotation
+    
     dResolution = oPystream_in.dResolution
     dResolution_meter = oPystream_in.dResolution_meter
     
@@ -96,12 +97,15 @@ def create_mesh_op(oPystream_in):
                 return aLatlon
             else:
                 if iMesh_type ==4: #mpas
+                    iFlag_use_mpas_dem = oPystream_in.iFlag_use_mpas_dem
                     sFilename_mesh_netcdf = oPystream_in.sFilename_mesh_netcdf
                     dLatitude_top    = oPystream_in.dLatitude_top   
                     dLatitude_bot    = oPystream_in.dLatitude_bot   
                     dLongitude_left  = oPystream_in.dLongitude_left 
                     dLongitude_right = oPystream_in.dLongitude_right
-                    aMpas = create_mpas_mesh(sFilename_mesh_netcdf, dLatitude_top, dLatitude_bot, dLongitude_left, dLongitude_right,\
+                    aMpas = create_mpas_mesh(iFlag_use_mpas_dem, \
+                        sFilename_mesh_netcdf, \
+                            dLatitude_top, dLatitude_bot, dLongitude_left, dLongitude_right,\
                         sFilename_mesh)
                     return aMpas
                 else:

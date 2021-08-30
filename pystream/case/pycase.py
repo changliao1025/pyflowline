@@ -9,7 +9,7 @@ class streamcase(object):
     iCase_index= 0
     sMesh_type = 1
     
-   
+    iFlag_use_mpas_dem=0
     iFlag_disconnected =0
     iFlag_rotation=0
     dResolution=0.0
@@ -72,6 +72,9 @@ class streamcase(object):
 
        
         iFlag_standalone = int(aParameter['iFlag_standalone'])
+        self.iFlag_standalone = iFlag_standalone
+        self.iFlag_use_mpas_dem = int(aParameter['iFlag_use_mpas_dem'])
+        
         
                
         iCase_index = int(aParameter['iCase_index'])

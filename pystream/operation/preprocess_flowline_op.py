@@ -96,12 +96,9 @@ def preprocess_flowline_op(oPystream_in):
 
     #ues location to find outlet
   
-    point= dict()
-    point['x'] = oPystream_in.dx_outlet
-    point['y'] = oPystream_in.dy_outlet
-    lon, lat = reproject_coordinates(oPystream_in.dx_outlet, oPystream_in.dy_outlet, pSpatialRef_pcs)
-    point['lon'] = lon
-    point['lat'] = lat
+    point= dict()   
+    point['lon'] = oPystream_in.dLon_outlet
+    point['lat'] = oPystream_in.dLat_outlet
     pVertex_outlet=pyvertex(point)
 
     aFlowline= correct_flowline_direction(aFlowline,  pVertex_outlet )
@@ -120,36 +117,29 @@ def preprocess_flowline_op(oPystream_in):
     export_flowline_to_shapefile(iFlag_projected, aFlowline,pSpatialRef_gcs, sFilename_out)
 
     
-    aFlowline = remove_small_river(aFlowline, dThreshold)
-    sFilename_out = 'flowline_large_step1_before_intersect.shp'
-    sFilename_out =os.path.join(sWorkspace_output, sFilename_out)
-    export_flowline_to_shapefile(iFlag_projected, aFlowline, pSpatialRef_gcs, sFilename_out)
+    #using loop to remove small river, here we use 5 steps
 
-    aVertex, lIndex_outlet, aIndex_headwater,aIndex_middle, aIndex_confluence, aConnectivity = find_flowline_confluence(aFlowline,  pVertex_outlet)
-    sFilename_out = 'flowline_vertex_with_confluence_step1_before_intersect.shp'
-    sFilename_out = os.path.join(sWorkspace_output, sFilename_out)
-    export_vertex_to_shapefile(iFlag_projected, aVertex, pSpatialRef_gcs, sFilename_out, aAttribute_data=aConnectivity)
+    for i in range(3):
+        sStep = "{:02d}".format(i+1)
+        aFlowline = remove_small_river(aFlowline, dThreshold)
+        sFilename_out = 'flowline_large_'+ sStep +'_before_intersect.shp'
+        sFilename_out =os.path.join(sWorkspace_output, sFilename_out)
+        export_flowline_to_shapefile(iFlag_projected, aFlowline, pSpatialRef_gcs, sFilename_out)
+        
 
-    aFlowline = merge_flowline( aFlowline,aVertex, pVertex_outlet, aIndex_headwater,aIndex_middle, aIndex_confluence  )  
-    sFilename_out = 'flowline_merge_step1_before_intersect.shp'
-    sFilename_out = os.path.join(sWorkspace_output, sFilename_out)
-    export_flowline_to_shapefile(iFlag_projected, aFlowline, pSpatialRef_gcs, sFilename_out)
+        aVertex, lIndex_outlet, aIndex_headwater,aIndex_middle, aIndex_confluence, aConnectivity = find_flowline_confluence(aFlowline,  pVertex_outlet)
+        sFilename_out = 'flowline_vertex_with_confluence_'+ sStep +'_before_intersect.shp'
+        sFilename_out = os.path.join(sWorkspace_output, sFilename_out)
+        export_vertex_to_shapefile(iFlag_projected, aVertex, pSpatialRef_gcs, sFilename_out, aAttribute_data=aConnectivity)
 
-    aFlowline = remove_small_river(aFlowline, dThreshold)
-    sFilename_out = 'flowline_large_step2_before_intersect.shp'
-    sFilename_out =os.path.join(sWorkspace_output, sFilename_out)
-    export_flowline_to_shapefile(iFlag_projected, aFlowline, pSpatialRef_gcs, sFilename_out)
+        aFlowline = merge_flowline( aFlowline,aVertex, pVertex_outlet, aIndex_headwater,aIndex_middle, aIndex_confluence  )  
+        sFilename_out = 'flowline_merge_'+ sStep +'_before_intersect.shp'
+        sFilename_out = os.path.join(sWorkspace_output, sFilename_out)
+        export_flowline_to_shapefile(iFlag_projected, aFlowline, pSpatialRef_gcs, sFilename_out)
 
+        if len(aFlowline) ==1:
+            break
 
-    aVertex, lIndex_outlet, aIndex_headwater,aIndex_middle, aIndex_confluence, aConnectivity = find_flowline_confluence(aFlowline,  pVertex_outlet)
-    sFilename_out = 'flowline_vertex_with_confluence_step2_before_intersect.shp'
-    sFilename_out = os.path.join(sWorkspace_output, sFilename_out)
-    export_vertex_to_shapefile(iFlag_projected, aVertex, pSpatialRef_gcs, sFilename_out, aAttribute_data=aConnectivity)
-
-    aFlowline = merge_flowline( aFlowline,aVertex, pVertex_outlet, aIndex_headwater,aIndex_middle, aIndex_confluence  )  
-    sFilename_out = 'flowline_merge_step2_before_intersect.shp'
-    sFilename_out = os.path.join(sWorkspace_output, sFilename_out)
-    export_flowline_to_shapefile(iFlag_projected, aFlowline, pSpatialRef_gcs, sFilename_out)
 
     #build segment index
     aFlowline, aStream_segment = define_stream_segment_index(aFlowline)

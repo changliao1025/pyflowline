@@ -23,9 +23,10 @@ def merge_flowline(aFlowline_in, aVertex, \
         return aFlowline_in
     
     aVertex_headwater=aVertex[aIndex_headwater]    
-    aVertex_middle=aVertex[aIndex_middle]    
-    aVertex_confluence=aVertex[aIndex_confluence]
-    
+    aVertex_middle=aVertex[aIndex_middle]   
+
+    if aIndex_confluence.size > 0:        
+        aVertex_confluence=aVertex[aIndex_confluence]    
     
     def merge_flowline_reach(lIndex, pVertex_start_in, pVertex_end_in):
         global lID

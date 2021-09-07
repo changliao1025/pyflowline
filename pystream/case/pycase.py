@@ -135,8 +135,8 @@ class streamcase(object):
         self.dLatitude_bot = float(aParameter['dLatitude_bot']) 
         self.dLatitude_top = float(aParameter['dLatitude_top']) 
 
-        self.dx_outlet = float(aParameter['dx_outlet']) 
-        self.dy_outlet = float(aParameter['dy_outlet']) 
+        self.dLon_outlet = float(aParameter['dLon_outlet']) 
+        self.dLat_outlet = float(aParameter['dLat_outlet']) 
 
         self.sFilename_spatial_reference = aParameter['sFilename_spatial_reference']
         self.sFilename_dem = aParameter['sFilename_dem']

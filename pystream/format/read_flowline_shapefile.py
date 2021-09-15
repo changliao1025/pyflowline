@@ -46,6 +46,8 @@ def read_flowline_shapefile(sFilename_shapefile_in):
         
         pGeometry_in = pFeature_shapefile.GetGeometryRef()
         sGeometry_type = pGeometry_in.GetGeometryName()
+
+        lNHDPlusID = int(pFeature_shapefile.GetField("NHDPlusID"))
         if (iFlag_transform ==1): #projections are different
             pGeometry_in.Transform(pTransform)
 
@@ -65,6 +67,7 @@ def read_flowline_shapefile(sFilename_shapefile_in):
                 dummy1= np.array(aCoords)
                 pLine = convert_gcs_coordinates_to_flowline(dummy1)
                 pLine.lIndex = lID
+                pLine.lNHDPlusID= lNHDPlusID
                 aFlowline.append(pLine)
                 lID = lID + 1
                
@@ -76,6 +79,7 @@ def read_flowline_shapefile(sFilename_shapefile_in):
                 dummy1= np.array(aCoords)
                 pLine = convert_gcs_coordinates_to_flowline(dummy1)
                 pLine.lIndex = lID
+                pLine.lNHDPlusID= lNHDPlusID
                 aFlowline.append(pLine)
                 lID = lID + 1
                 

@@ -31,6 +31,6 @@
     "sMesh_type": "mpas",       
     "sFilename_spatial_reference": "/qfs/people/liao313/data/hexwatershed/NHDPLUS_H_0204_HU4/vector/hydrology/boundary_proj.shp",
     "sFilename_dem": "/qfs/people/liao313/data/hexwatershed/NHDPLUS_H_0204_HU4/raster/dem/dem_ext.tif",
-    "sFilename_flowlinw_raw": "/qfs/people/liao313/data/hexwatershed/NHDPLUS_H_0204_HU4/vector/hydrology/streamord6above.shp",
+    "sFilename_flowlinw_raw": "/qfs/people/liao313/data/hexwatershed/NHDPLUS_H_0204_HU4/vector/hydrology/streamord6above_sim.shp",
     "sFilename_mesh_netcdf": "/qfs/people/liao313/workspace/python/jigsaw/icom-mesh/mesh/delaware_60_30_5_2_w_boundary/out/invert_mesh.nc"    
 }

@@ -24,6 +24,7 @@ def correct_flowline_direction(aFlowline_in, pVertex_outlet):
     iFlag_first = 1
     for i in range(nFlowline):
         pFlowline = aFlowline_in[i]
+        iFlag_dam = pFlowline.iFlag_dam
         iStream_order = pFlowline.iStream_order
         pVertex_start = pFlowline.pVertex_start
         pVertex_end = pFlowline.pVertex_end
@@ -46,6 +47,7 @@ def correct_flowline_direction(aFlowline_in, pVertex_outlet):
     lID = 0 
     pFlowline = aFlowline_in[lIndex_outlet]
     pFlowline.lIndex = lID
+    pFlowline.iFlag_dam = 1 # this one is not dam, but it should be preserved
     aFlowline_out.append(pFlowline)
     pVertex_start = pFlowline.pVertex_start
     pVertex_end = pFlowline.pVertex_end

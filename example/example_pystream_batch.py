@@ -9,8 +9,8 @@ from pystream.operation.full_op import full_op
 
 
 aResolution= [1000, 10000, 50000]
-sDate_in = '20210822'
-for i in range(0,1):
+sDate_in = '20210909'
+for i in range(0,3):
 
     #hexagon
     iCase_index = i * 3 + 1

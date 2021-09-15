@@ -37,10 +37,10 @@ def intersect_flowline_with_mesh_with_postprocess_op(oPystream_in):
 
     sWorkspace_output = oPystream_in.sWorkspace_output  
 
-    sFilename_flowlinw_raw = oPystream_in.sFilename_flowlinw_raw
+    sFilename_flowline_filter = oPystream_in.sFilename_flowline_filter
 
 
-    aFlowline, pSpatialRef_flowline = read_flowline_shapefile(sFilename_flowlinw_raw)
+    aFlowline, pSpatialRef_flowline = read_flowline_shapefile(sFilename_flowline_filter)
     
 
     sFilename_flowline = oPystream_in.sFilename_flowline_segment_order_before_intersect
@@ -56,11 +56,8 @@ def intersect_flowline_with_mesh_with_postprocess_op(oPystream_in):
 
     point= dict()
     
-    point['x'] = oPystream_in.dx_outlet
-    point['y'] = oPystream_in.dy_outlet
-    lon, lat = reproject_coordinates(oPystream_in.dx_outlet, oPystream_in.dy_outlet, pSpatialRef_flowline)
-    point['lon'] = lon
-    point['lat'] = lat
+    point['lon'] = oPystream_in.dLon_outlet
+    point['lat'] = oPystream_in.dLat_outlet
     pVertex_outlet=pyvertex(point)
     
     aFlowline, aFlowline_no_parallel, lCellID_outlet = remove_returning_flowline(iMesh_type, aCell_intersect, pVertex_outlet)

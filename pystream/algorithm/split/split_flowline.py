@@ -14,6 +14,7 @@ def split_flowline(aFlowline_in, aVertex_in):
     for i in range(nFlowline):
         pFlowline = aFlowline_in[i]
         iStream_order = pFlowline.iStream_order
+        iFlag_dam = pFlowline.iFlag_dam
         nVertex = pFlowline.nVertex
 
         iPart = 0
@@ -52,6 +53,7 @@ def split_flowline(aFlowline_in, aVertex_in):
 
                 pFlowline1 = pyflowline(aEdge)
                 pFlowline1.iStream_order = iStream_order
+                pFlowline1.iFlag_dam = iFlag_dam
                 aFlowline_out.append(pFlowline1)
                 pass
     

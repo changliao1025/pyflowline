@@ -11,6 +11,7 @@ class streamcase(object):
     
     iFlag_use_mpas_dem=0
     iFlag_disconnected =0
+    iFlag_dam=0
     iFlag_rotation=0
     dResolution=0.0
     dResolution_meter=0.0
@@ -43,7 +44,10 @@ class streamcase(object):
 
     sFilename_spatial_reference=''
     sFilename_dem=''
-    sFilename_flowlinw_raw=''
+    sFilename_flowline_raw=''
+    sFilename_flowline_filter=''
+    sFilename_dam=''
+    sFilename_flowline_topo=''
     #before intersect
     sFilename_flowline_segment_order_before_intersect=''
     sFilename_flowline_segment_index_before_intersect=''
@@ -73,7 +77,12 @@ class streamcase(object):
        
         iFlag_standalone = int(aParameter['iFlag_standalone'])
         self.iFlag_standalone = iFlag_standalone
-        self.iFlag_use_mpas_dem = int(aParameter['iFlag_use_mpas_dem'])
+
+        if 'iFlag_dam' in aParameter:
+            self.iFlag_dam = int(aParameter['iFlag_dam'])
+
+        if 'iFlag_use_mpas_dem' in aParameter:
+            self.iFlag_use_mpas_dem = int(aParameter['iFlag_use_mpas_dem'])
         
         
                
@@ -144,7 +153,15 @@ class streamcase(object):
         if 'sFilename_mesh_netcdf' in aParameter:
             self.sFilename_mesh_netcdf = aParameter['sFilename_mesh_netcdf']
 
-        self.sFilename_flowlinw_raw = aParameter['sFilename_flowlinw_raw']
+        self.sFilename_flowline_filter = aParameter['sFilename_flowline_filter']
+
+        if 'sFilename_dam' in aParameter:
+            self.sFilename_dam = aParameter['sFilename_dam']
+        if 'sFilename_flowline_topo' in aParameter:
+            self.sFilename_flowline_topo = aParameter['sFilename_flowline_topo']
+
+        if 'sFilename_flowline_raw' in aParameter:
+            self.sFilename_flowline_raw = aParameter['sFilename_flowline_raw']
 
         ##model generated files
         self.sFilename_mesh = self.sWorkspace_output + slash  + sMesh_type + ".shp"

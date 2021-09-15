@@ -12,6 +12,8 @@ class pyflowline(object):
     __metaclass__ = ABCMeta 
 
     lFlowlineID=-1
+    iFlag_dam = 0
+    lNHDPlusID=-1
     aEdge=None
     aVertex=None
 
@@ -42,6 +44,8 @@ class pyflowline(object):
 
         self.aVertex.append( aEdge[nEdge-1].pVertex_end )
         self.nVertex = nVertex
+
+        #self.iFlag_dam = 0
 
         #dict.__init__(self, aEdge=aEdge)
 
@@ -116,7 +120,8 @@ class pyflowline(object):
 
     def merge_upstream(self, other):
         pFlowline_out = copy.deepcopy(other)    
-
+        
+        iFlag_dam1 = other.iFlag_dam
         pVertex_start1 = other.pVertex_start
         pVertex_end1 = other.pVertex_end
         nVertex1 = other.nVertex
@@ -126,6 +131,7 @@ class pyflowline(object):
         pVertex_end2 = self.pVertex_end
         nVertex2 = self.nVertex
         nEdge2 = self.nEdge
+        iFlag_dam2 = self.iFlag_dam
 
 
         if pVertex_end1 == pVertex_start2:
@@ -142,7 +148,8 @@ class pyflowline(object):
             for i in range(1, nVertex2):
                 aVertex.append( self.aVertex[i] )
                 pass
-
+            
+            pFlowline_out.iFlag_dam = max(iFlag_dam1, iFlag_dam2)
             pFlowline_out.aEdge = aEdge
             pFlowline_out.aVertex = aVertex
             pFlowline_out.nEdge = nEdge

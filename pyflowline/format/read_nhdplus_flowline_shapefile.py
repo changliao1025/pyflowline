@@ -128,6 +128,7 @@ def track_nhdplus_flowline(aNHDPlusID_filter, aFromFlowline, aToFlowline, lNHDPl
     aNHDPlusID_dam_nonheadwater = list()
     def tag_downstream(lNHDPlusID_from):
         if lNHDPlusID_from in aNHDPlusID_filter:
+            dummy_index = aNHDPlusID_filter.index(lNHDPlusID_from)
             pass
         else:
             if lNHDPlusID_from in aFromFlowline:
@@ -143,7 +144,7 @@ def track_nhdplus_flowline(aNHDPlusID_filter, aFromFlowline, aToFlowline, lNHDPl
                         if lNHDPlusID_to==0:
                             pass
                         else:
-                            #print(lNHDPlusID, lNHDPlusID_to)
+                            print(lNHDPlusID, lNHDPlusID_to)
                             tag_downstream(lNHDPlusID_to)
         return 
 

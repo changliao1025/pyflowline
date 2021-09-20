@@ -78,7 +78,8 @@ def preprocess_flowline_op(oPystream_in):
             sDam = aData_dam[i][4]            
             lNHDPlusID = int(aData_dam[i][5])
             aNHDPlusID_dams_headwater.append(lNHDPlusID)
-            
+            if i==2:
+                print('debug')
             if lNHDPlusID in aNHDPlusID_filter:
                 #remove by id
                 for j in range(len(aFlowline)):

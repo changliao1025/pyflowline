@@ -1,10 +1,10 @@
 import os
-from pystream.shared.vertex import pyvertex
+from pyflowline.shared.vertex import pyvertex
 
-from pystream.format.read_flowline_geojson import read_flowline_geojson
-from pystream.format.export_flowline_to_shapefile import export_flowline_to_shapefile
+from pyflowline.format.read_flowline_geojson import read_flowline_geojson
+from pyflowline.format.export_flowline_to_shapefile import export_flowline_to_shapefile
 
-from pystream.algorithm.intersect.intersect_flowline_with_mesh import intersect_flowline_with_mesh
+from pyflowline.algorithm.intersect.intersect_flowline_with_mesh import intersect_flowline_with_mesh
 
 
 

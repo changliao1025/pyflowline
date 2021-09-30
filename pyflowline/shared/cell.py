@@ -3,8 +3,8 @@ from abc import ABCMeta, abstractmethod
 import numpy as np
 import json
 from osgeo import gdal, osr, ogr
-from pystream.shared.vertex import pyvertex
-from pystream.shared.edge import pyedge
+from pyflowline.shared.vertex import pyvertex
+from pyflowline.shared.edge import pyedge
 
 class pycell(metaclass=ABCMeta):
     

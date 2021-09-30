@@ -7,7 +7,7 @@ import json
 
 from pyearth.system.define_global_variables import *
 
-from pystream.case.pycase import streamcase
+from pyflowline.case.pycase import flowlinecase
 
 
 
@@ -15,7 +15,7 @@ from pystream.case.pycase import streamcase
 pDate = datetime.datetime.today()
 sDate_default = "{:04d}".format(pDate.year) + "{:02d}".format(pDate.month) + "{:02d}".format(pDate.day)
 
-def pystream_read_model_configuration_file(sFilename_configuration_in,\
+def pyflowline_read_model_configuration_file(sFilename_configuration_in,\
      iCase_index_in=None, \
          dResolution_in = None,\
          dResolution_meter_in = None,\
@@ -81,7 +81,7 @@ def pystream_read_model_configuration_file(sFilename_configuration_in,\
     
     #simulation
     
-    oPystream = streamcase(data)
+    opyflowline = flowlinecase(data)
    
     
-    return oPystream
+    return opyflowline

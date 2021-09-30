@@ -4,12 +4,16 @@ from pyearth.system.define_global_variables import *
 pDate = datetime.datetime.today()
 sDate_default = "{:04d}".format(pDate.year) + "{:02d}".format(pDate.month) + "{:02d}".format(pDate.day)
 
-class streamcase(object):
+class flowlinecase(object):
     __metaclass__ = ABCMeta
     iCase_index= 0
     sMesh_type = 1
-    
+    iFlag_standalone=1
+    iFlag_multiple = 0
     iFlag_use_mpas_dem=0
+    iFlag_simplification = 1 #user can turn on/off
+    iFlag_create_mesh=1
+    iFlag_intersect = 1
     iFlag_disconnected =0
     iFlag_dam=0
     iFlag_rotation=0
@@ -74,9 +78,23 @@ class streamcase(object):
         self.sRegion               = aParameter[ 'sRegion']
         self.sModel                = aParameter[ 'sModel']
 
-       
-        iFlag_standalone = int(aParameter['iFlag_standalone'])
-        self.iFlag_standalone = iFlag_standalone
+
+        if 'iFlag_standalone' in aParameter:
+            self.iFlag_standalone = int(aParameter['iFlag_standalone'])
+    
+        if 'iFlag_multiple' in aParameter:
+            self.iFlag_multiple = int(aParameter['iFlag_multiple'])
+        
+        if 'iFlag_simplification' in aParameter:
+            self.iFlag_simplification = int(aParameter['iFlag_simplification'])
+
+
+        if 'iFlag_create_mesh' in aParameter:
+            self.iFlag_create_mesh = int(aParameter['iFlag_create_mesh'])    
+
+        if 'iFlag_intersect' in aParameter:
+            self.iFlag_intersect = int(aParameter['iFlag_intersect'])
+
 
         if 'iFlag_dam' in aParameter:
             self.iFlag_dam = int(aParameter['iFlag_dam'])
@@ -99,7 +117,7 @@ class streamcase(object):
         self.sCase = sCase
 
         #the model can be run as part of hexwatershed or standalone
-        if iFlag_standalone ==1:
+        if self.iFlag_standalone ==1:
             sPath = self.sWorkspace_output + slash + sCase
             self.sWorkspace_output = sPath
         else:
@@ -143,9 +161,15 @@ class streamcase(object):
         self.dLongitude_right = float(aParameter['dLongitude_right']) 
         self.dLatitude_bot = float(aParameter['dLatitude_bot']) 
         self.dLatitude_top = float(aParameter['dLatitude_top']) 
+        
 
-        self.dLon_outlet = float(aParameter['dLon_outlet']) 
-        self.dLat_outlet = float(aParameter['dLat_outlet']) 
+        if self.iFlag_multiple == 0:
+            self.dLon_outlet = float(aParameter['dLon_outlet']) 
+            self.dLat_outlet = float(aParameter['dLat_outlet']) 
+        else:
+            #use a file name to store outlet locations
+            self.sFilename_outlet =  aParameter['sFilename_outlet']
+            pass
 
         self.sFilename_spatial_reference = aParameter['sFilename_spatial_reference']
         self.sFilename_dem = aParameter['sFilename_dem']
@@ -157,13 +181,14 @@ class streamcase(object):
 
         if 'sFilename_dam' in aParameter:
             self.sFilename_dam = aParameter['sFilename_dam']
+
         if 'sFilename_flowline_topo' in aParameter:
             self.sFilename_flowline_topo = aParameter['sFilename_flowline_topo']
 
         if 'sFilename_flowline_raw' in aParameter:
             self.sFilename_flowline_raw = aParameter['sFilename_flowline_raw']
 
-        ##model generated files
+        #model generated files
         self.sFilename_mesh = self.sWorkspace_output + slash  + sMesh_type + ".shp"
         
         self.sFilename_flowline_segment_index_before_intersect = self.sWorkspace_output + slash + 'flowline_segment_index_before_intersect.shp'

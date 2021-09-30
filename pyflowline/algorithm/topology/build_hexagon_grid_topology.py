@@ -3,19 +3,19 @@
 import imp
 import os
 import json
-from pystream.shared.vertex import pyvertex
+from pyflowline.shared.vertex import pyvertex
 import numpy as np
 from osgeo import ogr, osr
 
 from shapely.geometry import Point, LineString, MultiLineString
 from shapely.wkt import loads
-from pystream.shared.hexagon import pyhexagon
+from pyflowline.shared.hexagon import pyhexagon
 
-from pystream.format.convert_coordinates_to_cell import convert_pcs_coordinates_to_cell
-from pystream.format.convert_coordinates_to_flowline import convert_pcs_coordinates_to_flowline
-from pystream.algorithm.auxiliary.find_hexagon_through_edge import find_hexagon_through_edge
+from pyflowline.format.convert_coordinates_to_cell import convert_pcs_coordinates_to_cell
+from pyflowline.format.convert_coordinates_to_flowline import convert_pcs_coordinates_to_flowline
+from pyflowline.algorithm.auxiliary.find_hexagon_through_edge import find_hexagon_through_edge
 
-#from pystream.shared.link import pyhexagonlink
+#from pyflowline.shared.link import pyhexagonlink
 def build_hexagon_grid_topology(aHexagon_in):
     
     

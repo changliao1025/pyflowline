@@ -1,11 +1,11 @@
 import os, sys
 from osgeo import ogr, osr, gdal, gdalconst
 import numpy as np
-from pystream.shared.vertex import pyvertex
-from pystream.shared.edge import pyedge
-from pystream.shared.flowline import pyflowline
+from pyflowline.shared.vertex import pyvertex
+from pyflowline.shared.edge import pyedge
+from pyflowline.shared.flowline import pyflowline
 
-from pystream.algorithm.auxiliary.find_vertex_in_list import find_vertex_in_list
+from pyflowline.algorithm.auxiliary.find_vertex_in_list import find_vertex_in_list
 
 def split_flowline(aFlowline_in, aVertex_in):
     aFlowline_out = list()

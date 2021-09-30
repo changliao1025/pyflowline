@@ -6,27 +6,27 @@ from pyearth.gis.gdal.gdal_function import obtain_raster_metadata
 from pyearth.gis.gdal.gdal_function import reproject_coordinates
 from pyearth.gis.projection.degree_to_meter import degree_to_meter
 from pyearth.gis.projection.meter_to_degree import meter_to_degree
-from pystream.mesh.hexagon.create_hexagon_mesh import create_hexagon_mesh
-from pystream.mesh.latlon.create_latlon_mesh import create_latlon_mesh
-from pystream.mesh.square.create_square_mesh import create_square_mesh
-from pystream.mesh.mpas.create_mpas_mesh import create_mpas_mesh
-from pystream.mesh.tin.create_tin_mesh import create_tin_mesh
+from pyflowline.mesh.hexagon.create_hexagon_mesh import create_hexagon_mesh
+from pyflowline.mesh.latlon.create_latlon_mesh import create_latlon_mesh
+from pyflowline.mesh.square.create_square_mesh import create_square_mesh
+from pyflowline.mesh.mpas.create_mpas_mesh import create_mpas_mesh
+from pyflowline.mesh.tin.create_tin_mesh import create_tin_mesh
 
 
-def create_mesh_op(oPystream_in):
+def create_mesh_op(opyflowline_in):
 
 
     #we can use the dem extent to setup 
-    iMesh_type = oPystream_in.iMesh_type
-    iFlag_rotation = oPystream_in.iFlag_rotation
+    iMesh_type = opyflowline_in.iMesh_type
+    iFlag_rotation = opyflowline_in.iFlag_rotation
     
-    dResolution = oPystream_in.dResolution
-    dResolution_meter = oPystream_in.dResolution_meter
+    dResolution = opyflowline_in.dResolution
+    dResolution_meter = opyflowline_in.dResolution_meter
     
 
-    sFilename_dem = oPystream_in.sFilename_dem
-    sFilename_spatial_reference = oPystream_in.sFilename_spatial_reference
-    sFilename_mesh = oPystream_in.sFilename_mesh
+    sFilename_dem = opyflowline_in.sFilename_dem
+    sFilename_spatial_reference = opyflowline_in.sFilename_spatial_reference
+    sFilename_mesh = opyflowline_in.sFilename_mesh
 
     dPixelWidth, dOriginX, dOriginY, nrow, ncolumn, pSpatialRef_dem, pProjection, pGeotransform\
          = obtain_raster_metadata(sFilename_dem)
@@ -86,10 +86,10 @@ def create_mesh_op(oPystream_in):
             if iMesh_type ==3: #latlon
                 dResolution_meter = degree_to_meter(dLatitude_mean, dResolution)
                 dArea = np.power(dResolution_meter,2.0)
-                dLatitude_top    = oPystream_in.dLatitude_top   
-                dLatitude_bot    = oPystream_in.dLatitude_bot   
-                dLongitude_left  = oPystream_in.dLongitude_left 
-                dLongitude_right = oPystream_in.dLongitude_right
+                dLatitude_top    = opyflowline_in.dLatitude_top   
+                dLatitude_bot    = opyflowline_in.dLatitude_bot   
+                dLongitude_left  = opyflowline_in.dLongitude_left 
+                dLongitude_right = opyflowline_in.dLongitude_right
                 ncolumn= int( (dLongitude_right - dLongitude_left) / dResolution )
                 nrow= int( (dLatitude_top - dLatitude_bot) / dResolution )
                 aLatlon = create_latlon_mesh(dLongitude_left, dLatitude_bot, dResolution, ncolumn, nrow, \
@@ -97,12 +97,12 @@ def create_mesh_op(oPystream_in):
                 return aLatlon
             else:
                 if iMesh_type ==4: #mpas
-                    iFlag_use_mpas_dem = oPystream_in.iFlag_use_mpas_dem
-                    sFilename_mesh_netcdf = oPystream_in.sFilename_mesh_netcdf
-                    dLatitude_top    = oPystream_in.dLatitude_top   
-                    dLatitude_bot    = oPystream_in.dLatitude_bot   
-                    dLongitude_left  = oPystream_in.dLongitude_left 
-                    dLongitude_right = oPystream_in.dLongitude_right
+                    iFlag_use_mpas_dem = opyflowline_in.iFlag_use_mpas_dem
+                    sFilename_mesh_netcdf = opyflowline_in.sFilename_mesh_netcdf
+                    dLatitude_top    = opyflowline_in.dLatitude_top   
+                    dLatitude_bot    = opyflowline_in.dLatitude_bot   
+                    dLongitude_left  = opyflowline_in.dLongitude_left 
+                    dLongitude_right = opyflowline_in.dLongitude_right
                     aMpas = create_mpas_mesh(iFlag_use_mpas_dem, \
                         sFilename_mesh_netcdf, \
                             dLatitude_top, dLatitude_bot, dLongitude_left, dLongitude_right,\

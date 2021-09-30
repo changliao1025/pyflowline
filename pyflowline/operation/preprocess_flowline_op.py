@@ -4,67 +4,67 @@ import numpy as np
 import osr
 from pyearth.gis.gdal.gdal_function import reproject_coordinates
 from pyearth.toolbox.reader.text_reader_string import text_reader_string
-from pystream.shared.vertex import pyvertex
+from pyflowline.shared.vertex import pyvertex
 from pyearth.system.define_global_variables import *
 
-from pystream.format.read_flowline_shapefile import read_flowline_shapefile
-from pystream.format.read_nhdplus_flowline_shapefile import read_nhdplus_flowline_shapefile_attribute
-from pystream.format.read_nhdplus_flowline_shapefile import extract_nhdplus_flowline_shapefile_by_attribute
-from pystream.format.read_nhdplus_flowline_shapefile import track_nhdplus_flowline
+from pyflowline.format.read_flowline_shapefile import read_flowline_shapefile
+from pyflowline.format.read_nhdplus_flowline_shapefile import read_nhdplus_flowline_shapefile_attribute
+from pyflowline.format.read_nhdplus_flowline_shapefile import extract_nhdplus_flowline_shapefile_by_attribute
+from pyflowline.format.read_nhdplus_flowline_shapefile import track_nhdplus_flowline
 
-from pystream.format.export_flowline_to_shapefile import export_flowline_to_shapefile
-from pystream.format.export_vertex_to_shapefile import export_vertex_to_shapefile
+from pyflowline.format.export_flowline_to_shapefile import export_flowline_to_shapefile
+from pyflowline.format.export_vertex_to_shapefile import export_vertex_to_shapefile
 
-from pystream.algorithm.connect.connect_disconnect_flowline import connect_disconnect_flowline
-from pystream.algorithm.direction.correct_flowline_direction import correct_flowline_direction
+from pyflowline.algorithm.connect.connect_disconnect_flowline import connect_disconnect_flowline
+from pyflowline.algorithm.direction.correct_flowline_direction import correct_flowline_direction
 
 #merge
-from pystream.algorithm.merge.merge_flowline import merge_flowline
+from pyflowline.algorithm.merge.merge_flowline import merge_flowline
 
 #split
-from pystream.algorithm.split.split_flowline import split_flowline
-from pystream.algorithm.split.find_flowline_confluence import find_flowline_confluence
-from pystream.algorithm.split.find_flowline_vertex import find_flowline_vertex
+from pyflowline.algorithm.split.split_flowline import split_flowline
+from pyflowline.algorithm.split.find_flowline_confluence import find_flowline_confluence
+from pyflowline.algorithm.split.find_flowline_vertex import find_flowline_vertex
 
 
-from pystream.algorithm.loop.remove_flowline_loop import remove_flowline_loop
+from pyflowline.algorithm.loop.remove_flowline_loop import remove_flowline_loop
 #
-from pystream.algorithm.simplification.remove_small_river import remove_small_river
+from pyflowline.algorithm.simplification.remove_small_river import remove_small_river
 
-from pystream.algorithm.index.define_stream_order import define_stream_order
-from pystream.algorithm.index.define_stream_segment_index import define_stream_segment_index
+from pyflowline.algorithm.index.define_stream_order import define_stream_order
+from pyflowline.algorithm.index.define_stream_segment_index import define_stream_segment_index
 
 
 """
 prepare the flowline using multiple step approach
 """
 
-def preprocess_flowline_op(oPystream_in):
+def preprocess_flowline_op(opyflowline_in):
     
     #read shapefile and store information in the list
-    iMesh_type = oPystream_in.iMesh_type
-    iFlag_dam = oPystream_in.iFlag_dam
-    iFlag_disconnected = oPystream_in.iFlag_disconnected
-    dThreshold = oPystream_in.dThreshold_small_river
+    iMesh_type = opyflowline_in.iMesh_type
+    iFlag_dam = opyflowline_in.iFlag_dam
+    iFlag_disconnected = opyflowline_in.iFlag_disconnected
+    dThreshold = opyflowline_in.dThreshold_small_river
 
-    sFilename_flowline_filter = oPystream_in.sFilename_flowline_filter
+    sFilename_flowline_filter = opyflowline_in.sFilename_flowline_filter
 
 
-    sWorkspace_output = oPystream_in.sWorkspace_output
+    sWorkspace_output = opyflowline_in.sWorkspace_output
     aFlowline, pSpatialRef_pcs = read_flowline_shapefile(sFilename_flowline_filter)
     #we also need to save the spatial reference information for the output purpose
 
 
     if iFlag_dam ==1:
-        sFilename_dam = oPystream_in.sFilename_dam
+        sFilename_dam = opyflowline_in.sFilename_dam
         aData_dam = text_reader_string(sFilename_dam, iSkipline_in =1,cDelimiter_in=',' )
-        sFilename_flowline_topo = oPystream_in.sFilename_flowline_topo
+        sFilename_flowline_topo = opyflowline_in.sFilename_flowline_topo
         aData_flowline_topo = text_reader_string(sFilename_flowline_topo, iSkipline_in =1,cDelimiter_in=',' )
 
         aFromFlowline = aData_flowline_topo[:,1].astype(int).ravel()
         aToFlowline = aData_flowline_topo[:,2].astype(int).ravel()
 
-        sFilename_flowline_raw = oPystream_in.sFilename_flowline_raw
+        sFilename_flowline_raw = opyflowline_in.sFilename_flowline_raw
         aNHDPlusID_filter = read_nhdplus_flowline_shapefile_attribute(sFilename_flowline_filter)
         aNHDPlusID_raw = read_nhdplus_flowline_shapefile_attribute(sFilename_flowline_raw)
         ndam = len(aData_dam)
@@ -152,8 +152,8 @@ def preprocess_flowline_op(oPystream_in):
     #ues location to find outlet
   
     point= dict()   
-    point['lon'] = oPystream_in.dLon_outlet
-    point['lat'] = oPystream_in.dLat_outlet
+    point['lon'] = opyflowline_in.dLon_outlet
+    point['lat'] = opyflowline_in.dLat_outlet
     pVertex_outlet=pyvertex(point)
 
     aFlowline= correct_flowline_direction(aFlowline,  pVertex_outlet )
@@ -197,14 +197,14 @@ def preprocess_flowline_op(oPystream_in):
 
     #build segment index
     aFlowline, aStream_segment = define_stream_segment_index(aFlowline)
-    sFilename_out = oPystream_in.sFilename_flowline_segment_index_before_intersect
+    sFilename_out = opyflowline_in.sFilename_flowline_segment_index_before_intersect
     sFilename_out = os.path.join(sWorkspace_output, sFilename_out)
     export_flowline_to_shapefile(iFlag_projected, aFlowline, pSpatialRef_gcs, sFilename_out, \
         aAttribute_data=[aStream_segment], aAttribute_field=['iseg'], aAttribute_dtype=['int'])
 
     #build stream order 
     aFlowline, aStream_order = define_stream_order(aFlowline)
-    sFilename_out = oPystream_in.sFilename_flowline_segment_order_before_intersect
+    sFilename_out = opyflowline_in.sFilename_flowline_segment_order_before_intersect
     
     export_flowline_to_shapefile(iFlag_projected, aFlowline, pSpatialRef_gcs, sFilename_out, \
         aAttribute_data=[aStream_segment, aStream_order], aAttribute_field=['iseg','iord'], aAttribute_dtype=['int','int'])

@@ -2,11 +2,11 @@ from abc import ABCMeta, abstractmethod
 
 from osgeo import gdal, osr, ogr
 
-from pystream.shared.vertex import pyvertex
-from pystream.shared.edge import pyedge
-from pystream.shared.cell import pycell
-from pystream.shared.flowline import pyflowline
-from pystream.shared.mpas import pympas
+from pyflowline.shared.vertex import pyvertex
+from pyflowline.shared.edge import pyedge
+from pyflowline.shared.cell import pycell
+from pyflowline.shared.flowline import pyflowline
+from pyflowline.shared.mpas import pympas
 
 import json
 import numpy as np

@@ -1,6 +1,6 @@
 
 import os, sys
-from pystream.shared.edge import pyedge
+from pyflowline.shared.edge import pyedge
 import numpy as np
 from numpy.lib.financial import pv 
 from osgeo import ogr, osr, gdal, gdalconst

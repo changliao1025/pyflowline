@@ -2,19 +2,19 @@
 import imp
 import os
 import json
-from pystream.shared.vertex import pyvertex
+from pyflowline.shared.vertex import pyvertex
 import numpy as np
 from osgeo import ogr, osr
 
 from shapely.geometry import Point, LineString, MultiLineString
 from shapely.wkt import loads
-from pystream.shared.hexagon import pyhexagon
+from pyflowline.shared.hexagon import pyhexagon
 
-from pystream.format.convert_coordinates_to_cell import convert_gcs_coordinates_to_cell, convert_pcs_coordinates_to_cell
-from pystream.format.convert_coordinates_to_flowline import convert_gcs_coordinates_to_flowline,convert_pcs_coordinates_to_flowline
+from pyflowline.format.convert_coordinates_to_cell import convert_gcs_coordinates_to_cell, convert_pcs_coordinates_to_cell
+from pyflowline.format.convert_coordinates_to_flowline import convert_gcs_coordinates_to_flowline,convert_pcs_coordinates_to_flowline
 
 
-#from pystream.shared.link import pyhexagonlink
+#from pyflowline.shared.link import pyhexagonlink
 def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh, sFilename_flowline, sFilename_output):
 
     if  os.path.exists(sFilename_mesh) and  os.path.exists(sFilename_flowline) : 

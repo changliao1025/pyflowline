@@ -1,0 +1,29 @@
+package:
+  name: "pye3sm"
+  version: "0.0.1"
+
+source:
+  git_rev: v0.0.1
+  git_url: https://github.com/changliao1025/pye3sm
+
+requirements:
+  host:
+    - python
+    - setuptools
+  build:
+    - python
+  run:
+    - python
+    - netCDF4
+    - pyearth
+
+about:
+  home: https://github.com/changliao1025/pye3sm
+  license: MIT
+  license_familY: MIT
+  license_file: LICENSE
+  summary: "Python for E3SM"
+
+extra:
+  recipe-maintainers:
+    - changliao1025

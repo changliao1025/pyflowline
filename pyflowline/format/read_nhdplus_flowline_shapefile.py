@@ -1,17 +1,17 @@
 import os
 import json
-from pystream.shared.edge import pyedge
+from pyflowline.shared.edge import pyedge
 from osgeo import ogr, osr, gdal, gdalconst
 import numpy as np
 
 from shapely.geometry import Point, LineString, MultiLineString
 from shapely.wkt import loads
 
-from pystream.shared.vertex import pyvertex
-from pystream.shared.flowline import pyflowline
+from pyflowline.shared.vertex import pyvertex
+from pyflowline.shared.flowline import pyflowline
 
-from pystream.format.convert_coordinates_to_flowline import convert_pcs_coordinates_to_flowline
-from pystream.format.convert_coordinates_to_flowline import convert_gcs_coordinates_to_flowline
+from pyflowline.format.convert_coordinates_to_flowline import convert_pcs_coordinates_to_flowline
+from pyflowline.format.convert_coordinates_to_flowline import convert_gcs_coordinates_to_flowline
 
 def read_nhdplus_flowline_shapefile_attribute(sFilename_shapefile_in):
     """

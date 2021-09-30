@@ -1,5 +1,5 @@
 import os, sys
-from pystream.shared.flowline import pyflowline
+from pyflowline.shared.flowline import pyflowline
 import numpy as np 
 from osgeo import ogr, osr, gdal, gdalconst
 from shapely.geometry import Point, LineString
@@ -9,7 +9,7 @@ from shapely.wkt import loads
 lID=0
 aFlag_process=None
 
-from pystream.algorithm.auxiliary.check_head_water import check_head_water
+from pyflowline.algorithm.auxiliary.check_head_water import check_head_water
 
 def correct_flowline_direction(aFlowline_in, pVertex_outlet):
         

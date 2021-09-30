@@ -3,10 +3,10 @@ from osgeo import gdal, osr, ogr
 import numpy as np
 import json
 
-from pystream.shared.vertex import pyvertex
-from pystream.shared.edge import pyedge
-from pystream.shared.cell import pycell
-from pystream.shared.flowline import pyflowline
+from pyflowline.shared.vertex import pyvertex
+from pyflowline.shared.edge import pyedge
+from pyflowline.shared.cell import pycell
+from pyflowline.shared.flowline import pyflowline
 
 from pyearth.gis.location.calculate_polygon_area import calculate_polygon_area
 

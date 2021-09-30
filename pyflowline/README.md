@@ -2,12 +2,12 @@
 
 # Dependency
 
-* pystream use some functions from pyearth, which is a general purpose library for many Earth scient operation.
+* pyflowline use some functions from pyearth, which is a general purpose library for many Earth scient operation.
 
 
 # Requirements
 
-Pystream requires several input information for different operations. In general, these dataset are expected:
+pyflowline requires several input information for different operations. In general, these dataset are expected:
 
 * DEM raster file: this file will be used to obtain the spatial extent of the study domain
 * River flowline vector file: this file is used to guide the stream topology definition
@@ -16,7 +16,7 @@ Pystream requires several input information for different operations. In general
 
 # Steps
 
-In most cases, you will run pystream in the following steps:
+In most cases, you will run pyflowline in the following steps:
 
 All the settings are controled within the JSON configuration file, see the example folder for details.
 

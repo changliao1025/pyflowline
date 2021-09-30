@@ -1,14 +1,14 @@
 import os
 import json
-from pystream.shared.edge import pyedge
+from pyflowline.shared.edge import pyedge
 from osgeo import ogr, osr, gdal, gdalconst
 import numpy as np
 
 from shapely.geometry import Point, LineString, MultiLineString
 from shapely.wkt import loads
 
-from pystream.shared.vertex import pyvertex
-from pystream.shared.flowline import pyflowline
+from pyflowline.shared.vertex import pyvertex
+from pyflowline.shared.flowline import pyflowline
 
 
 

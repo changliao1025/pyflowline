@@ -2,7 +2,7 @@ import os, sys
 from osgeo import ogr, osr, gdal, gdalconst
 import numpy as np
 
-from pystream.algorithm.auxiliary.add_unique_vertex import add_unique_vertex
+from pyflowline.algorithm.auxiliary.add_unique_vertex import add_unique_vertex
 
 def find_flowline_vertex(aFlowline_in):
    

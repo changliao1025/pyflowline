@@ -1,5 +1,5 @@
 ---
-title: 'PyStream: A Python package for stream networks processing'
+title: 'pyflowline: A Python package for stream networks processing'
 
 tags:
   - Python
@@ -32,12 +32,12 @@ Computational hydrologic simulation often requires high quality river network in
 
 # Algorithms and implementation
 
-PyStream takes advantage of Python language's object oriented programming (OOP) architect. The river network and all of its elements (i.e. segment, reach, confluence.) are described as objects. These objects are processed throughout the package when applicable. 
+pyflowline takes advantage of Python language's object oriented programming (OOP) architect. The river network and all of its elements (i.e. segment, reach, confluence.) are described as objects. These objects are processed throughout the package when applicable. 
 
-![The data model. \label{fig:oop}](https://github.com/changliao1025/pystream/blob/main/pystream/figure/data_mode.png?raw=true)
+![The data model. \label{fig:oop}](https://github.com/changliao1025/pyflowline/blob/main/pyflowline/figure/data_mode.png?raw=true)
 
 
-A brief overview of the features provided by PyStream is list in Table 1.
+A brief overview of the features provided by pyflowline is list in Table 1.
 
 1. It uses JSON/GeoJSON as the internal exchange file format. Most objects within the package can be imported and exported during runtime;
 2. It relies on the open source Geospatial Data Abstraction Library (GDAL) and a few other Python packages to process geospatial data type;
@@ -52,31 +52,31 @@ The overall model workflow includes three components:
 2. Generate mesh based on the spatial extend of flowline and desired resolution
 3. Intersect mesh with flowline, produce topology information
 
-![The workflow of PyStream. \label{fig:workflow}](https://github.com/changliao1025/pystream/blob/main/pystream/figure/workflow.png?raw=true)
+![The workflow of pyflowline. \label{fig:workflow}](https://github.com/changliao1025/pyflowline/blob/main/pyflowline/figure/workflow.png?raw=true)
 
 * Connect disconnected flowline
 
 If two flowlines are disconnected more than the threshold of floating data type error, this algorithm can be used to connect them by providing a nearest point and a searching radius. If a starting or ending vertex falls within the radius, a new flowline will be built based on the existing flowline and the provided point.
 
-![Disconnect flowline. \label{fig:disconnected}](https://github.com/changliao1025/pystream/blob/main/pystream/figure/disconnect_flowline.png?raw=true)
+![Disconnect flowline. \label{fig:disconnected}](https://github.com/changliao1025/pyflowline/blob/main/pyflowline/figure/disconnect_flowline.png?raw=true)
 
 * Correct flow direction
 
 Due to data quality issue, existing flowline may have incorrect flow direction, which leads to multiple downstream flow direction. The corresponding node connection matrix has rows with multiple 1s. This algorithm scans from the outlet node and searches reversely, once such a row was detected, the corresponding flow direction is flipped.
 
-![Flow direction. \label{fig:direction}](https://github.com/changliao1025/pystream/blob/main/pystream/figure/flow_direction_matrix.png?raw=true)
+![Flow direction. \label{fig:direction}](https://github.com/changliao1025/pyflowline/blob/main/pyflowline/figure/flow_direction_matrix.png?raw=true)
 
 * Remove small river
 
 To simplify river network, small river with length less than the user provided threshold is removed. This algorithm only applies to headwater and should be called multiple times to achieve desired performance.
 
-![Small river. \label{fig:small_river}](https://github.com/changliao1025/pystream/blob/main/pystream/figure/small_river.png?raw=true)
+![Small river. \label{fig:small_river}](https://github.com/changliao1025/pyflowline/blob/main/pyflowline/figure/small_river.png?raw=true)
 
 * Remove braided loop
 
 Braided loop occurs when a node has more than one downstream even after flow direction correction. This algorithm removes these loops by only keeping the first detected downstream of any node.
 
-![Remove loops. \label{fig:loops}](https://github.com/changliao1025/pystream/blob/main/pystream/figure/remove_loop_matrix.png?raw=true)
+![Remove loops. \label{fig:loops}](https://github.com/changliao1025/pyflowline/blob/main/pyflowline/figure/remove_loop_matrix.png?raw=true)
 
 * Find critical vertex
 
@@ -88,7 +88,7 @@ The start and end vertices of a flowline define its type.
 
 The vertex type information is used to merge segmented flowlines.
 
-![Vertex type. \label{fig:vertex}](https://github.com/changliao1025/pystream/blob/main/pystream/figure/find_vertex.png?raw=true)
+![Vertex type. \label{fig:vertex}](https://github.com/changliao1025/pyflowline/blob/main/pyflowline/figure/find_vertex.png?raw=true)
 
 
 * Merge flowline
@@ -100,7 +100,7 @@ This algorithm merge flowlines so there is only 2 types of flowlines:
 
 If multiple flowlines are within the same confluence bound, they are merged as one.
 
-![Merge flowline. \label{fig:merge}](https://github.com/changliao1025/pystream/blob/main/pystream/figure/merge_flowline.png?raw=true)
+![Merge flowline. \label{fig:merge}](https://github.com/changliao1025/pyflowline/blob/main/pyflowline/figure/merge_flowline.png?raw=true)
 
 * Mesh generation
 
@@ -120,7 +120,7 @@ This algorithm simpify the topology information for several unusual scenarios. F
 
 
 
-![Topology simplification. \label{fig:topology_simplification}](https://github.com/changliao1025/pystream/blob/main/pystream/figure/simplification01.png?raw=true)
+![Topology simplification. \label{fig:topology_simplification}](https://github.com/changliao1025/pyflowline/blob/main/pyflowline/figure/simplification01.png?raw=true)
 
 In this example, the flowline AH is represented by a list of edges after the intersection. Each edge defines a topology relationship between two cells. For example, edge AB defines flow direction from cell a to cell c.
 Because the topology contains loops: cb-bc-cb-bc, it is simplified as acd, which means the final flow direction is from cell a to c, then to d.
@@ -138,34 +138,34 @@ Screenshot of before and after river networks at zoom-in regions are used to ill
 
 * Remove loop
 
-![Before remove loop. \label{fig:before_remove_loop}](https://github.com/changliao1025/pystream/blob/main/pystream/figure/before_loop.png?raw=true)
+![Before remove loop. \label{fig:before_remove_loop}](https://github.com/changliao1025/pyflowline/blob/main/pyflowline/figure/before_loop.png?raw=true)
 
-![After remove loop. \label{fig:after_remove_loop}](https://github.com/changliao1025/pystream/blob/main/pystream/figure/after_loop.png?raw=true)
+![After remove loop. \label{fig:after_remove_loop}](https://github.com/changliao1025/pyflowline/blob/main/pyflowline/figure/after_loop.png?raw=true)
 
 * Merge flowline
 
-![Before merge flowline. \label{fig:before_merge}](https://github.com/changliao1025/pystream/blob/main/pystream/figure/before_merge.png?raw=true)
+![Before merge flowline. \label{fig:before_merge}](https://github.com/changliao1025/pyflowline/blob/main/pyflowline/figure/before_merge.png?raw=true)
 
-![After merge flowline. \label{fig:after_merge}](https://github.com/changliao1025/pystream/blob/main/pystream/figure/after_merge.png?raw=true)
+![After merge flowline. \label{fig:after_merge}](https://github.com/changliao1025/pyflowline/blob/main/pyflowline/figure/after_merge.png?raw=true)
 
 * Mesh generation
 
-![Lan Lon mesh. \label{fig:lat_lon_mesh}](https://github.com/changliao1025/pystream/blob/main/pystream/figure/lat_lon.png?raw=true)
+![Lan Lon mesh. \label{fig:lat_lon_mesh}](https://github.com/changliao1025/pyflowline/blob/main/pyflowline/figure/lat_lon.png?raw=true)
 
-![Sqaure mesh. \label{fig:square_mesh}](https://github.com/changliao1025/pystream/blob/main/pystream/figure/square.png?raw=true)
+![Sqaure mesh. \label{fig:square_mesh}](https://github.com/changliao1025/pyflowline/blob/main/pyflowline/figure/square.png?raw=true)
 
-![Hexagon mesh. \label{fig:hexagon_mesh}](https://github.com/changliao1025/pystream/blob/main/pystream/figure/hexagon.png?raw=true)
+![Hexagon mesh. \label{fig:hexagon_mesh}](https://github.com/changliao1025/pyflowline/blob/main/pyflowline/figure/hexagon.png?raw=true)
 
-![Overlap mesh. \label{fig:meshed}](https://github.com/changliao1025/pystream/blob/main/pystream/figure/meshes.png?raw=true)
+![Overlap mesh. \label{fig:meshed}](https://github.com/changliao1025/pyflowline/blob/main/pyflowline/figure/meshes.png?raw=true)
 
 
 * Mesh and flowline intersection
 
-![Lat Lon intersect. \label{fig:lat_lon_intersect}](https://github.com/changliao1025/pystream/blob/main/pystream/figure/lat_lon_intersect.png?raw=true)
+![Lat Lon intersect. \label{fig:lat_lon_intersect}](https://github.com/changliao1025/pyflowline/blob/main/pyflowline/figure/lat_lon_intersect.png?raw=true)
 
-![Square intersect. \label{fig:square_intersect}](https://github.com/changliao1025/pystream/blob/main/pystream/figure/square_intersect.png?raw=true)
+![Square intersect. \label{fig:square_intersect}](https://github.com/changliao1025/pyflowline/blob/main/pyflowline/figure/square_intersect.png?raw=true)
 
-![Hexagon intersect. \label{fig:hexagon_intersect}](https://github.com/changliao1025/pystream/blob/main/pystream/figure/hexagon_intersect.png?raw=true)
+![Hexagon intersect. \label{fig:hexagon_intersect}](https://github.com/changliao1025/pyflowline/blob/main/pyflowline/figure/hexagon_intersect.png?raw=true)
 
 # Acknowledgement
 

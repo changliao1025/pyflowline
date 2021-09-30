@@ -1,4 +1,4 @@
-from pystream.algorithm.auxiliary.find_edge_in_list import find_edge_in_list
+from pyflowline.algorithm.auxiliary.find_edge_in_list import find_edge_in_list
 def remove_duplicate_edge(aEdge_in):
     aEdge_out = list()
 

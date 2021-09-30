@@ -1,9 +1,9 @@
 from abc import ABCMeta, abstractmethod
 import numpy as np
 from osgeo import gdal, osr, ogr
-from pystream.shared.vertex import pyvertex
-from pystream.shared.edge import pyedge
-from pystream.shared.cell import pycell
+from pyflowline.shared.vertex import pyvertex
+from pyflowline.shared.edge import pyedge
+from pyflowline.shared.cell import pycell
 from pyearth.gis.location.calculate_polygon_area import calculate_polygon_area
 
 class pysquare(pycell):

@@ -3,11 +3,11 @@ from posixpath import join
 import numpy as np
 
 from pyearth.toolbox.data.check_if_duplicates import check_if_duplicates
-from pystream.shared.hexagon import pyhexagon
-from pystream.shared.flowline import pyflowline
-from pystream.format.convert_coordinates_to_flowline import convert_gcs_coordinates_to_flowline, convert_pcs_coordinates_to_flowline
+from pyflowline.shared.hexagon import pyhexagon
+from pyflowline.shared.flowline import pyflowline
+from pyflowline.format.convert_coordinates_to_flowline import convert_gcs_coordinates_to_flowline, convert_pcs_coordinates_to_flowline
 
-from pystream.algorithm.auxiliary.find_vertex_in_list import find_vertex_in_list
+from pyflowline.algorithm.auxiliary.find_vertex_in_list import find_vertex_in_list
 def remove_returning_flowline(iMesh_type, aCell_intersect_in, pVertex_outlet_in):
     
     aFlowline_out=list()

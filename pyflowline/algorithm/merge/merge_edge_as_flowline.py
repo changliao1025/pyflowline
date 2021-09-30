@@ -1,6 +1,6 @@
 
 import numpy as np
-from pystream.algorithm.auxiliary.find_edge_in_list import find_edge_in_list
+from pyflowline.algorithm.auxiliary.find_edge_in_list import find_edge_in_list
 lID = 0
 def merge_edge_as_flowline(aEdge_in, pVertex_outlet_in):
     iFlag_first=1

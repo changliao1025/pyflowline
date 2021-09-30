@@ -1,4 +1,4 @@
-from pystream.shared.flowline import pyflowline
+from pyflowline.shared.flowline import pyflowline
 def define_stream_segment_index(aFlowline_in):
     nFlowline = len(aFlowline_in)
     aFlowline_out = list()

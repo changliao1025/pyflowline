@@ -1,20 +1,20 @@
 import os
 import json
-from pystream.shared.square import pysquare
-from pystream.shared.edge import pyedge
+from pyflowline.shared.square import pysquare
+from pyflowline.shared.edge import pyedge
 from osgeo import ogr, osr, gdal, gdalconst
 import numpy as np
 
 from shapely.geometry import Point, LineString, MultiLineString
 from shapely.wkt import loads
 
-from pystream.shared.vertex import pyvertex
-from pystream.shared.flowline import pyflowline
-from pystream.shared.hexagon import pyhexagon
-from pystream.shared.square import pysquare
-from pystream.shared.latlon import pylatlon
-from pystream.shared.mpas import pympas
-from pystream.shared.tin import pytin
+from pyflowline.shared.vertex import pyvertex
+from pyflowline.shared.flowline import pyflowline
+from pyflowline.shared.hexagon import pyhexagon
+from pyflowline.shared.square import pysquare
+from pyflowline.shared.latlon import pylatlon
+from pyflowline.shared.mpas import pympas
+from pyflowline.shared.tin import pytin
     
 def convert_gcs_attribute_to_cell(iMesh_type, aVertexID, aEdgeID,aVertexIndexOnEdge, aCoordinates_gcs):  
     npoint = len(aVertexID)     

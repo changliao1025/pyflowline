@@ -4,7 +4,7 @@ from numpy.lib.financial import pv
 
 from osgeo import gdal, osr, ogr
 
-from pystream.shared.vertex import pyvertex
+from pyflowline.shared.vertex import pyvertex
 
 class pyedge(object):
     __metaclass__ = ABCMeta 

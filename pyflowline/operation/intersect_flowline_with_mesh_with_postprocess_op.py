@@ -88,40 +88,10 @@ def intersect_flowline_with_mesh_with_postprocess_op(opyflowline_in):
         = find_flowline_confluence(aFlowline,  pVertex_outlet)
 
     aFlowline = merge_flowline( aFlowline,aVertex, pVertex_outlet, aIndex_headwater,aIndex_middle, aIndex_confluence  ) 
-    #added end
+  
 
 
     
-    
-    #pVertex_outlet=aFlowline[0].pVertex_end
-    #aVertex = find_flowline_vertex(aFlowline)
-    #
-    #sFilename_out = 'flowline_vertex_without_confluence_after_intersect.shp'
-    #sFilename_out = os.path.join(sWorkspace_output, sFilename_out)
-    #export_vertex_to_shapefile(iFlag_projected, aVertex, pSpatialRef, sFilename_out)
-    #
-    #aFlowline = split_flowline(aFlowline, aVertex)
-    #sFilename_out = 'flowline_split_by_point_after_intersect.shp'
-    #sFilename_out = os.path.join(sWorkspace_output, sFilename_out)
-    #export_flowline_to_shapefile(iFlag_projected, aFlowline, pSpatialRef, sFilename_out)
-    #aFlowline= correct_flowline_direction(aFlowline,  pVertex_outlet )
-#
-#
-    #
-    #aFlowline = remove_flowline_loop(  aFlowline )    
-    #sFilename_out = 'flowline_remove_loop_after_intersect.shp'
-    #sFilename_out = os.path.join(sWorkspace_output, sFilename_out)
-    #export_flowline_to_shapefile(iFlag_projected, aFlowline, pSpatialRef, sFilename_out)
-#
-#
-    #aFlowline, aEdge = split_flowline_to_edge(aFlowline)
-    ##aEdge = remove_duplicate_edge(aEdge)
-    #aFlowline = remove_duplicate_flowline(aFlowline)
-#
-    #aVertex, lIndex_outlet, aIndex_headwater,aIndex_middle, aIndex_confluence, aConnectivity\
-    #    = find_flowline_confluence(aFlowline,  pVertex_outlet)
-#
-    #aFlowline = merge_flowline( aFlowline,aVertex, pVertex_outlet, aIndex_headwater,#aIndex_middle, aIndex_confluence  )  
     aFlowline, aStream_segment = define_stream_segment_index(aFlowline)
     aFlowline, aStream_order = define_stream_order(aFlowline)
     

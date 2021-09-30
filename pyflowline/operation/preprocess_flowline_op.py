@@ -35,6 +35,9 @@ from pyflowline.algorithm.index.define_stream_order import define_stream_order
 from pyflowline.algorithm.index.define_stream_segment_index import define_stream_segment_index
 
 
+def read_list_of_files(sFilename_in):
+    aFilename = text_reader_string(sFilename_in)
+    return aFilename
 """
 prepare the flowline using multiple step approach
 """
@@ -42,17 +45,35 @@ prepare the flowline using multiple step approach
 def preprocess_flowline_op(opyflowline_in):
     
     #read shapefile and store information in the list
-    iMesh_type = opyflowline_in.iMesh_type
+    iFlag_multiple = opyflowline_in.iFlag_multiple
+    
     iFlag_dam = opyflowline_in.iFlag_dam
     iFlag_disconnected = opyflowline_in.iFlag_disconnected
     dThreshold = opyflowline_in.dThreshold_small_river
 
     sFilename_flowline_filter = opyflowline_in.sFilename_flowline_filter
 
-
     sWorkspace_output = opyflowline_in.sWorkspace_output
-    aFlowline, pSpatialRef_pcs = read_flowline_shapefile(sFilename_flowline_filter)
-    #we also need to save the spatial reference information for the output purpose
+
+    if iFlag_multiple == 0:
+        #only one outlet in this case
+        aFlowline, pSpatialRef_pcs = read_flowline_shapefile(sFilename_flowline_filter)
+        #we also need to save the spatial reference information for the output purpose
+        pass
+    else:
+        nOutlet = opyflowline_in.nOutlet
+        aFilename_flowline_filter = read_list_of_files(sFilename_flowline_filter)
+        aFlowline = list()
+        for i in range(nOutlet):
+            #in this case, the sFilename_flowline_filter is a list of files
+            sFilename_flowline_filter_dummy = aFilename_flowline_filter(i)
+
+            aFlowline_dummy, pSpatialRef_pcs = read_flowline_shapefile( sFilename_flowline_filter_dummy )
+            aFlowline = aFlowline + aFlowline_dummy
+            pass
+
+
+    
 
 
     if iFlag_dam ==1:
@@ -116,19 +137,7 @@ def preprocess_flowline_op(opyflowline_in):
 
     if iFlag_disconnected ==1:
         #need a better way to include this capability
-        
-        #aVertex=list()
-        #point= dict()
-        #point['x'] = -1589612.188
-        #point['y'] = 3068975.112
-        #pVertex=pyvertex(point)
-        #aVertex.append(pVertex)
-        #point['x'] =  -1568732.491
-        #point['y'] = 3064177.639
-        #pVertex=pyvertex(point)
-        #aVertex.append(pVertex)
-
-
+         
         aThreshold = np.full(2, 300.0, dtype=float)
         #aFlowline = connect_disconnect_flowline(aFlowline, aVertex, aThreshold)
         sFilename_out = 'flowline_connect.json'

@@ -17,6 +17,9 @@ class flowlinecase(object):
     iFlag_disconnected =0
     iFlag_dam=0
     iFlag_rotation=0
+
+    nOutlet = 1 #by default , there shoule ne only one ouelet
+
     dResolution=0.0
     dResolution_meter=0.0
     dThreshold_small_river=0.0
@@ -101,6 +104,9 @@ class flowlinecase(object):
 
         if 'iFlag_use_mpas_dem' in aParameter:
             self.iFlag_use_mpas_dem = int(aParameter['iFlag_use_mpas_dem'])
+        
+        if 'nOutlet' in aParameter:
+            self.nOutlet = int(aParameter['nOutlet'])
         
         
                

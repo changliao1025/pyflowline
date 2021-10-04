@@ -1,6 +1,8 @@
 from abc import ABCMeta, abstractmethod
 import datetime
 from pyearth.system.define_global_variables import *
+import json
+from pyflowline.shared.basin import pybasin
 pDate = datetime.datetime.today()
 sDate_default = "{:04d}".format(pDate.year) + "{:02d}".format(pDate.month) + "{:02d}".format(pDate.day)
 
@@ -68,6 +70,8 @@ class flowlinecase(object):
     sFilename_flowline_simplified_after_intersect=''
     sFilename_vertex_without_confluence_after_intersect=''
     flowline_split_by_point_after_intersect=''
+
+    aBasin = list()
     
     def __init__(self, aParameter):
         self.sFilename_model_configuration    = aParameter[ 'sFilename_model_configuration']
@@ -85,8 +89,8 @@ class flowlinecase(object):
         if 'iFlag_standalone' in aParameter:
             self.iFlag_standalone = int(aParameter['iFlag_standalone'])
     
-        if 'iFlag_multiple' in aParameter:
-            self.iFlag_multiple = int(aParameter['iFlag_multiple'])
+        #if 'iFlag_multiple' in aParameter:
+        #    self.iFlag_multiple = int(aParameter['iFlag_multiple'])
         
         if 'iFlag_simplification' in aParameter:
             self.iFlag_simplification = int(aParameter['iFlag_simplification'])
@@ -95,13 +99,12 @@ class flowlinecase(object):
         if 'iFlag_create_mesh' in aParameter:
             self.iFlag_create_mesh = int(aParameter['iFlag_create_mesh'])    
 
+        if 'iFlag_rotation' in aParameter:
+            self.iFlag_rotation = int(aParameter['iFlag_rotation'])
+
         if 'iFlag_intersect' in aParameter:
             self.iFlag_intersect = int(aParameter['iFlag_intersect'])
-
-
-        if 'iFlag_dam' in aParameter:
-            self.iFlag_dam = int(aParameter['iFlag_dam'])
-
+      
         if 'iFlag_use_mpas_dem' in aParameter:
             self.iFlag_use_mpas_dem = int(aParameter['iFlag_use_mpas_dem'])
         
@@ -131,7 +134,10 @@ class flowlinecase(object):
         
         Path(sPath).mkdir(parents=True, exist_ok=True)
 
-        self.sMesh_type =  aParameter['sMesh_type']
+        if 'sMesh_type' in aParameter:
+            self.sMesh_type =  aParameter['sMesh_type']
+        else:
+            self.sMesh_type = 'hexagon'
         
         sMesh_type = self.sMesh_type
         if sMesh_type =='hexagon': #hexagon
@@ -152,59 +158,54 @@ class flowlinecase(object):
                             print('Unsupported mesh type?')
          
      
-        self.iFlag_disconnected =  int(aParameter['iFlag_disconnected'])
 
-        self.iFlag_rotation = int(aParameter['iFlag_rotation'])
+        
         
         self.dResolution = float(aParameter['dResolution']) 
         self.dResolution_meter = float(aParameter['dResolution_meter']) 
 
-        self.dThreshold_small_river =  float(aParameter['dThreshold_small_river']) 
-
-        
         
         self.dLongitude_left = float(aParameter['dLongitude_left']) 
         self.dLongitude_right = float(aParameter['dLongitude_right']) 
         self.dLatitude_bot = float(aParameter['dLatitude_bot']) 
         self.dLatitude_top = float(aParameter['dLatitude_top']) 
-        
-
-        if self.iFlag_multiple == 0:
-            self.dLon_outlet = float(aParameter['dLon_outlet']) 
-            self.dLat_outlet = float(aParameter['dLat_outlet']) 
-        else:
-            #use a file name to store outlet locations
-            self.sFilename_outlet =  aParameter['sFilename_outlet']
-            pass
-
+       
+       
         self.sFilename_spatial_reference = aParameter['sFilename_spatial_reference']
         self.sFilename_dem = aParameter['sFilename_dem']
 
         if 'sFilename_mesh_netcdf' in aParameter:
             self.sFilename_mesh_netcdf = aParameter['sFilename_mesh_netcdf']
 
-        self.sFilename_flowline_filter = aParameter['sFilename_flowline_filter']
+        self.aBasin = list()
+        if 'sFilename_basins' in aParameter:
+            self.sFilename_basins = aParameter['sFilename_basins']
+            with open(self.sFilename_basins) as json_file:
+                dummy_data = json.load(json_file)   
 
-        if 'sFilename_dam' in aParameter:
-            self.sFilename_dam = aParameter['sFilename_dam']
+                for i in range(self.nOutlet):
+                    dummy_basin = dummy_data[i]
+                    print(dummy_basin)
+                    pBasin = pybasin(dummy_basin)
 
-        if 'sFilename_flowline_topo' in aParameter:
-            self.sFilename_flowline_topo = aParameter['sFilename_flowline_topo']
+                    self.aBasin.append(pBasin)
+        else:
+            pass
+            
 
-        if 'sFilename_flowline_raw' in aParameter:
-            self.sFilename_flowline_raw = aParameter['sFilename_flowline_raw']
+        self.sJob =  aParameter['sJob'] 
+
+        
 
         #model generated files
         self.sFilename_mesh = self.sWorkspace_output + slash  + sMesh_type + ".shp"
         
-        self.sFilename_flowline_segment_index_before_intersect = self.sWorkspace_output + slash + 'flowline_segment_index_before_intersect.shp'
-        self.sFilename_flowline_segment_order_before_intersect = self.sWorkspace_output + slash + 'flowline_segment_order_before_intersect.shp'
-
+        
 
         self.sFilename_mesh_info= self.sWorkspace_output + slash + sMesh_type + "_mesh_info.json"  
         
-        self.sFilename_flowline_intersect  = self.sWorkspace_output + slash + 'flowline_intersect.shp'
-        self.sJob =  aParameter['sJob'] 
+        
+        
 
         self.sWorkspace_data_project = self.sWorkspace_data +  slash + self.sWorkspace_project
 

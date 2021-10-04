@@ -139,9 +139,6 @@ def create_mpas_mesh(iFlag_use_mpas_dem, sFilename_mesh_netcdf, dLatitude_top, d
     aBed_elevation = bed_elevation0[:]
     
     ncell = len(aIndexToCellID)
-
-
-    
  
     aMpas = list()
     for i in range(ncell):

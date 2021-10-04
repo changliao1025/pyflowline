@@ -9,8 +9,8 @@ sDate_in = '20210909'
 iCase_index = 10
 
 sFilename_configuration_in = '/qfs/people/liao313/workspace/python/pyflowline/pyflowline/config/pyflowline_susquehanna_mpas.json'
-opyflowline = pyflowline_read_model_configuration_file(sFilename_configuration_in, \
+oPyflowline = pyflowline_read_model_configuration_file(sFilename_configuration_in, \
         sDate_in = sDate_in,\
         iCase_index_in=iCase_index )
 
-aCell = full_op(opyflowline)
+aCell = full_op(oPyflowline)

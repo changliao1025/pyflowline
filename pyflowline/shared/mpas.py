@@ -11,7 +11,7 @@ from pyflowline.shared.flowline import pyflowline
 from pyearth.gis.location.calculate_polygon_area import calculate_polygon_area
 
 import numpy as np
-import json
+
 from json import JSONEncoder
 
 class CellClassEncoder(JSONEncoder):

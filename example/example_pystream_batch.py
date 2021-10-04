@@ -17,29 +17,29 @@ for i in range(0,3):
     dReresolution_meter = aResolution[i]
 
     sFilename_configuration_in = '/qfs/people/liao313/workspace/python/pyflowline/pyflowline/config/pyflowline_susquehanna_hexagon.json'
-    opyflowline = pyflowline_read_model_configuration_file(sFilename_configuration_in, \
+    oPyflowline = pyflowline_read_model_configuration_file(sFilename_configuration_in, \
         sDate_in = sDate_in,\
         iCase_index_in=iCase_index, dResolution_meter_in =dReresolution_meter )
 
-    aCell = full_op(opyflowline)
+    aCell = full_op(oPyflowline)
 
 
     #square
     iCase_index = iCase_index + 1
     sFilename_configuration_in = '/qfs/people/liao313/workspace/python/pyflowline/pyflowline/config/pyflowline_susquehanna_square.json'
-    opyflowline = pyflowline_read_model_configuration_file(sFilename_configuration_in, \
+    oPyflowline = pyflowline_read_model_configuration_file(sFilename_configuration_in, \
         sDate_in = sDate_in,\
         iCase_index_in=iCase_index, dResolution_meter_in =dReresolution_meter )
 
-    aCell = full_op(opyflowline)
+    aCell = full_op(oPyflowline)
 
     #latlon
     iCase_index = iCase_index + 1
     sFilename_configuration_in = '/qfs/people/liao313/workspace/python/pyflowline/pyflowline/config/pyflowline_susquehanna_latlon.json'
-    opyflowline = pyflowline_read_model_configuration_file(sFilename_configuration_in, \
+    oPyflowline = pyflowline_read_model_configuration_file(sFilename_configuration_in, \
         sDate_in = sDate_in,\
         iCase_index_in=iCase_index, dResolution_meter_in =dReresolution_meter )
 
-    aCell = full_op(opyflowline)
+    aCell = full_op(oPyflowline)
 
 

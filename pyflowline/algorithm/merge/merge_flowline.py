@@ -32,7 +32,7 @@ def merge_flowline(aFlowline_in, aVertex, \
         global lID
         pFlowline = aFlowline_in[lIndex]
         pVertex_current = pVertex_start_in
-        
+        dummy = lIndex
         while (find_vertex_in_list(aVertex_middle, pVertex_current)[0] ==1):
             
             for j in range(0, nFlowline):      
@@ -43,32 +43,32 @@ def merge_flowline(aFlowline_in, aVertex, \
                     #this is the upstream, merge them 
                     pFlowline = pFlowline.merge_upstream(pFlowline2)
                     pVertex_current = pVertex_start
-                    #print(j)
+                    dummy = j
                     break
                 else:
                     pass
 
         #save 
+        print(dummy)
         pFlowline.lIndex = lID
         aFlowline_out.append(pFlowline)
         
         lID = lID + 1        
         #go to next 
         if find_vertex_in_list(aVertex_headwater, pVertex_current)[0] ==1: 
-            pass
+            print('headwater: ' , lID)
+            return
         else:
             #it must be confluence
             if find_vertex_in_list(aVertex_confluence, pVertex_current)[0] ==1: 
-                for j in range(0, nFlowline):                      
-                    pFlowline3 = aFlowline_in[j]                
+                for k in range(0, nFlowline):                      
+                    pFlowline3 = aFlowline_in[k]                
                     pVertex_start = pFlowline3.pVertex_start
                     pVertex_end = pFlowline3.pVertex_end
                     if pVertex_end == pVertex_current:
-                        merge_flowline_reach(j, pVertex_start, pVertex_end)
-                        pass
-            else:
-                print('something is wrong?')
-                pass
+                        merge_flowline_reach(k, pVertex_start, pVertex_end)
+                        
+            
             
     
     iFlag_first=1

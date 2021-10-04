@@ -13,45 +13,49 @@ from pyflowline.mesh.mpas.create_mpas_mesh import create_mpas_mesh
 from pyflowline.mesh.tin.create_tin_mesh import create_tin_mesh
 
 
-def create_mesh_op(opyflowline_in):
+def create_mesh_op(oPyflowline_in):
 
 
     #we can use the dem extent to setup 
-    iMesh_type = opyflowline_in.iMesh_type
-    iFlag_rotation = opyflowline_in.iFlag_rotation
+    iMesh_type = oPyflowline_in.iMesh_type
+    iFlag_rotation = oPyflowline_in.iFlag_rotation
     
-    dResolution = opyflowline_in.dResolution
-    dResolution_meter = opyflowline_in.dResolution_meter
+    dResolution = oPyflowline_in.dResolution
+    dResolution_meter = oPyflowline_in.dResolution_meter
     
 
-    sFilename_dem = opyflowline_in.sFilename_dem
-    sFilename_spatial_reference = opyflowline_in.sFilename_spatial_reference
-    sFilename_mesh = opyflowline_in.sFilename_mesh
+    sFilename_dem = oPyflowline_in.sFilename_dem
+    sFilename_spatial_reference = oPyflowline_in.sFilename_spatial_reference
+    sFilename_mesh = oPyflowline_in.sFilename_mesh
 
-    dPixelWidth, dOriginX, dOriginY, nrow, ncolumn, pSpatialRef_dem, pProjection, pGeotransform\
-         = obtain_raster_metadata(sFilename_dem)
+    if iMesh_type !=4: #hexagon
 
-    spatial_reference_source = pSpatialRef_dem
-    spatial_reference_target = osr.SpatialReference()  
-    spatial_reference_target.ImportFromEPSG(4326)
+        dPixelWidth, dOriginX, dOriginY, nrow, ncolumn, pSpatialRef_dem, pProjection, pGeotransform\
+             = obtain_raster_metadata(sFilename_dem)
 
-    dY_bot = dOriginY - (nrow+1) * dPixelWidth
-    dLongitude_left,  dLatitude_bot= reproject_coordinates(dOriginX, dY_bot,pSpatialRef_dem,spatial_reference_target)
-    dX_right = dOriginX + (ncolumn +1) * dPixelWidth
+        spatial_reference_source = pSpatialRef_dem
+        spatial_reference_target = osr.SpatialReference()  
+        spatial_reference_target.ImportFromEPSG(4326)
 
-    dLongitude_right, dLatitude_top= reproject_coordinates(dX_right, dOriginY,pSpatialRef_dem,spatial_reference_target)
-    dLatitude_mean = 0.5 * (dLatitude_top + dLatitude_bot)
+        dY_bot = dOriginY - (nrow+1) * dPixelWidth
+        dLongitude_left,  dLatitude_bot= reproject_coordinates(dOriginX, dY_bot,pSpatialRef_dem,spatial_reference_target)
+        dX_right = dOriginX + (ncolumn +1) * dPixelWidth
+
+        dLongitude_right, dLatitude_top= reproject_coordinates(dX_right, dOriginY,pSpatialRef_dem,spatial_reference_target)
+        dLatitude_mean = 0.5 * (dLatitude_top + dLatitude_bot)
 
 
-    if dResolution_meter < 0:
-        #not used
-        pass
+        if dResolution_meter < 0:
+            #not used
+            pass
+        else:
+            dResolution = meter_to_degree(dResolution_meter, dLatitude_mean)
+
+
+        dX_left = dOriginX
+        dY_top = dOriginY
     else:
-        dResolution = meter_to_degree(dResolution_meter, dLatitude_mean)
-        
-
-    dX_left = dOriginX
-    dY_top = dOriginY
+        pass
    
     
     if iMesh_type ==1: #hexagon
@@ -86,10 +90,10 @@ def create_mesh_op(opyflowline_in):
             if iMesh_type ==3: #latlon
                 dResolution_meter = degree_to_meter(dLatitude_mean, dResolution)
                 dArea = np.power(dResolution_meter,2.0)
-                dLatitude_top    = opyflowline_in.dLatitude_top   
-                dLatitude_bot    = opyflowline_in.dLatitude_bot   
-                dLongitude_left  = opyflowline_in.dLongitude_left 
-                dLongitude_right = opyflowline_in.dLongitude_right
+                dLatitude_top    = oPyflowline_in.dLatitude_top   
+                dLatitude_bot    = oPyflowline_in.dLatitude_bot   
+                dLongitude_left  = oPyflowline_in.dLongitude_left 
+                dLongitude_right = oPyflowline_in.dLongitude_right
                 ncolumn= int( (dLongitude_right - dLongitude_left) / dResolution )
                 nrow= int( (dLatitude_top - dLatitude_bot) / dResolution )
                 aLatlon = create_latlon_mesh(dLongitude_left, dLatitude_bot, dResolution, ncolumn, nrow, \
@@ -97,12 +101,12 @@ def create_mesh_op(opyflowline_in):
                 return aLatlon
             else:
                 if iMesh_type ==4: #mpas
-                    iFlag_use_mpas_dem = opyflowline_in.iFlag_use_mpas_dem
-                    sFilename_mesh_netcdf = opyflowline_in.sFilename_mesh_netcdf
-                    dLatitude_top    = opyflowline_in.dLatitude_top   
-                    dLatitude_bot    = opyflowline_in.dLatitude_bot   
-                    dLongitude_left  = opyflowline_in.dLongitude_left 
-                    dLongitude_right = opyflowline_in.dLongitude_right
+                    iFlag_use_mpas_dem = oPyflowline_in.iFlag_use_mpas_dem
+                    sFilename_mesh_netcdf = oPyflowline_in.sFilename_mesh_netcdf
+                    dLatitude_top    = oPyflowline_in.dLatitude_top   
+                    dLatitude_bot    = oPyflowline_in.dLatitude_bot   
+                    dLongitude_left  = oPyflowline_in.dLongitude_left 
+                    dLongitude_right = oPyflowline_in.dLongitude_right
                     aMpas = create_mpas_mesh(iFlag_use_mpas_dem, \
                         sFilename_mesh_netcdf, \
                             dLatitude_top, dLatitude_bot, dLongitude_left, dLongitude_right,\

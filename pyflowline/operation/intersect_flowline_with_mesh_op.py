@@ -8,20 +8,25 @@ from pyflowline.algorithm.intersect.intersect_flowline_with_mesh import intersec
 
 
 
-def intersect_flowline_with_mesh_op(oModel_in):
+def intersect_flowline_with_mesh_op(oPyflowline_in):
 
+    iMesh_type = oPyflowline_in.iMesh_type
+    sWorkspace_output = oPyflowline_in.sWorkspace_output
+    nOutlet = oPyflowline_in.nOutlet
+
+    sFilename_mesh=oPyflowline_in.sFilename_mesh
     
-    sWorkspace_output_case = oModel_in.sWorkspace_output_case  
 
+    for i in range(nOutlet):
+        sBasin =  "{:03d}".format(i+1)              
+        pBasin = oPyflowline_in.aBasin[i]
+        sFilename_flowline = pBasin.sFilename_flowline_segment_order_before_intersect
+        sFilename_flowline_in = os.path.join(sWorkspace_output, sFilename_flowline)
+        sFilename_flowline_intersect = pBasin.sFilename_flowline_intersect
+        sFilename_flowline_intersect_out = os.path.join(sWorkspace_output, sFilename_flowline_intersect)
 
-
-    sFilename_flowline = oModel_in.sFilename_flowline_segment_order_before_intersect
-
-    sFilename_mesh=oModel_in.sFilename_mesh
-    sFilename_flowline_intersect = oModel_in.sFilename_flowline_intersect
-
-    
-    aCell, aCell_intersect, aFlowline_intersect = intersect_flowline_with_mesh(4, sFilename_mesh, sFilename_flowline, sFilename_flowline_intersect)
+        aCell, aCell_intersect, aFlowline_intersect = intersect_flowline_with_mesh(iMesh_type, sFilename_mesh, \
+            sFilename_flowline_in, sFilename_flowline_intersect_out)
 
 
     

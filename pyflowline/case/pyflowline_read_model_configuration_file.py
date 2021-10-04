@@ -81,7 +81,7 @@ def pyflowline_read_model_configuration_file(sFilename_configuration_in,\
     
     #simulation
     
-    opyflowline = flowlinecase(data)
+    oPyflowline = flowlinecase(data)
    
     
-    return opyflowline
+    return oPyflowline

@@ -52,7 +52,7 @@ def preprocess_flowline_op(oPyflowline_in):
     nOutlet = oPyflowline_in.nOutlet
     if iFlag_simplification == 1: 
         
-        aFlowline = list()        
+        aFlowline = list()        #store all the flowline
         for i in range(nOutlet):
             sBasin =  "{:03d}".format(i+1)
             sWorkspace_output_basin = oPyflowline_in.sWorkspace_output + slash + sBasin
@@ -152,14 +152,14 @@ def preprocess_flowline_op(oPyflowline_in):
 
             pVertex_outlet = aFlowline_basin[0].pVertex_end
 
-            sFilename_out = 'flowline_direction_before_intersect' + sBasin + '.shp'
+            sFilename_out = 'flowline_direction_before_intersect_' + sBasin + '.shp'
             sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
             export_flowline_to_shapefile(iFlag_projected, aFlowline_basin, pSpatialRef_gcs, sFilename_out)
 
             #step 4: remove loops
 
             aFlowline_basin = remove_flowline_loop(aFlowline_basin)    
-            sFilename_out = 'flowline_loop_before_intersect' + sBasin + '.shp'
+            sFilename_out = 'flowline_loop_before_intersect_' + sBasin + '.shp'
             sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
             export_flowline_to_shapefile(iFlag_projected, aFlowline_basin,pSpatialRef_gcs, sFilename_out)
 

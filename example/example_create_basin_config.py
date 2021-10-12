@@ -12,7 +12,7 @@ for i in range(nbasin):
     pBasin = pybasin(aParameter)
     aBasin.append(pBasin)
 
-sFilename_json_out = '/qfs/people/liao313/workspace/python/pyflowline/pyflowline/config/pyflowline_icom_basin.json'
+sFilename_json_out = '/qfs/people/liao313/workspace/python/pyflowline/pyflowline/config/pyflowline_icom_basins.json'
 with open(sFilename_json_out, 'w', encoding='utf-8') as f:
     sJson = json.dumps([json.loads(ob.tojson()) for ob in aBasin],\
          sort_keys=True, \

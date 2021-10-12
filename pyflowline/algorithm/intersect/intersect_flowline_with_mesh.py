@@ -51,10 +51,10 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh, sFilename_flowli
     print( pSpatialRef_flowline)
     comparison = pSpatialRef_mesh.IsSame(pSpatialRef_flowline)
     if(comparison != 1):
-        iFlag_transform =1
+        iFlag_transform = 1
         transform = osr.CoordinateTransformation(pSpatialRef_mesh, pSpatialRef_flowline)
     else:
-        iFlag_transform =0
+        iFlag_transform = 0
 
     pDataset_out = pDriver_shapefile.CreateDataSource(sFilename_output)
 
@@ -193,9 +193,6 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh, sFilename_flowli
                 aCell.append(pCell)
                 pass
 
-
-            
-            
             
         else:
             pass

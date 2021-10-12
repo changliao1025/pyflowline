@@ -101,13 +101,13 @@ def create_mesh_op(oPyflowline_in):
                 return aLatlon
             else:
                 if iMesh_type ==4: #mpas
-                    iFlag_use_mpas_dem = oPyflowline_in.iFlag_use_mpas_dem
+                    iFlag_use_mesh_dem = oPyflowline_in.iFlag_use_mesh_dem
                     sFilename_mesh_netcdf = oPyflowline_in.sFilename_mesh_netcdf
                     dLatitude_top    = oPyflowline_in.dLatitude_top   
                     dLatitude_bot    = oPyflowline_in.dLatitude_bot   
                     dLongitude_left  = oPyflowline_in.dLongitude_left 
                     dLongitude_right = oPyflowline_in.dLongitude_right
-                    aMpas = create_mpas_mesh(iFlag_use_mpas_dem, \
+                    aMpas = create_mpas_mesh(iFlag_use_mesh_dem, \
                         sFilename_mesh_netcdf, \
                             dLatitude_top, dLatitude_bot, dLongitude_left, dLongitude_right,\
                         sFilename_mesh)

@@ -12,12 +12,12 @@ class flowlinecase(object):
     sMesh_type = 1
     iFlag_standalone=1
     iFlag_multiple = 0
-    iFlag_use_mpas_dem=0
+    iFlag_use_mesh_dem=0
     iFlag_simplification = 1 #user can turn on/off
     iFlag_create_mesh=1
     iFlag_intersect = 1
-    iFlag_disconnected =0
-    iFlag_dam=0
+    #iFlag_disconnected =0
+    #iFlag_dam=0
     iFlag_rotation=0
 
     nOutlet = 1 #by default , there shoule ne only one ouelet
@@ -53,23 +53,23 @@ class flowlinecase(object):
 
     sFilename_spatial_reference=''
     sFilename_dem=''
-    sFilename_flowline_raw=''
-    sFilename_flowline_filter=''
-    sFilename_dam=''
-    sFilename_flowline_topo=''
+    #sFilename_flowline_raw=''
+    #sFilename_flowline_filter=''
+    #sFilename_dam=''
+    #sFilename_flowline_topo=''
     #before intersect
-    sFilename_flowline_segment_order_before_intersect=''
-    sFilename_flowline_segment_index_before_intersect=''
+    #sFilename_flowline_segment_order_before_intersect=''
+    #sFilename_flowline_segment_index_before_intersect=''
 
     #intersect
     sFilename_mesh=''
     sFilename_mesh_info=''
     sFilename_mesh_netcdf=''
-    sFilename_flowline_intersect = ''
+    #sFilename_flowline_intersect = ''
     #after intersect
-    sFilename_flowline_simplified_after_intersect=''
-    sFilename_vertex_without_confluence_after_intersect=''
-    flowline_split_by_point_after_intersect=''
+    #sFilename_flowline_simplified_after_intersect=''
+    #sFilename_vertex_without_confluence_after_intersect=''
+    #flowline_split_by_point_after_intersect=''
 
     aBasin = list()
     
@@ -105,8 +105,8 @@ class flowlinecase(object):
         if 'iFlag_intersect' in aParameter:
             self.iFlag_intersect = int(aParameter['iFlag_intersect'])
       
-        if 'iFlag_use_mpas_dem' in aParameter:
-            self.iFlag_use_mpas_dem = int(aParameter['iFlag_use_mpas_dem'])
+        if 'iFlag_use_mesh_dem' in aParameter:
+            self.iFlag_use_mesh_dem = int(aParameter['iFlag_use_mesh_dem'])
         
         if 'nOutlet' in aParameter:
             self.nOutlet = int(aParameter['nOutlet'])

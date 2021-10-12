@@ -12,7 +12,7 @@ from pyearth.gis.location.convert_lat_lon_range import convert_180_to_360,conver
 from pyflowline.format.convert_coordinates_to_cell import convert_pcs_coordinates_to_cell
 from pyflowline.format.convert_attribute_to_cell import convert_gcs_attribute_to_cell
 
-def create_mpas_mesh(iFlag_use_mpas_dem, sFilename_mesh_netcdf, dLatitude_top, dLatitude_bot, dLongitude_left, dLongitude_right,sFilename_mesh):
+def create_mpas_mesh(iFlag_use_mesh_dem, sFilename_mesh_netcdf, dLatitude_top, dLatitude_bot, dLongitude_left, dLongitude_right,sFilename_mesh):
     
     if (os.path.exists(sFilename_mesh_netcdf)):
         pass
@@ -40,7 +40,7 @@ def create_mpas_mesh(iFlag_use_mpas_dem, sFilename_mesh_netcdf, dLatitude_top, d
     pLayer = pDataset.CreateLayer('cell', pSpatialRef_gcs, ogr.wkbPolygon)
     # Add one attribute
     pLayer.CreateField(ogr.FieldDefn('id', ogr.OFTInteger64)) #long type for high resolution
-    if iFlag_use_mpas_dem == 1:
+    if iFlag_use_mesh_dem == 1:
         pLayer.CreateField(ogr.FieldDefn('elev', ogr.OFTReal)) #float type for high resolution
     else:
 
@@ -188,7 +188,7 @@ def create_mpas_mesh(iFlag_use_mpas_dem, sFilename_mesh_netcdf, dLatitude_top, d
 
             pFeature.SetGeometry(pPolygon)
             pFeature.SetField("id", int(lCellID) )
-            if iFlag_use_mpas_dem == 1:
+            if iFlag_use_mesh_dem == 1:
                 pFeature.SetField("elev", dElevation )
                 
             pLayer.CreateFeature(pFeature)

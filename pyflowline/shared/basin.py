@@ -23,6 +23,8 @@ class pybasin(object):
     dLon_outlet = -9999.
     dLat_outlet = -9999.
 
+    dAccumulation_threshold= 100000.0
+
     dThreshold_small_river = 10000
 
     sFilename_flowline_raw=''
@@ -67,7 +69,12 @@ class pybasin(object):
         if 'dThreshold_small_river' in aParameter:            
             self.dThreshold_small_river             = float(aParameter['dThreshold_small_river'])
         else:
-            self.dThreshold_small_river   =10000
+            self.dThreshold_small_river   =10000.0
+
+        if 'dAccumulation_threshold' in aParameter:            
+            self.dAccumulation_threshold             = float(aParameter['dAccumulation_threshold'])
+        else:
+            self.dAccumulation_threshold = 100000.0
 
         if 'sFilename_flowline_raw' in aParameter:
             self.sFilename_flowline_raw = aParameter['sFilename_flowline_raw']

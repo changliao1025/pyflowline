@@ -44,6 +44,10 @@ def preprocess_flowline_op(oPyflowline_in):
     
     #read shapefile and store information in the list
     iFlag_simplification = oPyflowline_in.iFlag_simplification 
+    #the flowline should not be in GCS because it cannot be used for distance directly
+    pSpatialRef_gcs = osr.SpatialReference()
+    pSpatialRef_gcs.ImportFromEPSG(4326)
+    pSpatialRef_gcs.SetAxisMappingStrategy(osr.OAMS_TRADITIONAL_GIS_ORDER)
 
     nOutlet = oPyflowline_in.nOutlet
     if iFlag_simplification == 1: 
@@ -117,10 +121,7 @@ def preprocess_flowline_op(oPyflowline_in):
             else:
                 pass
 
-            #the flowline should not be in GCS because it cannot be used for distance directly
-            pSpatialRef_gcs = osr.SpatialReference()
-            pSpatialRef_gcs.ImportFromEPSG(4326)
-            pSpatialRef_gcs.SetAxisMappingStrategy(osr.OAMS_TRADITIONAL_GIS_ORDER)
+            
             sFilename_out = 'flowline_before_intersect' + sBasin + '.shp'
             sFilename_out = os.path.join(sWorkspace_output, sFilename_out)
 
@@ -188,14 +189,16 @@ def preprocess_flowline_op(oPyflowline_in):
             aFlowline_basin, aStream_segment = define_stream_segment_index(aFlowline_basin)
             sFilename_out = pBasin.sFilename_flowline_segment_index_before_intersect
             sFilename_out = os.path.join(sWorkspace_output, sFilename_out)
-            export_flowline_to_shapefile(iFlag_projected, aFlowline_basin, pSpatialRef_gcs, sFilename_out, \
+            export_flowline_to_shapefile(iFlag_projected, \
+                aFlowline_basin, pSpatialRef_gcs, sFilename_out, \
                 aAttribute_data=[aStream_segment], aAttribute_field=['iseg'], aAttribute_dtype=['int'])
 
             #build stream order 
             aFlowline_basin, aStream_order = define_stream_order(aFlowline_basin)
             sFilename_out = pBasin.sFilename_flowline_segment_order_before_intersect
             sFilename_out = os.path.join(sWorkspace_output, sFilename_out)
-            export_flowline_to_shapefile(iFlag_projected, aFlowline_basin, pSpatialRef_gcs, sFilename_out, \
+            export_flowline_to_shapefile(iFlag_projected, \
+                aFlowline_basin, pSpatialRef_gcs, sFilename_out, \
                 aAttribute_data=[aStream_segment, aStream_order], aAttribute_field=['iseg','iord'], aAttribute_dtype=['int','int'])
 
             

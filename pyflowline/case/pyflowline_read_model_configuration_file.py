@@ -16,6 +16,8 @@ pDate = datetime.datetime.today()
 sDate_default = "{:04d}".format(pDate.year) + "{:02d}".format(pDate.month) + "{:02d}".format(pDate.day)
 
 def pyflowline_read_model_configuration_file(sFilename_configuration_in,\
+    iFlag_standalone_in= None,\
+        iFlag_use_mesh_dem_in=None,\
      iCase_index_in=None, \
          dResolution_in = None,\
          dResolution_meter_in = None,\
@@ -35,6 +37,17 @@ def pyflowline_read_model_configuration_file(sFilename_configuration_in,\
         iCase_index = iCase_index_in
     else:       
         iCase_index = int( data['iCase_index'])
+    
+    if iFlag_standalone_in is not None:        
+        iFlag_standalone = iFlag_standalone_in
+    else:       
+        iFlag_standalone = 0
+
+    if iFlag_use_mesh_dem_in is not None:        
+        iFlag_use_mesh_dem = iFlag_use_mesh_dem_in
+    else:       
+        iFlag_use_mesh_dem = 0
+
 
     if sDate_in is not None:
         sDate = sDate_in
@@ -61,8 +74,9 @@ def pyflowline_read_model_configuration_file(sFilename_configuration_in,\
         pass
 
     
-
     data['iCase_index'] = iCase_index
+    data['iFlag_standalone'] = iFlag_standalone
+    data['iFlag_use_mesh_dem'] = iFlag_use_mesh_dem
     data['dResolution'] = dResolution
     data['dResolution_meter'] = dResolution_meter
 

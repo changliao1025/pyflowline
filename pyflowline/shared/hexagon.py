@@ -131,7 +131,9 @@ class pyhexagon(pycell):
 
         return iFlag_share
     
-    def export_to_json(self):
-        sJson = json.dumps(self.__dict__, ensure_ascii=False, indent=4, cls=NumpyArrayEncoder) 
+    def tojson(self):
+        sJson = json.dumps(self.__dict__, ensure_ascii=False, \
+             sort_keys=True, \
+            indent=4, cls=NumpyArrayEncoder) 
         return sJson
 

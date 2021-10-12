@@ -4,16 +4,16 @@
         "dLat_outlet": 39.0357,
         "dLon_outlet": -75.1453,
         "dThreshold_small_river": 10000.0,
-        "iFlag_dam": 1,
+        "iFlag_dam": 0,
         "iFlag_disconnected": 0,
         "lBasinID": 1,
         "lCellID_outlet": -1,
         "sFilename_dam": "/qfs/people/liao313/data/hexwatershed/NHDPLUS_H_0204_HU4/auxiliary/ICoM_dams.csv",
         "sFilename_flowline_filter": "/qfs/people/liao313/data/hexwatershed/NHDPLUS_H_0204_HU4/vector/hydrology/streamord6above_sim.shp",
-        "sFilename_flowline_intersect": "flowline_intersect001.shp",
+        "sFilename_flowline_intersect": "flowline_intersect_001.shp",
         "sFilename_flowline_raw": "/qfs/people/liao313/data/hexwatershed/NHDPLUS_H_0204_HU4/vector/hydrology/allflowline.shp",
-        "sFilename_flowline_segment_index_before_intersect": "flowline_segment_index_before_intersect001.shp",
-        "sFilename_flowline_segment_order_before_intersect": "flowline_segment_order_before_intersect001.shp",
+        "sFilename_flowline_segment_index_before_intersect": "flowline_segment_index_before_intersect_001.shp",
+        "sFilename_flowline_segment_order_before_intersect": "flowline_segment_order_before_intersect_001.shp",
         "sFilename_flowline_topo": "/qfs/people/liao313/data/hexwatershed/NHDPLUS_H_0204_HU4/auxiliary/flowline.csv"
     },
     {
@@ -27,10 +27,10 @@
         "lCellID_outlet": -1,
         "sFilename_dam": "",
         "sFilename_flowline_filter": "/qfs/people/liao313/data/hexwatershed/NHDPLUS_H_0204_HU4/vector/hydrology/streamord6above_sim.shp",
-        "sFilename_flowline_intersect": "flowline_intersect002.shp",
+        "sFilename_flowline_intersect": "flowline_intersect_002.shp",
         "sFilename_flowline_raw": "",
-        "sFilename_flowline_segment_index_before_intersect": "flowline_segment_index_before_intersect002.shp",
-        "sFilename_flowline_segment_order_before_intersect": "flowline_segment_order_before_intersect002.shp",
+        "sFilename_flowline_segment_index_before_intersect": "flowline_segment_index_before_intersect_002.shp",
+        "sFilename_flowline_segment_order_before_intersect": "flowline_segment_order_before_intersect_002.shp",
         "sFilename_flowline_topo": ""
     },
     {
@@ -44,10 +44,10 @@
         "lCellID_outlet": -1,
         "sFilename_dam": "",
         "sFilename_flowline_filter": "/qfs/people/liao313/data/hexwatershed/NHDPLUS_H_0204_HU4/vector/hydrology/streamord6above_sim.shp",
-        "sFilename_flowline_intersect": "flowline_intersect003.shp",
+        "sFilename_flowline_intersect": "flowline_intersect_003.shp",
         "sFilename_flowline_raw": "",
-        "sFilename_flowline_segment_index_before_intersect": "flowline_segment_index_before_intersect003.shp",
-        "sFilename_flowline_segment_order_before_intersect": "flowline_segment_order_before_intersect003.shp",
+        "sFilename_flowline_segment_index_before_intersect": "flowline_segment_index_before_intersect_003.shp",
+        "sFilename_flowline_segment_order_before_intersect": "flowline_segment_order_before_intersect_003.shp",
         "sFilename_flowline_topo": ""
     },
     {
@@ -55,16 +55,16 @@
         "dLat_outlet": 39.4620,
         "dLon_outlet": -76.0093,
         "dThreshold_small_river": 10000.0,
-        "iFlag_dam": 1,
+        "iFlag_dam": 0,
         "iFlag_disconnected": 0,
         "lBasinID": 4,
         "lCellID_outlet": -1,
         "sFilename_dam": "/qfs/people/liao313/data/hexwatershed/susquehanna/auxiliary/ICoM_dams.csv",
         "sFilename_flowline_filter": "/qfs/people/liao313/data/hexwatershed/susquehanna/vector/hydrology/streamord6above.shp",
-        "sFilename_flowline_intersect": "flowline_intersect004.shp",
+        "sFilename_flowline_intersect": "flowline_intersect_004.shp",
         "sFilename_flowline_raw": "/qfs/people/liao313/data/hexwatershed/susquehanna/vector/hydrology/allflowline.shp",
-        "sFilename_flowline_segment_index_before_intersect": "flowline_segment_index_before_intersect004.shp",
-        "sFilename_flowline_segment_order_before_intersect": "flowline_segment_order_before_intersect004.shp",
+        "sFilename_flowline_segment_index_before_intersect": "flowline_segment_index_before_intersect_004.shp",
+        "sFilename_flowline_segment_order_before_intersect": "flowline_segment_order_before_intersect_004.shp",
         "sFilename_flowline_topo": "/qfs/people/liao313/data/hexwatershed/susquehanna/auxiliary/flowline.csv"
     },
     {
@@ -78,10 +78,10 @@
         "lCellID_outlet": -1,
         "sFilename_dam": "",
         "sFilename_flowline_filter": "/qfs/people/liao313/data/hexwatershed/NHDPLUS_H_0206_HU4/vector/hydrology/streamord6above.shp",
-        "sFilename_flowline_intersect": "flowline_intersect005.shp",
+        "sFilename_flowline_intersect": "flowline_intersect_005.shp",
         "sFilename_flowline_raw": "",
-        "sFilename_flowline_segment_index_before_intersect": "flowline_segment_index_before_intersect005.shp",
-        "sFilename_flowline_segment_order_before_intersect": "flowline_segment_order_before_intersect005.shp",
+        "sFilename_flowline_segment_index_before_intersect": "flowline_segment_index_before_intersect_005.shp",
+        "sFilename_flowline_segment_order_before_intersect": "flowline_segment_order_before_intersect_005.shp",
         "sFilename_flowline_topo": ""
     },
     {
@@ -95,10 +95,10 @@
         "lCellID_outlet": -1,
         "sFilename_dam": "",
         "sFilename_flowline_filter": "/qfs/people/liao313/data/hexwatershed/NHDPLUS_H_0206_HU4/vector/hydrology/streamord6above.shp",
-        "sFilename_flowline_intersect": "flowline_intersect006.shp",
+        "sFilename_flowline_intersect": "flowline_intersect_006.shp",
         "sFilename_flowline_raw": "",
-        "sFilename_flowline_segment_index_before_intersect": "flowline_segment_index_before_intersect006.shp",
-        "sFilename_flowline_segment_order_before_intersect": "flowline_segment_order_before_intersect006.shp",
+        "sFilename_flowline_segment_index_before_intersect": "flowline_segment_index_before_intersect_006.shp",
+        "sFilename_flowline_segment_order_before_intersect": "flowline_segment_order_before_intersect_006.shp",
         "sFilename_flowline_topo": ""
     },
     {
@@ -112,10 +112,10 @@
         "lCellID_outlet": -1,
         "sFilename_dam": "",
         "sFilename_flowline_filter": "/qfs/people/liao313/data/hexwatershed/NHDPLUS_H_0206_HU4/vector/hydrology/streamord6above.shp",
-        "sFilename_flowline_intersect": "flowline_intersect007.shp",
+        "sFilename_flowline_intersect": "flowline_intersect_007.shp",
         "sFilename_flowline_raw": "",
-        "sFilename_flowline_segment_index_before_intersect": "flowline_segment_index_before_intersect007.shp",
-        "sFilename_flowline_segment_order_before_intersect": "flowline_segment_order_before_intersect007.shp",
+        "sFilename_flowline_segment_index_before_intersect": "flowline_segment_index_before_intersect_007.shp",
+        "sFilename_flowline_segment_order_before_intersect": "flowline_segment_order_before_intersect_007.shp",
         "sFilename_flowline_topo": ""
     },
     {
@@ -129,10 +129,10 @@
         "lCellID_outlet": -1,
         "sFilename_dam": "",
         "sFilename_flowline_filter": "/qfs/people/liao313/data/hexwatershed/NHDPLUS_H_0206_HU4/vector/hydrology/streamord6above.shp",
-        "sFilename_flowline_intersect": "flowline_intersect008.shp",
+        "sFilename_flowline_intersect": "flowline_intersect_008.shp",
         "sFilename_flowline_raw": "",
-        "sFilename_flowline_segment_index_before_intersect": "flowline_segment_index_before_intersect008.shp",
-        "sFilename_flowline_segment_order_before_intersect": "flowline_segment_order_before_intersect008.shp",
+        "sFilename_flowline_segment_index_before_intersect": "flowline_segment_index_before_intersect_008.shp",
+        "sFilename_flowline_segment_order_before_intersect": "flowline_segment_order_before_intersect_008.shp",
         "sFilename_flowline_topo": ""
     },
     {
@@ -146,10 +146,10 @@
         "lCellID_outlet": -1,
         "sFilename_dam": "",
         "sFilename_flowline_filter": "/qfs/people/liao313/data/hexwatershed/NHDPLUS_H_0206_HU4/vector/hydrology/streamord6above.shp",
-        "sFilename_flowline_intersect": "flowline_intersect009.shp",
+        "sFilename_flowline_intersect": "flowline_intersect_009.shp",
         "sFilename_flowline_raw": "",
-        "sFilename_flowline_segment_index_before_intersect": "flowline_segment_index_before_intersect009.shp",
-        "sFilename_flowline_segment_order_before_intersect": "flowline_segment_order_before_intersect009.shp",
+        "sFilename_flowline_segment_index_before_intersect": "flowline_segment_index_before_intersect_009.shp",
+        "sFilename_flowline_segment_order_before_intersect": "flowline_segment_order_before_intersect_009.shp",
         "sFilename_flowline_topo": ""
     },
     {
@@ -163,10 +163,10 @@
         "lCellID_outlet": -1,
         "sFilename_dam": "",
         "sFilename_flowline_filter": "/qfs/people/liao313/data/hexwatershed/NHDPLUS_H_0207_HU4/vector/hydrology/streamord7above.shp",
-        "sFilename_flowline_intersect": "flowline_intersect010.shp",
+        "sFilename_flowline_intersect": "flowline_intersect_010.shp",
         "sFilename_flowline_raw": "",
-        "sFilename_flowline_segment_index_before_intersect": "flowline_segment_index_before_intersect010.shp",
-        "sFilename_flowline_segment_order_before_intersect": "flowline_segment_order_before_intersect010.shp",
+        "sFilename_flowline_segment_index_before_intersect": "flowline_segment_index_before_intersect_010.shp",
+        "sFilename_flowline_segment_order_before_intersect": "flowline_segment_order_before_intersect_010.shp",
         "sFilename_flowline_topo": ""
     },
     {
@@ -180,10 +180,10 @@
         "lCellID_outlet": -1,
         "sFilename_dam": "",
         "sFilename_flowline_filter": "/qfs/people/liao313/data/hexwatershed/NHDPLUS_H_0208_HU4/vector/hydrology/streamord7above.shp",
-        "sFilename_flowline_intersect": "flowline_intersect011.shp",
+        "sFilename_flowline_intersect": "flowline_intersect_011.shp",
         "sFilename_flowline_raw": "",
-        "sFilename_flowline_segment_index_before_intersect": "flowline_segment_index_before_intersect011.shp",
-        "sFilename_flowline_segment_order_before_intersect": "flowline_segment_order_before_intersect011.shp",
+        "sFilename_flowline_segment_index_before_intersect": "flowline_segment_index_before_intersect_011.shp",
+        "sFilename_flowline_segment_order_before_intersect": "flowline_segment_order_before_intersect_011.shp",
         "sFilename_flowline_topo": ""
     },
     {
@@ -197,10 +197,10 @@
         "lCellID_outlet": -1,
         "sFilename_dam": "",
         "sFilename_flowline_filter": "/qfs/people/liao313/data/hexwatershed/NHDPLUS_H_0208_HU4/vector/hydrology/streamord7above.shp",
-        "sFilename_flowline_intersect": "flowline_intersect012.shp",
+        "sFilename_flowline_intersect": "flowline_intersect_012.shp",
         "sFilename_flowline_raw": "",
-        "sFilename_flowline_segment_index_before_intersect": "flowline_segment_index_before_intersect012.shp",
-        "sFilename_flowline_segment_order_before_intersect": "flowline_segment_order_before_intersect012.shp",
+        "sFilename_flowline_segment_index_before_intersect": "flowline_segment_index_before_intersect_012.shp",
+        "sFilename_flowline_segment_order_before_intersect": "flowline_segment_order_before_intersect_012.shp",
         "sFilename_flowline_topo": ""
     },
     {
@@ -214,10 +214,10 @@
         "lCellID_outlet": -1,
         "sFilename_dam": "",
         "sFilename_flowline_filter": "/qfs/people/liao313/data/hexwatershed/NHDPLUS_H_0208_HU4/vector/hydrology/streamord7above.shp",
-        "sFilename_flowline_intersect": "flowline_intersect013.shp",
+        "sFilename_flowline_intersect": "flowline_intersect_013.shp",
         "sFilename_flowline_raw": "",
-        "sFilename_flowline_segment_index_before_intersect": "flowline_segment_index_before_intersect013.shp",
-        "sFilename_flowline_segment_order_before_intersect": "flowline_segment_order_before_intersect013.shp",
+        "sFilename_flowline_segment_index_before_intersect": "flowline_segment_index_before_intersect_013.shp",
+        "sFilename_flowline_segment_order_before_intersect": "flowline_segment_order_before_intersect_013.shp",
         "sFilename_flowline_topo": ""
     }
 ]

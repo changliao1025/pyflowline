@@ -2,7 +2,7 @@ import os, sys
 
 import numpy as np
 import osr
-from pyearth.gis.gdal.gdal_function import reproject_coordinates
+
 from pyearth.toolbox.reader.text_reader_string import text_reader_string
 from pyflowline.shared.vertex import pyvertex
 from pyearth.system.define_global_variables import *
@@ -122,7 +122,7 @@ def preprocess_flowline_op(oPyflowline_in):
                 pass
 
             
-            sFilename_out = 'flowline_before_intersect' + sBasin + '.shp'
+            sFilename_out = 'flowline_before_intersect_' + sBasin + '.shp'
             sFilename_out = os.path.join(sWorkspace_output, sFilename_out)
 
             iFlag_projected = 0
@@ -130,12 +130,12 @@ def preprocess_flowline_op(oPyflowline_in):
 
 
             aVertex = find_flowline_vertex(aFlowline_basin)
-            sFilename_out = 'flowline_vertex_without_confluence_before_intersect' + sBasin + '.shp'
+            sFilename_out = 'flowline_vertex_without_confluence_before_intersect_' + sBasin + '.shp'
             sFilename_out = os.path.join(sWorkspace_output, sFilename_out)
             export_vertex_to_shapefile(iFlag_projected, aVertex,pSpatialRef_gcs, sFilename_out)
 
             aFlowline_basin = split_flowline(aFlowline_basin, aVertex)
-            sFilename_out = 'flowline_split_by_point_before_intersect' + sBasin + '.shp'
+            sFilename_out = 'flowline_split_by_point_before_intersect_' + sBasin + '.shp'
             sFilename_out = os.path.join(sWorkspace_output, sFilename_out)
             export_flowline_to_shapefile(iFlag_projected, aFlowline_basin,pSpatialRef_gcs, sFilename_out)
 
@@ -166,18 +166,18 @@ def preprocess_flowline_op(oPyflowline_in):
             for i in range(3):
                 sStep = "{:02d}".format(i+1)
                 aFlowline_basin = remove_small_river(aFlowline_basin, dThreshold)
-                sFilename_out = 'flowline_large_'+ sStep +'_before_intersect' + sBasin + '.shp'
+                sFilename_out = 'flowline_large_'+ sStep +'_before_intersect_' + sBasin + '.shp'
                 sFilename_out =os.path.join(sWorkspace_output, sFilename_out)
                 export_flowline_to_shapefile(iFlag_projected, aFlowline_basin, pSpatialRef_gcs, sFilename_out)
 
 
                 aVertex, lIndex_outlet, aIndex_headwater,aIndex_middle, aIndex_confluence, aConnectivity = find_flowline_confluence(aFlowline_basin,  pVertex_outlet)
-                sFilename_out = 'flowline_vertex_with_confluence_'+ sStep +'_before_intersect' + sBasin + '.shp'
+                sFilename_out = 'flowline_vertex_with_confluence_'+ sStep +'_before_intersect_' + sBasin + '.shp'
                 sFilename_out = os.path.join(sWorkspace_output, sFilename_out)
                 export_vertex_to_shapefile(iFlag_projected, aVertex, pSpatialRef_gcs, sFilename_out, aAttribute_data=aConnectivity)
 
                 aFlowline_basin = merge_flowline( aFlowline_basin,aVertex, pVertex_outlet, aIndex_headwater,aIndex_middle, aIndex_confluence  )  
-                sFilename_out = 'flowline_merge_'+ sStep +'_before_intersect' + sBasin + '.shp'
+                sFilename_out = 'flowline_merge_'+ sStep +'_before_intersect_' + sBasin + '.shp'
                 sFilename_out = os.path.join(sWorkspace_output, sFilename_out)
                 export_flowline_to_shapefile(iFlag_projected, aFlowline_basin, pSpatialRef_gcs, sFilename_out)
 

@@ -51,10 +51,12 @@ def preprocess_flowline_op(oPyflowline_in):
 
     nOutlet = oPyflowline_in.nOutlet
     if iFlag_simplification == 1: 
-        sWorkspace_output = oPyflowline_in.sWorkspace_output
+        
         aFlowline = list()        
         for i in range(nOutlet):
             sBasin =  "{:03d}".format(i+1)
+            sWorkspace_output_basin = oPyflowline_in.sWorkspace_output + slash + sBasin
+            Path(sWorkspace_output_basin).mkdir(parents=True, exist_ok=True)
             #in this case, the sFilename_flowline_filter is a list of files            
             pBasin = oPyflowline_in.aBasin[i]
             iFlag_dam  = pBasin.iFlag_dam
@@ -115,7 +117,7 @@ def preprocess_flowline_op(oPyflowline_in):
                 #aThreshold = np.full(2, 300.0, dtype=float)
                 #aFlowline_basin = connect_disconnect_flowline(aFlowline_basin, aVertex, aThreshold)
                 #sFilename_out = 'flowline_connect.json'
-                #sFilename_out = os.path.join(sWorkspace_output, sFilename_out)    
+                #sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)    
                 #export_flowline_to_shapefile(iFlag_projected, aFlowline_basin,pSpatialRef_gcs, sFilename_out)
                 pass
             else:
@@ -123,7 +125,7 @@ def preprocess_flowline_op(oPyflowline_in):
 
             
             sFilename_out = 'flowline_before_intersect_' + sBasin + '.shp'
-            sFilename_out = os.path.join(sWorkspace_output, sFilename_out)
+            sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
 
             iFlag_projected = 0
             export_flowline_to_shapefile(iFlag_projected, aFlowline_basin, pSpatialRef_gcs, sFilename_out)
@@ -131,12 +133,12 @@ def preprocess_flowline_op(oPyflowline_in):
 
             aVertex = find_flowline_vertex(aFlowline_basin)
             sFilename_out = 'flowline_vertex_without_confluence_before_intersect_' + sBasin + '.shp'
-            sFilename_out = os.path.join(sWorkspace_output, sFilename_out)
+            sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
             export_vertex_to_shapefile(iFlag_projected, aVertex,pSpatialRef_gcs, sFilename_out)
 
             aFlowline_basin = split_flowline(aFlowline_basin, aVertex)
             sFilename_out = 'flowline_split_by_point_before_intersect_' + sBasin + '.shp'
-            sFilename_out = os.path.join(sWorkspace_output, sFilename_out)
+            sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
             export_flowline_to_shapefile(iFlag_projected, aFlowline_basin,pSpatialRef_gcs, sFilename_out)
 
             #ues location to find outlet
@@ -151,14 +153,14 @@ def preprocess_flowline_op(oPyflowline_in):
             pVertex_outlet = aFlowline_basin[0].pVertex_end
 
             sFilename_out = 'flowline_direction_before_intersect' + sBasin + '.shp'
-            sFilename_out = os.path.join(sWorkspace_output, sFilename_out)
+            sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
             export_flowline_to_shapefile(iFlag_projected, aFlowline_basin, pSpatialRef_gcs, sFilename_out)
 
             #step 4: remove loops
 
             aFlowline_basin = remove_flowline_loop(aFlowline_basin)    
             sFilename_out = 'flowline_loop_before_intersect' + sBasin + '.shp'
-            sFilename_out = os.path.join(sWorkspace_output, sFilename_out)
+            sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
             export_flowline_to_shapefile(iFlag_projected, aFlowline_basin,pSpatialRef_gcs, sFilename_out)
 
             #using loop to remove small river, here we use 5 steps
@@ -167,18 +169,18 @@ def preprocess_flowline_op(oPyflowline_in):
                 sStep = "{:02d}".format(i+1)
                 aFlowline_basin = remove_small_river(aFlowline_basin, dThreshold)
                 sFilename_out = 'flowline_large_'+ sStep +'_before_intersect_' + sBasin + '.shp'
-                sFilename_out =os.path.join(sWorkspace_output, sFilename_out)
+                sFilename_out =os.path.join(sWorkspace_output_basin, sFilename_out)
                 export_flowline_to_shapefile(iFlag_projected, aFlowline_basin, pSpatialRef_gcs, sFilename_out)
 
 
                 aVertex, lIndex_outlet, aIndex_headwater,aIndex_middle, aIndex_confluence, aConnectivity = find_flowline_confluence(aFlowline_basin,  pVertex_outlet)
                 sFilename_out = 'flowline_vertex_with_confluence_'+ sStep +'_before_intersect_' + sBasin + '.shp'
-                sFilename_out = os.path.join(sWorkspace_output, sFilename_out)
+                sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
                 export_vertex_to_shapefile(iFlag_projected, aVertex, pSpatialRef_gcs, sFilename_out, aAttribute_data=aConnectivity)
 
                 aFlowline_basin = merge_flowline( aFlowline_basin,aVertex, pVertex_outlet, aIndex_headwater,aIndex_middle, aIndex_confluence  )  
                 sFilename_out = 'flowline_merge_'+ sStep +'_before_intersect_' + sBasin + '.shp'
-                sFilename_out = os.path.join(sWorkspace_output, sFilename_out)
+                sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
                 export_flowline_to_shapefile(iFlag_projected, aFlowline_basin, pSpatialRef_gcs, sFilename_out)
 
                 if len(aFlowline_basin) ==1:
@@ -188,7 +190,7 @@ def preprocess_flowline_op(oPyflowline_in):
             #build segment index
             aFlowline_basin, aStream_segment = define_stream_segment_index(aFlowline_basin)
             sFilename_out = pBasin.sFilename_flowline_segment_index_before_intersect
-            sFilename_out = os.path.join(sWorkspace_output, sFilename_out)
+            sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
             export_flowline_to_shapefile(iFlag_projected, \
                 aFlowline_basin, pSpatialRef_gcs, sFilename_out, \
                 aAttribute_data=[aStream_segment], aAttribute_field=['iseg'], aAttribute_dtype=['int'])
@@ -196,7 +198,7 @@ def preprocess_flowline_op(oPyflowline_in):
             #build stream order 
             aFlowline_basin, aStream_order = define_stream_order(aFlowline_basin)
             sFilename_out = pBasin.sFilename_flowline_segment_order_before_intersect
-            sFilename_out = os.path.join(sWorkspace_output, sFilename_out)
+            sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
             export_flowline_to_shapefile(iFlag_projected, \
                 aFlowline_basin, pSpatialRef_gcs, sFilename_out, \
                 aAttribute_data=[aStream_segment, aStream_order], aAttribute_field=['iseg','iord'], aAttribute_dtype=['int','int'])

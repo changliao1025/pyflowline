@@ -28,7 +28,7 @@ def correct_flowline_direction(aFlowline_in, pVertex_outlet):
         iStream_order = pFlowline.iStream_order
         pVertex_start = pFlowline.pVertex_start
         pVertex_end = pFlowline.pVertex_end
-        dDiatance = pVertex_end.calculate_distance( pVertex_outlet)             
+        dDiatance = pVertex_end.calculate_distance( pVertex_outlet )             
 
         if iFlag_first ==1:
             dDiatance_min = dDiatance                

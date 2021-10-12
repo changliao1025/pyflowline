@@ -49,14 +49,14 @@ def merge_flowline(aFlowline_in, aVertex, \
                     pass
 
         #save 
-        print(dummy)
+        #print(dummy)
         pFlowline.lIndex = lID
         aFlowline_out.append(pFlowline)
         
         lID = lID + 1        
         #go to next 
         if find_vertex_in_list(aVertex_headwater, pVertex_current)[0] ==1: 
-            print('headwater: ' , lID)
+            #print('headwater: ' , lID)
             return
         else:
             #it must be confluence

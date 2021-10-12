@@ -41,12 +41,12 @@ def pyflowline_read_model_configuration_file(sFilename_configuration_in,\
     if iFlag_standalone_in is not None:        
         iFlag_standalone = iFlag_standalone_in
     else:       
-        iFlag_standalone = 0
+        iFlag_standalone = int( data['iFlag_standalone'])
 
     if iFlag_use_mesh_dem_in is not None:        
         iFlag_use_mesh_dem = iFlag_use_mesh_dem_in
     else:       
-        iFlag_use_mesh_dem = 0
+        iFlag_use_mesh_dem = int(data['iFlag_use_mesh_dem'])
 
 
     if sDate_in is not None:

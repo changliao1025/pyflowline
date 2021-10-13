@@ -20,7 +20,7 @@ from pyearth.gis.gdal.gdal_function import reproject_coordinates
 
 
 
-def convert_gcs_coordinates_to_cell(iMesh_type, aCoordinates_gcs):
+def convert_gcs_coordinates_to_cell(iMesh_type, aCoordinates_gcs, dLon, dLat):
     npoint = len(aCoordinates_gcs)    
     aVertex=list()              
     aEdge=list()    
@@ -57,7 +57,7 @@ def convert_gcs_coordinates_to_cell(iMesh_type, aCoordinates_gcs):
                 return pLatlon
             else:
                 if iMesh_type ==4: #mpas       
-                    pMpas = pympas( aEdge, aVertex)
+                    pMpas = pympas( aEdge, aVertex, dLon, dLat)
                     return pMpas
                 else:
                     if iMesh_type ==5: #tin

@@ -21,7 +21,7 @@ class pytin(pycell):
     aNeighbor=None #the global ID of all neighbors
     nNeighbor=-1
 
-    def __init__(self, aEdge,aVertex):    
+    def __init__(self, aEdge,aVertex, dLon, dLat):       
         nEdge = len(aEdge)
         if nEdge !=3:
             pass
@@ -33,15 +33,12 @@ class pytin(pycell):
             self.nEdge = len(aEdge)
             self.nVertex = len(aVertex) - 1
 
-            dx=0.0
-            dy=0.0
-            for i in range(self.nVertex):
-                dx = dx + aVertex[i].dx
-                dy = dy + aVertex[i].dy
-                pass
-
-            self.dx_center = dx/self.nVertex
-            self.dy_center = dy/self.nVertex
+            self.dLon_center = dLon
+            self.dLat_center = dLat
+            pVertex = dict()        
+            pVertex['lon'] =self.dLon_center
+            pVertex['lat'] =self.dLat_center           
+            self.pVertex_center = pyvertex(pVertex)
 
             pass
         pass

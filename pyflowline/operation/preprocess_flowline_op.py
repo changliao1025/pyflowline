@@ -54,7 +54,7 @@ def preprocess_flowline_op(oPyflowline_in):
         
         aFlowline = list()        #store all the flowline
         #for i in range(0,nOutlet,1):
-        for i in range(10,11,1):
+        for i in range(0,nOutlet,1):
             sBasin =  "{:03d}".format(i+1)
             sWorkspace_output_basin = oPyflowline_in.sWorkspace_output + slash + sBasin
             Path(sWorkspace_output_basin).mkdir(parents=True, exist_ok=True)

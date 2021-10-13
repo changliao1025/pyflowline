@@ -25,7 +25,7 @@ class pylatlon(pycell):
     aNeighbor=None #the global ID of all neighbors
     nNeighbor=-1
 
-    def __init__(self, aEdge, aVertex):    
+    def __init__(self, aEdge, aVertex, dLon, dLat):    
         nEdge = len(aEdge)
         if nEdge != 4:
             pass
@@ -44,15 +44,10 @@ class pylatlon(pycell):
             #    dy = dy + aVertex[i].dy
             #    pass
 
-            dLon=0.0
-            dLat=0.0
-            for i in range(self.nVertex):
-                dLon = dLon + aVertex[i].dLongitude
-                dLat = dLat + aVertex[i].dLatitude
-                pass
+            
 
-            self.dLon_center = dLon/self.nVertex
-            self.dLat_center = dLat/self.nVertex
+            self.dLon_center = dLon
+            self.dLat_center = dLat
 
             pVertex = dict()        
             pVertex['lon'] =self.dLon_center

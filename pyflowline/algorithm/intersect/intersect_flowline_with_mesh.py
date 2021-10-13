@@ -81,6 +81,8 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh, sFilename_flowli
         #    pass
 
         lCellID = pFeature_mesh.GetField("id")
+        dLon = pFeature_mesh.GetField("lon")
+        dLat = pFeature_mesh.GetField("lat")
         if (iFlag_transform ==1): #projections are different
             pGeometry_mesh.Transform(transform)
 
@@ -98,7 +100,7 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh, sFilename_flowli
             #aCoords_gcs= np.array(aCoords_gcs)
             #convert lat/lon to projection because of intersect function
             #if iMesh_type_in ==4 or iMesh_type_in ==3: 
-            pCell = convert_gcs_coordinates_to_cell(iMesh_type_in, aCoords_gcs)
+            pCell = convert_gcs_coordinates_to_cell(iMesh_type_in, aCoords_gcs, dLon, dLat)
             #else:
             #    pCell = convert_pcs_coordinates_to_cell(iMesh_type_in, aCoords_pcs,)
 

@@ -23,7 +23,7 @@ class pysquare(pycell):
     nNeighbor=-1
     pVertex_center = None
 
-    def __init__(self, aEdge, aVertex):    
+    def __init__(self, aEdge, aVertex, dLon, dLat):    
         nEdge = len(aEdge)
         if nEdge != 4:
             pass
@@ -34,16 +34,10 @@ class pysquare(pycell):
             self.aVertex = aVertex #the first one and last one are the same
             self.nEdge = 4
             self.nVertex = 4
+        
 
-            dLon=0.0
-            dLat=0.0
-            for i in range(self.nVertex):
-                dLon = dLon + aVertex[i].dLongitude
-                dLat = dLat + aVertex[i].dLatitude
-                pass
-
-            self.dLon_center = dLon/self.nVertex
-            self.dLat_center = dLat/self.nVertex
+            self.dLon_center = dLon
+            self.dLat_center = dLat
             pVertex = dict()        
             pVertex['lon'] =self.dLon_center
             pVertex['lat'] =self.dLat_center           

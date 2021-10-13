@@ -40,6 +40,8 @@ def create_mpas_mesh(iFlag_use_mesh_dem, sFilename_mesh_netcdf, dLatitude_top, d
     pLayer = pDataset.CreateLayer('cell', pSpatialRef_gcs, ogr.wkbPolygon)
     # Add one attribute
     pLayer.CreateField(ogr.FieldDefn('id', ogr.OFTInteger64)) #long type for high resolution
+    pLayer.CreateField(ogr.FieldDefn('lon', ogr.OFTReal)) #long type for high resolution
+    pLayer.CreateField(ogr.FieldDefn('lat', ogr.OFTReal)) #long type for high resolution
     if iFlag_use_mesh_dem == 1:
         pLayer.CreateField(ogr.FieldDefn('elev', ogr.OFTReal)) #float type for high resolution
     else:
@@ -188,12 +190,14 @@ def create_mpas_mesh(iFlag_use_mesh_dem, sFilename_mesh_netcdf, dLatitude_top, d
 
             pFeature.SetGeometry(pPolygon)
             pFeature.SetField("id", int(lCellID) )
+            pFeature.SetField("lon", dLon )
+            pFeature.SetField("lat", dLat )
             if iFlag_use_mesh_dem == 1:
                 pFeature.SetField("elev", dElevation )
                 
             pLayer.CreateFeature(pFeature)
             
-            pmpas = convert_gcs_attribute_to_cell(4, aVertexIndex, aEdgeIndex, aVertexIndexOnEdge ,aCoords)
+            pmpas = convert_gcs_attribute_to_cell(4, aVertexIndex, aEdgeIndex, aVertexIndexOnEdge, aCoords, dLon, dLat)
            
             pmpas.lCellID = lCellID
 

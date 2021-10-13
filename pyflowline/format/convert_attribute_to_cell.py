@@ -16,21 +16,21 @@ from pyflowline.shared.latlon import pylatlon
 from pyflowline.shared.mpas import pympas
 from pyflowline.shared.tin import pytin
     
-def convert_gcs_attribute_to_cell(iMesh_type, aVertexID, aEdgeID,aVertexIndexOnEdge, aCoordinates_gcs):  
+def convert_gcs_attribute_to_cell(iMesh_type, aVertexID, aEdgeID, aVertexIndexOnEdge, aCoordinates_gcs, dLon, dLat):  
     npoint = len(aVertexID)     
     aVertex=list()        
     aEdge=list()
     
     if iMesh_type ==1: #hexagon
-        pHexagon = pyhexagon( aEdge, aVertex)
+        pHexagon = pyhexagon( aEdge, aVertex, dLon, dLat)
         return pHexagon
     else:
         if iMesh_type ==2: #sqaure
-            pSquare = pysquare( aEdge, aVertex)
+            pSquare = pysquare( aEdge, aVertex, dLon, dLat)
             return pSquare
         else:
             if iMesh_type ==3: #latlon
-                pLatlon = pylatlon( aEdge, aVertex)
+                pLatlon = pylatlon( aEdge, aVertex, dLon, dLat)
                 return pLatlon
             else:
                 if iMesh_type ==4: #mpas
@@ -61,7 +61,7 @@ def convert_gcs_attribute_to_cell(iMesh_type, aVertexID, aEdgeID,aVertexIndexOnE
                         pEdge.lEdgeID = int(aEdgeID[j])
                         aEdge.append(pEdge)
 
-                    pMpas = pympas( aEdge, aVertex)
+                    pMpas = pympas( aEdge, aVertex, dLon, dLat)
                     return pMpas
                 else:
                     if iMesh_type ==5: #tin

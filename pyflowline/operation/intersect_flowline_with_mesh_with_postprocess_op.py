@@ -39,7 +39,7 @@ def intersect_flowline_with_mesh_with_postprocess_op(oPyflowline_in):
     aMesh, pSpatialRef_mesh = read_mesh_shapefile(sFilename_mesh)
     for i in range(0, nOutlet, 1):
         sBasin =  "{:03d}".format(i+1)    
-        print(sBasin)         
+        print('Flowline interset with post',sBasin)         
         sWorkspace_output_basin = oPyflowline_in.sWorkspace_output + slash + sBasin 
         pBasin = oPyflowline_in.aBasin[i]
         sFilename_flowline = pBasin.sFilename_flowline_segment_order_before_intersect

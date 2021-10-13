@@ -13,7 +13,7 @@
     "iFlag_create_mesh":1,    
     "iFlag_intersect":1,        
     "iFlag_rotation": 0, 
-    "iCase_index": 3,
+    "iCase_index": 4,
     "iMesh_type": 4,    
     "nOutlet": 13,
     "dLongitude_left": -80.629,

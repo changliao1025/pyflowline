@@ -19,6 +19,7 @@ def intersect_flowline_with_mesh_op(oPyflowline_in):
 
     for i in range(nOutlet):
         sBasin =  "{:03d}".format(i+1)    
+        print(sBasin)
         sWorkspace_output_basin = oPyflowline_in.sWorkspace_output + slash + sBasin
         Path(sWorkspace_output_basin).mkdir(parents=True, exist_ok=True)          
         pBasin = oPyflowline_in.aBasin[i]

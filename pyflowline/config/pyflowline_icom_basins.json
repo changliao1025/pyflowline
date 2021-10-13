@@ -188,8 +188,8 @@
     },
     {
         "dAccumulation_threshold": 100000.0,
-        "dLat_outlet": 37.26394,
-        "dLon_outlet": -76.34324,
+        "dLat_outlet": 37.98,
+        "dLon_outlet": -76.89,
         "dThreshold_small_river": 10000.0,
         "iFlag_dam": 0,
         "iFlag_disconnected": 0,

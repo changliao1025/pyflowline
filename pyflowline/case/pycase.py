@@ -185,7 +185,7 @@ class flowlinecase(object):
 
                 for i in range(self.nOutlet):
                     dummy_basin = dummy_data[i]
-                    print(dummy_basin)
+                    #print(dummy_basin)
                     pBasin = pybasin(dummy_basin)
 
                     self.aBasin.append(pBasin)

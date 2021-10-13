@@ -89,7 +89,7 @@ class pybasin(object):
         if 'sFilename_dam' in aParameter:
             self.sFilename_dam = aParameter['sFilename_dam']
         else:
-            self.sFilename_dam   =''
+            self.sFilename_dam   = ''
 
         if 'sFilename_flowline_topo' in aParameter:
             self.sFilename_flowline_topo = aParameter['sFilename_flowline_topo']

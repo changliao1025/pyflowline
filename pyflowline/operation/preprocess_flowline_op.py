@@ -56,6 +56,7 @@ def preprocess_flowline_op(oPyflowline_in):
         #for i in range(0,nOutlet,1):
         for i in range(0,nOutlet,1):
             sBasin =  "{:03d}".format(i+1)
+            print('Flowline simplification',sBasin)
             sWorkspace_output_basin = oPyflowline_in.sWorkspace_output + slash + sBasin
             Path(sWorkspace_output_basin).mkdir(parents=True, exist_ok=True)
             #in this case, the sFilename_flowline_filter is a list of files            

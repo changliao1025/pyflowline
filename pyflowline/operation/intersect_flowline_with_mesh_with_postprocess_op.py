@@ -1,4 +1,5 @@
 import os
+import json
 from pyearth.system.define_global_variables import *
 from pyflowline.shared.vertex import pyvertex
 from pyearth.gis.gdal.gdal_function import reproject_coordinates
@@ -44,6 +45,7 @@ def intersect_flowline_with_mesh_with_postprocess_op(oPyflowline_in):
     aCell_intersect = list()
     aFlowline = list()   #store all the flowline
     aOutletID = list()
+    aBasin = list()
     if iFlag_intersect == 1:
         for i in range(0, nOutlet, 1):
             sBasin =  "{:03d}".format(i+1)    
@@ -68,9 +70,10 @@ def intersect_flowline_with_mesh_with_postprocess_op(oPyflowline_in):
 
             point['lon'] = pBasin.dLon_outlet
             point['lat'] = pBasin.dLat_outlet
-            pVertex_outlet=pyvertex(point)
+            pVertex_outlet_initial=pyvertex(point)
 
-            aFlowline_basin, aFlowline_no_parallel, lCellID_outlet = remove_returning_flowline(iMesh_type, aCell_intersect_basin, pVertex_outlet)
+            aFlowline_basin, aFlowline_no_parallel, lCellID_outlet, pVertex_outlet \
+                = remove_returning_flowline(iMesh_type, aCell_intersect_basin, pVertex_outlet_initial)
             sFilename_out = 'flowline_simplified_after_intersect_' + sBasin + '.shp'
             sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)  
 
@@ -118,11 +121,28 @@ def intersect_flowline_with_mesh_with_postprocess_op(oPyflowline_in):
             aCell_intersect = aCell_intersect + aCell_intersect_basin
             aOutletID.append(lCellID_outlet)
 
+            pBasin.lCellID_outlet = lCellID_outlet
+            pBasin.dLon_outlet = pVertex_outlet.dLongitude
+            pBasin.dLat_outlet = pVertex_outlet.dLatitude
+
+            aBasin.append(pBasin)
+
         print('Finished flowline intersect')
     else:
         print('Flowline intersect was skiped')
     
-    
+    #save basin info
+    sPath = os.path.dirname(oPyflowline_in.sFilename_basins)
+    sName = Path(oPyflowline_in.sFilename_basins).stem + '_new.json'
+    sFilename_configuration  =  sPath + slash + sName
+    with open(sFilename_configuration, 'w', encoding='utf-8') as f:
+        sJson = json.dumps([json.loads(ob.tojson()) for ob in aBasin],\
+            sort_keys=True, \
+            indent = 4)        
+        f.write(sJson)    
+        f.close()
+
+
     return aCell, aCell_intersect, aFlowline, aOutletID
 
 

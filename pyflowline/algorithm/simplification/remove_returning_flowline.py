@@ -285,4 +285,4 @@ def remove_returning_flowline(iMesh_type, aCell_intersect_in, pVertex_outlet_in)
 
 
 
-    return aFlowline_out, aFlowline_out_no_parallel, lCellID_outlet
+    return aFlowline_out, aFlowline_out_no_parallel, lCellID_outlet, pVertex_outlet

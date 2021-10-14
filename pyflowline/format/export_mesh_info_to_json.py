@@ -1,7 +1,7 @@
 import numpy as np
 import json
 
-def export_mesh_info_to_json(aCell_in,aFlowline_in ,sFilename_json_out):
+def export_mesh_info_to_json(aCell_in, aFlowline_in, sFilename_json_out):
     ncell=len(aCell_in)
 
     nFlowline = len(aFlowline_in)

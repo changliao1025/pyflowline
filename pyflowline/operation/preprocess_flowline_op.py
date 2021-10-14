@@ -50,9 +50,10 @@ def preprocess_flowline_op(oPyflowline_in):
     pSpatialRef_gcs.SetAxisMappingStrategy(osr.OAMS_TRADITIONAL_GIS_ORDER)
 
     nOutlet = oPyflowline_in.nOutlet
+    aFlowline = list()   #store all the flowline
     if iFlag_simplification == 1: 
         
-        aFlowline = list()        #store all the flowline
+             
         #for i in range(0,nOutlet,1):
         for i in range(0,nOutlet,1):
             sBasin =  "{:03d}".format(i+1)
@@ -209,7 +210,11 @@ def preprocess_flowline_op(oPyflowline_in):
             #add this basin into all flowline
 
             aFlowline = aFlowline + aFlowline_basin
+            
+        
+        print('Finished flowline simplification')
     else:
-        return
+        print('Flowline simplification was skiped')
 
-    print('Finished')
+    
+    return aFlowline

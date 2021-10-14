@@ -57,7 +57,11 @@ class pympas(pycell):
     aFlowline=None
     lCellID  = -1
     nNeighbor=-1
+    nNeighbor_land=-1
+    nNeighbor_ocean=-1
     aNeighbor=None #the global ID of all neighbors
+    aNeighbor_land=None #the global ID of all neighbors
+    aNeighbor_ocean=None #the global ID of all neighbors
 
     def __init__(self, aEdge, aVertex, dLon, dLat):    
         nEdge = len(aEdge)
@@ -69,6 +73,8 @@ class pympas(pycell):
             self.nEdge = len(aEdge)
             self.nVertex = len(aVertex) 
             self.nNeighbor = -1
+            self.nNeighbor_land = -1
+            self.nNeighbor_ocean = -1
 
             
 

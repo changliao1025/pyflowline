@@ -234,8 +234,8 @@ def create_mpas_mesh(iFlag_use_mesh_dem, sFilename_mesh_netcdf, dLatitude_top, d
                 nNeighbor_new = nNeighbor_new +1 
                 aNeighbor_new.append(lNeighbor)
                 
-        pCell.nNeighbor= len(aNeighbor_new)
-        pCell.aNeighbor = aNeighbor_new
+        pCell.nNeighbor_land= len(aNeighbor_new)
+        pCell.aNeighbor_land = aNeighbor_new
         aMpas_out.append(pCell)
 
 

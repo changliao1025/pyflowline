@@ -43,6 +43,7 @@ class pympas(pycell):
     dElevation=0.0
 
     iFlag_intersected=-1
+    iFlag_coast = 0
 
     lCellID_downstream_burned=-1
     iStream_order_burned=-1
@@ -75,8 +76,7 @@ class pympas(pycell):
             self.nNeighbor = -1
             self.nNeighbor_land = -1
             self.nNeighbor_ocean = -1
-
-            
+            self.iFlag_coast = 0            
 
             self.dLon_center = dLon
             self.dLat_center = dLat

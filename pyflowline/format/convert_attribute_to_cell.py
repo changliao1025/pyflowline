@@ -16,7 +16,7 @@ from pyflowline.shared.latlon import pylatlon
 from pyflowline.shared.mpas import pympas
 from pyflowline.shared.tin import pytin
     
-def convert_gcs_attribute_to_cell(iMesh_type, aVertexID, aEdgeID, aVertexIndexOnEdge, aCoordinates_gcs, dLon, dLat):  
+def convert_gcs_attribute_to_cell(iMesh_type, dLon, dLat, aCoordinates_gcs, aVertexID, aEdgeID, aVertexIndexOnEdge):  
     npoint = len(aVertexID)     
     aVertex=list()        
     aEdge=list()

@@ -197,7 +197,7 @@ def create_mpas_mesh(iFlag_use_mesh_dem, sFilename_mesh_netcdf, dLatitude_top, d
                 
             pLayer.CreateFeature(pFeature)
             
-            pmpas = convert_gcs_attribute_to_cell(4, aVertexIndex, aEdgeIndex, aVertexIndexOnEdge, aCoords, dLon, dLat)
+            pmpas = convert_gcs_attribute_to_cell(4, dLon, dLat, aCoords, aVertexIndex, aEdgeIndex, aVertexIndexOnEdge)
            
             pmpas.lCellID = lCellID
 
@@ -231,11 +231,12 @@ def create_mpas_mesh(iFlag_use_mesh_dem, sFilename_mesh_netcdf, dLatitude_top, d
         for j in range(nNeighbor):
             lNeighbor = int(aNeighbor[j])
             if lNeighbor in aCellID:
-                nNeighbor_new = nNeighbor_new +1 
+                nNeighbor_new = nNeighbor_new + 1 
                 aNeighbor_new.append(lNeighbor)
                 
         pCell.nNeighbor_land= len(aNeighbor_new)
         pCell.aNeighbor_land = aNeighbor_new
+        pCell.nNeighbor_ocean = pCell.nVertex - pCell.nNeighbor_land
         aMpas_out.append(pCell)
 
 

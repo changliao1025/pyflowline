@@ -1,7 +1,8 @@
+from typing import NoReturn
 import numpy as np
 import json
 
-def export_mesh_info_to_json(aCell_in, aFlowline_in, sFilename_json_out):
+def export_mesh_info_to_json(aCell_in, aFlowline_in, aCellID_outlet, sFilename_json_out):
     ncell=len(aCell_in)
 
     nFlowline = len(aFlowline_in)
@@ -29,13 +30,20 @@ def export_mesh_info_to_json(aCell_in, aFlowline_in, sFilename_json_out):
 
                     for l in range(ncell):
                         pVertex_center2 = aCell_in[l].pVertex_center
+                        lCellID = aCell_in[l].lCellID
                         if pVertex_center2 == pVertex_end:
-                            aCell_in[k].lCellID_downstream_burned = aCell_in[l].lCellID
+                            aCell_in[k].lCellID_downstream_burned = lCellID
+                            if lCellID in aCellID_outlet:
+                                aCell_in[l].iStream_segment_burned = iStream_segment
+                                aCell_in[l].iStream_order_burned = iStream_order
+
                             break
                     
                     
 
         pass
+
+
 
     with open(sFilename_json_out, 'w', encoding='utf-8') as f:
         sJson = json.dumps([json.loads(ob.tojson()) for ob in aCell_in], indent = 4)        

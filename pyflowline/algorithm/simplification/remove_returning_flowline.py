@@ -175,10 +175,6 @@ def remove_returning_flowline(iMesh_type, aCell_intersect_in, pVertex_outlet_in)
                 pFlowline.iStream_order=iStream_order_in
                 aFlowline_out.append(pFlowline)
             
-
-             
-            
-
             #print(iSegment_in, ': ',aCell_simple)
 
             sort_index = np.argsort(aStream_order)

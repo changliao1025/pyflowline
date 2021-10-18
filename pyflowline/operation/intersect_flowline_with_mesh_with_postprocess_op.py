@@ -72,6 +72,7 @@ def intersect_flowline_with_mesh_with_postprocess_op(oPyflowline_in):
             point['lat'] = pBasin.dLat_outlet
             pVertex_outlet_initial=pyvertex(point)
 
+            #from this point, aFlowline_basin is conceptual
             aFlowline_basin, aFlowline_no_parallel, lCellID_outlet, pVertex_outlet \
                 = remove_returning_flowline(iMesh_type, aCell_intersect_basin, pVertex_outlet_initial)
             sFilename_out = 'flowline_simplified_after_intersect_' + sBasin + '.shp'
@@ -117,7 +118,7 @@ def intersect_flowline_with_mesh_with_postprocess_op(oPyflowline_in):
             export_flowline_to_shapefile(iFlag_projected, aFlowline_basin, pSpatialRef, sFilename_out)
 
             aFlowline = aFlowline + aFlowline_basin
-            #aCell = aCell + aCell_basin
+            
             aCell_intersect = aCell_intersect + aCell_intersect_basin
             aOutletID.append(lCellID_outlet)
 
@@ -139,16 +140,9 @@ def intersect_flowline_with_mesh_with_postprocess_op(oPyflowline_in):
         sJson = json.dumps([json.loads(ob.tojson()) for ob in aBasin],\
             sort_keys=True, \
             indent = 4)        
+            
         f.write(sJson)    
         f.close()
 
-
     return aCell, aCell_intersect, aFlowline, aOutletID
-
-
-
-
-
-
-
 

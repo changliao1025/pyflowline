@@ -61,7 +61,7 @@ def convert_gcs_attribute_to_cell(iMesh_type, dLon, dLat, aCoordinates_gcs, aVer
                         pEdge.lEdgeID = int(aEdgeID[j])
                         aEdge.append(pEdge)
 
-                    pMpas = pympas( aEdge, aVertex, dLon, dLat)
+                    pMpas = pympas(dLon, dLat, aEdge, aVertex)
                     return pMpas
                 else:
                     if iMesh_type ==5: #tin

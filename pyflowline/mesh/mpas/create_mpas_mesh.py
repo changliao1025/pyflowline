@@ -12,7 +12,9 @@ from pyearth.gis.location.convert_lat_lon_range import convert_180_to_360,conver
 from pyflowline.format.convert_coordinates_to_cell import convert_pcs_coordinates_to_cell
 from pyflowline.format.convert_attribute_to_cell import convert_gcs_attribute_to_cell
 
-def create_mpas_mesh(iFlag_use_mesh_dem, sFilename_mesh_netcdf, dLatitude_top, dLatitude_bot, dLongitude_left, dLongitude_right,sFilename_mesh):
+def create_mpas_mesh(iFlag_use_mesh_dem, iFlag_save_mesh, \
+    dLatitude_top, dLatitude_bot, dLongitude_left, dLongitude_right,\
+     sFilename_mesh_netcdf, sFilename_mesh):
     
     if (os.path.exists(sFilename_mesh_netcdf)):
         pass
@@ -35,21 +37,23 @@ def create_mpas_mesh(iFlag_use_mesh_dem, sFilename_mesh_netcdf, dLatitude_top, d
 
     
     #geojson
-    pDataset = pDriver_shapefile.CreateDataSource(sFilename_mesh)
+    if iFlag_save_mesh ==1:
+        pDataset = pDriver_shapefile.CreateDataSource(sFilename_mesh)
 
-    pLayer = pDataset.CreateLayer('cell', pSpatialRef_gcs, ogr.wkbPolygon)
-    # Add one attribute
-    pLayer.CreateField(ogr.FieldDefn('id', ogr.OFTInteger64)) #long type for high resolution
-    pLayer.CreateField(ogr.FieldDefn('lon', ogr.OFTReal)) #long type for high resolution
-    pLayer.CreateField(ogr.FieldDefn('lat', ogr.OFTReal)) #long type for high resolution
-    if iFlag_use_mesh_dem == 1:
-        pLayer.CreateField(ogr.FieldDefn('elev', ogr.OFTReal)) #float type for high resolution
-    else:
+        pLayer = pDataset.CreateLayer('cell', pSpatialRef_gcs, ogr.wkbPolygon)
+        # Add one attribute
+        pLayer.CreateField(ogr.FieldDefn('id', ogr.OFTInteger64)) #long type for high resolution
+        pLayer.CreateField(ogr.FieldDefn('lon', ogr.OFTReal)) #long type for high resolution
+        pLayer.CreateField(ogr.FieldDefn('lat', ogr.OFTReal)) #long type for high resolution
 
-        pass
+        if iFlag_use_mesh_dem == 1:
+            pLayer.CreateField(ogr.FieldDefn('elev', ogr.OFTReal)) #float type for high resolution
+        else:
+
+            pass
     
-    pLayerDefn = pLayer.GetLayerDefn()
-    pFeature = ogr.Feature(pLayerDefn)
+        pLayerDefn = pLayer.GetLayerDefn()
+        pFeature = ogr.Feature(pLayerDefn)
         
 
     #write new netcdf
@@ -151,7 +155,6 @@ def create_mpas_mesh(iFlag_use_mesh_dem, sFilename_mesh_netcdf, dLatitude_top, d
 
             #get cell edge
             lCellID = int(aIndexToCellID[i])
-
             dElevation = float(aBed_elevation[i])
             aCellOnCellIndex = np.array(aCellsOnCell[i,:])
             aEdgesOnCellIndex = np.array(aEdgesOnCell[i,:])
@@ -181,21 +184,23 @@ def create_mpas_mesh(iFlag_use_mesh_dem, sFilename_mesh_netcdf, dLatitude_top, d
                 aCoords[j,0] = x1
                 aCoords[j,1] = y1
                 pass
-            x1 = convert_360_to_180(aLonVertex[0])
-            y1 = aLatVertex[0]
-            ring.AddPoint(x1, y1) #double check            
 
-            pPolygon = ogr.Geometry(ogr.wkbPolygon)
-            pPolygon.AddGeometry(ring)
+            if iFlag_save_mesh ==1:
+                x1 = convert_360_to_180(aLonVertex[0])
+                y1 = aLatVertex[0]
+                ring.AddPoint(x1, y1) #double check            
 
-            pFeature.SetGeometry(pPolygon)
-            pFeature.SetField("id", int(lCellID) )
-            pFeature.SetField("lon", dLon )
-            pFeature.SetField("lat", dLat )
-            if iFlag_use_mesh_dem == 1:
-                pFeature.SetField("elev", dElevation )
+                pPolygon = ogr.Geometry(ogr.wkbPolygon)
+                pPolygon.AddGeometry(ring)
+
+                pFeature.SetGeometry(pPolygon)
+                pFeature.SetField("id", int(lCellID) )
+                pFeature.SetField("lon", dLon )
+                pFeature.SetField("lat", dLat )
+                if iFlag_use_mesh_dem == 1:
+                    pFeature.SetField("elev", dElevation )
                 
-            pLayer.CreateFeature(pFeature)
+                pLayer.CreateFeature(pFeature)
             
             pmpas = convert_gcs_attribute_to_cell(4, dLon, dLat, aCoords, aVertexIndex, aEdgeIndex, aVertexIndexOnEdge)
            
@@ -205,6 +210,9 @@ def create_mpas_mesh(iFlag_use_mesh_dem, sFilename_mesh_netcdf, dLatitude_top, d
             
             pmpas.aNeighbor=aNeighborIndex
             pmpas.nNeighbor=len(aNeighborIndex)
+
+            pmpas.aNeighbor_land=aNeighborIndex
+            pmpas.nNeighbor_land=len(aNeighborIndex)
             
 
             aMpas.append(pmpas)

@@ -13,6 +13,7 @@ class flowlinecase(object):
     iFlag_standalone=1
     iFlag_multiple = 0
     iFlag_use_mesh_dem=0
+    iFlag_save_mesh = 0
     iFlag_simplification = 1 #user can turn on/off
     iFlag_create_mesh=1
     iFlag_intersect = 1
@@ -89,8 +90,8 @@ class flowlinecase(object):
         if 'iFlag_standalone' in aParameter:
             self.iFlag_standalone = int(aParameter['iFlag_standalone'])
     
-        #if 'iFlag_multiple' in aParameter:
-        #    self.iFlag_multiple = int(aParameter['iFlag_multiple'])
+        if 'iFlag_flowline' in aParameter:
+            self.iFlag_flowline             = int(aParameter[ 'iFlag_flowline'])
         
         if 'iFlag_simplification' in aParameter:
             self.iFlag_simplification = int(aParameter['iFlag_simplification'])
@@ -98,6 +99,9 @@ class flowlinecase(object):
 
         if 'iFlag_create_mesh' in aParameter:
             self.iFlag_create_mesh = int(aParameter['iFlag_create_mesh'])    
+        
+        if 'iFlag_save_mesh' in aParameter:
+            self.iFlag_save_mesh             = int(aParameter[ 'iFlag_save_mesh'])
 
         if 'iFlag_rotation' in aParameter:
             self.iFlag_rotation = int(aParameter['iFlag_rotation'])
@@ -178,19 +182,20 @@ class flowlinecase(object):
             self.sFilename_mesh_netcdf = aParameter['sFilename_mesh_netcdf']
 
         self.aBasin = list()
-        if 'sFilename_basins' in aParameter:
-            self.sFilename_basins = aParameter['sFilename_basins']
-            with open(self.sFilename_basins) as json_file:
-                dummy_data = json.load(json_file)   
-
-                for i in range(self.nOutlet):
-                    dummy_basin = dummy_data[i]
-                    #print(dummy_basin)
-                    pBasin = pybasin(dummy_basin)
-
-                    self.aBasin.append(pBasin)
-        else:
-            pass
+        if self.iFlag_flowline == 1:
+            if 'sFilename_basins' in aParameter:
+                self.sFilename_basins = aParameter['sFilename_basins']
+                with open(self.sFilename_basins) as json_file:
+                    dummy_data = json.load(json_file)   
+    
+                    for i in range(self.nOutlet):
+                        dummy_basin = dummy_data[i]
+                        #print(dummy_basin)
+                        pBasin = pybasin(dummy_basin)
+    
+                        self.aBasin.append(pBasin)
+            else:
+                pass
             
 
         self.sJob =  aParameter['sJob'] 

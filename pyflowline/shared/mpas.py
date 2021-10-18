@@ -64,7 +64,7 @@ class pympas(pycell):
     aNeighbor_land=None #the global ID of all neighbors
     aNeighbor_ocean=None #the global ID of all neighbors
 
-    def __init__(self, aEdge, aVertex, dLon, dLat):    
+    def __init__(self, dLon, dLat, aEdge, aVertex):    
         nEdge = len(aEdge)
         if nEdge < 3 or nEdge > 8:
             pass

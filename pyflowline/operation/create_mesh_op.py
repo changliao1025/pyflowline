@@ -18,6 +18,7 @@ def create_mesh_op(oPyflowline_in):
 
     #we can use the dem extent to setup 
     iMesh_type = oPyflowline_in.iMesh_type
+    iFlag_save_mesh = oPyflowline_in.iFlag_save_mesh
     iFlag_rotation = oPyflowline_in.iFlag_rotation
     
     dResolution = oPyflowline_in.dResolution
@@ -107,10 +108,9 @@ def create_mesh_op(oPyflowline_in):
                     dLatitude_bot    = oPyflowline_in.dLatitude_bot   
                     dLongitude_left  = oPyflowline_in.dLongitude_left 
                     dLongitude_right = oPyflowline_in.dLongitude_right
-                    aMpas = create_mpas_mesh(iFlag_use_mesh_dem, \
-                        sFilename_mesh_netcdf, \
+                    aMpas = create_mpas_mesh(iFlag_use_mesh_dem, iFlag_save_mesh, \
                             dLatitude_top, dLatitude_bot, dLongitude_left, dLongitude_right,\
-                        sFilename_mesh)
+                                sFilename_mesh_netcdf,      sFilename_mesh)
                     return aMpas
                 else:
                     if iMesh_type ==5: #tin

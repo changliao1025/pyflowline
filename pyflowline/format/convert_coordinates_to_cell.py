@@ -57,7 +57,7 @@ def convert_gcs_coordinates_to_cell(iMesh_type, aCoordinates_gcs, dLon, dLat):
                 return pLatlon
             else:
                 if iMesh_type ==4: #mpas       
-                    pMpas = pympas( aEdge, aVertex, dLon, dLat)
+                    pMpas = pympas(  dLon, dLat, aEdge, aVertex)
                     return pMpas
                 else:
                     if iMesh_type ==5: #tin

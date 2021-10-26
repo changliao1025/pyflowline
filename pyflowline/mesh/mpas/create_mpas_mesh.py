@@ -203,6 +203,10 @@ def create_mpas_mesh(iFlag_use_mesh_dem, iFlag_save_mesh, \
                 pLayer.CreateFeature(pFeature)
             
             pmpas = convert_gcs_attribute_to_cell(4, dLon, dLat, aCoords, aVertexIndex, aEdgeIndex, aVertexIndexOnEdge)
+
+            #calculate area 
+            pmpas.calculate_cell_area()
+            pmpas.calculate_edge_length()
            
             pmpas.lCellID = lCellID
 

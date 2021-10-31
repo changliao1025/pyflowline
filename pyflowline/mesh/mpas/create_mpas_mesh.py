@@ -125,6 +125,17 @@ def create_mpas_mesh(iFlag_use_mesh_dem, iFlag_save_mesh, \
         else:
             pass
 
+        if sKey == 'ice_elevation':
+            ice_elevation0 = aValue 
+        else:
+            pass
+
+        if sKey == 'areaCell':
+            areaCell0 = aValue 
+        else:
+            pass
+        
+
     aLatitudeVertex = latVertex0[:] / math.pi * 180
     aLongitudeVertex = lonVertex0[:] / math.pi * 180
     
@@ -143,6 +154,8 @@ def create_mpas_mesh(iFlag_use_mesh_dem, iFlag_save_mesh, \
     aIndexToVertexID = indexToVertexID0[:]
 
     aBed_elevation = bed_elevation0[:]
+    aIce_thickness = ice_elevation0[:]
+    aCellArea = areaCell0[:]
     
     ncell = len(aIndexToCellID)
  
@@ -156,72 +169,65 @@ def create_mpas_mesh(iFlag_use_mesh_dem, iFlag_save_mesh, \
             #get cell edge
             lCellID = int(aIndexToCellID[i])
             dElevation = float(aBed_elevation[i])
-            aCellOnCellIndex = np.array(aCellsOnCell[i,:])
-            aEdgesOnCellIndex = np.array(aEdgesOnCell[i,:])
-            aVertexOnCellIndex = np.array(aVertexOnCell[i,:])
+            dThickness_ice = float( aIce_thickness[i] )
+            dArea = float(aCellArea[i])
 
-            dummy0 = np.where(aVertexOnCellIndex > 0)
-            aVertexIndex = aVertexOnCellIndex[dummy0]
-            dummy1 = np.where(aEdgesOnCellIndex > 0)
-            aEdgeIndex= aEdgesOnCellIndex[dummy1]
-            dummy2 = np.where(aCellOnCellIndex > 0)
-            aNeighborIndex= (aCellOnCellIndex[dummy2]).astype(int)
+            if dThickness_ice > 0:
+                continue
+            else:
 
-            aVertexIndexOnEdge = np.array(aVertexOnEdge0[aEdgeIndex-1,:]).astype((int))
+                aCellOnCellIndex = np.array(aCellsOnCell[i,:])
+                aEdgesOnCellIndex = np.array(aEdgesOnCell[i,:])
+                aVertexOnCellIndex = np.array(aVertexOnCell[i,:])
+                dummy0 = np.where(aVertexOnCellIndex > 0)
+                aVertexIndex = aVertexOnCellIndex[dummy0]
+                dummy1 = np.where(aEdgesOnCellIndex > 0)
+                aEdgeIndex= aEdgesOnCellIndex[dummy1]
+                dummy2 = np.where(aCellOnCellIndex > 0)
+                aNeighborIndex= (aCellOnCellIndex[dummy2]).astype(int)
+                aVertexIndexOnEdge = np.array(aVertexOnEdge0[aEdgeIndex-1,:]).astype((int))
+                aLonVertex = aLongitudeVertex[aVertexIndex-1]
+                aLatVertex = aLatitudeVertex[aVertexIndex-1]
+                nVertex = len(aLonVertex)
+                ring = ogr.Geometry(ogr.wkbLinearRing)
+                aCoords = np.full((nVertex,2), -9999.0, dtype=float)
 
-            aLonVertex = aLongitudeVertex[aVertexIndex-1]
-            aLatVertex = aLatitudeVertex[aVertexIndex-1]
+                for j in range(nVertex):
+                    x1 = convert_360_to_180(aLonVertex[j])
+                    y1 = aLatVertex[j]      
+                    ring.AddPoint(x1, y1)
+                    aCoords[j,0] = x1
+                    aCoords[j,1] = y1
+                    pass
 
-            nVertex = len(aLonVertex)
-            ring = ogr.Geometry(ogr.wkbLinearRing)
+                if iFlag_save_mesh ==1:
+                    x1 = convert_360_to_180(aLonVertex[0])
+                    y1 = aLatVertex[0]
+                    ring.AddPoint(x1, y1) #double check            
+                    pPolygon = ogr.Geometry(ogr.wkbPolygon)
+                    pPolygon.AddGeometry(ring)
+                    pFeature.SetGeometry(pPolygon)
+                    pFeature.SetField("id", int(lCellID) )
+                    pFeature.SetField("lon", dLon )
+                    pFeature.SetField("lat", dLat )
+                    if iFlag_use_mesh_dem == 1:
+                        pFeature.SetField("elev", dElevation )
 
-            aCoords = np.full((nVertex,2), -9999.0, dtype=float)
+                    pLayer.CreateFeature(pFeature)
 
-            for j in range(nVertex):
-                x1 = convert_360_to_180(aLonVertex[j])
-                y1 = aLatVertex[j]      
-                ring.AddPoint(x1, y1)
-                aCoords[j,0] = x1
-                aCoords[j,1] = y1
-                pass
-
-            if iFlag_save_mesh ==1:
-                x1 = convert_360_to_180(aLonVertex[0])
-                y1 = aLatVertex[0]
-                ring.AddPoint(x1, y1) #double check            
-
-                pPolygon = ogr.Geometry(ogr.wkbPolygon)
-                pPolygon.AddGeometry(ring)
-
-                pFeature.SetGeometry(pPolygon)
-                pFeature.SetField("id", int(lCellID) )
-                pFeature.SetField("lon", dLon )
-                pFeature.SetField("lat", dLat )
-                if iFlag_use_mesh_dem == 1:
-                    pFeature.SetField("elev", dElevation )
-                
-                pLayer.CreateFeature(pFeature)
-            
-            pmpas = convert_gcs_attribute_to_cell(4, dLon, dLat, aCoords, aVertexIndex, aEdgeIndex, aVertexIndexOnEdge)
-
-            #calculate area 
-            pmpas.calculate_cell_area()
-            pmpas.calculate_edge_length()
-           
-            pmpas.lCellID = lCellID
-
-            pmpas.dElevation  = dElevation
-            
-            pmpas.aNeighbor=aNeighborIndex
-            pmpas.nNeighbor=len(aNeighborIndex)
-
-            pmpas.aNeighbor_land=aNeighborIndex
-            pmpas.nNeighbor_land=len(aNeighborIndex)
-            
-
-            aMpas.append(pmpas)
-    
-            #get vertex
+                pmpas = convert_gcs_attribute_to_cell(4, dLon, dLat, aCoords, aVertexIndex, aEdgeIndex, aVertexIndexOnEdge)
+                #calculate area 
+                #pmpas.calculate_cell_area()
+                pmpas.dArea = dArea
+                pmpas.calculate_edge_length()
+                pmpas.lCellID = lCellID
+                pmpas.dElevation  = dElevation
+                pmpas.aNeighbor=aNeighborIndex
+                pmpas.nNeighbor=len(aNeighborIndex)
+                pmpas.aNeighbor_land=aNeighborIndex
+                pmpas.nNeighbor_land=len(aNeighborIndex)
+                aMpas.append(pmpas)
+                #get vertex
 
         pass
 

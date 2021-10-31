@@ -42,6 +42,8 @@ class pympas(pycell):
     dLat_center=0.0
     dElevation=0.0
 
+    dLength_flowline=0.0
+
     iFlag_intersected=-1
     iFlag_coast = 0
 
@@ -118,7 +120,7 @@ class pympas(pycell):
 
         return iFlag_found, pEdge_out
     
-    def calculate_cell_area(self):
+    def calculate_cell_area(self): #not used anymore
         lons=list()
         lats=list()
         

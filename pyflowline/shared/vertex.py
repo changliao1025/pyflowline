@@ -1,7 +1,19 @@
 from abc import ABCMeta, abstractmethod
 import numpy as np
+import json
+from json import JSONEncoder
 
 from pyearth.gis.location.calculate_distance_based_on_lon_lat import calculate_distance_based_on_lon_lat
+
+class VertexClassEncoder(JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, np.integer):
+            return int(obj)
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        
+        return JSONEncoder.default(self, obj)
+
 class pyvertex(object):
     __metaclass__ = ABCMeta  
     lVertexID=-1
@@ -72,6 +84,14 @@ class pyvertex(object):
         dDistance = c
 
         return dDistance
+    
+    def tojson(self):
+        sJson = json.dumps(self.__dict__, \
+            sort_keys=True, \
+                indent = 4, \
+                    ensure_ascii=True, \
+                        cls=VertexClassEncoder)
+        return sJson
 
   
 

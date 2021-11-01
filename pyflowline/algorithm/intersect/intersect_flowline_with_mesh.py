@@ -83,6 +83,8 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh, sFilename_flowli
         lCellID = pFeature_mesh.GetField("id")
         dLon = pFeature_mesh.GetField("lon")
         dLat = pFeature_mesh.GetField("lat")
+        #dElevation = pFeature_mesh.GetField("elev")
+        dArea = pFeature_mesh.GetField("area")
         if (iFlag_transform ==1): #projections are different
             pGeometry_mesh.Transform(transform)
 
@@ -104,10 +106,11 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh, sFilename_flowli
             #else:
             #    pCell = convert_pcs_coordinates_to_cell(iMesh_type_in, aCoords_pcs,)
 
-            pCell.lCellID = lCellID #this information is not saved in shapefile
-            dArea = pGeometry_mesh.GetArea() 
-            pCell.dArea = pCell.calculate_cell_area()
+            pCell.lCellID = lCellID #this information is saved in shapefile
+            #dArea = pGeometry_mesh.GetArea() 
+            pCell.dArea = dArea #pCell.calculate_cell_area()
             pCell.dLength = pCell.calculate_edge_length()
+            pCell.dLength_flowline = pCell.dLength
                      
             aFlowline_intersect = list()
             iFlag_intersected = 0 
@@ -129,8 +132,7 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh, sFilename_flowli
                 if( iFlag_intersect == True):
 
                     iFlag_intersected = 1
-                    pGeometry_intersect = pGeometry_flowline.Intersection(pGeometry_mesh) 
-                    
+                    pGeometry_intersect = pGeometry_flowline.Intersection(pGeometry_mesh)                     
 
                     #add more process here to 
                     pGeometrytype_intersect = pGeometry_intersect.GetGeometryName()
@@ -187,7 +189,15 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh, sFilename_flowli
             pCell.aFlowline = aFlowline_intersect
             pCell.nFlowline = len(aFlowline_intersect)
             if iFlag_intersected ==1:     
-                pCell.iFlag_intersected = 1                       
+                pCell.iFlag_intersected = 1 
+                pCell.dLength_flowline = 0.0
+                for i in range (pCell.nFlowline):
+                    pFlowline = pCell.aFlowline[i]
+                    dLength_flowline = pFlowline.dLength 
+                    if ( dLength_flowline > pCell.dLength_flowline ):
+                        pCell.dLength_flowline = dLength_flowline
+
+                #replace flowline length if there is an actual flowline                    
                 aCell_intersect.append(pCell)
                 aCell.append(pCell)
             else:

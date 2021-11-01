@@ -14,7 +14,10 @@ from pyflowline.format.convert_coordinates_to_cell import convert_gcs_coordinate
 from pyearth.toolbox.data.check_if_duplicates import check_if_duplicates
 from pyearth.gis.gdal.gdal_function import reproject_coordinates, reproject_coordinates_batch
 
-def create_hexagon_mesh(iFlag_rotation, dX_left, dY_bot, dResolution_meter, ncolumn, nrow, sFilename_mesh_out, sFilename_spatial_reference_in):
+def create_hexagon_mesh(iFlag_rotation, dX_left, dY_bot, \
+    dResolution_meter, ncolumn, nrow, \
+        sFilename_mesh_out, \
+            sFilename_spatial_reference_in):
 
     
     if os.path.exists(sFilename_mesh_out): 

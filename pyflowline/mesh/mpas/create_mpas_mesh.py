@@ -46,6 +46,11 @@ def create_mpas_mesh(iFlag_use_mesh_dem, iFlag_save_mesh, \
         pLayer.CreateField(ogr.FieldDefn('lon', ogr.OFTReal)) #long type for high resolution
         pLayer.CreateField(ogr.FieldDefn('lat', ogr.OFTReal)) #long type for high resolution
 
+        pArea_field = ogr.FieldDefn('area', ogr.OFTReal)
+        pArea_field.SetWidth(20)
+        pArea_field.SetPrecision(2)
+        pLayer.CreateField(pArea_field)
+
         if iFlag_use_mesh_dem == 1:
             pLayer.CreateField(ogr.FieldDefn('elev', ogr.OFTReal)) #float type for high resolution
         else:
@@ -125,8 +130,8 @@ def create_mpas_mesh(iFlag_use_mesh_dem, iFlag_save_mesh, \
         else:
             pass
 
-        if sKey == 'ice_elevation':
-            ice_elevation0 = aValue 
+        if sKey == 'ice_thickness':
+            ice_thickness0 = aValue 
         else:
             pass
 
@@ -154,7 +159,7 @@ def create_mpas_mesh(iFlag_use_mesh_dem, iFlag_save_mesh, \
     aIndexToVertexID = indexToVertexID0[:]
 
     aBed_elevation = bed_elevation0[:]
-    aIce_thickness = ice_elevation0[:]
+    aIce_thickness = ice_thickness0[:]
     aCellArea = areaCell0[:]
     
     ncell = len(aIndexToCellID)
@@ -175,7 +180,6 @@ def create_mpas_mesh(iFlag_use_mesh_dem, iFlag_save_mesh, \
             if dThickness_ice > 0:
                 continue
             else:
-
                 aCellOnCellIndex = np.array(aCellsOnCell[i,:])
                 aEdgesOnCellIndex = np.array(aEdgesOnCell[i,:])
                 aVertexOnCellIndex = np.array(aVertexOnCell[i,:])
@@ -210,6 +214,7 @@ def create_mpas_mesh(iFlag_use_mesh_dem, iFlag_save_mesh, \
                     pFeature.SetField("id", int(lCellID) )
                     pFeature.SetField("lon", dLon )
                     pFeature.SetField("lat", dLat )
+                    pFeature.SetField("area", dArea )
                     if iFlag_use_mesh_dem == 1:
                         pFeature.SetField("elev", dElevation )
 
@@ -220,6 +225,7 @@ def create_mpas_mesh(iFlag_use_mesh_dem, iFlag_save_mesh, \
                 #pmpas.calculate_cell_area()
                 pmpas.dArea = dArea
                 pmpas.calculate_edge_length()
+                pmpas.dLength_flowline = pmpas.dLength_edge #Default
                 pmpas.lCellID = lCellID
                 pmpas.dElevation  = dElevation
                 pmpas.aNeighbor=aNeighborIndex

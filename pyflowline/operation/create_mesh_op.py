@@ -113,7 +113,7 @@ def create_mesh_op(oPyflowline_in):
                                 sFilename_mesh_netcdf,      sFilename_mesh)
                     return aMpas
                 else:
-                    if iMesh_type ==5: #tin
+                    if iMesh_type ==5: #tin this one need to be updated because central location issue
                         #tin edge
                         dArea = np.power(dResolution_meter,2.0)
                         dLength_edge = np.sqrt(  4.0 * dArea /  np.sqrt(3.0) )  

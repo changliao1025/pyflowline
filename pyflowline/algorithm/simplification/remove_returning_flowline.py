@@ -13,9 +13,7 @@ def remove_returning_flowline(iMesh_type, aCell_intersect_in, pVertex_outlet_in)
     aFlowline_out=list()
     #checking input data 
     #input hexagon should have at least one flowline inside
-    #input flowline should have order information and segment index?
-
-    
+    #input flowline should have order information and segment index?    
     
     nCell =  len(aCell_intersect_in)
 

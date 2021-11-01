@@ -78,7 +78,7 @@ def intersect_flowline_with_mesh_with_postprocess_op(oPyflowline_in):
             sFilename_out = 'flowline_simplified_after_intersect_' + sBasin + '.shp'
             sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)  
 
-            pSpatialRef=  pSpatialRef_mesh
+            pSpatialRef =  pSpatialRef_mesh
 
             export_flowline_to_shapefile(iFlag_projected, aFlowline_basin, pSpatialRef, sFilename_out)
 

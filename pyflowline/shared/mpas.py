@@ -2,6 +2,7 @@ from abc import ABCMeta, abstractmethod
 from osgeo import gdal, osr, ogr
 import numpy as np
 import json
+from json import JSONEncoder
 
 from pyflowline.shared.vertex import pyvertex
 from pyflowline.shared.edge import pyedge
@@ -10,9 +11,7 @@ from pyflowline.shared.flowline import pyflowline
 
 from pyearth.gis.location.calculate_polygon_area import calculate_polygon_area
 
-import numpy as np
 
-from json import JSONEncoder
 
 class CellClassEncoder(JSONEncoder):
     def default(self, obj):
@@ -23,9 +22,12 @@ class CellClassEncoder(JSONEncoder):
         if isinstance(obj, pyedge):
             return obj.lEdgeID
         if isinstance(obj, pyvertex):
-            return obj.lVertexID
+            return json.loads(obj.tojson()) #lVertexID
         if isinstance(obj, pyflowline):
             return obj.lFlowlineID
+        if isinstance(obj, list):
+            print('A list is found')
+            
         return JSONEncoder.default(self, obj)
 
 class pympas(pycell):
@@ -69,6 +71,7 @@ class pympas(pycell):
     def __init__(self, dLon, dLat, aEdge, aVertex):    
         nEdge = len(aEdge)
         if nEdge < 3 or nEdge > 8:
+            print('At lease 3 edges are required!')
             pass
         else:                          
             self.aEdge = aEdge
@@ -78,7 +81,7 @@ class pympas(pycell):
             self.nNeighbor = -1
             self.nNeighbor_land = -1
             self.nNeighbor_ocean = -1
-            self.iFlag_coast = 0            
+            self.iFlag_coast = 0      
 
             self.dLon_center = dLon
             self.dLat_center = dLat
@@ -90,7 +93,6 @@ class pympas(pycell):
             self.iStream_order_burned=-1
             self.iStream_segment_burned=-1
             self.dElevation=-9999.0
-
             pass
         pass
     
@@ -152,7 +154,7 @@ class pympas(pycell):
     def tojson(self):
         sJson = json.dumps(self.__dict__, \
             sort_keys=True, \
-                indent = 4, \
-                    ensure_ascii=True, \
-                        cls=CellClassEncoder)
+            indent = 4, \
+            ensure_ascii=True, \
+            cls=CellClassEncoder)
         return sJson

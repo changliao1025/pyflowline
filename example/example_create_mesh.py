@@ -15,7 +15,7 @@ from pyflowline.operation.create_mesh_op import create_mesh_op
 
 #sFilename_configuration_in = '/qfs/people/liao313/workspace/python/pyflowline/pyflowline/config/case_susquehanna_square.json'
 
-sFilename_configuration_in = '/qfs/people/liao313/workspace/python/pyflowline/pyflowline/config/pyflowline_icom_mpas.json'
+sFilename_configuration_in = '/qfs/people/liao313/workspace/python/pyflowline/pyflowline/config/pyflowline_susquehanna_mpas.json'
 
 #sFilename_configuration_in = '/qfs/people/liao313/workspace/python/pyflowline/pyflowline/config/case_susquehanna_tin.json'
 

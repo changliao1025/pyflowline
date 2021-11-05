@@ -13,8 +13,8 @@ class pylatlon(pycell):
     dArea=0.0
     dx_center=0.0
     dy_center=0.0
-    dLon_center=0.0
-    dLat_center=0.0
+    dLongitude_center=0.0
+    dLatitude_center=0.0
     aEdge=None
     aVertex=None
     aFlowline=None
@@ -46,12 +46,12 @@ class pylatlon(pycell):
 
             
 
-            self.dLon_center = dLon
-            self.dLat_center = dLat
+            self.dLongitude_center = dLon
+            self.dLatitude_center = dLat
 
             pVertex = dict()        
-            pVertex['lon'] =self.dLon_center
-            pVertex['lat'] =self.dLat_center           
+            pVertex['lon'] =self.dLongitude_center
+            pVertex['lat'] =self.dLatitude_center           
             self.pVertex_center = pyvertex(pVertex)
 
             self.lCellID_downstream_burned=-1

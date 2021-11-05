@@ -12,7 +12,7 @@ from pyearth.gis.location.convert_lat_lon_range import convert_180_to_360,conver
 from pyflowline.format.convert_coordinates_to_cell import convert_pcs_coordinates_to_cell
 from pyflowline.format.convert_attribute_to_cell import convert_gcs_attribute_to_cell
 
-def create_mpas_mesh(iFlag_use_mesh_dem, iFlag_save_mesh, \
+def create_mpas_mesh(iFlag_global, iFlag_use_mesh_dem, iFlag_save_mesh, \
     dLatitude_top, dLatitude_bot, dLongitude_left, dLongitude_right,\
      sFilename_mesh_netcdf, sFilename_mesh):
     
@@ -85,6 +85,11 @@ def create_mpas_mesh(iFlag_use_mesh_dem, iFlag_save_mesh, \
             cellsOnCell0 = aValue 
         else:
             pass
+
+        if sKey == 'cellsOnEdge':
+            cellsOnEdge0 = aValue 
+        else:
+            pass
             
         if sKey == 'verticesOnCell':
             verticesOnCell0 = aValue
@@ -115,6 +120,7 @@ def create_mpas_mesh(iFlag_use_mesh_dem, iFlag_save_mesh, \
             lonVertex0 = aValue 
         else:
             pass
+
         if sKey == 'latVertex':
             latVertex0 = aValue 
         else:
@@ -139,6 +145,11 @@ def create_mpas_mesh(iFlag_use_mesh_dem, iFlag_save_mesh, \
             areaCell0 = aValue 
         else:
             pass
+
+        if sKey == 'dcEdge':
+            dcEdge0 = aValue 
+        else:
+            pass
         
 
     aLatitudeVertex = latVertex0[:] / math.pi * 180
@@ -149,6 +160,7 @@ def create_mpas_mesh(iFlag_use_mesh_dem, iFlag_save_mesh, \
     aLongitudeCell = lonCell0[:] / math.pi * 180
 
     aCellsOnCell = cellsOnCell0[:]
+    aCellOnEdge = cellsOnEdge0[:]
 
     aEdgesOnCell= edgesOnCell0[:]
     aVertexOnCell = verticesOnCell0[:]
@@ -161,6 +173,8 @@ def create_mpas_mesh(iFlag_use_mesh_dem, iFlag_save_mesh, \
     aBed_elevation = bed_elevation0[:]
     aIce_thickness = ice_thickness0[:]
     aCellArea = areaCell0[:]
+
+    aDcEdge = dcEdge0[:]
     
     ncell = len(aIndexToCellID)
  
@@ -238,30 +252,34 @@ def create_mpas_mesh(iFlag_use_mesh_dem, iFlag_save_mesh, \
         pass
 
     #for maps we need to clean some cell because they were not actually in the domain
-    aMpas_out = list()
-    ncell = len(aMpas)
-    aCellID  = list()
-    for i in range(ncell):
-        pCell = aMpas[i]
-        lCellID = pCell.lCellID
-        aCellID.append(lCellID)
-    
-    for i in range(ncell):
-        pCell = aMpas[i]
-        aNeighbor = pCell.aNeighbor
-        nNeighbor = pCell.nNeighbor
-        aNeighbor_new = list()
-        nNeighbor_new = 0 
-        for j in range(nNeighbor):
-            lNeighbor = int(aNeighbor[j])
-            if lNeighbor in aCellID:
-                nNeighbor_new = nNeighbor_new + 1 
-                aNeighbor_new.append(lNeighbor)
-                
-        pCell.nNeighbor_land= len(aNeighbor_new)
-        pCell.aNeighbor_land = aNeighbor_new
-        pCell.nNeighbor_ocean = pCell.nVertex - pCell.nNeighbor_land
-        aMpas_out.append(pCell)
+
+    if iFlag_global == 1:
+        aMpas_out = aMpas
+    else:
+        aMpas_out = list()
+        ncell = len(aMpas)
+        aCellID  = list()
+        for i in range(ncell):
+            pCell = aMpas[i]
+            lCellID = pCell.lCellID
+            aCellID.append(lCellID)
+
+        for i in range(ncell):
+            pCell = aMpas[i]
+            aNeighbor = pCell.aNeighbor
+            nNeighbor = pCell.nNeighbor
+            aNeighbor_new = list()
+            nNeighbor_new = 0 
+            for j in range(nNeighbor):
+                lNeighbor = int(aNeighbor[j])
+                if lNeighbor in aCellID:
+                    nNeighbor_new = nNeighbor_new + 1 
+                    aNeighbor_new.append(lNeighbor)
+
+            pCell.nNeighbor_land= len(aNeighbor_new)
+            pCell.aNeighbor_land = aNeighbor_new
+            pCell.nNeighbor_ocean = pCell.nVertex - pCell.nNeighbor_land
+            aMpas_out.append(pCell)
 
 
     return aMpas_out

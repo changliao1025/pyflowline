@@ -40,8 +40,8 @@ class pympas(pycell):
     dx_center=0.0
     dy_center=0.0
     dz_center=0.0
-    dLon_center=0.0
-    dLat_center=0.0
+    dLongitude_center=0.0
+    dLatitude_center=0.0
     dElevation=0.0
 
     dLength_flowline=0.0
@@ -83,11 +83,11 @@ class pympas(pycell):
             self.nNeighbor_ocean = -1
             self.iFlag_coast = 0      
 
-            self.dLon_center = dLon
-            self.dLat_center = dLat
+            self.dLongitude_center = dLon
+            self.dLatitude_center = dLat
             pVertex = dict()        
-            pVertex['lon'] =self.dLon_center
-            pVertex['lat'] =self.dLat_center           
+            pVertex['lon'] =self.dLongitude_center
+            pVertex['lat'] =self.dLatitude_center           
             self.pVertex_center = pyvertex(pVertex)
             self.lCellID_downstream_burned=-1
             self.iStream_order_burned=-1

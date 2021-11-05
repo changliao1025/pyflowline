@@ -164,8 +164,8 @@ def remove_returning_flowline(iMesh_type, aCell_intersect_in, pVertex_outlet_in)
                     lCellID = aCell_simple[i]
                     for j in range( nCell):
                         if aCell_intersect_in[j].lCellID == lCellID:    
-                            x = aCell_intersect_in[j].dLon_center
-                            y = aCell_intersect_in[j].dLat_center                                
+                            x = aCell_intersect_in[j].dLongitude_center
+                            y = aCell_intersect_in[j].dLatitude_center                                
                             aCoordinates.append([x,y])
                     pass
                 pFlowline = convert_gcs_coordinates_to_flowline(aCoordinates)

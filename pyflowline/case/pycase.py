@@ -11,7 +11,8 @@ class flowlinecase(object):
     iCase_index= 0
     sMesh_type = 1
     iFlag_standalone=1
-    iFlag_multiple = 0
+    iFlag_global = 0
+    iFlag_multiple_outlet = 0
     iFlag_use_mesh_dem=0
     iFlag_save_mesh = 0
     iFlag_simplification = 1 #user can turn on/off
@@ -114,8 +115,12 @@ class flowlinecase(object):
         
         if 'nOutlet' in aParameter:
             self.nOutlet = int(aParameter['nOutlet'])
+
+        if 'iFlag_global' in aParameter:
+            self.iFlag_global             = int(aParameter[ 'iFlag_global'])
         
-        
+        if 'iFlag_multiple_outlet' in aParameter:
+            self.iFlag_multiple_outlet             = int(aParameter[ 'iFlag_multiple_outlet'])    
                
         iCase_index = int(aParameter['iCase_index'])
         sCase_index = "{:03d}".format( iCase_index )

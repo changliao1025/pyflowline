@@ -33,11 +33,11 @@ class pytin(pycell):
             self.nEdge = len(aEdge)
             self.nVertex = len(aVertex) - 1
 
-            self.dLon_center = dLon
-            self.dLat_center = dLat
+            self.dLongitude_center = dLon
+            self.dLatitude_center = dLat
             pVertex = dict()        
-            pVertex['lon'] =self.dLon_center
-            pVertex['lat'] =self.dLat_center           
+            pVertex['lon'] =self.dLongitude_center
+            pVertex['lat'] =self.dLatitude_center           
             self.pVertex_center = pyvertex(pVertex)
 
             pass

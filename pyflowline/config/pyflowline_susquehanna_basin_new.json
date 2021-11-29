@@ -1,8 +1,8 @@
 [
     {
         "dAccumulation_threshold": 100000.0,
-        "dLat_outlet": 39.5598198228956,
-        "dLon_outlet": -76.0889940311555,
+        "dLatitude_outlet_degree": 39.5598198228956,
+        "dLongitude_outlet_degree": -76.0889940311555,
         "dThreshold_small_river": 10000.0,
         "iFlag_dam": 1,
         "iFlag_disconnected": 0,

@@ -68,8 +68,8 @@ def intersect_flowline_with_mesh_with_postprocess_op(oPyflowline_in):
 
             point= dict()
 
-            point['lon'] = pBasin.dLon_outlet
-            point['lat'] = pBasin.dLat_outlet
+            point['lon'] = pBasin.dLongitude_outlet_degree
+            point['lat'] = pBasin.dLatitude_outlet_degree
             pVertex_outlet_initial=pyvertex(point)
 
             #from this point, aFlowline_basin is conceptual
@@ -123,8 +123,8 @@ def intersect_flowline_with_mesh_with_postprocess_op(oPyflowline_in):
             aOutletID.append(lCellID_outlet)
 
             pBasin.lCellID_outlet = lCellID_outlet
-            pBasin.dLon_outlet = pVertex_outlet.dLongitude
-            pBasin.dLat_outlet = pVertex_outlet.dLatitude
+            pBasin.dLongitude_outlet_degree = pVertex_outlet.dLongitude
+            pBasin.dLatitude_outlet_degree = pVertex_outlet.dLatitude
 
             aBasin.append(pBasin)
 

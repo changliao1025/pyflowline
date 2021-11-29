@@ -20,8 +20,8 @@ class pybasin(object):
     lCellID_outlet=-1
     iFlag_disconnected =0
     iFlag_dam=0
-    dLon_outlet = -9999.
-    dLat_outlet = -9999.
+    dLongitude_outlet_degree = -9999.
+    dLatitude_outlet_degree = -9999.
 
     dAccumulation_threshold= 100000.0
 
@@ -56,15 +56,15 @@ class pybasin(object):
         else:
             self.iFlag_dam   = 0
         
-        if 'dLon_outlet' in aParameter:            
-            self.dLon_outlet             = float(aParameter['dLon_outlet'])
+        if 'dLongitude_outlet_degree' in aParameter:            
+            self.dLongitude_outlet_degree             = float(aParameter['dLongitude_outlet_degree'])
         else:
-            self.dLon_outlet   = -9999.
+            self.dLongitude_outlet_degree   = -9999.
         
-        if 'dLat_outlet' in aParameter:            
-            self.dLat_outlet             = float(aParameter['dLat_outlet'])
+        if 'dLatitude_outlet_degree' in aParameter:            
+            self.dLatitude_outlet_degree             = float(aParameter['dLatitude_outlet_degree'])
         else:
-            self.dLat_outlet   = -9999.
+            self.dLatitude_outlet_degree   = -9999.
         
         if 'dThreshold_small_river' in aParameter:            
             self.dThreshold_small_river             = float(aParameter['dThreshold_small_river'])

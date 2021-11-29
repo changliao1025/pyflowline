@@ -147,8 +147,8 @@ def preprocess_flowline_op(oPyflowline_in):
             #ues location to find outlet
 
             point= dict()   
-            point['lon'] = pBasin.dLon_outlet
-            point['lat'] = pBasin.dLat_outlet
+            point['lon'] = pBasin.dLongitude_outlet_degree
+            point['lat'] = pBasin.dLatitude_outlet_degree
             pVertex_outlet=pyvertex(point)
 
             aFlowline_basin = correct_flowline_direction(aFlowline_basin,  pVertex_outlet )

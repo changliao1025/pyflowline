@@ -1,6 +1,5 @@
 import os 
 import sys #used to add system path
-from jdcal import gcal2jd, jd2gcal
 import datetime
 import json
 

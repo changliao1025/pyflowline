@@ -2,7 +2,6 @@
 import os, sys
 from pyflowline.shared.edge import pyedge
 import numpy as np
-from numpy.lib.financial import pv 
 from osgeo import ogr, osr, gdal, gdalconst
 
 

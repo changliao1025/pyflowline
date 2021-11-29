@@ -2,7 +2,6 @@ import os, sys
 import math
 import numpy as np
 from netCDF4 import Dataset
-
 from osgeo import ogr, osr, gdal, gdalconst
 
 from pyflowline.shared.mpas import pympas
@@ -53,6 +52,7 @@ def create_mpas_mesh(iFlag_global, iFlag_use_mesh_dem, iFlag_save_mesh, \
 
         if iFlag_use_mesh_dem == 1:
             pLayer.CreateField(ogr.FieldDefn('elev', ogr.OFTReal)) #float type for high resolution
+            pLayer.CreateField(ogr.FieldDefn('elev0', ogr.OFTReal)) #float type for high resolution
         else:
 
             pass
@@ -150,19 +150,24 @@ def create_mpas_mesh(iFlag_global, iFlag_use_mesh_dem, iFlag_save_mesh, \
             dcEdge0 = aValue 
         else:
             pass
+
+        if sKey == 'bed_elevation_profile':
+            bed_elevation_profile0 = aValue 
+        else:
+            pass
         
 
     aLatitudeVertex = latVertex0[:] / math.pi * 180
     aLongitudeVertex = lonVertex0[:] / math.pi * 180
     
-    #conver unit 
+    #convert unit 
     aLatitudeCell = latCell0[:] / math.pi * 180
     aLongitudeCell = lonCell0[:] / math.pi * 180
 
     aCellsOnCell = cellsOnCell0[:]
     aCellOnEdge = cellsOnEdge0[:]
 
-    aEdgesOnCell= edgesOnCell0[:]
+    aEdgesOnCell = edgesOnCell0[:]
     aVertexOnCell = verticesOnCell0[:]
     aVertexOnEdge0 = verticesOnEdge0[:]
     
@@ -173,8 +178,8 @@ def create_mpas_mesh(iFlag_global, iFlag_use_mesh_dem, iFlag_save_mesh, \
     aBed_elevation = bed_elevation0[:]
     aIce_thickness = ice_thickness0[:]
     aCellArea = areaCell0[:]
-
     aDcEdge = dcEdge0[:]
+    aBed_elevation_profile = bed_elevation_profile0[:]  #elevation
     
     ncell = len(aIndexToCellID)
  
@@ -187,7 +192,10 @@ def create_mpas_mesh(iFlag_global, iFlag_use_mesh_dem, iFlag_save_mesh, \
 
             #get cell edge
             lCellID = int(aIndexToCellID[i])
-            dElevation = float(aBed_elevation[i])
+            dElevation_mean = float(aBed_elevation[i])
+            dElevation_profile0 = float(aBed_elevation_profile[i,0])
+
+
             dThickness_ice = float( aIce_thickness[i] )
             dArea = float(aCellArea[i])
 
@@ -230,7 +238,8 @@ def create_mpas_mesh(iFlag_global, iFlag_use_mesh_dem, iFlag_save_mesh, \
                     pFeature.SetField("lat", dLat )
                     pFeature.SetField("area", dArea )
                     if iFlag_use_mesh_dem == 1:
-                        pFeature.SetField("elev", dElevation )
+                        pFeature.SetField("elev", dElevation_mean )
+                        pFeature.SetField("elev0", dElevation_profile0 )
 
                     pLayer.CreateFeature(pFeature)
 
@@ -241,11 +250,26 @@ def create_mpas_mesh(iFlag_global, iFlag_use_mesh_dem, iFlag_save_mesh, \
                 pmpas.calculate_edge_length()
                 pmpas.dLength_flowline = pmpas.dLength_edge #Default
                 pmpas.lCellID = lCellID
-                pmpas.dElevation  = dElevation
+                pmpas.dElevation_mean  = dElevation_mean
+                pmpas.dElevation_profile0 = dElevation_profile0
                 pmpas.aNeighbor=aNeighborIndex
                 pmpas.nNeighbor=len(aNeighborIndex)
                 pmpas.aNeighbor_land=aNeighborIndex
                 pmpas.nNeighbor_land=len(aNeighborIndex)
+
+                aDistance=list()
+                for i in range(pmpas.nNeighbor):
+                    lNeighborID = pmpas.aNeighbor[i]
+                    #find shared edge
+                    lEdgeID= aEdgeIndex[i]
+                    #print(lCellID,lNeighborID)
+                    #print(aCellOnEdge[lEdgeID-1])
+                    lIndex = aIndexToEdgeID[lEdgeID-1]
+                    dDistance = aDcEdge[lIndex]
+                    aDistance.append(dDistance)
+                    pass
+
+                pmpas.aNeighbor_distance = aDistance
                 aMpas.append(pmpas)
                 #get vertex
 

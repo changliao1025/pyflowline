@@ -40,9 +40,10 @@ class pympas(pycell):
     dx_center=0.0
     dy_center=0.0
     dz_center=0.0
-    dLongitude_center=0.0
-    dLatitude_center=0.0
-    dElevation=0.0
+    dLongitude_center_degree=0.0
+    dLatitude_center_degree=0.0
+    dElevation_mean=0.0
+    dElevation_profile0=0.0
 
     dLength_flowline=0.0
 
@@ -67,6 +68,7 @@ class pympas(pycell):
     aNeighbor=None #the global ID of all neighbors
     aNeighbor_land=None #the global ID of all neighbors
     aNeighbor_ocean=None #the global ID of all neighbors
+    aNeighbor_distance = None
 
     def __init__(self, dLon, dLat, aEdge, aVertex):    
         nEdge = len(aEdge)
@@ -83,16 +85,17 @@ class pympas(pycell):
             self.nNeighbor_ocean = -1
             self.iFlag_coast = 0      
 
-            self.dLongitude_center = dLon
-            self.dLatitude_center = dLat
+            self.dLongitude_center_degree = dLon
+            self.dLatitude_center_degree = dLat
             pVertex = dict()        
-            pVertex['lon'] =self.dLongitude_center
-            pVertex['lat'] =self.dLatitude_center           
+            pVertex['lon'] =self.dLongitude_center_degree
+            pVertex['lat'] =self.dLatitude_center_degree           
             self.pVertex_center = pyvertex(pVertex)
             self.lCellID_downstream_burned=-1
             self.iStream_order_burned=-1
             self.iStream_segment_burned=-1
-            self.dElevation=-9999.0
+            self.dElevation_mean=-9999.0
+            self.dElevation_profile0=-9999.0
             pass
         pass
     

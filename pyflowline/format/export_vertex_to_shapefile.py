@@ -49,7 +49,7 @@ def export_vertex_to_shapefile(iFlag_projected_in, aVertex_in, pSpatial_referenc
             dummy1= Point( pVertex.dx, pVertex.dy )             
             pass
         else:
-            dummy1= Point( pVertex.dLongitude, pVertex.dLatitude ) 
+            dummy1= Point( pVertex.dLongitude_degree, pVertex.dLatitude_degree ) 
             pass
 
         pGeometry_out = ogr.CreateGeometryFromWkb(dummy1.wkb)

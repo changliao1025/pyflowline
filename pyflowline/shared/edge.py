@@ -1,7 +1,5 @@
 from abc import ABCMeta, abstractmethod
 import json
-from numpy.lib.financial import pv
-
 from osgeo import gdal, osr, ogr
 
 from pyflowline.shared.vertex import pyvertex

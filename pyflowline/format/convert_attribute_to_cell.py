@@ -17,10 +17,11 @@ from pyflowline.shared.mpas import pympas
 from pyflowline.shared.tin import pytin
     
 def convert_gcs_attribute_to_cell(iMesh_type, dLon, dLat, \
-    aCoordinates_gcs, \
+        aCoordinates_gcs, \
         aVertexID, \
-            aEdgeID, \
+        aEdgeID, \
         aVertexIndexOnEdge):  
+        
     npoint = len(aVertexID)     
     aVertex=list()        
     aEdge=list()

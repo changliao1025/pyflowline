@@ -20,8 +20,8 @@ class pyvertex(object):
     dx=-9999
     dy=-9999
     dz=-9999
-    dLongitude=0.0
-    dLatitude=0.0
+    dLongitude_degree=0.0
+    dLatitude_degree=0.0
     dElevation=0.0
     lIndex=-1 #this index will be used for array
     def __init__(self, aParameter):
@@ -35,10 +35,10 @@ class pyvertex(object):
             self.dz             = float(aParameter['z'])
         
         #if 'lon' in aParameter:            
-        self.dLongitude      = float(aParameter['lon'])
+        self.dLongitude_degree      = float(aParameter['lon'])
         
         #if 'lat' in aParameter:            
-        self.dLatitude       = float(aParameter['lat'])
+        self.dLatitude_degree       = float(aParameter['lat'])
 
         
         return
@@ -62,14 +62,14 @@ class pyvertex(object):
         x1 = self.dx
         y1 = self.dy
         z1 = self.dz
-        lon1 = self.dLongitude
-        lat1 = self.dLatitude
+        lon1 = self.dLongitude_degree
+        lat1 = self.dLatitude_degree
         
         x2 = other.dx
         y2 = other.dy
         z2 = other.dz
-        lon2 = other.dLongitude
-        lat2 = other.dLatitude
+        lon2 = other.dLongitude_degree
+        lat2 = other.dLatitude_degree
 
         #if x1!=-9999 and x2!=-9999:
         #    a = (x1-x2) * (x1-x2)

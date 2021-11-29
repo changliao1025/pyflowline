@@ -74,7 +74,7 @@ def export_flowline_to_shapefile(iFlag_projected_in, aFlowline_in, pSpatial_refe
                 aPoint.append( Point( j.dx, j.dy ) )                
                 pass
             else:
-                aPoint.append( Point( j.dLongitude, j.dLatitude ) )
+                aPoint.append( Point( j.dLongitude_degree, j.dLatitude_degree ) )
                 pass
 
         dummy1= LineString( aPoint )

@@ -123,8 +123,8 @@ def intersect_flowline_with_mesh_with_postprocess_op(oPyflowline_in):
             aOutletID.append(lCellID_outlet)
 
             pBasin.lCellID_outlet = lCellID_outlet
-            pBasin.dLongitude_outlet_degree = pVertex_outlet.dLongitude
-            pBasin.dLatitude_outlet_degree = pVertex_outlet.dLatitude
+            pBasin.dLongitude_outlet_degree = pVertex_outlet.dLongitude_degree
+            pBasin.dLatitude_outlet_degree = pVertex_outlet.dLatitude_degree
 
             aBasin.append(pBasin)
 

@@ -224,7 +224,7 @@ def remove_returning_flowline(iMesh_type, aCell_intersect_in, pVertex_outlet_in)
     iStream_order=pFlowline.iStream_order
     pVertex_outlet=pFlowline.pVertex_end
         
-    retrieve_flowline_intersect_index(iStream_segment, iStream_order,  pVertex_outlet)
+    retrieve_flowline_intersect_index(iStream_segment, iStream_order, pVertex_outlet)
 
     #remove parallel
 

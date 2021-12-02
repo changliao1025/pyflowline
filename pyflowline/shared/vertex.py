@@ -47,7 +47,7 @@ class pyvertex(object):
         iFlag = -1
         
         c = self.calculate_distance(other)
-        if( c < 0.001 ): #be careful
+        if( c < 0.0001 ): #be careful
             iFlag = 1
         else:
             iFlag = 0       

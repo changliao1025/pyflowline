@@ -98,9 +98,9 @@ class pybasin(object):
 
         sBasinID = "{:03d}".format(self.lBasinID)
 
-        self.sFilename_flowline_segment_index_before_intersect = 'flowline_segment_index_before_intersect_' + sBasinID + '.shp'
-        self.sFilename_flowline_segment_order_before_intersect = 'flowline_segment_order_before_intersect_' + sBasinID + '.shp'
-        self.sFilename_flowline_intersect  = 'flowline_intersect_' + sBasinID + '.shp'
+        self.sFilename_flowline_segment_index_before_intersect = 'flowline_segment_index_before_intersect_' + sBasinID + '.json'
+        self.sFilename_flowline_segment_order_before_intersect = 'flowline_segment_order_before_intersect_' + sBasinID + '.json'
+        self.sFilename_flowline_intersect  = 'flowline_intersect_' + sBasinID + '.json'
         
         return
     

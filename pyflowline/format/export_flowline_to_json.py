@@ -3,8 +3,8 @@ import json
 from osgeo import ogr, osr, gdal, gdalconst
 from shapely.geometry import Point, LineString, MultiLineString
 from shapely.wkt import loads
-def export_flowline_to_shapefile(iFlag_projected_in, aFlowline_in, pSpatial_reference_in, \
-    sFilename_shapefile_out, \
+def export_flowline_to_json(iFlag_projected_in, aFlowline_in, pSpatial_reference_in, \
+    sFilename_json_out, \
     aAttribute_field=None,\
     aAttribute_data=None,\
         aAttribute_dtype=None):
@@ -13,9 +13,9 @@ def export_flowline_to_shapefile(iFlag_projected_in, aFlowline_in, pSpatial_refe
     This function should be used for stream flowline only.
     """
 
-    if os.path.exists(sFilename_shapefile_out): 
+    if os.path.exists(sFilename_json_out): 
         #delete it if it exists
-        os.remove(sFilename_shapefile_out)
+        os.remove(sFilename_json_out)
         pass
 
     nFlowline = len(aFlowline_in)
@@ -37,10 +37,10 @@ def export_flowline_to_shapefile(iFlag_projected_in, aFlowline_in, pSpatial_refe
         pass
 
 
-    #pDriver_json = ogr.GetDriverByName('GeoJSON')
-    pDriver_shapefile = ogr.GetDriverByName('ESRI Shapefile')
+    pDriver_json = ogr.GetDriverByName('GeoJSON')
+    #pDriver_json = ogr.GetDriverByName('ESRI Shapefile')
     #geojson
-    pDataset_shapefile = pDriver_shapefile.CreateDataSource(sFilename_shapefile_out)  
+    pDataset_shapefile = pDriver_json.CreateDataSource(sFilename_json_out)  
     
 
     pLayer_shapefile = pDataset_shapefile.CreateLayer('flowline', pSpatial_reference_in, ogr.wkbLineString)

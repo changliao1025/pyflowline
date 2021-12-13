@@ -208,7 +208,7 @@ class flowlinecase(object):
         
 
         #model generated files
-        self.sFilename_mesh = self.sWorkspace_output + slash  + sMesh_type + ".shp"
+        self.sFilename_mesh = self.sWorkspace_output + slash  + sMesh_type + ".json"
         
         
 

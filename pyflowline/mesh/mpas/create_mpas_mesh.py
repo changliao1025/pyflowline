@@ -29,7 +29,7 @@ def create_mpas_mesh(iFlag_global, iFlag_use_mesh_dem, iFlag_save_mesh, \
 
     netcdf_format = pDatasets_in.file_format
     pDriver_geojson = ogr.GetDriverByName('GeoJSON')
-    pDriver_shapefile = ogr.GetDriverByName('ESRI Shapefile')
+    #pDriver_shapefile = ogr.GetDriverByName('ESRI Shapefile')
   
     pSpatialRef_gcs = osr.SpatialReference()  
     pSpatialRef_gcs.ImportFromEPSG(4326)    # WGS84 lat/lon
@@ -37,7 +37,7 @@ def create_mpas_mesh(iFlag_global, iFlag_use_mesh_dem, iFlag_save_mesh, \
     
     #geojson
     if iFlag_save_mesh ==1:
-        pDataset = pDriver_shapefile.CreateDataSource(sFilename_mesh)
+        pDataset = pDriver_geojson.CreateDataSource(sFilename_mesh)
 
         pLayer = pDataset.CreateLayer('cell', pSpatialRef_gcs, ogr.wkbPolygon)
         # Add one attribute

@@ -102,7 +102,7 @@ def create_mesh_op(oPyflowline_in):
                     sFilename_mesh)
                 return aLatlon
             else:
-                if iMesh_type ==4: #mpas
+                if iMesh_type == 4: #mpas
                     iFlag_use_mesh_dem = oPyflowline_in.iFlag_use_mesh_dem
                     sFilename_mesh_netcdf = oPyflowline_in.sFilename_mesh_netcdf
                     dLatitude_top    = oPyflowline_in.dLatitude_top   

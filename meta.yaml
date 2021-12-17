@@ -4,7 +4,7 @@ package:
 
 source:
   git_rev: v0.0.1
-  git_url: https://github.com/changliao1025/pye3sm
+  git_url: https://github.com/changliao1025/pyflowline
 
 requirements:
   host:
@@ -18,7 +18,7 @@ requirements:
     - pyearth
 
 about:
-  home: https://github.com/changliao1025/pye3sm
+  home: https://github.com/changliao1025/pyflowline
   license: MIT
   license_familY: MIT
   license_file: LICENSE

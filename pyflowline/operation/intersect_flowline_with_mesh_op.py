@@ -1,5 +1,5 @@
 import os, sys
-from pyearth.system.define_global_variables import *
+
 from pyflowline.shared.vertex import pyvertex
 
 from pyflowline.format.read_flowline_geojson import read_flowline_geojson

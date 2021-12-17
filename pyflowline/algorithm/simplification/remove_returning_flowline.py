@@ -2,7 +2,7 @@ import copy
 from posixpath import join
 import numpy as np
 
-from pyearth.toolbox.data.check_if_duplicates import check_if_duplicates
+from pyflowline.algorithm.auxiliary.check_if_duplicates import check_if_duplicates
 from pyflowline.shared.hexagon import pyhexagon
 from pyflowline.shared.flowline import pyflowline
 from pyflowline.format.convert_coordinates_to_flowline import convert_gcs_coordinates_to_flowline, convert_pcs_coordinates_to_flowline

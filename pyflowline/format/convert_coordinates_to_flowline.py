@@ -3,11 +3,9 @@ import json
 from pyflowline.shared.edge import pyedge
 from osgeo import ogr, osr, gdal, gdalconst
 import numpy as np
-from pyearth.gis.gdal.gdal_function import reproject_coordinates
+from pyflowline.algorithm.auxiliary.reproject_coordinates import reproject_coordinates
 
 
-from shapely.geometry import Point, LineString, MultiLineString
-from shapely.wkt import loads
 
 
 

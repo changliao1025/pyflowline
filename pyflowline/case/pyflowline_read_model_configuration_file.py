@@ -4,7 +4,6 @@ import datetime
 import json
 
 
-from pyearth.system.define_global_variables import *
 
 from pyflowline.case.pycase import flowlinecase
 

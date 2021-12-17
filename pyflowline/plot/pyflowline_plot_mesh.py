@@ -4,9 +4,9 @@ from pathlib import Path
 import json
 
 
-from pyearth.system.define_global_variables import *
+
 from pyearth.visual.color.create_diverge_rgb_color_hex import create_diverge_rgb_color_hex
-import matplotlib
+
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 from matplotlib.collections import PatchCollection

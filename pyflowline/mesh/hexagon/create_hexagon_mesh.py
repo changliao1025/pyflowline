@@ -6,13 +6,11 @@
 import os, sys
 import numpy as np
 from osgeo import ogr, osr, gdal, gdalconst
-from shapely.geometry import Point, LineString, MultiLineString
-from shapely.wkt import loads
+
 from pyflowline.shared.hexagon import pyhexagon
 from pyflowline.format.convert_coordinates_to_cell import convert_gcs_coordinates_to_cell, convert_pcs_coordinates_to_cell
-
-from pyearth.toolbox.data.check_if_duplicates import check_if_duplicates
-from pyearth.gis.gdal.gdal_function import reproject_coordinates, reproject_coordinates_batch
+from pyflowline.algorithm.auxiliary.check_if_duplicates import check_if_duplicates
+from pyflowline.algorithm.auxiliary.reproject_coordinates import reproject_coordinates, reproject_coordinates_batch
 
 def create_hexagon_mesh(iFlag_rotation, dX_left, dY_bot, \
     dResolution_meter, ncolumn, nrow, \

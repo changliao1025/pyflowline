@@ -19,7 +19,8 @@ KEYWORDS = "Earth Science"
 REQUIRED = [
     "numpy", 
     "matplotlib",
-    "pyearth"
+    "gdal",
+    "netcdf4"
 ]
 
 CLASSIFY = [

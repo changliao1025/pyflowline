@@ -1,6 +1,6 @@
 import os
 import json
-from pyearth.system.define_global_variables import *
+
 from pyflowline.shared.vertex import pyvertex
 from pyearth.gis.gdal.gdal_function import reproject_coordinates
 from pyflowline.format.read_flowline_shapefile import read_flowline_shapefile

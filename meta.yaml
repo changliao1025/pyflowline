@@ -1,5 +1,5 @@
 package:
-  name: "pye3sm"
+  name: "pyflowline"
   version: "0.0.1"
 
 source:
@@ -15,14 +15,15 @@ requirements:
   run:
     - python
     - netCDF4
-    - pyearth
+    - numpy
+    - gdal
 
 about:
   home: https://github.com/changliao1025/pyflowline
   license: MIT
   license_familY: MIT
   license_file: LICENSE
-  summary: "Python for E3SM"
+  summary: "Python for River Flowline"
 
 extra:
   recipe-maintainers:

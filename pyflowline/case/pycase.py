@@ -1,6 +1,6 @@
 from abc import ABCMeta, abstractmethod
 import datetime
-from pyearth.system.define_global_variables import *
+
 import json
 from pyflowline.shared.basin import pybasin
 pDate = datetime.datetime.today()

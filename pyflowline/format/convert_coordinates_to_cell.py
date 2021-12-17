@@ -16,7 +16,7 @@ from pyflowline.shared.latlon import pylatlon
 from pyflowline.shared.mpas import pympas
 from pyflowline.shared.tin import pytin
 
-from pyearth.gis.gdal.gdal_function import reproject_coordinates
+from pyflowline.algorithm.auxiliary.reproject_coordinates import reproject_coordinates
 
 
 

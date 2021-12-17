@@ -6,9 +6,9 @@
 import os, sys
 from osgeo import ogr, osr, gdal, gdalconst
 
-from pyearth.gis.gdal.gdal_function import obtain_raster_metadata
 
-from pyearth.gis.gdal.gdal_function import reproject_coordinates, reproject_coordinates_batch
+
+from pyflowline.algorithm.auxiliary.reproject_coordinates import reproject_coordinates, reproject_coordinates_batch
 
 def create_square_mesh(dX_left, dY_bot, dResolution, ncolumn, nrow, sFilename_output, sFilename_spatial_reference_in):
 

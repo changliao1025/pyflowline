@@ -5,7 +5,7 @@ from osgeo import osr
 
 from pyearth.toolbox.reader.text_reader_string import text_reader_string
 from pyflowline.shared.vertex import pyvertex
-from pyearth.system.define_global_variables import *
+
 
 from pyflowline.format.read_flowline_shapefile import read_flowline_shapefile
 from pyflowline.format.read_nhdplus_flowline_shapefile import read_nhdplus_flowline_shapefile_attribute

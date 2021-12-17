@@ -2,7 +2,7 @@
 
 # Dependency
 
-* pyflowline use some functions from pyearth, which is a general purpose library for many Earth scient operation.
+* 
 
 
 # Requirements

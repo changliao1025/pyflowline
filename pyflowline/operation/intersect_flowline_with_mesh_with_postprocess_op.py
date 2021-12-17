@@ -2,7 +2,7 @@ import os
 import json
 
 from pyflowline.shared.vertex import pyvertex
-from pyearth.gis.gdal.gdal_function import reproject_coordinates
+from pyflowline.algorithm.auxiliary.reproject_coordinates import reproject_coordinates
 from pyflowline.format.read_flowline_shapefile import read_flowline_shapefile
 from pyflowline.format.read_mesh_shapefile import read_mesh_shapefile
 from pyflowline.format.read_flowline_geojson import read_flowline_geojson

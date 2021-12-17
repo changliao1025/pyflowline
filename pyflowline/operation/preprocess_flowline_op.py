@@ -2,8 +2,9 @@ import os, sys
 
 import numpy as np
 from osgeo import osr
+from pathlib import Path
 
-from pyearth.toolbox.reader.text_reader_string import text_reader_string
+from pyflowline.algorithm.auxiliary.text_reader_string import text_reader_string
 from pyflowline.shared.vertex import pyvertex
 
 

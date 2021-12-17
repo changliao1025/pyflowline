@@ -5,7 +5,7 @@ from osgeo import gdal, osr, ogr
 from pyflowline.shared.vertex import pyvertex
 from pyflowline.shared.edge import pyedge
 from pyflowline.shared.cell import pycell
-from pyearth.gis.location.calculate_polygon_area import calculate_polygon_area
+from pyflowline.algorithm.auxiliary.calculate_polygon_area import calculate_polygon_area
 import numpy as np
 import json
 from json import JSONEncoder

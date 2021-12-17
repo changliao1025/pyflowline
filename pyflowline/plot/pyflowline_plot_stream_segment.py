@@ -1,6 +1,6 @@
 import json
 from osgeo import ogr, osr, gdal, gdalconst
-from pyearth.system.define_global_variables import *
+
 def pyflowline_plot_stream_segment(oPyflowline_in):
 
     sWorkspace_output_case = oPyflowline_in.sWorkspace_output_case

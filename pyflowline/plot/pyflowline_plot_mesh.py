@@ -5,7 +5,6 @@ import json
 
 
 
-from pyearth.visual.color.create_diverge_rgb_color_hex import create_diverge_rgb_color_hex
 
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches

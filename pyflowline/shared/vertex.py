@@ -3,7 +3,7 @@ import numpy as np
 import json
 from json import JSONEncoder
 
-from pyearth.gis.location.calculate_distance_based_on_lon_lat import calculate_distance_based_on_lon_lat
+from pyflowline.algorithm.auxiliary.calculate_distance_based_on_lon_lat import calculate_distance_based_on_lon_lat
 
 class VertexClassEncoder(JSONEncoder):
     def default(self, obj):

@@ -76,16 +76,27 @@ class flowlinecase(object):
     aBasin = list()
     
     def __init__(self, aParameter):
-        self.sFilename_model_configuration    = aParameter[ 'sFilename_model_configuration']
-
-        self.sWorkspace_bin= aParameter[ 'sWorkspace_bin']
-        self.sWorkspace_data = aParameter[ 'sWorkspace_data']
         
-        self.sWorkspace_project= aParameter[ 'sWorkspace_project']
-        self.sWorkspace_output = aParameter[ 'sWorkspace_output']
+        if 'sFilename_model_configuration' in aParameter:
+            self.sFilename_model_configuration    = aParameter[ 'sFilename_model_configuration']
         
-        self.sRegion               = aParameter[ 'sRegion']
-        self.sModel                = aParameter[ 'sModel']
+        if 'sWorkspace_bin' in aParameter:
+            self.sWorkspace_bin= aParameter[ 'sWorkspace_bin']
+            
+        if 'sWorkspace_data' in aParameter:
+            self.sWorkspace_data = aParameter[ 'sWorkspace_data']
+        
+        if 'sWorkspace_project' in aParameter:
+            self.sWorkspace_project= aParameter[ 'sWorkspace_project']
+        
+        if 'sWorkspace_output' in aParameter:
+            self.sWorkspace_output = aParameter[ 'sWorkspace_output']
+        
+        if 'sRegion' in aParameter:
+            self.sRegion               = aParameter[ 'sRegion']
+        
+        if 'sModel' in aParameter:
+            self.sModel                = aParameter[ 'sModel']
 
 
         if 'iFlag_standalone' in aParameter:

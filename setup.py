@@ -20,7 +20,7 @@ REQUIRED = [
     "numpy", 
     "matplotlib",
     "gdal",
-    "netcdf4"
+    "netCDF4"
 ]
 
 CLASSIFY = [

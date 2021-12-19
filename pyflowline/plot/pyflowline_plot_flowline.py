@@ -1,7 +1,7 @@
 import json
 from osgeo import ogr, osr, gdal, gdalconst
 
-def pyflowline_plot_variable(oPyflowline_in, sVariable_in = None):
+def pyflowline_plot_flowline(oPyflowline_in, sVariable_in = None):
 
     sWorkspace_output_case = oPyflowline_in.sWorkspace_output_case
 

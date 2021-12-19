@@ -13,6 +13,7 @@
     "iFlag_disconnected": 0,
     "iFlag_stream_burning_topology": 1, 
     "iFlag_resample_method": 2,
+    "iFlag_use_mesh_dem": 0,
     "iCase_index": 1,
     "iMesh_type": 1,
     "lCellID_outlet": -1,    

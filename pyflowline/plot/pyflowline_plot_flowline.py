@@ -4,6 +4,7 @@ import json
 import numpy as np
 from osgeo import ogr, osr, gdal, gdalconst
 import matplotlib.pyplot as plt
+from matplotlib import cm
 import cartopy.crs as ccrs
 from shapely.wkt import loads
 import matplotlib.path as mpath
@@ -40,6 +41,9 @@ def pyflowline_plot_flowline(oBasin_in, sVariable_in = None):
     dLat_max = -90
     dLon_min = 180
     dLon_max = -180
+    n_colors = pLayer.GetFeatureCount()
+    
+    colours = cm.rainbow(np.linspace(0, 1, n_colors))
     for pFeature_shapefile in pLayer:
         pGeometry_in = pFeature_shapefile.GetGeometryRef()
         sGeometry_type = pGeometry_in.GetGeometryName()
@@ -70,12 +74,11 @@ def pyflowline_plot_flowline(oBasin_in, sVariable_in = None):
 
             path = mpath.Path(aCoords_gcs, codes)
             patch = mpatches.PathPatch(path,  \
-                lw=2, transform=ccrs.PlateCarree())
+                lw=1, transform=ccrs.PlateCarree(), alpha=0.8, edgecolor= colours[lID])
             ax.add_patch(patch)
+            lID = lID + 1
             
-    
-
-
+  
     pDataset = pLayer = pFeature  = None      
 
     ax.set_extent([dLon_min  , dLon_max , dLat_min , dLat_max ])

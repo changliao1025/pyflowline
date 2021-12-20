@@ -27,7 +27,7 @@
     "dResolution": 5000,
     "dResolution_meter": 50000,
     "dThreshold_small_river": 30000,
-    "sDate": "20210909",        
+    "sDate": "20211217",        
     "sMesh_type": "hexagon",       
     "sFilename_spatial_reference": "/qfs/people/liao313/data/hexwatershed/susquehanna/vector/hydrology/boundary_proj.shp",
     "sFilename_dem": "/qfs/people/liao313/data/hexwatershed/susquehanna/raster/dem/dem_ext.tif",

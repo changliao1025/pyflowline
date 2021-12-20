@@ -1,6 +1,8 @@
+import os
+from pathlib import Path
 from abc import ABCMeta, abstractmethod
-import datetime
 
+import datetime
 import json
 from pyflowline.shared.basin import pybasin
 pDate = datetime.datetime.today()
@@ -98,7 +100,6 @@ class flowlinecase(object):
         if 'sModel' in aParameter:
             self.sModel                = aParameter[ 'sModel']
 
-
         if 'iFlag_standalone' in aParameter:
             self.iFlag_standalone = int(aParameter['iFlag_standalone'])
     
@@ -147,7 +148,7 @@ class flowlinecase(object):
 
         #the model can be run as part of hexwatershed or standalone
         if self.iFlag_standalone ==1:
-            sPath = self.sWorkspace_output + slash + sCase
+            sPath = str(Path(self.sWorkspace_output)  /  sCase)
             self.sWorkspace_output = sPath
         else:
             sPath = self.sWorkspace_output
@@ -219,16 +220,18 @@ class flowlinecase(object):
         
 
         #model generated files
-        self.sFilename_mesh = self.sWorkspace_output + slash  + sMesh_type + ".json"
+
+   
+        self.sFilename_mesh = os.path.join(str(Path(self.sWorkspace_output)  ) , sMesh_type + ".json" )
         
         
 
-        self.sFilename_mesh_info= self.sWorkspace_output + slash + sMesh_type + "_mesh_info.json"  
+        self.sFilename_mesh_info= os.path.join(str(Path(self.sWorkspace_output)  ) , sMesh_type + "_mesh_info.json"  )
         
         
         
 
-        self.sWorkspace_data_project = self.sWorkspace_data +  slash + self.sWorkspace_project
+        self.sWorkspace_data_project = str(Path(self.sWorkspace_data ) / self.sWorkspace_project)
 
                 
         return

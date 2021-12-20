@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 from pyflowline.case.pycase import flowlinecase
 from pyflowline.case.pyflowline_read_model_configuration_file import pyflowline_read_model_configuration_file
@@ -11,7 +12,7 @@ if iFlag_option ==1:
 
 
 else: 
-    if iFlag_option ==2:
+    if iFlag_option == 2:
 
         #an example configuration file is provided with the repository, but you need to update this file based on your own case study
         
@@ -30,9 +31,9 @@ from pyflowline.format.convert_shapefile_to_json import convert_shapefile_to_jso
 nOutlet = oPyflowline.nOutlet
 for i in range(nOutlet):
     sBasin =  "{:03d}".format(i+1)    
-    sWorkspace_output_basin = Path(oPyflowline_in.sWorkspace_output) / sBasin
+    sWorkspace_output_basin = Path(oPyflowline.sWorkspace_output) / sBasin
     Path(sWorkspace_output_basin).mkdir(parents=True, exist_ok=True)                      
-    pBasin = oPyflowline_in.aBasin[i]
+    pBasin = oPyflowline.aBasin[i]
     #the original flowline in shapefile format
     sFilename_raw = pBasin.sFilename_flowline_filter
     #the new flowine in geojson format in WGS84

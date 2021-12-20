@@ -2,6 +2,7 @@ import os
 import json
 from osgeo import ogr, osr, gdal, gdalconst
 from pyflowline.format.read_flowline_shapefile import read_flowline_shapefile
+from pyflowline.format.export_flowline_to_json import export_flowline_to_json
 def convert_shapefile_to_json(sFilename_shapefile_in, sFilename_geojson_in):
 
     #read shapefile into a list

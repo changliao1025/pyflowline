@@ -1,7 +1,9 @@
 import os
 from pathlib import Path
 import json
+import numpy as np
 from osgeo import ogr, osr, gdal, gdalconst
+import matplotlib.pyplot as plt
 
 def pyflowline_plot_flowline(oBasin_in, sVariable_in = None):
 
@@ -12,7 +14,21 @@ def pyflowline_plot_flowline(oBasin_in, sVariable_in = None):
         sFilename_json = oBasin_in.sFilename_flowline_raw_json
     #convert existing flowline into the wgs83 system
 
-    sFilename_json = sWorkspace_output_case + slash + 'hexwatershed' + slash + 'hexwatershed.json'
+    #sFilename_json = sWorkspace_output_case + slash + 'hexwatershed' + slash + 'hexwatershed.json'
+    x = np.arange(1,10,1)
+    y = x * 2
+    fig = plt.figure( dpi=300 )
+    fig.set_figwidth( 12 )
+    fig.set_figheight( 12 )
+    ax = fig.add_axes([0.1, 0.15, 0.75, 0.6]  )
+    ax.plot(x, y)
+
+    
+    plt.savefig(sFilename_out, bbox_inches='tight')
+    plt.show()
+
+    return
+
 
     sFilename_shapefile = sWorkspace_output_case + slash + 'hexwatershed' + slash + 'flow_direction.shp'
     pDriver_shapefile = ogr.GetDriverByName('Esri Shapefile')

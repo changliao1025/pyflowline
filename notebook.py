@@ -17,7 +17,7 @@ else:
         #an example configuration file is provided with the repository, but you need to update this file based on your own case study
         
         #sFilename_configuration_in = str(Path.cwd()) +  '/pyflowline/config/pyflowline_susquehanna_hexagon.json' 
-        sFilename_configuration_in = '/qfs/people/liao313/workspace/python/pyflowline/pyflowline/config/pyflowline_susquehanna_hexagon.json'
+        sFilename_configuration_in = '/Users/liao313/workspace/python/pyflowline/pyflowline/config/pyflowline_susquehanna_hexagon_mac.json'
         print(sFilename_configuration_in)
         oPyflowline = pyflowline_read_model_configuration_file(sFilename_configuration_in)
 
@@ -37,8 +37,8 @@ for i in range(nOutlet):
     #the original flowline in shapefile format
     sFilename_raw = pBasin.sFilename_flowline_filter
     #the new flowine in geojson format in WGS84
-    sFilename_out = 'flowline_raw_' + sBasin + '.json'
-    sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
+    
+    sFilename_out = pBasin.sFilename_flowline_filter_json
     convert_shapefile_to_json(sFilename_raw, sFilename_out)
 
 
@@ -46,7 +46,7 @@ for i in range(nOutlet):
 from pyflowline.plot.pyflowline_plot_flowline import pyflowline_plot_flowline
 for i in range(nOutlet):
     pBasin = oPyflowline.aBasin[i]
-    pyflowline_plot_flowline(pBasin, sVariable_in = 'flowline_raw') 
+    pyflowline_plot_flowline(pBasin, sVariable_in = 'flowline_filter_json') 
 
 from pyflowline.operation.preprocess_flowline_op import preprocess_flowline_op
 preprocess_flowline_op(oPyflowline)

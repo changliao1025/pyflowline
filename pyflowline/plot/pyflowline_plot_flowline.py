@@ -4,84 +4,86 @@ import json
 import numpy as np
 from osgeo import ogr, osr, gdal, gdalconst
 import matplotlib.pyplot as plt
+import cartopy.crs as ccrs
+from shapely.wkt import loads
+import matplotlib.path as mpath
+import matplotlib.patches as mpatches
+desired_proj = ccrs.Orthographic(central_longitude=-75, central_latitude=42, globe=None)
+desired_proj = ccrs.PlateCarree()
 
 def pyflowline_plot_flowline(oBasin_in, sVariable_in = None):
 
     if sVariable_in is not None:
-
-        sFilename_json = oBasin_in.sFilename_flowline_raw_json
+        if sVariable_in == 'flowline_filter_json':
+            sFilename_json = oBasin_in.sFilename_flowline_filter_json
+        else:
+            pass
     else:
-        sFilename_json = oBasin_in.sFilename_flowline_raw_json
+        #default 
+        sFilename_json = oBasin_in.sFilename_flowline_filter_json
     #convert existing flowline into the wgs83 system
-
-    #sFilename_json = sWorkspace_output_case + slash + 'hexwatershed' + slash + 'hexwatershed.json'
-    x = np.arange(1,10,1)
-    y = x * 2
-    fig = plt.figure( dpi=300 )
-    fig.set_figwidth( 12 )
-    fig.set_figheight( 12 )
-    ax = fig.add_axes([0.1, 0.15, 0.75, 0.6]  )
-    ax.plot(x, y)
-
     
-    plt.savefig(sFilename_out, bbox_inches='tight')
-    plt.show()
+    fig = plt.figure( dpi=150 )
+    fig.set_figwidth( 8 )
+    fig.set_figheight( 8 )
+    ax = fig.add_axes([0.1, 0.15, 0.75, 0.6] , projection=desired_proj  )
+    pDriver = ogr.GetDriverByName('GeoJSON')
 
-    return
-
-
-    sFilename_shapefile = sWorkspace_output_case + slash + 'hexwatershed' + slash + 'flow_direction.shp'
-    pDriver_shapefile = ogr.GetDriverByName('Esri Shapefile')
-    pDataset = pDriver_shapefile.CreateDataSource(sFilename_shapefile)
-
+    pDataset = pDriver.Open(sFilename_json, gdal.GA_ReadOnly)
+    pLayer = pDataset.GetLayer(0)
    
     pSrs = osr.SpatialReference()  
     pSrs.ImportFromEPSG(4326)    # WGS84 lat/lon
 
-    pLayer = pDataset.CreateLayer('flowdir', pSrs, ogr.wkbLineString)
-    # Add one attribute
-    pLayer.CreateField(ogr.FieldDefn('id', ogr.OFTInteger64)) #long type for high resolution
-    pFac_field = ogr.FieldDefn('fac', ogr.OFTReal)
-    pFac_field.SetWidth(20)
-    pFac_field.SetPrecision(2)
-    pLayer.CreateField(pFac_field) #long type for high resolution
+    lID = 0
+    dLat_min = 90
+    dLat_max = -90
+    dLon_min = 180
+    dLon_max = -180
+    for pFeature_shapefile in pLayer:
+        pGeometry_in = pFeature_shapefile.GetGeometryRef()
+        sGeometry_type = pGeometry_in.GetGeometryName()
+        if sGeometry_type =='LINESTRING':
+            dummy0 = loads( pGeometry_in.ExportToWkt() )
+            aCoords_gcs = dummy0.coords
+            aCoords_gcs= np.array(aCoords_gcs)
+
+            nvertex = len(aCoords_gcs)
+
+            for i in range(nvertex):
+                dLon = aCoords_gcs[i][0]
+                dLat = aCoords_gcs[i][1]
+                if dLon > dLon_max:
+                    dLon_max = dLon
+                
+                if dLon < dLon_min:
+                    dLon_min = dLon
+                
+                if dLat > dLat_max:
+                    dLat_max = dLat
+
+                if dLat < dLat_min:
+                    dLat_min = dLat
+
+            codes = np.full(nvertex, mpath.Path.LINETO, dtype=int )
+            codes[0] = mpath.Path.MOVETO
+
+            path = mpath.Path(aCoords_gcs, codes)
+            patch = mpatches.PathPatch(path,  \
+                lw=2, transform=ccrs.PlateCarree())
+            ax.add_patch(patch)
+            
     
-    pLayerDefn = pLayer.GetLayerDefn()
-    pFeature = ogr.Feature(pLayerDefn)
 
 
-    with open(sFilename_json) as json_file:
-        data = json.load(json_file)  
+    pDataset = pLayer = pFeature  = None      
 
-        #print(type(data))
+    ax.set_extent([dLon_min  , dLon_max , dLat_min , dLat_max ])
+    
+    sDirname = os.path.dirname(sFilename_json)
+    sFilename  = Path(sFilename_json).stem + '.png'
+    sFilename_out = os.path.join(sDirname, sFilename)
+    plt.savefig(sFilename_out, bbox_inches='tight')
+    plt.show()
 
-        ncell = len(data)
-        lID =0 
-        for i in range(ncell):
-            pcell = data[i]
-            lCellID = int(pcell['lCellID'])
-            lCellID_downslope = int(pcell['lCellID_downslope'])
-            x_start=float(pcell['dLongitude_center_degree'])
-            y_start=float(pcell['dLatitude_center_degree'])
-            dfac = float(pcell['DrainageArea'])
-            for j in range(ncell):
-                pcell2 = data[j]
-                lCellID2 = int(pcell2['lCellID'])
-                if lCellID2 == lCellID_downslope:
-                    x_end=float(pcell2['dLongitude_center_degree'])
-                    y_end=float(pcell2['dLatitude_center_degree'])
-
-                    pLine = ogr.Geometry(ogr.wkbLineString)
-                    pLine.AddPoint(x_start, y_start)
-                    pLine.AddPoint(x_end, y_end)
-                    pFeature.SetGeometry(pLine)
-                    pFeature.SetField("id", lID)
-                    pFeature.SetField("fac", dfac)
-
-                    pLayer.CreateFeature(pFeature)
-                    lID =lID +1
-                    break
-
-
-        pDataset = pLayer = pFeature  = None      
-    pass
+    return

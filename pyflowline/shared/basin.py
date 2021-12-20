@@ -1,3 +1,4 @@
+import os
 from abc import ABCMeta, abstractmethod
 import numpy as np
 import json
@@ -30,8 +31,10 @@ class pybasin(object):
     sWorkspace_output_basin=''
 
     sFilename_flowline_raw=''
-    sFilename_flowline_raw_json=''
+    
     sFilename_flowline_filter=''
+    sFilename_flowline_filter_json=''
+
     sFilename_dam=''
     sFilename_flowline_topo=''
     #before intersect
@@ -87,7 +90,16 @@ class pybasin(object):
         if 'sFilename_flowline_filter' in aParameter:
             self.sFilename_flowline_filter = aParameter['sFilename_flowline_filter']
         else:
-            self.sFilename_flowline_filter   =''
+            self.sFilename_flowline_filter   = ''
+
+        if 'sWorkspace_output_basin' in aParameter:
+            self.sWorkspace_output_basin = aParameter['sWorkspace_output_basin']
+        else:
+            self.sWorkspace_output_basin   = ''
+            print('The basin output path is not specified!')
+
+
+        self.sFilename_flowline_filter_json = os.path.join(str(self.sWorkspace_output_basin ), "flowline_filter.json"  )
 
         if 'sFilename_dam' in aParameter:
             self.sFilename_dam = aParameter['sFilename_dam']

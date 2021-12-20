@@ -3,9 +3,6 @@ import numpy as np
 from pathlib import Path
 import json
 
-
-
-
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 from matplotlib.collections import PatchCollection

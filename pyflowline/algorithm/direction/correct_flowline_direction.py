@@ -2,9 +2,7 @@ import os, sys
 from pyflowline.shared.flowline import pyflowline
 import numpy as np 
 from osgeo import ogr, osr, gdal, gdalconst
-from shapely.geometry import Point, LineString
-from shapely.ops import split
-from shapely.wkt import loads
+
 
 lID=0
 aFlag_process=None

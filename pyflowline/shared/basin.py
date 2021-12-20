@@ -28,6 +28,7 @@ class pybasin(object):
     dThreshold_small_river = 10000
 
     sFilename_flowline_raw=''
+    sFilename_flowline_raw_json=''
     sFilename_flowline_filter=''
     sFilename_dam=''
     sFilename_flowline_topo=''

@@ -227,10 +227,7 @@ class flowlinecase(object):
         
 
         self.sFilename_mesh_info= os.path.join(str(Path(self.sWorkspace_output)  ) , sMesh_type + "_mesh_info.json"  )
-        
-        
-        
-
+    
         self.sWorkspace_data_project = str(Path(self.sWorkspace_data ) / self.sWorkspace_project)
 
                 

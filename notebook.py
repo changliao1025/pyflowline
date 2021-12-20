@@ -22,8 +22,26 @@ else:
 
         #print the case information in details
         print(oPyflowline)
-        
 
+#pyflowline can process multiple basins within one singel run
+#the total number of basin is controlled by the nOutlet variable
+#convert the raw flowline into geojson in WGS84 system        
+from pyflowline.format.convert_shapefile_to_json import convert_shapefile_to_json
+nOutlet = oPyflowline.nOutlet
+for i in range(nOutlet):
+    sBasin =  "{:03d}".format(i+1)    
+    sWorkspace_output_basin = Path(oPyflowline_in.sWorkspace_output) / sBasin
+    Path(sWorkspace_output_basin).mkdir(parents=True, exist_ok=True)                      
+    pBasin = oPyflowline_in.aBasin[i]
+    #the original flowline in shapefile format
+    sFilename_raw = pBasin.sFilename_flowline_filter
+    #the new flowine in geojson format in WGS84
+    sFilename_out = 'flowline_raw_' + sBasin + '.json'
+    sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
+    convert_shapefile_to_json(sFilename_raw, sFilename_out)
+
+
+#now we can visualize the flowline
 from pyflowline.plot.pyflowline_plot_flowline import pyflowline_plot_flowline
 pyflowline_plot_flowline(oPyflowline, sVariable_in = 'flowline_raw') 
 

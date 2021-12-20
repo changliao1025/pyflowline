@@ -7,7 +7,7 @@ def export_flowline_to_json(iFlag_projected_in, aFlowline_in, pSpatial_reference
     sFilename_json_out, \
     aAttribute_field=None,\
     aAttribute_data=None,\
-        aAttribute_dtype=None):
+    aAttribute_dtype=None):
     """
     convert a shpefile to json format.
     This function should be used for stream flowline only.

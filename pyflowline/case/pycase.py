@@ -206,9 +206,13 @@ class flowlinecase(object):
                     dummy_data = json.load(json_file)   
     
                     for i in range(self.nOutlet):
+                        sBasin =  "{:03d}".format(i+1)   
                         dummy_basin = dummy_data[i]
-                        #print(dummy_basin)
+                        
                         pBasin = pybasin(dummy_basin)
+                        sWorkspace_output_basin = Path(self.sWorkspace_output) / sBasin
+                        Path(sWorkspace_output_basin).mkdir(parents=True, exist_ok=True)     
+                        pBasin.sWorkspace_output_basin = sWorkspace_output_basin
     
                         self.aBasin.append(pBasin)
             else:

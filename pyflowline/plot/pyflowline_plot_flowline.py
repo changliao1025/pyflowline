@@ -3,9 +3,13 @@ from pathlib import Path
 import json
 from osgeo import ogr, osr, gdal, gdalconst
 
-def pyflowline_plot_flowline(oPyflowline_in, sVariable_in = None):
+def pyflowline_plot_flowline(oBasin_in, sVariable_in = None):
 
-    sWorkspace_output_case = oPyflowline_in.sWorkspace_output_case
+    if sVariable_in is not None:
+
+        sFilename_json = oBasin_in.sFilename_flowline_raw_json
+    else:
+        sFilename_json = oBasin_in.sFilename_flowline_raw_json
     #convert existing flowline into the wgs83 system
 
     sFilename_json = sWorkspace_output_case + slash + 'hexwatershed' + slash + 'hexwatershed.json'

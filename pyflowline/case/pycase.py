@@ -164,7 +164,7 @@ class flowlinecase(object):
         if sMesh_type =='hexagon': #hexagon
             self.iMesh_type = 1
         else:
-            if sMesh_type =='square': #sqaure
+            if sMesh_type =='square': #square
                 self.iMesh_type = 2
             else:
                 if sMesh_type =='latlon': #latlon
@@ -178,9 +178,6 @@ class flowlinecase(object):
                         else:
                             print('Unsupported mesh type?')
          
-     
-
-        
         
         self.dResolution = float(aParameter['dResolution']) 
         self.dResolution_meter = float(aParameter['dResolution_meter']) 

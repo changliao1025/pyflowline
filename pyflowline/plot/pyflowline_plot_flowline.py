@@ -32,7 +32,6 @@ def pyflowline_plot_flowline(oBasin_in, sVariable_in = None):
     fig.set_figheight( 4 )
     ax = fig.add_axes([0.1, 0.15, 0.75, 0.8] , projection=desired_proj  )
     pDriver = ogr.GetDriverByName('GeoJSON')
-
     pDataset = pDriver.Open(sFilename_json, gdal.GA_ReadOnly)
     pLayer = pDataset.GetLayer(0)
    
@@ -54,9 +53,7 @@ def pyflowline_plot_flowline(oBasin_in, sVariable_in = None):
             dummy0 = loads( pGeometry_in.ExportToWkt() )
             aCoords_gcs = dummy0.coords
             aCoords_gcs= np.array(aCoords_gcs)
-
             nvertex = len(aCoords_gcs)
-
             for i in range(nvertex):
                 dLon = aCoords_gcs[i][0]
                 dLat = aCoords_gcs[i][1]

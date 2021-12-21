@@ -28,20 +28,19 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh, sFilename_flowli
         os.remove(sFilename_output)
 
     
-    #pDriver_geojson = ogr.GetDriverByName( "GeoJSON")
-    pDriver_shapefile = ogr.GetDriverByName('ESRI Shapefile' )
+    pDriver_geojson = ogr.GetDriverByName( "GeoJSON")
+    #pDriver_shapefile = ogr.GetDriverByName('ESRI Shapefile' )
 
     #geojson
     aCell=list()
     aCell_intersect=list()    
    
-    pDataset_mesh = pDriver_shapefile.Open(sFilename_mesh, 0)
-    pDataset_flowline = pDriver_shapefile.Open(sFilename_flowline, 0)   
+    pDataset_mesh = pDriver_geojson.Open(sFilename_mesh, 0)
+    pDataset_flowline = pDriver_geojson.Open(sFilename_flowline, 0)   
 
     pLayer_mesh = pDataset_mesh.GetLayer(0)
     pSpatialRef_mesh = pLayer_mesh.GetSpatialRef()
     nfeature_mesh = pLayer_mesh.GetFeatureCount()
-    #print( pSpatialRef_mesh)
 
     pLayer_flowline = pDataset_flowline.GetLayer(0)
     pSpatialRef_flowline = pLayer_flowline.GetSpatialRef()
@@ -56,7 +55,7 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh, sFilename_flowli
     else:
         iFlag_transform = 0
 
-    pDataset_out = pDriver_shapefile.CreateDataSource(sFilename_output)
+    pDataset_out = pDriver_geojson.CreateDataSource(sFilename_output)
 
     pLayerOut = pDataset_out.CreateLayer('flowline', pSpatialRef_flowline, ogr.wkbMultiLineString)
     # Add one attribute
@@ -69,9 +68,10 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh, sFilename_flowli
     lID_flowline = 0           
 
     aFlowline_intersect_all=list()
-    for i in range (nfeature_mesh):
+    #for i in range (nfeature_mesh):
+    for pFeature_mesh in pLayer_mesh:
        
-        pFeature_mesh= pLayer_mesh.GetFeature(i)
+        #pFeature_mesh= pLayer_mesh.GetFeature(i)
         pGeometry_mesh = pFeature_mesh.GetGeometryRef()
         #if iMesh_type_in ==4 or iMesh_type_in ==3 :
         dummy0 = loads( pGeometry_mesh.ExportToWkt() )
@@ -102,7 +102,7 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh, sFilename_flowli
             #aCoords_gcs= np.array(aCoords_gcs)
             #convert lat/lon to projection because of intersect function
             #if iMesh_type_in ==4 or iMesh_type_in ==3: 
-            pCell = convert_gcs_coordinates_to_cell(iMesh_type_in, aCoords_gcs, dLon, dLat)
+            pCell = convert_gcs_coordinates_to_cell(iMesh_type_in, dLon, dLat, aCoords_gcs)
             #else:
             #    pCell = convert_pcs_coordinates_to_cell(iMesh_type_in, aCoords_pcs,)
 

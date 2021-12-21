@@ -1,8 +1,9 @@
 import sys, os, stat
 import numpy as np
 from pathlib import Path
+from osgeo import ogr, osr, gdal, gdalconst
 import json
-
+from shapely.wkt import loads
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import matplotlib.cm as cm
@@ -12,22 +13,26 @@ import cartopy.crs as ccrs
 
 desired_proj = ccrs.Orthographic(central_longitude=-75, central_latitude=42, globe=None)
 
-#desired_proj = ccrs.PlateCarree()
+desired_proj = ccrs.PlateCarree()
 
 def pyflowline_plot_mesh(oPyflowline_in):
 
     sWorkspace_output_case = oPyflowline_in.sWorkspace_output
-
-    
     
     sFilename_json  =  oPyflowline_in.sFilename_mesh
     
-    fig = plt.figure( dpi=300 )
-    fig.set_figwidth( 12 )
-    fig.set_figheight( 12 )
-    ax = fig.add_axes([0.1, 0.15, 0.75, 0.6] , projection=desired_proj )
+    fig = plt.figure( dpi=150 )
+    fig.set_figwidth( 4 )
+    fig.set_figheight( 4 )
+    ax = fig.add_axes([0.1, 0.15, 0.75, 0.7] , projection=desired_proj )
     
     ax.set_global()
+    pDriver = ogr.GetDriverByName('GeoJSON')
+    pDataset = pDriver.Open(sFilename_json, gdal.GA_ReadOnly)
+    pLayer = pDataset.GetLayer(0)
+   
+    pSrs = osr.SpatialReference()  
+    pSrs.ImportFromEPSG(4326)    # WGS84 lat/lon
 
     dLat_min = 90
     dLat_max = -90
@@ -35,43 +40,38 @@ def pyflowline_plot_mesh(oPyflowline_in):
     dLon_max = -180
 
 
-    with open(sFilename_json) as json_file:
-        data = json.load(json_file)        
+    for pFeature_shapefile in pLayer:
+        pGeometry_in = pFeature_shapefile.GetGeometryRef()
+        sGeometry_type = pGeometry_in.GetGeometryName()
 
-        ncell = len(data)
+        
         lID =0 
-        for i in range(ncell):
-            pcell = data[i]
-            lCellID = int(pcell['lCellID'])
-            lCellID_downslope = int(pcell['lCellID_downslope'])
-            x_start=float(pcell['dLongitude_center_degree'])
-            y_start=float(pcell['dLatitude_center_degree'])
+        if sGeometry_type =='POLYGON':
+            dummy0 = loads( pGeometry_in.ExportToWkt() )
+            aCoords_gcs = dummy0.exterior.coords
+            aCoords_gcs= np.array(aCoords_gcs)
+            nvertex = len(aCoords_gcs)
             
-
-            avertex = pcell['vVertex']
-            nvertex = len(avertex)
-            aLocation= np.full( (nvertex, 2), 0.0, dtype=float )
-           
-            
-            for k in range(nvertex):
-                aLocation[k,0] = avertex[k]['dLongitude_degree']
-                aLocation[k,1] = avertex[k]['dLatitude_degree']
-
-                if aLocation[k,0] > dLon_max:
-                    dLon_max = aLocation[k,0]
+            for i in range(nvertex):
+                dLon = aCoords_gcs[i][0]
+                dLat = aCoords_gcs[i][1]
+                if dLon > dLon_max:
+                    dLon_max = dLon
                 
-                if aLocation[k,0] < dLon_min:
-                    dLon_min = aLocation[k,0]
+                if dLon < dLon_min:
+                    dLon_min = dLon
                 
-                if aLocation[k,1] > dLat_max:
-                    dLat_max = aLocation[k,1]
+                if dLat > dLat_max:
+                    dLat_max = dLat
 
-                if aLocation[k,1] < dLat_min:
-                    dLat_min = aLocation[k,1]
+                if dLat < dLat_min:
+                    dLat_min = dLat
 
             
-            polygon = mpatches.Polygon(aLocation, closed=True,  alpha=0.8, edgecolor=b,transform=ccrs.PlateCarree() )
-            #aPatch.append(polygon)
+            polygon = mpatches.Polygon(aCoords_gcs[:,0:2], closed=True,  \
+                alpha=0.8, edgecolor = 'black',facecolor='none', \
+                    transform=ccrs.PlateCarree() )
+            
             ax.add_patch(polygon)                   
                     
     

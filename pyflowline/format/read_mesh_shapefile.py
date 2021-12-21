@@ -12,7 +12,7 @@ from pyflowline.shared.flowline import pyflowline
 
 
 
-def read_mesh_shapefile(sFilename_shapefile_in):
+def read_mesh_shapefile(sFilename_mesh_in):
     """
     convert a shpefile to json format.
     This function should be used for stream flowline only.
@@ -21,17 +21,12 @@ def read_mesh_shapefile(sFilename_shapefile_in):
     aMesh=list()
 
     pDriver_json = ogr.GetDriverByName('GeoJSON')
-    pDriver_shapefile = ogr.GetDriverByName('ESRI Shapefile')
+    #pDriver_shapefile = ogr.GetDriverByName('ESRI Shapefile')
    
-    pDataset_shapefile = pDriver_shapefile.Open(sFilename_shapefile_in, gdal.GA_ReadOnly)
+    pDataset_shapefile = pDriver_json.Open(sFilename_mesh_in, gdal.GA_ReadOnly)
     pLayer_shapefile = pDataset_shapefile.GetLayer(0)
     pSpatialRef_shapefile = pLayer_shapefile.GetSpatialRef()
 
-    
-    
-        
-        
-    
     #we also need to spatial reference
 
     return aMesh, pSpatialRef_shapefile

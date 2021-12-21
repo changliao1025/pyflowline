@@ -40,6 +40,12 @@ def create_hexagon_mesh(iFlag_rotation, dX_left, dY_bot, \
     pLayer = pDataset.CreateLayer('cell', pSpatialRef_gcs, ogr.wkbPolygon)
     # Add one attribute
     pLayer.CreateField(ogr.FieldDefn('id', ogr.OFTInteger64)) #long type for high resolution
+    pLayer.CreateField(ogr.FieldDefn('lon', ogr.OFTReal)) #long type for high resolution
+    pLayer.CreateField(ogr.FieldDefn('lat', ogr.OFTReal)) #long type for high resolution
+    pArea_field = ogr.FieldDefn('area', ogr.OFTReal)
+    pArea_field.SetWidth(20)
+    pArea_field.SetPrecision(2)
+    pLayer.CreateField(pArea_field)
     
     pLayerDefn = pLayer.GetLayerDefn()
     pFeature = ogr.Feature(pLayerDefn)
@@ -310,7 +316,8 @@ def create_hexagon_mesh(iFlag_rotation, dX_left, dY_bot, \
     
                 pFeature.SetGeometry(pPolygon)
                 pFeature.SetField("id", lCellID)
-                pLayer.CreateFeature(pFeature)
+                
+                
                 
     
     
@@ -334,9 +341,14 @@ def create_hexagon_mesh(iFlag_rotation, dX_left, dY_bot, \
                 dummy1= np.array(aCoords)
                 dLongitude_center = np.mean(aCoords[0:6,0])
                 dLatitude_center = np.mean(aCoords[0:6,1])
+                pFeature.SetField("lon", dLongitude_center )
+                pFeature.SetField("lat", dLatitude_center )
+                pFeature.SetField("area", dArea )
+                pLayer.CreateFeature(pFeature)
+                
                 pHexagon = convert_gcs_coordinates_to_cell(1, dLongitude_center, dLatitude_center, dummy1)
                 pHexagon.lCellID = lCellID
-                #build topoloy
+                #build topology
                 lCellID_center = lCellID
                 
                 aNeighbor=list()
@@ -379,7 +391,8 @@ def create_hexagon_mesh(iFlag_rotation, dX_left, dY_bot, \
                             aNeighbor.append(lCellID4)
                                                    
                 if check_if_duplicates(aNeighbor) == 0:
-                    print('error')   
+                    print('error')  
+
                 pHexagon.aNeighbor = aNeighbor
                 #print(lCellID_center,aNeighbor)
                 pHexagon.nNeighbor = len(aNeighbor)
@@ -388,14 +401,8 @@ def create_hexagon_mesh(iFlag_rotation, dX_left, dY_bot, \
     
                 pass
        
-
-        
         
     pDataset = pLayer = pFeature  = None      
-    
-
-    
-
 
 
     return aHexagon

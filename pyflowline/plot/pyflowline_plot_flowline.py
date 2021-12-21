@@ -21,6 +21,9 @@ def pyflowline_plot_flowline(oBasin_in, sVariable_in = None):
             if sVariable_in == 'flowline_simplified':
                 sFilename_out = oBasin_in.sFilename_flowline_segment_index_before_intersect
                 sFilename_json = os.path.join(sWorkspace_output_basin, sFilename_out)
+            else:
+                sFilename_out = oBasin_in.sFilename_flowline_final
+                sFilename_json = os.path.join(sWorkspace_output_basin, sFilename_out)
             pass
     else:
         #default 
@@ -90,6 +93,6 @@ def pyflowline_plot_flowline(oBasin_in, sVariable_in = None):
     sFilename  = Path(sFilename_json).stem + '.png'
     sFilename_out = os.path.join(sDirname, sFilename)
     plt.savefig(sFilename_out, bbox_inches='tight')
-    #plt.show()
+    plt.show()
 
     return

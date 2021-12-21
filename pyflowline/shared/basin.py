@@ -40,6 +40,7 @@ class pybasin(object):
     #before intersect
     sFilename_flowline_segment_order_before_intersect=''
     sFilename_flowline_segment_index_before_intersect=''
+    sFilename_flowline_final=''
     def __init__(self, aParameter):
 
         if 'lBasinID' in aParameter:            
@@ -116,6 +117,7 @@ class pybasin(object):
         self.sFilename_flowline_segment_index_before_intersect = 'flowline_segment_index_before_intersect_' + sBasinID + '.json'
         self.sFilename_flowline_segment_order_before_intersect = 'flowline_segment_order_before_intersect_' + sBasinID + '.json'
         self.sFilename_flowline_intersect  = 'flowline_intersect_' + sBasinID + '.json'
+        self.sFilename_flowline_final = 'flowline_final_' + sBasinID + '.json'
         
         return
     

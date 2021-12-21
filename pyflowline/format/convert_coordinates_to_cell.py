@@ -19,7 +19,8 @@ from pyflowline.algorithm.auxiliary.reproject_coordinates import reproject_coord
 
 
 
-def convert_gcs_coordinates_to_cell(iMesh_type, dLongitude_center_in, dLatitude_center_in, aCoordinates_gcs):
+def convert_gcs_coordinates_to_cell(iMesh_type, dLongitude_center_in, \
+    dLatitude_center_in, aCoordinates_gcs):
     npoint = len(aCoordinates_gcs)    
     aVertex=list()              
     aEdge=list()    

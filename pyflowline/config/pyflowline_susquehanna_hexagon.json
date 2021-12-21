@@ -29,7 +29,7 @@
     "dLongitude_outlet_degree": -76.0093,
     "dLatitude_outlet_degree": 39.4620,
     "dResolution": 5000,
-    "dResolution_meter": 50000,
+    "dResolution_meter": 5000,
     "dThreshold_small_river": 30000,
     "sDate": "20211217",        
     "sMesh_type": "hexagon",       

@@ -23,14 +23,14 @@ def create_hexagon_mesh(iFlag_rotation, dX_left, dY_bot, \
         os.remove(sFilename_mesh_out)
 
     pDriver_shapefile = ogr.GetDriverByName('Esri Shapefile')
-    #pDriver_geojson = ogr.GetDriverByName('GeoJSON')
+    pDriver_geojson = ogr.GetDriverByName('GeoJSON')
 
 
     pDataset_shapefile = pDriver_shapefile.Open(sFilename_spatial_reference_in, 0)
     pLayer_shapefile = pDataset_shapefile.GetLayer(0)
     pSpatialRef_pcs = pLayer_shapefile.GetSpatialRef()
     
-    pDataset = pDriver_shapefile.CreateDataSource(sFilename_mesh_out)
+    pDataset = pDriver_geojson.CreateDataSource(sFilename_mesh_out)
     
     
     pSpatialRef_gcs = osr.SpatialReference()  
@@ -332,7 +332,9 @@ def create_hexagon_mesh(iFlag_rotation, dX_left, dY_bot, \
                 aCoords[6,1] = y1
                     
                 dummy1= np.array(aCoords)
-                pHexagon = convert_gcs_coordinates_to_cell(1, dummy1)
+                dLongitude_center = np.mean(aCoords[0:6,0])
+                dLatitude_center = np.mean(aCoords[0:6,1])
+                pHexagon = convert_gcs_coordinates_to_cell(1, dLongitude_center, dLatitude_center, dummy1)
                 pHexagon.lCellID = lCellID
                 #build topoloy
                 lCellID_center = lCellID

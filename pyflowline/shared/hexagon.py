@@ -24,8 +24,8 @@ class pyhexagon(pycell):
     dx_center=0.0
     dy_center=0.0
 
-    dLongitude_center=0.0
-    dLatitude_center=0.0
+    dLongitude_center_degree=0.0
+    dLatitude_center_degree=0.0
     aEdge=None
     aVertex=None
     aFlowline=None
@@ -34,7 +34,7 @@ class pyhexagon(pycell):
 
     pVertex_center = None
 
-    def __init__(self, aEdge, aVertex):    
+    def __init__(self, dLon, dLat, aEdge, aVertex):    
 
         nEdge = len(aEdge)
         if nEdge != 6:
@@ -46,19 +46,13 @@ class pyhexagon(pycell):
             self.aVertex = aVertex #the first one and last one are the same
             self.nEdge = 6
             self.nVertex = 6
+            self.dLongitude_center_degree = dLon
+            self.dLatitude_center_degree = dLat
 
-            dLon=0.0
-            dLat=0.0
-            for i in range(self.nVertex):
-                dLon = dLon + aVertex[i].dLongitude
-                dLat = dLat + aVertex[i].dLatitude
-                pass
-
-            self.dLongitude_center = dLon/self.nVertex
-            self.dLatitude_center = dLat/self.nVertex
+            
             pVertex = dict()        
-            pVertex['lon'] =self.dLongitude_center
-            pVertex['lat'] =self.dLatitude_center           
+            pVertex['lon'] =self.dLongitude_center_degree
+            pVertex['lat'] =self.dLatitude_center_degree           
             self.pVertex_center = pyvertex(pVertex)
 
             self.lCellID_downstream_burned=-1

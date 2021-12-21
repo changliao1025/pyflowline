@@ -39,21 +39,24 @@ for i in range(nOutlet):
     #the new flowine in geojson format in WGS84
     
     sFilename_out = pBasin.sFilename_flowline_filter_json
-    convert_shapefile_to_json(sFilename_raw, sFilename_out)
+    #convert_shapefile_to_json(sFilename_raw, sFilename_out)
+    pass
 
 
 #now we can visualize the flowline
 from pyflowline.plot.pyflowline_plot_flowline import pyflowline_plot_flowline
 for i in range(nOutlet):
     pBasin = oPyflowline.aBasin[i]
-    pyflowline_plot_flowline(pBasin, sVariable_in = 'flowline_filter_json') 
+    #pyflowline_plot_flowline(pBasin, sVariable_in = 'flowline_filter_json') 
+    pass
 
 from pyflowline.operation.preprocess_flowline_op import preprocess_flowline_op
-preprocess_flowline_op(oPyflowline)
+#preprocess_flowline_op(oPyflowline)
 
 for i in range(nOutlet):
     pBasin = oPyflowline.aBasin[i]
     pyflowline_plot_flowline(pBasin, sVariable_in = 'flowline_simplified')
+    pass
 
 from pyflowline.operation.create_mesh_op import create_mesh_op
 aCell = create_mesh_op(oPyflowline)
@@ -67,4 +70,5 @@ intersect_flowline_with_mesh_with_postprocess_op(oPyflowline)
 for i in range(nOutlet):
     pBasin = oPyflowline.aBasin[i]
     pyflowline_plot_flowline(pBasin, sVariable_in = 'flowline_final')
+    pass
 

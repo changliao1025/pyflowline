@@ -1,6 +1,6 @@
 import os
 import json
-
+from pathlib import Path
 from pyflowline.shared.vertex import pyvertex
 from pyflowline.algorithm.auxiliary.reproject_coordinates import reproject_coordinates
 from pyflowline.format.read_flowline_shapefile import read_flowline_shapefile
@@ -50,8 +50,9 @@ def intersect_flowline_with_mesh_with_postprocess_op(oPyflowline_in):
         for i in range(0, nOutlet, 1):
             sBasin =  "{:03d}".format(i+1)    
             print('Flowline interset with postprocess ',sBasin)         
-            sWorkspace_output_basin = oPyflowline_in.sWorkspace_output + slash + sBasin 
+            
             pBasin = oPyflowline_in.aBasin[i]
+            sWorkspace_output_basin = pBasin.sWorkspace_output_basin
             sFilename_flowline = pBasin.sFilename_flowline_segment_order_before_intersect
             sFilename_flowline_in = os.path.join(sWorkspace_output_basin, sFilename_flowline)
             sFilename_flowline_intersect = pBasin.sFilename_flowline_intersect
@@ -134,8 +135,8 @@ def intersect_flowline_with_mesh_with_postprocess_op(oPyflowline_in):
     
     #save basin info
     sPath = os.path.dirname(oPyflowline_in.sFilename_basins)
-    sName = Path(oPyflowline_in.sFilename_basins).stem + '_new.json'
-    sFilename_configuration  =  sPath + slash + sName
+    sName = str(Path(oPyflowline_in.sFilename_basins).stem ) + '_new.json'
+    sFilename_configuration  =  os.path.join( sPath  , sName)
     with open(sFilename_configuration, 'w', encoding='utf-8') as f:
         sJson = json.dumps([json.loads(ob.tojson()) for ob in aBasin],\
             sort_keys=True, \

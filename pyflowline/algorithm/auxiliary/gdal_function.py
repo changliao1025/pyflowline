@@ -1,5 +1,5 @@
-
-import gdal
+import sys
+from osgeo import gdal, osr
 import numpy as np
 def obtain_raster_metadata(sFilename_geotiff):
     pDriver = gdal.GetDriverByName('GTiff')

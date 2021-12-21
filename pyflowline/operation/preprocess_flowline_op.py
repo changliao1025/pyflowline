@@ -9,6 +9,7 @@ from pyflowline.shared.vertex import pyvertex
 
 
 from pyflowline.format.read_flowline_shapefile import read_flowline_shapefile
+from pyflowline.format.read_flowline_geojson import read_flowline_geojson
 from pyflowline.format.read_nhdplus_flowline_shapefile import read_nhdplus_flowline_shapefile_attribute
 from pyflowline.format.read_nhdplus_flowline_shapefile import extract_nhdplus_flowline_shapefile_by_attribute
 from pyflowline.format.read_nhdplus_flowline_shapefile import track_nhdplus_flowline
@@ -63,15 +64,16 @@ def preprocess_flowline_op(oPyflowline_in):
         for i in range(0,nOutlet,1):
             sBasin =  "{:03d}".format(i+1)
             print('Flowline simplification',sBasin)
-            sWorkspace_output_basin = oPyflowline_in.sWorkspace_output + slash + sBasin
-            Path(sWorkspace_output_basin).mkdir(parents=True, exist_ok=True)
+            
             #in this case, the sFilename_flowline_filter is a list of files            
             pBasin = oPyflowline_in.aBasin[i]
+            sWorkspace_output_basin = pBasin.sWorkspace_output_basin
             iFlag_dam  = pBasin.iFlag_dam
             iFlag_disconnected = pBasin.iFlag_disconnected
             dThreshold = pBasin.dThreshold_small_river
             sFilename_flowline_filter = pBasin.sFilename_flowline_filter
-            aFlowline_basin, pSpatialRef_pcs = read_flowline_shapefile( sFilename_flowline_filter )                
+            sFilename_flowline_filter_json = pBasin.sFilename_flowline_filter_json
+            aFlowline_basin, pSpatialRef_pcs = read_flowline_geojson( sFilename_flowline_filter_json )                
             if iFlag_dam ==1:
                 sFilename_dam = pBasin.sFilename_dam
                 aData_dam = text_reader_string(sFilename_dam, iSkipline_in =1,cDelimiter_in=',' )

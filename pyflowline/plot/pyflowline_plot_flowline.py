@@ -13,11 +13,14 @@ desired_proj = ccrs.Orthographic(central_longitude=-75, central_latitude=42, glo
 desired_proj = ccrs.PlateCarree()
 
 def pyflowline_plot_flowline(oBasin_in, sVariable_in = None):
-
+    sWorkspace_output_basin = oBasin_in.sWorkspace_output_basin 
     if sVariable_in is not None:
         if sVariable_in == 'flowline_filter_json':
             sFilename_json = oBasin_in.sFilename_flowline_filter_json
         else:
+            if sVariable_in == 'flowline_simplified':
+                sFilename_out = oBasin_in.sFilename_flowline_segment_index_before_intersect
+                sFilename_json = os.path.join(sWorkspace_output_basin, sFilename_out)
             pass
     else:
         #default 
@@ -25,9 +28,9 @@ def pyflowline_plot_flowline(oBasin_in, sVariable_in = None):
     #convert existing flowline into the wgs83 system
     
     fig = plt.figure( dpi=150 )
-    fig.set_figwidth( 8 )
-    fig.set_figheight( 8 )
-    ax = fig.add_axes([0.1, 0.15, 0.75, 0.6] , projection=desired_proj  )
+    fig.set_figwidth( 4 )
+    fig.set_figheight( 4 )
+    ax = fig.add_axes([0.1, 0.15, 0.75, 0.8] , projection=desired_proj  )
     pDriver = ogr.GetDriverByName('GeoJSON')
 
     pDataset = pDriver.Open(sFilename_json, gdal.GA_ReadOnly)
@@ -73,9 +76,12 @@ def pyflowline_plot_flowline(oBasin_in, sVariable_in = None):
             codes[0] = mpath.Path.MOVETO
 
             path = mpath.Path(aCoords_gcs, codes)
-            patch = mpatches.PathPatch(path,  \
-                lw=1, transform=ccrs.PlateCarree(), alpha=0.8, edgecolor= colours[lID])
-            ax.add_patch(patch)
+            #patch = mpatches.PathPatch(path,  \
+            #    lw=1, transform=ccrs.PlateCarree(), alpha=0.8, edgecolor= colours[lID])
+            #ax.add_patch(patch)
+            # plot control points and connecting lines
+            x, y = zip(*path.vertices)
+            line, = ax.plot(x, y, color= colours[lID])
             lID = lID + 1
             
   
@@ -87,6 +93,6 @@ def pyflowline_plot_flowline(oBasin_in, sVariable_in = None):
     sFilename  = Path(sFilename_json).stem + '.png'
     sFilename_out = os.path.join(sDirname, sFilename)
     plt.savefig(sFilename_out, bbox_inches='tight')
-    plt.show()
+    #plt.show()
 
     return

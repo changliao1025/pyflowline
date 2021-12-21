@@ -19,7 +19,7 @@ from pyflowline.algorithm.auxiliary.reproject_coordinates import reproject_coord
 
 
 
-def convert_gcs_coordinates_to_cell(iMesh_type, aCoordinates_gcs, dLon, dLat):
+def convert_gcs_coordinates_to_cell(iMesh_type, dLongitude_center_in, dLatitude_center_in, aCoordinates_gcs):
     npoint = len(aCoordinates_gcs)    
     aVertex=list()              
     aEdge=list()    
@@ -44,23 +44,23 @@ def convert_gcs_coordinates_to_cell(iMesh_type, aCoordinates_gcs, dLon, dLat):
     if iMesh_type ==1: #hexagon
         
 
-        pHexagon = pyhexagon( aEdge, aVertex)
+        pHexagon = pyhexagon( dLongitude_center_in, dLatitude_center_in, aEdge, aVertex)
         return pHexagon
     else:
         if iMesh_type ==2: #sqaure
-            pSquare = pysquare( aEdge, aVertex)
+            pSquare = pysquare(dLongitude_center_in, dLatitude_center_in, aEdge, aVertex)
             return pSquare
         else:
             if iMesh_type ==3: #latlon
-                pLatlon = pylatlon( aEdge, aVertex)
+                pLatlon = pylatlon(dLongitude_center_in, dLatitude_center_in, aEdge, aVertex)
                 return pLatlon
             else:
                 if iMesh_type ==4: #mpas       
-                    pMpas = pympas(  dLon, dLat, aEdge, aVertex)
+                    pMpas = pympas(  dLongitude_center_in, dLatitude_center_in, aEdge, aVertex)
                     return pMpas
                 else:
                     if iMesh_type ==5: #tin
-                        pTin = pytin( aEdge, aVertex)
+                        pTin = pytin(dLongitude_center_in, dLatitude_center_in, aEdge, aVertex)
                         return pTin
                         pass
                     else:

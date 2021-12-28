@@ -8,7 +8,7 @@ Overview
 
 
 
-HexWatershed is a hydrologic routing model based on the hexagon alike mesh framework.
+Pyflowline is a hydrologic routing model based on the hexagon alike mesh framework.
 
 
 ***********

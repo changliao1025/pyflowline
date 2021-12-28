@@ -2,13 +2,10 @@
 Support
 #######
 
-Limited support is provided through Issue_:
+Limited support is provided through Issue:
 
-.. _Issue: https://github.com/pnnl/hexwatershed/issues
 
-and Slack_:
 
-.. _Slack: https://hexwatershed.slack.com/
 
 
 

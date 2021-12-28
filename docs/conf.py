@@ -43,11 +43,11 @@ read_the_docs_build = os.environ.get('READTHEDOCS', None) == 'True'
 breathe_projects = {}
 
 if read_the_docs_build:
-    input_dir = '../src'
+    input_dir = '../pyflowline'
     output_dir = 'build'
     configureDoxyfile(input_dir, output_dir)
     subprocess.call('doxygen', shell=True)
-    breathe_projects['HexWatershed'] = output_dir + '/xml'
+    breathe_projects['pyflowline'] = output_dir + '/xml'
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
@@ -57,7 +57,7 @@ extensions = [ "breathe" ]
 #...
 
 # Breathe Configuration
-breathe_default_project = "HexWatershed"
+breathe_default_project = "pyflowline"
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -72,7 +72,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'HexWatershed'
+project = u'pyflowline'
 copyright = u'2020, Pacific Northwest National Laboratory'
 
 # The version info for the project you're documenting, acts as replacement for

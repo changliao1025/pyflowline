@@ -1,5 +1,5 @@
 #####################
-What is HexWatershed?
+What is Pyflowline?
 #####################
 
 *********
@@ -8,13 +8,12 @@ Overview
 
 
 
-Pyflowline is a hydrologic routing model based on the hexagon alike mesh framework.
+Pyflowline is a Python package to process river network for Earth Science. It supports the HexWatershed.
 
 
 ***********
 Development
 ***********
 
-HexWatershed is developed in an open-source, public repository hosted under Pacific Northwest National Laboratory (PNNL) organization on Github_:
+Pyflowline is developed in an open-source, public repository hosted under Pacific Northwest National Laboratory (PNNL) organization on Github:
 
-.. _Github: https://github.com/pnnl/hexwatershed

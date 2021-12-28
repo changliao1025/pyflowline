@@ -7,49 +7,12 @@ Algorithm
 Overview
 ********
 
-HexWatershed implemented major watershed delineation algorithms.
-
-**************
-DEM resampling
-**************
-
-******************
-Depression filling
-******************
+Pyflowline implemented a list of algorithms to operate on river networks.
 
 
-**************
-Stream burning
-**************
-
-****
-Lake
-****
-
-**************
-Flow direction
-**************
-
-*****************
-Flow accumulation
-*****************
 
 ***********
 Stream grid
 ***********
 
-*****************
-Stream confluence
-*****************
 
-**************
-Stream segment
-**************
-
-********
-Subbasin
-********
-
-*********
-Watershed
-*********

@@ -5,9 +5,7 @@ API Reference
 
 .. toctree::
    :maxdepth: 2
-   :numbered:
+   :numbered:   
 
-   cplus/cplus.rst
-
-   python/python.rst
+   python.rst
 

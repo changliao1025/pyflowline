@@ -6,12 +6,12 @@ import shutil
 
 from setuptools import setup, find_packages, Command
 
-NAME = "pye3sm"
+NAME = "pyflowline"
 DESCRIPTION = \
-    "Python for E3SM."
+    "River network for Earth Science"
 AUTHOR = "Chang Liao"
 AUTHOR_EMAIL = "chang.liao@pnnl.gov"
-URL = "https://github.com/changliao1025/pye3sm"
+URL = "https://github.com/changliao1025/pyflowline"
 VERSION = "0.1.0"
 REQUIRES_PYTHON = ">=3.6.0"
 KEYWORDS = "Earth Science"

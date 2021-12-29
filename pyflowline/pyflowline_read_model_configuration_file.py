@@ -2,13 +2,7 @@ import os
 import sys #used to add system path
 import datetime
 import json
-
-
-
 from pyflowline.classes.pycase import flowlinecase
-
-
-
 
 pDate = datetime.datetime.today()
 sDate_default = "{:04d}".format(pDate.year) + "{:02d}".format(pDate.month) + "{:02d}".format(pDate.day)

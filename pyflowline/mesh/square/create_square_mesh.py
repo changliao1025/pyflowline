@@ -10,12 +10,13 @@ from osgeo import ogr, osr, gdal, gdalconst
 
 from pyflowline.algorithm.auxiliary.reproject_coordinates import reproject_coordinates, reproject_coordinates_batch
 
-def create_square_mesh(dX_left, dY_bot, dResolution, ncolumn, nrow, sFilename_output, sFilename_spatial_reference_in):
+def create_square_mesh(dX_left_in, dY_bot_in, dResolution_meter_in, ncolumn_in, nrow_in, \
+    sFilename_output_in, sFilename_spatial_reference_in):
 
    
-    if os.path.exists(sFilename_output): 
+    if os.path.exists(sFilename_output_in): 
         #delete it if it exists
-        os.remove(sFilename_output)
+        os.remove(sFilename_output_in)
 
     pDriver_shapefile = ogr.GetDriverByName('Esri Shapefile')
     #pDriver_geojson = ogr.GetDriverByName('GeoJSON')
@@ -25,7 +26,7 @@ def create_square_mesh(dX_left, dY_bot, dResolution, ncolumn, nrow, sFilename_ou
     pSpatial_reference = pLayer_shapefile.GetSpatialRef()   
         
 
-    pDataset = pDriver_shapefile.CreateDataSource(sFilename_output)
+    pDataset = pDriver_shapefile.CreateDataSource(sFilename_output_in)
     
     pSpatialRef_gcs = osr.SpatialReference()  
     pSpatialRef_gcs.ImportFromEPSG(4326)    # WGS84 lat/lon     
@@ -40,10 +41,10 @@ def create_square_mesh(dX_left, dY_bot, dResolution, ncolumn, nrow, sFilename_ou
 
     
 
-    xleft = dX_left
-    xspacing= dResolution
-    ybottom = dY_bot
-    yspacing = dResolution
+    xleft = dX_left_in
+    xspacing= dResolution_meter_in
+    ybottom = dY_bot_in
+    yspacing = dResolution_meter_in
 
     lID =0 
     #.........
@@ -51,8 +52,8 @@ def create_square_mesh(dX_left, dY_bot, dResolution, ncolumn, nrow, sFilename_ou
     #   |           |
     #(x1,y1)-----(x4,y4)
     #...............
-    for column in range(0, ncolumn):
-        for row in range(0, nrow):
+    for column in range(0, ncolumn_in):
+        for row in range(0, nrow_in):
             #define a polygon here
             x1 = xleft + (column * xspacing)
             y1 = ybottom + (row * yspacing)

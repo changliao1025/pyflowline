@@ -20,8 +20,7 @@ class flowlinecase(object):
     iFlag_simplification = 1 #user can turn on/off
     iFlag_create_mesh=1
     iFlag_intersect = 1
-    #iFlag_disconnected =0
-    #iFlag_dam=0
+    
     iFlag_rotation=0
 
     nOutlet = 1 #by default , there shoule ne only one ouelet

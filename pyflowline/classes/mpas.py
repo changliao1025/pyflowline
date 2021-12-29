@@ -37,8 +37,8 @@ class pympas(pycell):
     nEdge=0
     dLength=0.0
     dArea=0.0
-    dx_center=0.0
-    dy_center=0.0
+    dX_center_meter=0.0
+    dY_center_meter=0.0
     dz_center=0.0
     dLongitude_center_degree=0.0
     dLatitude_center_degree=0.0

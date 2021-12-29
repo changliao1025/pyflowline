@@ -11,17 +11,18 @@ from pyflowline.classes.mpas import pympas
 
 from pyflowline.format.convert_coordinates_to_cell import convert_pcs_coordinates_to_cell
 
-def create_tin_mesh(dX_left, dY_bot, dResolution_meter, ncolumn, nrow,sFilename_mesh_out, sFilename_spatial_reference_in):
+def create_tin_mesh(dX_left_in, dY_bot_in, dResolution_meter_in, ncolumn_in, nrow_in,
+sFilename_output_in, sFilename_spatial_reference_in):
      
     
-    if os.path.exists(sFilename_mesh_out): 
+    if os.path.exists(sFilename_output_in): 
         #delete it if it exists
-        os.remove(sFilename_mesh_out)
+        os.remove(sFilename_output_in)
     
     pDriver_shapefile = ogr.GetDriverByName('Esri Shapefile')
 
     
-    pDataset = pDriver_shapefile.CreateDataSource(sFilename_mesh_out)
+    pDataset = pDriver_shapefile.CreateDataSource(sFilename_output_in)
     
     pDataset_shapefile = pDriver_shapefile.Open(sFilename_spatial_reference_in, 0)
     pLayer_shapefile = pDataset_shapefile.GetLayer(0)
@@ -39,10 +40,10 @@ def create_tin_mesh(dX_left, dY_bot, dResolution_meter, ncolumn, nrow,sFilename_
 
     
 
-    xleft = dX_left
-    ybottom = dY_bot
+    xleft = dX_left_in
+    ybottom = dY_bot_in
 
-    dArea = np.power(dResolution_meter,2.0)
+    dArea = np.power(dResolution_meter_in,2.0)
     #tin edge
     dLength_edge = np.sqrt(  4.0 * dArea /  np.sqrt(3.0) )  
     dX_shift = 0.5 * dLength_edge
@@ -59,9 +60,9 @@ def create_tin_mesh(dX_left, dY_bot, dResolution_meter, ncolumn, nrow,sFilename_
     #   |           |
     #(x1,y1)-----(x4,y4)
     #...............
-    for column in range(0, ncolumn):
+    for column in range(0, ncolumn_in):
         #print(column)
-        for row in range(0, nrow):
+        for row in range(0, nrow_in):
             
 
             if column % 2 == 0 :

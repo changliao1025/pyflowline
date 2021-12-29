@@ -3,21 +3,28 @@ import sys, os, stat
 import numpy as np
 from pathlib import Path
 from shutil import copy2
-
 import subprocess
 import datetime
 
 
 pDate = datetime.datetime.today()
 sDate_default = "{:04d}".format(pDate.year) + "{:02d}".format(pDate.month) + "{:02d}".format(pDate.day)
-sDate = '20201015'
+
+
 def create_dggrid_case( iCase_index, \
     iResolution_index ,\
         sGrid_type,\
+            sDate_in = None, \
         sFilename_crop_shapefile_in =None ):
 
     sCase = "{:03d}".format( iCase_index )
     sResolution = "{:02d}".format( iResolution_index )
+
+    if sDate_in is not None:
+        sDate = sDate_in 
+    else:
+        sDate = sDate_default
+
     if sFilename_crop_shapefile_in is not None:
         if os.path.isfile(sFilename_crop_shapefile_in):
             iFlag_crop =1
@@ -26,8 +33,6 @@ def create_dggrid_case( iCase_index, \
             iFlag_crop = 0
     else:
         iFlag_crop = 0
-
-
 
 
     sCase_folder = sWorkspace_job + slash + sGrid_type + sResolution + slash + 'case'  +  sDate + sCase
@@ -146,9 +151,7 @@ def create_dggrid_case( iCase_index, \
 if __name__ == '__main__':
 
 
-    sRegion = 'conus'
-
-    
+    sRegion = 'conus'    
 
     sWorkspace_job = '/qfs/people/liao313/jobs/' + 'dggrid' + slash + sRegion + slash + 'simulation'
     sWorkspace_out = '/pic/scratch/liao313/04model/dggrid/' + slash + sRegion + slash + 'simulation'
@@ -163,6 +166,7 @@ if __name__ == '__main__':
         create_dggrid_case( iCase_index, \
                     iResolution_index ,  \
                         sGrid_type,
+                    
                        sFilename_crop_shapefile_in=  sFilename_boundary)
         
 

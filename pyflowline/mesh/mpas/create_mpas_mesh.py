@@ -11,21 +11,25 @@ from pyflowline.algorithm.auxiliary.convert_lat_lon_range import convert_180_to_
 from pyflowline.format.convert_coordinates_to_cell import convert_pcs_coordinates_to_cell
 from pyflowline.format.convert_attribute_to_cell import convert_gcs_attribute_to_cell
 
-def create_mpas_mesh(iFlag_global, iFlag_use_mesh_dem, iFlag_save_mesh, \
-    dLatitude_top, dLatitude_bot, dLongitude_left, dLongitude_right,\
-     sFilename_mesh_netcdf, sFilename_mesh):
+def create_mpas_mesh(iFlag_global_in, \
+    iFlag_use_mesh_dem, \
+        iFlag_save_mesh_in, \
+        dLongitude_left_in, dLongitude_right_in,\
+    dLatitude_top_in, dLatitude_bot_in, \
+     sFilename_mesh_netcdf_in, \
+         sFilename_output_in):
     
-    if (os.path.exists(sFilename_mesh_netcdf)):
+    if (os.path.exists(sFilename_mesh_netcdf_in)):
         pass
     else:
         print('Mesh file does not exist!')
         exit
     
-    if os.path.exists(sFilename_mesh): 
+    if os.path.exists(sFilename_output_in): 
         #delete it if it exists
-        os.remove(sFilename_mesh)
+        os.remove(sFilename_output_in)
 
-    pDatasets_in = Dataset(sFilename_mesh_netcdf)
+    pDatasets_in = Dataset(sFilename_mesh_netcdf_in)
 
     netcdf_format = pDatasets_in.file_format
     pDriver_geojson = ogr.GetDriverByName('GeoJSON')
@@ -36,8 +40,8 @@ def create_mpas_mesh(iFlag_global, iFlag_use_mesh_dem, iFlag_save_mesh, \
 
     
     #geojson
-    if iFlag_save_mesh ==1:
-        pDataset = pDriver_geojson.CreateDataSource(sFilename_mesh)
+    if iFlag_save_mesh_in ==1:
+        pDataset = pDriver_geojson.CreateDataSource(sFilename_output_in)
 
         pLayer = pDataset.CreateLayer('cell', pSpatialRef_gcs, ogr.wkbPolygon)
         # Add one attribute
@@ -188,7 +192,7 @@ def create_mpas_mesh(iFlag_global, iFlag_use_mesh_dem, iFlag_save_mesh, \
         dLat = convert_360_to_180 (aLatitudeCell[i])
         dLon = convert_360_to_180 (aLongitudeCell[i])
 
-        if dLat > dLatitude_bot and dLat < dLatitude_top and dLon > dLongitude_left and dLon < dLongitude_right:
+        if dLat > dLatitude_bot_in and dLat < dLatitude_top_in and dLon > dLongitude_left_in and dLon < dLongitude_right_in:
 
             #get cell edge
             lCellID = int(aIndexToCellID[i])
@@ -226,7 +230,7 @@ def create_mpas_mesh(iFlag_global, iFlag_use_mesh_dem, iFlag_save_mesh, \
                     aCoords[j,1] = y1
                     pass
 
-                if iFlag_save_mesh ==1:
+                if iFlag_save_mesh_in ==1:
                     x1 = convert_360_to_180(aLonVertex[0])
                     y1 = aLatVertex[0]
                     ring.AddPoint(x1, y1) #double check            
@@ -277,7 +281,7 @@ def create_mpas_mesh(iFlag_global, iFlag_use_mesh_dem, iFlag_save_mesh, \
 
     #for maps we need to clean some cell because they were not actually in the domain
 
-    if iFlag_global == 1:
+    if iFlag_global_in == 1:
         aMpas_out = aMpas
     else:
         aMpas_out = list()

@@ -1,7 +1,6 @@
 from abc import ABCMeta, abstractmethod
 import json
 import numpy as np
-from numpy.lib.function_base import average
 import copy
 from osgeo import gdal, osr, ogr
 
@@ -12,8 +11,15 @@ class pyflowline(object):
     __metaclass__ = ABCMeta 
 
     lFlowlineID=-1
+    lIndex=-1
+    lIndex_upstream=-1
+    lIndex_downstream=-1
+
     iFlag_dam = 0
     lNHDPlusID=-1
+
+    pVertex_start=None
+    pVertex_end=None
     aEdge=None
     aVertex=None
 
@@ -21,10 +27,6 @@ class pyflowline(object):
 
     iStream_segment=-1
     iStream_order =-1
-
-    lIndex=-1
-    lIndex_upstream=-1
-    lIndex_downstream=-1
 
     nEdge=0
     nVertex=0
@@ -44,11 +46,7 @@ class pyflowline(object):
 
         self.aVertex.append( aEdge[nEdge-1].pVertex_end )
         self.nVertex = nVertex
-
-        #self.iFlag_dam = 0
-
-        #dict.__init__(self, aEdge=aEdge)
-
+     
         return
 
     def calculate_length(self):

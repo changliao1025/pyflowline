@@ -11,8 +11,8 @@ class pylatlon(pycell):
     nFlowline=0
     dLength=0.0
     dArea=0.0
-    dx_center=0.0
-    dy_center=0.0
+    dX_center_meter=0.0
+    dY_center_meter=0.0
     dLongitude_center=0.0
     dLatitude_center=0.0
     aEdge=None

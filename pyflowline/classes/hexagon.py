@@ -1,14 +1,16 @@
 from abc import ABCMeta, abstractmethod
 import numpy as np
 import json
+from json import JSONEncoder
 from osgeo import gdal, osr, ogr
+
+
 from pyflowline.classes.vertex import pyvertex
 from pyflowline.classes.edge import pyedge
 from pyflowline.classes.cell import pycell
-from pyflowline.algorithm.auxiliary.calculate_polygon_area import calculate_polygon_area
-import numpy as np
-import json
-from json import JSONEncoder
+from pyflowline.algorithm.auxiliary.gdal_function import calculate_polygon_area
+
+
 class NumpyArrayEncoder(JSONEncoder):
     def default(self, obj):
         if isinstance(obj, np.ndarray):
@@ -16,20 +18,20 @@ class NumpyArrayEncoder(JSONEncoder):
         return JSONEncoder.default(self, obj)
 
 class pyhexagon(pycell):
-    #lIndex=-1  
-    
+    lIndex=-1      
+    lCellID  = -1
     nFlowline=0
     dLength=0.0
     dArea=0.0
-    dx_center=0.0
-    dy_center=0.0
+    dX_center_meter_meter=0.0
+    dY_center_meter_meter=0.0
 
     dLongitude_center_degree=0.0
     dLatitude_center_degree=0.0
     aEdge=None
     aVertex=None
     aFlowline=None
-    lCellID  = -1
+    
     aNeighbor=None #the global ID of all neighbors
 
     pVertex_center = None
@@ -51,8 +53,8 @@ class pyhexagon(pycell):
 
             
             pVertex = dict()        
-            pVertex['lon'] =self.dLongitude_center_degree
-            pVertex['lat'] =self.dLatitude_center_degree           
+            pVertex['dLongitude_degree'] =self.dLongitude_center_degree
+            pVertex['dLatitude_degree'] =self.dLatitude_center_degree           
             self.pVertex_center = pyvertex(pVertex)
 
             self.lCellID_downstream_burned=-1

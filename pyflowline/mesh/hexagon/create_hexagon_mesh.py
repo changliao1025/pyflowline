@@ -12,15 +12,18 @@ from pyflowline.format.convert_coordinates_to_cell import convert_gcs_coordinate
 from pyflowline.algorithm.auxiliary.check_if_duplicates import check_if_duplicates
 from pyflowline.algorithm.auxiliary.reproject_coordinates import reproject_coordinates, reproject_coordinates_batch
 
-def create_hexagon_mesh(iFlag_rotation, dX_left, dY_bot, \
-    dResolution_meter, ncolumn, nrow, \
-        sFilename_mesh_out, \
+def create_hexagon_mesh(iFlag_rotation_in, \
+    dX_left_in, dY_bot_in, \
+    dResolution_meter_in, \
+        ncolumn_in, \
+            nrow_in, \
+        sFilename_output_in, \
             sFilename_spatial_reference_in):
 
     
-    if os.path.exists(sFilename_mesh_out): 
+    if os.path.exists(sFilename_output_in): 
         #delete it if it exists
-        os.remove(sFilename_mesh_out)
+        os.remove(sFilename_output_in)
 
     pDriver_shapefile = ogr.GetDriverByName('Esri Shapefile')
     pDriver_geojson = ogr.GetDriverByName('GeoJSON')
@@ -30,7 +33,7 @@ def create_hexagon_mesh(iFlag_rotation, dX_left, dY_bot, \
     pLayer_shapefile = pDataset_shapefile.GetLayer(0)
     pSpatial_reference = pLayer_shapefile.GetSpatialRef()
     
-    pDataset = pDriver_geojson.CreateDataSource(sFilename_mesh_out)
+    pDataset = pDriver_geojson.CreateDataSource(sFilename_output_in)
     
     
     pSpatialRef_gcs = osr.SpatialReference()  
@@ -51,10 +54,10 @@ def create_hexagon_mesh(iFlag_rotation, dX_left, dY_bot, \
     pFeature = ogr.Feature(pLayerDefn)
 
 
-    xleft = dX_left
-    ybottom = dY_bot
+    xleft = dX_left_in
+    ybottom = dY_bot_in
 
-    dArea = np.power(dResolution_meter,2.0)
+    dArea = np.power(dResolution_meter_in,2.0)
     #hexagon edge
     dLength_edge = np.sqrt(  2.0 * dArea / (3.0* np.sqrt(3.0))  )
 
@@ -67,13 +70,13 @@ def create_hexagon_mesh(iFlag_rotation, dX_left, dY_bot, \
     #...............
   
     lCellID = 1
-    if iFlag_rotation ==0:
+    if iFlag_rotation_in ==0:
         dX_shift = 0.5 * dLength_edge * np.sqrt(3.0)
         dY_shift = 0.5 * dLength_edge
         dX_spacing = dLength_edge * np.sqrt(3.0)
         dY_spacing = dLength_edge * 1.5
-        for iRow in range(1, nrow+1):
-            for iColumn in range(1, ncolumn+1):
+        for iRow in range(1, nrow_in+1):
+            for iColumn in range(1, ncolumn_in+1):
                 if iRow % 2 == 1 : #odd
                 #define a polygon here
                     x1 = xleft + (iColumn-1) * dX_spacing
@@ -183,40 +186,40 @@ def create_hexagon_mesh(iFlag_rotation, dX_left, dY_bot, \
                     lCellID0 = lCellID_center - 1
                     aNeighbor.append(lCellID0)
 
-                if iRow < nrow :#1 and 2
+                if iRow < nrow_in :#1 and 2
                     if iRow %2 ==0:
-                        lCellID1 = ncolumn * iRow + iColumn 
+                        lCellID1 = ncolumn_in * iRow + iColumn 
                         aNeighbor.append(lCellID1)
-                        if iColumn!=ncolumn:
-                            lCellID2 = ncolumn * iRow + iColumn + 1
+                        if iColumn!=ncolumn_in:
+                            lCellID2 = ncolumn_in * iRow + iColumn + 1
                             aNeighbor.append(lCellID2)
                     else:
-                        lCellID2 = ncolumn * iRow + iColumn
+                        lCellID2 = ncolumn_in * iRow + iColumn
                         aNeighbor.append(lCellID2)
                         if iColumn != 1:
-                            lCellID1 = ncolumn * iRow + iColumn - 1 
+                            lCellID1 = ncolumn_in * iRow + iColumn - 1 
                             aNeighbor.append(lCellID1)
 
                 
                         
                         
-                if iColumn < ncolumn:#3
+                if iColumn < ncolumn_in:#3
                     lCellID3 = lCellID_center + 1
                     aNeighbor.append(lCellID3)
 
                 if iRow > 1 : #4 and 5
                     if iRow %2 ==1:
-                        lCellID4 = ncolumn * (iRow-2) + iColumn 
+                        lCellID4 = ncolumn_in * (iRow-2) + iColumn 
                         aNeighbor.append(lCellID4)
 
                         if iColumn !=1:
-                            lCellID5 = ncolumn * (iRow-2) + iColumn -1
+                            lCellID5 = ncolumn_in * (iRow-2) + iColumn -1
                             aNeighbor.append(lCellID5)
                     else:
-                        lCellID5 = ncolumn * (iRow-2) + iColumn 
+                        lCellID5 = ncolumn_in * (iRow-2) + iColumn 
                         aNeighbor.append(lCellID5)
-                        if iColumn!=ncolumn:
-                            lCellID4 = ncolumn * (iRow-2) + iColumn + 1
+                        if iColumn!=ncolumn_in:
+                            lCellID4 = ncolumn_in * (iRow-2) + iColumn + 1
                             aNeighbor.append(lCellID4)
 
 
@@ -237,8 +240,8 @@ def create_hexagon_mesh(iFlag_rotation, dX_left, dY_bot, \
         dY_shift = 0.5 * dLength_edge * np.sqrt(3.0)
         dX_spacing = dLength_edge * 1.5
         dY_spacing = dLength_edge * np.sqrt(3.0)
-        for iColumn in range(1, ncolumn+1):
-            for iRow in range(1, nrow+1):
+        for iColumn in range(1, ncolumn_in+1):
+            for iRow in range(1, nrow_in+1):
                 if iColumn % 2 == 0 :
                 #define a polygon here
                     x1 = xleft + (iColumn-1) * dX_spacing
@@ -358,36 +361,36 @@ def create_hexagon_mesh(iFlag_rotation, dX_left, dY_bot, \
 
                 if iColumn> 1:#1 ans 2
                     if iColumn %2 ==0:
-                        lCellID1 = nrow * (iColumn-2) + iRow 
+                        lCellID1 = nrow_in * (iColumn-2) + iRow 
                         aNeighbor.append(lCellID1)
-                        if iRow!=nrow:
-                            lCellID2 = nrow * (iColumn-2) + iRow +1
+                        if iRow!=nrow_in:
+                            lCellID2 = nrow_in * (iColumn-2) + iRow +1
                             aNeighbor.append(lCellID2)
                     else:
-                        lCellID2 = nrow * (iColumn-2) + iRow
+                        lCellID2 = nrow_in * (iColumn-2) + iRow
                         aNeighbor.append(lCellID2)
                         if iRow != 1:
-                            lCellID1 = nrow * (iColumn-2) + iRow -1
+                            lCellID1 = nrow_in * (iColumn-2) + iRow -1
                             aNeighbor.append(lCellID1)
 
                                         
                         
-                if iRow < nrow:#3
+                if iRow < nrow_in:#3
                     lCellID3 = lCellID_center + 1
                     aNeighbor.append(lCellID3)
 
-                if iColumn  < ncolumn  : #4 and 5
+                if iColumn  < ncolumn_in  : #4 and 5
                     if iColumn %2 ==1:
-                        lCellID4 = nrow * iColumn + iRow 
+                        lCellID4 = nrow_in * iColumn + iRow 
                         aNeighbor.append(lCellID4)
                         if iRow !=1:
-                            lCellID5 = nrow * iColumn + iRow -1
+                            lCellID5 = nrow_in * iColumn + iRow -1
                             aNeighbor.append(lCellID5)
                     else:
-                        lCellID5 = nrow * iColumn + iRow 
+                        lCellID5 = nrow_in * iColumn + iRow 
                         aNeighbor.append(lCellID5)
-                        if iRow!=nrow:
-                            lCellID4 = nrow * iColumn + iRow  +1
+                        if iRow!=nrow_in:
+                            lCellID4 = nrow_in * iColumn + iRow  +1
                             aNeighbor.append(lCellID4)
                                                    
                 if check_if_duplicates(aNeighbor) == 0:

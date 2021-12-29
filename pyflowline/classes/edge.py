@@ -7,11 +7,11 @@ from pyflowline.classes.vertex import pyvertex
 class pyedge(object):
     __metaclass__ = ABCMeta 
     lEdgeID=-1
+    lIndex=-1
     pVertex_start = None
     pVertex_end = None
     dLength=0.0
-
-    lIndex=-1
+    
     lIndex_upstream=-1
     lIndex_downstream=-1
 
@@ -30,7 +30,6 @@ class pyedge(object):
 
     def calculate_length(self):
         dLength =0.0
-
         dLength = self.pVertex_start.calculate_distance( self.pVertex_end)
         self.dLength= dLength
 
@@ -126,8 +125,7 @@ class pyedge(object):
         return iFlag 
     
     def __eq__(self, other):                
-        iFlag_overlap = self.is_overlap(other)          
-
+        iFlag_overlap = self.is_overlap(other)  
         return iFlag_overlap
 
     def __ne__(self, other):

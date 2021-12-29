@@ -10,18 +10,18 @@ from osgeo import ogr, osr, gdal, gdalconst
 
 #os.environ['PROJ_LIB'] = '/qfs/people/liao313/.conda/envs/gdalenv/share/proj'
 
-def create_latlon_mesh(dLongitude_left, dLatitude_bot, dResolution, ncolumn, nrow, sFilename_output):
+def create_latlon_mesh(dLongitude_left_in, dLatitude_bot_in, dResolution_degree_in, ncolumn_in, nrow_in, sFilename_output_in):
 
    
-    if os.path.exists(sFilename_output): 
+    if os.path.exists(sFilename_output_in): 
         #delete it if it exists
-        os.remove(sFilename_output)
+        os.remove(sFilename_output_in)
 
 
     pDriver_shapefile = ogr.GetDriverByName('Esri Shapefile')
     #pDriver_geojson = ogr.GetDriverByName('GeoJSON')
     
-    pDataset = pDriver_shapefile.CreateDataSource(sFilename_output)
+    pDataset = pDriver_shapefile.CreateDataSource(sFilename_output_in)
     pSpatialRef_gcs = osr.SpatialReference()  
     pSpatialRef_gcs.ImportFromEPSG(4326)    # WGS84 lat/lon
     pSpatialRef_gcs.SetAxisMappingStrategy(osr.OAMS_TRADITIONAL_GIS_ORDER)
@@ -35,10 +35,10 @@ def create_latlon_mesh(dLongitude_left, dLatitude_bot, dResolution, ncolumn, nro
 
     
 
-    xleft = dLongitude_left
-    xspacing= dResolution
-    ybottom = dLatitude_bot
-    yspacing = dResolution
+    xleft = dLongitude_left_in
+    xspacing= dResolution_degree_in
+    ybottom = dLatitude_bot_in
+    yspacing = dResolution_degree_in
 
     lID =0 
     #.........
@@ -46,8 +46,8 @@ def create_latlon_mesh(dLongitude_left, dLatitude_bot, dResolution, ncolumn, nro
     #   |           |
     #(x1,y1)-----(x4,y4)
     #...............
-    for column in range(0, ncolumn):
-        for row in range(0, nrow):
+    for column in range(0, ncolumn_in):
+        for row in range(0, nrow_in):
             #define a polygon here
             x1 = xleft + (column * xspacing)
             y1 = ybottom + (row * yspacing)

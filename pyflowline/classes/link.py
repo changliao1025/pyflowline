@@ -1,5 +1,7 @@
 from abc import ABCMeta, abstractmethod
-
+import json
+import numpy as np
+from json import JSONEncoder
 from osgeo import gdal, osr, ogr
 
 from pyflowline.classes.vertex import pyvertex
@@ -8,9 +10,7 @@ from pyflowline.classes.cell import pycell
 from pyflowline.classes.flowline import pyflowline
 from pyflowline.classes.mpas import pympas
 
-import json
-import numpy as np
-from json import JSONEncoder
+
 class LinkClassEncoder(JSONEncoder):
     def default(self, obj):
         if isinstance(obj, np.ndarray):

@@ -36,11 +36,11 @@ def create_hexagon_mesh(iFlag_rotation_in, \
     pDataset = pDriver_geojson.CreateDataSource(sFilename_output_in)
     
     
-    pSpatialRef_gcs = osr.SpatialReference()  
-    pSpatialRef_gcs.ImportFromEPSG(4326)    # WGS84 lat/lon
-    pSpatialRef_gcs.SetAxisMappingStrategy(osr.OAMS_TRADITIONAL_GIS_ORDER)
+    pSpatial_reference_gcs = osr.SpatialReference()  
+    pSpatial_reference_gcs.ImportFromEPSG(4326)    # WGS84 lat/lon
+    pSpatial_reference_gcs.SetAxisMappingStrategy(osr.OAMS_TRADITIONAL_GIS_ORDER)
 
-    pLayer = pDataset.CreateLayer('cell', pSpatialRef_gcs, ogr.wkbPolygon)
+    pLayer = pDataset.CreateLayer('cell', pSpatial_reference_gcs, ogr.wkbPolygon)
     # Add one attribute
     pLayer.CreateField(ogr.FieldDefn('id', ogr.OFTInteger64)) #long type for high resolution
     pLayer.CreateField(ogr.FieldDefn('lon', ogr.OFTReal)) #long type for high resolution

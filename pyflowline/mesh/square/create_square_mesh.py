@@ -28,11 +28,11 @@ def create_square_mesh(dX_left_in, dY_bot_in, dResolution_meter_in, ncolumn_in, 
 
     pDataset = pDriver_shapefile.CreateDataSource(sFilename_output_in)
     
-    pSpatialRef_gcs = osr.SpatialReference()  
-    pSpatialRef_gcs.ImportFromEPSG(4326)    # WGS84 lat/lon     
-    pSpatialRef_gcs.SetAxisMappingStrategy(osr.OAMS_TRADITIONAL_GIS_ORDER)
+    pSpatial_reference_gcs = osr.SpatialReference()  
+    pSpatial_reference_gcs.ImportFromEPSG(4326)    # WGS84 lat/lon     
+    pSpatial_reference_gcs.SetAxisMappingStrategy(osr.OAMS_TRADITIONAL_GIS_ORDER)
 
-    pLayer = pDataset.CreateLayer('cell', pSpatialRef_gcs, ogr.wkbPolygon)
+    pLayer = pDataset.CreateLayer('cell', pSpatial_reference_gcs, ogr.wkbPolygon)
     # Add one attribute
     pLayer.CreateField(ogr.FieldDefn('id', ogr.OFTInteger64)) #long type for high resolution
     

@@ -46,9 +46,9 @@ def preprocess_flowline_op(oPyflowline_in):
     #read shapefile and store information in the list
     iFlag_simplification = oPyflowline_in.iFlag_simplification 
     #the flowline should not be in GCS because it cannot be used for distance directly
-    pSpatialRef_gcs = osr.SpatialReference()
-    pSpatialRef_gcs.ImportFromEPSG(4326)
-    pSpatialRef_gcs.SetAxisMappingStrategy(osr.OAMS_TRADITIONAL_GIS_ORDER)
+    pSpatial_reference_gcs = osr.SpatialReference()
+    pSpatial_reference_gcs.ImportFromEPSG(4326)
+    pSpatial_reference_gcs.SetAxisMappingStrategy(osr.OAMS_TRADITIONAL_GIS_ORDER)
 
     nOutlet = oPyflowline_in.nOutlet
     aFlowline = list()   #store all the flowline
@@ -123,7 +123,7 @@ def preprocess_flowline_op(oPyflowline_in):
                 #aFlowline_basin = connect_disconnect_flowline(aFlowline_basin, aVertex, aThreshold)
                 #sFilename_out = 'flowline_connect.json'
                 #sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)    
-                #export_flowline_to_json(iFlag_projected, aFlowline_basin,pSpatialRef_gcs, sFilename_out)
+                #export_flowline_to_json(iFlag_projected, aFlowline_basin,pSpatial_reference_gcs, sFilename_out)
                 pass
             else:
                 pass
@@ -133,7 +133,7 @@ def preprocess_flowline_op(oPyflowline_in):
             sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
 
             iFlag_projected = 0
-            export_flowline_to_json(iFlag_projected, aFlowline_basin, pSpatialRef_gcs, sFilename_out)
+            export_flowline_to_json(iFlag_projected, aFlowline_basin, pSpatial_reference_gcs, sFilename_out)
 
             #calculate length
             dLength_total = calculate_flowline_length(aFlowline_basin)
@@ -142,12 +142,12 @@ def preprocess_flowline_op(oPyflowline_in):
             aVertex = find_flowline_vertex(aFlowline_basin)
             sFilename_out = 'flowline_vertex_without_confluence_before_intersect_' + sBasin + '.json'
             sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
-            export_vertex_to_json(iFlag_projected, aVertex,pSpatialRef_gcs, sFilename_out)
+            export_vertex_to_json(iFlag_projected, aVertex,pSpatial_reference_gcs, sFilename_out)
 
             aFlowline_basin = split_flowline(aFlowline_basin, aVertex)
             sFilename_out = 'flowline_split_by_point_before_intersect_' + sBasin + '.json'
             sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
-            export_flowline_to_json(iFlag_projected, aFlowline_basin,pSpatialRef_gcs, sFilename_out)
+            export_flowline_to_json(iFlag_projected, aFlowline_basin,pSpatial_reference_gcs, sFilename_out)
 
             #ues location to find outlet
 
@@ -162,14 +162,14 @@ def preprocess_flowline_op(oPyflowline_in):
 
             sFilename_out = 'flowline_direction_before_intersect_' + sBasin + '.json'
             sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
-            export_flowline_to_json(iFlag_projected, aFlowline_basin, pSpatialRef_gcs, sFilename_out)
+            export_flowline_to_json(iFlag_projected, aFlowline_basin, pSpatial_reference_gcs, sFilename_out)
 
             #step 4: remove loops
 
             aFlowline_basin = remove_flowline_loop(aFlowline_basin)    
             sFilename_out = 'flowline_loop_before_intersect_' + sBasin + '.json'
             sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
-            export_flowline_to_json(iFlag_projected, aFlowline_basin,pSpatialRef_gcs, sFilename_out)
+            export_flowline_to_json(iFlag_projected, aFlowline_basin,pSpatial_reference_gcs, sFilename_out)
 
             #using loop to remove small river, here we use 5 steps
 
@@ -178,18 +178,18 @@ def preprocess_flowline_op(oPyflowline_in):
                 aFlowline_basin = remove_small_river(aFlowline_basin, dThreshold)
                 sFilename_out = 'flowline_large_'+ sStep +'_before_intersect_' + sBasin + '.json'
                 sFilename_out =os.path.join(sWorkspace_output_basin, sFilename_out)
-                export_flowline_to_json(iFlag_projected, aFlowline_basin, pSpatialRef_gcs, sFilename_out)
+                export_flowline_to_json(iFlag_projected, aFlowline_basin, pSpatial_reference_gcs, sFilename_out)
 
 
                 aVertex, lIndex_outlet, aIndex_headwater,aIndex_middle, aIndex_confluence, aConnectivity = find_flowline_confluence(aFlowline_basin,  pVertex_outlet)
                 sFilename_out = 'flowline_vertex_with_confluence_'+ sStep +'_before_intersect_' + sBasin + '.json'
                 sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
-                export_vertex_to_json(iFlag_projected, aVertex, pSpatialRef_gcs, sFilename_out, aAttribute_data=aConnectivity)
+                export_vertex_to_json(iFlag_projected, aVertex, pSpatial_reference_gcs, sFilename_out, aAttribute_data=aConnectivity)
 
                 aFlowline_basin = merge_flowline( aFlowline_basin,aVertex, pVertex_outlet, aIndex_headwater,aIndex_middle, aIndex_confluence  )  
                 sFilename_out = 'flowline_merge_'+ sStep +'_before_intersect_' + sBasin + '.json'
                 sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
-                export_flowline_to_json(iFlag_projected, aFlowline_basin, pSpatialRef_gcs, sFilename_out)
+                export_flowline_to_json(iFlag_projected, aFlowline_basin, pSpatial_reference_gcs, sFilename_out)
 
                 if len(aFlowline_basin) ==1:
                     break
@@ -203,7 +203,7 @@ def preprocess_flowline_op(oPyflowline_in):
             sFilename_out = pBasin.sFilename_flowline_segment_index_before_intersect
             sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
             export_flowline_to_json(iFlag_projected, \
-                aFlowline_basin, pSpatialRef_gcs, sFilename_out, \
+                aFlowline_basin, pSpatial_reference_gcs, sFilename_out, \
                 aAttribute_data=[aStream_segment], aAttribute_field=['iseg'], aAttribute_dtype=['int'])
 
             #build stream order 
@@ -211,7 +211,7 @@ def preprocess_flowline_op(oPyflowline_in):
             sFilename_out = pBasin.sFilename_flowline_segment_order_before_intersect
             sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
             export_flowline_to_json(iFlag_projected, \
-                aFlowline_basin, pSpatialRef_gcs, sFilename_out, \
+                aFlowline_basin, pSpatial_reference_gcs, sFilename_out, \
                 aAttribute_data=[aStream_segment, aStream_order], aAttribute_field=['iseg','iord'], aAttribute_dtype=['int','int'])
 
             

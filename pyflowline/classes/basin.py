@@ -12,10 +12,15 @@ import matplotlib.patches as mpatches
 from matplotlib import cm
 
 import cartopy.crs as ccrs
-desired_proj = ccrs.Orthographic(central_longitude=-75, central_latitude=42, globe=None)
-desired_proj = ccrs.PlateCarree()
+
+
+from pyflowline.algorithm.auxiliary.text_reader_string import text_reader_string
 
 from pyflowline.formats.convert_shapefile_to_json import convert_shapefile_to_json
+from pyflowline.formats.export_flowline import export_flowline_to_json
+
+desired_proj = ccrs.Orthographic(central_longitude=-75, central_latitude=42, globe=None)
+desired_proj = ccrs.PlateCarree()
 
 class BasinClassEncoder(JSONEncoder):
     def default(self, obj):
@@ -31,6 +36,7 @@ class BasinClassEncoder(JSONEncoder):
 
 class pybasin(object):
     lBasinID =1 
+    sBasin=''
     lCellID_outlet=-1
     iFlag_disconnected =0
     iFlag_dam=0
@@ -38,6 +44,7 @@ class pybasin(object):
     dLatitude_outlet_degree = -9999.
     dAccumulation_threshold= 100000.0
     dThreshold_small_river = 10000
+    dLength_flowline_total = 0.0
     sWorkspace_output_basin=''
     sFilename_flowline_raw=''    
     sFilename_flowline_filter=''
@@ -48,12 +55,16 @@ class pybasin(object):
     sFilename_flowline_segment_order_before_intersect=''
     sFilename_flowline_segment_index_before_intersect=''
     sFilename_flowline_final=''
+
+    aFlowline_basin=None
     def __init__(self, aParameter):
 
         if 'lBasinID' in aParameter:            
             self.lBasinID             = int(aParameter['lBasinID'])
         else:
             self.lBasinID   = 1
+        
+        self.sBasin =  "{:03d}".format(self.lBasinID )
         
         if 'lCellID_outlet' in aParameter:            
             self.lCellID_outlet             = int(aParameter['lCellID_outlet'])
@@ -141,6 +152,31 @@ class pybasin(object):
         sFilename_out = self.sFilename_flowline_filter_json
         convert_shapefile_to_json(1, sFilename_raw, sFilename_out)
     
+    def export_flowline(self, aFlowline_in, sFilename_json_in,iFlag_projected_in = None,  pSpatial_reference_in = None):
+
+        export_flowline_to_json(aFlowline_in, iFlag_projected_in= iFlag_projected_in, \
+            pSpatial_reference_in = pSpatial_reference_in)
+
+
+
+    def calculate_flowline_length(self, aFlowline_in):
+
+        dLength = 0.0
+
+        nflowline = len(aFlowline_in)
+
+        for i in range(nflowline):
+
+            pFlowline= aFlowline_in[i]
+
+            pFlowline.calculate_length()
+
+            dLength = dLength + pFlowline.dLength
+
+        self.dLength_flowline_total = dLength
+
+        return dLength
+    
     def plot(self, sVariable_in=None):
 
         if sVariable_in is not None:
@@ -221,5 +257,147 @@ class pybasin(object):
         return
 
     def preprocess_flowline(self):
-        
-        return
+
+        try:
+            sFilename_flowline_filter = self.sFilename_flowline_filter
+            sFilename_flowline_filter_json = self.sFilename_flowline_filter_json
+            aFlowline_basin, pSpatial_reference = read_flowline_geojson( sFilename_flowline_filter_json )   
+            sWorkspace_output_basin = self.sWorkspace_output_basin
+            if self.iFlag_dam ==1:
+                sFilename_dam = self.sFilename_dam
+                aData_dam = text_reader_string(sFilename_dam, iSkipline_in =1,cDelimiter_in=',' )
+                sFilename_flowline_topo = self.sFilename_flowline_topo
+                aData_flowline_topo = text_reader_string(sFilename_flowline_topo, iSkipline_in =1,cDelimiter_in=',' )
+                aFromFlowline = aData_flowline_topo[:,1].astype(int).ravel()
+                aToFlowline = aData_flowline_topo[:,2].astype(int).ravel()
+                sFilename_flowline_raw = self.sFilename_flowline_raw
+                aNHDPlusID_filter = read_nhdplus_flowline_shapefile_attribute(sFilename_flowline_filter)
+                aNHDPlusID_raw = read_nhdplus_flowline_shapefile_attribute(sFilename_flowline_raw)
+                ndam = len(aData_dam)
+                aNHDPlusID_dams_headwater = list()
+                aNHDPlusID_dams_nonheadwater = list()
+                for j in range(0, ndam):
+                    #print(j)
+                    dLon = float(aData_dam[j][1])
+                    dLat = float(aData_dam[j][0])
+                    sDam = aData_dam[j][4]            
+                    lNHDPlusID = int(aData_dam[j][5])
+                    aNHDPlusID_dams_headwater.append(lNHDPlusID)
+
+                    if lNHDPlusID in aNHDPlusID_filter:
+                        #remove by id
+                        for k in range(len(aFlowline_basin)):
+                            if aFlowline_basin[k].lNHDPlusID == lNHDPlusID:
+                                aFlowline_basin.pop(k)
+                                break
+                        pass
+                    else:                                
+                        aNHDPlusID_dam_nonheadwater = track_nhdplus_flowline(aNHDPlusID_filter, aFromFlowline, aToFlowline, lNHDPlusID)
+                        aNHDPlusID_filter = aNHDPlusID_filter + aNHDPlusID_dams_headwater+ aNHDPlusID_dam_nonheadwater  
+                        aNHDPlusID_dams_nonheadwater = aNHDPlusID_dams_nonheadwater + aNHDPlusID_dam_nonheadwater
+
+                aFlowline_dams_headwater = extract_nhdplus_flowline_shapefile_by_attribute(sFilename_flowline_raw, aNHDPlusID_dams_headwater )
+                for i in range(len(aFlowline_dams_headwater)):
+                    aFlowline_dams_headwater[i].iFlag_dam = 1
+
+                aFlowline_dams_nonheadwater = extract_nhdplus_flowline_shapefile_by_attribute(sFilename_flowline_raw, aNHDPlusID_dams_nonheadwater )
+                aFlowline_basin = aFlowline_basin + aFlowline_dams_headwater + aFlowline_dams_nonheadwater
+            else:
+                pass
+
+            if iFlag_disconnected == 1:                
+                #aThreshold = np.full(2, 300.0, dtype=float)
+                #aFlowline_basin = connect_disconnect_flowline(aFlowline_basin, aVertex, aThreshold)
+                #sFilename_out = 'flowline_connect.json'
+                #sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)    
+                #export_flowline_to_json(iFlag_projected, aFlowline_basin,pSpatial_reference_gcs, sFilename_out)
+                pass
+            else:
+                pass
+
+            sFilename_out = 'flowline_before_intersect_' + sBasin + '.json'
+            sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)            
+            export_flowline(aFlowline_basin, sFilename_out)
+
+            #calculate length
+            calculate_flowline_length(aFlowline_basin)
+            print(self.dLength_flowline_total)
+
+            aVertex = find_flowline_vertex(aFlowline_basin)
+            sFilename_out = 'flowline_vertex_without_confluence_before_intersect_' + sBasin + '.json'
+            sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
+            export_vertex_to_json(iFlag_projected, aVertex,pSpatial_reference_gcs, sFilename_out)
+
+            aFlowline_basin = split_flowline(aFlowline_basin, aVertex)
+            sFilename_out = 'flowline_split_by_point_before_intersect_' + sBasin + '.json'
+            sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
+            export_flowline_to_json(iFlag_projected, aFlowline_basin,pSpatial_reference_gcs, sFilename_out)
+
+            #ues location to find outlet
+
+            point= dict()   
+            point['lon'] = pBasin.dLongitude_outlet_degree
+            point['lat'] = pBasin.dLatitude_outlet_degree
+            pVertex_outlet=pyvertex(point)
+
+            aFlowline_basin = correct_flowline_direction(aFlowline_basin,  pVertex_outlet )
+
+            pVertex_outlet = aFlowline_basin[0].pVertex_end
+
+            sFilename_out = 'flowline_direction_before_intersect_' + sBasin + '.json'
+            sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
+            export_flowline_to_json(iFlag_projected, aFlowline_basin, pSpatial_reference_gcs, sFilename_out)
+
+            #step 4: remove loops
+
+            aFlowline_basin = remove_flowline_loop(aFlowline_basin)    
+            sFilename_out = 'flowline_loop_before_intersect_' + sBasin + '.json'
+            sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
+            export_flowline_to_json(iFlag_projected, aFlowline_basin,pSpatial_reference_gcs, sFilename_out)
+
+            #using loop to remove small river, here we use 5 steps
+
+            for i in range(3):
+                sStep = "{:02d}".format(i+1)
+                aFlowline_basin = remove_small_river(aFlowline_basin, dThreshold)
+                sFilename_out = 'flowline_large_'+ sStep +'_before_intersect_' + sBasin + '.json'
+                sFilename_out =os.path.join(sWorkspace_output_basin, sFilename_out)
+                export_flowline_to_json(iFlag_projected, aFlowline_basin, pSpatial_reference_gcs, sFilename_out)
+
+
+                aVertex, lIndex_outlet, aIndex_headwater,aIndex_middle, aIndex_confluence, aConnectivity = find_flowline_confluence(aFlowline_basin,  pVertex_outlet)
+                sFilename_out = 'flowline_vertex_with_confluence_'+ sStep +'_before_intersect_' + sBasin + '.json'
+                sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
+                export_vertex_to_json(iFlag_projected, aVertex, pSpatial_reference_gcs, sFilename_out, aAttribute_data=aConnectivity)
+
+                aFlowline_basin = merge_flowline( aFlowline_basin,aVertex, pVertex_outlet, aIndex_headwater,aIndex_middle, aIndex_confluence  )  
+                sFilename_out = 'flowline_merge_'+ sStep +'_before_intersect_' + sBasin + '.json'
+                sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
+                export_flowline_to_json(iFlag_projected, aFlowline_basin, pSpatial_reference_gcs, sFilename_out)
+
+                if len(aFlowline_basin) ==1:
+                    break
+
+            
+            dLength_total_new = calculate_flowline_length(aFlowline_basin)
+            print(dLength_total_new)
+
+            #build segment index
+            aFlowline_basin, aStream_segment = define_stream_segment_index(aFlowline_basin)
+            sFilename_out = pBasin.sFilename_flowline_segment_index_before_intersect
+            sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
+            export_flowline_to_json(iFlag_projected, \
+                aFlowline_basin, pSpatial_reference_gcs, sFilename_out, \
+                aAttribute_data=[aStream_segment], aAttribute_field=['iseg'], aAttribute_dtype=['int'])
+
+            #build stream order 
+            aFlowline_basin, aStream_order = define_stream_order(aFlowline_basin)
+            sFilename_out = pBasin.sFilename_flowline_segment_order_before_intersect
+            sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
+            export_flowline_to_json(iFlag_projected, \
+                aFlowline_basin, pSpatial_reference_gcs, sFilename_out, \
+                aAttribute_data=[aStream_segment, aStream_order], aAttribute_field=['iseg','iord'], aAttribute_dtype=['int','int'])
+        except:
+            print('Flowline preprocess failed')
+
+        return aFlowline_basin

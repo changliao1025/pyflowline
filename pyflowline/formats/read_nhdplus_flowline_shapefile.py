@@ -60,14 +60,14 @@ def extract_nhdplus_flowline_shapefile_by_attribute(sFilename_shapefile_in, aAtt
     pLayer_shapefile = pDataset_shapefile.GetLayer(0)
     pSpatialRef_shapefile = pLayer_shapefile.GetSpatialRef()
 
-    pSpatialRef_gcs = osr.SpatialReference()
-    pSpatialRef_gcs.ImportFromEPSG(4326)
-    pSpatialRef_gcs.SetAxisMappingStrategy(osr.OAMS_TRADITIONAL_GIS_ORDER)
+    pSpatial_reference_gcs = osr.SpatialReference()
+    pSpatial_reference_gcs.ImportFromEPSG(4326)
+    pSpatial_reference_gcs.SetAxisMappingStrategy(osr.OAMS_TRADITIONAL_GIS_ORDER)
 
-    comparison = pSpatialRef_shapefile.IsSame(pSpatialRef_gcs)
+    comparison = pSpatialRef_shapefile.IsSame(pSpatial_reference_gcs)
     if(comparison != 1):
         iFlag_transform =1
-        pTransform = osr.CoordinateTransformation(pSpatialRef_shapefile, pSpatialRef_gcs)
+        pTransform = osr.CoordinateTransformation(pSpatialRef_shapefile, pSpatial_reference_gcs)
     else:
         iFlag_transform =0   
 

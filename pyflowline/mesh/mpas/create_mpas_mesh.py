@@ -35,15 +35,15 @@ def create_mpas_mesh(iFlag_global_in, \
     pDriver_geojson = ogr.GetDriverByName('GeoJSON')
     #pDriver_shapefile = ogr.GetDriverByName('ESRI Shapefile')
   
-    pSpatialRef_gcs = osr.SpatialReference()  
-    pSpatialRef_gcs.ImportFromEPSG(4326)    # WGS84 lat/lon
+    pSpatial_reference_gcs = osr.SpatialReference()  
+    pSpatial_reference_gcs.ImportFromEPSG(4326)    # WGS84 lat/lon
 
     
     #geojson
     if iFlag_save_mesh_in ==1:
         pDataset = pDriver_geojson.CreateDataSource(sFilename_output_in)
 
-        pLayer = pDataset.CreateLayer('cell', pSpatialRef_gcs, ogr.wkbPolygon)
+        pLayer = pDataset.CreateLayer('cell', pSpatial_reference_gcs, ogr.wkbPolygon)
         # Add one attribute
         pLayer.CreateField(ogr.FieldDefn('id', ogr.OFTInteger64)) #long type for high resolution
         pLayer.CreateField(ogr.FieldDefn('lon', ogr.OFTReal)) #long type for high resolution

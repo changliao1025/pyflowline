@@ -219,6 +219,10 @@ class flowlinecase(object):
             pass
 
     def preprocess_flowline(self):
-        for pBasin in self.aBasin:            
-            pBasin.preprocess_flowline()
-            pass
+        aFlowline_out = list()   #store all the flowline
+        if self.iFlag_simplification == 1: 
+            for pBasin in self.aBasin:
+                aFlowline_basin = pBasin.preprocess_flowline()
+                pass
+        
+        return aFlowline_out

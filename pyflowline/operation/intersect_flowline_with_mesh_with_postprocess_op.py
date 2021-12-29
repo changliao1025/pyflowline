@@ -40,7 +40,7 @@ def intersect_flowline_with_mesh_with_postprocess_op(oPyflowline_in):
 
     sFilename_mesh=oPyflowline_in.sFilename_mesh
     
-    aMesh, pSpatialRef_mesh = read_mesh_json(sFilename_mesh)
+    aMesh, pSpatial_reference_mesh = read_mesh_json(sFilename_mesh)
 
     
     aCell = list()
@@ -81,9 +81,9 @@ def intersect_flowline_with_mesh_with_postprocess_op(oPyflowline_in):
             sFilename_out = 'flowline_simplified_after_intersect_' + sBasin + '.json'
             sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)  
 
-            pSpatialRef =  pSpatialRef_mesh
+            pSpatial_reference =  pSpatial_reference_mesh
 
-            export_flowline_to_json(iFlag_projected, aFlowline_basin, pSpatialRef, sFilename_out)
+            export_flowline_to_json(iFlag_projected, aFlowline_basin, pSpatial_reference, sFilename_out)
 
             #added start
             aFlowline_basin, aEdge = split_flowline_to_edge(aFlowline_basin)
@@ -94,14 +94,14 @@ def intersect_flowline_with_mesh_with_postprocess_op(oPyflowline_in):
 
             sFilename_out = 'flowline_debug_' + sBasin + '.json'
             sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
-            export_flowline_to_json(iFlag_projected, aFlowline_basin, pSpatialRef, sFilename_out)
+            export_flowline_to_json(iFlag_projected, aFlowline_basin, pSpatial_reference, sFilename_out)
 
             aVertex, lIndex_outlet, aIndex_headwater,aIndex_middle, aIndex_confluence, aConnectivity\
                 = find_flowline_confluence(aFlowline_basin,  pVertex_outlet)
 
             sFilename_out = 'flowline_vertex_with_confluence_01_after_intersect_' + sBasin + '.json'
             sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
-            export_vertex_to_json(iFlag_projected, aVertex, pSpatialRef, sFilename_out, aAttribute_data=aConnectivity)
+            export_vertex_to_json(iFlag_projected, aVertex, pSpatial_reference, sFilename_out, aAttribute_data=aConnectivity)
 
 
             aFlowline_basin = merge_flowline( aFlowline_basin,aVertex, pVertex_outlet, aIndex_headwater,aIndex_middle, aIndex_confluence  )  
@@ -118,7 +118,7 @@ def intersect_flowline_with_mesh_with_postprocess_op(oPyflowline_in):
 
             sFilename_out = pBasin.sFilename_flowline_final
             sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
-            export_flowline_to_json(iFlag_projected, aFlowline_basin, pSpatialRef, sFilename_out)
+            export_flowline_to_json(iFlag_projected, aFlowline_basin, pSpatial_reference, sFilename_out)
 
             aFlowline = aFlowline + aFlowline_basin
             

@@ -39,7 +39,7 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh_in, sFilename_flo
     pDataset_flowline = pDriver_geojson.Open(sFilename_flowline_in, 0)   
 
     pLayer_mesh = pDataset_mesh.GetLayer(0)
-    pSpatialRef_mesh = pLayer_mesh.GetSpatialRef()
+    pSpatial_reference_mesh = pLayer_mesh.GetSpatialRef()
     nfeature_mesh = pLayer_mesh.GetFeatureCount()
 
     pLayer_flowline = pDataset_flowline.GetLayer(0)
@@ -48,10 +48,10 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh_in, sFilename_flo
     pLayerDefinition = pLayer_flowline.GetLayerDefn()
     
     #print( pSpatialRef_flowline)
-    comparison = pSpatialRef_mesh.IsSame(pSpatialRef_flowline)
+    comparison = pSpatial_reference_mesh.IsSame(pSpatialRef_flowline)
     if(comparison != 1):
         iFlag_transform = 1
-        transform = osr.CoordinateTransformation(pSpatialRef_mesh, pSpatialRef_flowline)
+        transform = osr.CoordinateTransformation(pSpatial_reference_mesh, pSpatialRef_flowline)
     else:
         iFlag_transform = 0
 

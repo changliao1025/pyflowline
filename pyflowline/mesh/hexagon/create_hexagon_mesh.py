@@ -28,7 +28,7 @@ def create_hexagon_mesh(iFlag_rotation, dX_left, dY_bot, \
 
     pDataset_shapefile = pDriver_shapefile.Open(sFilename_spatial_reference_in, 0)
     pLayer_shapefile = pDataset_shapefile.GetLayer(0)
-    pSpatialRef_pcs = pLayer_shapefile.GetSpatialRef()
+    pSpatial_reference = pLayer_shapefile.GetSpatialRef()
     
     pDataset = pDriver_geojson.CreateDataSource(sFilename_mesh_out)
     
@@ -100,12 +100,12 @@ def create_hexagon_mesh(iFlag_rotation, dX_left, dY_bot, \
                
                 aCoords = np.full((7,2), -9999.0, dtype=float)
 
-                #x1,y1 = reproject_coordinates(x1, y1, pSpatialRef_pcs)
-                #x2,y2 = reproject_coordinates(x2, y2, pSpatialRef_pcs)
-                #x3,y3 = reproject_coordinates(x3, y3, pSpatialRef_pcs)
-                #x4,y4 = reproject_coordinates(x4, y4, pSpatialRef_pcs)
-                #x5,y5 = reproject_coordinates(x5, y5, pSpatialRef_pcs)
-                #x6,y6 = reproject_coordinates(x6, y6, pSpatialRef_pcs)
+                #x1,y1 = reproject_coordinates(x1, y1, pSpatial_reference)
+                #x2,y2 = reproject_coordinates(x2, y2, pSpatial_reference)
+                #x3,y3 = reproject_coordinates(x3, y3, pSpatial_reference)
+                #x4,y4 = reproject_coordinates(x4, y4, pSpatial_reference)
+                #x5,y5 = reproject_coordinates(x5, y5, pSpatial_reference)
+                #x6,y6 = reproject_coordinates(x6, y6, pSpatial_reference)
                 x = list()
                 x.append(x1)
                 x.append(x2)
@@ -122,7 +122,7 @@ def create_hexagon_mesh(iFlag_rotation, dX_left, dY_bot, \
                 y.append(y5)
                 y.append(y6)
 
-                x_new , y_new = reproject_coordinates_batch(x, y, pSpatialRef_pcs)
+                x_new , y_new = reproject_coordinates_batch(x, y, pSpatial_reference)
                 x1=x_new[0]
                 x2=x_new[1]
                 x3=x_new[2]
@@ -174,7 +174,7 @@ def create_hexagon_mesh(iFlag_rotation, dX_left, dY_bot, \
                 aCoords[6,1] = y1
            
                 dummy1= np.array(aCoords)
-                pHexagon = convert_pcs_coordinates_to_cell(1, dummy1, pSpatialRef_pcs)
+                pHexagon = convert_pcs_coordinates_to_cell(1, dummy1, pSpatial_reference)
                 pHexagon.lCellID = lCellID
                 lCellID_center = lCellID
                 #build topoloy
@@ -265,12 +265,12 @@ def create_hexagon_mesh(iFlag_rotation, dX_left, dY_bot, \
                
                 aCoords = np.full((7,2), -9999.0, dtype=float)
 
-                #x1,y1 = reproject_coordinates(x1, y1, pSpatialRef_pcs)
-                #x2,y2 = reproject_coordinates(x2, y2, pSpatialRef_pcs)
-                #x3,y3 = reproject_coordinates(x3, y3, pSpatialRef_pcs)
-                #x4,y4 = reproject_coordinates(x4, y4, pSpatialRef_pcs)
-                #x5,y5 = reproject_coordinates(x5, y5, pSpatialRef_pcs)
-                #x6,y6 = reproject_coordinates(x6, y6, pSpatialRef_pcs)
+                #x1,y1 = reproject_coordinates(x1, y1, pSpatial_reference)
+                #x2,y2 = reproject_coordinates(x2, y2, pSpatial_reference)
+                #x3,y3 = reproject_coordinates(x3, y3, pSpatial_reference)
+                #x4,y4 = reproject_coordinates(x4, y4, pSpatial_reference)
+                #x5,y5 = reproject_coordinates(x5, y5, pSpatial_reference)
+                #x6,y6 = reproject_coordinates(x6, y6, pSpatial_reference)
 
                 x = list()
                 x.append(x1)
@@ -288,7 +288,7 @@ def create_hexagon_mesh(iFlag_rotation, dX_left, dY_bot, \
                 y.append(y5)
                 y.append(y6)
 
-                x_new , y_new = reproject_coordinates_batch(x, y, pSpatialRef_pcs)
+                x_new , y_new = reproject_coordinates_batch(x, y, pSpatial_reference)
                 x1=x_new[0]
                 x2=x_new[1]
                 x3=x_new[2]

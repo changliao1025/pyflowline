@@ -73,7 +73,7 @@ def preprocess_flowline_op(oPyflowline_in):
             dThreshold = pBasin.dThreshold_small_river
             sFilename_flowline_filter = pBasin.sFilename_flowline_filter
             sFilename_flowline_filter_json = pBasin.sFilename_flowline_filter_json
-            aFlowline_basin, pSpatialRef_pcs = read_flowline_geojson( sFilename_flowline_filter_json )                
+            aFlowline_basin, pSpatial_reference = read_flowline_geojson( sFilename_flowline_filter_json )                
             if iFlag_dam ==1:
                 sFilename_dam = pBasin.sFilename_dam
                 aData_dam = text_reader_string(sFilename_dam, iSkipline_in =1,cDelimiter_in=',' )

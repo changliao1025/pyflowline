@@ -1,17 +1,16 @@
 import os
 import json
-from pyflowline.classes.edge import pyedge
-from osgeo import ogr, osr, gdal, gdalconst
 import numpy as np
-
+from osgeo import ogr, osr, gdal, gdalconst
 from shapely.geometry import Point, LineString, MultiLineString
 from shapely.wkt import loads
 
 from pyflowline.classes.vertex import pyvertex
+from pyflowline.classes.edge import pyedge
 from pyflowline.classes.flowline import pyflowline
 
-from pyflowline.format.convert_coordinates_to_flowline import convert_pcs_coordinates_to_flowline
-from pyflowline.format.convert_coordinates_to_flowline import convert_gcs_coordinates_to_flowline
+from pyflowline.format.convert_coordinates_to_flowline import convert_pcs_coordinates_to_flowline,convert_gcs_coordinates_to_flowline
+
 
 def read_nhdplus_flowline_shapefile_attribute(sFilename_shapefile_in):
     """
@@ -123,36 +122,36 @@ def extract_nhdplus_flowline_shapefile_by_attribute(sFilename_shapefile_in, aAtt
 
     return aFlowline
 
-def track_nhdplus_flowline(aNHDPlusID_filter, aFromFlowline, aToFlowline, lNHDPlusID):
+def track_nhdplus_flowline(aNHDPlusID_filter_in, aFromFlowline_in, aToFlowline_in, lNHDPlusID_in):
     #aNHDPlusID_dam_headwater = list()
     aNHDPlusID_dam_nonheadwater = list()
     def tag_downstream(lNHDPlusID_from):
-        if lNHDPlusID_from in aNHDPlusID_filter:
-            dummy_index = aNHDPlusID_filter.index(lNHDPlusID_from)
+        if lNHDPlusID_from in aNHDPlusID_filter_in:
+            dummy_index = aNHDPlusID_filter_in.index(lNHDPlusID_from)
             pass
         else:
-            if lNHDPlusID_from in aFromFlowline:
+            if lNHDPlusID_from in aFromFlowline_in:
 
                 if lNHDPlusID_from in aNHDPlusID_dam_nonheadwater:
                     pass
                 else:
                     aNHDPlusID_dam_nonheadwater.append(lNHDPlusID_from)
-                    dummy_index = np.where(aFromFlowline == lNHDPlusID_from )
+                    dummy_index = np.where(aFromFlowline_in == lNHDPlusID_from )
                     nDownstream = dummy_index[0].size
                     for i in range(nDownstream):
-                        lNHDPlusID_to = aToFlowline[dummy_index[0][i]   ]                    
+                        lNHDPlusID_to = aToFlowline_in[dummy_index[0][i]   ]                    
                         if lNHDPlusID_to==0:
                             pass
                         else:
-                            print(lNHDPlusID, lNHDPlusID_to)
+                            print(lNHDPlusID_in, lNHDPlusID_to)
                             tag_downstream(lNHDPlusID_to)
         return 
 
-    if lNHDPlusID in aNHDPlusID_filter:
-        dummy_index = aNHDPlusID_filter.index(lNHDPlusID)
+    if lNHDPlusID_in in aNHDPlusID_filter_in:
+        dummy_index = aNHDPlusID_filter_in.index(lNHDPlusID_in)
         #print( lNHDPlusID, dummy_index)        
     else:
-        tag_downstream(lNHDPlusID)   
+        tag_downstream(lNHDPlusID_in)   
         #remove the first one
         aNHDPlusID_dam_nonheadwater.pop(0)    
 

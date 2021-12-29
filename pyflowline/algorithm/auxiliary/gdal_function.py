@@ -57,7 +57,7 @@ def retrieve_geotiff_metadata(sFilename_geotiff_in):
         sys.exit("Try again!")
     else: 
         pProjection = pDataset.GetProjection()
-        pSpatialRef = osr.SpatialReference(wkt=pProjection)
+        pSpatial_reference = osr.SpatialReference(wkt=pProjection)
     
     
         ncolumn = pDataset.RasterXSize
@@ -71,7 +71,7 @@ def retrieve_geotiff_metadata(sFilename_geotiff_in):
         pPixelHeight = pGeotransform[5]       
         
         print( dPixelWidth, dOriginX, dOriginY, nrow, ncolumn)
-        return dPixelWidth, dOriginX, dOriginY, nrow, ncolumn, pSpatialRef, pProjection, pGeotransform
+        return dPixelWidth, dOriginX, dOriginY, nrow, ncolumn, pSpatial_reference, pProjection, pGeotransform
 
 
 def degree_to_meter(dLatitude_in, dResolution_degree_in):

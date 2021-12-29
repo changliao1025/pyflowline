@@ -22,7 +22,7 @@ def create_square_mesh(dX_left, dY_bot, dResolution, ncolumn, nrow, sFilename_ou
 
     pDataset_shapefile = pDriver_shapefile.Open(sFilename_spatial_reference_in, 0)
     pLayer_shapefile = pDataset_shapefile.GetLayer(0)
-    pSpatialRef_pcs = pLayer_shapefile.GetSpatialRef()   
+    pSpatial_reference = pLayer_shapefile.GetSpatialRef()   
         
 
     pDataset = pDriver_shapefile.CreateDataSource(sFilename_output)
@@ -66,10 +66,10 @@ def create_square_mesh(dX_left, dY_bot, dResolution, ncolumn, nrow, sFilename_ou
             x4 = xleft + ((column + 1) * xspacing)
             y4 = ybottom + (row * yspacing)
 
-            #x1,y1 = reproject_coordinates(x1, y1, pSpatialRef_pcs)
-            #x2,y2 = reproject_coordinates(x2, y2, pSpatialRef_pcs)
-            #x3,y3 = reproject_coordinates(x3, y3, pSpatialRef_pcs)
-            #x4,y4 = reproject_coordinates(x4, y4, pSpatialRef_pcs)
+            #x1,y1 = reproject_coordinates(x1, y1, pSpatial_reference)
+            #x2,y2 = reproject_coordinates(x2, y2, pSpatial_reference)
+            #x3,y3 = reproject_coordinates(x3, y3, pSpatial_reference)
+            #x4,y4 = reproject_coordinates(x4, y4, pSpatial_reference)
             x = list()
             x.append(x1)
             x.append(x2)
@@ -82,7 +82,7 @@ def create_square_mesh(dX_left, dY_bot, dResolution, ncolumn, nrow, sFilename_ou
             y.append(y3)
             y.append(y4)
            
-            x_new , y_new = reproject_coordinates_batch(x, y, pSpatialRef_pcs)
+            x_new , y_new = reproject_coordinates_batch(x, y, pSpatial_reference)
             x1=x_new[0]
             x2=x_new[1]
             x3=x_new[2]

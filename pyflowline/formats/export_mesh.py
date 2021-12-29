@@ -1,11 +1,11 @@
-from typing import NoReturn
+
 import numpy as np
 import json
 
-def export_mesh_info_to_json(iFlag_flowline, aCell_in, aFlowline_in, aCellID_outlet, sFilename_json_out):
+def export_mesh_info_to_json(iFlag_flowline_in, aCell_in, aFlowline_in, aCellID_outlet_iin, sFilename_json_in):
     ncell=len(aCell_in)
 
-    if iFlag_flowline == 1:
+    if iFlag_flowline_in == 1:
         nFlowline = len(aFlowline_in)
         for i in range(nFlowline):
             pFlowline = aFlowline_in[i]
@@ -32,7 +32,7 @@ def export_mesh_info_to_json(iFlag_flowline, aCell_in, aFlowline_in, aCellID_out
                             lCellID = aCell_in[l].lCellID
                             if pVertex_center2 == pVertex_end:
                                 aCell_in[k].lCellID_downstream_burned = lCellID
-                                if lCellID in aCellID_outlet:
+                                if lCellID in aCellID_outlet_iin:
                                     aCell_in[l].iStream_segment_burned = iStream_segment
                                     aCell_in[l].iStream_order_burned = iStream_order
 
@@ -47,7 +47,7 @@ def export_mesh_info_to_json(iFlag_flowline, aCell_in, aFlowline_in, aCellID_out
 
 
 
-    with open(sFilename_json_out, 'w', encoding='utf-8') as f:
+    with open(sFilename_json_in, 'w', encoding='utf-8') as f:
         sJson = json.dumps([json.loads(ob.tojson()) for ob in aCell_in], indent = 4)        
         f.write(sJson)    
         f.close()

@@ -133,3 +133,6 @@ class pyhexagon(pycell):
             indent=4, cls=NumpyArrayEncoder) 
         return sJson
 
+    def plot():
+        return
+

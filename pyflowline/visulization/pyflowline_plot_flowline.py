@@ -74,12 +74,7 @@ def pyflowline_plot_flowline(oBasin_in, sVariable_in = None):
 
             codes = np.full(nvertex, mpath.Path.LINETO, dtype=int )
             codes[0] = mpath.Path.MOVETO
-
-            path = mpath.Path(aCoords_gcs, codes)
-            #patch = mpatches.PathPatch(path,  \
-            #    lw=1, transform=ccrs.PlateCarree(), alpha=0.8, edgecolor= colours[lID])
-            #ax.add_patch(patch)
-            # plot control points and connecting lines
+            path = mpath.Path(aCoords_gcs, codes)            
             x, y = zip(*path.vertices)
             line, = ax.plot(x, y, color= colours[lID])
             lID = lID + 1

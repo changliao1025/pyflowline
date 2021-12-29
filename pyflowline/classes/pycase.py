@@ -24,55 +24,31 @@ class flowlinecase(object):
     iFlag_rotation=0
 
     nOutlet = 1 #by default , there shoule ne only one ouelet
-
     dResolution=0.0
     dResolution_meter=0.0
     dThreshold_small_river=0.0
-
-    dLongitude_left = -79.44374
-    dLongitude_right = -74.24774 
-
-    dLatitude_bot = 39.00 #,1399152.687,1978258.386
-    dLatitude_top = 43.00334 # ,1748363.409,2424316.881
-
-
+    dLongitude_left = -180
+    dLongitude_right = 180
+    dLatitude_bot = -90
+    dLatitude_top = 90
     sFilename_model_configuration=''
-
-    sWorkspace_data=''
- 
-    
-    sWorkspace_project=''
-    
-    sWorkspace_output=''
-    
-    
+    sWorkspace_data=''     
+    sWorkspace_project=''    
+    sWorkspace_output=''    
     sRegion=''
     sModel=''
-    iMesh_type ='hexagon'
+    sMesh_type ='hexagon'
 
     sCase=''
-    sDate=''
-    
+    sDate=''    
 
     sFilename_spatial_reference=''
-    sFilename_dem=''
-    #sFilename_flowline_raw=''
-    #sFilename_flowline_filter=''
-    #sFilename_dam=''
-    #sFilename_flowline_topo=''
-    #before intersect
-    #sFilename_flowline_segment_order_before_intersect=''
-    #sFilename_flowline_segment_index_before_intersect=''
+    sFilename_dem=''   
 
-    #intersect
     sFilename_mesh=''
     sFilename_mesh_info=''
     sFilename_mesh_netcdf=''
-    #sFilename_flowline_intersect = ''
-    #after intersect
-    #sFilename_flowline_simplified_after_intersect=''
-    #sFilename_vertex_without_confluence_after_intersect=''
-    #flowline_split_by_point_after_intersect=''
+    
 
     aBasin = list()
     

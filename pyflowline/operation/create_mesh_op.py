@@ -2,7 +2,7 @@ import os, sys
 import numpy as np
 import osgeo
 from osgeo import ogr, osr, gdal, gdalconst
-from pyflowline.algorithm.auxiliary.gdal_function import obtain_raster_metadata
+from pyflowline.algorithm.auxiliary.gdal_function import retrieve_geotiff_metadata
 from pyflowline.algorithm.auxiliary.reproject_coordinates import reproject_coordinates
 from pyflowline.algorithm.auxiliary.gdal_function  import degree_to_meter
 from pyflowline.algorithm.auxiliary.gdal_function  import meter_to_degree
@@ -33,7 +33,7 @@ def create_mesh_op(oPyflowline_in):
     if iMesh_type !=4: #hexagon
 
         dPixelWidth, dOriginX, dOriginY, nrow, ncolumn, pSpatialRef_dem, pProjection, pGeotransform\
-             = obtain_raster_metadata(sFilename_dem)
+             = retrieve_geotiff_metadata(sFilename_dem)
 
         spatial_reference_source = pSpatialRef_dem
         spatial_reference_target = osr.SpatialReference()  

@@ -1,7 +1,7 @@
 import os, sys
 import numpy as np
 
-from pyflowline.case.pyflowline_read_model_configuration_file import pyflowline_read_model_configuration_file
+from pyflowline.classes.pyflowline_read_model_configuration_file import pyflowline_read_model_configuration_file
 
 from pyflowline.operation.preprocess_flowline_op import preprocess_flowline_op
 

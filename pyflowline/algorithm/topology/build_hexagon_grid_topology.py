@@ -1,24 +1,23 @@
 
 
-import imp
 import os
 import json
-from pyflowline.shared.vertex import pyvertex
 import numpy as np
 from osgeo import ogr, osr
 
 from shapely.geometry import Point, LineString, MultiLineString
 from shapely.wkt import loads
-from pyflowline.shared.hexagon import pyhexagon
+
+from pyflowline.classes.vertex import pyvertex
+from pyflowline.classes.edge import pyedge
+from pyflowline.classes.flowline import pyflowline
+from pyflowline.classes.hexagon import pyhexagon
 
 from pyflowline.format.convert_coordinates_to_cell import convert_pcs_coordinates_to_cell
 from pyflowline.format.convert_coordinates_to_flowline import convert_pcs_coordinates_to_flowline
 from pyflowline.algorithm.auxiliary.find_hexagon_through_edge import find_hexagon_through_edge
 
-#from pyflowline.shared.link import pyhexagonlink
 def build_hexagon_grid_topology(aHexagon_in):
-    
-    
 
     nHexagon = len(aHexagon_in)
 

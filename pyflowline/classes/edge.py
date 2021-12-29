@@ -2,7 +2,7 @@ from abc import ABCMeta, abstractmethod
 import json
 from osgeo import gdal, osr, ogr
 
-from pyflowline.shared.vertex import pyvertex
+from pyflowline.classes.vertex import pyvertex
 
 class pyedge(object):
     __metaclass__ = ABCMeta 

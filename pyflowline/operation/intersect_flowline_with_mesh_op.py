@@ -1,6 +1,6 @@
 import os, sys
 
-from pyflowline.shared.vertex import pyvertex
+from pyflowline.classes.vertex import pyvertex
 
 from pyflowline.format.read_flowline_geojson import read_flowline_geojson
 from pyflowline.format.export_flowline_to_shapefile import export_flowline_to_shapefile

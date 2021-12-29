@@ -1,7 +1,7 @@
 import os
 import json
 from pathlib import Path
-from pyflowline.shared.vertex import pyvertex
+from pyflowline.classes.vertex import pyvertex
 from pyflowline.algorithm.auxiliary.reproject_coordinates import reproject_coordinates
 from pyflowline.format.read_flowline_shapefile import read_flowline_shapefile
 #from pyflowline.format.read_mesh_shapefile import read_mesh_shapefile

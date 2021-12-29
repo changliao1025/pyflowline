@@ -3,8 +3,8 @@ from pyflowline.format.export_mesh_info_to_json import export_mesh_info_to_json
 import numpy as np
 
 
-from pyflowline.case.pycase import flowlinecase
-from pyflowline.case.pyflowline_read_model_configuration_file import pyflowline_read_model_configuration_file
+from pyflowline.classes.pycase import flowlinecase
+from pyflowline.classes.pyflowline_read_model_configuration_file import pyflowline_read_model_configuration_file
 
 from pyflowline.operation.create_mesh_op import create_mesh_op
 

@@ -1,3 +1,5 @@
+
+from pyflowline.classes.flowline import pyflowline
 def calculate_flowline_length(aFlowline_in):
 
     dLength = 0.0

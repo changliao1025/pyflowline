@@ -1,8 +1,8 @@
 import json
-from pyflowline.shared.edge import pyedge
-from pyflowline.shared.flowline import pyflowline
+from pyflowline.classes.edge import pyedge
+from pyflowline.classes.flowline import pyflowline
 #from pyflowline.shared.link import pympaslink
-from pyflowline.shared.link import pycelllink
+from pyflowline.classes.link import pycelllink
 def export_flowline_info_to_json(aCell, aCell_intersect_in, aFlowline_in, sFilename_json_out):
     
     #export the flowline topology to json

@@ -1,5 +1,5 @@
 import os, sys
-from pyflowline.shared.flowline import pyflowline
+from pyflowline.classes.flowline import pyflowline
 import numpy as np 
 from osgeo import ogr, osr, gdal, gdalconst
 
@@ -9,7 +9,7 @@ aFlag_process=None
 
 from pyflowline.algorithm.auxiliary.check_head_water import check_head_water
 
-def correct_flowline_direction(aFlowline_in, pVertex_outlet):
+def correct_flowline_direction(aFlowline_in, pVertex_outlet_in):
         
     #we have to go reversely    
     aFlowline_out= list()   
@@ -26,7 +26,7 @@ def correct_flowline_direction(aFlowline_in, pVertex_outlet):
         iStream_order = pFlowline.iStream_order
         pVertex_start = pFlowline.pVertex_start
         pVertex_end = pFlowline.pVertex_end
-        dDiatance = pVertex_end.calculate_distance( pVertex_outlet )             
+        dDiatance = pVertex_end.calculate_distance( pVertex_outlet_in )             
 
         if iFlag_first ==1:
             dDiatance_min = dDiatance                

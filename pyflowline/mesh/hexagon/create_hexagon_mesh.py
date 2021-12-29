@@ -7,7 +7,7 @@ import os, sys
 import numpy as np
 from osgeo import ogr, osr, gdal, gdalconst
 
-from pyflowline.shared.hexagon import pyhexagon
+from pyflowline.classes.hexagon import pyhexagon
 from pyflowline.format.convert_coordinates_to_cell import convert_gcs_coordinates_to_cell, convert_pcs_coordinates_to_cell
 from pyflowline.algorithm.auxiliary.check_if_duplicates import check_if_duplicates
 from pyflowline.algorithm.auxiliary.reproject_coordinates import reproject_coordinates, reproject_coordinates_batch

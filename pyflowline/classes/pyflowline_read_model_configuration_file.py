@@ -5,7 +5,7 @@ import json
 
 
 
-from pyflowline.case.pycase import flowlinecase
+from pyflowline.classes.pycase import flowlinecase
 
 
 

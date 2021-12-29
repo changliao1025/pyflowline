@@ -1,20 +1,20 @@
 import os
 import json
-from pyflowline.shared.square import pysquare
-from pyflowline.shared.edge import pyedge
+from pyflowline.classes.square import pysquare
+from pyflowline.classes.edge import pyedge
 from osgeo import ogr, osr, gdal, gdalconst
 import numpy as np
 
 from shapely.geometry import Point, LineString, MultiLineString
 from shapely.wkt import loads
 
-from pyflowline.shared.vertex import pyvertex
-from pyflowline.shared.flowline import pyflowline
-from pyflowline.shared.hexagon import pyhexagon
-from pyflowline.shared.square import pysquare
-from pyflowline.shared.latlon import pylatlon
-from pyflowline.shared.mpas import pympas
-from pyflowline.shared.tin import pytin
+from pyflowline.classes.vertex import pyvertex
+from pyflowline.classes.flowline import pyflowline
+from pyflowline.classes.hexagon import pyhexagon
+from pyflowline.classes.square import pysquare
+from pyflowline.classes.latlon import pylatlon
+from pyflowline.classes.mpas import pympas
+from pyflowline.classes.tin import pytin
     
 def convert_gcs_attribute_to_cell(iMesh_type, dLon, dLat, \
         aCoordinates_gcs, \

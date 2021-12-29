@@ -1,6 +1,6 @@
 import os
 import json
-from pyflowline.shared.edge import pyedge
+from pyflowline.classes.edge import pyedge
 from osgeo import ogr, osr, gdal, gdalconst
 import numpy as np
 from pyflowline.algorithm.auxiliary.reproject_coordinates import reproject_coordinates
@@ -9,8 +9,8 @@ from pyflowline.algorithm.auxiliary.reproject_coordinates import reproject_coord
 
 
 
-from pyflowline.shared.vertex import pyvertex
-from pyflowline.shared.flowline import pyflowline
+from pyflowline.classes.vertex import pyvertex
+from pyflowline.classes.flowline import pyflowline
 
 def convert_gcs_coordinates_to_flowline(aCoordinates):
     npoint = len(aCoordinates)

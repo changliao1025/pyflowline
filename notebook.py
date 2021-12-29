@@ -1,7 +1,7 @@
 import os
 from pathlib import Path
-from pyflowline.case.pycase import flowlinecase
-from pyflowline.case.pyflowline_read_model_configuration_file import pyflowline_read_model_configuration_file
+from pyflowline.classes.pycase import flowlinecase
+from pyflowline.classes.pyflowline_read_model_configuration_file import pyflowline_read_model_configuration_file
 
 iFlag_option = 2
 

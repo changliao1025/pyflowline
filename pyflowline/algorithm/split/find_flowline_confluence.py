@@ -1,11 +1,14 @@
 import os, sys
-from osgeo import ogr, osr, gdal, gdalconst
 import numpy as np
+from osgeo import ogr, osr, gdal, gdalconst
 
+from pyflowline.classes.vertex import pyvertex
+from pyflowline.classes.edge import pyedge
+from pyflowline.classes.flowline import pyflowline
 from pyflowline.algorithm.auxiliary.find_vertex_in_list import find_vertex_in_list
 from pyflowline.algorithm.auxiliary.add_unique_vertex import add_unique_vertex
-
 from pyflowline.algorithm.auxiliary.check_head_water import check_head_water
+
 def find_flowline_confluence(aFlowline_in, pVertex_outlet_in):
     
     nFlowline = len(aFlowline_in)

@@ -1,7 +1,7 @@
 
 import json
 
-from pyflowline.shared.basin import pybasin
+from pyflowline.classes.basin import pybasin
 
 aBasin = list()
 

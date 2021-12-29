@@ -5,7 +5,6 @@ from osgeo import gdal, osr, ogr, gdalconst
 
 def remove_flowline_loop(aFlowline_in):
     aFlowline_out=list()
-
     nFlowline = len(aFlowline_in)
         
     

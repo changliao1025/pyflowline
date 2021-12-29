@@ -4,7 +4,7 @@ import numpy as np
 from netCDF4 import Dataset
 from osgeo import ogr, osr, gdal, gdalconst
 
-from pyflowline.shared.mpas import pympas
+from pyflowline.classes.mpas import pympas
 
 from pyflowline.algorithm.auxiliary.convert_lat_lon_range import convert_180_to_360,convert_360_to_180
 

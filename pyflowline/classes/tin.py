@@ -1,9 +1,9 @@
 from abc import ABCMeta, abstractmethod
 from osgeo import gdal, osr, ogr
 import numpy as np
-from pyflowline.shared.vertex import pyvertex
-from pyflowline.shared.edge import pyedge
-from pyflowline.shared.cell import pycell
+from pyflowline.classes.vertex import pyvertex
+from pyflowline.classes.edge import pyedge
+from pyflowline.classes.cell import pycell
 
 class pytin(pycell):
     #lIndex=0    

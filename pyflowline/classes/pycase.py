@@ -4,7 +4,7 @@ from abc import ABCMeta, abstractmethod
 
 import datetime
 import json
-from pyflowline.shared.basin import pybasin
+from pyflowline.classes.basin import pybasin
 pDate = datetime.datetime.today()
 sDate_default = "{:04d}".format(pDate.year) + "{:02d}".format(pDate.month) + "{:02d}".format(pDate.day)
 

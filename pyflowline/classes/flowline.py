@@ -5,8 +5,8 @@ from numpy.lib.function_base import average
 import copy
 from osgeo import gdal, osr, ogr
 
-from pyflowline.shared.vertex import pyvertex
-from pyflowline.shared.edge import pyedge
+from pyflowline.classes.vertex import pyvertex
+from pyflowline.classes.edge import pyedge
 
 class pyflowline(object):
     __metaclass__ = ABCMeta 

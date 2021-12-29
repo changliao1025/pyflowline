@@ -1,23 +1,24 @@
 import os, sys
-from osgeo import ogr, osr, gdal, gdalconst
+
 import numpy as np
-
+from osgeo import ogr, osr, gdal, gdalconst
 from pyflowline.algorithm.auxiliary.find_vertex_in_list import find_vertex_in_list
-lID = 0
-def merge_flowline(aFlowline_in, aVertex, \
-    pVertex_outlet_in, \
-        aIndex_headwater,\
-            aIndex_middle, \
-                aIndex_confluence ):
 
-    nVertex=len(aVertex)
+lID = 0
+def merge_flowline(aFlowline_in, aVertex_in, \
+    pVertex_outlet_in, \
+        aIndex_headwater_in,\
+            aIndex_middle_in, \
+                aIndex_confluence_in ):
+
+    nVertex=len(aVertex_in)
     nFlowline = len(aFlowline_in)
     aFlowline_out=list()           
     
-    aVertex = np.array(aVertex)
-    aIndex_headwater = np.array(aIndex_headwater)
-    aIndex_middle = np.array(aIndex_middle)
-    aIndex_confluence = np.array(aIndex_confluence)
+    aVertex = np.array(aVertex_in)
+    aIndex_headwater = np.array(aIndex_headwater_in)
+    aIndex_middle = np.array(aIndex_middle_in)
+    aIndex_confluence = np.array(aIndex_confluence_in)
 
     if aIndex_middle.size == 0:
         return aFlowline_in
@@ -28,11 +29,11 @@ def merge_flowline(aFlowline_in, aVertex, \
     if aIndex_confluence.size > 0:        
         aVertex_confluence=aVertex[aIndex_confluence]    
     
-    def merge_flowline_reach(lIndex, pVertex_start_in, pVertex_end_in):
+    def merge_flowline_reach(lIndex_in, pVertex_start_in, pVertex_end_in):
         global lID
-        pFlowline = aFlowline_in[lIndex]
+        pFlowline = aFlowline_in[lIndex_in]
         pVertex_current = pVertex_start_in
-        dummy = lIndex
+        dummy = lIndex_in
         while (find_vertex_in_list(aVertex_middle, pVertex_current)[0] ==1):
             
             for j in range(0, nFlowline):      

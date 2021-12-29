@@ -1,9 +1,9 @@
 import os, sys
-from osgeo import ogr, osr, gdal, gdalconst
 import numpy as np
-from pyflowline.shared.vertex import pyvertex
-from pyflowline.shared.edge import pyedge
-from pyflowline.shared.flowline import pyflowline
+from osgeo import ogr, osr, gdal, gdalconst
+from pyflowline.classes.vertex import pyvertex
+from pyflowline.classes.edge import pyedge
+from pyflowline.classes.flowline import pyflowline
 
 from pyflowline.algorithm.auxiliary.find_vertex_in_list import find_vertex_in_list
 

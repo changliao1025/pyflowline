@@ -1,8 +1,8 @@
 #this is an exmaple to run all the stepsimport os, sys
 import numpy as np
 
-from pyflowline.case.pycase import flowlinecase
-from pyflowline.case.pyflowline_read_model_configuration_file import pyflowline_read_model_configuration_file
+from pyflowline.classes.pycase import flowlinecase
+from pyflowline.classes.pyflowline_read_model_configuration_file import pyflowline_read_model_configuration_file
 from pyflowline.operation.full_op import full_op
 
 

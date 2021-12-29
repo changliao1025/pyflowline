@@ -4,10 +4,10 @@ import numpy as np
 import json
 from json import JSONEncoder
 
-from pyflowline.shared.vertex import pyvertex
-from pyflowline.shared.edge import pyedge
-from pyflowline.shared.cell import pycell
-from pyflowline.shared.flowline import pyflowline
+from pyflowline.classes.vertex import pyvertex
+from pyflowline.classes.edge import pyedge
+from pyflowline.classes.cell import pycell
+from pyflowline.classes.flowline import pyflowline
 
 from pyflowline.algorithm.auxiliary.calculate_polygon_area import calculate_polygon_area
 

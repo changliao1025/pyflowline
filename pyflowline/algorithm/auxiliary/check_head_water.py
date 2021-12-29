@@ -1,4 +1,16 @@
+from pyflowline.classes.vertex import pyvertex
+from pyflowline.classes.flowline import pyflowline
+
 def check_head_water(aFlowline_in, pVertex_start_in):
+    """[Check whether a vertex assoacited with a flowline is a headwater or not]
+
+    Args:
+        aFlowline_in ([pyflowline]): [all the flowline]
+        pVertex_start_in ([pyvertex]): [the vertex of interest]
+
+    Returns:
+        [int]: [0: not headwater; 1: is headwater]
+    """
     nFlowline = len(aFlowline_in)
     iFlag_head_water = -1
     iCount = 0

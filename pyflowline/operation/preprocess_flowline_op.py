@@ -5,7 +5,7 @@ from osgeo import osr
 from pathlib import Path
 
 from pyflowline.algorithm.auxiliary.text_reader_string import text_reader_string
-from pyflowline.shared.vertex import pyvertex
+from pyflowline.classes.vertex import pyvertex
 
 
 from pyflowline.format.read_flowline_shapefile import read_flowline_shapefile

@@ -1,14 +1,17 @@
 import copy
-from posixpath import join
 import numpy as np
 
-from pyflowline.algorithm.auxiliary.check_if_duplicates import check_if_duplicates
-from pyflowline.shared.hexagon import pyhexagon
-from pyflowline.shared.flowline import pyflowline
-from pyflowline.format.convert_coordinates_to_flowline import convert_gcs_coordinates_to_flowline, convert_pcs_coordinates_to_flowline
+from pyflowline.classes.hexagon import pyhexagon
 
+from pyflowline.classes.vertex import pyvertex
+from pyflowline.classes.edge import pyedge
+from pyflowline.classes.flowline import pyflowline
+
+from pyflowline.format.convert_coordinates_to_flowline import convert_gcs_coordinates_to_flowline, convert_pcs_coordinates_to_flowline
+from pyflowline.algorithm.auxiliary.check_if_duplicates import check_if_duplicates
 from pyflowline.algorithm.auxiliary.find_vertex_in_list import find_vertex_in_list
-def remove_returning_flowline(iMesh_type, aCell_intersect_in, pVertex_outlet_in):
+
+def remove_returning_flowline(iMesh_type_in, aCell_intersect_in, pVertex_outlet_in):
     
     aFlowline_out=list()
     #checking input data 

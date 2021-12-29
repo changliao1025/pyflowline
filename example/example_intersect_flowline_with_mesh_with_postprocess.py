@@ -1,6 +1,6 @@
 import os
-from pyflowline.case.pycase import flowlinecase
-from pyflowline.case.pyflowline_read_model_configuration_file import pyflowline_read_model_configuration_file
+from pyflowline.classes.pycase import flowlinecase
+from pyflowline.classes.pyflowline_read_model_configuration_file import pyflowline_read_model_configuration_file
 from pyflowline.operation.intersect_flowline_with_mesh_with_postprocess_op import intersect_flowline_with_mesh_with_postprocess_op
 
 

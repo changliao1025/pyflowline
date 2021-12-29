@@ -1,31 +1,31 @@
 
-import imp
+
 import os
 import json
-from pyflowline.shared.vertex import pyvertex
 import numpy as np
 from osgeo import ogr, osr
 
 from shapely.geometry import Point, LineString, MultiLineString
 from shapely.wkt import loads
-from pyflowline.shared.hexagon import pyhexagon
+
+from pyflowline.classes.vertex import pyvertex
+from pyflowline.classes.hexagon import pyhexagon
 
 from pyflowline.format.convert_coordinates_to_cell import convert_gcs_coordinates_to_cell, convert_pcs_coordinates_to_cell
 from pyflowline.format.convert_coordinates_to_flowline import convert_gcs_coordinates_to_flowline,convert_pcs_coordinates_to_flowline
 
 
-#from pyflowline.shared.link import pyhexagonlink
-def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh, sFilename_flowline, sFilename_output):
+def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh_in, sFilename_flowline_in, sFilename_output_in):
 
-    if  os.path.exists(sFilename_mesh) and  os.path.exists(sFilename_flowline) : 
+    if  os.path.exists(sFilename_mesh_in) and  os.path.exists(sFilename_flowline_in) : 
         pass
     else:
         print('The input file does not exist')
         return
 
-    if os.path.exists(sFilename_output): 
+    if os.path.exists(sFilename_output_in): 
         #delete it if it exists
-        os.remove(sFilename_output)
+        os.remove(sFilename_output_in)
 
     
     pDriver_geojson = ogr.GetDriverByName( "GeoJSON")
@@ -35,8 +35,8 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh, sFilename_flowli
     aCell=list()
     aCell_intersect=list()    
    
-    pDataset_mesh = pDriver_geojson.Open(sFilename_mesh, 0)
-    pDataset_flowline = pDriver_geojson.Open(sFilename_flowline, 0)   
+    pDataset_mesh = pDriver_geojson.Open(sFilename_mesh_in, 0)
+    pDataset_flowline = pDriver_geojson.Open(sFilename_flowline_in, 0)   
 
     pLayer_mesh = pDataset_mesh.GetLayer(0)
     pSpatialRef_mesh = pLayer_mesh.GetSpatialRef()
@@ -55,7 +55,7 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh, sFilename_flowli
     else:
         iFlag_transform = 0
 
-    pDataset_out = pDriver_geojson.CreateDataSource(sFilename_output)
+    pDataset_out = pDriver_geojson.CreateDataSource(sFilename_output_in)
 
     pLayerOut = pDataset_out.CreateLayer('flowline', pSpatialRef_flowline, ogr.wkbMultiLineString)
     # Add one attribute
@@ -72,13 +72,10 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh, sFilename_flowli
     for pFeature_mesh in pLayer_mesh:
        
         #pFeature_mesh= pLayer_mesh.GetFeature(i)
-        pGeometry_mesh = pFeature_mesh.GetGeometryRef()
-        #if iMesh_type_in ==4 or iMesh_type_in ==3 :
+        pGeometry_mesh = pFeature_mesh.GetGeometryRef()        
         dummy0 = loads( pGeometry_mesh.ExportToWkt() )
         aCoords_gcs = dummy0.exterior.coords
-        aCoords_gcs= np.array(aCoords_gcs)
-        #else:
-        #    pass
+        aCoords_gcs= np.array(aCoords_gcs)       
 
         lCellID = pFeature_mesh.GetField("id")
         dLon = pFeature_mesh.GetField("lon")
@@ -95,19 +92,9 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh, sFilename_flowli
 
         #convert geometry to edge
         pGeometrytype_mesh = pGeometry_mesh.GetGeometryName()
-        if(pGeometrytype_mesh == 'POLYGON'):
-            #dummy = loads( pGeometry_mesh.ExportToWkt() )
-            #be careful with this part, it may not have the same order as the original mpas structure
-            #aCoords_gcs = dummy.exterior.coords
-            #aCoords_gcs= np.array(aCoords_gcs)
-            #convert lat/lon to projection because of intersect function
-            #if iMesh_type_in ==4 or iMesh_type_in ==3: 
-            pCell = convert_gcs_coordinates_to_cell(iMesh_type_in, dLon, dLat, aCoords_gcs)
-            #else:
-            #    pCell = convert_pcs_coordinates_to_cell(iMesh_type_in, aCoords_pcs,)
-
-            pCell.lCellID = lCellID #this information is saved in shapefile
-            #dArea = pGeometry_mesh.GetArea() 
+        if(pGeometrytype_mesh == 'POLYGON'):            
+            pCell = convert_gcs_coordinates_to_cell(iMesh_type_in, dLon, dLat, aCoords_gcs)     
+            pCell.lCellID = lCellID #this information is saved in shapefile            
             pCell.dArea = dArea #pCell.calculate_cell_area()
             pCell.dLength = pCell.calculate_edge_length()
             pCell.dLength_flowline = pCell.dLength

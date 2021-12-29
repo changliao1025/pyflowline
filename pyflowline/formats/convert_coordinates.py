@@ -13,7 +13,7 @@ from pyflowline.classes.latlon import pylatlon
 from pyflowline.classes.mpas import pympas
 from pyflowline.classes.tin import pytin
 
-from pyflowline.algorithm.auxiliary.reproject_coordinates import reproject_coordinates
+from pyflowline.algorithm.auxiliary.gdal_functions import reproject_coordinates
 
 
 
@@ -125,8 +125,8 @@ def convert_gcs_coordinates_to_flowline(aCoordinates_in):
         x = aCoordinates_in[i][0]
         y = aCoordinates_in[i][1]
         dummy = dict()
-        dummy['lon'] =x
-        dummy['lat'] =y
+        dummy['dLongitude_degree'] = x
+        dummy['dLatitude_degree'] = y
         pVertex = pyvertex(dummy)
         aVertex.append(pVertex)
         

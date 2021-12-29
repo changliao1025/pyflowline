@@ -3,7 +3,7 @@ import numpy as np
 import json
 from json import JSONEncoder
 
-from pyflowline.algorithm.auxiliary.gdal_function import calculate_distance_based_on_lon_lat
+from pyflowline.algorithm.auxiliary.gdal_functions import calculate_distance_based_on_lon_lat
 
 class VertexClassEncoder(JSONEncoder):
     def default(self, obj):
@@ -37,9 +37,12 @@ class pyvertex(object):
         if 'z' in aParameter:            
             self.dZ_meter             = float(aParameter['z'])
         
-        #longitude and latitude are always required          
-        self.dLongitude_degree      = float(aParameter['dLongitude_degree'])                 
-        self.dLatitude_degree       = float(aParameter['dLongitude_degree'])
+        #longitude and latitude are always required     
+        try:     
+            self.dLongitude_degree      = float(aParameter['dLongitude_degree'])                 
+            self.dLatitude_degree       = float(aParameter['dLatitude_degree'])
+        except:
+            print('Initialization of vertex failed!')
         
         return
     

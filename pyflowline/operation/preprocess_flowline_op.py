@@ -41,11 +41,6 @@ from pyflowline.algorithm.index.define_stream_order import define_stream_order
 from pyflowline.algorithm.index.define_stream_segment_index import define_stream_segment_index
 
 
-def read_list_of_files(sFilename_in):
-    aFilename = text_reader_string(sFilename_in)
-    return aFilename
-
-
 def preprocess_flowline_op(oPyflowline_in):
     
     #read shapefile and store information in the list

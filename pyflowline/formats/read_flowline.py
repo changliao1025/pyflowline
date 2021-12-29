@@ -9,7 +9,7 @@ from pyflowline.classes.edge import pyedge
 from pyflowline.classes.vertex import pyvertex
 from pyflowline.classes.flowline import pyflowline
 
-from pyflowline.format.convert_coordinates_to_flowline import convert_gcs_coordinates_to_flowline, convert_pcs_coordinates_to_flowline
+from pyflowline.formats.convert_coordinates import convert_gcs_coordinates_to_flowline, convert_pcs_coordinates_to_flowline
 
 
 def read_flowline_shapefile(sFilename_shapefile_in):

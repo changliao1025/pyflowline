@@ -207,3 +207,18 @@ class flowlinecase(object):
                 
         return
         
+
+    def convert_flowline_to_json(self):
+        for pBasin in self.aBasin:            
+            pBasin.convert_flowline_to_json()
+            pass
+
+    def plot(self, sVariable_in=None):
+        for pBasin in self.aBasin:            
+            pBasin.plot(sVariable_in= sVariable_in)
+            pass
+
+    def preprocess_flowline(self):
+        for pBasin in self.aBasin:            
+            pBasin.preprocess_flowline()
+            pass

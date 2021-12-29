@@ -1,9 +1,9 @@
 import os
 from abc import ABCMeta, abstractmethod
-import numpy as np
 import json
 from json import JSONEncoder
 from pathlib import Path
+import numpy as np
 from osgeo import ogr, osr, gdal, gdalconst
 from shapely.wkt import loads
 import matplotlib.pyplot as plt
@@ -14,6 +14,8 @@ from matplotlib import cm
 import cartopy.crs as ccrs
 desired_proj = ccrs.Orthographic(central_longitude=-75, central_latitude=42, globe=None)
 desired_proj = ccrs.PlateCarree()
+
+from pyflowline.formats.convert_shapefile_to_json import convert_shapefile_to_json
 
 class BasinClassEncoder(JSONEncoder):
     def default(self, obj):
@@ -134,7 +136,12 @@ class pybasin(object):
                         cls=BasinClassEncoder)
         return sJson
     
-    def plot(sVariable_in=None):
+    def convert_flowline_to_json(self):
+        sFilename_raw = self.sFilename_flowline_filter            
+        sFilename_out = self.sFilename_flowline_filter_json
+        convert_shapefile_to_json(1, sFilename_raw, sFilename_out)
+    
+    def plot(self, sVariable_in=None):
 
         if sVariable_in is not None:
             if sVariable_in == 'flowline_filter_json':
@@ -211,4 +218,8 @@ class pybasin(object):
         plt.savefig(sFilename_out, bbox_inches='tight')
         plt.show()
     
+        return
+
+    def preprocess_flowline(self):
+        
         return

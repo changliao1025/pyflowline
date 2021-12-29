@@ -19,7 +19,9 @@ def pyflowline_read_model_configuration_file(sFilename_configuration_in,\
                  sDate_in = None,\
                      sWorkspace_output_in = None):
 
-
+    if not os.path.isfile(sFilename_configuration_in):
+        print(sFilename_configuration_in + ' does not exist')
+        return
     
     # Opening JSON file
     with open(sFilename_configuration_in) as json_file:

@@ -229,3 +229,6 @@ class flowlinecase(object):
 
             self.aFlowline = aFlowline_out
         return aFlowline_out
+    
+    def create_mesh(self):
+        return

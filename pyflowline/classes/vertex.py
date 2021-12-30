@@ -3,7 +3,7 @@ import numpy as np
 import json
 from json import JSONEncoder
 
-from pyflowline.algorithm.auxiliary.gdal_functions import calculate_distance_based_on_lon_lat
+from pyflowline.algorithms.auxiliary.gdal_functions import calculate_distance_based_on_lon_lat
 
 class VertexClassEncoder(JSONEncoder):
     def default(self, obj):

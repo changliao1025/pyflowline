@@ -2,10 +2,10 @@ import os, sys
 import numpy as np
 import osgeo
 from osgeo import ogr, osr, gdal, gdalconst
-from pyflowline.algorithm.auxiliary.gdal_functions import retrieve_geotiff_metadata
-from pyflowline.algorithm.auxiliary.reproject_coordinates import reproject_coordinates
-from pyflowline.algorithm.auxiliary.gdal_functions  import degree_to_meter
-from pyflowline.algorithm.auxiliary.gdal_functions  import meter_to_degree
+from pyflowline.algorithms.auxiliary.gdal_functions import retrieve_geotiff_metadata
+from pyflowline.algorithms.auxiliary.reproject_coordinates import reproject_coordinates
+from pyflowline.algorithms.auxiliary.gdal_functions  import degree_to_meter
+from pyflowline.algorithms.auxiliary.gdal_functions  import meter_to_degree
 from pyflowline.mesh.hexagon.create_hexagon_mesh import create_hexagon_mesh
 from pyflowline.mesh.latlon.create_latlon_mesh import create_latlon_mesh
 from pyflowline.mesh.square.create_square_mesh import create_square_mesh

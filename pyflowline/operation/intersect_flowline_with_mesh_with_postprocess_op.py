@@ -2,7 +2,7 @@ import os
 import json
 from pathlib import Path
 from pyflowline.classes.vertex import pyvertex
-from pyflowline.algorithm.auxiliary.reproject_coordinates import reproject_coordinates
+from pyflowline.algorithms.auxiliary.reproject_coordinates import reproject_coordinates
 from pyflowline.format.read_flowline_shapefile import read_flowline_shapefile
 #from pyflowline.format.read_mesh_shapefile import read_mesh_shapefile
 from pyflowline.format.read_mesh_json import read_mesh_json
@@ -11,22 +11,22 @@ from pyflowline.format.read_flowline_geojson import read_flowline_geojson
 #from pyflowline.format.export_flowline_to_shapefile import export_flowline_to_shapefile
 from pyflowline.format.export_vertex_to_json import export_vertex_to_json
 from pyflowline.format.export_flowline_to_json import export_flowline_to_json
-from pyflowline.algorithm.intersect.intersect_flowline_with_mesh import intersect_flowline_with_mesh
+from pyflowline.algorithms.intersect.intersect_flowline_with_mesh import intersect_flowline_with_mesh
 
-from pyflowline.algorithm.simplification.remove_returning_flowline import remove_returning_flowline
-from pyflowline.algorithm.simplification.remove_duplicate_flowline import remove_duplicate_flowline
-from pyflowline.algorithm.simplification.remove_duplicate_edge import remove_duplicate_edge
-from pyflowline.algorithm.direction.correct_flowline_direction import correct_flowline_direction
-from pyflowline.algorithm.loop.remove_flowline_loop import remove_flowline_loop
-from pyflowline.algorithm.split.find_flowline_vertex import find_flowline_vertex
-from pyflowline.algorithm.split.find_flowline_confluence import find_flowline_confluence
-from pyflowline.algorithm.split.split_flowline import split_flowline
-from pyflowline.algorithm.split.split_flowline_to_edge import split_flowline_to_edge
+from pyflowline.algorithms.simplification.remove_returning_flowline import remove_returning_flowline
+from pyflowline.algorithms.simplification.remove_duplicate_flowline import remove_duplicate_flowline
+from pyflowline.algorithms.simplification.remove_duplicate_edge import remove_duplicate_edge
+from pyflowline.algorithms.direction.correct_flowline_direction import correct_flowline_direction
+from pyflowline.algorithms.loop.remove_flowline_loop import remove_flowline_loop
+from pyflowline.algorithms.split.find_flowline_vertex import find_flowline_vertex
+from pyflowline.algorithms.split.find_flowline_confluence import find_flowline_confluence
+from pyflowline.algorithms.split.split_flowline import split_flowline
+from pyflowline.algorithms.split.split_flowline_to_edge import split_flowline_to_edge
 from pyflowline.format.export_vertex_to_shapefile import export_vertex_to_shapefile
-from pyflowline.algorithm.merge.merge_flowline import merge_flowline
+from pyflowline.algorithms.merge.merge_flowline import merge_flowline
 
-from pyflowline.algorithm.index.define_stream_order import define_stream_order
-from pyflowline.algorithm.index.define_stream_segment_index import define_stream_segment_index
+from pyflowline.algorithms.index.define_stream_order import define_stream_order
+from pyflowline.algorithms.index.define_stream_segment_index import define_stream_segment_index
 
 def intersect_flowline_with_mesh_with_postprocess_op(oPyflowline_in):
 

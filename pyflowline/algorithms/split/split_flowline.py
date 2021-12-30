@@ -5,7 +5,7 @@ from pyflowline.classes.vertex import pyvertex
 from pyflowline.classes.edge import pyedge
 from pyflowline.classes.flowline import pyflowline
 
-from pyflowline.algorithm.auxiliary.find_vertex_in_list import find_vertex_in_list
+from pyflowline.algorithms.auxiliary.find_index_in_list import find_vertex_in_list
 
 def split_flowline(aFlowline_in, aVertex_in):
     aFlowline_out = list()

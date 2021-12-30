@@ -9,7 +9,7 @@ from pyflowline.classes.vertex import pyvertex
 from pyflowline.classes.edge import pyedge
 from pyflowline.classes.flowline import pyflowline
 
-from pyflowline.format.convert_coordinates_to_flowline import convert_pcs_coordinates_to_flowline,convert_gcs_coordinates_to_flowline
+from pyflowline.formats.convert_coordinates import convert_pcs_coordinates_to_flowline,convert_gcs_coordinates_to_flowline
 
 
 def read_nhdplus_flowline_shapefile_attribute(sFilename_shapefile_in):
@@ -51,7 +51,7 @@ def read_nhdplus_flowline_shapefile_attribute(sFilename_shapefile_in):
     #aFromNode, aToNode, 
     return aNHDPlusID
 
-def extract_nhdplus_flowline_shapefile_by_attribute(sFilename_shapefile_in, aAttribute):
+def extract_nhdplus_flowline_shapefile_by_attribute(sFilename_shapefile_in, aAttribute_in):
     aFlowline =list()
     #pDriver_json = ogr.GetDriverByName('GeoJSON')
     pDriver_shapefile = ogr.GetDriverByName('ESRI Shapefile')
@@ -92,7 +92,7 @@ def extract_nhdplus_flowline_shapefile_by_attribute(sFilename_shapefile_in, aAtt
             pass
         else:
             print('Geometry issue')
-        if lNHDPlusID in aAttribute:
+        if lNHDPlusID in aAttribute_in:
             if(sGeometry_type == 'MULTILINESTRING'):
                 aLine = ogr.ForceToLineString(pGeometry_in)
                 for Line in aLine: 

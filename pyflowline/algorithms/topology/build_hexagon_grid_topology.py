@@ -15,7 +15,7 @@ from pyflowline.classes.hexagon import pyhexagon
 
 from pyflowline.format.convert_coordinates_to_cell import convert_pcs_coordinates_to_cell
 from pyflowline.format.convert_coordinates_to_flowline import convert_pcs_coordinates_to_flowline
-from pyflowline.algorithm.auxiliary.find_hexagon_through_edge import find_hexagon_through_edge
+from pyflowline.algorithms.auxiliary.find_hexagon_through_edge import find_hexagon_through_edge
 
 def build_hexagon_grid_topology(aHexagon_in):
 

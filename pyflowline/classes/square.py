@@ -4,7 +4,7 @@ from osgeo import gdal, osr, ogr
 from pyflowline.classes.vertex import pyvertex
 from pyflowline.classes.edge import pyedge
 from pyflowline.classes.cell import pycell
-from pyflowline.algorithm.auxiliary.gdal_functions import calculate_polygon_area
+from pyflowline.algorithms.auxiliary.gdal_functions import calculate_polygon_area
 
 class pysquare(pycell):
     #lIndex=0 

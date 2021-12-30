@@ -4,7 +4,7 @@ import numpy as np
 from osgeo import osr
 from pathlib import Path
 
-from pyflowline.algorithm.auxiliary.text_reader_string import text_reader_string
+from pyflowline.algorithms.auxiliary.text_reader_string import text_reader_string
 from pyflowline.classes.vertex import pyvertex
 
 
@@ -19,26 +19,26 @@ from pyflowline.format.export_flowline_to_json import export_flowline_to_json
 from pyflowline.format.export_vertex_to_shapefile import export_vertex_to_shapefile
 from pyflowline.format.export_vertex_to_json import export_vertex_to_json
 
-from pyflowline.algorithm.stat.calculate_flowline_length import calculate_flowline_length
+from pyflowline.algorithms.stat.calculate_flowline_length import calculate_flowline_length
 
-from pyflowline.algorithm.connect.connect_disconnect_flowline import connect_disconnect_flowline
-from pyflowline.algorithm.direction.correct_flowline_direction import correct_flowline_direction
+from pyflowline.algorithms.connect.connect_disconnect_flowline import connect_disconnect_flowline
+from pyflowline.algorithms.direction.correct_flowline_direction import correct_flowline_direction
 
 #merge
-from pyflowline.algorithm.merge.merge_flowline import merge_flowline
+from pyflowline.algorithms.merge.merge_flowline import merge_flowline
 
 #split
-from pyflowline.algorithm.split.split_flowline import split_flowline
-from pyflowline.algorithm.split.find_flowline_confluence import find_flowline_confluence
-from pyflowline.algorithm.split.find_flowline_vertex import find_flowline_vertex
+from pyflowline.algorithms.split.split_flowline import split_flowline
+from pyflowline.algorithms.split.find_flowline_confluence import find_flowline_confluence
+from pyflowline.algorithms.split.find_flowline_vertex import find_flowline_vertex
 
 
-from pyflowline.algorithm.loop.remove_flowline_loop import remove_flowline_loop
+from pyflowline.algorithms.loop.remove_flowline_loop import remove_flowline_loop
 #
-from pyflowline.algorithm.simplification.remove_small_river import remove_small_river
+from pyflowline.algorithms.simplification.remove_small_river import remove_small_river
 
-from pyflowline.algorithm.index.define_stream_order import define_stream_order
-from pyflowline.algorithm.index.define_stream_segment_index import define_stream_segment_index
+from pyflowline.algorithms.index.define_stream_order import define_stream_order
+from pyflowline.algorithms.index.define_stream_segment_index import define_stream_segment_index
 
 
 def preprocess_flowline_op(oPyflowline_in):

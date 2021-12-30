@@ -4,16 +4,29 @@ from osgeo import ogr, osr, gdal, gdalconst
 from shapely.geometry import Point, LineString, MultiLineString
 from shapely.wkt import loads
 
-def export_vertex_to_json(iFlag_projected_in, aVertex_in, pSpatial_reference_in, sFilename_json_out,\
+def export_vertex_to_json(aVertex_in, sFilename_json_in,\
+    iFlag_projected_in=None,\
+        pSpatial_reference_in=None, \
     aAttribute_data=None):
     """
-    convert a shpefile to json format.
+    convert a shapefile to json format.
     This function should be used for stream flowline only.
     """
 
-    if os.path.exists(sFilename_json_out): 
+    if os.path.exists(sFilename_json_in): 
         #delete it if it exists
-        os.remove(sFilename_json_out)
+        os.remove(sFilename_json_in)
+        pass
+    
+    if iFlag_projected_in is None:
+        iFlag_projected_in = 1
+    else:
+        iFlag_projected_in = 0
+
+    if  pSpatial_reference_in is None:        
+        pSpatial_reference_in = osr.SpatialReference()  
+        pSpatial_reference_in.ImportFromEPSG(4326)    # WGS84 lat/lon
+    else:
         pass
 
     if aAttribute_data is not None:
@@ -27,7 +40,7 @@ def export_vertex_to_json(iFlag_projected_in, aVertex_in, pSpatial_reference_in,
     pDriver = ogr.GetDriverByName('GeoJSON')
     #pDriver = ogr.GetDriverByName('ESRI Shapefile')
     #geojson
-    pDataset_json = pDriver.CreateDataSource(sFilename_json_out)
+    pDataset_json = pDriver.CreateDataSource(sFilename_json_in)
 
 
     pLayer_json = pDataset_json.CreateLayer('vertex', pSpatial_reference_in, ogr.wkbPoint)

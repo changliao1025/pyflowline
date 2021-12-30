@@ -5,7 +5,7 @@ from pyflowline.classes.vertex import pyvertex
 from pyflowline.format.read_flowline_geojson import read_flowline_geojson
 from pyflowline.format.export_flowline_to_shapefile import export_flowline_to_shapefile
 
-from pyflowline.algorithm.intersect.intersect_flowline_with_mesh import intersect_flowline_with_mesh
+from pyflowline.algorithms.intersect.intersect_flowline_with_mesh import intersect_flowline_with_mesh
 
 
 

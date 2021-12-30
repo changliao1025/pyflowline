@@ -8,7 +8,7 @@ from pyflowline.classes.edge import pyedge
 from pyflowline.classes.flowline import pyflowline
 from pyflowline.classes.link import pycelllink
 
-def export_flowline_to_json(    aFlowline_in, \
+def export_flowline_to_json( aFlowline_in, \
     sFilename_json_in, \
     iFlag_projected_in= None, \
     pSpatial_reference_in=None, \
@@ -27,9 +27,9 @@ def export_flowline_to_json(    aFlowline_in, \
 
     nFlowline = len(aFlowline_in)
     if iFlag_projected_in is None:
-        iFlag_projected_in = 1
-    else:
         iFlag_projected_in = 0
+    else:
+        iFlag_projected_in = 1
 
     if  pSpatial_reference_in is None:        
         pSpatial_reference_in = osr.SpatialReference()  

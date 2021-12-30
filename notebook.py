@@ -41,10 +41,10 @@ oPyflowline.preprocess_flowline()
 #from pyflowline.operation.preprocess_flowline_op import preprocess_flowline_op
 #preprocess_flowline_op(oPyflowline)
 
-for i in range(nOutlet):
-    pBasin = oPyflowline.aBasin[i]
-    pBasin.plot(sVariable_in = 'flowline_simplified')
-    pass
+oPyflowline.plot(sVariable_in = 'flowline_simplified')
+#for pBasin in oPyflowline.aBasin: 
+#    pBasin.plot(sVariable_in = 'flowline_simplified')
+#    pass
 
 from pyflowline.operation.create_mesh_op import create_mesh_op
 aCell = create_mesh_op(oPyflowline)

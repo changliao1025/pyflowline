@@ -7,7 +7,7 @@ from osgeo import ogr, osr, gdal, gdalconst
 lID=0
 aFlag_process=None
 
-from pyflowline.algorithm.auxiliary.check_head_water import check_head_water
+from pyflowline.algorithms.auxiliary.check_head_water import check_head_water
 
 def correct_flowline_direction(aFlowline_in, pVertex_outlet_in):
         

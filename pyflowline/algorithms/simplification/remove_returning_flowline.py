@@ -8,8 +8,8 @@ from pyflowline.classes.edge import pyedge
 from pyflowline.classes.flowline import pyflowline
 
 from pyflowline.format.convert_coordinates_to_flowline import convert_gcs_coordinates_to_flowline, convert_pcs_coordinates_to_flowline
-from pyflowline.algorithm.auxiliary.check_if_duplicates import check_if_duplicates
-from pyflowline.algorithm.auxiliary.find_vertex_in_list import find_vertex_in_list
+from pyflowline.algorithms.auxiliary.check_if_duplicates import check_if_duplicates
+from pyflowline.algorithms.auxiliary.find_vertex_in_list import find_vertex_in_list
 
 def remove_returning_flowline(iMesh_type_in, aCell_intersect_in, pVertex_outlet_in):
     

@@ -51,6 +51,7 @@ class flowlinecase(object):
     
 
     aBasin = list()
+    aFlowline=list()
     
     def __init__(self, aParameter):
         
@@ -223,6 +224,8 @@ class flowlinecase(object):
         if self.iFlag_simplification == 1: 
             for pBasin in self.aBasin:
                 aFlowline_basin = pBasin.preprocess_flowline()
-                pass
-        
+                
+                aFlowline_out = aFlowline_out + aFlowline_basin
+
+            self.aFlowline = aFlowline_out
         return aFlowline_out

@@ -5,9 +5,9 @@ from osgeo import ogr, osr, gdal, gdalconst
 from pyflowline.classes.vertex import pyvertex
 from pyflowline.classes.edge import pyedge
 from pyflowline.classes.flowline import pyflowline
-from pyflowline.algorithm.auxiliary.find_vertex_in_list import find_vertex_in_list
-from pyflowline.algorithm.auxiliary.add_unique_vertex import add_unique_vertex
-from pyflowline.algorithm.auxiliary.check_head_water import check_head_water
+from pyflowline.algorithms.auxiliary.find_index_in_list import find_vertex_in_list
+from pyflowline.algorithms.auxiliary.find_index_in_list import add_unique_vertex
+from pyflowline.algorithms.auxiliary.check_head_water import check_head_water
 
 def find_flowline_confluence(aFlowline_in, pVertex_outlet_in):
     

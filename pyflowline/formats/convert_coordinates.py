@@ -13,7 +13,7 @@ from pyflowline.classes.latlon import pylatlon
 from pyflowline.classes.mpas import pympas
 from pyflowline.classes.tin import pytin
 
-from pyflowline.algorithm.auxiliary.gdal_functions import reproject_coordinates
+from pyflowline.algorithms.auxiliary.gdal_functions import reproject_coordinates
 
 
 

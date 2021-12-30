@@ -9,8 +9,8 @@ from osgeo import ogr, osr, gdal, gdalconst
 
 from pyflowline.classes.hexagon import pyhexagon
 from pyflowline.format.convert_coordinates_to_cell import convert_gcs_coordinates_to_cell, convert_pcs_coordinates_to_cell
-from pyflowline.algorithm.auxiliary.check_if_duplicates import check_if_duplicates
-from pyflowline.algorithm.auxiliary.reproject_coordinates import reproject_coordinates, reproject_coordinates_batch
+from pyflowline.algorithms.auxiliary.check_if_duplicates import check_if_duplicates
+from pyflowline.algorithms.auxiliary.reproject_coordinates import reproject_coordinates, reproject_coordinates_batch
 
 def create_hexagon_mesh(iFlag_rotation_in, \
     dX_left_in, dY_bot_in, \

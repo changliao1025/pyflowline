@@ -9,7 +9,7 @@ from pyflowline.classes.mpas import pympas
 
 
 
-from pyflowline.format.convert_coordinates_to_cell import convert_pcs_coordinates_to_cell
+from pyflowline.formats.convert_coordinates import convert_pcs_coordinates_to_cell
 
 def create_tin_mesh(dX_left_in, dY_bot_in, dResolution_meter_in, ncolumn_in, nrow_in,
 sFilename_output_in, sFilename_spatial_reference_in):

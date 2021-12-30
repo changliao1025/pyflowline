@@ -6,10 +6,10 @@ from osgeo import ogr, osr, gdal, gdalconst
 
 from pyflowline.classes.mpas import pympas
 
-from pyflowline.algorithms.auxiliary.convert_lat_lon_range import convert_180_to_360,convert_360_to_180
+from pyflowline.algorithms.auxiliary.gdal_functions import convert_180_to_360,convert_360_to_180
 
-from pyflowline.format.convert_coordinates_to_cell import convert_pcs_coordinates_to_cell
-from pyflowline.format.convert_attribute_to_cell import convert_gcs_attribute_to_cell
+from pyflowline.formats.convert_coordinates import convert_pcs_coordinates_to_cell
+from pyflowline.formats.convert_attributes import convert_gcs_attributes_to_cell
 
 def create_mpas_mesh(iFlag_global_in, \
     iFlag_use_mesh_dem, \

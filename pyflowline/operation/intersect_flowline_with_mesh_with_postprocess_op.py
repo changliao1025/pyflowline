@@ -4,11 +4,9 @@ from pathlib import Path
 from pyflowline.classes.vertex import pyvertex
 from pyflowline.algorithms.auxiliary.reproject_coordinates import reproject_coordinates
 from pyflowline.format.read_flowline_shapefile import read_flowline_shapefile
-#from pyflowline.format.read_mesh_shapefile import read_mesh_shapefile
+
 from pyflowline.format.read_mesh_json import read_mesh_json
 from pyflowline.format.read_flowline_geojson import read_flowline_geojson
-
-#from pyflowline.format.export_flowline_to_shapefile import export_flowline_to_shapefile
 from pyflowline.format.export_vertex_to_json import export_vertex_to_json
 from pyflowline.format.export_flowline_to_json import export_flowline_to_json
 from pyflowline.algorithms.intersect.intersect_flowline_with_mesh import intersect_flowline_with_mesh

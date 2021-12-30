@@ -4,9 +4,51 @@ from abc import ABCMeta, abstractmethod
 
 import datetime
 import json
+from osgeo import ogr, osr, gdal, gdalconst
+
+from pyflowline.classes.vertex import pyvertex
 from pyflowline.classes.basin import pybasin
+
+
+from pyflowline.algorithms.auxiliary.gdal_functions import retrieve_geotiff_metadata
+from pyflowline.algorithms.auxiliary.gdal_functions import reproject_coordinates
+from pyflowline.algorithms.auxiliary.gdal_functions  import degree_to_meter
+from pyflowline.algorithms.auxiliary.gdal_functions  import meter_to_degree
+from pyflowline.mesh.hexagon.create_hexagon_mesh import create_hexagon_mesh
+from pyflowline.mesh.latlon.create_latlon_mesh import create_latlon_mesh
+from pyflowline.mesh.square.create_square_mesh import create_square_mesh
+from pyflowline.mesh.mpas.create_mpas_mesh import create_mpas_mesh
+from pyflowline.mesh.tin.create_tin_mesh import create_tin_mesh
+
+
+
+from pyflowline.algorithms.auxiliary.gdal_functions import reproject_coordinates
+from pyflowline.formats.read_flowline import read_flowline_shapefile
+
+from pyflowline.formats.read_mesh import read_mesh_json
+from pyflowline.formats.read_flowline import read_flowline_geojson
+from pyflowline.formats.export_vertex import export_vertex_to_json
+from pyflowline.formats.export_flowline import export_flowline_to_json
+from pyflowline.algorithms.intersect.intersect_flowline_with_mesh import intersect_flowline_with_mesh
+
+from pyflowline.algorithms.simplification.remove_returning_flowline import remove_returning_flowline
+from pyflowline.algorithms.simplification.remove_duplicate_flowline import remove_duplicate_flowline
+from pyflowline.algorithms.simplification.remove_duplicate_edge import remove_duplicate_edge
+from pyflowline.algorithms.direction.correct_flowline_direction import correct_flowline_direction
+from pyflowline.algorithms.loop.remove_flowline_loop import remove_flowline_loop
+from pyflowline.algorithms.split.find_flowline_vertex import find_flowline_vertex
+from pyflowline.algorithms.split.find_flowline_confluence import find_flowline_confluence
+from pyflowline.algorithms.split.split_flowline import split_flowline
+from pyflowline.algorithms.split.split_flowline_to_edge import split_flowline_to_edge
+
+from pyflowline.algorithms.merge.merge_flowline import merge_flowline
+
+from pyflowline.algorithms.index.define_stream_order import define_stream_order
+from pyflowline.algorithms.index.define_stream_segment_index import define_stream_segment_index
+
 pDate = datetime.datetime.today()
 sDate_default = "{:04d}".format(pDate.year) + "{:02d}".format(pDate.month) + "{:02d}".format(pDate.day)
+
 
 class flowlinecase(object):
     __metaclass__ = ABCMeta
@@ -215,9 +257,92 @@ class flowlinecase(object):
             pass
 
     def plot(self, sVariable_in=None):
-        for pBasin in self.aBasin:            
-            pBasin.plot(sVariable_in= sVariable_in)
-            pass
+        if sVariable_in == 'mesh':
+            self.plot_mesh()
+        else:
+            for pBasin in self.aBasin:            
+                pBasin.plot(sVariable_in= sVariable_in)
+                pass
+        
+        return
+    
+    def plot_mesh(self):
+
+        sWorkspace_output_case = self.sWorkspace_output
+
+        sFilename_json  =  self.sFilename_mesh
+
+        fig = plt.figure( dpi=150 )
+        fig.set_figwidth( 4 )
+        fig.set_figheight( 4 )
+        ax = fig.add_axes([0.1, 0.15, 0.75, 0.7] , projection=desired_proj )
+
+        ax.set_global()
+        pDriver = ogr.GetDriverByName('GeoJSON')
+        pDataset = pDriver.Open(sFilename_json, gdal.GA_ReadOnly)
+        pLayer = pDataset.GetLayer(0)
+    
+        pSrs = osr.SpatialReference()  
+        pSrs.ImportFromEPSG(4326)    # WGS84 lat/lon
+
+        dLat_min = 90
+        dLat_max = -90
+        dLon_min = 180
+        dLon_max = -180
+        
+        for pFeature_shapefile in pLayer:
+            pGeometry_in = pFeature_shapefile.GetGeometryRef()
+            sGeometry_type = pGeometry_in.GetGeometryName()
+
+
+            lID =0 
+            if sGeometry_type =='POLYGON':
+                dummy0 = loads( pGeometry_in.ExportToWkt() )
+                aCoords_gcs = dummy0.exterior.coords
+                aCoords_gcs= np.array(aCoords_gcs)
+                nvertex = len(aCoords_gcs)
+
+                for i in range(nvertex):
+                    dLon = aCoords_gcs[i][0]
+                    dLat = aCoords_gcs[i][1]
+                    if dLon > dLon_max:
+                        dLon_max = dLon
+
+                    if dLon < dLon_min:
+                        dLon_min = dLon
+
+                    if dLat > dLat_max:
+                        dLat_max = dLat
+
+                    if dLat < dLat_min:
+                        dLat_min = dLat
+
+
+                polygon = mpatches.Polygon(aCoords_gcs[:,0:2], closed=True,  \
+                    alpha=0.8, edgecolor = 'black',facecolor='none', \
+                        transform=ccrs.PlateCarree() )
+
+                ax.add_patch(polygon)                   
+
+
+        dDiff_lon = dLon_max - dLon_min
+        dDiff_lat = dLat_max - dLat_min
+    
+        ax.set_extent([dLon_min  , dLon_max , dLat_min , dLat_max ])
+
+        ax.coastlines()#resolution='110m')
+        ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True,
+                      linewidth=1, color='gray', alpha=0.3, linestyle='--')
+
+
+        sDirname = os.path.dirname(sFilename_json)
+        sFilename  = Path(sFilename_json).stem + '.png'
+        sFilename_out = os.path.join(sDirname, sFilename)
+        plt.savefig(sFilename_out, bbox_inches='tight')
+
+        pDataset = pLayer = pFeature  = None   
+        plt.show()   
+        return
 
     def preprocess_flowline(self):
         aFlowline_out = list()   #store all the flowline
@@ -231,4 +356,150 @@ class flowlinecase(object):
         return aFlowline_out
     
     def create_mesh(self):
+        
+        iFlag_global =  self.iFlag_global
+        iMesh_type = self.iMesh_type
+        iFlag_save_mesh = self.iFlag_save_mesh
+        iFlag_rotation = self.iFlag_rotation
+
+        dResolution = self.dResolution
+        dResolution_meter = self.dResolution_meter
+
+
+        sFilename_dem = self.sFilename_dem
+        sFilename_spatial_reference = self.sFilename_spatial_reference
+        sFilename_mesh = self.sFilename_mesh
+        if iMesh_type !=4: #hexagon
+
+            dPixelWidth, dOriginX, dOriginY, nrow, ncolumn, pSpatialRef_dem, pProjection, pGeotransform\
+                 = retrieve_geotiff_metadata(sFilename_dem)
+
+            spatial_reference_source = pSpatialRef_dem
+            spatial_reference_target = osr.SpatialReference()  
+            spatial_reference_target.ImportFromEPSG(4326)
+
+            dY_bot = dOriginY - (nrow+1) * dPixelWidth
+            dLongitude_left,  dLatitude_bot= reproject_coordinates(dOriginX, dY_bot,pSpatialRef_dem,spatial_reference_target)
+            dX_right = dOriginX + (ncolumn +1) * dPixelWidth
+
+            dLongitude_right, dLatitude_top= reproject_coordinates(dX_right, dOriginY,pSpatialRef_dem,spatial_reference_target)
+            dLatitude_mean = 0.5 * (dLatitude_top + dLatitude_bot)
+
+
+            if dResolution_meter < 0:
+                #not used
+                pass
+            else:
+                dResolution = meter_to_degree(dResolution_meter, dLatitude_mean)
+
+
+            dX_left = dOriginX
+            dY_top = dOriginY
+        else:
+            pass
+
+        if iMesh_type ==1: #hexagon
+
+            #hexagon edge
+            dResolution_meter = degree_to_meter(dLatitude_mean, dResolution )
+            dArea = np.power(dResolution_meter,2.0)
+            dLength_edge = np.sqrt(  2.0 * dArea / (3.0* np.sqrt(3.0))  )
+            if iFlag_rotation ==0:            
+                dX_spacing = dLength_edge * np.sqrt(3.0)
+                dY_spacing = dLength_edge * 1.5
+                ncolumn= int( (dX_right - dX_left) / dX_spacing )
+                nrow= int( (dY_top - dY_bot) / dY_spacing ) 
+            else:            
+                dX_spacing = dLength_edge * 1.5
+                dY_spacing = dLength_edge * np.sqrt(3.0)    
+                ncolumn= int( (dX_right - dX_left) / dX_spacing )+1
+                nrow= int( (dY_top - dY_bot) / dY_spacing )
+
+            aHexagon = create_hexagon_mesh(iFlag_rotation, dX_left, dY_bot, dResolution_meter, ncolumn, nrow, \
+                sFilename_mesh, sFilename_spatial_reference)
+            return aHexagon
+        else:
+            if iMesh_type ==2: #sqaure
+                ncolumn= int( (dX_right - dX_left) / dResolution_meter )
+                nrow= int( (dY_top - dY_bot) / dResolution_meter )
+
+                aSquare = create_square_mesh(dX_left, dY_bot, dResolution_meter, ncolumn, nrow, \
+                    sFilename_mesh, sFilename_spatial_reference)
+                return aSquare
+            else:
+                if iMesh_type ==3: #latlon
+                    dResolution_meter = degree_to_meter(dLatitude_mean, dResolution)
+                    dArea = np.power(dResolution_meter,2.0)
+                    dLatitude_top    = self.dLatitude_top   
+                    dLatitude_bot    = self.dLatitude_bot   
+                    dLongitude_left  = self.dLongitude_left 
+                    dLongitude_right = self.dLongitude_right
+                    ncolumn= int( (dLongitude_right - dLongitude_left) / dResolution )
+                    nrow= int( (dLatitude_top - dLatitude_bot) / dResolution )
+                    aLatlon = create_latlon_mesh(dLongitude_left, dLatitude_bot, dResolution, ncolumn, nrow, \
+                        sFilename_mesh)
+                    return aLatlon
+                else:
+                    if iMesh_type == 4: #mpas
+                        iFlag_use_mesh_dem = self.iFlag_use_mesh_dem
+                        sFilename_mesh_netcdf = self.sFilename_mesh_netcdf
+                        dLatitude_top    = self.dLatitude_top   
+                        dLatitude_bot    = self.dLatitude_bot   
+                        dLongitude_left  = self.dLongitude_left 
+                        dLongitude_right = self.dLongitude_right
+                        aMpas = create_mpas_mesh(iFlag_global, iFlag_use_mesh_dem, iFlag_save_mesh, \
+                                dLatitude_top, dLatitude_bot, dLongitude_left, dLongitude_right,\
+                                    sFilename_mesh_netcdf,      sFilename_mesh)
+                        return aMpas
+                    else:
+                        if iMesh_type ==5: #tin this one need to be updated because central location issue
+                            #tin edge
+                            dArea = np.power(dResolution_meter,2.0)
+                            dLength_edge = np.sqrt(  4.0 * dArea /  np.sqrt(3.0) )  
+                            dX_shift = 0.5 * dLength_edge
+                            dY_shift = 0.5 * dLength_edge * np.sqrt(3.0) 
+                            dX_spacing = dX_shift * 2
+                            dY_spacing = dY_shift
+                            ncolumn= int( (dX_right - dX_left) / dX_shift )
+                            nrow= int( (dY_top - dY_bot) / dY_spacing ) 
+                            aTin = create_tin_mesh(dX_left, dY_bot, dResolution_meter, ncolumn, nrow,sFilename_mesh, sFilename_spatial_reference)
+                            return aTin
+                        else:
+                            print('Unsupported mesh type?')
+                            return
+        return
+    
+    def intersect_flowline_with_mesh(self):
+        iMesh_type = self.iMesh_type
+        iFlag_intersect = self.iFlag_intersect
+        sWorkspace_output = self.sWorkspace_output
+        nOutlet = self.nOutlet
+        sFilename_mesh=self.sFilename_mesh
+        aMesh, pSpatial_reference_mesh = read_mesh_json(sFilename_mesh)
+        aCell = list()
+        aCell_intersect = list()
+        aFlowline = list()   #store all the flowline
+        aOutletID = list()
+        aBasin = list()
+        if iFlag_intersect == 1:
+            for pBasin in self.aBasin:
+                pBasin.intersect_flowline_with_mesh()
+                aFlowline = aFlowline + pBasin.aFlowline_basin
+                aBasin.append(pBasin)
+                aOutletID.append(pBasin.lCellID_outlet)
+            
+            #save basin info
+            sPath = os.path.dirname(self.sFilename_basins)
+            sName = str(Path(self.sFilename_basins).stem ) + '_new.json'
+            sFilename_configuration  =  os.path.join( sPath  , sName)
+            with open(sFilename_configuration, 'w', encoding='utf-8') as f:
+                sJson = json.dumps([json.loads(ob.tojson()) for ob in aBasin],\
+                    sort_keys=True, \
+                    indent = 4)        
+
+                f.write(sJson)    
+                f.close()
+
+            return aCell, aCell_intersect, aFlowline, aOutletID
+
         return

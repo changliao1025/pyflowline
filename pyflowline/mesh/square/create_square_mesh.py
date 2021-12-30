@@ -8,7 +8,7 @@ from osgeo import ogr, osr, gdal, gdalconst
 
 
 
-from pyflowline.algorithms.auxiliary.reproject_coordinates import reproject_coordinates, reproject_coordinates_batch
+from pyflowline.algorithms.auxiliary.gdal_functions import reproject_coordinates, reproject_coordinates_batch
 
 def create_square_mesh(dX_left_in, dY_bot_in, dResolution_meter_in, ncolumn_in, nrow_in, \
     sFilename_output_in, sFilename_spatial_reference_in):

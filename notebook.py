@@ -46,19 +46,21 @@ oPyflowline.plot(sVariable_in = 'flowline_simplified')
 #    pBasin.plot(sVariable_in = 'flowline_simplified')
 #    pass
 
-from pyflowline.operation.create_mesh_op import create_mesh_op
-aCell = create_mesh_op(oPyflowline)
+oPyflowline.create_mesh()
+#from pyflowline.operation.create_mesh_op import create_mesh_op
+#aCell = create_mesh_op(oPyflowline)
 
-from pyflowline.plot.pyflowline_plot_mesh import pyflowline_plot_mesh
-pyflowline_plot_mesh(oPyflowline)
+oPyflowline.plot(sVariable_in = 'mesh')
+#from pyflowline.plot.pyflowline_plot_mesh import pyflowline_plot_mesh
+#pyflowline_plot_mesh(oPyflowline)
 
+oPyflowline.intersect_flowline_with_mesh()
 
-
-from pyflowline.operation.intersect_flowline_with_mesh_with_postprocess_op import intersect_flowline_with_mesh_with_postprocess_op
-intersect_flowline_with_mesh_with_postprocess_op(oPyflowline)
-
-for i in range(nOutlet):
-    pBasin = oPyflowline.aBasin[i]
-    pyflowline_plot_flowline(pBasin, sVariable_in = 'flowline_final')
-    pass
+#from pyflowline.operation.intersect_flowline_with_mesh_with_postprocess_op import intersect_flowline_with_mesh_with_postprocess_op
+#intersect_flowline_with_mesh_with_postprocess_op(oPyflowline)
+#
+#for i in range(nOutlet):
+#    pBasin = oPyflowline.aBasin[i]
+#    pyflowline_plot_flowline(pBasin, sVariable_in = 'flowline_final')
+#    pass
 

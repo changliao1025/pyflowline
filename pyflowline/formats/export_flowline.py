@@ -55,14 +55,13 @@ def export_flowline_to_json( aFlowline_in, \
 
 
     pDriver_json = ogr.GetDriverByName('GeoJSON')
-    #pDriver_json = ogr.GetDriverByName('ESRI Shapefile')
-    #geojson
-    pDataset_shapefile = pDriver_json.CreateDataSource(sFilename_json_in)  
+    
+    pDataset_json = pDriver_json.CreateDataSource(sFilename_json_in)  
     
 
-    pLayer_shapefile = pDataset_shapefile.CreateLayer('flowline', pSpatial_reference_in, ogr.wkbLineString)
+    pLayer_json = pDataset_json.CreateLayer('flowline', pSpatial_reference_in, ogr.wkbLineString)
     # Add one attribute
-    pLayer_shapefile.CreateField(ogr.FieldDefn('id', ogr.OFTInteger64)) #long type for high resolution
+    pLayer_json.CreateField(ogr.FieldDefn('id', ogr.OFTInteger64)) #long type for high resolution
 
     #add the other fields
     if iFlag_attribute ==1:
@@ -70,14 +69,14 @@ def export_flowline_to_json( aFlowline_in, \
             sField = aAttribute_field[i]
             dtype = aAttribute_dtype[i]
             if dtype == 'int':
-                pLayer_shapefile.CreateField(ogr.FieldDefn(sField, ogr.OFTInteger64))
+                pLayer_json.CreateField(ogr.FieldDefn(sField, ogr.OFTInteger64))
                 pass
             else:
-                pLayer_shapefile.CreateField(ogr.FieldDefn(sField, ogr.OFTReal))
+                pLayer_json.CreateField(ogr.FieldDefn(sField, ogr.OFTReal))
                 pass
         
     
-    pLayerDefn = pLayer_shapefile.GetLayerDefn()
+    pLayerDefn = pLayer_json.GetLayerDefn()
     pFeature_out = ogr.Feature(pLayerDefn)
 
     lID = 0
@@ -109,12 +108,12 @@ def export_flowline_to_json( aFlowline_in, \
                     pFeature_out.SetField(sField, float(dummy[i]))
         
         # Add new pFeature_shapefile to output Layer
-        pLayer_shapefile.CreateFeature(pFeature_out)        
+        pLayer_json.CreateFeature(pFeature_out)        
         lID =  lID + 1
         pass
         
-    pDataset_shapefile.FlushCache()
-    pDataset_shapefile = pLayer_shapefile = pFeature_out  = None    
+    pDataset_json.FlushCache()
+    pDataset_json = pLayer_json = pFeature_out  = None    
 
     return
 

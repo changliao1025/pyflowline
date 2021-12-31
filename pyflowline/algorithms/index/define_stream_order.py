@@ -1,6 +1,6 @@
 import os, sys
 import numpy as np 
-from osgeo import ogr, osr, gdal, gdalconst
+
 from pyflowline.algorithms.auxiliary.check_head_water import check_head_water
 def define_stream_order(aFlowline_in):
     nFlowline = len(aFlowline_in)
@@ -18,7 +18,6 @@ def define_stream_order(aFlowline_in):
                 aStream_order[i] = 1
                 pass
         
-
         #now 
         while aStream_order[0] == 0:
 

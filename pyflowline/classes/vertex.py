@@ -60,19 +60,12 @@ class pyvertex(object):
     def __ne__(self, other):
         return not self.__eq__(other)
     
-    def calculate_distance(self, other):        
-        
+    def calculate_distance(self, other):                
         lon1 = self.dLongitude_degree
-        lat1 = self.dLatitude_degree        
-        
+        lat1 = self.dLatitude_degree    
         lon2 = other.dLongitude_degree
         lat2 = other.dLatitude_degree
-        
-
-        c= calculate_distance_based_on_lon_lat(lon1,  lat1, lon2, lat2)
-
-        dDistance = c
-
+        dDistance = calculate_distance_based_on_lon_lat(lon1,  lat1, lon2, lat2)        
         return dDistance
     
     def tojson(self):

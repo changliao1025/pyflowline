@@ -11,8 +11,6 @@ from pyflowline.classes.flowline import pyflowline
 
 from pyflowline.algorithms.auxiliary.gdal_functions import calculate_polygon_area
 
-
-
 class CellClassEncoder(JSONEncoder):
     def default(self, obj):
         if isinstance(obj, np.integer):

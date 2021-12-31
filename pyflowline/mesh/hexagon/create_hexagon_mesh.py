@@ -24,6 +24,12 @@ def create_hexagon_mesh(iFlag_rotation_in, \
     if os.path.exists(sFilename_output_in): 
         #delete it if it exists
         os.remove(sFilename_output_in)
+    
+    if os.path.exists(sFilename_spatial_reference_in): 
+        pass
+    else:
+        print('Spatial reference file is missing')
+        return
 
     pDriver_shapefile = ogr.GetDriverByName('Esri Shapefile')
     pDriver_geojson = ogr.GetDriverByName('GeoJSON')
@@ -103,12 +109,7 @@ def create_hexagon_mesh(iFlag_rotation_in, \
                
                 aCoords = np.full((7,2), -9999.0, dtype=float)
 
-                #x1,y1 = reproject_coordinates(x1, y1, pSpatial_reference)
-                #x2,y2 = reproject_coordinates(x2, y2, pSpatial_reference)
-                #x3,y3 = reproject_coordinates(x3, y3, pSpatial_reference)
-                #x4,y4 = reproject_coordinates(x4, y4, pSpatial_reference)
-                #x5,y5 = reproject_coordinates(x5, y5, pSpatial_reference)
-                #x6,y6 = reproject_coordinates(x6, y6, pSpatial_reference)
+                
                 x = list()
                 x.append(x1)
                 x.append(x2)
@@ -156,8 +157,6 @@ def create_hexagon_mesh(iFlag_rotation_in, \
                 pFeature.SetGeometry(pPolygon)
                 pFeature.SetField("id", lCellID)
                 pLayer.CreateFeature(pFeature)
-                
-    
     
                 #dummy = loads( ring.ExportToWkt() )
                 #aCoords = dummy.exterior.coords
@@ -200,8 +199,6 @@ def create_hexagon_mesh(iFlag_rotation_in, \
                             lCellID1 = ncolumn_in * iRow + iColumn - 1 
                             aNeighbor.append(lCellID1)
 
-                
-                        
                         
                 if iColumn < ncolumn_in:#3
                     lCellID3 = lCellID_center + 1
@@ -268,13 +265,6 @@ def create_hexagon_mesh(iFlag_rotation_in, \
                
                 aCoords = np.full((7,2), -9999.0, dtype=float)
 
-                #x1,y1 = reproject_coordinates(x1, y1, pSpatial_reference)
-                #x2,y2 = reproject_coordinates(x2, y2, pSpatial_reference)
-                #x3,y3 = reproject_coordinates(x3, y3, pSpatial_reference)
-                #x4,y4 = reproject_coordinates(x4, y4, pSpatial_reference)
-                #x5,y5 = reproject_coordinates(x5, y5, pSpatial_reference)
-                #x6,y6 = reproject_coordinates(x6, y6, pSpatial_reference)
-
                 x = list()
                 x.append(x1)
                 x.append(x2)
@@ -319,10 +309,6 @@ def create_hexagon_mesh(iFlag_rotation_in, \
     
                 pFeature.SetGeometry(pPolygon)
                 pFeature.SetField("id", lCellID)
-                
-                
-                
-    
     
                 #dummy = loads( ring.ExportToWkt() )
                 #aCoords = dummy.exterior.coords

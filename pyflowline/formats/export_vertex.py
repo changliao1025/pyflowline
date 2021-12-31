@@ -4,10 +4,11 @@ from osgeo import ogr, osr, gdal, gdalconst
 from shapely.geometry import Point, LineString, MultiLineString
 from shapely.wkt import loads
 
-def export_vertex_to_json(aVertex_in, sFilename_json_in,\
-    iFlag_projected_in=None,\
+def export_vertex_to_json(aVertex_in, \
+        sFilename_json_in,\
+        iFlag_projected_in=None,\
         pSpatial_reference_in=None, \
-    aAttribute_data=None):
+        aAttribute_data=None):
     """
     convert a shapefile to json format.
     This function should be used for stream flowline only.
@@ -19,9 +20,9 @@ def export_vertex_to_json(aVertex_in, sFilename_json_in,\
         pass
     
     if iFlag_projected_in is None:
-        iFlag_projected_in = 1
-    else:
         iFlag_projected_in = 0
+    else:
+        iFlag_projected_in = 1
 
     if  pSpatial_reference_in is None:        
         pSpatial_reference_in = osr.SpatialReference()  
@@ -36,13 +37,8 @@ def export_vertex_to_json(aVertex_in, sFilename_json_in,\
         iFlag_attribute=0
 
     nVertex = len(aVertex_in)
-
-    pDriver = ogr.GetDriverByName('GeoJSON')
-    #pDriver = ogr.GetDriverByName('ESRI Shapefile')
-    #geojson
+    pDriver = ogr.GetDriverByName('GeoJSON')        
     pDataset_json = pDriver.CreateDataSource(sFilename_json_in)
-
-
     pLayer_json = pDataset_json.CreateLayer('vertex', pSpatial_reference_in, ogr.wkbPoint)
     # Add one attribute
     pLayer_json.CreateField(ogr.FieldDefn('id', ogr.OFTInteger64)) #long type for high resolution
@@ -52,10 +48,7 @@ def export_vertex_to_json(aVertex_in, sFilename_json_in,\
 
     pLayerDefn = pLayer_json.GetLayerDefn()
     pFeature_out = ogr.Feature(pLayerDefn)
-
     lID = 0
-
-
     for i in range(nVertex):       
         pVertex = aVertex_in[i]
 
@@ -84,7 +77,9 @@ def export_vertex_to_json(aVertex_in, sFilename_json_in,\
     return
 
 
-def export_vertex_to_shapefile(iFlag_projected_in, aVertex_in, pSpatial_reference_in, sFilename_shapefile_out,\
+def export_vertex_to_shapefile(aVertex_in, sFilename_shapefile_out,\
+    pSpatial_reference_in, 
+    iFlag_projected_in, 
     aAttribute_data=None):
     """
     convert a shpefile to json format.

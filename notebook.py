@@ -27,30 +27,30 @@ else:
 #pyflowline can process multiple basins within one singel run
 #the total number of basin is controlled by the nOutlet variable
 #convert the raw flowline into geojson in WGS84 system        
-oPyflowline.convert_flowline_to_json()
+#oPyflowline.convert_flowline_to_json()
 
 
-oPyflowline.plot(sVariable_in = 'flowline_filter_json')
+#oPyflowline.plot(sVariable_in = 'flowline_filter_json')
 #now we can visualize the flowline
 
 #for pBasin in oPyflowline.aBasin:    
 #    pBasin.plot(sVariable_in = 'flowline_filter_json') 
 #    pass
-oPyflowline.preprocess_flowline()
+#oPyflowline.preprocess_flowline()
 
 #from pyflowline.operation.preprocess_flowline_op import preprocess_flowline_op
 #preprocess_flowline_op(oPyflowline)
 
-oPyflowline.plot(sVariable_in = 'flowline_simplified')
+#oPyflowline.plot(sVariable_in = 'flowline_simplified')
 #for pBasin in oPyflowline.aBasin: 
 #    pBasin.plot(sVariable_in = 'flowline_simplified')
 #    pass
 
-oPyflowline.create_mesh()
+#oPyflowline.create_mesh()
 #from pyflowline.operation.create_mesh_op import create_mesh_op
 #aCell = create_mesh_op(oPyflowline)
 
-oPyflowline.plot(sVariable_in = 'mesh')
+#oPyflowline.plot(sVariable_in = 'mesh')
 #from pyflowline.plot.pyflowline_plot_mesh import pyflowline_plot_mesh
 #pyflowline_plot_mesh(oPyflowline)
 

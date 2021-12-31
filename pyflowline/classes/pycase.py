@@ -2,10 +2,16 @@ import os
 from pathlib import Path
 from abc import ABCMeta, abstractmethod
 
+import numpy as np
 import datetime
 import json
 from osgeo import ogr, osr, gdal, gdalconst
-
+import matplotlib.pyplot as plt
+from shapely.wkt import loads
+import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
+import matplotlib.cm as cm
+from matplotlib.collections import PatchCollection
 from pyflowline.classes.vertex import pyvertex
 from pyflowline.classes.basin import pybasin
 
@@ -45,6 +51,12 @@ from pyflowline.algorithms.merge.merge_flowline import merge_flowline
 
 from pyflowline.algorithms.index.define_stream_order import define_stream_order
 from pyflowline.algorithms.index.define_stream_segment_index import define_stream_segment_index
+
+import cartopy.crs as ccrs
+
+desired_proj = ccrs.Orthographic(central_longitude=-75, central_latitude=42, globe=None)
+
+desired_proj = ccrs.PlateCarree()
 
 pDate = datetime.datetime.today()
 sDate_default = "{:04d}".format(pDate.year) + "{:02d}".format(pDate.month) + "{:02d}".format(pDate.day)
@@ -348,32 +360,25 @@ class flowlinecase(object):
         aFlowline_out = list()   #store all the flowline
         if self.iFlag_simplification == 1: 
             for pBasin in self.aBasin:
-                aFlowline_basin = pBasin.preprocess_flowline()
-                
+                aFlowline_basin = pBasin.preprocess_flowline()                
                 aFlowline_out = aFlowline_out + aFlowline_basin
 
             self.aFlowline = aFlowline_out
         return aFlowline_out
     
-    def create_mesh(self):
-        
+    def create_mesh(self):        
         iFlag_global =  self.iFlag_global
         iMesh_type = self.iMesh_type
         iFlag_save_mesh = self.iFlag_save_mesh
         iFlag_rotation = self.iFlag_rotation
-
         dResolution = self.dResolution
         dResolution_meter = self.dResolution_meter
-
-
         sFilename_dem = self.sFilename_dem
         sFilename_spatial_reference = self.sFilename_spatial_reference
         sFilename_mesh = self.sFilename_mesh
         if iMesh_type !=4: #hexagon
-
             dPixelWidth, dOriginX, dOriginY, nrow, ncolumn, pSpatialRef_dem, pProjection, pGeotransform\
                  = retrieve_geotiff_metadata(sFilename_dem)
-
             spatial_reference_source = pSpatialRef_dem
             spatial_reference_target = osr.SpatialReference()  
             spatial_reference_target.ImportFromEPSG(4326)
@@ -483,7 +488,7 @@ class flowlinecase(object):
         aBasin = list()
         if iFlag_intersect == 1:
             for pBasin in self.aBasin:
-                pBasin.intersect_flowline_with_mesh()
+                pBasin.intersect_flowline_with_mesh(iMesh_type,sFilename_mesh)
                 aFlowline = aFlowline + pBasin.aFlowline_basin
                 aBasin.append(pBasin)
                 aOutletID.append(pBasin.lCellID_outlet)

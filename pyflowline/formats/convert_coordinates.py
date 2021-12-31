@@ -30,8 +30,8 @@ def convert_gcs_coordinates_to_cell(iMesh_type_in, \
         x = aCoordinates_gcs_in[i][0]
         y = aCoordinates_gcs_in[i][1]
         dummy = dict()
-        dummy['lon'] = x
-        dummy['lat'] = y
+        dummy['dLongitude_degree'] = x
+        dummy['dLatitude_degree'] = y
         pVertex = pyvertex(dummy)
         aVertex.append(pVertex)
 
@@ -83,7 +83,7 @@ def convert_pcs_coordinates_to_cell(iMesh_type_in, aCoordinates_pcs_in, pSpatial
         dummy['x'] = x
         dummy['y'] = y
 
-        dummy['lon'], dummy['lat'] = reproject_coordinates(x, y , pSpatial_reference_in)
+        dummy['dLongitude_degree'], dummy['dLatitude_degree'] = reproject_coordinates(x, y , pSpatial_reference_in)
         pVertex = pyvertex(dummy)
         aVertex.append(pVertex)
     for j in range(npoint-1):

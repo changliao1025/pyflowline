@@ -14,6 +14,10 @@ from matplotlib import cm
 import cartopy.crs as ccrs
 
 from pyflowline.classes.vertex import pyvertex
+
+from pyflowline.classes.edge import pyedge
+from pyflowline.classes.cell import pycell
+from pyflowline.classes.flowline import pyflowline
 from pyflowline.algorithms.auxiliary.text_reader_string import text_reader_string
 from pyflowline.formats.read_flowline import read_flowline_geojson
 
@@ -35,7 +39,7 @@ from pyflowline.algorithms.index.define_stream_order import define_stream_order
 from pyflowline.algorithms.index.define_stream_segment_index import define_stream_segment_index
 
 from pyflowline.formats.read_mesh import read_mesh_json
-from pyflowline.formats.read_flowline import read_flowline_geojson
+
 from pyflowline.formats.export_vertex import export_vertex_to_json
 from pyflowline.formats.export_flowline import export_flowline_to_json
 from pyflowline.algorithms.intersect.intersect_flowline_with_mesh import intersect_flowline_with_mesh
@@ -66,6 +70,12 @@ class BasinClassEncoder(JSONEncoder):
             return float(obj)
         if isinstance(obj, np.ndarray):
             return obj.tolist()
+        if isinstance(obj, pyedge):
+            return obj.lEdgeID
+        if isinstance(obj, pyvertex):
+            return json.loads(obj.tojson()) #lVertexID
+        if isinstance(obj, pyflowline):
+            return obj.lFlowlineID
         
         return JSONEncoder.default(self, obj)
 
@@ -249,8 +259,8 @@ class pybasin(object):
         n_colors = pLayer.GetFeatureCount()
         
         colours = cm.rainbow(np.linspace(0, 1, n_colors))
-        for pFeature_shapefile in pLayer:
-            pGeometry_in = pFeature_shapefile.GetGeometryRef()
+        for pFeature in pLayer:
+            pGeometry_in = pFeature.GetGeometryRef()
             sGeometry_type = pGeometry_in.GetGeometryName()
             if sGeometry_type =='LINESTRING':
                 dummy0 = loads( pGeometry_in.ExportToWkt() )
@@ -372,7 +382,7 @@ class pybasin(object):
 
             point= dict()   
             point['dLongitude_degree'] = self.dLongitude_outlet_degree
-            point['dLongitude_degree'] = self.dLatitude_outlet_degree
+            point['dLatitude_degree'] = self.dLatitude_outlet_degree
             pVertex_outlet=pyvertex(point)
 
             aFlowline_basin = correct_flowline_direction(aFlowline_basin,  pVertex_outlet )
@@ -448,16 +458,12 @@ class pybasin(object):
             aCell, aCell_intersect_basin, aFlowline_intersect_all = intersect_flowline_with_mesh(iMesh_type, sFilename_mesh, \
                 sFilename_flowline_in, sFilename_flowline_intersect_out)
 
-            sFilename_flowline_filter = self.sFilename_flowline_filter
-
-            aFlowline_basin, pSpatialRef_flowline = read_flowline_shapefile(sFilename_flowline_filter)
-
-            iFlag_projected = 0
-
+            sFilename_flowline_filter_json = self.sFilename_flowline_filter
+           
             point= dict()
 
             point['dLongitude_degree'] = self.dLongitude_outlet_degree
-            point['dLongitude_degree'] = self.dLatitude_outlet_degree
+            point['dLatitude_degree'] = self.dLatitude_outlet_degree
             pVertex_outlet_initial=pyvertex(point)
 
             #from this point, aFlowline_basin is conceptual
@@ -466,9 +472,9 @@ class pybasin(object):
             sFilename_out = 'flowline_simplified_after_intersect_' + self.sBasinID + '.json'
             sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)  
 
-            pSpatial_reference =  pSpatial_reference_mesh
+            
 
-            export_flowline_to_json(iFlag_projected, aFlowline_basin, pSpatial_reference, sFilename_out)
+            export_flowline_to_json(aFlowline_basin,  sFilename_out)
 
             #added start
             aFlowline_basin, aEdge = split_flowline_to_edge(aFlowline_basin)
@@ -479,14 +485,14 @@ class pybasin(object):
 
             sFilename_out = 'flowline_debug_' + self.sBasinID + '.json'
             sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
-            export_flowline_to_json(iFlag_projected, aFlowline_basin, pSpatial_reference, sFilename_out)
+            export_flowline_to_json( aFlowline_basin,  sFilename_out)
 
             aVertex, lIndex_outlet, aIndex_headwater,aIndex_middle, aIndex_confluence, aConnectivity\
                 = find_flowline_confluence(aFlowline_basin,  pVertex_outlet)
 
             sFilename_out = 'flowline_vertex_with_confluence_01_after_intersect_' + self.sBasinID + '.json'
             sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
-            export_vertex_to_json(iFlag_projected, aVertex, pSpatial_reference, sFilename_out, aAttribute_data=aConnectivity)
+            export_vertex_to_json( aVertex,  sFilename_out, aAttribute_data=aConnectivity)
 
 
             aFlowline_basin = merge_flowline( aFlowline_basin,aVertex, pVertex_outlet, aIndex_headwater,aIndex_middle, aIndex_confluence  )  
@@ -501,18 +507,15 @@ class pybasin(object):
             aFlowline_basin, aStream_segment = define_stream_segment_index(aFlowline_basin)
             aFlowline_basin, aStream_order = define_stream_order(aFlowline_basin)
 
-            sFilename_out = pBasin.sFilename_flowline_final
+            sFilename_out = self.sFilename_flowline_final
             sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
-            export_flowline_to_json(iFlag_projected, aFlowline_basin, pSpatial_reference, sFilename_out)
+            export_flowline_to_json( aFlowline_basin,  sFilename_out)
 
-            aFlowline = aFlowline + aFlowline_basin
-            
-            aCell_intersect = aCell_intersect + aCell_intersect_basin
-            aOutletID.append(lCellID_outlet)
+            self.aFlowline_basin = aFlowline_basin
 
-            pBasin.lCellID_outlet = lCellID_outlet
-            pBasin.dLongitude_outlet_degree = pVertex_outlet.dLongitude_degree
-            pBasin.dLatitude_outlet_degree = pVertex_outlet.dLatitude_degree
+            self.lCellID_outlet = lCellID_outlet
+            self.dLongitude_outlet_degree = pVertex_outlet.dLongitude_degree
+            self.dLatitude_outlet_degree = pVertex_outlet.dLatitude_degree
         except:
             print('Intersection failed')
         return

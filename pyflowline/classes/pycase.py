@@ -1,7 +1,8 @@
 import os
 from pathlib import Path
 from abc import ABCMeta, abstractmethod
-
+import json
+from json import JSONEncoder
 import numpy as np
 import datetime
 import json
@@ -14,6 +15,7 @@ import matplotlib.cm as cm
 from matplotlib.collections import PatchCollection
 from pyflowline.classes.vertex import pyvertex
 from pyflowline.classes.basin import pybasin
+from pyflowline.classes.flowline import pyflowline
 
 
 from pyflowline.algorithms.auxiliary.gdal_functions import retrieve_geotiff_metadata
@@ -61,6 +63,21 @@ desired_proj = ccrs.PlateCarree()
 pDate = datetime.datetime.today()
 sDate_default = "{:04d}".format(pDate.year) + "{:02d}".format(pDate.month) + "{:02d}".format(pDate.day)
 
+class CaseClassEncoder(JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, np.integer):
+            return int(obj)
+        if isinstance(obj, np.float):
+            return float(obj)
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        if isinstance(obj, pybasin):
+            return obj.lBasinID
+        
+        if isinstance(obj, pyflowline):
+            return obj.lFlowlineID
+        
+        return JSONEncoder.default(self, obj)
 
 class flowlinecase(object):
     __metaclass__ = ABCMeta
@@ -508,3 +525,12 @@ class flowlinecase(object):
             return aCell, aCell_intersect, aFlowline, aOutletID
 
         return
+
+
+    def tojson(self):
+        sJson = json.dumps(self.__dict__, \
+            sort_keys=True, \
+                indent = 4, \
+                    ensure_ascii=True, \
+                        cls=CaseClassEncoder)
+        return sJson

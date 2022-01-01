@@ -16,18 +16,18 @@ else:
 
         #an example configuration file is provided with the repository, but you need to update this file based on your own case study
         
-        #sFilename_configuration_in = str(Path.cwd()) +  '/pyflowline/config/pyflowline_susquehanna_hexagon.json' 
-        sFilename_configuration_in = '/Users/liao313/workspace/python/pyflowline/configurations/pyflowline_susquehanna_hexagon_mac.json'
+        sFilename_configuration_in = str(Path.cwd()) +  '/configurations/pyflowline_susquehanna_hexagon.json' 
+        #sFilename_configuration_in = '/Users/liao313/workspace/python/pyflowline/configurations/pyflowline_susquehanna_hexagon_mac.json'
         print(sFilename_configuration_in)
         oPyflowline = pyflowline_read_model_configuration_file(sFilename_configuration_in)
 
         #print the case information in details
-        print(oPyflowline)
+        print(oPyflowline.tojson())
 
 #pyflowline can process multiple basins within one singel run
 #the total number of basin is controlled by the nOutlet variable
 #convert the raw flowline into geojson in WGS84 system        
-#oPyflowline.convert_flowline_to_json()
+oPyflowline.convert_flowline_to_json()
 
 
 #oPyflowline.plot(sVariable_in = 'flowline_filter_json')
@@ -36,7 +36,7 @@ else:
 #for pBasin in oPyflowline.aBasin:    
 #    pBasin.plot(sVariable_in = 'flowline_filter_json') 
 #    pass
-#oPyflowline.preprocess_flowline()
+oPyflowline.preprocess_flowline()
 
 #from pyflowline.operation.preprocess_flowline_op import preprocess_flowline_op
 #preprocess_flowline_op(oPyflowline)
@@ -46,7 +46,7 @@ else:
 #    pBasin.plot(sVariable_in = 'flowline_simplified')
 #    pass
 
-#oPyflowline.create_mesh()
+oPyflowline.create_mesh()
 #from pyflowline.operation.create_mesh_op import create_mesh_op
 #aCell = create_mesh_op(oPyflowline)
 

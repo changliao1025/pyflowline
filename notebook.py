@@ -16,7 +16,7 @@ else:
 
         #an example configuration file is provided with the repository, but you need to update this file based on your own case study
         #linux
-        sFilename_configuration_in = str(Path.cwd()) +  '/configurations/pyflowline_susquehanna_hexagon.json' 
+        #sFilename_configuration_in = str(Path.cwd()) +  '/configurations/pyflowline_susquehanna_hexagon.json' 
         #mac
         sFilename_configuration_in = '/Users/liao313/workspace/python/pyflowline/configurations/pyflowline_susquehanna_hexagon_mac.json'
         print(sFilename_configuration_in)
@@ -28,12 +28,12 @@ else:
 #pyflowline can process multiple basins within one singel run
 #the total number of basin is controlled by the nOutlet variable
 #convert the raw flowline into geojson in WGS84 system        
-oPyflowline.convert_flowline_to_json()
+#oPyflowline.convert_flowline_to_json()
 
 
-oPyflowline.plot(sVariable_in = 'flowline_filter_json')
+#oPyflowline.plot(sVariable_in = 'flowline_filter_json')
 
-oPyflowline.preprocess_flowline()
+#oPyflowline.preprocess_flowline()
 
 
 

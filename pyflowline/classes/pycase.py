@@ -479,7 +479,7 @@ class flowlinecase(object):
         ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True,
                       linewidth=1, color='gray', alpha=0.3, linestyle='--')
 
-        ax.set_title( sMesh_type.title() +  '-based flowline')
+        ax.set_title( sMesh_type.title() +  ' mesh-based flowline')
         #ax.text(0.95, 0.95, sMesh_type, \
         #verticalalignment='top', horizontalalignment='right',\
         #        transform=ax.transAxes, \

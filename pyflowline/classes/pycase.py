@@ -323,8 +323,8 @@ class flowlinecase(object):
         dLon_min = 180
         dLon_max = -180
         
-        for pFeature_shapefile in pLayer:
-            pGeometry_in = pFeature_shapefile.GetGeometryRef()
+        for pFeature in pLayer:
+            pGeometry_in = pFeature.GetGeometryRef()
             sGeometry_type = pGeometry_in.GetGeometryName()
 
 
@@ -374,7 +374,7 @@ class flowlinecase(object):
         plt.savefig(sFilename_out, bbox_inches='tight')
 
         pDataset = pLayer = pFeature  = None   
-        plt.show()   
+        #plt.show()   
         return
 
     def plot_mesh_with_flowline(self):
@@ -400,8 +400,8 @@ class flowlinecase(object):
         dLon_min = 180
         dLon_max = -180
         
-        for pFeature_shapefile in pLayer:
-            pGeometry_in = pFeature_shapefile.GetGeometryRef()
+        for pFeature in pLayer:
+            pGeometry_in = pFeature.GetGeometryRef()
             sGeometry_type = pGeometry_in.GetGeometryName()
             lID =0 
             if sGeometry_type =='POLYGON':
@@ -425,13 +425,11 @@ class flowlinecase(object):
                     if dLat < dLat_min:
                         dLat_min = dLat
 
-
                 polygon = mpatches.Polygon(aCoords_gcs[:,0:2], closed=True,   linewidth=1, \
                     alpha=0.8, edgecolor = 'black',facecolor='none', \
                         transform=ccrs.PlateCarree() )
 
                 ax.add_patch(polygon)                   
-
 
         dDiff_lon = dLon_max - dLon_min
         dDiff_lat = dLat_max - dLat_min
@@ -464,7 +462,6 @@ class flowlinecase(object):
                     lID = lID + 1
                 pass
             pass
-
     
         ax.set_extent([dLon_min  , dLon_max , dLat_min , dLat_max ])
 
@@ -472,14 +469,13 @@ class flowlinecase(object):
         ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True,
                       linewidth=1, color='gray', alpha=0.3, linestyle='--')
 
-
         sDirname = os.path.dirname(sFilename_mesh)
         sFilename  = Path(sFilename_mesh).stem + '_flowline.png'
         sFilename_out = os.path.join(sDirname, sFilename)
         plt.savefig(sFilename_out, bbox_inches='tight')
 
         pDataset = pLayer = pFeature  = None   
-        plt.show()   
+        #plt.show()   
         return
 
     def preprocess_flowline(self):

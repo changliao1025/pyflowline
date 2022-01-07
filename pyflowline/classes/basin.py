@@ -300,7 +300,7 @@ class pybasin(object):
         sFilename  = Path(sFilename_json).stem + '.png'
         sFilename_out = os.path.join(sDirname, sFilename)
         plt.savefig(sFilename_out, bbox_inches='tight')
-        plt.show()
+        #plt.show()
     
         return
 

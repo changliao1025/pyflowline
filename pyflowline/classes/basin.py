@@ -240,7 +240,7 @@ class pybasin(object):
             #default 
             sFilename_json = self.sFilename_flowline_filter_json
         
-        fig = plt.figure( dpi=150 )
+        fig = plt.figure( dpi=300)
         fig.set_figwidth( 4 )
         fig.set_figheight( 4 )
         ax = fig.add_axes([0.1, 0.15, 0.75, 0.8] , projection=desired_proj  )
@@ -286,13 +286,15 @@ class pybasin(object):
                 codes[0] = mpath.Path.MOVETO
                 path = mpath.Path(aCoords_gcs, codes)            
                 x, y = zip(*path.vertices)
-                line, = ax.plot(x, y, color= colours[lID])
+                line, = ax.plot(x, y, color= colours[lID],linewidth=1)
                 lID = lID + 1
                 
     
         pDataset = pLayer = pFeature  = None      
     
         ax.set_extent([dLon_min  , dLon_max , dLat_min , dLat_max ])
+        ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True,
+                      linewidth=1, color='gray', alpha=0.3, linestyle='--')
         
         sDirname = os.path.dirname(sFilename_json)
         sFilename  = Path(sFilename_json).stem + '.png'

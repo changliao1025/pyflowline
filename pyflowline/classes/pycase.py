@@ -8,6 +8,7 @@ import datetime
 import json
 from osgeo import ogr, osr, gdal, gdalconst
 import matplotlib.pyplot as plt
+import matplotlib.path as mpath
 from shapely.wkt import loads
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
@@ -289,9 +290,12 @@ class flowlinecase(object):
         if sVariable_in == 'mesh':
             self.plot_mesh()
         else:
-            for pBasin in self.aBasin:            
-                pBasin.plot(sVariable_in= sVariable_in)
-                pass
+            if sVariable_in == 'overlap':
+                self.plot_mesh_with_flowline()
+            else:
+                for pBasin in self.aBasin:            
+                    pBasin.plot(sVariable_in= sVariable_in)
+                    pass
         
         return
     
@@ -301,7 +305,7 @@ class flowlinecase(object):
 
         sFilename_json  =  self.sFilename_mesh
 
-        fig = plt.figure( dpi=150 )
+        fig = plt.figure(dpi=300)
         fig.set_figwidth( 4 )
         fig.set_figheight( 4 )
         ax = fig.add_axes([0.1, 0.15, 0.75, 0.7] , projection=desired_proj )
@@ -347,7 +351,7 @@ class flowlinecase(object):
                         dLat_min = dLat
 
 
-                polygon = mpatches.Polygon(aCoords_gcs[:,0:2], closed=True,  \
+                polygon = mpatches.Polygon(aCoords_gcs[:,0:2], closed=True,  linewidth=1, \
                     alpha=0.8, edgecolor = 'black',facecolor='none', \
                         transform=ccrs.PlateCarree() )
 
@@ -366,6 +370,111 @@ class flowlinecase(object):
 
         sDirname = os.path.dirname(sFilename_json)
         sFilename  = Path(sFilename_json).stem + '.png'
+        sFilename_out = os.path.join(sDirname, sFilename)
+        plt.savefig(sFilename_out, bbox_inches='tight')
+
+        pDataset = pLayer = pFeature  = None   
+        plt.show()   
+        return
+
+    def plot_mesh_with_flowline(self):
+        sWorkspace_output_case = self.sWorkspace_output
+
+        sFilename_mesh  =  self.sFilename_mesh
+
+        fig = plt.figure( dpi=300 )
+        fig.set_figwidth( 4 )
+        fig.set_figheight( 4 )
+        ax = fig.add_axes([0.1, 0.15, 0.75, 0.7] , projection=desired_proj )
+
+        ax.set_global()
+        pDriver = ogr.GetDriverByName('GeoJSON')
+        pDataset = pDriver.Open(sFilename_mesh, gdal.GA_ReadOnly)
+        pLayer = pDataset.GetLayer(0)
+    
+        pSrs = osr.SpatialReference()  
+        pSrs.ImportFromEPSG(4326)    # WGS84 lat/lon
+
+        dLat_min = 90
+        dLat_max = -90
+        dLon_min = 180
+        dLon_max = -180
+        
+        for pFeature_shapefile in pLayer:
+            pGeometry_in = pFeature_shapefile.GetGeometryRef()
+            sGeometry_type = pGeometry_in.GetGeometryName()
+            lID =0 
+            if sGeometry_type =='POLYGON':
+                dummy0 = loads( pGeometry_in.ExportToWkt() )
+                aCoords_gcs = dummy0.exterior.coords
+                aCoords_gcs= np.array(aCoords_gcs)
+                nvertex = len(aCoords_gcs)
+
+                for i in range(nvertex):
+                    dLon = aCoords_gcs[i][0]
+                    dLat = aCoords_gcs[i][1]
+                    if dLon > dLon_max:
+                        dLon_max = dLon
+
+                    if dLon < dLon_min:
+                        dLon_min = dLon
+
+                    if dLat > dLat_max:
+                        dLat_max = dLat
+
+                    if dLat < dLat_min:
+                        dLat_min = dLat
+
+
+                polygon = mpatches.Polygon(aCoords_gcs[:,0:2], closed=True,   linewidth=1, \
+                    alpha=0.8, edgecolor = 'black',facecolor='none', \
+                        transform=ccrs.PlateCarree() )
+
+                ax.add_patch(polygon)                   
+
+
+        dDiff_lon = dLon_max - dLon_min
+        dDiff_lat = dLat_max - dLat_min
+
+        #plot flowline now
+        for pBasin in self.aBasin:
+            sWorkspace_output_basin=  pBasin.sWorkspace_output_basin
+            sFilename_out = pBasin.sFilename_flowline_final
+            sFilename_json = os.path.join(sWorkspace_output_basin, sFilename_out)
+            pDriver = ogr.GetDriverByName('GeoJSON')
+            pDataset = pDriver.Open(sFilename_json, gdal.GA_ReadOnly)
+            pLayer = pDataset.GetLayer(0)
+            n_colors = pLayer.GetFeatureCount()
+        
+            colours = cm.rainbow(np.linspace(0, 1, n_colors))
+            for pFeature in pLayer:
+                pGeometry_in = pFeature.GetGeometryRef()
+                sGeometry_type = pGeometry_in.GetGeometryName()
+                if sGeometry_type =='LINESTRING':
+                    dummy0 = loads( pGeometry_in.ExportToWkt() )
+                    aCoords_gcs = dummy0.coords
+                    aCoords_gcs= np.array(aCoords_gcs)
+                    nvertex = len(aCoords_gcs)   
+
+                    codes = np.full(nvertex, mpath.Path.LINETO, dtype=int )
+                    codes[0] = mpath.Path.MOVETO
+                    path = mpath.Path(aCoords_gcs, codes)            
+                    x, y = zip(*path.vertices)
+                    line, = ax.plot(x, y, color= colours[lID], linewidth=1)
+                    lID = lID + 1
+                pass
+            pass
+
+    
+        ax.set_extent([dLon_min  , dLon_max , dLat_min , dLat_max ])
+
+        ax.coastlines()#resolution='110m')
+        ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True,
+                      linewidth=1, color='gray', alpha=0.3, linestyle='--')
+
+
+        sDirname = os.path.dirname(sFilename_mesh)
+        sFilename  = Path(sFilename_mesh).stem + '_flowline.png'
         sFilename_out = os.path.join(sDirname, sFilename)
         plt.savefig(sFilename_out, bbox_inches='tight')
 

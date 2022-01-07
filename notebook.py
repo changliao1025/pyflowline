@@ -29,25 +29,12 @@ else:
 #the total number of basin is controlled by the nOutlet variable
 #convert the raw flowline into geojson in WGS84 system        
 #oPyflowline.convert_flowline_to_json()
-
-
 #oPyflowline.plot(sVariable_in = 'flowline_filter_json')
-
 #oPyflowline.preprocess_flowline()
-
-
-
-
-
 oPyflowline.create_mesh()
-#from pyflowline.operation.create_mesh_op import create_mesh_op
-#aCell = create_mesh_op(oPyflowline)
-
-#oPyflowline.plot(sVariable_in = 'mesh')
-#from pyflowline.plot.pyflowline_plot_mesh import pyflowline_plot_mesh
-#pyflowline_plot_mesh(oPyflowline)
-
+oPyflowline.plot(sVariable_in = 'mesh')
 oPyflowline.intersect_flowline_with_mesh()
-
+oPyflowline.plot(sVariable_in = 'final')
+oPyflowline.plot(sVariable_in = 'overlap')
 
 print('Finished')

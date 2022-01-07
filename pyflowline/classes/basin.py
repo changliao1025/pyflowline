@@ -295,6 +295,7 @@ class pybasin(object):
         ax.set_extent([dLon_min  , dLon_max , dLat_min , dLat_max ])
         ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True,
                       linewidth=1, color='gray', alpha=0.3, linestyle='--')
+        ax.set_title( 'Flowline')
         
         sDirname = os.path.dirname(sFilename_json)
         sFilename  = Path(sFilename_json).stem + '.png'

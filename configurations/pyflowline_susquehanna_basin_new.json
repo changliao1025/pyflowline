@@ -17,17 +17,17 @@
         "iFlag_dam": 0,
         "iFlag_disconnected": 0,
         "lBasinID": 1,
-        "lCellID_outlet": 4146,
+        "lCellID_outlet": 1037,
         "sBasinID": "001",
         "sFilename_dam": "/qfs/people/liao313/data/hexwatershed/susquehanna/auxiliary/ICoM_dams.csv",
         "sFilename_flowline_filter": "/qfs/people/liao313/data/hexwatershed/susquehanna/vector/hydrology/streamord7above.shp",
-        "sFilename_flowline_filter_json": "/compyfs/liao313/04model/pyflowline/susquehanna/pyflowline20211231001/001/flowline_filter.json",
+        "sFilename_flowline_filter_json": "/compyfs/liao313/04model/pyflowline/susquehanna/pyflowline20211231004/001/flowline_filter.json",
         "sFilename_flowline_final": "flowline_final_001.json",
         "sFilename_flowline_intersect": "flowline_intersect_001.json",
         "sFilename_flowline_raw": "/qfs/people/liao313/data/hexwatershed/susquehanna/vector/hydrology/allflowline.shp",
         "sFilename_flowline_segment_index_before_intersect": "flowline_segment_index_before_intersect_001.json",
         "sFilename_flowline_segment_order_before_intersect": "flowline_segment_order_before_intersect_001.json",
         "sFilename_flowline_topo": "/qfs/people/liao313/data/hexwatershed/susquehanna/auxiliary/flowline.csv",
-        "sWorkspace_output_basin": "/compyfs/liao313/04model/pyflowline/susquehanna/pyflowline20211231001/001"
+        "sWorkspace_output_basin": "/compyfs/liao313/04model/pyflowline/susquehanna/pyflowline20211231004/001"
     }
 ]

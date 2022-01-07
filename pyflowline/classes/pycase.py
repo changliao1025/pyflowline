@@ -304,6 +304,7 @@ class flowlinecase(object):
         sWorkspace_output_case = self.sWorkspace_output
 
         sFilename_json  =  self.sFilename_mesh
+        sMesh_type = self.sMesh_type
 
         fig = plt.figure(dpi=300)
         fig.set_figwidth( 4 )
@@ -361,7 +362,15 @@ class flowlinecase(object):
         dDiff_lon = dLon_max - dLon_min
         dDiff_lat = dLat_max - dLat_min
     
-        ax.set_extent([dLon_min  , dLon_max , dLat_min , dLat_max ])
+        ax.set_extent([dLon_min -0.1  , dLon_max+0.1 , dLat_min-0.1 , dLat_max+0.1 ])
+
+        #add mesh info
+        ax.set_title( sMesh_type.title() +  ' mesh')
+
+        #ax.text(0.95, 0.95, sMesh_type, \
+        #verticalalignment='top', horizontalalignment='right',\
+        #        transform=ax.transAxes, \
+        #        color='black', fontsize=15)
 
         ax.coastlines()#resolution='110m')
         ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True,
@@ -381,6 +390,7 @@ class flowlinecase(object):
         sWorkspace_output_case = self.sWorkspace_output
 
         sFilename_mesh  =  self.sFilename_mesh
+        sMesh_type = self.sMesh_type
 
         fig = plt.figure( dpi=300 )
         fig.set_figwidth( 4 )
@@ -463,11 +473,17 @@ class flowlinecase(object):
                 pass
             pass
     
-        ax.set_extent([dLon_min  , dLon_max , dLat_min , dLat_max ])
+        ax.set_extent([dLon_min -0.1  , dLon_max+0.1 , dLat_min-0.1 , dLat_max+0.1 ])
 
         ax.coastlines()#resolution='110m')
         ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True,
                       linewidth=1, color='gray', alpha=0.3, linestyle='--')
+
+        ax.set_title( sMesh_type.title() +  '-based flowline')
+        #ax.text(0.95, 0.95, sMesh_type, \
+        #verticalalignment='top', horizontalalignment='right',\
+        #        transform=ax.transAxes, \
+        #        color='black', fontsize=15)
 
         sDirname = os.path.dirname(sFilename_mesh)
         sFilename  = Path(sFilename_mesh).stem + '_flowline.png'

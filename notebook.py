@@ -16,9 +16,9 @@ else:
 
         #an example configuration file is provided with the repository, but you need to update this file based on your own case study
         #linux
-        #sFilename_configuration_in = str(Path.cwd()) +  '/configurations/pyflowline_susquehanna_hexagon.json' 
+        sFilename_configuration_in = str(Path.cwd()) +  '/configurations/pyflowline_susquehanna_hexagon.json' 
         #mac
-        sFilename_configuration_in = '/Users/liao313/workspace/python/pyflowline/configurations/pyflowline_susquehanna_hexagon_mac.json'
+        #sFilename_configuration_in = '/Users/liao313/workspace/python/pyflowline/configurations/pyflowline_susquehanna_hexagon_mac.json'
         print(sFilename_configuration_in)
         oPyflowline = pyflowline_read_model_configuration_file(sFilename_configuration_in)
 

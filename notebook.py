@@ -4,16 +4,11 @@ from pyflowline.classes.pycase import flowlinecase
 from pyflowline.pyflowline_read_model_configuration_file import pyflowline_read_model_configuration_file
 
 iFlag_option = 2
-
 if iFlag_option ==1:
-
     oPyflowline=flowlinecase()
     oPyflowline.iCase_index = 1
-
-
 else: 
     if iFlag_option == 2:
-
         #an example configuration file is provided with the repository, but you need to update this file based on your own case study
         #linux
         sFilename_configuration_in = str(Path.cwd()) +  '/configurations/pyflowline_susquehanna_hexagon.json' 
@@ -21,7 +16,6 @@ else:
         #sFilename_configuration_in = '/Users/liao313/workspace/python/pyflowline/configurations/pyflowline_susquehanna_hexagon_mac.json'
         print(sFilename_configuration_in)
         oPyflowline = pyflowline_read_model_configuration_file(sFilename_configuration_in)
-
         #print the case information in details
         print(oPyflowline.tojson())
 

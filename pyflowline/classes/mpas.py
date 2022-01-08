@@ -86,8 +86,8 @@ class pympas(pycell):
             self.dLongitude_center_degree = dLon
             self.dLatitude_center_degree = dLat
             pVertex = dict()        
-            pVertex['lon'] =self.dLongitude_center_degree
-            pVertex['lat'] =self.dLatitude_center_degree           
+            pVertex['dLongitude_degree'] =self.dLongitude_center_degree
+            pVertex['dLatitude_degree'] =self.dLatitude_center_degree           
             self.pVertex_center = pyvertex(pVertex)
             self.lCellID_downstream_burned=-1
             self.iStream_order_burned=-1

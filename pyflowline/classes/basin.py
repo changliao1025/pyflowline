@@ -261,9 +261,7 @@ class pybasin(object):
         dLat_min = 90
         dLat_max = -90
         dLon_min = 180
-        dLon_max = -180   
-
-        
+        dLon_max = -180          
         
 
         #ax.add_image(request, 6)    # 5 = zoom level
@@ -304,14 +302,14 @@ class pybasin(object):
     
         pDataset = pLayer = pFeature  = None    
         sDirname = os.path.dirname(sFilename_json)
-        marginx  = (dLon_max - dLon_min) / 13
-        marginy  = (dLat_max - dLat_min) / 13
+        marginx  = (dLon_max - dLon_min) / 20
+        marginy  = (dLat_max - dLat_min) / 20
         aExtent_in = [dLon_min - marginx , dLon_max + marginx , dLat_min - marginy , dLat_max + marginy]
         #aExtent_in = [-76.5,-76.2, 41.6,41.9]
         #aExtent_in = [-76.95,-76.75, 40.7,40.9]
         sFilename  = Path(sFilename_json).stem + '.png'
         #sFilename  = Path(sFilename_json).stem + '_meander.png'       
-        sFilename  = Path(sFilename_json).stem + '_loop.png'  
+        #sFilename  = Path(sFilename_json).stem + '_loop.png'  
         ax.set_extent(aExtent_in)       
     
         ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True,

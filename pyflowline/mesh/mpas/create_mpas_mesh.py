@@ -247,7 +247,7 @@ def create_mpas_mesh(iFlag_global_in, \
 
                     pLayer.CreateFeature(pFeature)
 
-                pmpas = convert_gcs_attribute_to_cell(4, dLon, dLat, aCoords, aVertexIndex, aEdgeIndex, aVertexIndexOnEdge)
+                pmpas = convert_gcs_attributes_to_cell(4, dLon, dLat, aCoords, aVertexIndex, aEdgeIndex, aVertexIndexOnEdge)
                 #calculate area 
                 #pmpas.calculate_cell_area()
                 pmpas.dArea = dArea

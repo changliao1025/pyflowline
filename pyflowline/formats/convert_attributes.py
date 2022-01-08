@@ -28,15 +28,15 @@ def convert_gcs_attributes_to_cell(iMesh_type_in, dLongitude_center_in, dLatitud
     aEdge=list()
     
     if iMesh_type_in == 1: #hexagon
-        pHexagon = pyhexagon(dLongitude_in, dLatitude_center_in, aEdge, aVertex)
+        pHexagon = pyhexagon(dLongitude_center_in, dLatitude_center_in, aEdge, aVertex)
         return pHexagon
     else:
         if iMesh_type_in == 2: #sqaure
-            pSquare = pysquare(dLongitude_in, dLatitude_center_in, aEdge, aVertex)
+            pSquare = pysquare(dLongitude_center_in, dLatitude_center_in, aEdge, aVertex)
             return pSquare
         else:
             if iMesh_type_in == 3: #latlon
-                pLatlon = pylatlon(dLongitude_in, dLatitude_center_in, aEdge, aVertex)
+                pLatlon = pylatlon(dLongitude_center_in, dLatitude_center_in, aEdge, aVertex)
                 return pLatlon
             else:
                 if iMesh_type_in == 4: #mpas
@@ -44,8 +44,8 @@ def convert_gcs_attributes_to_cell(iMesh_type_in, dLongitude_center_in, dLatitud
                         lon = aCoordinates_gcs_in[i][0]
                         lat = aCoordinates_gcs_in[i][1]
                         pVertex = dict()        
-                        pVertex['lon'] =lon
-                        pVertex['lat'] =lat
+                        pVertex['dLongitude_degree'] =lon
+                        pVertex['dLatitude_degree'] =lat
                         pVertex = pyvertex(pVertex)
                         pVertex.lVertexID = int(aVertexID_in[i])
                         aVertex.append(pVertex)
@@ -54,24 +54,24 @@ def convert_gcs_attributes_to_cell(iMesh_type_in, dLongitude_center_in, dLatitud
                         aVertexID_dummy = aVertexIndexOnEdge_in[j,:]
                         pVertex = dict()
                         dummy_index = np.where(aVertexID_in == aVertexID_dummy[0])     
-                        pVertex['lon'] =aCoordinates_gcs_in[dummy_index,0]
-                        pVertex['lat'] =aCoordinates_gcs_in[dummy_index,1]
+                        pVertex['dLongitude_degree'] =aCoordinates_gcs_in[dummy_index,0]
+                        pVertex['dLatitude_degree'] =aCoordinates_gcs_in[dummy_index,1]
                         pVertex_start = pyvertex(pVertex)
                         pVertex_start.lVertexID = int( aVertexID_dummy[0] )
                         dummy_index = np.where(aVertexID_in == aVertexID_dummy[1])     
-                        pVertex['lon'] =aCoordinates_gcs_in[dummy_index,0]
-                        pVertex['lat'] =aCoordinates_gcs_in[dummy_index,1]
+                        pVertex['dLongitude_degree'] =aCoordinates_gcs_in[dummy_index,0]
+                        pVertex['dLatitude_degree'] =aCoordinates_gcs_in[dummy_index,1]
                         pVertex_end = pyvertex(pVertex)
                         pVertex_end.lVertexID = int(aVertexID_dummy[1])
                         pEdge = pyedge( pVertex_start, pVertex_end )
                         pEdge.lEdgeID = int(aEdgeID_in[j])
                         aEdge.append(pEdge)
 
-                    pMpas = pympas(dLongitude_in, dLatitude_center_in, aEdge, aVertex)
+                    pMpas = pympas(dLongitude_center_in, dLatitude_center_in, aEdge, aVertex)
                     return pMpas
                 else:
                     if iMesh_type_in ==5: #tin
-                        pTin = pytin(dLongitude_in, dLatitude_center_in, aEdge, aVertex)
+                        pTin = pytin(dLongitude_center_in, dLatitude_center_in, aEdge, aVertex)
                         return pTin
                         pass
                     else:
@@ -106,8 +106,8 @@ def convert_pcs_attributes_to_cell(iMesh_type_in, \
                         lon = aCoordinates_pcs_in[i][0]
                         lat = aCoordinates_pcs_in[i][1]
                         pVertex = dict()        
-                        pVertex['lon'] =lon
-                        pVertex['lat'] =lat
+                        pVertex['dLongitude_degree'] =lon
+                        pVertex['dLatitude_degree'] =lat
                         pVertex = pyvertex(pVertex)
                         pVertex.lVertexID = int(aVertexID_in[i])
                         aVertex.append(pVertex)
@@ -116,13 +116,13 @@ def convert_pcs_attributes_to_cell(iMesh_type_in, \
                         aVertexID_dummy = aVertexIndexOnEdge_in[j,:]
                         pVertex = dict()
                         dummy_index = np.where(aVertexID_in == aVertexID_dummy[0])     
-                        pVertex['lon'] =aCoordinates_pcs_in[dummy_index,0]
-                        pVertex['lat'] =aCoordinates_pcs_in[dummy_index,1]
+                        pVertex['dLongitude_degree'] =aCoordinates_pcs_in[dummy_index,0]
+                        pVertex['dLatitude_degree'] =aCoordinates_pcs_in[dummy_index,1]
                         pVertex_start = pyvertex(pVertex)
                         pVertex_start.lVertexID = int( aVertexID_dummy[0] )
                         dummy_index = np.where(aVertexID_in == aVertexID_dummy[1])     
-                        pVertex['lon'] =aCoordinates_pcs_in[dummy_index,0]
-                        pVertex['lat'] =aCoordinates_pcs_in[dummy_index,1]
+                        pVertex['dLongitude_degree'] =aCoordinates_pcs_in[dummy_index,0]
+                        pVertex['dLatitude_degree'] =aCoordinates_pcs_in[dummy_index,1]
                         pVertex_end = pyvertex(pVertex)
                         pVertex_end.lVertexID = int(aVertexID_dummy[1])
                         pEdge = pyedge( pVertex_start, pVertex_end )

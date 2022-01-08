@@ -286,16 +286,19 @@ class flowlinecase(object):
             pBasin.convert_flowline_to_json()
             pass
 
-    def plot(self, sVariable_in=None):
+    def plot(self, sVariable_in=None, aExtent_in = None):
         if sVariable_in == 'mesh':
             self.plot_mesh()
         else:
-            if sVariable_in == 'overlap':
-                self.plot_mesh_with_flowline()
+            if sVariable_in == 'overlap_filter':
+                self.plot_mesh_with_flowline(iFlag_simplified = 1, aExtent_in= aExtent_in)
             else:
-                for pBasin in self.aBasin:            
-                    pBasin.plot(sVariable_in= sVariable_in)
-                    pass
+                if sVariable_in == 'overlap':
+                    self.plot_mesh_with_flowline( aExtent_in= aExtent_in)
+                else:
+                    for pBasin in self.aBasin:            
+                        pBasin.plot(sVariable_in= sVariable_in)
+                        pass
         
         return
     
@@ -352,7 +355,7 @@ class flowlinecase(object):
                         dLat_min = dLat
 
 
-                polygon = mpatches.Polygon(aCoords_gcs[:,0:2], closed=True,  linewidth=1, \
+                polygon = mpatches.Polygon(aCoords_gcs[:,0:2], closed=True,  linewidth=0.25, \
                     alpha=0.8, edgecolor = 'black',facecolor='none', \
                         transform=ccrs.PlateCarree() )
 
@@ -361,11 +364,12 @@ class flowlinecase(object):
 
         
         if aExtent_in is None:
-            marginx  = (dLon_max - dLon_min) / 13
-            marginy  = (dLat_max - dLat_min) / 13
-            ax.set_extent([dLon_min - marginx , dLon_max + marginx , dLat_min - marginy , dLat_max + marginy])  
-        else:
-            ax.set_extent( aExtent_in )  
+            marginx  = (dLon_max - dLon_min) / 20
+            marginy  = (dLat_max - dLat_min) / 20
+            aExtent_in = [dLon_min - marginx , dLon_max + marginx , dLat_min - marginy , dLat_max + marginy]
+       
+        
+        ax.set_extent( aExtent_in )  
     
 
         #add mesh info
@@ -390,7 +394,7 @@ class flowlinecase(object):
         #plt.show()   
         return
 
-    def plot_mesh_with_flowline(self, aExtent_in = None):
+    def plot_mesh_with_flowline(self, iFlag_simplified=None, aExtent_in=None):
         sWorkspace_output_case = self.sWorkspace_output
 
         sFilename_mesh  =  self.sFilename_mesh
@@ -439,7 +443,7 @@ class flowlinecase(object):
                     if dLat < dLat_min:
                         dLat_min = dLat
 
-                polygon = mpatches.Polygon(aCoords_gcs[:,0:2], closed=True,   linewidth=1, \
+                polygon = mpatches.Polygon(aCoords_gcs[:,0:2], closed=True,   linewidth=0.25, \
                     alpha=0.8, edgecolor = 'black',facecolor='none', \
                         transform=ccrs.PlateCarree() )
 
@@ -450,7 +454,11 @@ class flowlinecase(object):
         #plot flowline now
         for pBasin in self.aBasin:
             sWorkspace_output_basin=  pBasin.sWorkspace_output_basin
-            sFilename_out = pBasin.sFilename_flowline_final
+            if iFlag_simplified is None:
+                sFilename_out = pBasin.sFilename_flowline_final
+            else:                
+                sFilename = pBasin.sFilename_flowline_segment_order_before_intersect
+                sFilename_out = os.path.join(sWorkspace_output_basin, sFilename)
             sFilename_json = os.path.join(sWorkspace_output_basin, sFilename_out)
             pDriver = ogr.GetDriverByName('GeoJSON')
             pDataset = pDriver.Open(sFilename_json, gdal.GA_ReadOnly)
@@ -471,31 +479,38 @@ class flowlinecase(object):
                     codes[0] = mpath.Path.MOVETO
                     path = mpath.Path(aCoords_gcs, codes)            
                     x, y = zip(*path.vertices)
-                    line, = ax.plot(x, y, color= colours[lID], linewidth=1)
+                    line, = ax.plot(x, y, color= colours[lID], linewidth=0.25)
                     lID = lID + 1
                 pass
             pass
-    
+        
+        sDirname = os.path.dirname(sFilename_mesh)
         if aExtent_in is None:
-            marginx  = (dLon_max - dLon_min) / 13
-            marginy  = (dLat_max - dLat_min) / 13
-            ax.set_extent([dLon_min - marginx , dLon_max + marginx , dLat_min - marginy , dLat_max + marginy])  
+            marginx  = (dLon_max - dLon_min) / 20
+            marginy  = (dLat_max - dLat_min) / 20
+            aExtent_in = [dLon_min - marginx , dLon_max + marginx , dLat_min - marginy , dLat_max + marginy]
+            sTitle = 'Flowline guided ' + sMesh_type.title() + ' mesh'
+            sFilename  = Path(sFilename_mesh).stem + '_flowline.png'
         else:
-            ax.set_extent( aExtent_in )  
+            sTitle = 'Flowline guided ' + sMesh_type.title() + ' mesh'
+            sFilename  = Path(sFilename_mesh).stem + '_flowline_zoom.png'
+       
+        
+        ax.set_extent( aExtent_in )  
       
 
         ax.coastlines()#resolution='110m')
         ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True,
                       linewidth=1, color='gray', alpha=0.3, linestyle='--')
-
-        ax.set_title( sMesh_type.title() +  ' mesh-based flowline')
+        
+        ax.set_title( sTitle )
         #ax.text(0.95, 0.95, sMesh_type, \
         #verticalalignment='top', horizontalalignment='right',\
         #        transform=ax.transAxes, \
         #        color='black', fontsize=15)
 
-        sDirname = os.path.dirname(sFilename_mesh)
-        sFilename  = Path(sFilename_mesh).stem + '_flowline.png'
+        
+        
         sFilename_out = os.path.join(sDirname, sFilename)
         plt.savefig(sFilename_out, bbox_inches='tight')
 
@@ -600,7 +615,7 @@ class flowlinecase(object):
                         dLongitude_left  = self.dLongitude_left 
                         dLongitude_right = self.dLongitude_right
                         aMpas = create_mpas_mesh(iFlag_global, iFlag_use_mesh_dem, iFlag_save_mesh, \
-                                dLatitude_top, dLatitude_bot, dLongitude_left, dLongitude_right,\
+                              dLongitude_left, dLongitude_right,  dLatitude_top, dLatitude_bot, \
                                     sFilename_mesh_netcdf,      sFilename_mesh)
                         return aMpas
                     else:

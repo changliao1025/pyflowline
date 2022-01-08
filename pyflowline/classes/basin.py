@@ -12,6 +12,7 @@ import matplotlib.patches as mpatches
 from matplotlib import cm
 
 import cartopy.crs as ccrs
+import cartopy.io.img_tiles as cimgt
 
 from pyflowline.classes.vertex import pyvertex
 
@@ -223,7 +224,7 @@ class pybasin(object):
 
         return dLength
     
-    def plot(self, sVariable_in=None):
+    def plot(self, sVariable_in=None, aExtent_in = None):
         sWorkspace_output_basin = self.sWorkspace_output_basin
         if sVariable_in is not None:
             if sVariable_in == 'flowline_filter_json':
@@ -240,10 +241,12 @@ class pybasin(object):
             #default 
             sFilename_json = self.sFilename_flowline_filter_json
         
+        #request = cimgt.OSM()
         fig = plt.figure( dpi=300)
         fig.set_figwidth( 4 )
         fig.set_figheight( 4 )
-        ax = fig.add_axes([0.1, 0.15, 0.75, 0.8] , projection=desired_proj  )
+        ax = fig.add_axes([0.1, 0.15, 0.75, 0.8] , projection=desired_proj ) #request.crs
+        
         pDriver = ogr.GetDriverByName('GeoJSON')
         pDataset = pDriver.Open(sFilename_json, gdal.GA_ReadOnly)
         pLayer = pDataset.GetLayer(0)
@@ -255,7 +258,13 @@ class pybasin(object):
         dLat_min = 90
         dLat_max = -90
         dLon_min = 180
-        dLon_max = -180
+        dLon_max = -180   
+
+        
+        
+
+        #ax.add_image(request, 6)    # 5 = zoom level
+
         n_colors = pLayer.GetFeatureCount()
         
         colours = cm.rainbow(np.linspace(0, 1, n_colors))
@@ -290,9 +299,14 @@ class pybasin(object):
                 lID = lID + 1
                 
     
-        pDataset = pLayer = pFeature  = None      
+        pDataset = pLayer = pFeature  = None    
+        if aExtent_in is None:
+            marginx  = (dLon_max - dLon_min) / 10
+            marginy  = (dLat_max - dLat_min) / 10
+            ax.set_extent([dLon_min - marginx , dLon_max + marginx , dLat_min - marginy , dLat_max + marginy])  
+        else:
+            ax.set_extent( aExtent_in )  
     
-        ax.set_extent([dLon_min  , dLon_max , dLat_min , dLat_max ])
         ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True,
                       linewidth=1, color='gray', alpha=0.3, linestyle='--')
         ax.set_title( 'Flowline')
@@ -474,8 +488,6 @@ class pybasin(object):
                 = remove_returning_flowline(iMesh_type, aCell_intersect_basin, pVertex_outlet_initial)
             sFilename_out = 'flowline_simplified_after_intersect_' + self.sBasinID + '.json'
             sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)  
-
-            
 
             export_flowline_to_json(aFlowline_basin,  sFilename_out)
 

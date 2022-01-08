@@ -299,7 +299,7 @@ class flowlinecase(object):
         
         return
     
-    def plot_mesh(self):
+    def plot_mesh(self, aExtent_in=None):
 
         sWorkspace_output_case = self.sWorkspace_output
 
@@ -359,10 +359,14 @@ class flowlinecase(object):
                 ax.add_patch(polygon)                   
 
 
-        dDiff_lon = dLon_max - dLon_min
-        dDiff_lat = dLat_max - dLat_min
+        
+        if aExtent_in is None:
+            marginx  = (dLon_max - dLon_min) / 10
+            marginy  = (dLat_max - dLat_min) / 10
+            ax.set_extent([dLon_min - marginx , dLon_max + marginx , dLat_min - marginy , dLat_max + marginy])  
+        else:
+            ax.set_extent( aExtent_in )  
     
-        ax.set_extent([dLon_min -0.1  , dLon_max+0.1 , dLat_min-0.1 , dLat_max+0.1 ])
 
         #add mesh info
         ax.set_title( sMesh_type.title() +  ' mesh')
@@ -386,7 +390,7 @@ class flowlinecase(object):
         #plt.show()   
         return
 
-    def plot_mesh_with_flowline(self):
+    def plot_mesh_with_flowline(self, aExtent_in = None):
         sWorkspace_output_case = self.sWorkspace_output
 
         sFilename_mesh  =  self.sFilename_mesh
@@ -441,8 +445,7 @@ class flowlinecase(object):
 
                 ax.add_patch(polygon)                   
 
-        dDiff_lon = dLon_max - dLon_min
-        dDiff_lat = dLat_max - dLat_min
+       
 
         #plot flowline now
         for pBasin in self.aBasin:
@@ -473,7 +476,13 @@ class flowlinecase(object):
                 pass
             pass
     
-        ax.set_extent([dLon_min -0.1  , dLon_max+0.1 , dLat_min-0.1 , dLat_max+0.1 ])
+        if aExtent_in is None:
+            marginx  = (dLon_max - dLon_min) / 10
+            marginy  = (dLat_max - dLat_min) / 10
+            ax.set_extent([dLon_min - marginx , dLon_max + marginx , dLat_min - marginy , dLat_max + marginy])  
+        else:
+            ax.set_extent( aExtent_in )  
+      
 
         ax.coastlines()#resolution='110m')
         ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True,

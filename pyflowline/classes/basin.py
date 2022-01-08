@@ -224,18 +224,21 @@ class pybasin(object):
 
         return dLength
     
-    def plot(self, sVariable_in=None, aExtent_in = None):
+    def plot(self, sVariable_in=None):
         sWorkspace_output_basin = self.sWorkspace_output_basin
         if sVariable_in is not None:
             if sVariable_in == 'flowline_filter_json':
                 sFilename_json = self.sFilename_flowline_filter_json
+                sTitle = 'Original flowline'
             else:
                 if sVariable_in == 'flowline_simplified':
                     sFilename_out = self.sFilename_flowline_segment_index_before_intersect
                     sFilename_json = os.path.join(sWorkspace_output_basin, sFilename_out)
+                    sTitle = 'Simplified flowline'
                 else:
                     sFilename_out = self.sFilename_flowline_final
                     sFilename_json = os.path.join(sWorkspace_output_basin, sFilename_out)
+                    sTitle = 'Conceptual flowline'
                 pass
         else:
             #default 
@@ -300,19 +303,21 @@ class pybasin(object):
                 
     
         pDataset = pLayer = pFeature  = None    
-        if aExtent_in is None:
-            marginx  = (dLon_max - dLon_min) / 10
-            marginy  = (dLat_max - dLat_min) / 10
-            ax.set_extent([dLon_min - marginx , dLon_max + marginx , dLat_min - marginy , dLat_max + marginy])  
-        else:
-            ax.set_extent( aExtent_in )  
+        sDirname = os.path.dirname(sFilename_json)
+        marginx  = (dLon_max - dLon_min) / 13
+        marginy  = (dLat_max - dLat_min) / 13
+        aExtent_in = [dLon_min - marginx , dLon_max + marginx , dLat_min - marginy , dLat_max + marginy]
+        #aExtent_in = [-76.5,-76.2, 41.6,41.9]
+        #aExtent_in = [-76.95,-76.75, 40.7,40.9]
+        sFilename  = Path(sFilename_json).stem + '.png'
+        #sFilename  = Path(sFilename_json).stem + '_meander.png'       
+        sFilename  = Path(sFilename_json).stem + '_loop.png'  
+        ax.set_extent(aExtent_in)       
     
         ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True,
                       linewidth=1, color='gray', alpha=0.3, linestyle='--')
-        ax.set_title( 'Flowline')
+        ax.set_title( sTitle)       
         
-        sDirname = os.path.dirname(sFilename_json)
-        sFilename  = Path(sFilename_json).stem + '.png'
         sFilename_out = os.path.join(sDirname, sFilename)
         plt.savefig(sFilename_out, bbox_inches='tight')
         #plt.show()
@@ -439,6 +444,12 @@ class pybasin(object):
 
                 if len(aFlowline_basin) ==1:
                     break
+            
+            #the final vertex info
+            aVertex, lIndex_outlet, aIndex_headwater,aIndex_middle, aIndex_confluence, aConnectivity = find_flowline_confluence(aFlowline_basin,  pVertex_outlet)
+            sFilename_out = 'flowline_vertex_with_confluence_before_intersect_final_' + self.sBasinID + '.json'
+            sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
+            export_vertex_to_json( aVertex,  sFilename_out, aAttribute_data=aConnectivity)
 
             
             dLength_total_new = self.calculate_flowline_length(aFlowline_basin)

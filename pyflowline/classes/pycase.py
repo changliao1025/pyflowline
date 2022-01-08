@@ -361,8 +361,8 @@ class flowlinecase(object):
 
         
         if aExtent_in is None:
-            marginx  = (dLon_max - dLon_min) / 10
-            marginy  = (dLat_max - dLat_min) / 10
+            marginx  = (dLon_max - dLon_min) / 13
+            marginy  = (dLat_max - dLat_min) / 13
             ax.set_extent([dLon_min - marginx , dLon_max + marginx , dLat_min - marginy , dLat_max + marginy])  
         else:
             ax.set_extent( aExtent_in )  
@@ -477,8 +477,8 @@ class flowlinecase(object):
             pass
     
         if aExtent_in is None:
-            marginx  = (dLon_max - dLon_min) / 10
-            marginy  = (dLat_max - dLat_min) / 10
+            marginx  = (dLon_max - dLon_min) / 13
+            marginy  = (dLat_max - dLat_min) / 13
             ax.set_extent([dLon_min - marginx , dLon_max + marginx , dLat_min - marginy , dLat_max + marginy])  
         else:
             ax.set_extent( aExtent_in )  

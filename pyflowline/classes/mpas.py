@@ -129,8 +129,8 @@ class pympas(pycell):
         
         for i in range(self.nVertex):
             
-            lons.append( self.aVertex[i].dLongitude )
-            lats.append( self.aVertex[i].dLatitude )
+            lons.append( self.aVertex[i].dLongitude_degree )
+            lats.append( self.aVertex[i].dLatitude_degree )
 
 
         self.dArea = calculate_polygon_area(lats, lons)

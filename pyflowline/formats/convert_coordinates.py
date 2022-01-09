@@ -15,9 +15,6 @@ from pyflowline.classes.tin import pytin
 
 from pyflowline.algorithms.auxiliary.gdal_functions import reproject_coordinates
 
-
-
-
 def convert_gcs_coordinates_to_cell(iMesh_type_in, \
     dLongitude_center_in, \
     dLatitude_center_in, \

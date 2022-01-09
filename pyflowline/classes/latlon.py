@@ -25,7 +25,7 @@ class pylatlon(pycell):
     aNeighbor=None #the global ID of all neighbors
     nNeighbor=-1
 
-    def __init__(self, aEdge, aVertex, dLon, dLat):    
+    def __init__(self, dLon, dLat, aEdge, aVertex):    
         nEdge = len(aEdge)
         if nEdge != 4:
             pass
@@ -50,8 +50,8 @@ class pylatlon(pycell):
             self.dLatitude_center = dLat
 
             pVertex = dict()        
-            pVertex['lon'] =self.dLongitude_center
-            pVertex['lat'] =self.dLatitude_center           
+            pVertex['dLongitude_degree'] =self.dLongitude_center
+            pVertex['dLatitude_degree'] =self.dLatitude_center           
             self.pVertex_center = pyvertex(pVertex)
 
             self.lCellID_downstream_burned=-1
@@ -93,8 +93,8 @@ class pylatlon(pycell):
         
         for i in range(self.nVertex):
             
-            lons.append( self.aVertex[i].dLongitude )
-            lats.append( self.aVertex[i].dLatitude )
+            lons.append( self.aVertex[i].dLongitude_degree )
+            lats.append( self.aVertex[i].dLatitude_degree )
 
 
         self.dArea = calculate_polygon_area(lats, lons)

@@ -13,8 +13,8 @@ class pylatlon(pycell):
     dArea=0.0
     dX_center_meter=0.0
     dY_center_meter=0.0
-    dLongitude_center=0.0
-    dLatitude_center=0.0
+    dLongitude_center_degree=0.0
+    dLatitude_center_degree=0.0
     aEdge=None
     aVertex=None
     aFlowline=None
@@ -35,23 +35,14 @@ class pylatlon(pycell):
             self.aEdge = aEdge
             self.aVertex = aVertex #the first one and last one are the same
             self.nEdge = 4
-            self.nVertex = 4
+            self.nVertex = 4                 
 
-            #dx=0.0
-            #dy=0.0
-            #for i in range(4):
-            #    dx = dx + aVertex[i].dx
-            #    dy = dy + aVertex[i].dy
-            #    pass
-
-            
-
-            self.dLongitude_center = dLon
-            self.dLatitude_center = dLat
+            self.dLongitude_center_degree = dLon
+            self.dLatitude_center_degree = dLat
 
             pVertex = dict()        
-            pVertex['dLongitude_degree'] =self.dLongitude_center
-            pVertex['dLatitude_degree'] =self.dLatitude_center           
+            pVertex['dLongitude_degree'] =self.dLongitude_center_degree
+            pVertex['dLatitude_degree'] =self.dLatitude_center_degree           
             self.pVertex_center = pyvertex(pVertex)
 
             self.lCellID_downstream_burned=-1

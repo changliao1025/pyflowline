@@ -5,7 +5,9 @@
 #we will use gdal api for most operations
 import os, sys
 from osgeo import ogr, osr, gdal, gdalconst
-
+import numpy as np
+from pyflowline.classes.square import pysquare
+from pyflowline.formats.convert_coordinates import convert_gcs_coordinates_to_cell, convert_pcs_coordinates_to_cell
 
 
 from pyflowline.algorithms.auxiliary.gdal_functions import reproject_coordinates, reproject_coordinates_batch
@@ -19,14 +21,14 @@ def create_square_mesh(dX_left_in, dY_bot_in, dResolution_meter_in, ncolumn_in, 
         os.remove(sFilename_output_in)
 
     pDriver_shapefile = ogr.GetDriverByName('Esri Shapefile')
-    #pDriver_geojson = ogr.GetDriverByName('GeoJSON')
+    pDriver_geojson = ogr.GetDriverByName('GeoJSON')
 
     pDataset_shapefile = pDriver_shapefile.Open(sFilename_spatial_reference_in, 0)
     pLayer_shapefile = pDataset_shapefile.GetLayer(0)
     pSpatial_reference = pLayer_shapefile.GetSpatialRef()   
         
 
-    pDataset = pDriver_shapefile.CreateDataSource(sFilename_output_in)
+    pDataset = pDriver_geojson.CreateDataSource(sFilename_output_in)
     
     pSpatial_reference_gcs = osr.SpatialReference()  
     pSpatial_reference_gcs.ImportFromEPSG(4326)    # WGS84 lat/lon     
@@ -35,11 +37,15 @@ def create_square_mesh(dX_left_in, dY_bot_in, dResolution_meter_in, ncolumn_in, 
     pLayer = pDataset.CreateLayer('cell', pSpatial_reference_gcs, ogr.wkbPolygon)
     # Add one attribute
     pLayer.CreateField(ogr.FieldDefn('id', ogr.OFTInteger64)) #long type for high resolution
-    
-    pLayerDefn = pLayer.GetLayerDefn()
-    pFeature = ogr.Feature(pLayerDefn)
+    pLayer.CreateField(ogr.FieldDefn('lon', ogr.OFTReal)) #long type for high resolution
+    pLayer.CreateField(ogr.FieldDefn('lat', ogr.OFTReal)) #long type for high resolution
+    pArea_field = ogr.FieldDefn('area', ogr.OFTReal)
+    pArea_field.SetWidth(20)
+    pArea_field.SetPrecision(2)
+    pLayer.CreateField(pArea_field)
 
-    
+    pLayerDefn = pLayer.GetLayerDefn()
+    pFeature = ogr.Feature(pLayerDefn)    
 
     xleft = dX_left_in
     xspacing= dResolution_meter_in
@@ -52,6 +58,7 @@ def create_square_mesh(dX_left_in, dY_bot_in, dResolution_meter_in, ncolumn_in, 
     #   |           |
     #(x1,y1)-----(x4,y4)
     #...............
+    aSquare = list()
     for column in range(0, ncolumn_in):
         for row in range(0, nrow_in):
             #define a polygon here
@@ -67,10 +74,7 @@ def create_square_mesh(dX_left_in, dY_bot_in, dResolution_meter_in, ncolumn_in, 
             x4 = xleft + ((column + 1) * xspacing)
             y4 = ybottom + (row * yspacing)
 
-            #x1,y1 = reproject_coordinates(x1, y1, pSpatial_reference)
-            #x2,y2 = reproject_coordinates(x2, y2, pSpatial_reference)
-            #x3,y3 = reproject_coordinates(x3, y3, pSpatial_reference)
-            #x4,y4 = reproject_coordinates(x4, y4, pSpatial_reference)
+           
             x = list()
             x.append(x1)
             x.append(x2)
@@ -92,8 +96,7 @@ def create_square_mesh(dX_left_in, dY_bot_in, dResolution_meter_in, ncolumn_in, 
             y1=y_new[0]
             y2=y_new[1]
             y3=y_new[2]
-            y4=y_new[3]
-          
+            y4=y_new[3]        
            
 
             ring = ogr.Geometry(ogr.wkbLinearRing)
@@ -105,17 +108,40 @@ def create_square_mesh(dX_left_in, dY_bot_in, dResolution_meter_in, ncolumn_in, 
             pPolygon = ogr.Geometry(ogr.wkbPolygon)
             pPolygon.AddGeometry(ring)
 
+            dLon = (x1 + x2 + x3 + x4)/4.0
+            dLat = (y1 + y2 + y3 + y4)/4.0
+            aCoords = np.full((5,2), -9999.0, dtype=float)
+            aCoords[0,0] = x1
+            aCoords[0,1] = y1
+            aCoords[1,0] = x2
+            aCoords[1,1] = y2
+            aCoords[2,0] = x3
+            aCoords[2,1] = y3
+            aCoords[3,0] = x4
+            aCoords[3,1] = y4
+            aCoords[4,0] = x1
+            aCoords[4,1] = y1
+            dummy1= np.array(aCoords)
+
+            pSquare = convert_gcs_coordinates_to_cell(2, dLon, dLat, dummy1)
+            dArea = pSquare.calculate_cell_area()
+
             pFeature.SetGeometry(pPolygon)
             pFeature.SetField("id", lID)
+            pFeature.SetField("lon", dLon )
+            pFeature.SetField("lat", dLat )
+            pFeature.SetField("area", dArea )
             pLayer.CreateFeature(pFeature)
 
             lID = lID + 1
+            aSquare.append(pSquare)
 
 
             pass
+
     pDataset = pLayer = pFeature  = None      
 
 
 
-    return
+    return aSquare
 

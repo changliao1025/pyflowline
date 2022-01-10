@@ -289,16 +289,13 @@ class flowlinecase(object):
     def plot(self, sVariable_in=None, aExtent_in = None):
         if sVariable_in == 'mesh':
             self.plot_mesh()
-        else:
-            if sVariable_in == 'overlap_filter':
-                self.plot_mesh_with_flowline(iFlag_simplified = 1, aExtent_in= aExtent_in)
+        else:            
+            if sVariable_in == 'overlap':
+                self.plot_mesh_with_flowline( aExtent_in= aExtent_in)
             else:
-                if sVariable_in == 'overlap':
-                    self.plot_mesh_with_flowline( aExtent_in= aExtent_in)
-                else:
-                    for pBasin in self.aBasin:            
-                        pBasin.plot(sVariable_in= sVariable_in)
-                        pass
+                for pBasin in self.aBasin:            
+                    pBasin.plot(sVariable_in= sVariable_in)
+                    pass
         
         return
     
@@ -394,7 +391,7 @@ class flowlinecase(object):
         #plt.show()   
         return
 
-    def plot_mesh_with_flowline(self, iFlag_simplified=None, aExtent_in=None):
+    def plot_mesh_with_flowline(self, aExtent_in=None):
         sWorkspace_output_case = self.sWorkspace_output
 
         sFilename_mesh  =  self.sFilename_mesh
@@ -420,8 +417,7 @@ class flowlinecase(object):
         
         for pFeature in pLayer:
             pGeometry_in = pFeature.GetGeometryRef()
-            sGeometry_type = pGeometry_in.GetGeometryName()
-            lID =0 
+            sGeometry_type = pGeometry_in.GetGeometryName()            
             if sGeometry_type =='POLYGON':
                 dummy0 = loads( pGeometry_in.ExportToWkt() )
                 aCoords_gcs = dummy0.exterior.coords
@@ -449,16 +445,39 @@ class flowlinecase(object):
 
                 ax.add_patch(polygon)                   
 
-       
-
-        #plot flowline now
+        #draw base flowline first with black color
+        lID = 0 
         for pBasin in self.aBasin:
-            sWorkspace_output_basin=  pBasin.sWorkspace_output_basin
-            if iFlag_simplified is None:
-                sFilename_out = pBasin.sFilename_flowline_final
-            else:                
-                sFilename = pBasin.sFilename_flowline_segment_order_before_intersect
-                sFilename_out = os.path.join(sWorkspace_output_basin, sFilename)
+            sWorkspace_output_basin=  pBasin.sWorkspace_output_basin                        
+            sFilename = pBasin.sFilename_flowline_segment_order_before_intersect
+            sFilename_out = os.path.join(sWorkspace_output_basin, sFilename)
+            sFilename_json = os.path.join(sWorkspace_output_basin, sFilename_out)
+            pDriver = ogr.GetDriverByName('GeoJSON')
+            pDataset = pDriver.Open(sFilename_json, gdal.GA_ReadOnly)
+            pLayer = pDataset.GetLayer(0)
+            n_colors = pLayer.GetFeatureCount()     
+            for pFeature in pLayer:
+                pGeometry_in = pFeature.GetGeometryRef()
+                sGeometry_type = pGeometry_in.GetGeometryName()
+                if sGeometry_type =='LINESTRING':
+                    dummy0 = loads( pGeometry_in.ExportToWkt() )
+                    aCoords_gcs = dummy0.coords
+                    aCoords_gcs= np.array(aCoords_gcs)
+                    nvertex = len(aCoords_gcs)   
+                    codes = np.full(nvertex, mpath.Path.LINETO, dtype=int )
+                    codes[0] = mpath.Path.MOVETO
+                    path = mpath.Path(aCoords_gcs, codes)            
+                    x, y = zip(*path.vertices)
+                    line, = ax.plot(x, y, color= 'black', linewidth=0.5)
+                    lID = lID + 1
+                pass
+            pass
+
+        #plot new flowline now
+        lID = 0 
+        for pBasin in self.aBasin:
+            sWorkspace_output_basin=  pBasin.sWorkspace_output_basin            
+            sFilename_out = pBasin.sFilename_flowline_final           
             sFilename_json = os.path.join(sWorkspace_output_basin, sFilename_out)
             pDriver = ogr.GetDriverByName('GeoJSON')
             pDataset = pDriver.Open(sFilename_json, gdal.GA_ReadOnly)
@@ -479,7 +498,7 @@ class flowlinecase(object):
                     codes[0] = mpath.Path.MOVETO
                     path = mpath.Path(aCoords_gcs, codes)            
                     x, y = zip(*path.vertices)
-                    line, = ax.plot(x, y, color= colours[lID], linewidth=0.25)
+                    line, = ax.plot(x, y, color= colours[lID], linewidth=1)
                     lID = lID + 1
                 pass
             pass
@@ -488,26 +507,32 @@ class flowlinecase(object):
         if aExtent_in is None:
             marginx  = (dLon_max - dLon_min) / 20
             marginy  = (dLat_max - dLat_min) / 20
-            aExtent_in = [dLon_min - marginx , dLon_max + marginx , dLat_min - marginy , dLat_max + marginy]
-            sTitle = 'Flowline guided ' + sMesh_type.title() + ' mesh'
-            sFilename  = Path(sFilename_mesh).stem + '_flowline.png'
-        else:
-            sTitle = 'Flowline guided ' + sMesh_type.title() + ' mesh'
-            sFilename  = Path(sFilename_mesh).stem + '_flowline_zoom.png'
-       
+            aExtent_in = [dLon_min - marginx , dLon_max + marginx , dLat_min - marginy , dLat_max + marginy]           
+                
         
-        ax.set_extent( aExtent_in )  
-      
+        sTitle = 'Conceptual flowline'
+        sFilename  = Path(sFilename_mesh).stem + '_flowline_final.png'                      
+        
+        ax.set_extent( aExtent_in )        
 
         ax.coastlines()#resolution='110m')
         ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True,
-                      linewidth=1, color='gray', alpha=0.3, linestyle='--')
+                      linewidth=0.2, color='gray', alpha=0.3, linestyle='--')
         
         ax.set_title( sTitle )
-        #ax.text(0.95, 0.95, sMesh_type, \
-        #verticalalignment='top', horizontalalignment='right',\
-        #        transform=ax.transAxes, \
-        #        color='black', fontsize=15)
+        sText = 'Mesh type: ' + sMesh_type.title()
+        ax.text(0.05, 0.95, sText, \
+        verticalalignment='top', horizontalalignment='left',\
+                transform=ax.transAxes, \
+                color='black', fontsize=8)
+        
+        sResolution =  'Resolution: ' + "{:0d}".format( int(self.dResolution_meter) ) + 'm'
+
+        if self.sMesh_type != 'mpas':
+            ax.text(0.05, 0.90, sResolution, \
+                verticalalignment='top', horizontalalignment='left',\
+                transform=ax.transAxes, \
+                color='black', fontsize=8)
 
         
         

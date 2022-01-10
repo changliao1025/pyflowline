@@ -13,8 +13,8 @@ class pysquare(pycell):
     dArea=0.0
     dX_center_meter=0.0
     dY_center_meter=0.0
-    dLongitude_center=0.0
-    dLatitude_center=0.0
+    dLongitude_center_degree=0.0
+    dLatitude_center_degree=0.0
     aEdge=None
     aVertex=None
     aFlowline=None
@@ -23,7 +23,7 @@ class pysquare(pycell):
     nNeighbor=-1
     pVertex_center = None
 
-    def __init__(self, aEdge, aVertex, dLon, dLat):    
+    def __init__(self, dLon, dLat, aEdge, aVertex):    
         nEdge = len(aEdge)
         if nEdge != 4:
             pass
@@ -36,11 +36,12 @@ class pysquare(pycell):
             self.nVertex = 4
         
 
-            self.dLongitude_center = dLon
-            self.dLatitude_center = dLat
+            self.dLongitude_center_degree = dLon
+            self.dLatitude_center_degree = dLat
             pVertex = dict()        
-            pVertex['lon'] =self.dLongitude_center
-            pVertex['lat'] =self.dLatitude_center           
+            pVertex['dLongitude_degree'] =self.dLongitude_center_degree
+
+            pVertex['dLatitude_degree'] =self.dLatitude_center_degree         
             self.pVertex_center = pyvertex(pVertex)
 
             self.lCellID_downstream_burned=-1
@@ -82,8 +83,8 @@ class pysquare(pycell):
         
         for i in range(self.nVertex):
             
-            lons.append( self.aVertex[i].dLongitude )
-            lats.append( self.aVertex[i].dLatitude )
+            lons.append( self.aVertex[i].dLongitude_degree )
+            lats.append( self.aVertex[i].dLatitude_degree )
 
 
         self.dArea = calculate_polygon_area(lats, lons)

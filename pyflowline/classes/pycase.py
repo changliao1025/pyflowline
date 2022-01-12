@@ -28,7 +28,7 @@ from pyflowline.mesh.latlon.create_latlon_mesh import create_latlon_mesh
 from pyflowline.mesh.square.create_square_mesh import create_square_mesh
 from pyflowline.mesh.mpas.create_mpas_mesh import create_mpas_mesh
 from pyflowline.mesh.tin.create_tin_mesh import create_tin_mesh
-
+from pyflowline.formats.convert_shapefile_to_json import convert_shapefile_to_json_swat
 
 
 from pyflowline.algorithms.auxiliary.gdal_functions import reproject_coordinates
@@ -543,6 +543,194 @@ class flowlinecase(object):
         #plt.show()   
         return
 
+    def compare_with_raster_dem_method(self, sFilename_dem_flowline, aExtent_in=None):
+        sWorkspace_output_case = self.sWorkspace_output
+
+        sFilename_mesh  =  self.sFilename_mesh
+        sMesh_type = self.sMesh_type
+
+        fig = plt.figure( dpi=300 )
+        fig.set_figwidth( 4 )
+        fig.set_figheight( 4 )
+        ax = fig.add_axes([0.1, 0.15, 0.75, 0.7] , projection=desired_proj )
+
+        ax.set_global()
+        pDriver = ogr.GetDriverByName('GeoJSON')
+        pDataset = pDriver.Open(sFilename_mesh, gdal.GA_ReadOnly)
+        pLayer = pDataset.GetLayer(0)
+    
+        pSrs = osr.SpatialReference()  
+        pSrs.ImportFromEPSG(4326)    # WGS84 lat/lon
+
+        dLat_min = 90
+        dLat_max = -90
+        dLon_min = 180
+        dLon_max = -180
+        
+        for pFeature in pLayer:
+            pGeometry_in = pFeature.GetGeometryRef()
+            sGeometry_type = pGeometry_in.GetGeometryName()            
+            if sGeometry_type =='POLYGON':
+                dummy0 = loads( pGeometry_in.ExportToWkt() )
+                aCoords_gcs = dummy0.exterior.coords
+                aCoords_gcs= np.array(aCoords_gcs)
+                nvertex = len(aCoords_gcs)
+
+                for i in range(nvertex):
+                    dLon = aCoords_gcs[i][0]
+                    dLat = aCoords_gcs[i][1]
+                    if dLon > dLon_max:
+                        dLon_max = dLon
+
+                    if dLon < dLon_min:
+                        dLon_min = dLon
+
+                    if dLat > dLat_max:
+                        dLat_max = dLat
+
+                    if dLat < dLat_min:
+                        dLat_min = dLat
+
+                polygon = mpatches.Polygon(aCoords_gcs[:,0:2], closed=True,   linewidth=0.25, \
+                    alpha=0.8, edgecolor = 'black',facecolor='none', \
+                        transform=ccrs.PlateCarree() )
+
+                ax.add_patch(polygon)                   
+
+        #draw base flowline first with black color
+        lID = 0 
+        for pBasin in self.aBasin:
+            sWorkspace_output_basin=  pBasin.sWorkspace_output_basin                        
+            sFilename = pBasin.sFilename_flowline_segment_order_before_intersect
+            sFilename_out = os.path.join(sWorkspace_output_basin, sFilename)
+            sFilename_json = os.path.join(sWorkspace_output_basin, sFilename_out)
+            pDriver = ogr.GetDriverByName('GeoJSON')
+            pDataset = pDriver.Open(sFilename_json, gdal.GA_ReadOnly)
+            pLayer = pDataset.GetLayer(0)
+            n_colors = pLayer.GetFeatureCount()     
+            for pFeature in pLayer:
+                pGeometry_in = pFeature.GetGeometryRef()
+                sGeometry_type = pGeometry_in.GetGeometryName()
+                if sGeometry_type =='LINESTRING':
+                    dummy0 = loads( pGeometry_in.ExportToWkt() )
+                    aCoords_gcs = dummy0.coords
+                    aCoords_gcs= np.array(aCoords_gcs)
+                    nvertex = len(aCoords_gcs)   
+                    codes = np.full(nvertex, mpath.Path.LINETO, dtype=int )
+                    codes[0] = mpath.Path.MOVETO
+                    path = mpath.Path(aCoords_gcs, codes)            
+                    x, y = zip(*path.vertices)
+                    line, = ax.plot(x, y, color= 'black', linewidth=0.5)
+                    lID = lID + 1
+                pass
+            pass
+
+        #plot new flowline now
+        lID = 0 
+        for pBasin in self.aBasin:
+            sWorkspace_output_basin=  pBasin.sWorkspace_output_basin            
+            sFilename_out = pBasin.sFilename_flowline_final           
+            sFilename_json = os.path.join(sWorkspace_output_basin, sFilename_out)
+            pDriver = ogr.GetDriverByName('GeoJSON')
+            pDataset = pDriver.Open(sFilename_json, gdal.GA_ReadOnly)
+            pLayer = pDataset.GetLayer(0)
+            
+            for pFeature in pLayer:
+                pGeometry_in = pFeature.GetGeometryRef()
+                sGeometry_type = pGeometry_in.GetGeometryName()
+                if sGeometry_type =='LINESTRING':
+                    dummy0 = loads( pGeometry_in.ExportToWkt() )
+                    aCoords_gcs = dummy0.coords
+                    aCoords_gcs= np.array(aCoords_gcs)
+                    nvertex = len(aCoords_gcs)   
+                    codes = np.full(nvertex, mpath.Path.LINETO, dtype=int )
+                    codes[0] = mpath.Path.MOVETO
+                    path = mpath.Path(aCoords_gcs, codes)            
+                    x, y = zip(*path.vertices)
+                    line, = ax.plot(x, y, color= 'blue', linewidth=1)
+                    lID = lID + 1
+                pass
+            pass
+
+        #now swat result
+        #conver file first
+        for pBasin in self.aBasin:
+            sWorkspace_output_basin=  pBasin.sWorkspace_output_basin 
+            sFilename_swat = os.path.join(sWorkspace_output_basin, 'swat.json')
+            convert_shapefile_to_json_swat(1, sFilename_dem_flowline, sFilename_swat)
+            pDriver = ogr.GetDriverByName('GeoJSON')
+            pDataset = pDriver.Open(sFilename_swat, gdal.GA_ReadOnly)
+            pLayer = pDataset.GetLayer(0)
+           
+            for pFeature in pLayer:
+                pGeometry_in = pFeature.GetGeometryRef()
+                sGeometry_type = pGeometry_in.GetGeometryName()
+                if sGeometry_type =='LINESTRING':
+                    dummy0 = loads( pGeometry_in.ExportToWkt() )
+                    aCoords_gcs = dummy0.coords
+                    aCoords_gcs= np.array(aCoords_gcs)
+                    nvertex = len(aCoords_gcs)   
+
+                    codes = np.full(nvertex, mpath.Path.LINETO, dtype=int )
+                    codes[0] = mpath.Path.MOVETO
+                    path = mpath.Path(aCoords_gcs, codes)            
+                    x, y = zip(*path.vertices)
+                    line, = ax.plot(x, y, color= 'red', linewidth=1)
+                    lID = lID + 1
+                pass
+            pass
+            #plot new
+
+        
+        sDirname = os.path.dirname(sFilename_mesh)
+        if aExtent_in is None:
+            marginx  = (dLon_max - dLon_min) / 20
+            marginy  = (dLat_max - dLat_min) / 20
+            aExtent_in = [dLon_min - marginx , dLon_max + marginx , dLat_min - marginy , dLat_max + marginy]           
+                
+        
+        sTitle = 'Conceptual flowline'
+        sFilename  = Path(sFilename_mesh).stem + '_flowline_compare_zoom.png'                      
+        
+        ax.set_extent( aExtent_in )        
+
+        ax.coastlines()#resolution='110m')
+        ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True,
+                      linewidth=0.2, color='gray', alpha=0.3, linestyle='--')
+        
+        ax.set_title( sTitle )
+        sText = 'Mesh type: ' + sMesh_type.title()
+        ax.text(0.05, 0.95, sText, \
+        verticalalignment='top', horizontalalignment='left',\
+                transform=ax.transAxes, \
+                color='black', fontsize=8)
+        
+        sResolution =  'Resolution: ' + "{:0d}".format( int(self.dResolution_meter) ) + 'm'
+
+        if self.sMesh_type != 'mpas':
+            ax.text(0.05, 0.90, sResolution, \
+                verticalalignment='top', horizontalalignment='left',\
+                transform=ax.transAxes, \
+                color='black', fontsize=8)
+        
+        sText = 'Topologic relationship-based'
+        ax.text(0.05, 0.85, sText, \
+        verticalalignment='top', horizontalalignment='left',\
+                transform=ax.transAxes, \
+                color='blue', fontsize=8)
+        
+        sText = 'Raster DEM-based'
+        ax.text(0.05, 0.80, sText, \
+        verticalalignment='top', horizontalalignment='left',\
+                transform=ax.transAxes, \
+                color='red', fontsize=8)
+        
+        
+        sFilename_out = os.path.join(sDirname, sFilename)
+        plt.savefig(sFilename_out, bbox_inches='tight')
+
+        pDataset = pLayer = pFeature  = None   
+        return
     def preprocess_flowline(self):
         aFlowline_out = list()   #store all the flowline
         if self.iFlag_simplification == 1: 

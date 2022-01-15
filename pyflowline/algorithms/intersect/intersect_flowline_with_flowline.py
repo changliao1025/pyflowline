@@ -1,4 +1,5 @@
 
+
 import os
 import json
 import numpy as np
@@ -14,9 +15,9 @@ from pyflowline.formats.convert_coordinates import convert_gcs_coordinates_to_ce
 from pyflowline.formats.convert_coordinates import convert_gcs_coordinates_to_flowline, convert_pcs_coordinates_to_flowline
 
 
-def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh_in, sFilename_flowline_in, sFilename_output_in):
+def intersect_flowline_with_flowline(iMesh_type_in, sFilename_flowline_a_in, sFilename_flowline_b_in, sFilename_output_in):
 
-    if  os.path.exists(sFilename_mesh_in) and  os.path.exists(sFilename_flowline_in) : 
+    if  os.path.exists(sFilename_flowline_a_in) and  os.path.exists(sFilename_flowline_b_in) : 
         pass
     else:
         print('The input file does not exist')
@@ -34,29 +35,29 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh_in, sFilename_flo
     aCell=list()
     aCell_intersect=list()    
    
-    pDataset_mesh = pDriver_geojson.Open(sFilename_mesh_in, 0)
-    pDataset_flowline = pDriver_geojson.Open(sFilename_flowline_in, 0)   
+    pDataset_flowline_a = pDriver_geojson.Open(sFilename_flowline_a_in, 0)
+    pDataset_flowline_b = pDriver_geojson.Open(sFilename_flowline_b_in, 0)   
 
-    pLayer_mesh = pDataset_mesh.GetLayer(0)
-    pSpatial_reference_mesh = pLayer_mesh.GetSpatialRef()
-    nfeature_mesh = pLayer_mesh.GetFeatureCount()
+    pLayer_flowline_a = pDataset_flowline_a.GetLayer(0)
+    pSpatial_reference_a = pLayer_flowline_a.GetSpatialRef()
+    nfeature_flowline_a = pLayer_flowline_a.GetFeatureCount()
 
-    pLayer_flowline = pDataset_flowline.GetLayer(0)
-    pSpatial_reference_flowline = pLayer_flowline.GetSpatialRef()
-    nfeature_flowline = pLayer_flowline.GetFeatureCount()
-    pLayerDefinition = pLayer_flowline.GetLayerDefn()
+    pLayer_flowline_b = pDataset_flowline_b.GetLayer(0)
+    pSpatial_reference_b = pLayer_flowline_b.GetSpatialRef()
+    nfeature_flowline_b = pLayer_flowline_b.GetFeatureCount()
+    pLayerDefinition = pLayer_flowline_b.GetLayerDefn()
     
     #print( pSpatial_reference_flowline)
-    comparison = pSpatial_reference_mesh.IsSame(pSpatial_reference_flowline)
+    comparison = pSpatial_reference_a.IsSame(pSpatial_reference_b)
     if(comparison != 1):
         iFlag_transform = 1
-        transform = osr.CoordinateTransformation(pSpatial_reference_mesh, pSpatial_reference_flowline)
+        transform = osr.CoordinateTransformation(pSpatial_reference_a, pSpatial_reference_b)
     else:
         iFlag_transform = 0
 
     pDataset_out = pDriver_geojson.CreateDataSource(sFilename_output_in)
 
-    pLayerOut = pDataset_out.CreateLayer('flowline', pSpatial_reference_flowline, ogr.wkbMultiLineString)
+    pLayerOut = pDataset_out.CreateLayer('flowline', pSpatial_reference_b, ogr.wkbMultiLineString)
     # Add one attribute
     pLayerOut.CreateField(ogr.FieldDefn('id', ogr.OFTInteger64)) #long type for high resolution
     pLayerOut.CreateField(ogr.FieldDefn('iseg', ogr.OFTInteger)) #long type for high resolution
@@ -68,7 +69,7 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh_in, sFilename_flo
 
     aFlowline_intersect_all=list()
     #for i in range (nfeature_mesh):
-    for pFeature_mesh in pLayer_mesh:
+    for pFeature_mesh in pLayer_flowline_a:
        
         #pFeature_mesh= pLayer_mesh.GetFeature(i)
         pGeometry_mesh = pFeature_mesh.GetGeometryRef()        
@@ -100,9 +101,9 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh_in, sFilename_flo
                      
             aFlowline_intersect = list()
             iFlag_intersected = 0 
-            for j in range (nfeature_flowline):
+            for j in range (nfeature_flowline_b):
             #for pFeature_flowline in pLayer_flowline:
-                pFeature_flowline = pLayer_flowline.GetFeature(j)
+                pFeature_flowline = pLayer_flowline_b.GetFeature(j)
                 pGeometry_flowline = pFeature_flowline.GetGeometryRef()
 
                 iStream_segment = pFeature_flowline.GetField("iseg")

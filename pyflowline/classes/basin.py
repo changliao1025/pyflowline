@@ -59,6 +59,10 @@ from pyflowline.algorithms.merge.merge_flowline import merge_flowline
 
 from pyflowline.algorithms.index.define_stream_order import define_stream_order
 from pyflowline.algorithms.index.define_stream_segment_index import define_stream_segment_index
+from pyflowline.algorithms.area.calculate_area_of_difference import calculate_area_of_difference_simplified
+
+from pyflowline.algorithms.intersect.intersect_flowline_with_flowline import intersect_flowline_with_flowline
+
 
 desired_proj = ccrs.Orthographic(central_longitude=-75, central_latitude=42, globe=None)
 desired_proj = ccrs.PlateCarree()
@@ -542,4 +546,23 @@ class pybasin(object):
             self.dLatitude_outlet_degree = pVertex_outlet.dLatitude_degree
         except:
             print('Intersection failed')
+        return
+
+    def evaluate(self):
+
+        sFilename_simplified =  self.sFilename_flowline_segment_order_before_intersect
+        sFilename_simplified= os.path.join(self.sWorkspace_output_basin, sFilename_simplified)
+
+        sFilename_final = self.sFilename_flowline_final
+        sFilename_final= os.path.join(self.sWorkspace_output_basin, sFilename_final)
+
+        
+        #intersect first
+        sFilename_output= os.path.join(self.sWorkspace_output_basin, 'intersect_flowline.json')
+        intersect_flowline_with_flowline(sFilename_simplified, sFilename_final, sFilename_output)
+
+        #plot diff
+        sFilename_output = os.path.join(self.sWorkspace_output_basin, 'area_of_diff.png')
+
+        #calculate_area_of_difference_simplified(sFilename_simplified , sFilename_final, sFilename_output)
         return

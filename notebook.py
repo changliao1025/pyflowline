@@ -45,7 +45,9 @@ aExtent_zoom = [-77.3,-76.5, 40.2,41.0] #confluence
 #oPyflowline.plot(sVariable_in = 'overlap',aExtent_in=aExtent_full )
 
 
-sFilename_dem_flowline ='/qfs/people/liao313/data/hexwatershed/susquehanna/vector/swat/swat10k.shp'
-oPyflowline.compare_with_raster_dem_method(sFilename_dem_flowline,aExtent_in=aExtent_zoom )
+#sFilename_dem_flowline ='/qfs/people/liao313/data/hexwatershed/susquehanna/vector/swat/swat10k.shp'
+#oPyflowline.compare_with_raster_dem_method(sFilename_dem_flowline,aExtent_in=aExtent_zoom )
+
+oPyflowline.evaluate()
 
 print('Finished')

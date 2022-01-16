@@ -30,30 +30,9 @@ from pyflowline.mesh.mpas.create_mpas_mesh import create_mpas_mesh
 from pyflowline.mesh.tin.create_tin_mesh import create_tin_mesh
 from pyflowline.formats.convert_shapefile_to_json import convert_shapefile_to_json_swat
 
-
 from pyflowline.algorithms.auxiliary.gdal_functions import reproject_coordinates
-from pyflowline.formats.read_flowline import read_flowline_shapefile
 
 from pyflowline.formats.read_mesh import read_mesh_json
-from pyflowline.formats.read_flowline import read_flowline_geojson
-from pyflowline.formats.export_vertex import export_vertex_to_json
-from pyflowline.formats.export_flowline import export_flowline_to_json
-from pyflowline.algorithms.intersect.intersect_flowline_with_mesh import intersect_flowline_with_mesh
-
-from pyflowline.algorithms.simplification.remove_returning_flowline import remove_returning_flowline
-from pyflowline.algorithms.simplification.remove_duplicate_flowline import remove_duplicate_flowline
-from pyflowline.algorithms.simplification.remove_duplicate_edge import remove_duplicate_edge
-from pyflowline.algorithms.direction.correct_flowline_direction import correct_flowline_direction
-from pyflowline.algorithms.loop.remove_flowline_loop import remove_flowline_loop
-from pyflowline.algorithms.split.find_flowline_vertex import find_flowline_vertex
-from pyflowline.algorithms.split.find_flowline_confluence import find_flowline_confluence
-from pyflowline.algorithms.split.split_flowline import split_flowline
-from pyflowline.algorithms.split.split_flowline_to_edge import split_flowline_to_edge
-
-from pyflowline.algorithms.merge.merge_flowline import merge_flowline
-
-from pyflowline.algorithms.index.define_stream_order import define_stream_order
-from pyflowline.algorithms.index.define_stream_segment_index import define_stream_segment_index
 
 import cartopy.crs as ccrs
 
@@ -884,6 +863,12 @@ class flowlinecase(object):
 
         return
 
+    def evaluate(self):
+
+        for pBasin in self.aBasin:
+
+            pBasin.evaluate()
+        return
 
     def tojson(self):
         sJson = json.dumps(self.__dict__, \

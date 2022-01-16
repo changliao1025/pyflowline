@@ -29,10 +29,7 @@ def intersect_flowline_with_flowline( sFilename_flowline_a_in, sFilename_flowlin
 
     
     pDriver_geojson = ogr.GetDriverByName( "GeoJSON")
-    #pDriver_shapefile = ogr.GetDriverByName('ESRI Shapefile' )
 
-    
-   
     pDataset_flowline_a = pDriver_geojson.Open(sFilename_flowline_a_in, 0)
     pDataset_flowline_b = pDriver_geojson.Open(sFilename_flowline_b_in, 0)   
 
@@ -64,7 +61,7 @@ def intersect_flowline_with_flowline( sFilename_flowline_a_in, sFilename_flowlin
    
     lID_flowline = 0           
 
-    aFlowline_intersect_all=list()
+    aVertex_intersect=list()
     #for i in range (nfeature_mesh):
     for pFeature_flowline_a in pLayer_flowline_a:
        
@@ -114,12 +111,25 @@ def intersect_flowline_with_flowline( sFilename_flowline_a_in, sFilename_flowlin
                             pFeatureOut.SetField("id", lID_flowline)         
                             pLayerOut.CreateFeature(pFeatureOut)    
                             lID_flowline = lID_flowline + 1
+
+                            point0= dict()   
+                            point0['dLongitude_degree'] = point.GetX()
+                            point0['dLatitude_degree'] = point.GetY()
+                            pVertex=pyvertex(point0)
+                            aVertex_intersect.append(pVertex)
                     else:
                         #print(pGeometrytype_intersect)
                         pFeatureOut.SetGeometry(pGeometry_intersect)
                         pFeatureOut.SetField("id", lID_flowline)         
                         pLayerOut.CreateFeature(pFeatureOut)    
                         lID_flowline = lID_flowline + 1
+
+                        point= dict()   
+                        point['dLongitude_degree'] = pGeometry_intersect.GetX()
+                        point['dLatitude_degree'] = pGeometry_intersect.GetY()
+                        pVertex=pyvertex(point)
+
+                        aVertex_intersect.append(pVertex)
                     
                     
                 else:
@@ -131,4 +141,4 @@ def intersect_flowline_with_flowline( sFilename_flowline_a_in, sFilename_flowlin
             pass
 
     pDataset_out = pLayerOut = None
-    return   aFlowline_intersect_all
+    return   aVertex_intersect

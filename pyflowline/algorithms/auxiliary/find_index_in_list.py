@@ -34,7 +34,44 @@ def find_vertex_in_list(aVertex_in, pVertex_in):
         pass
     
     return iFlag_exist, lIndex
-   
+
+def find_vertex_on_edge(aVertex_in, pEdge_in):
+    iFlag_exist = 0
+    aIndex= list()
+    aIndex_order=list()
+    aDistance=list()
+    nVertex= len(aVertex_in)
+    npoint = 0
+    
+    if nVertex > 0 :
+        for i in np.arange( nVertex):
+            pVertex = aVertex_in[i]
+
+            if pEdge_in.check_vertex_on_edge(pVertex) == 1:
+                iFlag_exist = 1      
+                dis = pEdge_in.pVertex_start.calculate_distance(pVertex)
+                aDistance.append(dis)
+                aIndex.append(i) 
+                npoint = npoint + 1          
+            else:
+                pass
+
+        #re-order 
+        if iFlag_exist == 1 :
+            x = np.array(aDistance)
+            b = np.argsort(x)
+            c = np.array(aIndex)
+            d= c[b]
+            aIndex_order = list(d)
+        
+    else:
+        pass
+
+
+    
+    return iFlag_exist, npoint , aIndex_order
+
+
 def find_edge_in_list(aEdge_in, pEdge_in):
     """[find the index of an edge in a list]
 

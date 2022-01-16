@@ -115,13 +115,18 @@ class pyedge(object):
         pVertex_start = self.pVertex_start
         pVertex_end = self.pVertex_end
         self.dLength = pVertex_start.calculate_distance(pVertex_end)
-        d1 = pVertex_start.calculate_distance(pVertex_in)
-        d2 = pVertex_end.calculate_distance(pVertex_in)
-        d3 = d1 +d2 -self.dLength
-        if ( d3 < 10.0   ):#care
-            iFlag = 1
+        if pVertex_in != pVertex_start and pVertex_in!=pVertex_end:
+            
+            d1 = pVertex_start.calculate_distance(pVertex_in)
+            d2 = pVertex_end.calculate_distance(pVertex_in)
+            d3 = d1 +d2 -self.dLength
+            if ( d3 < 1.0   ):#care
+                iFlag = 1
+            else:
+                iFlag = 0 
         else:
-            iFlag = 0 
+                iFlag = 0 
+
         return iFlag 
     
     def __eq__(self, other):                

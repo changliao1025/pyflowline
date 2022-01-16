@@ -11,6 +11,8 @@ import matplotlib.path as mpath
 import matplotlib.patches as mpatches
 from matplotlib import cm
 
+
+
 import cartopy.crs as ccrs
 import cartopy.io.img_tiles as cimgt
 
@@ -559,10 +561,67 @@ class pybasin(object):
         
         #intersect first
         sFilename_output= os.path.join(self.sWorkspace_output_basin, 'intersect_flowline.json')
-        intersect_flowline_with_flowline(sFilename_simplified, sFilename_final, sFilename_output)
+        aVertex_intersect = intersect_flowline_with_flowline(sFilename_simplified, sFilename_final, sFilename_output)
+
+        #get confluence simple
+        aFlowline_simplified,pSpatial_reference = read_flowline_geojson( sFilename_simplified )   
+        
+        point= dict()   
+        point['dLongitude_degree'] = self.dLongitude_outlet_degree
+        point['dLatitude_degree'] = self.dLatitude_outlet_degree
+        pVertex_outlet=pyvertex(point)
+
+        aVertex_simplified, lIndex_outlet_simplified, \
+            aIndex_headwater_simplified, aIndex_middle, \
+                aIndex_confluence_simplified, aConnectivity\
+                = find_flowline_confluence(aFlowline_simplified,  pVertex_outlet)
 
         #plot diff
-        sFilename_output = os.path.join(self.sWorkspace_output_basin, 'area_of_diff.png')
+        aFlowline_conceptual,pSpatial_reference = read_flowline_geojson( sFilename_final ) 
+        aVertex_conceptual, lIndex_outlet_conceptual, \
+            aIndex_headwater_conceptual,\
+            aIndex_middle, aIndex_confluence_conceptual, \
+                aConnectivity\
+                = find_flowline_confluence(aFlowline_conceptual,  pVertex_outlet)
 
-        #calculate_area_of_difference_simplified(sFilename_simplified , sFilename_final, sFilename_output)
+        #merge confluence
+        a=np.array(aIndex_confluence_simplified)
+        b=np.array(aIndex_confluence_conceptual)
+        c = list(np.array(aVertex_simplified)[a] )
+        d= list(np.array(aVertex_conceptual)[b] )
+        e= c+d + aVertex_intersect
+        f = np.array(aIndex_headwater_simplified)
+        g = np.array(aIndex_headwater_conceptual)
+        h0 =list(np.array(aVertex_simplified)[f] )
+        h1 =list(np.array(aVertex_conceptual)[g] )
+
+        o0 =aVertex_simplified[lIndex_outlet_simplified] 
+        o1 =aVertex_conceptual[lIndex_outlet_conceptual]
+
+        aHeadwater = h0 + h1 
+        aHeadwater.append(o0)
+        aHeadwater.append(o1)
+
+        #export 
+        sFilename_output= os.path.join(self.sWorkspace_output_basin, 'intersect_flowline_all.json')
+        export_vertex_to_json( e, sFilename_output)
+
+
+        #split
+        aFlowline_all = aFlowline_simplified + aFlowline_conceptual
+        aFlowline_simplified_split = split_flowline(aFlowline_simplified, e)
+        sFilename_out = 'split_flowline_simplified.json'
+        sFilename_out = os.path.join(self.sWorkspace_output_basin, sFilename_out)
+        export_flowline_to_json(aFlowline_simplified_split, sFilename_out)
+        aFlowline_conceptual_split = split_flowline(aFlowline_conceptual, e)
+        sFilename_out = 'split_flowline_conceptual.json'
+        sFilename_out = os.path.join(self.sWorkspace_output_basin, sFilename_out)
+        export_flowline_to_json(aFlowline_conceptual_split, sFilename_out)
+
+        aFlowline_all = aFlowline_simplified_split + aFlowline_conceptual_split
+
+        sFilename_output = os.path.join(self.sWorkspace_output_basin, 'area_diff_polygon.json')
+        #remove headwater not needed here
+
+        calculate_area_of_difference_simplified(aFlowline_all, sFilename_output)
         return

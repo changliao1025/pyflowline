@@ -14,7 +14,7 @@ else:
         sFilename_configuration_in = str(Path.cwd()) +  '/configurations/pyflowline_susquehanna_hexagon.json' 
         sFilename_configuration_in = str(Path.cwd()) +  '/configurations/pyflowline_susquehanna_mpas.json' 
         #sFilename_configuration_in = str(Path.cwd()) +  '/configurations/pyflowline_susquehanna_latlon.json' 
-        sFilename_configuration_in = str(Path.cwd()) +  '/configurations/pyflowline_susquehanna_square.json' 
+        #sFilename_configuration_in = str(Path.cwd()) +  '/configurations/pyflowline_susquehanna_square.json' 
         #mac
         #sFilename_configuration_in = '/Users/liao313/workspace/python/pyflowline/configurations/pyflowline_susquehanna_hexagon_mac.json'
         print(sFilename_configuration_in)

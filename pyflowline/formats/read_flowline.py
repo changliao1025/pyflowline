@@ -184,11 +184,27 @@ def read_flowline_geojson(sFilename_geojson_in):
     pLayer_geojson = pDataset_geojson.GetLayer(0)
     pSpatialRef_geojson = pLayer_geojson.GetSpatialRef()
 
+
+    ldefn = pLayer_geojson.GetLayerDefn()
+    schema =list()
+    for n in range(ldefn.GetFieldCount()):
+        fdefn = ldefn.GetFieldDefn(n)
+        schema.append(fdefn.name)
+    if 'iseg' in schema:
+        iFlag_segment = 1
+    else:
+        iFlag_segment = 0    
+
     lID = 0
     for pFeature_geojson in pLayer_geojson:
         pGeometry_geojson = pFeature_geojson.GetGeometryRef()
         pGeometry_in = pFeature_geojson.GetGeometryRef()
         sGeometry_type = pGeometry_in.GetGeometryName()
+
+        if iFlag_segment ==1:
+            iStream_segment = pFeature_geojson.GetField("iseg")
+        else:
+            iStream_segment = -1
         
         if sGeometry_type =='LINESTRING':
             dummy = loads( pGeometry_in.ExportToWkt() )
@@ -196,6 +212,7 @@ def read_flowline_geojson(sFilename_geojson_in):
             dummy1= np.array(aCoords)
             pLine = convert_gcs_coordinates_to_flowline(dummy1)
             pLine.lIndex = lID
+            pLine.iStream_segment = iStream_segment
             aFlowline.append(pLine)
             lID = lID + 1
             

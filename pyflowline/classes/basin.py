@@ -41,6 +41,7 @@ from pyflowline.algorithms.simplification.remove_small_river import remove_small
 from pyflowline.algorithms.index.define_stream_order import define_stream_order
 from pyflowline.algorithms.index.define_stream_segment_index import define_stream_segment_index
 
+from pyflowline.algorithms.auxiliary.find_index_in_list import find_vertex_in_list, find_vertex_on_edge
 from pyflowline.formats.read_mesh import read_mesh_json
 
 from pyflowline.formats.export_vertex import export_vertex_to_json
@@ -595,6 +596,13 @@ class pybasin(object):
         g = np.array(aIndex_headwater_conceptual)
         h0 =list(np.array(aVertex_simplified)[f] )
         h1 =list(np.array(aVertex_conceptual)[g] )
+        aVertex_all =list()
+        for i in e:
+            iFlag_exist, lIndex = find_vertex_in_list( aVertex_all,  i)
+            if iFlag_exist ==1:
+                pass
+            else:
+                aVertex_all.append(i)
 
         o0 =aVertex_simplified[lIndex_outlet_simplified] 
         o1 =aVertex_conceptual[lIndex_outlet_conceptual]
@@ -605,16 +613,16 @@ class pybasin(object):
 
         #export 
         sFilename_output= os.path.join(self.sWorkspace_output_basin, 'intersect_flowline_all.json')
-        export_vertex_to_json( e, sFilename_output)
+        export_vertex_to_json( aVertex_all, sFilename_output)
 
 
         #split
         aFlowline_all = aFlowline_simplified + aFlowline_conceptual
-        aFlowline_simplified_split = split_flowline(aFlowline_simplified, e,iFlag_intersect =1)
+        aFlowline_simplified_split = split_flowline(aFlowline_simplified, aVertex_all,iFlag_intersect =1)
         sFilename_out = 'split_flowline_simplified.json'
         sFilename_out = os.path.join(self.sWorkspace_output_basin, sFilename_out)
         export_flowline_to_json(aFlowline_simplified_split, sFilename_out)
-        aFlowline_conceptual_split = split_flowline(aFlowline_conceptual, e,iFlag_intersect =1)
+        aFlowline_conceptual_split = split_flowline(aFlowline_conceptual, aVertex_all,iFlag_intersect =1)
         sFilename_out = 'split_flowline_conceptual.json'
         sFilename_out = os.path.join(self.sWorkspace_output_basin, sFilename_out)
         export_flowline_to_json(aFlowline_conceptual_split, sFilename_out)

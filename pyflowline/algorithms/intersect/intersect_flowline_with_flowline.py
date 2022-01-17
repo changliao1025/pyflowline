@@ -11,6 +11,7 @@ from shapely.wkt import loads
 from pyflowline.classes.vertex import pyvertex
 from pyflowline.classes.hexagon import pyhexagon
 
+from pyflowline.algorithms.auxiliary.find_index_in_list import find_vertex_in_list, find_vertex_on_edge
 from pyflowline.formats.convert_coordinates import convert_gcs_coordinates_to_cell, convert_pcs_coordinates_to_cell
 from pyflowline.formats.convert_coordinates import convert_gcs_coordinates_to_flowline, convert_pcs_coordinates_to_flowline
 
@@ -106,39 +107,49 @@ def intersect_flowline_with_flowline( sFilename_flowline_a_in, sFilename_flowlin
                     if pGeometrytype_intersect == 'MULTIPOINT':
                         npoint = pGeometry_intersect.GetGeometryCount()
                         for i  in range(npoint): 
-                            point = pGeometry_intersect.GetGeometryRef(i)
-                            pFeatureOut.SetGeometry(point)
-                            pFeatureOut.SetField("id", lID_flowline)         
-                            pLayerOut.CreateFeature(pFeatureOut)    
-                            lID_flowline = lID_flowline + 1
+                            point = pGeometry_intersect.GetGeometryRef(i)                            
 
                             point0= dict()   
                             point0['dLongitude_degree'] = point.GetX()
                             point0['dLatitude_degree'] = point.GetY()
                             pVertex=pyvertex(point0)
-                            aVertex_intersect.append(pVertex)
+                            iFlag_exist, lIndex = find_vertex_in_list( aVertex_intersect,  pVertex)
+                            if iFlag_exist ==1:
+                                pass
+                            else:
+                                #only save it if it differs
+                                aVertex_intersect.append(pVertex)
+                                pFeatureOut.SetGeometry(point)
+                                pFeatureOut.SetField("id", lID_flowline)         
+                                pLayerOut.CreateFeature(pFeatureOut)    
+                                lID_flowline = lID_flowline + 1
+
                     else:
-                        #print(pGeometrytype_intersect)
-                        pFeatureOut.SetGeometry(pGeometry_intersect)
-                        pFeatureOut.SetField("id", lID_flowline)         
-                        pLayerOut.CreateFeature(pFeatureOut)    
-                        lID_flowline = lID_flowline + 1
+                        #print(pGeometrytype_intersect)                      
 
                         point= dict()   
                         point['dLongitude_degree'] = pGeometry_intersect.GetX()
                         point['dLatitude_degree'] = pGeometry_intersect.GetY()
                         pVertex=pyvertex(point)
-
-                        aVertex_intersect.append(pVertex)
-                    
+                        iFlag_exist, lIndex = find_vertex_in_list( aVertex_intersect,  pVertex)
+                        if iFlag_exist ==1:
+                            pass
+                        else:
+                            #only save it if it differs
+                            aVertex_intersect.append(pVertex)
+                            pFeatureOut.SetGeometry(pGeometry_intersect)
+                            pFeatureOut.SetField("id", lID_flowline)         
+                            pLayerOut.CreateFeature(pFeatureOut)    
+                            lID_flowline = lID_flowline + 1
+                                        
                     
                 else:
                     pass
-
-            
+           
             
         else:
             pass
 
-    pDataset_out = pLayerOut = None
+    pDataset_out = pLayerOut = None    
+
     return   aVertex_intersect

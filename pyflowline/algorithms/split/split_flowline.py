@@ -28,7 +28,7 @@ def split_flowline(aFlowline_in, aVertex_in, iFlag_intersect = None):
             pVertex = pEdge.pVertex_start
             aVertex_all.append(pVertex)
             iFlag_exist, lIndex = find_vertex_in_list( aVertex_in,  pVertex)
-            if iFlag_exist == 1:
+            if iFlag_exist == 1:                
                 iPart = iPart + 1
                 aVertex.append(aVertex_in[lIndex])
                 
@@ -37,9 +37,11 @@ def split_flowline(aFlowline_in, aVertex_in, iFlag_intersect = None):
                 #they must be ordered
                 if iFlag_exist==1:
                     for m in range(npoint):
+                        pVertex_dummy = aVertex_in[aIndex[m]]
+                    
                         iPart = iPart + 1
-                        aVertex.append(aVertex_in[aIndex[m]])
-                        aVertex_all.append(aVertex_in[aIndex[m]])
+                        aVertex.append(pVertex_dummy)
+                        aVertex_all.append(pVertex_dummy)
                     pass
 
         #the last vertex

@@ -88,7 +88,7 @@ class pylatlon(pycell):
             lats.append( self.aVertex[i].dLatitude_degree )
 
 
-        self.dArea = calculate_polygon_area(lats, lons)
+        self.dArea = calculate_polygon_area( lons ,lats)
 
         
         return self.dArea

@@ -18,7 +18,7 @@
     "iFlag_stream_burning_topology": 1, 
     "iFlag_resample_method": 2,
     "iFlag_use_mesh_dem": 0,
-    "iCase_index": 1,
+    "iCase_index": 4,
     "iMesh_type": 2,  
     "dAccumulation_threshold": 100000,
     "dLongitude_left": -79.44374,

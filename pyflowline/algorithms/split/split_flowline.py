@@ -8,7 +8,7 @@ from pyflowline.classes.flowline import pyflowline
 
 from pyflowline.algorithms.auxiliary.find_index_in_list import find_vertex_in_list, find_vertex_on_edge
 
-def split_flowline(aFlowline_in, aVertex_in):
+def split_flowline(aFlowline_in, aVertex_in, iFlag_intersect = None):
     aFlowline_out = list()
     nFlowline = len(aFlowline_in)
 
@@ -32,15 +32,15 @@ def split_flowline(aFlowline_in, aVertex_in):
                 iPart = iPart + 1
                 aVertex.append(aVertex_in[lIndex])
                 
-
-            iFlag_exist, npoint, aIndex = find_vertex_on_edge( aVertex_in,  pEdge)
-            #they must be ordered
-            if iFlag_exist==1:
-                for m in range(npoint):
-                    iPart = iPart + 1
-                    aVertex.append(aVertex_in[aIndex[m]])
-                    aVertex_all.append(aVertex_in[aIndex[m]])
-                pass
+            if iFlag_intersect is not None:
+                iFlag_exist, npoint, aIndex = find_vertex_on_edge( aVertex_in,  pEdge)
+                #they must be ordered
+                if iFlag_exist==1:
+                    for m in range(npoint):
+                        iPart = iPart + 1
+                        aVertex.append(aVertex_in[aIndex[m]])
+                        aVertex_all.append(aVertex_in[aIndex[m]])
+                    pass
 
         #the last vertex
         pVertex = pFlowline.pVertex_end

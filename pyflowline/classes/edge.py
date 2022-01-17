@@ -120,7 +120,7 @@ class pyedge(object):
             d1 = pVertex_start.calculate_distance(pVertex_in)
             d2 = pVertex_end.calculate_distance(pVertex_in)
             d3 = d1 +d2 -self.dLength
-            if ( d3 < 1.0   ):#care
+            if ( d3 < 0.1   ):#care
                 iFlag = 1
             else:
                 iFlag = 0 

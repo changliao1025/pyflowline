@@ -14,10 +14,11 @@ from pyflowline.classes.flowline import pyflowline
 from pyflowline.formats.convert_coordinates import convert_gcs_coordinates_to_flowline 
 
 from pyflowline.algorithms.intersect.intersect_flowline_with_flowline import intersect_flowline_with_flowline
+from pyflowline.algorithms.auxiliary.gdal_functions import calculate_polygon_area
 
 def calculate_area_of_difference_raw(sFilename_a, sFilename_b):
 
-    
+    #not yet supported
 
 
     return
@@ -50,7 +51,7 @@ def calculate_area_of_difference_simplified(aFlowline_in, \
     
 
     dummy = polygonize(aFlowline)
-    aPo = list(dummy)
+    aPolygon_out = list(dummy)
     pDataset = pDriver_geojson.CreateDataSource(sFilename_output_in) 
     pSpatial_reference_gcs = osr.SpatialReference()  
     pSpatial_reference_gcs.ImportFromEPSG(4326)    # WGS84 lat/lon
@@ -63,15 +64,20 @@ def calculate_area_of_difference_simplified(aFlowline_in, \
     pLayerDefn = pLayer.GetLayerDefn()
     pFeature = ogr.Feature(pLayerDefn)    
     lCellID =0
+    dArea =0.0
 
-    for po in aPo:
+    
+    for po in aPolygon_out:
         ring = ogr.Geometry(ogr.wkbLinearRing)
         aCoords_gcs = po.exterior.coords
         aCoords_gcs= np.array(aCoords_gcs)  
         nPoint  = (aCoords_gcs.shape)[0]
-
+        lons=list()
+        lats=list()
         for i in range(nPoint):
             ring.AddPoint(aCoords_gcs[i,0], aCoords_gcs[i,1])
+            lons.append( aCoords_gcs[i,0] )
+            lats.append( aCoords_gcs[i,1] )
         
         pPolygon = ogr.Geometry(ogr.wkbPolygon)
         pPolygon.AddGeometry(ring)
@@ -80,7 +86,10 @@ def calculate_area_of_difference_simplified(aFlowline_in, \
         pLayer.CreateFeature(pFeature)
         lCellID= lCellID+1
 
-    return
+        dArea0 = calculate_polygon_area(lons, lats)
+        dArea = dArea + dArea0
+
+    return aPolygon_out, dArea
    
     
 

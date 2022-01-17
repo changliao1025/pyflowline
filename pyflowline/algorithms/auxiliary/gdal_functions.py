@@ -215,7 +215,7 @@ def calculate_distance_based_on_lon_lat(lon1, lat1, lon2, lat2):
     r = 6378137.0
     return c * r
 
-def calculate_polygon_area(lats, lons, algorithm = 0, radius = 6378137.0):
+def calculate_polygon_area(lons, lats,  algorithm = 0, radius = 6378137.0):
     """
     Computes area of spherical polygon, assuming spherical Earth. 
     Returns result in ratio of the sphere's area if the radius is specified. Otherwise, in the units of provided radius.

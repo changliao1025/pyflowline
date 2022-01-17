@@ -61,7 +61,7 @@ from pyflowline.algorithms.merge.merge_flowline import merge_flowline
 
 from pyflowline.algorithms.index.define_stream_order import define_stream_order
 from pyflowline.algorithms.index.define_stream_segment_index import define_stream_segment_index
-from pyflowline.algorithms.area.calculate_area_of_difference import calculate_area_of_difference_simplified
+from pyflowline.algorithms.auxiliary.calculate_area_of_difference import calculate_area_of_difference_simplified
 
 from pyflowline.algorithms.intersect.intersect_flowline_with_flowline import intersect_flowline_with_flowline
 
@@ -188,6 +188,7 @@ class pybasin(object):
         self.sFilename_flowline_segment_order_before_intersect = 'flowline_segment_order_before_intersect_' + sBasinID + '.json'
         self.sFilename_flowline_intersect  = 'flowline_intersect_' + sBasinID + '.json'
         self.sFilename_flowline_final = 'flowline_final_' + sBasinID + '.json'
+        self.sFilename_area_of_difference = 'area_of_difference' + sBasinID + '.json'
         
         return
     
@@ -609,19 +610,108 @@ class pybasin(object):
 
         #split
         aFlowline_all = aFlowline_simplified + aFlowline_conceptual
-        aFlowline_simplified_split = split_flowline(aFlowline_simplified, e)
+        aFlowline_simplified_split = split_flowline(aFlowline_simplified, e,iFlag_intersect =1)
         sFilename_out = 'split_flowline_simplified.json'
         sFilename_out = os.path.join(self.sWorkspace_output_basin, sFilename_out)
         export_flowline_to_json(aFlowline_simplified_split, sFilename_out)
-        aFlowline_conceptual_split = split_flowline(aFlowline_conceptual, e)
+        aFlowline_conceptual_split = split_flowline(aFlowline_conceptual, e,iFlag_intersect =1)
         sFilename_out = 'split_flowline_conceptual.json'
         sFilename_out = os.path.join(self.sWorkspace_output_basin, sFilename_out)
         export_flowline_to_json(aFlowline_conceptual_split, sFilename_out)
 
         aFlowline_all = aFlowline_simplified_split + aFlowline_conceptual_split
 
-        sFilename_output = os.path.join(self.sWorkspace_output_basin, 'area_diff_polygon.json')
+        sFilename_area_of_difference = self.sFilename_area_of_difference
+        sFilename_output = os.path.join(self.sWorkspace_output_basin, sFilename_area_of_difference)
         #remove headwater not needed here
 
-        calculate_area_of_difference_simplified(aFlowline_all, sFilename_output)
+        aPolygon_out, dArea = calculate_area_of_difference_simplified(aFlowline_all, sFilename_output)
+        print('Area of difference: ', dArea)
+        self.plot_area_of_difference()
+        return
+
+    def plot_area_of_difference(self):
+        #request = cimgt.OSM()
+        sFilename_json = self.sFilename_area_of_difference
+        sFilename_json = os.path.join(self.sWorkspace_output_basin, sFilename_json)
+       
+        fig = plt.figure( dpi=300)
+        fig.set_figwidth( 4 )
+        fig.set_figheight( 4 )
+        ax = fig.add_axes([0.1, 0.15, 0.75, 0.8] , projection=desired_proj ) #request.crs
+        
+        pDriver = ogr.GetDriverByName('GeoJSON')
+        pDataset = pDriver.Open(sFilename_json, gdal.GA_ReadOnly)
+        pLayer = pDataset.GetLayer(0)
+    
+        pSrs = osr.SpatialReference()  
+        pSrs.ImportFromEPSG(4326)    # WGS84 lat/lon
+    
+        lID = 0
+        dLat_min = 90
+        dLat_max = -90
+        dLon_min = 180
+        dLon_max = -180          
+        
+
+        #ax.add_image(request, 6)    # 5 = zoom level
+
+        n_colors = pLayer.GetFeatureCount()
+        
+        colours = cm.rainbow(np.linspace(0, 1, n_colors))
+        for pFeature in pLayer:
+            pGeometry_in = pFeature.GetGeometryRef()
+            sGeometry_type = pGeometry_in.GetGeometryName()
+            if sGeometry_type =='POLYGON':
+                dummy0 = loads( pGeometry_in.ExportToWkt() )
+                aCoords_gcs = dummy0.exterior.coords
+                aCoords_gcs= np.array(aCoords_gcs)
+                nvertex = len(aCoords_gcs)
+                for i in range(nvertex):
+                    dLon = aCoords_gcs[i][0]
+                    dLat = aCoords_gcs[i][1]
+                    if dLon > dLon_max:
+                        dLon_max = dLon
+                    
+                    if dLon < dLon_min:
+                        dLon_min = dLon
+                    
+                    if dLat > dLat_max:
+                        dLat_max = dLat
+    
+                    if dLat < dLat_min:
+                        dLat_min = dLat
+    
+                polygon = mpatches.Polygon(aCoords_gcs[:,0:2], closed=True,  linewidth=0.25, \
+                    alpha=0.8, edgecolor = 'black',facecolor='red', \
+                        transform=ccrs.PlateCarree() )
+
+                ax.add_patch(polygon)   
+                lID = lID + 1
+                
+    
+        pDataset = pLayer = pFeature  = None    
+        sDirname = os.path.dirname(sFilename_json)
+       
+        marginx  = (dLon_max - dLon_min) / 20
+        marginy  = (dLat_max - dLat_min) / 20
+        aExtent_in = [dLon_min - marginx , dLon_max + marginx , dLat_min - marginy , dLat_max + marginy]
+       
+        
+        ax.set_extent( aExtent_in )  
+        
+        #aExtent_in = [-76.5,-76.2, 41.6,41.9]
+        #aExtent_in = [-76.95,-76.75, 40.7,40.9]
+        sFilename  = Path(sFilename_json).stem + '.png'
+        #sFilename  = Path(sFilename_json).stem + '_meander.png'       
+        #sFilename  = Path(sFilename_json).stem + '_loop.png'  
+              
+        sTitle = 'Area of difference'
+        ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True,
+                      linewidth=1, color='gray', alpha=0.3, linestyle='--')
+        ax.set_title( sTitle)       
+        
+        sFilename_out = os.path.join(sDirname, sFilename)
+        plt.savefig(sFilename_out, bbox_inches='tight')
+        #plt.show()
         return

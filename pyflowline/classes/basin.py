@@ -60,8 +60,6 @@ from pyflowline.algorithms.split.split_flowline_to_edge import split_flowline_to
 from pyflowline.formats.export_vertex import export_vertex_to_shapefile
 from pyflowline.algorithms.merge.merge_flowline import merge_flowline
 
-from pyflowline.algorithms.index.define_stream_order import define_stream_order
-from pyflowline.algorithms.index.define_stream_segment_index import define_stream_segment_index
 from pyflowline.algorithms.auxiliary.calculate_area_of_difference import calculate_area_of_difference_simplified
 
 from pyflowline.algorithms.intersect.intersect_flowline_with_flowline import intersect_flowline_with_flowline
@@ -541,7 +539,8 @@ class pybasin(object):
 
             sFilename_out = self.sFilename_flowline_final
             sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
-            export_flowline_to_json( aFlowline_basin,  sFilename_out)
+            export_flowline_to_json(  aFlowline_basin, sFilename_out, \
+                aAttribute_data=[aStream_segment, aStream_order], aAttribute_field=['iseg','iord'], aAttribute_dtype=['int','int'])
 
             self.aFlowline_basin = aFlowline_basin
 
@@ -566,13 +565,12 @@ class pybasin(object):
         aVertex_intersect = intersect_flowline_with_flowline(sFilename_simplified, sFilename_final, sFilename_output)
 
         #get confluence simple
-        aFlowline_simplified,pSpatial_reference = read_flowline_geojson( sFilename_simplified )   
-        
         point= dict()   
         point['dLongitude_degree'] = self.dLongitude_outlet_degree
         point['dLatitude_degree'] = self.dLatitude_outlet_degree
         pVertex_outlet=pyvertex(point)
 
+        aFlowline_simplified,pSpatial_reference = read_flowline_geojson( sFilename_simplified )   
         aVertex_simplified, lIndex_outlet_simplified, \
             aIndex_headwater_simplified, aIndex_middle, \
                 aIndex_confluence_simplified, aConnectivity\
@@ -581,9 +579,8 @@ class pybasin(object):
         #plot diff
         aFlowline_conceptual,pSpatial_reference = read_flowline_geojson( sFilename_final ) 
         aVertex_conceptual, lIndex_outlet_conceptual, \
-            aIndex_headwater_conceptual,\
-            aIndex_middle, aIndex_confluence_conceptual, \
-                aConnectivity\
+            aIndex_headwater_conceptual, aIndex_middle, \
+            aIndex_confluence_conceptual,  aConnectivity \
                 = find_flowline_confluence(aFlowline_conceptual,  pVertex_outlet)
 
         #merge confluence
@@ -617,11 +614,13 @@ class pybasin(object):
 
 
         #split
-        aFlowline_all = aFlowline_simplified + aFlowline_conceptual
+ 
         aFlowline_simplified_split = split_flowline(aFlowline_simplified, aVertex_all,iFlag_intersect =1)
         sFilename_out = 'split_flowline_simplified.json'
         sFilename_out = os.path.join(self.sWorkspace_output_basin, sFilename_out)
         export_flowline_to_json(aFlowline_simplified_split, sFilename_out)
+
+
         aFlowline_conceptual_split = split_flowline(aFlowline_conceptual, aVertex_all,iFlag_intersect =1)
         sFilename_out = 'split_flowline_conceptual.json'
         sFilename_out = os.path.join(self.sWorkspace_output_basin, sFilename_out)

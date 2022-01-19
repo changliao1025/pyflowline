@@ -2,9 +2,36 @@
 import sys
 import numpy as np
 import osgeo
+import math
 from math import radians, cos, sin, asin, sqrt
 from osgeo import ogr, osr, gdal, gdalconst
 from numpy import arctan2, cos, sin, sqrt, pi, power, append, diff
+def latlong_to_3d(latr, lonr):
+    """Convert a point given latitude and longitude in radians to
+    3-dimensional space, assuming a sphere radius of one."""
+    return np.array((
+        math.cos(latr) * math.cos(lonr),
+        math.cos(latr) * math.sin(lonr),
+        math.sin(latr)
+    ))
+
+def angle_between_vectors_degrees(u, v):
+    """Return the angle between two vectors in any dimension space,
+    in degrees."""
+
+    a = np.dot(u, v)
+    b = np.linalg.norm(u)
+    c = np.linalg.norm(v)
+    d = a / (b* c)
+    if d > 1:
+        d=1
+    if d < -1:
+        d=-1
+    e = math.acos(d)
+    f = np.degrees(e)
+    return f
+    #return np.degrees(
+    #    math.acos(np.dot(u, v) / (np.linalg.norm(u) * np.linalg.norm(v))))
 
 def convert_360_to_180(dLongitude_in):
     """[This function is modified from

@@ -1,3 +1,4 @@
+import math
 import numpy as np
 from pyflowline.classes.vertex import pyvertex
 from pyflowline.classes.edge import pyedge
@@ -35,6 +36,8 @@ def find_vertex_in_list(aVertex_in, pVertex_in):
     
     return iFlag_exist, lIndex
 
+
+
 def find_vertex_on_edge(aVertex_in, pEdge_in):
     iFlag_exist = 0
     aIndex= list()
@@ -46,14 +49,19 @@ def find_vertex_on_edge(aVertex_in, pEdge_in):
     if nVertex > 0 :
         for i in np.arange( nVertex):
             pVertex = aVertex_in[i]
-
-            if pEdge_in.check_vertex_on_edge(pVertex) == 1:
+            iFlag_overlap = pEdge_in.check_vertex_on_edge(pVertex)
+            if iFlag_overlap == 1:
+                iFlag_overlap = pEdge_in.check_vertex_on_edge(pVertex)
                 iFlag_exist = 1      
                 dis = pEdge_in.pVertex_start.calculate_distance(pVertex)
                 aDistance.append(dis)
                 aIndex.append(i) 
                 npoint = npoint + 1          
             else:
+                dis = pEdge_in.pVertex_start.calculate_distance(pVertex)
+                if  dis < (1.0 * pEdge_in.dLength):
+                    iFlag_overlap = pEdge_in.check_vertex_on_edge(pVertex)
+                   
                 pass
 
         #re-order 

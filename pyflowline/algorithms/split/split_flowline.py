@@ -8,6 +8,7 @@ from pyflowline.classes.flowline import pyflowline
 
 from pyflowline.algorithms.auxiliary.find_index_in_list import find_vertex_in_list, find_vertex_on_edge
 
+
 def split_flowline(aFlowline_in, aVertex_in, iFlag_intersect = None):
     aFlowline_out = list()
     nFlowline = len(aFlowline_in)
@@ -15,6 +16,8 @@ def split_flowline(aFlowline_in, aVertex_in, iFlag_intersect = None):
     for i in range(nFlowline):
         pFlowline = aFlowline_in[i]
         iStream_order = pFlowline.iStream_order
+        iStream_segment = pFlowline.iStream_segment
+        
         iFlag_dam = pFlowline.iFlag_dam
         nVertex = pFlowline.nVertex
         nEdge= pFlowline.nEdge
@@ -30,7 +33,7 @@ def split_flowline(aFlowline_in, aVertex_in, iFlag_intersect = None):
             iFlag_exist, lIndex = find_vertex_in_list( aVertex_in,  pVertex)
             if iFlag_exist == 1:                
                 iPart = iPart + 1
-                aVertex.append(aVertex_in[lIndex])
+                aVertex.append(pVertex)
                 
             if iFlag_intersect is not None:
                 iFlag_exist, npoint, aIndex = find_vertex_on_edge( aVertex_in,  pEdge)
@@ -50,7 +53,7 @@ def split_flowline(aFlowline_in, aVertex_in, iFlag_intersect = None):
         iFlag_exist, lIndex = find_vertex_in_list( aVertex_in,  pVertex)
         if iFlag_exist == 1:
             iPart = iPart + 1
-            aVertex.append(aVertex_in[lIndex])
+            aVertex.append(pVertex)
             pass
 
 
@@ -75,22 +78,26 @@ def split_flowline(aFlowline_in, aVertex_in, iFlag_intersect = None):
                         iFlag_exist, lIndex = find_vertex_in_list( aVertex_all,  pVertex)
                         if iFlag_exist ==1:
                             aVertex_index.append(lIndex)
+                    
+                    #find duplicate
+
 
                     for k in range(nLine):
                         t = aVertex_index[k]
                         s = aVertex_index[k+1]
-                        aEdge=list()
-                        for l in range(t,s):
-                            pVertex0 = aVertex_all[l]  #pFlowline.aVertex[l]
-                            pVertex1 = aVertex_all[l+1]  #pFlowline.aVertex[l+1]
-                            pEdge = pyedge(pVertex0, pVertex1)
-                            aEdge.append(pEdge)
-                            pass
+                        if s!=t:
+                            aEdge=list()
+                            for l in range(t,s):
+                                pVertex0 = aVertex_all[l]  #pFlowline.  aVertex[l]
+                                pVertex1 = aVertex_all[l+1]  #pFlowline.    aVertex[l+1]
+                                pEdge = pyedge(pVertex0, pVertex1)
+                                aEdge.append(pEdge)
+                                pass
 
-                        pFlowline1 = pyflowline(aEdge)
-                        pFlowline1.iStream_order = iStream_order
-                        pFlowline1.iFlag_dam = iFlag_dam
-                        aFlowline_out.append(pFlowline1)
+                            pFlowline1 = pyflowline(aEdge)
+                            pFlowline1.iStream_order = iStream_order
+                            pFlowline1.iFlag_dam = iFlag_dam
+                            aFlowline_out.append(pFlowline1)
                         pass
                     
                     pass

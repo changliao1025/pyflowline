@@ -46,6 +46,7 @@ class pyflowline(object):
 
         self.aVertex.append( aEdge[nEdge-1].pVertex_end )
         self.nVertex = nVertex
+        self.dLength= self.calculate_length()
      
         return
 

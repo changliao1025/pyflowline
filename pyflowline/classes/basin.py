@@ -456,7 +456,7 @@ class pybasin(object):
         self.aFlowline_basin= aFlowline_basin
         return aFlowline_basin
 
-    def intersect_flowline_with_mesh(self, iMesh_type, sFilename_mesh):
+    def reconstruct_topological_relationship(self, iMesh_type, sFilename_mesh):
 
         
         sWorkspace_output_basin = self.sWorkspace_output_basin

@@ -14,6 +14,7 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import matplotlib.cm as cm
 from matplotlib.collections import PatchCollection
+from pyflowline.classes.mpas import pympas
 from pyflowline.classes.vertex import pyvertex
 from pyflowline.classes.basin import pybasin
 from pyflowline.classes.flowline import pyflowline
@@ -55,6 +56,8 @@ class CaseClassEncoder(JSONEncoder):
             return json.loads(obj.tojson())        
         if isinstance(obj, pyflowline):
             return obj.lFlowlineID
+        if isinstance(obj, pympas):
+            return obj.lCellID
         
         return JSONEncoder.default(self, obj)
 
@@ -103,7 +106,7 @@ class flowlinecase(object):
     aBasin = list()
     aFlowline_simplified=list()
     aFlowline_conceptual=list()
-    aOutletID = list()
+    aCellID_outlet = list()
     aCell=list()
 
     
@@ -714,7 +717,7 @@ class flowlinecase(object):
         pDataset = pLayer = pFeature  = None   
         return
     
-    def preprocess_flowline(self):
+    def flowline_simplification(self):
         aFlowline_out = list()   #store all the flowline
         if self.iFlag_simplification == 1: 
             for pBasin in self.aBasin:
@@ -832,23 +835,23 @@ class flowlinecase(object):
                             return
         return
     
-    def intersect_flowline_with_mesh(self):
+    def reconstruct_topological_relationship(self):
         iMesh_type = self.iMesh_type
         iFlag_intersect = self.iFlag_intersect
         sWorkspace_output = self.sWorkspace_output
         nOutlet = self.nOutlet
         sFilename_mesh=self.sFilename_mesh
-        self.aCell, pSpatial_reference_mesh = read_mesh_json(sFilename_mesh)
+        self.aCell, pSpatial_reference_mesh = read_mesh_json(iMesh_type, sFilename_mesh)
         
         aFlowline_conceptual = list()   #store all the flowline
-        aOutletID = list()
+        aCellID_outlet = list()
         aBasin = list()
         if iFlag_intersect == 1:
             for pBasin in self.aBasin:
-                pBasin.intersect_flowline_with_mesh(iMesh_type,sFilename_mesh)
+                pBasin.reconstruct_topological_relationship(iMesh_type,sFilename_mesh)
                 aFlowline_conceptual = aFlowline_conceptual + pBasin.aFlowline_basin
                 aBasin.append(pBasin)
-                aOutletID.append(pBasin.lCellID_outlet)
+                aCellID_outlet.append(pBasin.lCellID_outlet)
             
             #save basin json info for hexwatershed model
             sPath = os.path.dirname(self.sFilename_basins)
@@ -864,9 +867,9 @@ class flowlinecase(object):
                 f.close()
             
             self.aFlowline_conceptual = aFlowline_conceptual
-            self.aOutletID = aOutletID
+            self.aCellID_outlet = aCellID_outlet
 
-            return   aFlowline_conceptual, aOutletID
+            return   aFlowline_conceptual, aCellID_outlet
 
         return
 
@@ -893,13 +896,14 @@ class flowlinecase(object):
     
 
     def export_mesh_info_to_json(self):
+        
         aCell_all = self.aCell
         sFilename_json = self.sFilename_mesh_info
         ncell=len(aCell_all)
         iFlag_flowline = self.iFlag_flowline
         aCellID_outlet = self.aCellID_outlet
 
-        aFlowline = self.aFlowline
+        aFlowline = self.aFlowline_conceptual
 
         if iFlag_flowline == 1:
             nFlowline = len(aFlowline)

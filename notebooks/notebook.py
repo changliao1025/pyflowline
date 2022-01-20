@@ -1,5 +1,13 @@
 import os
 from pathlib import Path
+
+import logging
+for handler in logging.root.handlers[:]:
+    logging.root.removeHandler(handler)
+
+logging.basicConfig(format='%(asctime)s %(message)s')
+logging.warning('is the Pyflowline simulation started.')
+
 from pyflowline.classes.pycase import flowlinecase
 from pyflowline.pyflowline_read_model_configuration_file import pyflowline_read_model_configuration_file
 
@@ -11,10 +19,12 @@ else:
     if iFlag_option == 2:
         #an example configuration file is provided with the repository, but you need to update this file based on your own case study
         #linux
-        sFilename_configuration_in = str(Path.cwd()) +  '/configurations/pyflowline_susquehanna_hexagon.json' 
-        sFilename_configuration_in = str(Path.cwd()) +  '/configurations/pyflowline_susquehanna_mpas.json' 
+  
+        sPath = str(Path(__file__).parent.resolve())
+        sFilename_configuration_in = sPath +  '/../configurations/pyflowline_susquehanna_hexagon.json' 
+        sFilename_configuration_in = sPath +  '/../tests/configurations/pyflowline_susquehanna_mpas.json' 
         #sFilename_configuration_in = str(Path.cwd()) +  '/configurations/pyflowline_susquehanna_latlon.json' 
-        sFilename_configuration_in = str(Path.cwd()) +  '/configurations/pyflowline_susquehanna_square.json' 
+        #sFilename_configuration_in = str(Path.cwd()) +  '/configurations/pyflowline_susquehanna_square.json' 
         #mac
         #sFilename_configuration_in = '/Users/liao313/workspace/python/pyflowline/configurations/pyflowline_susquehanna_hexagon_mac.json'
         print(sFilename_configuration_in)
@@ -25,13 +35,13 @@ else:
 #pyflowline can process multiple basins within one singel run
 #the total number of basin is controlled by the nOutlet variable
 #convert the raw flowline into geojson in WGS84 system        
-oPyflowline.convert_flowline_to_json()
+#oPyflowline.convert_flowline_to_json()
 #oPyflowline.plot(sVariable_in = 'flowline_filter_json')
-oPyflowline.preprocess_flowline()
+oPyflowline.flowline_simplification()
 #oPyflowline.plot(sVariable_in = 'flowline_simplified')
 
 
-oPyflowline.create_mesh()
+oPyflowline.mesh_generation()
 #oPyflowline.plot(sVariable_in = 'mesh')
 #exit()
 aExtent_full = [-78.5,-75.5, 39.2,42.5]
@@ -40,7 +50,7 @@ aExtent_full = [-78.5,-75.5, 39.2,42.5]
 #aExtent_zoom = [-77.3,-76.5, 40.2,41.0] #braided
 aExtent_zoom = [-77.3,-76.5, 40.2,41.0] #confluence
 
-oPyflowline.intersect_flowline_with_mesh()
+oPyflowline.reconstruct_topological_relationship()
 #oPyflowline.plot(sVariable_in = 'final')
 #oPyflowline.plot(sVariable_in = 'overlap',aExtent_in=aExtent_full )
 
@@ -49,6 +59,9 @@ oPyflowline.export()
 #sFilename_dem_flowline ='/qfs/people/liao313/data/hexwatershed/susquehanna/vector/swat/swat10k.shp'
 #oPyflowline.compare_with_raster_dem_method(sFilename_dem_flowline,aExtent_in=aExtent_zoom )
 
-oPyflowline.evaluate()
+#oPyflowline.evaluate()
 
 print('Finished')
+
+logging.basicConfig(format='%(asctime)s %(message)s')
+logging.warning('is the time Pyflowline simulation finished.')

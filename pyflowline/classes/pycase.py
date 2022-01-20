@@ -883,6 +883,8 @@ class flowlinecase(object):
     def export(self):
         
         self.export_mesh_info_to_json()
+        for pBasin in self.aBasin:
+            pBasin.export()
 
         self.tojson()
 

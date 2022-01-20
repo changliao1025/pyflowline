@@ -41,7 +41,7 @@ oPyflowline.flowline_simplification()
 #oPyflowline.plot(sVariable_in = 'flowline_simplified')
 
 
-oPyflowline.mesh_generation()
+#oPyflowline.mesh_generation()
 #oPyflowline.plot(sVariable_in = 'mesh')
 #exit()
 aExtent_full = [-78.5,-75.5, 39.2,42.5]

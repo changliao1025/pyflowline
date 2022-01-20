@@ -109,6 +109,7 @@ class pybasin(object):
     sFilename_flowline_segment_order_before_intersect=''
     sFilename_flowline_segment_index_before_intersect=''
     sFilename_flowline_final=''
+    sFilename_basin_info=''
 
     aFlowline_basin=None
     
@@ -191,10 +192,12 @@ class pybasin(object):
         self.sFilename_flowline_intersect  = 'flowline_intersect_' + sBasinID + '.json'
         self.sFilename_flowline_final = 'flowline_final_' + sBasinID + '.json'
         self.sFilename_area_of_difference = 'area_of_difference' + sBasinID + '.json'
-        
+        self.sFilename_basin_info = 'basin_info_' + sBasinID + '.json'
         return
     
     def tojson(self):
+
+
         sJson = json.dumps(self.__dict__, \
             sort_keys=True, \
                 indent = 4, \
@@ -212,7 +215,6 @@ class pybasin(object):
         export_flowline_to_json(aFlowline_in, sFilename_json_in,\
             iFlag_projected_in= iFlag_projected_in, \
             pSpatial_reference_in = pSpatial_reference_in)
-
 
 
     def calculate_flowline_length(self, aFlowline_in):
@@ -509,7 +511,22 @@ class pybasin(object):
         self.dLength_flowline_conceptual = self.calculate_flowline_length(aFlowline_basin)
         
     def export(self):
-        self.tojson
+        self.export_basin_info_to_json()
+        self.tojson()    
+        return
+
+    def export_basin_info_to_json(self):
+        sFilename_json = self.sFilename_basin_info
+        sFilename_json = os.path.join(str(Path(self.sWorkspace_output_basin)  ) , sFilename_json  )
+
+        with open(sFilename_json, 'w', encoding='utf-8') as f:
+            sJson = json.dumps(self.__dict__, \
+            sort_keys=True, \
+                indent = 4, \
+                    ensure_ascii=True, \
+                        cls=BasinClassEncoder)      
+            f.write(sJson)    
+            f.close()
         return
 
     def evaluate(self):

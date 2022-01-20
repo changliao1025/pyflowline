@@ -690,7 +690,7 @@ class flowlinecase(object):
                 transform=ax.transAxes, \
                 color='black', fontsize=8)
         
-        sResolution =  'Resolution: ' + "{:0d}".format( int(self.dResolution_meter) ) + 'm'
+        sResolution =  'Resolution: ' + "{:0d}".format( int(self.dResolution_meter/1000) ) + ' km'
 
         if self.sMesh_type != 'mpas':
             ax.text(0.05, 0.90, sResolution, \
@@ -846,12 +846,21 @@ class flowlinecase(object):
         aFlowline_conceptual = list()   #store all the flowline
         aCellID_outlet = list()
         aBasin = list()
+        aCell_intersect=list()
         if iFlag_intersect == 1:
             for pBasin in self.aBasin:
-                pBasin.reconstruct_topological_relationship(iMesh_type,sFilename_mesh)
+                aCell_intersect_basin = pBasin.reconstruct_topological_relationship(iMesh_type,sFilename_mesh)
                 aFlowline_conceptual = aFlowline_conceptual + pBasin.aFlowline_basin
                 aBasin.append(pBasin)
                 aCellID_outlet.append(pBasin.lCellID_outlet)
+                aCell_intersect = aCell_intersect + aCell_intersect_basin
+
+                #update length?
+            for pCell in self.aCell:
+                for pCell2 in aCell_intersect:
+                    if pCell2.lCellID == pCell.lCellID:
+                        pCell.dLength_flowline = pCell2.dLength_flowline
+
             
             #save basin json info for hexwatershed model
             sPath = os.path.dirname(self.sFilename_basins)

@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 
 import logging
+from token import OP
 for handler in logging.root.handlers[:]:
     logging.root.removeHandler(handler)
 
@@ -37,29 +38,33 @@ else:
 #convert the raw flowline into geojson in WGS84 system        
 #oPyflowline.convert_flowline_to_json()
 #oPyflowline.plot(sVariable_in = 'flowline_filter_json')
-oPyflowline.flowline_simplification()
+#oPyflowline.flowline_simplification()
 #oPyflowline.plot(sVariable_in = 'flowline_simplified')
 
 
 #oPyflowline.mesh_generation()
 #oPyflowline.plot(sVariable_in = 'mesh')
 #exit()
-aExtent_full = [-78.5,-75.5, 39.2,42.5]
+#aExtent_full = [-78.5,-75.5, 39.2,42.5]
 #aExtent_zoom = [-76.0,-76.5, 39.5,40.0] #outlet
 #aExtent_zoom = [-76.5,-76.2, 41.6,41.9] #meander
 #aExtent_zoom = [-77.3,-76.5, 40.2,41.0] #braided
-aExtent_zoom = [-77.3,-76.5, 40.2,41.0] #confluence
+#aExtent_zoom = [-77.3,-76.5, 40.2,41.0] #confluence
 
 oPyflowline.reconstruct_topological_relationship()
 #oPyflowline.plot(sVariable_in = 'final')
 #oPyflowline.plot(sVariable_in = 'overlap',aExtent_in=aExtent_full )
 
+#replace conceptual flowline with real flowline length
+
+#oPyflowline.update()
+oPyflowline.evaluate()
 oPyflowline.export()
 
 #sFilename_dem_flowline ='/qfs/people/liao313/data/hexwatershed/susquehanna/vector/swat/swat10k.shp'
 #oPyflowline.compare_with_raster_dem_method(sFilename_dem_flowline,aExtent_in=aExtent_zoom )
 
-#oPyflowline.evaluate()
+
 
 print('Finished')
 

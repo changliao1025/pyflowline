@@ -11,6 +11,7 @@ import matplotlib.path as mpath
 import matplotlib.patches as mpatches
 from matplotlib import cm
 
+
 import cartopy.crs as ccrs
 import cartopy.io.img_tiles as cimgt
 
@@ -97,6 +98,9 @@ class pybasin(object):
     dLength_flowline_before_simplification = 0.0
     dLength_flowline_after_simplification = 0.0
     dLength_flowline_conceptual = 0.0
+
+    dArea_of_difference=0.0
+    dDistance_displace = 0.0
     sWorkspace_output_basin=''
     sFilename_flowline_raw=''    
     sFilename_flowline_filter=''
@@ -462,6 +466,10 @@ class pybasin(object):
         sWorkspace_output_basin = self.sWorkspace_output_basin
         sFilename_flowline = self.sFilename_flowline_segment_order_before_intersect
         sFilename_flowline_in = os.path.join(sWorkspace_output_basin, sFilename_flowline)
+        aFlowline_basin, pSpatial_reference = read_flowline_geojson( sFilename_flowline_in )   
+        self.dLength_flowline_after_simplification = self.calculate_flowline_length(aFlowline_basin)
+
+        
         sFilename_flowline_intersect = self.sFilename_flowline_intersect
         sFilename_flowline_intersect_out = os.path.join(sWorkspace_output_basin, sFilename_flowline_intersect)
         aCell, aCell_intersect_basin, aFlowline_intersect_all = intersect_flowline_with_mesh(iMesh_type, sFilename_mesh, \
@@ -483,9 +491,7 @@ class pybasin(object):
         aFlowline_basin = remove_duplicate_flowline(aFlowline_basin)
         aFlowline_basin = correct_flowline_direction(aFlowline_basin,  pVertex_outlet )
         aFlowline_basin = remove_flowline_loop(  aFlowline_basin )  
-        sFilename_out = 'flowline_debug_' + self.sBasinID + '.json'
-        sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
-        export_flowline_to_json( aFlowline_basin,  sFilename_out)
+  
         aVertex, lIndex_outlet, aIndex_headwater,aIndex_middle, aIndex_confluence, aConnectivity\
             = find_flowline_confluence(aFlowline_basin,  pVertex_outlet)
         sFilename_out = 'flowline_vertex_with_confluence_01_after_intersect_' + self.sBasinID + '.json'
@@ -507,6 +513,8 @@ class pybasin(object):
         self.dLongitude_outlet_degree = pVertex_outlet.dLongitude_degree
         self.dLatitude_outlet_degree = pVertex_outlet.dLatitude_degree
         self.dLength_flowline_conceptual = self.calculate_flowline_length(aFlowline_basin)
+
+        return aCell_intersect_basin
         
     def export(self):
         self.export_basin_info_to_json()
@@ -610,6 +618,8 @@ class pybasin(object):
 
         aPolygon_out, dArea = calculate_area_of_difference_simplified(aFlowline_all, sFilename_output)
         print('Area of difference: ', dArea)
+        self.dArea_of_difference = dArea
+        self.dDistance_displace = dArea / self.dLength_flowline_after_simplification
         self.plot_area_of_difference()
         return
 
@@ -692,7 +702,13 @@ class pybasin(object):
         sTitle = 'Area of difference'
         ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True,
                       linewidth=1, color='gray', alpha=0.3, linestyle='--')
-        ax.set_title( sTitle)       
+        ax.set_title( sTitle)  
+     
+        sText = 'Total area: ' + "{:4.1f}".format( int(self.dArea_of_difference/1.0E6) ) + ' km^2'
+        ax.text(0.05, 0.90, sText, \
+        verticalalignment='top', horizontalalignment='left',\
+                transform=ax.transAxes, \
+                color='blue', fontsize=8)
         
         sFilename_out = os.path.join(sDirname, sFilename)
         plt.savefig(sFilename_out, bbox_inches='tight')

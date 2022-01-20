@@ -12,7 +12,6 @@
         "dAccumulation_threshold": 100000.0,
         "dLatitude_outlet_degree": 39.5569753171024,
         "dLength_flowline_after_simplification": 971952.797693134,
-        "dLength_flowline_before_simplification": 1084025.0091417406,
         "dLength_flowline_conceptual": 859929.1686997304,
         "dLongitude_outlet_degree": -76.0831369233622,
         "dThreshold_small_river": 10000.0,

@@ -52,8 +52,7 @@ class CaseClassEncoder(JSONEncoder):
         if isinstance(obj, np.ndarray):
             return obj.tolist()
         if isinstance(obj, pybasin):
-            return obj.lBasinID
-        
+            return json.loads(obj.tojson())        
         if isinstance(obj, pyflowline):
             return obj.lFlowlineID
         
@@ -102,7 +101,11 @@ class flowlinecase(object):
     
 
     aBasin = list()
-    aFlowline=list()
+    aFlowline_simplified=list()
+    aFlowline_conceptual=list()
+    aOutletID = list()
+    aCell=list()
+
     
     def __init__(self, aParameter):
         
@@ -710,6 +713,7 @@ class flowlinecase(object):
 
         pDataset = pLayer = pFeature  = None   
         return
+    
     def preprocess_flowline(self):
         aFlowline_out = list()   #store all the flowline
         if self.iFlag_simplification == 1: 
@@ -717,7 +721,7 @@ class flowlinecase(object):
                 aFlowline_basin = pBasin.preprocess_flowline()                
                 aFlowline_out = aFlowline_out + aFlowline_basin
 
-            self.aFlowline = aFlowline_out
+            self.aFlowline_simplified = aFlowline_out
         return aFlowline_out
     
     def create_mesh(self):        
@@ -834,23 +838,23 @@ class flowlinecase(object):
         sWorkspace_output = self.sWorkspace_output
         nOutlet = self.nOutlet
         sFilename_mesh=self.sFilename_mesh
-        aMesh, pSpatial_reference_mesh = read_mesh_json(sFilename_mesh)
-        aCell = list()
-        aCell_intersect = list()
-        aFlowline = list()   #store all the flowline
+        self.aCell, pSpatial_reference_mesh = read_mesh_json(sFilename_mesh)
+        
+        aFlowline_conceptual = list()   #store all the flowline
         aOutletID = list()
         aBasin = list()
         if iFlag_intersect == 1:
             for pBasin in self.aBasin:
                 pBasin.intersect_flowline_with_mesh(iMesh_type,sFilename_mesh)
-                aFlowline = aFlowline + pBasin.aFlowline_basin
+                aFlowline_conceptual = aFlowline_conceptual + pBasin.aFlowline_basin
                 aBasin.append(pBasin)
                 aOutletID.append(pBasin.lCellID_outlet)
             
-            #save basin info
+            #save basin json info for hexwatershed model
             sPath = os.path.dirname(self.sFilename_basins)
             sName = str(Path(self.sFilename_basins).stem ) + '_new.json'
             sFilename_configuration  =  os.path.join( sPath  , sName)
+
             with open(sFilename_configuration, 'w', encoding='utf-8') as f:
                 sJson = json.dumps([json.loads(ob.tojson()) for ob in aBasin],\
                     sort_keys=True, \
@@ -858,8 +862,11 @@ class flowlinecase(object):
 
                 f.write(sJson)    
                 f.close()
+            
+            self.aFlowline_conceptual = aFlowline_conceptual
+            self.aOutletID = aOutletID
 
-            return aCell, aCell_intersect, aFlowline, aOutletID
+            return   aFlowline_conceptual, aOutletID
 
         return
 
@@ -870,6 +877,12 @@ class flowlinecase(object):
             pBasin.evaluate()
         return
 
+    def export(self):
+        
+        self.export_mesh_info_to_json()
+
+        self.tojson()
+
     def tojson(self):
         sJson = json.dumps(self.__dict__, \
             sort_keys=True, \
@@ -877,3 +890,62 @@ class flowlinecase(object):
                     ensure_ascii=True, \
                         cls=CaseClassEncoder)
         return sJson
+    
+
+    def export_mesh_info_to_json(self):
+        aCell_all = self.aCell
+        sFilename_json = self.sFilename_mesh_info
+        ncell=len(aCell_all)
+        iFlag_flowline = self.iFlag_flowline
+        aCellID_outlet = self.aCellID_outlet
+
+        aFlowline = self.aFlowline
+
+        if iFlag_flowline == 1:
+            nFlowline = len(aFlowline)
+            for i in range(nFlowline):
+                pFlowline = aFlowline[i]
+                nEdge = pFlowline.nEdge
+                nVertex = pFlowline.nVertex
+                aEdge = pFlowline.aEdge
+
+                iStream_segment = pFlowline.iStream_segment
+                iStream_order = pFlowline.iStream_order
+
+                for j in range(nEdge):
+                    pEdge = aEdge[j]
+                    pVertex_start = pEdge.pVertex_start
+                    pVertex_end = pEdge.pVertex_end
+                    for k in range(ncell):
+                        pVertex_center = aCell_all[k].pVertex_center
+
+                        if pVertex_center == pVertex_start:
+                            aCell_all[k].iStream_segment_burned = iStream_segment
+                            aCell_all[k].iStream_order_burned = iStream_order
+
+                            for l in range(ncell):
+                                pVertex_center2 = aCell_all[l].pVertex_center
+                                lCellID = aCell_all[l].lCellID
+                                if pVertex_center2 == pVertex_end:
+                                    aCell_all[k].lCellID_downstream_burned = lCellID
+                                    if lCellID in aCellID_outlet:
+                                        aCell_all[l].iStream_segment_burned = iStream_segment
+                                        aCell_all[l].iStream_order_burned = iStream_order
+
+                                    break
+                                
+                                
+
+                pass
+        else:
+            #only mesh, no flowline
+            pass
+
+
+
+        with open(sFilename_json, 'w', encoding='utf-8') as f:
+            sJson = json.dumps([json.loads(ob.tojson()) for ob in aCell_all], indent = 4)        
+            f.write(sJson)    
+            f.close()
+
+        return

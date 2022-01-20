@@ -199,7 +199,6 @@ def create_mpas_mesh(iFlag_global_in, \
             dElevation_mean = float(aBed_elevation[i])
             dElevation_profile0 = float(aBed_elevation_profile[i,0])
 
-
             dThickness_ice = float( aIce_thickness[i] )
             dArea = float(aCellArea[i])
 

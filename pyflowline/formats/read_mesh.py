@@ -25,6 +25,16 @@ def read_mesh_json(iMesh_type_in, sFilename_mesh_in):
     pLayer_mesh = pDataset_mesh.GetLayer(0)
     pSpatial_reference_out = pLayer_mesh.GetSpatialRef()
 
+    ldefn = pLayer_mesh.GetLayerDefn()
+    schema =list()
+    for n in range(ldefn.GetFieldCount()):
+        fdefn = ldefn.GetFieldDefn(n)
+        schema.append(fdefn.name)
+    if 'iseg' in schema:
+        iFlag_segment = 1
+    else:
+        iFlag_segment = 0   
+
     #we also need to spatial reference
     for pFeature_mesh in pLayer_mesh:
        
@@ -37,8 +47,11 @@ def read_mesh_json(iMesh_type_in, sFilename_mesh_in):
         lCellID = pFeature_mesh.GetField("id")
         dLon = pFeature_mesh.GetField("lon")
         dLat = pFeature_mesh.GetField("lat")
-        #dElevation = pFeature_mesh.GetField("elev")
+        
         dArea = pFeature_mesh.GetField("area")
+        if iMesh_type_in == 4:
+            dElevation_mean = pFeature_mesh.GetField("elev")
+            dElevation_profile0 = pFeature_mesh.GetField("elev0")
         #convert geometry to edge
         pGeometrytype_mesh = pGeometry_mesh.GetGeometryName()
         if(pGeometrytype_mesh == 'POLYGON'):            
@@ -47,6 +60,9 @@ def read_mesh_json(iMesh_type_in, sFilename_mesh_in):
             pCell.dArea = dArea #pCell.calculate_cell_area()
             pCell.dLength = pCell.calculate_edge_length()
             pCell.dLength_flowline = pCell.dLength
+            if iMesh_type_in == 4:
+                pCell.dElevation_mean = dElevation_mean
+                pCell.dElevation_profile0 = dElevation_profile0
 
             aCell_out.append(pCell)
 

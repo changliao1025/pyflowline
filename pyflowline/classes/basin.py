@@ -331,7 +331,7 @@ class pybasin(object):
     
         return
 
-    def preprocess_flowline(self):
+    def flowline_simplification(self):
 
         
         sFilename_flowline_filter = self.sFilename_flowline_filter

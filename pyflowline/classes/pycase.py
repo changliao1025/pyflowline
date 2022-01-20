@@ -721,7 +721,7 @@ class flowlinecase(object):
         aFlowline_out = list()   #store all the flowline
         if self.iFlag_simplification == 1: 
             for pBasin in self.aBasin:
-                aFlowline_basin = pBasin.preprocess_flowline()                
+                aFlowline_basin = pBasin.flowline_simplification()                
                 aFlowline_out = aFlowline_out + aFlowline_basin
 
             self.aFlowline_simplified = aFlowline_out

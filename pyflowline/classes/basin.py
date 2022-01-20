@@ -11,8 +11,6 @@ import matplotlib.path as mpath
 import matplotlib.patches as mpatches
 from matplotlib import cm
 
-
-
 import cartopy.crs as ccrs
 import cartopy.io.img_tiles as cimgt
 
@@ -57,7 +55,7 @@ from pyflowline.algorithms.split.find_flowline_vertex import find_flowline_verte
 from pyflowline.algorithms.split.find_flowline_confluence import find_flowline_confluence
 from pyflowline.algorithms.split.split_flowline import split_flowline
 from pyflowline.algorithms.split.split_flowline_to_edge import split_flowline_to_edge
-from pyflowline.formats.export_vertex import export_vertex_to_shapefile
+
 from pyflowline.algorithms.merge.merge_flowline import merge_flowline
 
 from pyflowline.algorithms.auxiliary.calculate_area_of_difference import calculate_area_of_difference_simplified

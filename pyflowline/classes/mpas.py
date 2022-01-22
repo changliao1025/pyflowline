@@ -11,22 +11,9 @@ from pyflowline.classes.flowline import pyflowline
 
 from pyflowline.algorithms.auxiliary.gdal_functions import calculate_polygon_area
 
-class CellClassEncoder(JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, np.integer):
-            return int(obj)
-        if isinstance(obj, np.ndarray):
-            return obj.tolist()
-        if isinstance(obj, pyedge):
-            return obj.lEdgeID
-        if isinstance(obj, pyvertex):
-            return json.loads(obj.tojson()) #lVertexID
-        if isinstance(obj, pyflowline):
-            return obj.lFlowlineID
-        if isinstance(obj, list):
-            print('A list is found')
-            
-        return JSONEncoder.default(self, obj)
+from pyflowline.classes.classencoder import ClassEncoder
+
+
 
 class pympas(pycell):
     
@@ -157,5 +144,5 @@ class pympas(pycell):
             sort_keys=True, \
             indent = 4, \
             ensure_ascii=True, \
-            cls=CellClassEncoder)
+            cls=ClassEncoder)
         return sJson

@@ -8,14 +8,12 @@ from osgeo import gdal, osr, ogr
 from pyflowline.classes.vertex import pyvertex
 from pyflowline.classes.edge import pyedge
 from pyflowline.classes.cell import pycell
+
+from pyflowline.classes.flowline import pyflowline
 from pyflowline.algorithms.auxiliary.gdal_functions import calculate_polygon_area
 
 
-class NumpyArrayEncoder(JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, np.ndarray):
-            return obj.tolist()
-        return JSONEncoder.default(self, obj)
+from pyflowline.classes.classencoder import ClassEncoder
 
 class pyhexagon(pycell):
     lIndex=-1      
@@ -130,7 +128,7 @@ class pyhexagon(pycell):
     def tojson(self):
         sJson = json.dumps(self.__dict__, ensure_ascii=False, \
              sort_keys=True, \
-            indent=4, cls=NumpyArrayEncoder) 
+            indent=4, cls=CellClassEncoder) 
         return sJson
 
     def plot():

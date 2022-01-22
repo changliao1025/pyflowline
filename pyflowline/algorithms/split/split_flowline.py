@@ -62,13 +62,13 @@ def split_flowline(aFlowline_in, aVertex_in, iFlag_intersect = None):
             pass
         else:
             if iPart ==1:
-                print('Something is wrong')
+                print('This flowline does not form any loop')
                 pass
             else:
-                if iPart ==2:
-                    aFlowline_out.append(pFlowline)
-                    pass
-                else: #greater than 2
+                if iPart >=2:
+                    #aFlowline_out.append(pFlowline)
+                    #pass
+                #else: #greater than 2
 
                     nLine = iPart-1
                     #rebuild index

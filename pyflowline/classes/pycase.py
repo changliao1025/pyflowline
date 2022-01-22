@@ -15,6 +15,10 @@ import matplotlib.patches as mpatches
 import matplotlib.cm as cm
 from matplotlib.collections import PatchCollection
 from pyflowline.classes.mpas import pympas
+from pyflowline.classes.hexagon import pyhexagon
+from pyflowline.classes.latlon import pylatlon
+from pyflowline.classes.square import pysquare
+
 from pyflowline.classes.vertex import pyvertex
 from pyflowline.classes.basin import pybasin
 from pyflowline.classes.flowline import pyflowline
@@ -35,6 +39,8 @@ from pyflowline.algorithms.auxiliary.gdal_functions import reproject_coordinates
 
 from pyflowline.formats.read_mesh import read_mesh_json
 
+from pyflowline.classes.classencoder import ClassEncoder
+
 import cartopy.crs as ccrs
 
 desired_proj = ccrs.Orthographic(central_longitude=-75, central_latitude=42, globe=None)
@@ -44,22 +50,7 @@ desired_proj = ccrs.PlateCarree()
 pDate = datetime.datetime.today()
 sDate_default = "{:04d}".format(pDate.year) + "{:02d}".format(pDate.month) + "{:02d}".format(pDate.day)
 
-class CaseClassEncoder(JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, np.integer):
-            return int(obj)
-        if isinstance(obj, np.float):
-            return float(obj)
-        if isinstance(obj, np.ndarray):
-            return obj.tolist()
-        if isinstance(obj, pybasin):
-            return json.loads(obj.tojson())        
-        if isinstance(obj, pyflowline):
-            return obj.lFlowlineID
-        if isinstance(obj, pympas):
-            return obj.lCellID
-        
-        return JSONEncoder.default(self, obj)
+
 
 class flowlinecase(object):
     __metaclass__ = ABCMeta
@@ -727,7 +718,7 @@ class flowlinecase(object):
             self.aFlowline_simplified = aFlowline_out
         return aFlowline_out
     
-    def create_mesh(self):        
+    def mesh_generation(self):        
         iFlag_global =  self.iFlag_global
         iMesh_type = self.iMesh_type
         iFlag_save_mesh = self.iFlag_save_mesh
@@ -902,7 +893,7 @@ class flowlinecase(object):
             sort_keys=True, \
                 indent = 4, \
                     ensure_ascii=True, \
-                        cls=CaseClassEncoder)
+                        cls=ClassEncoder)
         return sJson
     
 

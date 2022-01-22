@@ -50,8 +50,7 @@ def find_vertex_on_edge(aVertex_in, pEdge_in):
         for i in np.arange( nVertex):
             pVertex = aVertex_in[i]
             iFlag_overlap = pEdge_in.check_vertex_on_edge(pVertex)
-            if iFlag_overlap == 1:
-                iFlag_overlap = pEdge_in.check_vertex_on_edge(pVertex)
+            if iFlag_overlap == 1:                
                 iFlag_exist = 1      
                 dis = pEdge_in.pVertex_start.calculate_distance(pVertex)
                 aDistance.append(dis)

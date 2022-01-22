@@ -22,7 +22,7 @@ from pyflowline.classes.square import pysquare
 from pyflowline.classes.vertex import pyvertex
 from pyflowline.classes.basin import pybasin
 from pyflowline.classes.flowline import pyflowline
-
+from pyflowline.classes.edge import pyedge
 
 from pyflowline.algorithms.auxiliary.gdal_functions import retrieve_geotiff_metadata
 from pyflowline.algorithms.auxiliary.gdal_functions import reproject_coordinates
@@ -39,7 +39,6 @@ from pyflowline.algorithms.auxiliary.gdal_functions import reproject_coordinates
 
 from pyflowline.formats.read_mesh import read_mesh_json
 
-from pyflowline.classes.classencoder import ClassEncoder
 
 import cartopy.crs as ccrs
 
@@ -51,6 +50,36 @@ pDate = datetime.datetime.today()
 sDate_default = "{:04d}".format(pDate.year) + "{:02d}".format(pDate.month) + "{:02d}".format(pDate.day)
 
 
+
+class CaseClassEncoder(JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, np.integer):
+            return int(obj)
+        if isinstance(obj, np.float32):
+            return float(obj)
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        if isinstance(obj, list):
+            pass  
+        if isinstance(obj, pyvertex):
+            return json.loads(obj.tojson()) #lVertexID
+        if isinstance(obj, pyedge):
+            return obj.lEdgeID        
+        if isinstance(obj, pyflowline):
+            return obj.lFlowlineID
+        if isinstance(obj, pyhexagon):
+            return obj.lCellID
+        if isinstance(obj, pysquare):
+            return obj.lCellID
+        if isinstance(obj, pylatlon):
+            return obj.lCellID
+        if isinstance(obj, pympas):
+            return obj.lCellID
+        
+        if isinstance(obj, pybasin):
+            return json.loads(obj.tojson())    
+            
+        return JSONEncoder.default(self, obj)
 
 class flowlinecase(object):
     __metaclass__ = ABCMeta
@@ -893,7 +922,7 @@ class flowlinecase(object):
             sort_keys=True, \
                 indent = 4, \
                     ensure_ascii=True, \
-                        cls=ClassEncoder)
+                        cls=CaseClassEncoder)
         return sJson
     
 

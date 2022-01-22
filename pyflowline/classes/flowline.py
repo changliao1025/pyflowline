@@ -30,7 +30,11 @@ class pyflowline(object):
 
     nEdge=0
     nVertex=0
-
+    iFlag_right = 0
+    iFlag_left = 0
+    aFlowlineID_start = list()
+    aFlowlineID_end = list()
+    
     def __init__(self, aEdge):    
         self.aEdge = aEdge
         nEdge  = len(aEdge)

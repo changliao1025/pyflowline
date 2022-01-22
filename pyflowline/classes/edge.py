@@ -2,7 +2,7 @@ from abc import ABCMeta, abstractmethod
 import json
 import numpy as np
 from osgeo import gdal, osr, ogr
-from pyflowline.algorithms.auxiliary.gdal_functions import latlong_to_3d, angle_between_vectors_degrees
+from pyflowline.algorithms.auxiliary.gdal_functions import  calculate_angle_betwen_vertex
 from pyflowline.classes.vertex import pyvertex
 
 class pyedge(object):
@@ -121,21 +121,12 @@ class pyedge(object):
             d1 = pVertex_start.calculate_distance(pVertex_in)
             d2 = pVertex_end.calculate_distance(pVertex_in)
             d3 = d1 +d2 -self.dLength
-            a = np.radians(np.array((pVertex_start.dLatitude_degree, pVertex_start.dLongitude_degree) ))
-            b = np.radians(np.array((pVertex_in.dLatitude_degree, pVertex_in.dLongitude_degree) ))
-            c = np.radians(np.array((pVertex_end.dLatitude_degree, pVertex_end.dLongitude_degree) ))
-            # The points in 3D space
-            a3 = latlong_to_3d(*a)
-            b3 = latlong_to_3d(*b)
-            c3 = latlong_to_3d(*c)
 
-            # Vectors in 3D space
-            a3vec = a3 - b3
-            c3vec = c3 - b3
+            angle3deg = calculate_angle_betwen_vertex(pVertex_start.dLatitude_degree, pVertex_start.dLongitude_degree,\
+                pVertex_in.dLatitude_degree, pVertex_in.dLongitude_degree, \
+               pVertex_end.dLatitude_degree, pVertex_end.dLongitude_degree )
 
-            # Find the angle between the vectors in 2D space
-            angle3deg = angle_between_vectors_degrees(a3vec, c3vec)
-
+        
             if angle3deg > 175 and d3 < 0.1:
                 iFlag = 1
             else:

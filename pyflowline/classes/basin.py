@@ -63,10 +63,31 @@ from pyflowline.algorithms.auxiliary.calculate_area_of_difference import calcula
 
 from pyflowline.algorithms.intersect.intersect_flowline_with_flowline import intersect_flowline_with_flowline
 
-from pyflowline.classes.classencoder import ClassEncoder
 desired_proj = ccrs.Orthographic(central_longitude=-75, central_latitude=42, globe=None)
 desired_proj = ccrs.PlateCarree()
 
+class BasinClassEncoder(JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, np.integer):
+            return int(obj)
+        if isinstance(obj, np.float32):
+            return float(obj)
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        if isinstance(obj, list):
+            pass  
+        if isinstance(obj, pyvertex):
+            return json.loads(obj.tojson()) #lVertexID
+        if isinstance(obj, pyedge):
+            return obj.lEdgeID        
+        if isinstance(obj, pyflowline):
+            return obj.lFlowlineID
+        
+        
+        if isinstance(obj, pybasin):
+            return json.loads(obj.tojson())    
+            
+        return JSONEncoder.default(self, obj)
 
 
 
@@ -515,7 +536,7 @@ class pybasin(object):
             sort_keys=True, \
                 indent = 4, \
                     ensure_ascii=True, \
-                        cls=ClassEncoder)      
+                        cls=BasinClassEncoder)      
             f.write(sJson)    
             f.close()
         return
@@ -601,7 +622,7 @@ class pybasin(object):
         sFilename_output = os.path.join(self.sWorkspace_output_basin, sFilename_area_of_difference)
         #remove headwater not needed here
 
-        aPolygon_out, dArea = calculate_area_of_difference_simplified(aFlowline_all, sFilename_output)
+        aPolygon_out, dArea = calculate_area_of_difference_simplified(aFlowline_all, aVertex_all, sFilename_output)
         print('Area of difference: ', dArea)
         self.dArea_of_difference = dArea
         self.dDistance_displace = dArea / self.dLength_flowline_after_simplification

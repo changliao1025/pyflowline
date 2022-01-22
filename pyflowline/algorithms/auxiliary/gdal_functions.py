@@ -6,6 +6,24 @@ import math
 from math import radians, cos, sin, asin, sqrt
 from osgeo import ogr, osr, gdal, gdalconst
 from numpy import arctan2, cos, sin, sqrt, pi, power, append, diff
+
+
+def calculate_angle_betwen_vertex(x1, y1, x2, y2, x3, y3):
+    #all in degree
+    a = np.radians(np.array((x1, y1) ))
+    b = np.radians(np.array((x2, y2) ))
+    c = np.radians(np.array((x3, y3) ))
+    # The points in 3D space
+    a3 = latlong_to_3d(*a)
+    b3 = latlong_to_3d(*b)
+    c3 = latlong_to_3d(*c)
+    # Vectors in 3D space
+    a3vec = a3 - b3
+    c3vec = c3 - b3        
+    angle3deg = angle_between_vectors_degrees(a3vec, c3vec)
+
+    return  angle3deg
+    
 def latlong_to_3d(latr, lonr):
     """Convert a point given latitude and longitude in radians to
     3-dimensional space, assuming a sphere radius of one."""

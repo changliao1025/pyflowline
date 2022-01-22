@@ -9,9 +9,7 @@ from pyflowline.classes.flowline import pyflowline
 from pyflowline.classes.hexagon import pyhexagon
 from pyflowline.classes.square import pysquare
 from pyflowline.classes.latlon import pylatlon
-
 from pyflowline.classes.mpas import pympas
-
 from pyflowline.classes.basin import pybasin
 
 class ClassEncoder(JSONEncoder):

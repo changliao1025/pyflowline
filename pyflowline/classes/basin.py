@@ -63,26 +63,11 @@ from pyflowline.algorithms.auxiliary.calculate_area_of_difference import calcula
 
 from pyflowline.algorithms.intersect.intersect_flowline_with_flowline import intersect_flowline_with_flowline
 
-
+from pyflowline.classes.classencoder import ClassEncoder
 desired_proj = ccrs.Orthographic(central_longitude=-75, central_latitude=42, globe=None)
 desired_proj = ccrs.PlateCarree()
 
-class BasinClassEncoder(JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, np.integer):
-            return int(obj)
-        if isinstance(obj, np.float):
-            return float(obj)
-        if isinstance(obj, np.ndarray):
-            return obj.tolist()
-        if isinstance(obj, pyedge):
-            return obj.lEdgeID
-        if isinstance(obj, pyvertex):
-            return json.loads(obj.tojson()) #lVertexID
-        if isinstance(obj, pyflowline):
-            return obj.lFlowlineID
-        
-        return JSONEncoder.default(self, obj)
+
 
 
 class pybasin(object):
@@ -530,7 +515,7 @@ class pybasin(object):
             sort_keys=True, \
                 indent = 4, \
                     ensure_ascii=True, \
-                        cls=BasinClassEncoder)      
+                        cls=ClassEncoder)      
             f.write(sJson)    
             f.close()
         return

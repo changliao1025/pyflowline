@@ -6,6 +6,8 @@ from pyflowline.classes.edge import pyedge
 from pyflowline.classes.cell import pycell
 from pyflowline.algorithms.auxiliary.gdal_functions import calculate_polygon_area
 
+
+from pyflowline.classes.classencoder import ClassEncoder
 class pylatlon(pycell):
     #lIndex=0 
     nFlowline=0

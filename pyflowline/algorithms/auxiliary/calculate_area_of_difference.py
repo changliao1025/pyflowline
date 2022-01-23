@@ -7,7 +7,7 @@ from shapely.geometry import Point, LineString, MultiLineString
 from shapely.wkt import loads
 
 from shapely.ops import polygonize, polygonize_full
-from pyflowline.algorithms.auxiliary.gdal_functions import  calculate_angle_betwen_vertex
+from pyflowline.algorithms.auxiliary.gdal_functions import  calculate_angle_betwen_vertex, calculate_angle_betwen_vertex_2d
 from pyflowline.classes.edge import pyedge
 from pyflowline.classes.vertex import pyvertex
 from pyflowline.classes.flowline import pyflowline
@@ -114,7 +114,7 @@ def calculate_area_of_difference_simplified(aFlowline_in, aVertex_all_in, \
                 x3 = pVertex_dummy.dLongitude_degree
                 y3 = pVertex_dummy.dLatitude_degree
 
-                angle_dummy = calculate_angle_betwen_vertex( x1, y1, x2, y2, x3, y3  )
+                angle_dummy = calculate_angle_betwen_vertex_2d( x1, y1, x2, y2, x3, y3  )
                 print(angle_dummy)
                 if angle_dummy < angle_min:
                     angle_min = angle_dummy

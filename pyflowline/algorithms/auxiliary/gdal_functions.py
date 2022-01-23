@@ -14,9 +14,9 @@ def calculate_angle_betwen_vertex(x1, y1, x2, y2, x3, y3):
     b = np.radians(np.array((x2, y2) ))
     c = np.radians(np.array((x3, y3) ))
     # The points in 3D space
-    a3 = latlong_to_3d(*a)
-    b3 = latlong_to_3d(*b)
-    c3 = latlong_to_3d(*c)
+    a3 = longlat_to_3d(*a)
+    b3 = longlat_to_3d(*b)
+    c3 = longlat_to_3d(*c)
     # Vectors in 3D space
     a3vec = a3 - b3
     c3vec = c3 - b3        
@@ -24,14 +24,13 @@ def calculate_angle_betwen_vertex(x1, y1, x2, y2, x3, y3):
 
     return  angle3deg
     
-def latlong_to_3d(latr, lonr):
+def longlat_to_3d(lonr, latr):
     """Convert a point given latitude and longitude in radians to
     3-dimensional space, assuming a sphere radius of one."""
-    return np.array((
-        math.cos(latr) * math.cos(lonr),
-        math.cos(latr) * math.sin(lonr),
-        math.sin(latr)
-    ))
+    a = math.cos(latr) * math.cos(lonr)
+    b = math.cos(latr) * math.sin(lonr)
+    c = math.sin(latr)
+    return np.array((a,b,c))
 
 def angle_between_vectors_degrees(u, v):
     """Return the angle between two vectors in any dimension space,
@@ -42,11 +41,14 @@ def angle_between_vectors_degrees(u, v):
     c = np.linalg.norm(v)
     d = a / (b* c)
     if d > 1:
-        d=1
+        d = 1
     if d < -1:
-        d=-1
+        d = -1
     e = math.acos(d)
     f = np.degrees(e)
+    #if d < 0:
+    #    f = f + 180.0    
+
     return f
     #return np.degrees(
     #    math.acos(np.dot(u, v) / (np.linalg.norm(u) * np.linalg.norm(v))))

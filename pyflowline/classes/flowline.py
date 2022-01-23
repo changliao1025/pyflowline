@@ -32,8 +32,8 @@ class pyflowline(object):
     nVertex=0
     iFlag_right = 0
     iFlag_left = 0
-    aFlowlineID_start = list()
-    aFlowlineID_end = list()
+    aFlowlineID_start = None
+    aFlowlineID_end = None
     
     def __init__(self, aEdge):    
         self.aEdge = aEdge
@@ -51,6 +51,8 @@ class pyflowline(object):
         self.aVertex.append( aEdge[nEdge-1].pVertex_end )
         self.nVertex = nVertex
         self.dLength= self.calculate_length()
+        self.aFlowlineID_start = list()
+        self.aFlowlineID_end = list()
      
         return
 

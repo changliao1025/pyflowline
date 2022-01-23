@@ -122,12 +122,13 @@ class pyedge(object):
             d2 = pVertex_end.calculate_distance(pVertex_in)
             d3 = d1 +d2 -self.dLength
 
-            angle3deg = calculate_angle_betwen_vertex(pVertex_start.dLatitude_degree, pVertex_start.dLongitude_degree,\
-                pVertex_in.dLatitude_degree, pVertex_in.dLongitude_degree, \
-               pVertex_end.dLatitude_degree, pVertex_end.dLongitude_degree )
+            angle3deg = calculate_angle_betwen_vertex(\
+                 pVertex_start.dLongitude_degree, pVertex_start.dLatitude_degree,\
+                 pVertex_in.dLongitude_degree, pVertex_in.dLatitude_degree,\
+                 pVertex_end.dLongitude_degree,pVertex_end.dLatitude_degree)
 
         
-            if angle3deg > 175 and d3 < 0.1:
+            if  angle3deg > 175 and d3 < 0.1:
                 iFlag = 1
             else:
                 iFlag = 0

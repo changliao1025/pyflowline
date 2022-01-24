@@ -9,8 +9,11 @@ from numpy import arctan2, cos, sin, sqrt, pi, power, append, diff
 
 def calculate_angle_betwen_vertex_2d(x1, y1, x2, y2, x3, y3):
     a0 = np.arctan2(y3 - y2, x3 - x2)
+    a00 = np.degrees(a0)
     b0 = np.arctan2(y1 - y2, x1 - x2)
+    b00 = np.degrees(b0)
     angle = ( a0 - b0  )
+    angle0 = a00-b00
     
     
 

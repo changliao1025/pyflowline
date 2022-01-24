@@ -127,7 +127,6 @@ class pyedge(object):
                  pVertex_in.dLongitude_degree, pVertex_in.dLatitude_degree,\
                  pVertex_end.dLongitude_degree,pVertex_end.dLatitude_degree)
 
-        
             if  angle3deg > 175 and d3 < 0.1:
                 iFlag = 1
             else:

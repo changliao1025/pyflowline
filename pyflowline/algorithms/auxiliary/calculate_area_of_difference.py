@@ -7,7 +7,7 @@ from shapely.geometry import Point, LineString, MultiLineString
 from shapely.wkt import loads
 
 from shapely.ops import polygonize, polygonize_full
-from pyflowline.algorithms.auxiliary.gdal_functions import  calculate_angle_betwen_vertex, calculate_angle_betwen_vertex_2d
+from pyflowline.algorithms.auxiliary.gdal_functions import calculate_angle_betwen_vertex,  calculate_angle_betwen_vertex_normal
 from pyflowline.classes.edge import pyedge
 from pyflowline.classes.vertex import pyvertex
 from pyflowline.classes.flowline import pyflowline
@@ -114,12 +114,27 @@ def calculate_area_of_difference_simplified(aFlowline_in, aVertex_all_in, \
                 x3 = pVertex_dummy.dLongitude_degree
                 y3 = pVertex_dummy.dLatitude_degree
 
-                angle_dummy = calculate_angle_betwen_vertex_2d( x1, y1, x2, y2, x3, y3  )
+                #angle_dummy0 = calculate_angle_betwen_vertex( x1, y1, x2, y2, x3, y3  )
+
+                angle_dummy = calculate_angle_betwen_vertex_normal( x1, y1, x2, y2, x3, y3  )
                 print(angle_dummy)
                 if angle_dummy < angle_min:
                     angle_min = angle_dummy
                     iIndex_right = i
             
+            #mini
+
+            pFlowline_out = aFlowline_in[iIndex_right]
+
+            if pFlowline_out.pVertex_start == pVertex_stop:
+                #aFlowline_in[iIndex_right].iFlag_right =1
+                iFlag_reverse_new=0
+                pVertex_stop_out =   pFlowline_out.pVertex_end
+            else:
+                #aFlowline_in[iIndex_right].iFlag_left =1
+                iFlag_reverse_new=1
+                pVertex_stop_out=pFlowline_out.pVertex_start
+            return iFlag_reverse_new, pFlowline_out, pVertex_stop_out
 
 
         else:
@@ -171,57 +186,46 @@ def calculate_area_of_difference_simplified(aFlowline_in, aVertex_all_in, \
                     angle_min = angle_dummy
                     iIndex_right = i
             
+            #take the mini
+
+            
 
 
         else:
             #rever direction
             pVertex_stop = pFlowline_in.pVertex_start
 
-    def walk_cycle_right( pFlowline_in ):
+    def walk_cycle(iFlag_reverse, pFlowline_in ):
 
-        iFlag_right = pFlowline_in.iFlag_right
-        if iFlag_right == 1:
-            return
-        else:
-            pVertex_start = pFlowline_in.pVertex_start
-            pVertex_end = pFlowline_in.pVertex_end
-            pFlowline_next, pVertex_stop  = get_right_branch(0, pFlowline_in)
+        if iFlag_reverse ==0:
 
-            if (pVertex_stop == pVertex_start):
-                #a loop is finished
-
-                pass
+            iFlag_right = pFlowline_in.iFlag_right
+            if iFlag_right == 1:
+                return
             else:
-                pFlowline_in = pFlowline_next
-                walk_cycle_right( pFlowline_in)
+                pVertex_start = pFlowline_in.pVertex_start
+                pVertex_end = pFlowline_in.pVertex_end
+                iFlag_reverse_new, pFlowline_next, pVertex_stop  = get_right_branch(0, pFlowline_in)
+                aFlowline_in[pFlowline_in.lFlowlineID].iFlag_right=1
+
+                if (pVertex_stop == pVertex_start):
+                    #a loop is finished
+                    pass
+                else:
+                    pFlowline_in = pFlowline_next
+                    walk_cycle( iFlag_reverse_new, pFlowline_in)
+
+        else:
+            iFlag_left = pFlowline_in.iFlag_left
 
     
         return
 
-    def walk_cycle_left( pFlowline_in ):
-
-        iFlag_left = pFlowline_in.iFlag_left
-        if iFlag_left == 1:
-            return
-        else:
-            pVertex_start = pFlowline_in.pVertex_start
-            pVertex_end = pFlowline_in.pVertex_end
-            pFlowline_next, pVertex_stop  = get_left_branch(0, pFlowline_in)
-
-            if (pVertex_stop == pVertex_start):
-                #a loop is finished
-
-                pass
-            else:
-                pFlowline_in = pFlowline_next
-                walk_cycle_left( pFlowline_in)
-
     
-        return
 
     for i in range(nFlowline):
         pFlowline_in = aFlowline_in[i]
-        walk_cycle_right(pFlowline_in)
+        walk_cycle(0, pFlowline_in)
 
 
 

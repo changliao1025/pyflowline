@@ -7,39 +7,28 @@ from math import radians, cos, sin, asin, sqrt
 from osgeo import ogr, osr, gdal, gdalconst
 from numpy import arctan2, cos, sin, sqrt, pi, power, append, diff
 
-def calculate_angle_betwen_vertex_2d(x1, y1, x2, y2, x3, y3):
-    a0 = np.arctan2(y3 - y2, x3 - x2)
-    a00 = np.degrees(a0)
-    b0 = np.arctan2(y1 - y2, x1 - x2)
-    b00 = np.degrees(b0)
-    angle = ( a0 - b0  )
-    angle0 = a00-b00
-    
-    
-
+def calculate_angle_betwen_vertex_normal(x1, y1, x2, y2, x3, y3):
     a = np.radians(np.array((x1, y1) ))
     b = np.radians(np.array((x2, y2) ))
     c = np.radians(np.array((x3, y3) ))
+    # The points in 3D space
+    a3 = longlat_to_3d(*a)
+    b3 = longlat_to_3d(*b)
+    c3 = longlat_to_3d(*c)
 
-    # Vectors in latitude/longitude space
-    avec = a - b
-    cvec = c - b
+    a3vec = a3 - b3
+    c3vec = c3 - b3 
 
-    # Adjust vectors for changed longitude scale at given latitude into 2D space
-    lat = b[0]
-    avec[1] *= math.cos(lat)
-    cvec[1] *= math.cos(lat)
-    # Find the angle between the vectors in 2D space
-    angle2deg = angle_between_vectors_degrees(avec, cvec)
+    dot=np.dot(a3vec, c3vec)
+    g = np.cross(a3vec, c3vec)
+    det = np.dot(b3, g)
+    angle = np.arctan2(det, dot)
+    f = np.degrees(angle) 
 
-    if angle < 0:
-        c = np.degrees(angle)
-        d = c +  360
-        e = 360 - angle2deg
-    else:
-        pass
+    if f < 0:
+        f = 360 + f
     
-    return angle2deg
+    return f
 
 def calculate_angle_betwen_vertex(x1, y1, x2, y2, x3, y3):
     #all in degree

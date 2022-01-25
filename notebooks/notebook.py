@@ -27,7 +27,6 @@ else:
         sFilename_configuration_in = sPath +  '/../tests/configurations/pyflowline_susquehanna_latlon.json' 
         #sFilename_configuration_in = sPath +  '/../tests/configurations/pyflowline_susquehanna_mpas.json' 
         
-        
         #mac
         #sFilename_configuration_in = '/Users/liao313/workspace/python/pyflowline/configurations/pyflowline_susquehanna_hexagon_mac.json'
         print(sFilename_configuration_in)
@@ -42,7 +41,6 @@ oPyflowline.convert_flowline_to_json()
 #oPyflowline.plot(sVariable_in = 'flowline_filter_json')
 oPyflowline.flowline_simplification()
 #oPyflowline.plot(sVariable_in = 'flowline_simplified')
-
 
 oPyflowline.mesh_generation()
 #oPyflowline.plot(sVariable_in = 'mesh')

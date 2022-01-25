@@ -136,3 +136,10 @@ class pylatlon(pycell):
 
 
         return iFlag_share
+    def tojson(self):
+        sJson = json.dumps(self.__dict__, \
+            sort_keys=True, \
+            indent = 4, \
+            ensure_ascii=True, \
+            cls=LatlonClassEncoder)
+        return sJson

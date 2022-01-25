@@ -153,7 +153,7 @@ def degree_to_meter(dLatitude_in, dResolution_degree_in):
     Returns:
         [type]: [description]
     """
-    dRadius = 6378.1 * 1000 #unit: m earth radius
+    dRadius = 6378137.0  #unit: m earth radius
     dRadius2 = dRadius * np.cos( dLatitude_in / 180.0 * np.pi)
     dResolution_meter = dResolution_degree_in / 360.0 * (2*np.pi * dRadius2)
 
@@ -171,7 +171,7 @@ def meter_to_degree(dResolution_meter_in, dLatitude_mean_in):
     """
     dLatitude_mean = abs(dLatitude_mean_in)
 
-    dRadius = 6378.1 * 1000 #unit: m earth radius
+    dRadius = 6378137.0 # #unit: m earth radius
     dRadius2 = dRadius * np.cos( dLatitude_mean / 180.0 * np.pi)
 
     ##dResolution_meter = dResolution_degree / 360.0 * 2*np.pi * dRadius2
@@ -280,7 +280,7 @@ def calculate_distance_based_on_lon_lat(lon1, lat1, lon2, lat2):
     dlat = lat2 - lat1 
     a = sin(dlat/2)**2 + cos(lat1) * cos(lat2) * sin(dlon/2)**2
     c = 2 * asin(sqrt(a)) 
-    #r = 6371000 # Radius of earth in kilometers. Use 3956 for miles
+    # Radius of earth in kilometers. Use 3956 for miles
     r = 6378137.0
     return c * r
 

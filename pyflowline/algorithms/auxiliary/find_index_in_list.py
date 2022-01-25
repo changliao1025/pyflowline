@@ -1,5 +1,6 @@
 import math
 import numpy as np
+import copy
 from pyflowline.classes.vertex import pyvertex
 from pyflowline.classes.edge import pyedge
 from pyflowline.classes.flowline import pyflowline
@@ -207,4 +208,20 @@ def add_unique_vertex(aVertex_in, pVertex_in):
     return aVertex_in, iFlag_exist
 
 
+def find_list_in_list(aList_in, pList_in):
+    c = copy.deepcopy(pList_in)
+    c.sort()
+    nList = len(aList_in)
+    iFlag = 0
+    for i in range(nList):
+        a = aList_in[i]
+        b = copy.deepcopy(a)
+        b.sort()
+        if (b == c ):
+            iFlag =1 
+            break
+        else:
+            iFlag = 0
 
+   
+    return iFlag

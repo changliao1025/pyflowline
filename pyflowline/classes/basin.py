@@ -603,18 +603,20 @@ class pybasin(object):
         export_vertex_to_json( aVertex_all, sFilename_output)
 
 
+
         #split
  
         aFlowline_simplified_split = split_flowline(aFlowline_simplified, aVertex_all,iFlag_intersect =1)
         sFilename_out = 'split_flowline_simplified.json'
         sFilename_out = os.path.join(self.sWorkspace_output_basin, sFilename_out)
         export_flowline_to_json(aFlowline_simplified_split, sFilename_out)
-
+        #aFlowline_simplified_split, dummy = read_flowline_geojson(sFilename_out)
 
         aFlowline_conceptual_split = split_flowline(aFlowline_conceptual, aVertex_all,iFlag_intersect =1)
         sFilename_out = 'split_flowline_conceptual.json'
         sFilename_out = os.path.join(self.sWorkspace_output_basin, sFilename_out)
         export_flowline_to_json(aFlowline_conceptual_split, sFilename_out)
+        #aFlowline_conceptual_split, dummy = read_flowline_geojson(sFilename_out)
 
         aFlowline_all = aFlowline_simplified_split + aFlowline_conceptual_split
 
@@ -658,6 +660,7 @@ class pybasin(object):
         n_colors = pLayer.GetFeatureCount()
         
         colours = cm.rainbow(np.linspace(0, 1, n_colors))
+        lID=0
         for pFeature in pLayer:
             pGeometry_in = pFeature.GetGeometryRef()
             sGeometry_type = pGeometry_in.GetGeometryName()
@@ -682,7 +685,7 @@ class pybasin(object):
                         dLat_min = dLat
     
                 polygon = mpatches.Polygon(aCoords_gcs[:,0:2], closed=True,  linewidth=0.25, \
-                    alpha=0.8, edgecolor = 'black',facecolor='red', \
+                    alpha=0.8, edgecolor = 'red',facecolor='red', \
                         transform=ccrs.PlateCarree() )
 
                 ax.add_patch(polygon)   

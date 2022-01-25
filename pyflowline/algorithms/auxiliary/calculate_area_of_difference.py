@@ -5,7 +5,7 @@ import numpy as np
 from osgeo import ogr, osr, gdal, gdalconst
 from shapely.geometry import Point, LineString, MultiLineString
 from shapely.wkt import loads
-
+from matplotlib import cm
 from shapely.ops import polygonize, polygonize_full
 from pyflowline.algorithms.auxiliary.gdal_functions import calculate_angle_betwen_vertex,  calculate_angle_betwen_vertex_normal
 from pyflowline.classes.edge import pyedge
@@ -17,7 +17,7 @@ from pyflowline.formats.convert_coordinates import convert_gcs_coordinates_to_fl
 from pyflowline.algorithms.intersect.intersect_flowline_with_flowline import intersect_flowline_with_flowline
 from pyflowline.algorithms.auxiliary.gdal_functions import calculate_polygon_area
 
-
+from pyflowline.algorithms.auxiliary.find_index_in_list import find_list_in_list ,find_vertex_in_list
 
 def calculate_area_of_difference_raw(sFilename_a, sFilename_b):
 
@@ -38,7 +38,7 @@ def calculate_area_of_difference_simplified(aFlowline_in, aVertex_all_in, \
 
     nFlowline = len(aFlowline_in)
     nVeretx = len(aVertex_all_in)
-    aFlowline = list()
+
 
 
     #rebuild
@@ -64,15 +64,21 @@ def calculate_area_of_difference_simplified(aFlowline_in, aVertex_all_in, \
         for j  in range(len(aFlowline_in)):
             pFlowline2 = aFlowline_in[j]
             if pFlowline.lFlowlineID != pFlowline2.lFlowlineID:
-                if pFlowline.pVertex_start in (pFlowline2.pVertex_start, pFlowline2.pVertex_end):
-                    pFlowline.aFlowlineID_start.append(pFlowline2.lFlowlineID)                    
-                elif pFlowline.pVertex_end in (pFlowline2.pVertex_start, pFlowline2.pVertex_end):                                    
-                    pFlowline.aFlowlineID_end.append(pFlowline2.lFlowlineID)
+                if (pFlowline.pVertex_start == pFlowline2.pVertex_start ):
+                    pFlowline.aFlowlineID_start_start.append(pFlowline2.lFlowlineID)
+
+                if (pFlowline.pVertex_start==pFlowline2.pVertex_end):
+                    pFlowline.aFlowlineID_start_end.append(pFlowline2.lFlowlineID)   
+                
+                if (pFlowline.pVertex_end==pFlowline2.pVertex_start ):
+                    pFlowline.aFlowlineID_end_start.append(pFlowline2.lFlowlineID)
+                if (pFlowline.pVertex_end==pFlowline2.pVertex_end):
+                    pFlowline.aFlowlineID_end_end.append(pFlowline2.lFlowlineID)
 
   
 
 
-    def get_right_branch(iFlag_reverse, pFlowline_in):
+    def get_next_branch(iFlag_rightleft, iFlag_reverse, pFlowline_in):
         """
         This function starts at a contact (called `edge_0`) and calculates
         the angles between the adjacent contacts at a side (either `stop` or
@@ -85,6 +91,7 @@ def calculate_area_of_difference_simplified(aFlowline_in, aVertex_all_in, \
         """
 
         nEdge = pFlowline_in.nEdge
+        iFlag_exist = 0 
         if iFlag_reverse ==0 :
             #normal direction
             pVertex_stop = pFlowline_in.pVertex_end
@@ -95,164 +102,246 @@ def calculate_area_of_difference_simplified(aFlowline_in, aVertex_all_in, \
             x2 = pEdge.pVertex_end.dLongitude_degree
             y2 = pEdge.pVertex_end.dLatitude_degree
             
-            angle_min = 360
+           
             iIndex_right = -1
-            for i in pFlowline_in.aFlowlineID_end:
-                pFlowline_dummy = aFlowline_in[i]
-                if (pFlowline_dummy.pVertex_start == pVertex_stop):
-                    nEdge2 = pFlowline_dummy.nEdge
-                    pEdge2 = pFlowline_dummy.aEdge[0]
-                    pVertex_dummy = pEdge2.pVertex_end
-                else:
-                    #revered
-                    nEdge2 = pFlowline_dummy.nEdge
-                    pEdge2 = pFlowline_dummy.aEdge[nEdge2-1]
-                    pVertex_dummy = pEdge2.pVertex_start
-                
-                #calculate angle              
-                
-                x3 = pVertex_dummy.dLongitude_degree
-                y3 = pVertex_dummy.dLatitude_degree
 
-                #angle_dummy0 = calculate_angle_betwen_vertex( x1, y1, x2, y2, x3, y3  )
-
-                angle_dummy = calculate_angle_betwen_vertex_normal( x1, y1, x2, y2, x3, y3  )
-                print(angle_dummy)
-                if angle_dummy < angle_min:
-                    angle_min = angle_dummy
-                    iIndex_right = i
-            
-            #mini
-
-            pFlowline_out = aFlowline_in[iIndex_right]
-
-            if pFlowline_out.pVertex_start == pVertex_stop:
-                #aFlowline_in[iIndex_right].iFlag_right =1
-                iFlag_reverse_new=0
-                pVertex_stop_out =   pFlowline_out.pVertex_end
+            n = len(pFlowline_in.aFlowlineID_end_start) + len(pFlowline_in.aFlowlineID_end_end)
+            if n == 0:
+                iFlag_exist = 0 
+                iFlag_reverse_new= 0
+                pFlowline_out = None
+                pVertex_stop_out = None
+                return iFlag_exist, iFlag_reverse_new, pFlowline_out, pVertex_stop_out
             else:
-                #aFlowline_in[iIndex_right].iFlag_left =1
-                iFlag_reverse_new=1
-                pVertex_stop_out=pFlowline_out.pVertex_start
-            return iFlag_reverse_new, pFlowline_out, pVertex_stop_out
+                aAngle=list()
+                for i in pFlowline_in.aFlowlineID_end_start:
+                    pFlowline_dummy = aFlowline_in[i]
+                    if (pFlowline_dummy.pVertex_start == pVertex_stop):
+                        nEdge2 = pFlowline_dummy.nEdge
+                        pEdge2 = pFlowline_dummy.aEdge[0]
+                        pVertex_dummy = pEdge2.pVertex_end
+                    else:                        #revered
+                        nEdge2 = pFlowline_dummy.nEdge
+                        pEdge2 = pFlowline_dummy.aEdge[nEdge2-1]
+                        pVertex_dummy = pEdge2.pVertex_start
+
+                    #calculate angle              
+                    x3 = pVertex_dummy.dLongitude_degree
+                    y3 = pVertex_dummy.dLatitude_degree
+                    angle_dummy = calculate_angle_betwen_vertex_normal( x1, y1, x2, y2, x3, y3  )                    
+                    aAngle.append(angle_dummy)
+                for i in pFlowline_in.aFlowlineID_end_end:
+                    pFlowline_dummy = aFlowline_in[i]
+                    if (pFlowline_dummy.pVertex_start == pVertex_stop):
+                        nEdge2 = pFlowline_dummy.nEdge
+                        pEdge2 = pFlowline_dummy.aEdge[0]
+                        pVertex_dummy = pEdge2.pVertex_end
+                    else:                        #revered
+                        nEdge2 = pFlowline_dummy.nEdge
+                        pEdge2 = pFlowline_dummy.aEdge[nEdge2-1]
+                        pVertex_dummy = pEdge2.pVertex_start
+
+                    #calculate angle              
+                    x3 = pVertex_dummy.dLongitude_degree
+                    y3 = pVertex_dummy.dLatitude_degree
+                    angle_dummy = calculate_angle_betwen_vertex_normal( x1, y1, x2, y2, x3, y3  )                    
+                    aAngle.append(angle_dummy)
+                    
+
+                #mini
+                dummy = pFlowline_in.aFlowlineID_end_start + pFlowline_in.aFlowlineID_end_end
+                if iFlag_rightleft ==0 :
+                    min_angle = min(aAngle)
+                    iIndex_right = aAngle.index(min_angle)                   
+                    pFlowline_out = aFlowline_in[ dummy[iIndex_right] ]
+                    pass
+                else:
+                    max_angle = max(aAngle)
+                    iIndex_left = aAngle.index(max_angle)
+                    pFlowline_out = aFlowline_in[ dummy[iIndex_left]]
+                    pass
+
+                if pFlowline_out.pVertex_start == pVertex_stop:                 
+                    iFlag_reverse_new=0
+                    pVertex_stop_out =   pFlowline_out.pVertex_end
+                else:                  
+                    iFlag_reverse_new=1
+                    pVertex_stop_out=pFlowline_out.pVertex_start
+
+                iFlag_exist = 1
+                return iFlag_exist, iFlag_reverse_new, pFlowline_out, pVertex_stop_out
 
 
         else:
             #rever direction
             pVertex_stop = pFlowline_in.pVertex_start
+            pEdge = pFlowline_in.aEdge[0]            
+            x1 = pEdge.pVertex_end.dLongitude_degree
+            y1 = pEdge.pVertex_end.dLatitude_degree
+            x2 = pEdge.pVertex_start.dLongitude_degree
+            y2 = pEdge.pVertex_start.dLatitude_degree
+            angle_min = 360
+            iIndex_right = -1
+            n = len(pFlowline_in.aFlowlineID_start_start) + len(pFlowline_in.aFlowlineID_start_end)
+            if n == 0:
+                iFlag_exist = 0 
+                iFlag_reverse_new= 0
+                pFlowline_out = None
+                pVertex_stop_out = None
+                return iFlag_exist, iFlag_reverse_new, pFlowline_out, pVertex_stop_out
+            else:
+                aAngle=list()
+                for i in pFlowline_in.aFlowlineID_start_start:
+                    pFlowline_dummy = aFlowline_in[i]
+                    if (pFlowline_dummy.pVertex_start == pVertex_stop):
+                        nEdge2 = pFlowline_dummy.nEdge
+                        pEdge2 = pFlowline_dummy.aEdge[0]
+                        pVertex_dummy = pEdge2.pVertex_end
+                    else:
+                        nEdge2 = pFlowline_dummy.nEdge
+                        pEdge2 = pFlowline_dummy.aEdge[nEdge2-1]
+                        pVertex_dummy = pEdge2.pVertex_start
+
+                    x3 = pVertex_dummy.dLongitude_degree
+                    y3 = pVertex_dummy.dLatitude_degree
+                    angle_dummy = calculate_angle_betwen_vertex_normal( x1, y1, x2, y2, x3, y3  )
+                    aAngle.append(angle_dummy)
+                for i in pFlowline_in.aFlowlineID_start_end:
+                    pFlowline_dummy = aFlowline_in[i]
+                    if (pFlowline_dummy.pVertex_start == pVertex_stop):
+                        nEdge2 = pFlowline_dummy.nEdge
+                        pEdge2 = pFlowline_dummy.aEdge[0]
+                        pVertex_dummy = pEdge2.pVertex_end
+                    else:
+                        nEdge2 = pFlowline_dummy.nEdge
+                        pEdge2 = pFlowline_dummy.aEdge[nEdge2-1]
+                        pVertex_dummy = pEdge2.pVertex_start
+
+                    x3 = pVertex_dummy.dLongitude_degree
+                    y3 = pVertex_dummy.dLatitude_degree
+                    angle_dummy = calculate_angle_betwen_vertex_normal( x1, y1, x2, y2, x3, y3  )
+                    aAngle.append(angle_dummy)
+                    
+                #mini
+                dummy = pFlowline_in.aFlowlineID_start_start + pFlowline_in.aFlowlineID_start_end
+                if iFlag_rightleft ==0 :
+                    min_angle = min(aAngle)
+                    iIndex_right = aAngle.index(min_angle)
+                    pFlowline_out = aFlowline_in[dummy[iIndex_right]]
+                    pass
+                else:
+                    max_angle = max(aAngle)
+                    iIndex_left = aAngle.index(max_angle)
+                    pFlowline_out = aFlowline_in[dummy[iIndex_left]]
+                    pass
+
+                if pFlowline_out.pVertex_start == pVertex_stop:            
+                    iFlag_reverse_new=0
+                    pVertex_stop_out =   pFlowline_out.pVertex_end
+                else:           
+                    iFlag_reverse_new=1
+                    pVertex_stop_out=pFlowline_out.pVertex_start
+
+                iFlag_exist = 1
+                return iFlag_exist, iFlag_reverse_new, pFlowline_out, pVertex_stop_out
 
         
-    def get_left_branch(iFlag_reverse, pFlowline_in):
-        """
-        This function starts at a contact (called `edge_0`) and calculates
-        the angles between the adjacent contacts at a side (either `stop` or
-        `start`) and then chooses the right-branching contact, and the opposite
-        side for the next contact.
+    
 
-        For example, if we are at `edge_0` and `edge_2` is the right-branching contact,
-        and the `start` side of `edge_2` meets `edge_0`, then the next side will be `stop`.
-
-        """
-
-        nEdge = pFlowline_in.nEdge
-        if iFlag_reverse ==0 :
-            #normal direction
-            pVertex_stop = pFlowline_in.pVertex_end
-            pEdge = pFlowline_in.aEdge[nEdge-1]
-
-            x1 = pEdge.pVertex_start.dLongitude_degree
-            y1 = pEdge.pVertex_start.dLatitude_degree
-            x2 = pEdge.pVertex_end.dLongitude_degree
-            y2 = pEdge.pVertex_end.dLatitude_degree
-            
-            angle_min = 360
-            iIndex_right = -1
-            for i in pFlowline_in.aFlowlineID_end:
-                pFlowline_dummy = aFlowline_in[i]
-                if (pFlowline_dummy.pVertex_start == pVertex_stop):
-                    pVertex_start_dummy = pFlowline_dummy.pVertex_start
-                else:
-                    pVertex_start_dummy = pFlowline_dummy.pVertex_end
-                
-                #calculate angle
-                
-                
-                x3 = pVertex_start_dummy.dLongitude_degree
-                y3 = pVertex_start_dummy.dLatitude_degree
-
-                angle_dummy = calculate_angle_betwen_vertex( x1, y1, x2, y2, x3,y3  )
-                print(angle_dummy)
-                if angle_dummy < angle_min:
-                    angle_min = angle_dummy
-                    iIndex_right = i
-            
-            #take the mini
-
-            
-
-
-        else:
-            #rever direction
-            pVertex_stop = pFlowline_in.pVertex_start
-
-    def walk_cycle(iFlag_reverse, pFlowline_in ):
-
+    def walk_cycle(iFlag_rightleft, iFlag_reverse, pFlowline_in, pVertex_origin, aFlowline_list, aVertex_list ):
+        iFlag_loop = 1
         if iFlag_reverse ==0:
 
             iFlag_right = pFlowline_in.iFlag_right
             if iFlag_right == 1:
-                return
+                iFlag_loop = 0
+                return iFlag_loop, aFlowline_list
             else:
-                pVertex_start = pFlowline_in.pVertex_start
-                pVertex_end = pFlowline_in.pVertex_end
-                iFlag_reverse_new, pFlowline_next, pVertex_stop  = get_right_branch(0, pFlowline_in)
-                aFlowline_in[pFlowline_in.lFlowlineID].iFlag_right=1
+                
+                iFlag_exist, iFlag_reverse_new, pFlowline_next, pVertex_stop  = get_next_branch(iFlag_rightleft, 0, pFlowline_in)
+                if iFlag_exist ==1:
+                    aFlowline_list.append(pFlowline_next.lFlowlineID)
+                    if (pVertex_stop == pVertex_origin):
+                        #a loop is finished
+                        iFlag_loop = 1
+                        return iFlag_loop, aFlowline_list
+                        pass
+                    else:
+                        iFlag_vertex_exist, index_dummy = find_vertex_in_list(aVertex_list, pVertex_stop)
+                        if iFlag_vertex_exist ==1:
+                            #this one show before
+                            iFlag_loop = 0
+                            return iFlag_loop, aFlowline_list
+                        else:
+                            aVertex_list.append(pVertex_stop)
 
-                if (pVertex_stop == pVertex_start):
-                    #a loop is finished
-                    pass
+                        pFlowline_in = pFlowline_next
+                        iFlag_loop, aFlowline_list = walk_cycle(iFlag_rightleft, iFlag_reverse_new, pFlowline_in,\
+                            pVertex_origin, aFlowline_list, aVertex_list)
                 else:
-                    pFlowline_in = pFlowline_next
-                    walk_cycle( iFlag_reverse_new, pFlowline_in)
+                    iFlag_loop = 0
+                    return iFlag_loop, aFlowline_list
 
         else:
-            iFlag_left = pFlowline_in.iFlag_left
+            iFlag_right = pFlowline_in.iFlag_right
+            if iFlag_right == 1:
+                iFlag_loop = 0
+                return iFlag_loop, aFlowline_list
+            else:
+                
+                iFlag_exist, iFlag_reverse_new, pFlowline_next, pVertex_stop = get_next_branch(iFlag_rightleft,1, pFlowline_in)
+                
+                if iFlag_exist ==1:
+                    #aFlowline_in[pFlowline_in.lFlowlineID].iFlag_right=1
 
-    
-        return
+                    aFlowline_list.append(pFlowline_next.lFlowlineID)
 
-    
+                    if (pVertex_stop == pVertex_origin):
+                        #a loop is finished
+                        iFlag_loop = 1
+                        return iFlag_loop, aFlowline_list                        
+                    else:
+                        iFlag_vertex_exist, index_dummy = find_vertex_in_list(aVertex_list, pVertex_stop)
+                        if iFlag_vertex_exist ==1:
+                            #this one show before
+                            iFlag_loop = 0
+                            return iFlag_loop, aFlowline_list
+                        else:
+                            aVertex_list.append(pVertex_stop)
 
-    for i in range(nFlowline):
+                        pFlowline_in = pFlowline_next
+                        iFlag_loop, aFlowline_list = walk_cycle(iFlag_rightleft, iFlag_reverse_new, pFlowline_in, \
+                        pVertex_origin, aFlowline_list,aVertex_list)
+                else:
+                    iFlag_loop = 0
+                    return iFlag_loop, aFlowline_list
+
+                
+        return iFlag_loop, aFlowline_list
+
+    aList_all = list()
+
+    for i in range(0,nFlowline):
         pFlowline_in = aFlowline_in[i]
-        walk_cycle(0, pFlowline_in)
+        aFlowline_list=list()
+        aVertex_list=list()
+        iFlag_loop , aFlowline_list = walk_cycle(0, 0, pFlowline_in, pFlowline_in.pVertex_start, aFlowline_list, aVertex_list)
+        if iFlag_loop == 1:            
+            aFlowline_list.insert(0, i)
+            iFlag = find_list_in_list(aList_all,aFlowline_list )
+            if iFlag == 1:
+                pass
+            else:
+                aList_all.append(aFlowline_list)
+                print(aFlowline_list)
 
-
-
-        
     
-    #shapely method, but not complete
-    #for i in range(nFlowline):
-    #   
-    #    pFlowline = aFlowline_in[i]
-    #    nVertex= pFlowline.nVertex
-    #    aCoords_gcs = np.full((nVertex,2), -9999. ,dtype=float)
-    #    for k in range(nVertex):
-    #        aCoords_gcs[k,0] = pFlowline.aVertex[k].dLongitude_degree
-    #        aCoords_gcs[k,1] = pFlowline.aVertex[k].dLatitude_degree
-    #    
-    #    aCoords_gcs= tuple(j for j in aCoords_gcs) #np.array(aCoords_gcs)    
-    #    aFlowline.append(aCoords_gcs)   
-    #dummy = polygonize(aFlowline)
-    #aPolygon_out = list(dummy)
-
-
     pDataset = pDriver_geojson.CreateDataSource(sFilename_output_in) 
     pSpatial_reference_gcs = osr.SpatialReference()  
     pSpatial_reference_gcs.ImportFromEPSG(4326)    # WGS84 lat/lon
     pSpatial_reference_gcs.SetAxisMappingStrategy(osr.OAMS_TRADITIONAL_GIS_ORDER)
 
-    pLayer = pDataset.CreateLayer('intersect', pSpatial_reference_gcs, ogr.wkbPolygon)
+    pLayer = pDataset.CreateLayer('aod', pSpatial_reference_gcs, ogr.wkbPolygon)
     # Add one attribute
     pLayer.CreateField(ogr.FieldDefn('id', ogr.OFTInteger64)) #long type for high resolution
 
@@ -261,28 +350,47 @@ def calculate_area_of_difference_simplified(aFlowline_in, aVertex_all_in, \
     lCellID =0
     dArea =0.0
 
-    
-    for po in aPolygon_out:
-        ring = ogr.Geometry(ogr.wkbLinearRing)
-        aCoords_gcs = po.exterior.coords
-        aCoords_gcs= np.array(aCoords_gcs)  
-        nPoint  = (aCoords_gcs.shape)[0]
-        lons=list()
-        lats=list()
-        for i in range(nPoint):
-            ring.AddPoint(aCoords_gcs[i,0], aCoords_gcs[i,1])
-            lons.append( aCoords_gcs[i,0] )
-            lats.append( aCoords_gcs[i,1] )
-        
-        pPolygon = ogr.Geometry(ogr.wkbPolygon)
-        pPolygon.AddGeometry(ring)
-        pFeature.SetGeometry(pPolygon)
-        pFeature.SetField("id", lCellID)
-        pLayer.CreateFeature(pFeature)
-        lCellID= lCellID+1
+    #shapely method, but not complete
+    for n in range(0,len(aList_all)):
+        aFlowline_list = aList_all[n]
+        nFlowline = len(aFlowline_list)
+        aFlowline_polygon=list()
+        for m in range(nFlowline):
+            dummy_index = aFlowline_list[m]
+            pFlowline = aFlowline_in[dummy_index]
+            nVertex= pFlowline.nVertex
+            aCoords_gcs = np.full((nVertex,2), -9999. ,dtype=float)
+            for k in range(nVertex):
+                aCoords_gcs[k,0] = pFlowline.aVertex[k].dLongitude_degree
+                aCoords_gcs[k,1] = pFlowline.aVertex[k].dLatitude_degree
+            
+            aCoords_gcs= tuple(j for j in aCoords_gcs) #np.array(aCoords_gcs)    
+            aFlowline_polygon.append(aCoords_gcs)   
 
-        dArea0 = calculate_polygon_area(lons, lats)
-        dArea = dArea + dArea0
+        dummy = polygonize(aFlowline_polygon)
+        aPolygon_out =  list(dummy) 
+  
+        for po in aPolygon_out:
+            ring = ogr.Geometry(ogr.wkbLinearRing)
+            aCoords_gcs = po.exterior.coords
+            aCoords_gcs= np.array(aCoords_gcs)  
+            nPoint  = (aCoords_gcs.shape)[0]
+            lons=list()
+            lats=list()
+            for i in range(nPoint):
+                ring.AddPoint(aCoords_gcs[i,0], aCoords_gcs[i,1])
+                lons.append( aCoords_gcs[i,0] )
+                lats.append( aCoords_gcs[i,1] )
+
+            pPolygon = ogr.Geometry(ogr.wkbPolygon)
+            pPolygon.AddGeometry(ring)
+            pFeature.SetGeometry(pPolygon)
+            pFeature.SetField("id", lCellID)
+            pLayer.CreateFeature(pFeature)
+            lCellID= lCellID+1
+
+            dArea0 = calculate_polygon_area(lons, lats)
+            dArea = dArea + dArea0
 
     return aPolygon_out, dArea
    

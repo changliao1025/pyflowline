@@ -98,7 +98,8 @@ class pyhexagon(pycell):
         iFlag_found = 0
         pEdge_out = None
         for pEdge in self.aEdge:
-            if( pEdge.check_vertex_on_edge(pVertex_in) ==1 ):
+            iFlag, dummy ,diff = pEdge.check_vertex_on_edge(pVertex_in)
+            if( iFlag ==1 ):
                 iFlag_found =1
                 pEdge_out = pEdge
                 break

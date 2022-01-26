@@ -2,7 +2,8 @@ from abc import ABCMeta, abstractmethod
 import json
 import numpy as np
 from osgeo import gdal, osr, ogr
-from pyflowline.algorithms.auxiliary.gdal_functions import  calculate_angle_betwen_vertex
+from pyflowline.algorithms.auxiliary.gdal_functions import  calculate_angle_betwen_vertex, \
+    calculate_polygon_area, calculate_distance_to_plane
 from pyflowline.classes.vertex import pyvertex
 
 class pyedge(object):
@@ -113,35 +114,38 @@ class pyedge(object):
 
     def check_vertex_on_edge(self, pVertex_in):
         iFlag =0 
-
+        dDistance = -1
+        dDistance_plane = 9999
         pVertex_start = self.pVertex_start
         pVertex_end = self.pVertex_end
         self.dLength = pVertex_start.calculate_distance(pVertex_end)
         if pVertex_in != pVertex_start and pVertex_in!=pVertex_end:
-            d1 = pVertex_start.calculate_distance(pVertex_in)
-            d2 = pVertex_end.calculate_distance(pVertex_in)
-            d3 = d1 +d2 -self.dLength
-
+            d1 = pVertex_start.calculate_distance(pVertex_in)            
+            d2 = pVertex_end.calculate_distance(pVertex_in)  
+            d3 = d1 + d2 - self.dLength
             angle3deg = calculate_angle_betwen_vertex(\
                  pVertex_start.dLongitude_degree, pVertex_start.dLatitude_degree,\
                  pVertex_in.dLongitude_degree, pVertex_in.dLatitude_degree,\
                  pVertex_end.dLongitude_degree,pVertex_end.dLatitude_degree)
 
-            if  angle3deg > 179 and d3 < 0.11: #care
+            dDistance_plane = calculate_distance_to_plane(\
+                 pVertex_start.dLongitude_degree, pVertex_start.dLatitude_degree,\
+                 pVertex_in.dLongitude_degree, pVertex_in.dLatitude_degree,\
+                 pVertex_end.dLongitude_degree,pVertex_end.dLatitude_degree)
+            lons = [pVertex_start.dLongitude_degree,pVertex_in.dLongitude_degree,pVertex_end.dLongitude_degree]
+            lats = [pVertex_start.dLatitude_degree, pVertex_in.dLatitude_degree, pVertex_end.dLatitude_degree]
+            dArea = calculate_polygon_area(lons, lats)
+
+            if  angle3deg > 178 and d3 < 1.0: #care
                 iFlag = 1
+                dDistance = d1
             else:
                 iFlag = 0
-            #if (d1<self.dLength and d2<self.dLength and d3 < 0.1 ):#care
-                
-                
-            #else:
-            #    if (d3 < 0.1):
-            #        print('debug')
-            #    iFlag = 0 
+            
         else:
                 iFlag = 0 
 
-        return iFlag 
+        return iFlag, dDistance, dDistance_plane
     
     def __eq__(self, other):                
         iFlag_overlap = self.is_overlap(other)  

@@ -46,6 +46,7 @@ from pyflowline.formats.read_mesh import read_mesh_json
 from pyflowline.formats.export_vertex import export_vertex_to_json
 from pyflowline.formats.export_flowline import export_flowline_to_json
 from pyflowline.algorithms.intersect.intersect_flowline_with_mesh import intersect_flowline_with_mesh
+from pyflowline.algorithms.intersect.intersect_flowline_with_vertex import intersect_flowline_with_vertex
 
 from pyflowline.algorithms.simplification.remove_returning_flowline import remove_returning_flowline
 from pyflowline.algorithms.simplification.remove_duplicate_flowline import remove_duplicate_flowline
@@ -95,6 +96,7 @@ class pybasin(object):
     lBasinID =1 
     sBasinID=''
     lCellID_outlet=-1
+    iFlag_debug = 0
     iFlag_disconnected =0
     iFlag_dam=0
     dLongitude_outlet_degree = -9999.
@@ -117,9 +119,11 @@ class pybasin(object):
     sFilename_flowline_segment_order_before_intersect=''
     sFilename_flowline_segment_index_before_intersect=''
     sFilename_flowline_final=''
+    sFilename_flowline_edge=''
     sFilename_basin_info=''
 
     aFlowline_basin=None
+    pVertex_outlet=None
     
     def __init__(self, aParameter):
 
@@ -195,12 +199,13 @@ class pybasin(object):
 
         self.sBasinID = sBasinID = "{:03d}".format(self.lBasinID)
 
-        self.sFilename_flowline_segment_index_before_intersect = 'flowline_segment_index_before_intersect_' + sBasinID + '.json'
-        self.sFilename_flowline_segment_order_before_intersect = 'flowline_segment_order_before_intersect_' + sBasinID + '.json'
-        self.sFilename_flowline_intersect  = 'flowline_intersect_' + sBasinID + '.json'
-        self.sFilename_flowline_final = 'flowline_final_' + sBasinID + '.json'
-        self.sFilename_area_of_difference = 'area_of_difference' + sBasinID + '.json'
-        self.sFilename_basin_info = 'basin_info_' + sBasinID + '.json'
+        self.sFilename_flowline_segment_index_before_intersect = 'flowline_segment_index_before_intersect.json'
+        self.sFilename_flowline_segment_order_before_intersect = 'flowline_segment_order_before_intersect.json'
+        self.sFilename_flowline_intersect  = 'flowline_intersect.json'
+        self.sFilename_flowline_final = 'flowline_final.json'
+        self.sFilename_flowline_edge = 'flowline_edge.json'
+        self.sFilename_area_of_difference = 'area_of_difference.json'
+        self.sFilename_basin_info = 'basin_info.json'
         return
     
     def tojson(self):
@@ -394,20 +399,24 @@ class pybasin(object):
             pass
         else:
             pass
-        sFilename_out = 'flowline_before_intersect_' + self.sBasinID + '.json'
-        sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)            
-        self.export_flowline(aFlowline_basin, sFilename_out)
+            
+        if self.iFlag_debug ==1:
+            sFilename_out = 'flowline_before_intersect.json'
+            sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)            
+            self.export_flowline(aFlowline_basin, sFilename_out)
         #calculate length
         self.dLength_flowline_before_simplification = self.calculate_flowline_length(aFlowline_basin)
         
         aVertex = find_flowline_vertex(aFlowline_basin)
-        sFilename_out = 'flowline_vertex_without_confluence_before_intersect_' + self.sBasinID + '.json'
-        sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
-        export_vertex_to_json( aVertex, sFilename_out)
+        if self.iFlag_debug ==1:
+            sFilename_out = 'flowline_vertex_without_confluence_before_intersect.json'
+            sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
+            export_vertex_to_json( aVertex, sFilename_out)
         aFlowline_basin = split_flowline(aFlowline_basin, aVertex)
-        sFilename_out = 'flowline_split_by_point_before_intersect_' + self.sBasinID + '.json'
-        sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
-        export_flowline_to_json(aFlowline_basin, sFilename_out)
+        if self.iFlag_debug ==1:
+            sFilename_out = 'flowline_split_by_point_before_intersect.json'
+            sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
+            export_flowline_to_json(aFlowline_basin, sFilename_out)
         #ues location to find outlet
         point= dict()   
         point['dLongitude_degree'] = self.dLongitude_outlet_degree
@@ -415,35 +424,41 @@ class pybasin(object):
         pVertex_outlet=pyvertex(point)
         aFlowline_basin = correct_flowline_direction(aFlowline_basin,  pVertex_outlet )
         pVertex_outlet = aFlowline_basin[0].pVertex_end
-        sFilename_out = 'flowline_direction_before_intersect_' + self.sBasinID + '.json'
-        sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
-        export_flowline_to_json( aFlowline_basin,  sFilename_out)
+        self.pVertex_outlet = pVertex_outlet
+        if self.iFlag_debug ==1:
+            sFilename_out = 'flowline_direction_before_intersect.json'
+            sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
+            export_flowline_to_json( aFlowline_basin,  sFilename_out)
         #step 4: remove loops
         aFlowline_basin = remove_flowline_loop(aFlowline_basin)    
-        sFilename_out = 'flowline_loop_before_intersect_' + self.sBasinID + '.json'
-        sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
-        export_flowline_to_json( aFlowline_basin, sFilename_out)
+        if self.iFlag_debug ==1:
+            sFilename_out = 'flowline_loop_before_intersect.json'
+            sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
+            export_flowline_to_json( aFlowline_basin, sFilename_out)
         #using loop to remove small river, here we use 5 steps
         for i in range(3):
             sStep = "{:02d}".format(i+1)
             aFlowline_basin = remove_small_river(aFlowline_basin, self.dThreshold_small_river)
-            sFilename_out = 'flowline_large_'+ sStep +'_before_intersect_' + self.sBasinID + '.json'
-            sFilename_out =os.path.join(sWorkspace_output_basin, sFilename_out)
-            export_flowline_to_json( aFlowline_basin,  sFilename_out)
+            if self.iFlag_debug ==1:
+                sFilename_out = 'flowline_large_'+ sStep +'_before_intersect.json'
+                sFilename_out =os.path.join(sWorkspace_output_basin, sFilename_out)
+                export_flowline_to_json( aFlowline_basin,  sFilename_out)
             aVertex, lIndex_outlet, aIndex_headwater,aIndex_middle, aIndex_confluence, aConnectivity = find_flowline_confluence(aFlowline_basin,  pVertex_outlet)
-            sFilename_out = 'flowline_vertex_with_confluence_'+ sStep +'_before_intersect_' + self.sBasinID + '.json'
-            sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
-            export_vertex_to_json( aVertex,  sFilename_out, aAttribute_data=aConnectivity)
+            if self.iFlag_debug ==1:
+                sFilename_out = 'flowline_vertex_with_confluence_'+ sStep +'_before_intersect.json'
+                sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
+                export_vertex_to_json( aVertex,  sFilename_out, aAttribute_data=aConnectivity)
             aFlowline_basin = merge_flowline( aFlowline_basin,aVertex, pVertex_outlet, aIndex_headwater,aIndex_middle, aIndex_confluence  )  
-            sFilename_out = 'flowline_merge_'+ sStep +'_before_intersect_' + self.sBasinID + '.json'
-            sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
-            export_flowline_to_json( aFlowline_basin,  sFilename_out)
-            if len(aFlowline_basin) ==1:
+            if self.iFlag_debug ==1:
+                sFilename_out = 'flowline_merge_'+ sStep +'_before_intersect.json'
+                sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
+                export_flowline_to_json( aFlowline_basin,  sFilename_out)
+            if len(aFlowline_basin) == 1:
                 break
         
         #the final vertex info
         aVertex, lIndex_outlet, aIndex_headwater,aIndex_middle, aIndex_confluence, aConnectivity = find_flowline_confluence(aFlowline_basin,  pVertex_outlet)
-        sFilename_out = 'flowline_vertex_with_confluence_before_intersect_final_' + self.sBasinID + '.json'
+        sFilename_out = 'flowline_vertex_with_confluence_before_intersect_final.json'
         sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
         export_vertex_to_json( aVertex,  sFilename_out, aAttribute_data=aConnectivity)
         
@@ -451,10 +466,11 @@ class pybasin(object):
         
         #build segment index
         aFlowline_basin, aStream_segment = define_stream_segment_index(aFlowline_basin)
-        sFilename_out = self.sFilename_flowline_segment_index_before_intersect
-        sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
-        export_flowline_to_json(  aFlowline_basin, sFilename_out, \
-            aAttribute_data=[aStream_segment], aAttribute_field=['iseg'], aAttribute_dtype=['int'])
+        if self.iFlag_debug ==1:
+            sFilename_out = self.sFilename_flowline_segment_index_before_intersect
+            sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
+            export_flowline_to_json(  aFlowline_basin, sFilename_out, \
+                aAttribute_data=[aStream_segment], aAttribute_field=['iseg'], aAttribute_dtype=['int'])
         #build stream order 
         aFlowline_basin, aStream_order = define_stream_order(aFlowline_basin)
         sFilename_out = self.sFilename_flowline_segment_order_before_intersect
@@ -467,7 +483,6 @@ class pybasin(object):
         return aFlowline_basin
 
     def reconstruct_topological_relationship(self, iMesh_type, sFilename_mesh):
-
         
         sWorkspace_output_basin = self.sWorkspace_output_basin
         sFilename_flowline = self.sFilename_flowline_segment_order_before_intersect
@@ -486,13 +501,18 @@ class pybasin(object):
         point['dLongitude_degree'] = self.dLongitude_outlet_degree
         point['dLatitude_degree'] = self.dLatitude_outlet_degree
         pVertex_outlet_initial=pyvertex(point)
+
         #from this point, aFlowline_basin is conceptual
+
+        #segment based
         aFlowline_basin, aFlowline_no_parallel, lCellID_outlet, pVertex_outlet \
             = remove_returning_flowline(iMesh_type, aCell_intersect_basin, pVertex_outlet_initial)
-        sFilename_out = 'flowline_simplified_after_intersect_' + self.sBasinID + '.json'
-        sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)  
-        export_flowline_to_json(aFlowline_basin,  sFilename_out)
-        #added start
+        if self.iFlag_debug ==1:
+            sFilename_out = 'flowline_simplified_after_intersect.json'
+            sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)  
+            export_flowline_to_json(aFlowline_basin,  sFilename_out)
+
+        #edge based
         aFlowline_basin, aEdge = split_flowline_to_edge(aFlowline_basin)
         aFlowline_basin = remove_duplicate_flowline(aFlowline_basin)
         aFlowline_basin = correct_flowline_direction(aFlowline_basin,  pVertex_outlet )
@@ -500,20 +520,31 @@ class pybasin(object):
   
         aVertex, lIndex_outlet, aIndex_headwater,aIndex_middle, aIndex_confluence, aConnectivity\
             = find_flowline_confluence(aFlowline_basin,  pVertex_outlet)
-        sFilename_out = 'flowline_vertex_with_confluence_01_after_intersect_' + self.sBasinID + '.json'
-        sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
-        export_vertex_to_json( aVertex,  sFilename_out, aAttribute_data=aConnectivity)
-        aFlowline_basin = merge_flowline( aFlowline_basin,aVertex, pVertex_outlet, aIndex_headwater,aIndex_middle, aIndex_confluence  )  
-        aFlowline_basin = remove_flowline_loop(  aFlowline_basin )    
+        if self.iFlag_debug ==1:
+            sFilename_out = 'flowline_vertex_with_confluence_after_intersect.json'
+            sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
+            export_vertex_to_json( aVertex,  sFilename_out, aAttribute_data=aConnectivity)
+        
+        #segment based
+        aFlowline_basin = merge_flowline( aFlowline_basin,aVertex, pVertex_outlet, aIndex_headwater,aIndex_middle, aIndex_confluence  )          
+        #aFlowline_basin = remove_flowline_loop(  aFlowline_basin )            
         aVertex, lIndex_outlet, aIndex_headwater,aIndex_middle, aIndex_confluence, aConnectivity\
-            = find_flowline_confluence(aFlowline_basin,  pVertex_outlet)
-        aFlowline_basin = merge_flowline( aFlowline_basin,aVertex, pVertex_outlet, aIndex_headwater,aIndex_middle, aIndex_confluence  ) 
+            = find_flowline_confluence(aFlowline_basin,  pVertex_outlet)        
+        #aFlowline_basin = merge_flowline( aFlowline_basin,aVertex, pVertex_outlet, aIndex_headwater,aIndex_middle, aIndex_confluence  ) 
         aFlowline_basin, aStream_segment = define_stream_segment_index(aFlowline_basin)
         aFlowline_basin, aStream_order = define_stream_order(aFlowline_basin)
+
+        #edge based
+        aFlowline_basin_edge, aEdge = split_flowline_to_edge(aFlowline_basin)
+        sFilename_out = self.sFilename_flowline_edge
+        sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
+        export_flowline_to_json(  aFlowline_basin_edge, sFilename_out)
+
         sFilename_out = self.sFilename_flowline_final
         sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
         export_flowline_to_json(  aFlowline_basin, sFilename_out, \
             aAttribute_data=[aStream_segment, aStream_order], aAttribute_field=['iseg','iord'], aAttribute_dtype=['int','int'])
+
         self.aFlowline_basin = aFlowline_basin
         self.lCellID_outlet = lCellID_outlet
         self.dLongitude_outlet_degree = pVertex_outlet.dLongitude_degree
@@ -546,13 +577,13 @@ class pybasin(object):
         sFilename_simplified =  self.sFilename_flowline_segment_order_before_intersect
         sFilename_simplified= os.path.join(self.sWorkspace_output_basin, sFilename_simplified)
 
-        sFilename_final = self.sFilename_flowline_final
-        sFilename_final= os.path.join(self.sWorkspace_output_basin, sFilename_final)
+        sFilename_flowline_edge = self.sFilename_flowline_edge
+        sFilename_flowline_edge= os.path.join(self.sWorkspace_output_basin, sFilename_flowline_edge)
 
         
         #intersect first
         sFilename_output= os.path.join(self.sWorkspace_output_basin, 'intersect_flowline.json')
-        aVertex_intersect = intersect_flowline_with_flowline(sFilename_simplified, sFilename_final, sFilename_output)
+        aVertex_intersect = intersect_flowline_with_flowline(sFilename_simplified, sFilename_flowline_edge, sFilename_output)
 
         #get confluence simple
         point= dict()   
@@ -567,7 +598,7 @@ class pybasin(object):
                 = find_flowline_confluence(aFlowline_simplified,  pVertex_outlet)
 
         #plot diff
-        aFlowline_conceptual,pSpatial_reference = read_flowline_geojson( sFilename_final ) 
+        aFlowline_conceptual,pSpatial_reference = read_flowline_geojson( sFilename_flowline_edge ) 
         aVertex_conceptual, lIndex_outlet_conceptual, \
             aIndex_headwater_conceptual, aIndex_middle, \
             aIndex_confluence_conceptual,  aConnectivity \
@@ -601,21 +632,23 @@ class pybasin(object):
         #export 
         sFilename_output= os.path.join(self.sWorkspace_output_basin, 'intersect_flowline_all.json')
         export_vertex_to_json( aVertex_all, sFilename_output)
-
-
+        sFilename_vertex=sFilename_output
 
         #split
  
-        aFlowline_simplified_split = split_flowline(aFlowline_simplified, aVertex_all,iFlag_intersect =1)
+        #aFlowline_simplified_split = split_flowline(aFlowline_simplified, aVertex_all,iFlag_intersect =1)
         sFilename_out = 'split_flowline_simplified.json'
         sFilename_out = os.path.join(self.sWorkspace_output_basin, sFilename_out)
-        export_flowline_to_json(aFlowline_simplified_split, sFilename_out)
-        #aFlowline_simplified_split, dummy = read_flowline_geojson(sFilename_out)
+        #export_flowline_to_json(aFlowline_simplified_split, sFilename_out)
+        aFlowline_simplified_split, dummy = read_flowline_geojson(sFilename_out)
 
-        aFlowline_conceptual_split = split_flowline(aFlowline_conceptual, aVertex_all,iFlag_intersect =1)
         sFilename_out = 'split_flowline_conceptual.json'
         sFilename_out = os.path.join(self.sWorkspace_output_basin, sFilename_out)
-        export_flowline_to_json(aFlowline_conceptual_split, sFilename_out)
+        intersect_flowline_with_vertex( sFilename_flowline_edge, sFilename_vertex, sFilename_out)
+
+        #aFlowline_conceptual_split = split_flowline(aFlowline_conceptual, aVertex_all,iFlag_intersect =1)
+        
+        #export_flowline_to_json(aFlowline_conceptual_split, sFilename_out)
         #aFlowline_conceptual_split, dummy = read_flowline_geojson(sFilename_out)
 
         aFlowline_all = aFlowline_simplified_split + aFlowline_conceptual_split

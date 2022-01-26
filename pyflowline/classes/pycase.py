@@ -745,6 +745,13 @@ class flowlinecase(object):
                 aFlowline_out = aFlowline_out + aFlowline_basin
 
             self.aFlowline_simplified = aFlowline_out
+
+        #export the outlet into a since file
+        aOutlet = list()
+        if self.iFlag_simplification == 1: 
+            for pBasin in self.aBasin:
+                aOutlet.append(pBasin.pVertex_outlet)
+
         return aFlowline_out
     
     def mesh_generation(self):        

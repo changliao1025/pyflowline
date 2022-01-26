@@ -24,7 +24,7 @@ else:
         sPath = str(Path(__file__).parent.resolve())
         sFilename_configuration_in = sPath +  '/../tests/configurations/pyflowline_susquehanna_hexagon.json' 
         sFilename_configuration_in = sPath +  '/../tests/configurations/pyflowline_susquehanna_square.json' 
-        sFilename_configuration_in = sPath +  '/../tests/configurations/pyflowline_susquehanna_latlon.json' 
+        #sFilename_configuration_in = sPath +  '/../tests/configurations/pyflowline_susquehanna_latlon.json' 
         #sFilename_configuration_in = sPath +  '/../tests/configurations/pyflowline_susquehanna_mpas.json' 
         
         #mac
@@ -42,7 +42,7 @@ oPyflowline.convert_flowline_to_json()
 oPyflowline.flowline_simplification()
 #oPyflowline.plot(sVariable_in = 'flowline_simplified')
 
-oPyflowline.mesh_generation()
+#oPyflowline.mesh_generation()
 #oPyflowline.plot(sVariable_in = 'mesh')
 #exit()
 #aExtent_full = [-78.5,-75.5, 39.2,42.5]

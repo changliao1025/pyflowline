@@ -1,4 +1,3 @@
-
 import sys
 import numpy as np
 import osgeo
@@ -6,6 +5,27 @@ import math
 from math import radians, cos, sin, asin, sqrt
 from osgeo import ogr, osr, gdal, gdalconst
 from numpy import arctan2, cos, sin, sqrt, pi, power, append, diff
+
+#https://stackoverflow.com/questions/8204998/how-to-check-if-a-pointlonc-latc-lie-on-a-great-circle-running-from-lona-lata
+def calculate_distance_to_plane(x1, y1, x2, y2, x3, y3):
+    
+    a = np.radians(np.array((x1, y1) ))
+    b = np.radians(np.array((x2, y2) )) #this is the middle one
+    c = np.radians(np.array((x3, y3) ))
+    # The points in 3D space
+    a3 = longlat_to_3d(*a)
+    b3 = longlat_to_3d(*b)
+    c3 = longlat_to_3d(*c)
+    #The formula is x+b*y+c*z=0 
+    x1,y1,z1 = a3
+    x2,y2,z2 = b3
+    x3,y3,z3 = c3
+    c = (-x1*y3 + x3* y1)/( z1*y3 - z3*y1 )
+    b = (  -x1*z3 + x3 * z1 ) / (y1 * z3 - y3*z1)
+
+    distance = abs(  x2 + b * y2 + c * z2 )
+
+    return distance
 
 def calculate_angle_betwen_vertex_normal(x1, y1, x2, y2, x3, y3):
     a = np.radians(np.array((x1, y1) ))

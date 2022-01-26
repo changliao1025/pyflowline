@@ -53,7 +53,7 @@ def export_vertex_to_json(aVertex_in, \
         pVertex = aVertex_in[i]
 
         if iFlag_projected_in ==1:
-            dummy1= Point( pVertex.dx, pVertex.dy )             
+            dummy1= Point( pVertex.dx, pVertex.dy )
             pass
         else:
             dummy1= Point( pVertex.dLongitude_degree, pVertex.dLatitude_degree ) 

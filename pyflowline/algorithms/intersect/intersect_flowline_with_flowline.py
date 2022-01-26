@@ -104,6 +104,7 @@ def intersect_flowline_with_flowline( sFilename_flowline_a_in, sFilename_flowlin
                     pGeometry_intersect = pGeometry_flowline_b.Intersection(pGeometry_flowline_a)      
                     #add more process here to 
                     pGeometrytype_intersect = pGeometry_intersect.GetGeometryName()
+                    
                     if pGeometrytype_intersect == 'MULTIPOINT':
                         npoint = pGeometry_intersect.GetGeometryCount()
                         for i  in range(npoint): 

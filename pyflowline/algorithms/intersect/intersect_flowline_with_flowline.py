@@ -42,6 +42,14 @@ def intersect_flowline_with_flowline( sFilename_flowline_a_in, sFilename_flowlin
     pSpatial_reference_b = pLayer_flowline_b.GetSpatialRef()
     nfeature_flowline_b = pLayer_flowline_b.GetFeatureCount()
     pLayerDefinition = pLayer_flowline_b.GetLayerDefn()
+    schema =list()
+    for n in range(pLayerDefinition.GetFieldCount()):
+        fdefn = pLayerDefinition.GetFieldDefn(n)
+        schema.append(fdefn.name)
+    if 'id' in schema:
+        iFlag_id = 1
+    else:
+        iFlag_id = 0   
     
     #print( pSpatial_reference_flowline)
     comparison = pSpatial_reference_a.IsSame(pSpatial_reference_b)
@@ -60,7 +68,7 @@ def intersect_flowline_with_flowline( sFilename_flowline_a_in, sFilename_flowlin
     pLayerDefn = pLayerOut.GetLayerDefn()
     pFeatureOut = ogr.Feature(pLayerDefn)    
    
-    lID_flowline = 0           
+    lVertexID = 0           
 
     aVertex_intersect=list()
     #for i in range (nfeature_mesh):
@@ -92,6 +100,11 @@ def intersect_flowline_with_flowline( sFilename_flowline_a_in, sFilename_flowlin
                 pFeature_flowline_b = pLayer_flowline_b.GetFeature(j)
                 pGeometry_flowline_b = pFeature_flowline_b.GetGeometryRef()
 
+                if iFlag_id ==1:
+                    lFlowlineID = pFeature_flowline_b.GetField("id")
+                else:
+                    lFlowlineID = -1
+
 
                 if (pGeometry_flowline_b.IsValid()):
                     pass
@@ -114,6 +127,7 @@ def intersect_flowline_with_flowline( sFilename_flowline_a_in, sFilename_flowlin
                             point0['dLongitude_degree'] = point.GetX()
                             point0['dLatitude_degree'] = point.GetY()
                             pVertex=pyvertex(point0)
+                            pVertex.lFlowlineID = lFlowlineID
                             iFlag_exist, lIndex = find_vertex_in_list( aVertex_intersect,  pVertex)
                             if iFlag_exist ==1:
                                 pass
@@ -121,9 +135,9 @@ def intersect_flowline_with_flowline( sFilename_flowline_a_in, sFilename_flowlin
                                 #only save it if it differs
                                 aVertex_intersect.append(pVertex)
                                 pFeatureOut.SetGeometry(point)
-                                pFeatureOut.SetField("id", lID_flowline)         
+                                pFeatureOut.SetField("id", lVertexID)         
                                 pLayerOut.CreateFeature(pFeatureOut)    
-                                lID_flowline = lID_flowline + 1
+                                lVertexID = lVertexID + 1
 
                     else:
                         #print(pGeometrytype_intersect)                      
@@ -132,6 +146,7 @@ def intersect_flowline_with_flowline( sFilename_flowline_a_in, sFilename_flowlin
                         point['dLongitude_degree'] = pGeometry_intersect.GetX()
                         point['dLatitude_degree'] = pGeometry_intersect.GetY()
                         pVertex=pyvertex(point)
+                        pVertex.lFlowlineID = lFlowlineID
                         iFlag_exist, lIndex = find_vertex_in_list( aVertex_intersect,  pVertex)
                         if iFlag_exist ==1:
                             pass
@@ -139,9 +154,9 @@ def intersect_flowline_with_flowline( sFilename_flowline_a_in, sFilename_flowlin
                             #only save it if it differs
                             aVertex_intersect.append(pVertex)
                             pFeatureOut.SetGeometry(pGeometry_intersect)
-                            pFeatureOut.SetField("id", lID_flowline)         
+                            pFeatureOut.SetField("id", lVertexID)         
                             pLayerOut.CreateFeature(pFeatureOut)    
-                            lID_flowline = lID_flowline + 1
+                            lVertexID = lVertexID + 1
                                         
                     
                 else:

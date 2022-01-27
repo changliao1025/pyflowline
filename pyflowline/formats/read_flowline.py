@@ -194,6 +194,10 @@ def read_flowline_geojson(sFilename_geojson_in):
         iFlag_segment = 1
     else:
         iFlag_segment = 0    
+    if 'id' in schema:
+        iFlag_id = 1
+    else:
+        iFlag_id = 0
 
     lID = 0
     for pFeature_geojson in pLayer_geojson:
@@ -206,6 +210,12 @@ def read_flowline_geojson(sFilename_geojson_in):
         else:
             iStream_segment = -1
         
+        if iFlag_id ==1:
+            lFlowlineID = pFeature_geojson.GetField("id")
+        else:
+            lFlowlineID = -1
+
+        
         if sGeometry_type =='LINESTRING':
             dummy = loads( pGeometry_in.ExportToWkt() )
             aCoords = dummy.coords
@@ -213,6 +223,7 @@ def read_flowline_geojson(sFilename_geojson_in):
             pLine = convert_gcs_coordinates_to_flowline(dummy1)
             pLine.lIndex = lID
             pLine.iStream_segment = iStream_segment
+            pLine.lFlowlineID = lFlowlineID
             aFlowline.append(pLine)
             lID = lID + 1
             

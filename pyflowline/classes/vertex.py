@@ -18,6 +18,7 @@ class pyvertex(object):
     __metaclass__ = ABCMeta  
     lIndex=-1 #this index will be used for array
     lVertexID=-1
+    lFlowlineID = -1  #we use this id only for intersect
     dX_meter=-9999
     dY_meter=-9999
     dZ_meter=-9999

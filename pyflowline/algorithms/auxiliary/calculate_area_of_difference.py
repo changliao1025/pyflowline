@@ -57,10 +57,7 @@ def calculate_area_of_difference_simplified(aFlowline_in, aVertex_all_in, \
             elif aVertex_all_in[i] == aFlowline_in[j].pVertex_end:
                 aFlowline_in[j].pVertex_end.lVertexID = i
 
-
-
     for pFlowline in aFlowline_in:      
-
         for j  in range(len(aFlowline_in)):
             pFlowline2 = aFlowline_in[j]
             if pFlowline.lFlowlineID != pFlowline2.lFlowlineID:
@@ -74,9 +71,6 @@ def calculate_area_of_difference_simplified(aFlowline_in, aVertex_all_in, \
                     pFlowline.aFlowlineID_end_start.append(pFlowline2.lFlowlineID)
                 if (pFlowline.pVertex_end==pFlowline2.pVertex_end):
                     pFlowline.aFlowlineID_end_end.append(pFlowline2.lFlowlineID)
-
-  
-
 
     def get_next_branch(iFlag_rightleft, iFlag_reverse, pFlowline_in):
         """
@@ -244,9 +238,7 @@ def calculate_area_of_difference_simplified(aFlowline_in, aVertex_all_in, \
 
                 iFlag_exist = 1
                 return iFlag_exist, iFlag_reverse_new, pFlowline_out, pVertex_stop_out
-
-        
-    
+  
 
     def walk_cycle(iFlag_rightleft, iFlag_reverse, pFlowline_in, pVertex_origin, aFlowline_list, aVertex_list ):
         iFlag_loop = 1

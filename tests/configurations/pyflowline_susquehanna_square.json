@@ -29,7 +29,7 @@
     "dLatitude_outlet_degree": 39.4620,
     "dResolution": 500,
     "dResolution_meter": 50000,
-    "dThreshold_small_river": 30000,
+    "dThreshold_small_river": 10000,
     "sDate": "20220112",        
     "sMesh_type": "square",       
     "sFilename_spatial_reference": "/qfs/people/liao313/data/hexwatershed/susquehanna/vector/hydrology/boundary_proj.shp",

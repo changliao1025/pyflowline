@@ -572,7 +572,7 @@ class pybasin(object):
             f.close()
         return
 
-    def evaluate(self):
+    def evaluate(self, iMesh_type, sMesh_type):
 
         sFilename_simplified =  self.sFilename_flowline_segment_order_before_intersect
         sFilename_simplified= os.path.join(self.sWorkspace_output_basin, sFilename_simplified)
@@ -597,7 +597,7 @@ class pybasin(object):
                 aIndex_confluence_simplified, aConnectivity\
                 = find_flowline_confluence(aFlowline_simplified,  pVertex_outlet)
 
-        #plot diff
+        
         aFlowline_conceptual,pSpatial_reference = read_flowline_geojson( sFilename_flowline_edge ) 
         aVertex_conceptual, lIndex_outlet_conceptual, \
             aIndex_headwater_conceptual, aIndex_middle_conceptual, \
@@ -657,10 +657,10 @@ class pybasin(object):
         print('Area of difference: ', dArea)
         self.dArea_of_difference = dArea
         self.dDistance_displace = dArea / self.dLength_flowline_after_simplification
-        self.plot_area_of_difference()
+        self.plot_area_of_difference(iMesh_type, sMesh_type)
         return
 
-    def plot_area_of_difference(self):
+    def plot_area_of_difference(self, iMesh_type, sMesh_type):
         #request = cimgt.OSM()
         sFilename_json = self.sFilename_area_of_difference
         sFilename_json = os.path.join(self.sWorkspace_output_basin, sFilename_json)
@@ -741,6 +741,12 @@ class pybasin(object):
         ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True,
                       linewidth=1, color='gray', alpha=0.3, linestyle='--')
         ax.set_title( sTitle)  
+
+        sText = 'Mesh type: ' + sMesh_type.title()
+        ax.text(0.05, 0.95, sText, \
+        verticalalignment='top', horizontalalignment='left',\
+                transform=ax.transAxes, \
+                color='black', fontsize=8)
      
         sText = 'Total area: ' + "{:4.1f}".format( int(self.dArea_of_difference/1.0E6) ) + ' km^2'
         ax.text(0.05, 0.90, sText, \

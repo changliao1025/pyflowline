@@ -913,7 +913,7 @@ class flowlinecase(object):
 
         for pBasin in self.aBasin:
 
-            pBasin.evaluate()
+            pBasin.evaluate(self.iMesh_type, self.sMesh_type)
         return
 
     def export(self):

@@ -36,8 +36,7 @@ def split_flowline(aFlowline_in, aVertex_in, iFlag_intersect = None, iFlag_use_i
             if iFlag_exist == 1:                
                 iPart = iPart + 1
                 aVertex.append(pVertex)
-            if iStream_segment ==1  and j ==2:
-                print('debug')
+            
                 
             if iFlag_intersect is not None:
                 if iFlag_use_id is not None:

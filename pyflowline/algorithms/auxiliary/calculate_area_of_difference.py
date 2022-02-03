@@ -339,8 +339,8 @@ def calculate_area_of_difference_simplified(aFlowline_in, aVertex_all_in, \
 
     pLayerDefn = pLayer.GetLayerDefn()
     pFeature = ogr.Feature(pLayerDefn)    
-    lCellID =0
-    dArea =0.0
+    lCellID = 0
+    dArea = 0.0
 
     #shapely method, but not complete
     for n in range(0,len(aList_all)):

@@ -1,4 +1,4 @@
-import sys
+import os,sys
 import numpy as np
 import osgeo
 import math
@@ -364,3 +364,93 @@ def calculate_polygon_area(lons, lats,  algorithm = 0, radius = 6378137.0):
         #https://trs.jpl.nasa.gov/handle/2014/41271
         #TODO
         pass
+
+
+def gdal_read_geotiff_file(sFilename_in):
+    """Read a Geotiff format raster file.
+
+    Args:
+        sFilename_in (string): The file name
+
+    Returns:
+        tuple: aData_out, pPixelWidth, dOriginX, dOriginY, nrow, ncolumn, dMissing_value , pGeotransform, pProjection,  pSpatial_reference
+    """
+    
+    if os.path.exists(sFilename_in):
+        pass
+    else:
+        print('The file does not exist!')
+        return
+
+    sDriverName='GTiff'
+    pDriver = gdal.GetDriverByName(sDriverName)  
+
+    if pDriver is None:
+        print ("%s pDriver not available.\n" % sDriverName)
+    else:
+        print  ("%s pDriver IS available.\n" % sDriverName)  
+
+    pDataset = gdal.Open(sFilename_in, gdal.GA_ReadOnly)
+
+    if pDataset is None:
+        print("Couldn't open this file: " + sFilename_in)
+        sys.exit("Try again!")
+    else:       
+        pProjection = pDataset.GetProjection()
+
+        pDataset.GetMetadata()
+       
+        ncolumn = pDataset.RasterXSize
+        nrow = pDataset.RasterYSize
+        nband = pDataset.RasterCount
+
+        pGeotransform = pDataset.GetGeoTransform()
+        dOriginX = pGeotransform[0]
+        dOriginY = pGeotransform[3]
+        dPixelWidth = pGeotransform[1]
+        pPixelHeight = pGeotransform[5]
+
+        pBand = pDataset.GetRasterBand(1)
+
+        # Data type of the values
+        gdal.GetDataTypeName(pBand.DataType)
+        # Compute statistics if needed
+        if pBand.GetMinimum() is None or pBand.GetMaximum() is None:
+            pBand.ComputeStatistics(0)
+
+        dMissing_value = pBand.GetNoDataValue()
+       
+        aData_out = pBand.ReadAsArray(0, 0, ncolumn, nrow)
+    
+        #we will use one of them to keep the consistency
+        pSpatial_reference = osr.SpatialReference(wkt=pProjection)
+       
+
+        pDataset = None
+        pBand = None      
+        pBand = None
+
+        return aData_out, dPixelWidth, dOriginX, dOriginY, nrow, ncolumn, dMissing_value, pGeotransform, pProjection,  pSpatial_reference
+
+def Google_MetersPerPixel( zoomLevel ):
+
+  
+   
+   # Return to the caller if there is an error.
+   #On_Error, 2
+   
+   #; Need a zoom level?
+   
+   
+   # Number of pixels in an image with a zoom level of 0.
+   pixels_in_image = 256
+   
+   # The equitorial radius of the Earth assuming WGS-84 ellipsoid.
+   earth_radius = 6378137.0
+   
+   # The number of meters per pixel.
+   metersPerPixel = (2* np.pi * earth_radius) / pixels_in_image / np.power(2,zoomLevel)
+   
+   # Return the value.
+   return metersPerPixel
+   

@@ -143,7 +143,7 @@ def track_nhdplus_flowline(aNHDPlusID_filter_in, aFromFlowline_in, aToFlowline_i
                         if lNHDPlusID_to==0:
                             pass
                         else:
-                            print(lNHDPlusID_in, lNHDPlusID_to)
+                            #print(lNHDPlusID_in, lNHDPlusID_to)
                             tag_downstream(lNHDPlusID_to)
         return 
 

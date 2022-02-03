@@ -621,6 +621,24 @@ class pybasin(object):
                 pass
             else:
                 aVertex_all.append(i)
+
+        h = aVertex_intersect  + d         
+        aVertex_all_simplified =list()
+        for i in h:
+            iFlag_exist, lIndex = find_vertex_in_list( aVertex_all_simplified,  i)
+            if iFlag_exist ==1:
+                pass
+            else:
+                aVertex_all_simplified.append(i)
+
+        j = aVertex_intersect  + e + f       
+        aVertex_all_conceptual =list()
+        for i in j:
+            iFlag_exist, lIndex = find_vertex_in_list( aVertex_all_conceptual,  i)
+            if iFlag_exist ==1:
+                pass
+            else:
+                aVertex_all_conceptual.append(i)
         
 
         #export 
@@ -631,14 +649,14 @@ class pybasin(object):
         
         #split
  
-        aFlowline_simplified_split = split_flowline(aFlowline_simplified, aVertex_all,iFlag_intersect =1)
+        aFlowline_simplified_split = split_flowline(aFlowline_simplified, aVertex_all_simplified,iFlag_intersect =1)
         self.iFlag_debug =1
         if self.iFlag_debug ==1:
             sFilename_out = 'flowline_split_simplified.json'
             sFilename_out = os.path.join(self.sWorkspace_output_basin, sFilename_out)
             export_flowline_to_json(aFlowline_simplified_split, sFilename_out)     
         
-        aFlowline_conceptual_split = split_flowline(aFlowline_conceptual, aVertex_all,\
+        aFlowline_conceptual_split = split_flowline(aFlowline_conceptual, aVertex_all_conceptual,\
             iFlag_intersect =1, iFlag_use_id=1)
         self.iFlag_debug =1
         if self.iFlag_debug ==1:

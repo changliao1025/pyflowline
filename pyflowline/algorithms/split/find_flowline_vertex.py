@@ -1,9 +1,4 @@
-import os, sys
-import numpy as np
-from osgeo import ogr, osr, gdal, gdalconst
-from pyflowline.classes.vertex import pyvertex
-from pyflowline.classes.edge import pyedge
-from pyflowline.classes.flowline import pyflowline
+
 from pyflowline.algorithms.auxiliary.find_index_in_list import add_unique_vertex
 
 def find_flowline_vertex(aFlowline_in):

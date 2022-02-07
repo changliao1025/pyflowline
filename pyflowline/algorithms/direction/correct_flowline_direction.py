@@ -1,8 +1,4 @@
-import os, sys
-from pyflowline.classes.flowline import pyflowline
 import numpy as np 
-from osgeo import ogr, osr, gdal, gdalconst
-
 
 lID=0
 aFlag_process=None

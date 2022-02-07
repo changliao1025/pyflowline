@@ -1,6 +1,5 @@
-import sys, os
+
 import numpy as np
-from osgeo import gdal, osr, ogr, gdalconst
 
 
 def remove_flowline_loop(aFlowline_in):

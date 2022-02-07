@@ -1,18 +1,11 @@
 
 import os
-import json
 import numpy as np
 from osgeo import ogr, osr
-
-from shapely.geometry import Point, LineString, MultiLineString
 from shapely.wkt import loads
 
-from pyflowline.classes.vertex import pyvertex
-from pyflowline.classes.hexagon import pyhexagon
-
-from pyflowline.formats.convert_coordinates import convert_gcs_coordinates_to_cell, convert_pcs_coordinates_to_cell
-from pyflowline.formats.convert_coordinates import convert_gcs_coordinates_to_flowline, convert_pcs_coordinates_to_flowline
-
+from pyflowline.formats.convert_coordinates import convert_gcs_coordinates_to_cell
+from pyflowline.formats.convert_coordinates import convert_gcs_coordinates_to_flowline
 
 def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh_in, sFilename_flowline_in, sFilename_output_in):
 

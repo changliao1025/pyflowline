@@ -1,10 +1,10 @@
 
-import numpy as np
-from pyflowline.algorithms.auxiliary.find_index_in_list import find_edge_in_list
+from pyflowline.algorithms.auxiliary.find_index_in_list import find_list_in_list ,find_vertex_in_list
 lID = 0
 def merge_edge_as_flowline(aEdge_in, pVertex_outlet_in):
     iFlag_first=1
     nEdge = len(aEdge_in)
+    aFlowline_out=list()
 
     def merge_edge_reach(lIndex_in, pVertex_start_in, pVertex_end_in):
         global lID

@@ -1,10 +1,11 @@
 import os,sys
 import numpy as np
 import osgeo
-import math
-from math import radians, cos, sin, asin, sqrt
-from osgeo import ogr, osr, gdal, gdalconst
-from numpy import arctan2, cos, sin, sqrt, pi, power, append, diff
+
+from osgeo import  osr, gdal
+from numpy import  cos, sin, sqrt, append, diff
+
+#most of these functions are copied from the pyearth package
 
 #https://stackoverflow.com/questions/8204998/how-to-check-if-a-pointlonc-latc-lie-on-a-great-circle-running-from-lona-lata
 def calculate_distance_to_plane(x1, y1, x2, y2, x3, y3):
@@ -69,9 +70,9 @@ def calculate_angle_betwen_vertex(x1, y1, x2, y2, x3, y3):
 def longlat_to_3d(lonr, latr):
     """Convert a point given latitude and longitude in radians to
     3-dimensional space, assuming a sphere radius of one."""
-    a = math.cos(latr) * math.cos(lonr)
-    b = math.cos(latr) * math.sin(lonr)
-    c = math.sin(latr)
+    a = np.cos(latr) * np.cos(lonr)
+    b = np.cos(latr) * np.sin(lonr)
+    c = np.sin(latr)
     return np.array((a,b,c))
 
 def angle_between_vectors_degrees(u, v):
@@ -293,13 +294,13 @@ def calculate_distance_based_on_lon_lat(lon1, lat1, lon2, lat2):
     on the earth (specified in decimal degrees)
     """
     # convert decimal degrees to radians 
-    lon1, lat1, lon2, lat2 = map(radians, [lon1, lat1, lon2, lat2])
+    lon1, lat1, lon2, lat2 = map(np.radians, [lon1, lat1, lon2, lat2])
 
     # haversine formula 
     dlon = lon2 - lon1 
     dlat = lat2 - lat1 
-    a = sin(dlat/2)**2 + cos(lat1) * cos(lat2) * sin(dlon/2)**2
-    c = 2 * asin(sqrt(a)) 
+    a = np.sin(dlat/2)**2 + cos(lat1) * cos(lat2) * sin(dlon/2)**2
+    c = 2 * np.asin(np.sqrt(a)) 
     # Radius of earth in kilometers. Use 3956 for miles
     r = 6378137.0
     return c * r
@@ -325,15 +326,15 @@ def calculate_polygon_area(lons, lats,  algorithm = 0, radius = 6378137.0):
 
         # Get colatitude (a measure of surface distance as an angle)
         a = sin(lats/2)**2 + cos(lats)* sin(lons/2)**2
-        colat = 2*arctan2( sqrt(a), sqrt(1-a) )
+        colat = 2*np.arctan2( sqrt(a), sqrt(1-a) )
 
         #azimuth of each point in segment from the arbitrary origin
-        az = arctan2(cos(lats) * sin(lons), sin(lats)) % (2*pi)
+        az = np.arctan2(cos(lats) * sin(lons), sin(lats)) % (2*np.pi)
 
         # Calculate step sizes
         # daz = diff(az) % (2*pi)
         daz = diff(az)
-        daz = (daz + pi) % (2 * pi) - pi
+        daz = (daz + np.pi) % (2 * np.pi) - np.pi
 
         # Determine average surface distance for each step
         deltas=diff(colat)/2
@@ -344,11 +345,11 @@ def calculate_polygon_area(lons, lats,  algorithm = 0, radius = 6378137.0):
 
         # Integrate and save the answer as a fraction of the unit sphere.
         # Note that the sum of the integrands will include a factor of 4pi.
-        area = abs(sum(integrands))/(4*pi) # Could be area of inside or outside
+        area = abs(sum(integrands))/(4*np.pi) # Could be area of inside or outside
 
         area = min(area,1-area)
         if radius is not None: #return in units of radius
-            return area * 4*pi*radius**2
+            return area * 4*np.pi*radius**2
         else: #return in ratio of sphere total area
             return area
     elif algorithm==2:

@@ -1,7 +1,5 @@
-import os, sys
 
 import numpy as np
-from osgeo import ogr, osr, gdal, gdalconst
 from pyflowline.algorithms.auxiliary.find_index_in_list import find_vertex_in_list
 
 lID = 0
@@ -68,9 +66,7 @@ def merge_flowline(aFlowline_in, aVertex_in, \
                     pVertex_end = pFlowline3.pVertex_end
                     if pVertex_end == pVertex_current:
                         merge_flowline_reach(k, pVertex_start, pVertex_end)
-                        
-            
-            
+                                
     
     iFlag_first=1
     for i in range(nFlowline):        
@@ -99,7 +95,5 @@ def merge_flowline(aFlowline_in, aVertex_in, \
     pVertex_end = pFlowline.pVertex_end      
 
     merge_flowline_reach(lIndex_outlet, pVertex_start, pVertex_end)   
-
-
 
     return aFlowline_out

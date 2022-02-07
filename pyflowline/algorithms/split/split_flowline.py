@@ -1,8 +1,5 @@
-import os, sys
-from telnetlib import IP
+
 import numpy as np
-from osgeo import ogr, osr, gdal, gdalconst
-from pyflowline.classes.vertex import pyvertex
 from pyflowline.classes.edge import pyedge
 from pyflowline.classes.flowline import pyflowline
 

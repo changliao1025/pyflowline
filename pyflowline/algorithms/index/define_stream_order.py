@@ -1,4 +1,4 @@
-import os, sys
+
 import numpy as np 
 
 from pyflowline.algorithms.auxiliary.check_head_water import check_head_water

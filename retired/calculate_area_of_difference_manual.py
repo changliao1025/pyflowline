@@ -1,24 +1,13 @@
 import os
-import json
-from telnetlib import X3PAD
-import numpy as np
-from osgeo import ogr, osr, gdal, gdalconst
-from shapely.geometry import Point, LineString, MultiLineString
-from shapely.wkt import loads
-from matplotlib import cm
-from shapely.ops import polygonize, polygonize_full
-from pyflowline.algorithms.auxiliary.gdal_functions import   calculate_angle_betwen_vertex_normal
+from osgeo import ogr, osr
 
-
+from pyflowline.algorithms.auxiliary.gdal_functions import calculate_angle_betwen_vertex_normal
 from pyflowline.algorithms.auxiliary.gdal_functions import calculate_polygon_area
-
 from pyflowline.algorithms.auxiliary.find_index_in_list import find_list_in_list ,find_vertex_in_list
 
 def calculate_area_of_difference_raw(sFilename_a, sFilename_b):
 
     #not yet supported
-
-
     return
 
 def calculate_area_of_difference_simplified_manual(aFlowline_in, aVertex_all_in, \
@@ -33,8 +22,6 @@ def calculate_area_of_difference_simplified_manual(aFlowline_in, aVertex_all_in,
 
     nFlowline = len(aFlowline_in)
     nVeretx = len(aVertex_all_in)
-
-
 
     #rebuild
     for i  in range(nFlowline):

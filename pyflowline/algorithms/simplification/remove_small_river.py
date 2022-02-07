@@ -1,9 +1,4 @@
-import sys, os
-import numpy as np
 
-from pyflowline.classes.vertex import pyvertex
-from pyflowline.classes.edge import pyedge
-from pyflowline.classes.flowline import pyflowline
 from pyflowline.algorithms.auxiliary.check_head_water import check_head_water
 
 def remove_small_river(aFlowline_in, dThreshold_in):

@@ -1,9 +1,5 @@
-import math
-import numpy as np
 import copy
-from pyflowline.classes.vertex import pyvertex
-from pyflowline.classes.edge import pyedge
-from pyflowline.classes.flowline import pyflowline
+import numpy as np
 
 def find_vertex_in_list(aVertex_in, pVertex_in):
     """[find the index of a vertex in a list]

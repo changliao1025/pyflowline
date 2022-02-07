@@ -1,5 +1,5 @@
 
-from pyflowline.classes.flowline import pyflowline
+
 from pyflowline.algorithms.auxiliary.find_index_in_list import find_flowline_in_list
 def remove_duplicate_flowline(aFlowline_in):
     aFlowline_out = list()

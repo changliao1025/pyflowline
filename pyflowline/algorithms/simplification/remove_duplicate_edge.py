@@ -1,5 +1,4 @@
 
-from pyflowline.classes.edge import pyedge
 
 from pyflowline.algorithms.auxiliary.find_index_in_list import find_edge_in_list
 def remove_duplicate_edge(aEdge_in):

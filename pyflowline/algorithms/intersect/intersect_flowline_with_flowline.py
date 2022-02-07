@@ -1,20 +1,10 @@
-
-
 import os
-import json
 import numpy as np
 from osgeo import ogr, osr
 
-from shapely.geometry import Point, LineString, MultiLineString
 from shapely.wkt import loads
-
 from pyflowline.classes.vertex import pyvertex
-from pyflowline.classes.hexagon import pyhexagon
-
-from pyflowline.algorithms.auxiliary.find_index_in_list import find_vertex_in_list, find_vertex_on_edge
-from pyflowline.formats.convert_coordinates import convert_gcs_coordinates_to_cell, convert_pcs_coordinates_to_cell
-from pyflowline.formats.convert_coordinates import convert_gcs_coordinates_to_flowline, convert_pcs_coordinates_to_flowline
-
+from pyflowline.algorithms.auxiliary.find_index_in_list import find_vertex_in_list
 
 def intersect_flowline_with_flowline( sFilename_flowline_a_in, sFilename_flowline_b_in, sFilename_output_in):
 

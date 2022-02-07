@@ -1,12 +1,4 @@
-
-import os, sys
-import numpy as np
-from osgeo import ogr, osr, gdal, gdalconst
-from pyflowline.classes.vertex import pyvertex
 from pyflowline.classes.edge import pyedge
-from pyflowline.classes.flowline import pyflowline
-
-
 
 def connect_disconnect_flowline(aFlowline_in, aVertex_in, aThreshold_in):
     """[summary]

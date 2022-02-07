@@ -1,5 +1,4 @@
-from abc import ABCMeta, abstractmethod
-from osgeo import gdal, osr, ogr
+
 import numpy as np
 import json
 from json import JSONEncoder

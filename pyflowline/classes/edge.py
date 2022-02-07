@@ -1,10 +1,8 @@
 from abc import ABCMeta, abstractmethod
-import json
-import numpy as np
-from osgeo import gdal, osr, ogr
+
 from pyflowline.algorithms.auxiliary.gdal_functions import  calculate_angle_betwen_vertex, \
     calculate_polygon_area, calculate_distance_to_plane
-from pyflowline.classes.vertex import pyvertex
+
 
 class pyedge(object):
     __metaclass__ = ABCMeta 

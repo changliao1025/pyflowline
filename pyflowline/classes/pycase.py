@@ -1,68 +1,60 @@
 import os
 from pathlib import Path
-from abc import ABCMeta, abstractmethod
-import utm
-import osgeo
-import requests
-import matplotlib.image as mpimg
+from abc import ABCMeta
 import json
 from json import JSONEncoder
-import numpy as np
 import datetime
-import json
-from osgeo import ogr, osr, gdal, gdalconst
+
+import numpy as np
+import utm
+import requests
+from osgeo import ogr, osr, gdal
+
+import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
 import matplotlib.path as mpath
 import matplotlib.ticker as mticker
-from shapely.wkt import loads
-import matplotlib.pyplot as plt
-import matplotlib.ticker as ticker
-from cartopy.mpl.ticker import LongitudeFormatter, LatitudeFormatter,      LatitudeLocator
 import matplotlib.patches as mpatches
-import cartopy.io.shapereader as shpreader
 import matplotlib.cm as cm
-from matplotlib.collections import PatchCollection
-from pyflowline.algorithms.auxiliary.text_reader_string import text_reader_string
+
+from shapely.wkt import loads
+from cartopy.mpl.ticker import LongitudeFormatter, LatitudeFormatter
+import cartopy.io.shapereader as shpreader
+from cartopy.feature import ShapelyFeature
+import cartopy.crs as ccrs
+
 from pyflowline.classes.mpas import pympas
 from pyflowline.classes.hexagon import pyhexagon
 from pyflowline.classes.latlon import pylatlon
 from pyflowline.classes.square import pysquare
-from cartopy.feature import ShapelyFeature
 from pyflowline.classes.vertex import pyvertex
 from pyflowline.classes.basin import pybasin
 from pyflowline.classes.flowline import pyflowline
 from pyflowline.classes.edge import pyedge
 
-from pyflowline.algorithms.auxiliary.gdal_functions import reproject_coordinates_batch, retrieve_geotiff_metadata
-from pyflowline.algorithms.auxiliary.gdal_functions import reproject_coordinates
+from pyflowline.formats.convert_shapefile_to_json import convert_shapefile_to_json_swat
+
+from pyflowline.formats.read_mesh import read_mesh_json
+
+from pyflowline.algorithms.auxiliary.text_reader_string import text_reader_string
+from pyflowline.algorithms.auxiliary.gdal_functions import reproject_coordinates, reproject_coordinates_batch
+from pyflowline.algorithms.auxiliary.gdal_functions import 
 from pyflowline.algorithms.auxiliary.gdal_functions  import degree_to_meter
 from pyflowline.algorithms.auxiliary.gdal_functions  import meter_to_degree
+from pyflowline.algorithms.auxiliary.gdal_functions import gdal_read_geotiff_file, retrieve_geotiff_metadata
+from pyflowline.algorithms.auxiliary.gdal_functions import  Google_MetersPerPixel
 
-from pyflowline.algorithms.auxiliary.gdal_functions import gdal_read_geotiff_file
 from pyflowline.mesh.hexagon.create_hexagon_mesh import create_hexagon_mesh
 from pyflowline.mesh.latlon.create_latlon_mesh import create_latlon_mesh
 from pyflowline.mesh.square.create_square_mesh import create_square_mesh
 from pyflowline.mesh.mpas.create_mpas_mesh import create_mpas_mesh
 from pyflowline.mesh.tin.create_tin_mesh import create_tin_mesh
-from pyflowline.formats.convert_shapefile_to_json import convert_shapefile_to_json_swat
 
-from pyflowline.algorithms.auxiliary.gdal_functions import reproject_coordinates, Google_MetersPerPixel
-
-from pyflowline.formats.read_mesh import read_mesh_json
-
-
-import cartopy.crs as ccrs
-
-desired_proj = ccrs.Orthographic(central_longitude=-75, central_latitude=42, globe=None)
-
+#desired_proj = ccrs.Orthographic(central_longitude=-75, central_latitude=42, globe=None)
 desired_proj = ccrs.PlateCarree()
-
-#dem_proj =ccrs.AlbersEqualArea()
 
 pDate = datetime.datetime.today()
 sDate_default = "{:04d}".format(pDate.year) + "{:02d}".format(pDate.month) + "{:02d}".format(pDate.day)
-
-
 
 class CaseClassEncoder(JSONEncoder):
     def default(self, obj):
@@ -688,7 +680,7 @@ class flowlinecase(object):
         ax_histo.set_ylabel(sLabel_y,fontsize=4 )       
         ax_histo.set_xlim( dMin_x, dMax_x )
 
-        formatter = ticker.ScalarFormatter(useMathText=True)
+        formatter = mticker.ScalarFormatter(useMathText=True)
         formatter.set_scientific(True)        
         ax_histo.yaxis.set_major_formatter(formatter)
         ax_histo.tick_params(axis='x', labelsize=5 )

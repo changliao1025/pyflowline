@@ -1,8 +1,6 @@
 from abc import ABCMeta, abstractmethod
-import json
 import numpy as np
 import copy
-from osgeo import gdal, osr, ogr
 
 from pyflowline.classes.vertex import pyvertex
 from pyflowline.classes.edge import pyedge

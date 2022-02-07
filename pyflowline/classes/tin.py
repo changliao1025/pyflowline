@@ -1,12 +1,11 @@
-from abc import ABCMeta, abstractmethod
-from osgeo import gdal, osr, ogr
+
 import numpy as np
 from pyflowline.classes.vertex import pyvertex
 from pyflowline.classes.edge import pyedge
 from pyflowline.classes.cell import pycell
 
 class pytin(pycell):
-    #lIndex=0    
+    
     nFlowline=0
     nVertex =0 
     nEdge=0

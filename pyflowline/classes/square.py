@@ -1,15 +1,15 @@
-from abc import ABCMeta, abstractmethod
+
 import numpy as np
-from osgeo import gdal, osr, ogr
+
 import json
 from json import JSONEncoder
+
 from pyflowline.classes.vertex import pyvertex
 from pyflowline.classes.edge import pyedge
 from pyflowline.classes.cell import pycell
-
 from pyflowline.classes.flowline import pyflowline
-from pyflowline.algorithms.auxiliary.gdal_functions import calculate_polygon_area
 
+from pyflowline.algorithms.auxiliary.gdal_functions import calculate_polygon_area
 
 class SquareClassEncoder(JSONEncoder):
     def default(self, obj):

@@ -1,58 +1,34 @@
 import os
+from pathlib import Path
 from abc import ABCMeta, abstractmethod
 import json
 from json import JSONEncoder
-from pathlib import Path
 import numpy as np
-from osgeo import ogr, osr, gdal, gdalconst
-from shapely.wkt import loads
+
 import matplotlib.pyplot as plt
 import matplotlib.path as mpath
 import matplotlib.patches as mpatches
 from matplotlib import cm
-
-
 import cartopy.crs as ccrs
-import cartopy.io.img_tiles as cimgt
+
+from osgeo import ogr, osr, gdal
+from shapely.wkt import loads
 
 from pyflowline.classes.vertex import pyvertex
-
 from pyflowline.classes.edge import pyedge
-from pyflowline.classes.cell import pycell
 from pyflowline.classes.flowline import pyflowline
-from pyflowline.algorithms.auxiliary.text_reader_string import text_reader_string
 from pyflowline.formats.read_flowline import read_flowline_geojson
-
 from pyflowline.formats.read_nhdplus_flowline_shapefile import read_nhdplus_flowline_shapefile_attribute
 from pyflowline.formats.read_nhdplus_flowline_shapefile import extract_nhdplus_flowline_shapefile_by_attribute
 from pyflowline.formats.read_nhdplus_flowline_shapefile import track_nhdplus_flowline
 from pyflowline.formats.convert_shapefile_to_json import convert_shapefile_to_json
 from pyflowline.formats.export_flowline import export_flowline_to_json
-from pyflowline.algorithms.split.find_flowline_vertex import find_flowline_vertex
 from pyflowline.formats.export_vertex import export_vertex_to_json
-from pyflowline.algorithms.merge.merge_flowline import merge_flowline
-from pyflowline.algorithms.split.split_flowline import split_flowline
-from pyflowline.algorithms.split.find_flowline_confluence import find_flowline_confluence
-from pyflowline.algorithms.split.find_flowline_vertex import find_flowline_vertex
-from pyflowline.algorithms.direction.correct_flowline_direction import correct_flowline_direction
-from pyflowline.algorithms.loop.remove_flowline_loop import remove_flowline_loop
-from pyflowline.algorithms.simplification.remove_small_river import remove_small_river
-from pyflowline.algorithms.index.define_stream_order import define_stream_order
-from pyflowline.algorithms.index.define_stream_segment_index import define_stream_segment_index
 
-from pyflowline.algorithms.auxiliary.find_index_in_list import find_vertex_in_list, find_vertex_on_edge
-from pyflowline.formats.read_mesh import read_mesh_json
+from pyflowline.algorithms.auxiliary.text_reader_string import text_reader_string
+from pyflowline.algorithms.auxiliary.find_index_in_list import find_vertex_in_list
+from pyflowline.algorithms.auxiliary.calculate_area_of_difference import calculate_area_of_difference_simplified
 
-from pyflowline.formats.export_vertex import export_vertex_to_json
-from pyflowline.formats.export_flowline import export_flowline_to_json
-from pyflowline.algorithms.intersect.intersect_flowline_with_mesh import intersect_flowline_with_mesh
-from pyflowline.algorithms.intersect.intersect_flowline_with_vertex import intersect_flowline_with_vertex
-
-from pyflowline.algorithms.simplification.remove_returning_flowline import remove_returning_flowline
-from pyflowline.algorithms.simplification.remove_duplicate_flowline import remove_duplicate_flowline
-from pyflowline.algorithms.simplification.remove_duplicate_edge import remove_duplicate_edge
-from pyflowline.algorithms.direction.correct_flowline_direction import correct_flowline_direction
-from pyflowline.algorithms.loop.remove_flowline_loop import remove_flowline_loop
 from pyflowline.algorithms.split.find_flowline_vertex import find_flowline_vertex
 from pyflowline.algorithms.split.find_flowline_confluence import find_flowline_confluence
 from pyflowline.algorithms.split.split_flowline import split_flowline
@@ -60,11 +36,21 @@ from pyflowline.algorithms.split.split_flowline_to_edge import split_flowline_to
 
 from pyflowline.algorithms.merge.merge_flowline import merge_flowline
 
-from pyflowline.algorithms.auxiliary.calculate_area_of_difference import calculate_area_of_difference_simplified
+from pyflowline.algorithms.direction.correct_flowline_direction import correct_flowline_direction
 
+from pyflowline.algorithms.loop.remove_flowline_loop import remove_flowline_loop
+
+from pyflowline.algorithms.simplification.remove_small_river import remove_small_river
+from pyflowline.algorithms.simplification.remove_returning_flowline import remove_returning_flowline
+from pyflowline.algorithms.simplification.remove_duplicate_flowline import remove_duplicate_flowline
+
+from pyflowline.algorithms.index.define_stream_order import define_stream_order
+from pyflowline.algorithms.index.define_stream_segment_index import define_stream_segment_index
+
+from pyflowline.algorithms.intersect.intersect_flowline_with_mesh import intersect_flowline_with_mesh
 from pyflowline.algorithms.intersect.intersect_flowline_with_flowline import intersect_flowline_with_flowline
 
-desired_proj = ccrs.Orthographic(central_longitude=-75, central_latitude=42, globe=None)
+#desired_proj = ccrs.Orthographic(central_longitude=-75, central_latitude=42, globe=None)
 desired_proj = ccrs.PlateCarree()
 
 class BasinClassEncoder(JSONEncoder):

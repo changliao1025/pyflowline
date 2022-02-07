@@ -13,17 +13,21 @@ import json
 from osgeo import ogr, osr, gdal, gdalconst
 import matplotlib.pyplot as plt
 import matplotlib.path as mpath
+import matplotlib.ticker as mticker
 from shapely.wkt import loads
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
+from cartopy.mpl.ticker import LongitudeFormatter, LatitudeFormatter,      LatitudeLocator
 import matplotlib.patches as mpatches
+import cartopy.io.shapereader as shpreader
 import matplotlib.cm as cm
 from matplotlib.collections import PatchCollection
+from pyflowline.algorithms.auxiliary.text_reader_string import text_reader_string
 from pyflowline.classes.mpas import pympas
 from pyflowline.classes.hexagon import pyhexagon
 from pyflowline.classes.latlon import pylatlon
 from pyflowline.classes.square import pysquare
-
+from cartopy.feature import ShapelyFeature
 from pyflowline.classes.vertex import pyvertex
 from pyflowline.classes.basin import pybasin
 from pyflowline.classes.flowline import pyflowline
@@ -510,9 +514,9 @@ class flowlinecase(object):
         dem_proj =ccrs.AlbersEqualArea(central_longitude=pSpatial_reference_source.GetProjParm('longitude_of_center'), \
             central_latitude=pSpatial_reference_source.GetProjParm('latitude_of_center'),\
                 standard_parallels=(pSpatial_reference_source.GetProjParm('standard_parallel_1'),pSpatial_reference_source.GetProjParm('standard_parallel_2')))
-        ax_data = fig.add_axes([0.3, 0.15, 0.6, 0.55] , projection=dem_proj )
-        ax_data.set_xmargin(0.05)
-        ax_data.set_ymargin(0.10)          
+        ax_dem = fig.add_axes([0.3, 0.15, 0.6, 0.55] , projection=dem_proj )
+        ax_dem.set_xmargin(0.05)
+        ax_dem.set_ymargin(0.10)          
         
         missing_value = dummy[6]
 
@@ -543,9 +547,15 @@ class flowlinecase(object):
         aImage_in[np.where(aImage_in == missing_value)] = np.nan
 
         # 
-        demplot = ax_data.imshow(aImage_in, origin='upper', extent=aImage_extent,       transform=dem_proj) 
+        demplot = ax_dem.imshow(aImage_in, origin='upper', extent=aImage_extent,cmap=cm.terrain,transform=dem_proj) 
+        # change all spines
+        for axis in ['top','bottom','left','right']:
+            ax_dem.spines[axis].set_linewidth(0.5)
+
+        # increase tick width
+        ax_dem.tick_params(width=0.5)
         u = utm.from_latlon(dLatitude_center, dLongitude_center)
-        gl = ax_data.gridlines(crs=ccrs.PlateCarree(), draw_labels=True,
+        gl = ax_dem.gridlines(crs=ccrs.PlateCarree(), draw_labels=True,
                       linewidth=1, color='gray', alpha=0.3, linestyle='--')
         gl.left_labels=False
         gl.top_labels=False        
@@ -559,15 +569,39 @@ class flowlinecase(object):
         gl.xlabel_style = {'size': XTEXT_SIZE, 'color': 'k', 'rotation':0, 'ha':'right'}
         gl.ylabel_style = {'size': YTEXT_SIZE, 'color': 'k', 'rotation':90,'weight': 'normal'}
 
+        sFilename_nhd = '/qfs/people/liao313/data/hexwatershed/susquehanna/vector/hydrology/nhd_proj.shp'
+        reader = shpreader.Reader(sFilename_nhd)
+        shape_feature = ShapelyFeature(reader.geometries(),
+                                dem_proj, facecolor='none')
+        ax_dem.add_feature(shape_feature)
+        pSpatial_reference_source = osr.SpatialReference()  
+        pSpatial_reference_source.ImportFromEPSG(4326)
+        pSpatial_reference_target = osr.SpatialReference()  
+        pSpatial_reference_target.ImportFromWkt(dem_proj.to_wkt())
+        for pBasin in self.aBasin:
+            sFilename_dam = pBasin.sFilename_dam
+
+            aData_dam = text_reader_string(sFilename_dam, iSkipline_in =1,cDelimiter_in=',' )
+            ndam = len(aData_dam)
+            for idam in range(ndam):
+                dLon = float(aData_dam[idam, 1])
+                dLat = float(aData_dam[idam, 0])
+                x,y = reproject_coordinates(dLon, dLat,pSpatial_reference_source, pSpatial_reference_target )
+                ax_dem.plot(x,y,marker = 'x', color='red', markersize=4)
+
+                pass
+
         ax_cb= fig.add_axes([0.2, 0.2, 0.02, 0.5])
         
         cb = plt.colorbar(demplot, cax = ax_cb, extend = 'both')
+        cb.ax.get_yaxis().set_ticks_position('left')
         cb.ax.get_yaxis().labelpad = 10
         cb.ax.set_ylabel('Unit: meter', rotation=270)
+        cb.ax.tick_params(labelsize=6) 
 
         #google earth
         zone = u[2]
-        ge_proj = ccrs.Mercator(central_longitude=dLongitude_center)
+        ge_proj = ccrs.Mercator()#central_longitude=dLongitude_center)
         
         pSpatial_reference_source = osr.SpatialReference()  
         pSpatial_reference_source.ImportFromEPSG(4326)
@@ -583,7 +617,8 @@ class flowlinecase(object):
         scale = Google_MetersPerPixel(iZoom)
         xrange = (uv_xcenter - (xsize_ge/2.0*scale), uv_xcenter + (xsize_ge/2.0*scale))
         yrange = (uv_ycenter - (ysize_ge/2.0*scale), uv_ycenter + (ysize_ge/2.0*scale))
- 
+
+
         aImage_extent = [xrange[0], xrange[1],yrange[0], yrange[1] ]
         ax_ge = fig.add_axes([0.1, 0.75, 0.2, 0.2] , projection=ge_proj )
          
@@ -611,19 +646,31 @@ class flowlinecase(object):
 
         img = mpimg.imread('google_map.png')
         ax_ge.imshow(img,extent=aImage_extent,       transform=ge_proj)
-        gl_ge= ax_ge.gridlines(crs=ccrs.PlateCarree(), draw_labels=True,
+        gl_ge = ax_ge.gridlines(crs=ccrs.PlateCarree(), draw_labels=True,
                       linewidth=1, color='gray', alpha=0.3, linestyle='--')
+        #gl_ge.xlocator = mticker.FixedLocator(aLon_range)
+        #gl_ge.ylocator = mticker.FixedLocator(aLat_range)
+        gl_ge.xformatter = LongitudeFormatter()
+        gl_ge.yformatter = LatitudeFormatter()
         gl_ge.right_labels=False
         gl_ge.bottom_labels=False        
        
         # declare text size
-        XTEXT_SIZE = 4
-        YTEXT_SIZE = 4
+        XTEXT_SIZE = 2.5
+        YTEXT_SIZE = 2.5
         # to facilitate text rotation at bottom edge, ...
         # text justification: 'ha':'right' is used to avoid clashing with map's boundary
         # default of 'ha' is center, often causes trouble when text rotation is not zero
         gl_ge.xlabel_style = {'size': XTEXT_SIZE, 'color': 'k', 'rotation':0, 'ha':'right'}
         gl_ge.ylabel_style = {'size': YTEXT_SIZE, 'color': 'k', 'rotation':90,'weight': 'normal'}
+        #add boundary
+        sFilename_boundary = '/qfs/people/liao313/data/hexwatershed/susquehanna/vector/hydrology/boundary_ge.shp'
+        reader = shpreader.Reader(sFilename_boundary)
+        shape_feature = ShapelyFeature(reader.geometries(),
+                                ge_proj, facecolor='none')
+        ax_ge.add_feature(shape_feature)
+
+        #histogram
 
         ax_histo = fig.add_axes([0.4, 0.8, 0.4, 0.15]  )
         sFilename_slope = '/qfs/people/liao313/data/hexwatershed/susquehanna/raster/dem/slope_ext.tif'
@@ -634,7 +681,7 @@ class flowlinecase(object):
         dMax_x=60
         dMin_x=0
         dSpace_x=4
-        ax_histo.hist(aSlope,  int(  (dMax_x-dMin_x)/ dSpace_x))  
+        ax_histo.hist(aSlope,  int(  (dMax_x-dMin_x)/ dSpace_x), color = "skyblue", ec="skyblue")  
         sLabel_x= 'Slope (degree)'
         sLabel_y ='Frequency'
         ax_histo.set_xlabel(sLabel_x,fontsize=4 )
@@ -648,7 +695,12 @@ class flowlinecase(object):
         ax_histo.tick_params(axis='y', labelsize=5 )
         ax_histo.yaxis.offsetText.set_fontsize(5)
 
-        
+        sText =  'Outlet'
+        ax_dem.text(0.85, 0.05, sText, \
+                verticalalignment='top', horizontalalignment='left',\
+                transform=ax_dem.transAxes, \
+                color='black', fontsize=7)
+
         sFilename  = 'study_area.png'
         sFilename_out = os.path.join(sWorkspace_output_case, sFilename)
         plt.savefig(sFilename_out, bbox_inches='tight')

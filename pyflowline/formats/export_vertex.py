@@ -1,8 +1,8 @@
 import os
-import json
-from osgeo import ogr, osr, gdal, gdalconst
-from shapely.geometry import Point, LineString, MultiLineString
-from shapely.wkt import loads
+
+from osgeo import ogr, osr
+from shapely.geometry import Point
+
 
 def export_vertex_to_json(aVertex_in, \
         sFilename_json_in,\

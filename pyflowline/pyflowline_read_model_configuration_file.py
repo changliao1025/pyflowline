@@ -1,5 +1,5 @@
 import os 
-import sys #used to add system path
+
 import datetime
 import json
 from pyflowline.classes.pycase import flowlinecase

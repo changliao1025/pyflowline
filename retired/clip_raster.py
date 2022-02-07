@@ -1,5 +1,5 @@
 import numpy as np
-import geojson as gj
+
 from osgeo import ogr, osr, gdal
 
 # Enable GDAL/OGR exceptions

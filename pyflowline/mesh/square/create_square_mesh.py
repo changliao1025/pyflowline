@@ -4,13 +4,13 @@
 #because it is mesh, it represent the edge instead of center
 #we will use gdal api for most operations
 import os, sys
-from osgeo import ogr, osr, gdal, gdalconst
+from osgeo import ogr, osr
 import numpy as np
 from pyflowline.classes.square import pysquare
-from pyflowline.formats.convert_coordinates import convert_gcs_coordinates_to_cell, convert_pcs_coordinates_to_cell
+from pyflowline.formats.convert_coordinates import convert_gcs_coordinates_to_cell
 
 
-from pyflowline.algorithms.auxiliary.gdal_functions import reproject_coordinates, reproject_coordinates_batch
+from pyflowline.algorithms.auxiliary.gdal_functions import  reproject_coordinates_batch
 
 def create_square_mesh(dX_left_in, dY_bot_in, dResolution_meter_in, ncolumn_in, nrow_in, \
     sFilename_output_in, sFilename_spatial_reference_in):

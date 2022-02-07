@@ -1,13 +1,10 @@
 import os, sys
-import math
+
 import numpy as np
-from netCDF4 import Dataset
-
-from osgeo import ogr, osr, gdal, gdalconst
-
-from pyflowline.classes.mpas import pympas
 
 
+from osgeo import ogr
+from pyflowline.classes.tin import pytin
 
 from pyflowline.formats.convert_coordinates import convert_pcs_coordinates_to_cell
 
@@ -130,9 +127,6 @@ sFilename_output_in, sFilename_spatial_reference_in):
             aCoords[3,0] = x1
             aCoords[3,1] = y1
             
-
-
-
             dummy1= np.array(aCoords)
             pHexagon = convert_pcs_coordinates_to_cell(1, dummy1)
             aTin.append(pHexagon)
@@ -140,10 +134,6 @@ sFilename_output_in, sFilename_spatial_reference_in):
             pass
         
     pDataset = pLayer = pFeature  = None      
-    
-  
-    
 
-    
 
     return aTin

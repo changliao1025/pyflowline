@@ -1,16 +1,9 @@
-import os
-import json
+
 import numpy as np
-from osgeo import ogr, osr, gdal, gdalconst
-from shapely.geometry import Point, LineString, MultiLineString
+from osgeo import ogr, gdal
 from shapely.wkt import loads
 
-from pyflowline.classes.vertex import pyvertex
-from pyflowline.classes.edge import pyedge
-from pyflowline.classes.flowline import pyflowline
-
 from pyflowline.formats.convert_coordinates import convert_gcs_coordinates_to_cell
-
 
 def read_mesh_json(iMesh_type_in, sFilename_mesh_in):
     """

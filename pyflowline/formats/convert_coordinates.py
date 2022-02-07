@@ -1,7 +1,4 @@
-import os
-import json
-import numpy as np
-from osgeo import ogr, osr, gdal, gdalconst
+
 
 from pyflowline.classes.vertex import pyvertex
 from pyflowline.classes.edge import pyedge

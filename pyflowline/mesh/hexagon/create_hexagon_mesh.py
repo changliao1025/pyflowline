@@ -5,12 +5,12 @@
 #we will use gdal api for most operations
 import os, sys
 import numpy as np
-from osgeo import ogr, osr, gdal, gdalconst
+from osgeo import ogr, osr
 
 from pyflowline.classes.hexagon import pyhexagon
 from pyflowline.formats.convert_coordinates import convert_gcs_coordinates_to_cell, convert_pcs_coordinates_to_cell
 from pyflowline.algorithms.auxiliary.find_index_in_list import check_if_duplicates
-from pyflowline.algorithms.auxiliary.gdal_functions import reproject_coordinates, reproject_coordinates_batch
+from pyflowline.algorithms.auxiliary.gdal_functions import reproject_coordinates_batch
 
 def create_hexagon_mesh(iFlag_rotation_in, \
     dX_left_in, dY_bot_in, \

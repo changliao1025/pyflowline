@@ -1,16 +1,10 @@
-import os
-import json
+
 import numpy as np
-from osgeo import ogr, osr, gdal, gdalconst
-from shapely.geometry import Point, LineString, MultiLineString
+from osgeo import ogr, osr, gdal
+
 from shapely.wkt import loads
 
-from pyflowline.classes.edge import pyedge
-from pyflowline.classes.vertex import pyvertex
-from pyflowline.classes.flowline import pyflowline
-
-from pyflowline.formats.convert_coordinates import convert_gcs_coordinates_to_flowline, convert_pcs_coordinates_to_flowline
-
+from pyflowline.formats.convert_coordinates import convert_gcs_coordinates_to_flowline
 
 def read_flowline_shapefile(sFilename_shapefile_in):
     """

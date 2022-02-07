@@ -1,11 +1,11 @@
 import os
 import json
 
-from osgeo import ogr, osr, gdal, gdalconst
-from shapely.geometry import Point, LineString, MultiLineString
-from shapely.wkt import loads
+from osgeo import ogr, osr
+from shapely.geometry import Point, LineString
+
 from pyflowline.classes.edge import pyedge
-from pyflowline.classes.flowline import pyflowline
+
 from pyflowline.classes.link import pycelllink
 
 def export_flowline_to_json( aFlowline_in, \

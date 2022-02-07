@@ -1,15 +1,12 @@
-import os, sys
+import os
 import math
 import numpy as np
+from osgeo import ogr, osr
 from netCDF4 import Dataset
-from osgeo import ogr, osr, gdal, gdalconst
-
 from pyflowline.classes.mpas import pympas
 
-from pyflowline.algorithms.auxiliary.gdal_functions import convert_180_to_360,convert_360_to_180
-
-from pyflowline.formats.convert_coordinates import convert_pcs_coordinates_to_cell
 from pyflowline.formats.convert_attributes import convert_gcs_attributes_to_cell
+from pyflowline.algorithms.auxiliary.gdal_functions import convert_360_to_180
 
 def create_mpas_mesh(iFlag_global_in, \
     iFlag_use_mesh_dem, \

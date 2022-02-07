@@ -5,11 +5,9 @@
 #we will use gdal api for most operations
 import os, sys
 import numpy as np
-from osgeo import ogr, osr, gdal, gdalconst
+from osgeo import ogr, osr
 from pyflowline.classes.latlon import pylatlon
-from pyflowline.formats.convert_coordinates import convert_gcs_coordinates_to_cell, convert_pcs_coordinates_to_cell
-
-#os.environ['PROJ_LIB'] = '/qfs/people/liao313/.conda/envs/gdalenv/share/proj'
+from pyflowline.formats.convert_coordinates import convert_gcs_coordinates_to_cell
 
 def create_latlon_mesh(dLongitude_left_in, dLatitude_bot_in, dResolution_degree_in, ncolumn_in, nrow_in, sFilename_output_in):
 

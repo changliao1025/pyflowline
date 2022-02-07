@@ -1,6 +1,5 @@
-import os
-import json
-from osgeo import ogr, osr, gdal, gdalconst
+
+from osgeo import  osr
 from pyflowline.formats.read_flowline import read_flowline_shapefile, read_flowline_shapefile_swat
 from pyflowline.formats.export_flowline import export_flowline_to_json
 

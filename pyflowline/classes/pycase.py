@@ -1216,5 +1216,5 @@ class flowlinecase(object):
             json.dump(self.__dict__, f,sort_keys=True, \
                 ensure_ascii=False, \
                 indent=4, \
-                    cls=CaseClassEncoder)
+                cls=CaseClassEncoder)
         return

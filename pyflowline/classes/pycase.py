@@ -33,12 +33,10 @@ from pyflowline.classes.flowline import pyflowline
 from pyflowline.classes.edge import pyedge
 
 from pyflowline.formats.convert_shapefile_to_json import convert_shapefile_to_json_swat
-
 from pyflowline.formats.read_mesh import read_mesh_json
 
 from pyflowline.algorithms.auxiliary.text_reader_string import text_reader_string
 from pyflowline.algorithms.auxiliary.gdal_functions import reproject_coordinates, reproject_coordinates_batch
-from pyflowline.algorithms.auxiliary.gdal_functions import 
 from pyflowline.algorithms.auxiliary.gdal_functions  import degree_to_meter
 from pyflowline.algorithms.auxiliary.gdal_functions  import meter_to_degree
 from pyflowline.algorithms.auxiliary.gdal_functions import gdal_read_geotiff_file, retrieve_geotiff_metadata
@@ -102,7 +100,7 @@ class flowlinecase(object):
     iFlag_rotation=0
 
     nOutlet = 1 #by default , there shoule ne only one ouelet
-    dResolution=0.0
+    dResolution_degree=0.0
     dResolution_meter=0.0
     dThreshold_small_river=0.0
     dLongitude_left = -180
@@ -236,19 +234,31 @@ class flowlinecase(object):
                         else:
                             print('Unsupported mesh type?')
          
-        
-        self.dResolution = float(aParameter['dResolution']) 
-        self.dResolution_meter = float(aParameter['dResolution_meter']) 
+        if 'dResolution_degree' in aParameter:
+            self.dResolution_degree = float(aParameter['dResolution_degree']) 
 
-        
-        self.dLongitude_left = float(aParameter['dLongitude_left']) 
-        self.dLongitude_right = float(aParameter['dLongitude_right']) 
-        self.dLatitude_bot = float(aParameter['dLatitude_bot']) 
-        self.dLatitude_top = float(aParameter['dLatitude_top']) 
+        if 'dResolution_meter' in aParameter:
+            self.dResolution_meter = float(aParameter['dResolution_meter']) 
+        else:
+            print('Please specify resolution.')
+
+        if 'dLongitude_left' in aParameter:
+            self.dLongitude_left = float(aParameter['dLongitude_left']) 
+
+        if 'dLongitude_right' in aParameter:
+            self.dLongitude_right = float(aParameter['dLongitude_right']) 
+
+        if 'dLatitude_bot' in aParameter:
+            self.dLatitude_bot = float(aParameter['dLatitude_bot']) 
+
+        if 'dLatitude_top' in aParameter:
+            self.dLatitude_top = float(aParameter['dLatitude_top']) 
        
-       
-        self.sFilename_spatial_reference = aParameter['sFilename_spatial_reference']
-        self.sFilename_dem = aParameter['sFilename_dem']
+        if 'sFilename_spatial_reference' in aParameter:
+            self.sFilename_spatial_reference = aParameter['sFilename_spatial_reference']
+
+        if 'sFilename_dem' in aParameter:
+            self.sFilename_dem = aParameter['sFilename_dem']
 
         if 'sFilename_mesh_netcdf' in aParameter:
             self.sFilename_mesh_netcdf = aParameter['sFilename_mesh_netcdf']
@@ -271,22 +281,16 @@ class flowlinecase(object):
             else:
                 pass
             
+        if 'sJob' in aParameter:
+            self.sJob =  aParameter['sJob'] 
+       
 
-        self.sJob =  aParameter['sJob'] 
-
-        
-
-        #model generated files
-
-   
+        #model generated files   
         self.sFilename_mesh = os.path.join(str(Path(self.sWorkspace_output)  ) , sMesh_type + ".json" )
-        
-        
-
+               
         self.sFilename_mesh_info= os.path.join(str(Path(self.sWorkspace_output)  ) , sMesh_type + "_mesh_info.json"  )
     
         self.sWorkspace_data_project = str(Path(self.sWorkspace_data ) / self.sWorkspace_project)
-
                 
         return
         
@@ -1206,3 +1210,11 @@ class flowlinecase(object):
                     ensure_ascii=True, \
                         cls=CaseClassEncoder)
         return sJson
+
+    def export_config_to_json(self, sFilename_output):
+        with open(sFilename_output, 'w', encoding='utf-8') as f:
+            json.dump(self.__dict__, f,sort_keys=True, \
+                ensure_ascii=False, \
+                indent=4, \
+                    cls=CaseClassEncoder)
+        return

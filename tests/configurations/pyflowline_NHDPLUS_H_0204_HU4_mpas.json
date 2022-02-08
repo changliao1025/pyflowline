@@ -25,7 +25,7 @@
     "dLatitude_top": 43.00334,
     "dLongitude_outlet_degree": -75.1453,
     "dLatitude_outlet_degree": 39.0357,
-    "dResolution": 5000,
+    "dResolution_degree": 5000,
     "dResolution_meter": 5000,
     "dThreshold_small_river": 30000,
     "sDate": "20210915",        

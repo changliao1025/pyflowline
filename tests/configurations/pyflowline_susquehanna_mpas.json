@@ -23,7 +23,7 @@
     "dLongitude_right": -74.5,
     "dLatitude_bot": 39.20,
     "dLatitude_top": 42.8,
-    "dResolution": 5000,
+    "dResolution_degree": 5000,
     "dResolution_meter": 5000,    
     "sDate": "20220110",        
     "sMesh_type": "mpas",       

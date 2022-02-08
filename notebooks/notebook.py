@@ -2,7 +2,6 @@
 from pathlib import Path
 
 import logging
-from token import OP
 for handler in logging.root.handlers[:]:
     logging.root.removeHandler(handler)
 
@@ -11,11 +10,19 @@ logging.warning('is the time Pyflowline simulation started.')
 
 from pyflowline.classes.pycase import flowlinecase
 from pyflowline.pyflowline_read_model_configuration_file import pyflowline_read_model_configuration_file
+from pyflowline.pyflowline_generate_template_configuration_json_file import pyflowline_generate_template_configuration_json_file
 
-iFlag_option = 2
+iFlag_option = 1
 if iFlag_option ==1:
-    oPyflowline=flowlinecase()
+
+    sPath = str(Path(__file__).parent.resolve())
+    sFilename_configuration_in = sPath +  '/../tests/configurations/template.json' 
+    
+    oPyflowline = pyflowline_generate_template_configuration_json_file(sFilename_configuration_in)
+    print(oPyflowline.tojson())
+    #now you can customize the model object
     oPyflowline.iCase_index = 1
+    print(oPyflowline.tojson())
 else: 
     if iFlag_option == 2:
         #an example configuration file is provided with the repository, but you need to update this file based on your own case study
@@ -41,7 +48,7 @@ else:
 #oPyflowline.plot(sVariable_in = 'flowline_filter_json')
 #oPyflowline.flowline_simplification()
 #oPyflowline.plot(sVariable_in = 'flowline_simplified')
-oPyflowline.plot_study_area()
+#oPyflowline.plot_study_area()
 exit()
 oPyflowline.mesh_generation()
 #oPyflowline.plot(sVariable_in = 'mesh')

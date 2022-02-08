@@ -10,7 +10,7 @@ def pyflowline_read_model_configuration_file(sFilename_configuration_in,\
     iFlag_standalone_in= None,\
         iFlag_use_mesh_dem_in=None,\
      iCase_index_in=None, \
-         dResolution_in = None,\
+         dResolution_degree_in = None,\
          dResolution_meter_in = None,\
          sJob_in=None,\
          aVariable_in = None, \
@@ -48,10 +48,10 @@ def pyflowline_read_model_configuration_file(sFilename_configuration_in,\
         sDate = data['sDate']
         pass
 
-    if dResolution_in is not None:
-        dResolution = dResolution_in
+    if dResolution_degree_in is not None:
+        dResolution_degree = dResolution_degree_in
     else:
-        dResolution = data['dResolution']
+        dResolution_degree = data['dResolution_degree']
         pass
 
     if dResolution_meter_in is not None:
@@ -70,7 +70,7 @@ def pyflowline_read_model_configuration_file(sFilename_configuration_in,\
     data['iCase_index'] = iCase_index
     data['iFlag_standalone'] = iFlag_standalone
     data['iFlag_use_mesh_dem'] = iFlag_use_mesh_dem
-    data['dResolution'] = dResolution
+    data['dResolution_degree'] = dResolution_degree
     data['dResolution_meter'] = dResolution_meter
 
     data['sDate'] = sDate

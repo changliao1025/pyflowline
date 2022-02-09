@@ -19,10 +19,9 @@ def pyflowline_generate_template_configuration_json_file(sFilename_json):
     aConfig = {}
     aConfig['iFlag_flowline'] = 1
     aConfig['iFlag_merge_reach'] = 1
-    aConfig['iMesh_type'] = 4 #mpas
-    aConfig['iFlag_resample_method'] = 2
-    aConfig['lCellID_outlet'] = -1
-    aConfig['nOutlet'] = 1
+    
+    aConfig['iFlag_resample_method'] = 2    
+    aConfig['nOutlet'] = nBasin
     aConfig['dResolution_degree'] = 10000
     aConfig['dResolution_meter'] = 10000
     aConfig['dLongitude_left'] = -180
@@ -37,14 +36,14 @@ def pyflowline_generate_template_configuration_json_file(sFilename_json):
     aConfig['sRegion'] = 'susquehanna'
     aConfig['sModel'] = 'pyflowline'
     aConfig['iCase_index'] = 1
-    aConfig['iMesh_type'] = 4
+   
     aConfig['sMesh_type'] = 'mpas'
     aConfig['sJob'] = 'pyflowline'
     aConfig['sDate']= '20220110'
     aConfig['sFilename_mesh'] = "/qfs/people/liao313/data/icom/mesh/delaware_lnd_60_30_5_2_v2/lnd_cull_mesh.nc"    
     aConfig['flowline_info'] = 'flowline_info.json'
     aConfig['sFilename_mesh_info'] = 'mesh_info.json'
-    aConfig['sFilename_elevation'] = 'elevation.shp'
+    aConfig['sFilename_elevation'] = 'elevation.json'
     aConfig['sFilename_dem']  = '/qfs/people/liao313/data/hexwatershed/susquehanna/raster/dem/dem_ext.tif'    
     aConfig['sFilename_spatial_reference'] = '/qfs/people/liao313/data/hexwatershed/susquehanna/vector/hydrology/boundary_proj.shp'
     

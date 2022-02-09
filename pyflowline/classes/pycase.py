@@ -133,7 +133,10 @@ class flowlinecase(object):
     aCell=list()
 
     
-    def __init__(self, aParameter):
+    def __init__(self, aParameter,\
+        iFlag_standalone_in= None,\
+             sModel_in = None,\
+                     sWorkspace_output_in = None):
         
         if 'sFilename_model_configuration' in aParameter:
             self.sFilename_model_configuration    = aParameter[ 'sFilename_model_configuration']
@@ -147,17 +150,28 @@ class flowlinecase(object):
         if 'sWorkspace_project' in aParameter:
             self.sWorkspace_project= aParameter[ 'sWorkspace_project']
         
-        if 'sWorkspace_output' in aParameter:
-            self.sWorkspace_output = aParameter[ 'sWorkspace_output']
+        if sWorkspace_output_in is not None:
+            self.sWorkspace_output = sWorkspace_output_in
+        else:
+            if 'sWorkspace_output' in aParameter:
+                self.sWorkspace_output = aParameter[ 'sWorkspace_output']
         
         if 'sRegion' in aParameter:
             self.sRegion               = aParameter[ 'sRegion']
         
-        if 'sModel' in aParameter:
-            self.sModel                = aParameter[ 'sModel']
+        if sModel_in is not None:
+            self.sModel = sModel_in
+        else:
+            if 'sModel' in aParameter:
+                self.sModel                = aParameter[ 'sModel']
 
-        if 'iFlag_standalone' in aParameter:
-            self.iFlag_standalone = int(aParameter['iFlag_standalone'])
+        if iFlag_standalone_in is not None:
+            self.iFlag_standalone = iFlag_standalone_in
+        else:
+            if 'iFlag_standalone' in aParameter:
+                self.iFlag_standalone = int(aParameter['iFlag_standalone'])
+            else:
+                self.iFlag_standalone=1
     
         if 'iFlag_flowline' in aParameter:
             self.iFlag_flowline             = int(aParameter[ 'iFlag_flowline'])
@@ -190,7 +204,10 @@ class flowlinecase(object):
         if 'iFlag_multiple_outlet' in aParameter:
             self.iFlag_multiple_outlet             = int(aParameter[ 'iFlag_multiple_outlet'])    
                
-        iCase_index = int(aParameter['iCase_index'])
+        if 'iCase_index' in aParameter:
+            iCase_index = int(aParameter['iCase_index'])
+        else:
+            iCase_index = 1
         sCase_index = "{:03d}".format( iCase_index )
         sDate   = aParameter[ 'sDate']
         if sDate is not None:
@@ -479,6 +496,16 @@ class flowlinecase(object):
             pBasin.evaluate(self.iMesh_type, self.sMesh_type)
         return
 
+    def setup(self):
+        self.convert_flowline_to_json()
+        return
+
+    def run(self):
+        self.flowline_simplification()
+        self.mesh_generation()
+        self.reconstruct_topological_relationship()
+        self.export()
+        return
 
     def plot(self, sVariable_in=None, aExtent_in = None):
         if sVariable_in == 'mesh':

@@ -22,6 +22,7 @@ class pyflowline(object):
     aVertex=None
 
     dLength=0.0
+    dSinuosity=0.0
 
     iStream_segment=-1
     iStream_order =-1

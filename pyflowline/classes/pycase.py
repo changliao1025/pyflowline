@@ -493,9 +493,7 @@ class flowlinecase(object):
         return
 
     def evaluate(self):
-
         for pBasin in self.aBasin:
-
             pBasin.evaluate(self.iMesh_type, self.sMesh_type)
         return
 

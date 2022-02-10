@@ -28,6 +28,7 @@ from pyflowline.formats.export_vertex import export_vertex_to_json
 from pyflowline.algorithms.auxiliary.text_reader_string import text_reader_string
 from pyflowline.algorithms.auxiliary.find_index_in_list import find_vertex_in_list
 from pyflowline.algorithms.auxiliary.calculate_area_of_difference import calculate_area_of_difference_simplified
+from pyflowline.algorithms.auxiliary.gdal_functions import  calculate_angle_betwen_vertex
 
 from pyflowline.algorithms.split.find_flowline_vertex import find_flowline_vertex
 from pyflowline.algorithms.split.find_flowline_confluence import find_flowline_confluence
@@ -110,6 +111,7 @@ class pybasin(object):
     #sFilename_basin_configuration=''
 
     aFlowline_basin=None
+    aVertex_confluence=None
     pVertex_outlet=None
     
     def __init__(self, aParameter):
@@ -196,144 +198,7 @@ class pybasin(object):
         self.sFilename_area_of_difference = 'area_of_difference.json'
         self.sFilename_basin_info = 'basin_info.json'
         return
-    
-    def tojson(self):
-
-
-        sJson = json.dumps(self.__dict__, \
-            sort_keys=True, \
-                indent = 4, \
-                    ensure_ascii=True, \
-                        cls=BasinClassEncoder)
-        return sJson
-    
-    def convert_flowline_to_json(self):
-        sFilename_raw = self.sFilename_flowline_filter            
-        sFilename_out = self.sFilename_flowline_filter_json
-        convert_shapefile_to_json(1, sFilename_raw, sFilename_out)
-    
-    def export_flowline(self, aFlowline_in, sFilename_json_in,iFlag_projected_in = None,  pSpatial_reference_in = None):
-
-        export_flowline_to_json(aFlowline_in, sFilename_json_in,\
-            iFlag_projected_in= iFlag_projected_in, \
-            pSpatial_reference_in = pSpatial_reference_in)
-
-
-    def calculate_flowline_length(self, aFlowline_in):
-
-        dLength = 0.0
-
-        nflowline = len(aFlowline_in)
-
-        for i in range(nflowline):
-
-            pFlowline= aFlowline_in[i]
-
-            pFlowline.calculate_length()
-
-            dLength = dLength + pFlowline.dLength
-
         
-
-        return dLength
-    
-    def plot(self, sVariable_in=None):
-        sWorkspace_output_basin = self.sWorkspace_output_basin
-        if sVariable_in is not None:
-            if sVariable_in == 'flowline_filter_json':
-                sFilename_json = self.sFilename_flowline_filter_json
-                sTitle = 'Original flowline'
-            else:
-                if sVariable_in == 'flowline_simplified':
-                    sFilename_out = self.sFilename_flowline_segment_index_before_intersect
-                    sFilename_json = os.path.join(sWorkspace_output_basin, sFilename_out)
-                    sTitle = 'Simplified flowline'
-                else:
-                    sFilename_out = self.sFilename_flowline_final
-                    sFilename_json = os.path.join(sWorkspace_output_basin, sFilename_out)
-                    sTitle = 'Conceptual flowline'
-                pass
-        else:
-            #default 
-            sFilename_json = self.sFilename_flowline_filter_json
-        
-        #request = cimgt.OSM()
-        fig = plt.figure( dpi=300)
-        fig.set_figwidth( 4 )
-        fig.set_figheight( 4 )
-        ax = fig.add_axes([0.1, 0.15, 0.75, 0.8] , projection=desired_proj ) #request.crs
-        
-        pDriver = ogr.GetDriverByName('GeoJSON')
-        pDataset = pDriver.Open(sFilename_json, gdal.GA_ReadOnly)
-        pLayer = pDataset.GetLayer(0)
-    
-        pSrs = osr.SpatialReference()  
-        pSrs.ImportFromEPSG(4326)    # WGS84 lat/lon
-    
-        lID = 0
-        dLat_min = 90
-        dLat_max = -90
-        dLon_min = 180
-        dLon_max = -180          
-        
-
-        #ax.add_image(request, 6)    # 5 = zoom level
-
-        n_colors = pLayer.GetFeatureCount()
-        
-        colours = cm.rainbow(np.linspace(0, 1, n_colors))
-        for pFeature in pLayer:
-            pGeometry_in = pFeature.GetGeometryRef()
-            sGeometry_type = pGeometry_in.GetGeometryName()
-            if sGeometry_type =='LINESTRING':
-                dummy0 = loads( pGeometry_in.ExportToWkt() )
-                aCoords_gcs = dummy0.coords
-                aCoords_gcs= np.array(aCoords_gcs)
-                nvertex = len(aCoords_gcs)
-                for i in range(nvertex):
-                    dLon = aCoords_gcs[i][0]
-                    dLat = aCoords_gcs[i][1]
-                    if dLon > dLon_max:
-                        dLon_max = dLon
-                    
-                    if dLon < dLon_min:
-                        dLon_min = dLon
-                    
-                    if dLat > dLat_max:
-                        dLat_max = dLat
-    
-                    if dLat < dLat_min:
-                        dLat_min = dLat
-    
-                codes = np.full(nvertex, mpath.Path.LINETO, dtype=int )
-                codes[0] = mpath.Path.MOVETO
-                path = mpath.Path(aCoords_gcs, codes)            
-                x, y = zip(*path.vertices)
-                line, = ax.plot(x, y, color= colours[lID],linewidth=1)
-                lID = lID + 1
-                
-    
-        pDataset = pLayer = pFeature  = None    
-        sDirname = os.path.dirname(sFilename_json)
-        marginx  = (dLon_max - dLon_min) / 20
-        marginy  = (dLat_max - dLat_min) / 20
-        aExtent_in = [dLon_min - marginx , dLon_max + marginx , dLat_min - marginy , dLat_max + marginy]
-        #aExtent_in = [-76.5,-76.2, 41.6,41.9]
-        #aExtent_in = [-76.95,-76.75, 40.7,40.9]
-        sFilename  = Path(sFilename_json).stem + '.png'
-        #sFilename  = Path(sFilename_json).stem + '_meander.png'       
-        #sFilename  = Path(sFilename_json).stem + '_loop.png'  
-        ax.set_extent(aExtent_in)       
-    
-        ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True,
-                      linewidth=1, color='gray', alpha=0.3, linestyle='--')
-        ax.set_title( sTitle)       
-        
-        sFilename_out = os.path.join(sDirname, sFilename)
-        plt.savefig(sFilename_out, bbox_inches='tight')
-        #plt.show()
-    
-        return
 
     def flowline_simplification(self):
 
@@ -515,13 +380,18 @@ class pybasin(object):
             export_vertex_to_json( aVertex,  sFilename_out, aAttribute_data=aConnectivity)
         
         #segment based
-        aFlowline_basin = merge_flowline( aFlowline_basin,aVertex, pVertex_outlet, aIndex_headwater,aIndex_middle, aIndex_confluence  )          
-        #aFlowline_basin = remove_flowline_loop(  aFlowline_basin )            
+        aFlowline_basin = merge_flowline( aFlowline_basin,aVertex, pVertex_outlet, aIndex_headwater,aIndex_middle, aIndex_confluence  )                          
         aVertex, lIndex_outlet, aIndex_headwater,aIndex_middle, aIndex_confluence, aConnectivity\
             = find_flowline_confluence(aFlowline_basin,  pVertex_outlet)        
-        #aFlowline_basin = merge_flowline( aFlowline_basin,aVertex, pVertex_outlet, aIndex_headwater,aIndex_middle, aIndex_confluence  ) 
         aFlowline_basin, aStream_segment = define_stream_segment_index(aFlowline_basin)
         aFlowline_basin, aStream_order = define_stream_order(aFlowline_basin)
+
+        #save confluence
+        aVertex = np.array(aVertex)
+        aIndex_confluence = np.array(aIndex_confluence)
+        if aIndex_confluence.size > 0:        
+            self.aVertex_confluence = aVertex[aIndex_confluence]  
+            
 
         #edge based
         aFlowline_basin_edge, aEdge = split_flowline_to_edge(aFlowline_basin)
@@ -542,26 +412,13 @@ class pybasin(object):
 
         return aCell_intersect_basin
         
-    def export(self):
-        self.export_basin_info_to_json()
-        self.tojson()    
-        return
-
-    def export_basin_info_to_json(self):
-        sFilename_json = self.sFilename_basin_info
-        sFilename_json = os.path.join(str(Path(self.sWorkspace_output_basin)  ) , sFilename_json  )
-
-        with open(sFilename_json, 'w', encoding='utf-8') as f:
-            sJson = json.dumps(self.__dict__, \
-            sort_keys=True, \
-                indent = 4, \
-                    ensure_ascii=True, \
-                        cls=BasinClassEncoder)      
-            f.write(sJson)    
-            f.close()
-        return
-
     def evaluate(self, iMesh_type, sMesh_type):
+        self.calculate_river_sinuosity()
+        self.calculate_confluence_branching_angle()
+        #self.evaluate_area_of_difference(iMesh_type, sMesh_type)
+        return
+
+    def evaluate_area_of_difference(self, iMesh_type, sMesh_type):
 
         sFilename_simplified =  self.sFilename_flowline_segment_order_before_intersect
         sFilename_simplified= os.path.join(self.sWorkspace_output_basin, sFilename_simplified)
@@ -629,15 +486,13 @@ class pybasin(object):
             else:
                 aVertex_all_conceptual.append(i)
         
-
         #export 
         self.iFlag_debug =1
         if self.iFlag_debug ==1:
             sFilename_output= os.path.join(self.sWorkspace_output_basin, 'vertex_split_all.json')
             export_vertex_to_json( aVertex_all, sFilename_output)
         
-        #split
- 
+        #split 
         aFlowline_simplified_split = split_flowline(aFlowline_simplified, aVertex_all_simplified,iFlag_intersect =1)
         self.iFlag_debug =1
         if self.iFlag_debug ==1:
@@ -665,6 +520,104 @@ class pybasin(object):
         self.dArea_of_difference = dArea
         self.dDistance_displace = dArea / self.dLength_flowline_after_simplification
         self.plot_area_of_difference(iMesh_type, sMesh_type)
+        return
+
+    def plot(self, sVariable_in=None):
+        sWorkspace_output_basin = self.sWorkspace_output_basin
+        if sVariable_in is not None:
+            if sVariable_in == 'flowline_filter_json':
+                sFilename_json = self.sFilename_flowline_filter_json
+                sTitle = 'Original flowline'
+            else:
+                if sVariable_in == 'flowline_simplified':
+                    sFilename_out = self.sFilename_flowline_segment_index_before_intersect
+                    sFilename_json = os.path.join(sWorkspace_output_basin, sFilename_out)
+                    sTitle = 'Simplified flowline'
+                else:
+                    sFilename_out = self.sFilename_flowline_final
+                    sFilename_json = os.path.join(sWorkspace_output_basin, sFilename_out)
+                    sTitle = 'Conceptual flowline'
+                pass
+        else:
+            #default 
+            sFilename_json = self.sFilename_flowline_filter_json
+        
+        #request = cimgt.OSM()
+        fig = plt.figure( dpi=300)
+        fig.set_figwidth( 4 )
+        fig.set_figheight( 4 )
+        ax = fig.add_axes([0.1, 0.15, 0.75, 0.8] , projection=desired_proj ) #request.crs
+        
+        pDriver = ogr.GetDriverByName('GeoJSON')
+        pDataset = pDriver.Open(sFilename_json, gdal.GA_ReadOnly)
+        pLayer = pDataset.GetLayer(0)
+    
+        pSrs = osr.SpatialReference()  
+        pSrs.ImportFromEPSG(4326)    # WGS84 lat/lon
+    
+        lID = 0
+        dLat_min = 90
+        dLat_max = -90
+        dLon_min = 180
+        dLon_max = -180          
+        
+
+        #ax.add_image(request, 6)    # 5 = zoom level
+
+        n_colors = pLayer.GetFeatureCount()
+        
+        colours = cm.rainbow(np.linspace(0, 1, n_colors))
+        for pFeature in pLayer:
+            pGeometry_in = pFeature.GetGeometryRef()
+            sGeometry_type = pGeometry_in.GetGeometryName()
+            if sGeometry_type =='LINESTRING':
+                dummy0 = loads( pGeometry_in.ExportToWkt() )
+                aCoords_gcs = dummy0.coords
+                aCoords_gcs= np.array(aCoords_gcs)
+                nvertex = len(aCoords_gcs)
+                for i in range(nvertex):
+                    dLon = aCoords_gcs[i][0]
+                    dLat = aCoords_gcs[i][1]
+                    if dLon > dLon_max:
+                        dLon_max = dLon
+                    
+                    if dLon < dLon_min:
+                        dLon_min = dLon
+                    
+                    if dLat > dLat_max:
+                        dLat_max = dLat
+    
+                    if dLat < dLat_min:
+                        dLat_min = dLat
+    
+                codes = np.full(nvertex, mpath.Path.LINETO, dtype=int )
+                codes[0] = mpath.Path.MOVETO
+                path = mpath.Path(aCoords_gcs, codes)            
+                x, y = zip(*path.vertices)
+                line, = ax.plot(x, y, color= colours[lID],linewidth=1)
+                lID = lID + 1
+                
+    
+        pDataset = pLayer = pFeature  = None    
+        sDirname = os.path.dirname(sFilename_json)
+        marginx  = (dLon_max - dLon_min) / 20
+        marginy  = (dLat_max - dLat_min) / 20
+        aExtent_in = [dLon_min - marginx , dLon_max + marginx , dLat_min - marginy , dLat_max + marginy]
+        #aExtent_in = [-76.5,-76.2, 41.6,41.9]
+        #aExtent_in = [-76.95,-76.75, 40.7,40.9]
+        sFilename  = Path(sFilename_json).stem + '.png'
+        #sFilename  = Path(sFilename_json).stem + '_meander.png'       
+        #sFilename  = Path(sFilename_json).stem + '_loop.png'  
+        ax.set_extent(aExtent_in)       
+    
+        ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True,
+                      linewidth=1, color='gray', alpha=0.3, linestyle='--')
+        ax.set_title( sTitle)       
+        
+        sFilename_out = os.path.join(sDirname, sFilename)
+        plt.savefig(sFilename_out, bbox_inches='tight')
+        #plt.show()
+    
         return
 
     def plot_area_of_difference(self, iMesh_type, sMesh_type):
@@ -764,4 +717,98 @@ class pybasin(object):
         sFilename_out = os.path.join(sDirname, sFilename)
         plt.savefig(sFilename_out, bbox_inches='tight')
         #plt.show()
+        return
+    
+    def export(self):
+        self.export_basin_info_to_json()
+        self.tojson()    
+        return
+
+    def export_flowline(self, aFlowline_in, sFilename_json_in,iFlag_projected_in = None,  pSpatial_reference_in = None):
+
+        export_flowline_to_json(aFlowline_in, sFilename_json_in,\
+            iFlag_projected_in= iFlag_projected_in, \
+            pSpatial_reference_in = pSpatial_reference_in)
+
+    def export_basin_info_to_json(self):
+        sFilename_json = self.sFilename_basin_info
+        sFilename_json = os.path.join(str(Path(self.sWorkspace_output_basin)  ) , sFilename_json  )
+
+        with open(sFilename_json, 'w', encoding='utf-8') as f:
+            sJson = json.dumps(self.__dict__, \
+            sort_keys=True, \
+                indent = 4, \
+                    ensure_ascii=True, \
+                        cls=BasinClassEncoder)      
+            f.write(sJson)    
+            f.close()
+        return
+
+    def tojson(self):
+        sJson = json.dumps(self.__dict__, \
+            sort_keys=True, \
+                indent = 4, \
+                    ensure_ascii=True, \
+                        cls=BasinClassEncoder)
+        return sJson
+    
+    def convert_flowline_to_json(self):
+        sFilename_raw = self.sFilename_flowline_filter            
+        sFilename_out = self.sFilename_flowline_filter_json
+        convert_shapefile_to_json(1, sFilename_raw, sFilename_out)
+        
+    def calculate_flowline_length(self, aFlowline_in):
+
+        dLength = 0.0
+
+        nflowline = len(aFlowline_in)
+
+        for i in range(nflowline):
+
+            pFlowline= aFlowline_in[i]
+
+            pFlowline.calculate_length()
+
+            dLength = dLength + pFlowline.dLength        
+
+        return dLength
+
+    def calculate_river_sinuosity(self):
+
+        #the numner of segment
+
+        for pFlowline in self.aFlowline_basin:
+
+            pVertex_start = pFlowline.pVertex_start
+            pVertex_end = pFlowline.pVertex_end
+            dDistance = pVertex_start.calculate_distance(pVertex_end)
+
+            pFlowline.dSinuosity = pFlowline.dLength / dDistance
+            
+        return
+
+    def calculate_confluence_branching_angle(self):
+
+        #this can only be calculated for confluence
+        for pVertex in self.aVertex_confluence:
+            aEdge=list()
+            for pFlowline in self.aFlowline_basin:
+                pVertex_end = pFlowline.pVertex_end
+                if pVertex_end == pVertex:
+                    pEdge = pFlowline.aEdge[pFlowline.nEdge-1]
+                    aEdge.append(pEdge)
+                    pass
+            
+            #normally there are 2 edges meet at confluence
+            #now calcualate the angle
+            if len(aEdge)!=2:
+                print('error')
+            x1 = aEdge[0].pVertex_start.dLongitude_degree
+            y1 = aEdge[0].pVertex_start.dLatitude_degree
+            x2 = pVertex.dLongitude_degree
+            y2 = pVertex.dLatitude_degree
+            x3 = aEdge[1].pVertex_start.dLongitude_degree
+            y3 = aEdge[1].pVertex_start.dLatitude_degree
+            dAngle = calculate_angle_betwen_vertex(x1, y1, x2, y2, x3, y3)
+
         return

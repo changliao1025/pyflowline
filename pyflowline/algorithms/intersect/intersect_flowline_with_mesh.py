@@ -25,7 +25,7 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh_in, sFilename_flo
 
     #geojson
     aCell=list()
-    aCell_intersect=list()    
+    aCell_intersect=list()
    
     pDataset_mesh = pDriver_geojson.Open(sFilename_mesh_in, 0)
     pDataset_flowline = pDriver_geojson.Open(sFilename_flowline_in, 0)   

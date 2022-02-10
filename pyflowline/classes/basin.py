@@ -107,6 +107,7 @@ class pybasin(object):
     sFilename_flowline_final=''
     sFilename_flowline_edge=''
     sFilename_basin_info=''
+    #sFilename_basin_configuration=''
 
     aFlowline_basin=None
     pVertex_outlet=None
@@ -153,6 +154,8 @@ class pybasin(object):
             self.dAccumulation_threshold             = float(aParameter['dAccumulation_threshold'])
         else:
             self.dAccumulation_threshold = 100000.0
+        
+
 
         if 'sFilename_flowline_raw' in aParameter:
             self.sFilename_flowline_raw = aParameter['sFilename_flowline_raw']

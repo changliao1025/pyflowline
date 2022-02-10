@@ -5,11 +5,43 @@ import json
 #once it's generated, you can modify it and use it for different simulations
 from pyflowline.classes.pycase import flowlinecase
 from pyflowline.classes.basin import pybasin
+
+def pyflowline_generate_basin_template_configuration_json_file(sFilename_basins_json, nBasin, sWorkspace_output):
+    aBasin_out = list()
+    for i in range(nBasin):
+        sBasin =  "{:03d}".format(i+1)   
+        aConfig_basin = {}
+        aConfig_basin['iFlag_dam'] = 0
+        aConfig_basin['iFlag_disconnected'] = 0
+        aConfig_basin['lBasinID'] = i + 1
+        aConfig_basin['dLatitude_outlet_degree'] = -180
+        aConfig_basin['dLongitude_outlet_degree'] = 180
+        aConfig_basin['dAccumulation_threshold'] = -90
+        aConfig_basin['dThreshold_small_river'] = 90
+        
+        aConfig_basin['sFilename_dam'] = "/qfs/people/liao313/data/hexwatershed/susquehanna/auxiliary/ICoM_dams.csv"
+        aConfig_basin['sFilename_flowline_filter'] = "/qfs/people/liao313/data/hexwatershed/susquehanna/vector/hydrology/streamord7above.shp"
+        aConfig_basin['sFilename_flowline_raw'] = "/qfs/people/liao313/data/hexwatershed/susquehanna/vector/hydrology/allflowline.shp"
+        aConfig_basin['sFilename_flowline_topo'] = "/qfs/people/liao313/data/hexwatershed/susquehanna/auxiliary/flowline.csv"
+        aConfig_basin['sWorkspace_output_basin'] = str(Path(sWorkspace_output) / sBasin )
+        pBasin = pybasin(aConfig_basin)    
+        aBasin_out.append(pBasin)
+        
+        pass
+        
+    #export basin config to a file    
+    sFilename_basins_json = sFilename_basins_json 
+    with open(sFilename_basins_json, 'w', encoding='utf-8') as f:
+        sJson = json.dumps([json.loads(ob.tojson()) for ob in aBasin_out], indent = 4)        
+        f.write(sJson)    
+        f.close()
+
+    
+
+    return aBasin_out
 def pyflowline_generate_template_configuration_json_file(sFilename_json):
    
-    #sFilename_json = '/compyfs/liao313/04model/pyhexwatershed/columbia_river_basin/compset.json'
-    if os.path.exists(sFilename_json): 
-        #delete it if it exists
+    if os.path.exists(sFilename_json):         
         os.remove(sFilename_json)
 
     nBasin = 1
@@ -47,40 +79,18 @@ def pyflowline_generate_template_configuration_json_file(sFilename_json):
     aConfig['sFilename_dem']  = '/qfs/people/liao313/data/hexwatershed/susquehanna/raster/dem/dem_ext.tif'    
     aConfig['sFilename_spatial_reference'] = '/qfs/people/liao313/data/hexwatershed/susquehanna/vector/hydrology/boundary_proj.shp'
     
-    #aConfig['sFilename_basins'] = "/qfs/people/liao313/workspace/python/pyflowline/tests/configurations/pyflowline_susquehanna_basin.json"
-
 
     oModel = flowlinecase(aConfig)
 
-    for i in range(nBasin):
-        sBasin =  "{:03d}".format(i+1)   
-        aConfig_basin = {}
-        aConfig['iFlag_dam'] = 1
-        aConfig['iFlag_disconnected'] = 1
-        aConfig['lBasinID'] = i + 1
-        aConfig_basin['dLatitude_outlet_degree'] = -180
-        aConfig_basin['dLongitude_outlet_degree'] = 180
-        aConfig_basin['dAccumulation_threshold'] = -90
-        aConfig_basin['dThreshold_small_river'] = 90
-        aConfig_basin['sFilename_dam'] = "/qfs/people/liao313/data/hexwatershed/susquehanna/auxiliary/ICoM_dams.csv"
-        aConfig_basin['sFilename_flowline_filter'] = "/qfs/people/liao313/data/hexwatershed/susquehanna/vector/hydrology/streamord7above.shp"
-        aConfig_basin['sFilename_flowline_raw'] = "/qfs/people/liao313/data/hexwatershed/susquehanna/vector/hydrology/allflowline.shp"
-        aConfig_basin['sFilename_flowline_topo'] = "/qfs/people/liao313/data/hexwatershed/susquehanna/auxiliary/flowline.csv"
-        aConfig_basin['sWorkspace_output_basin'] = str(Path(oModel.sWorkspace_output) / sBasin )
-        pBasin = pybasin(aConfig_basin)    
-        oModel.aBasin.append(pBasin)
-        pass
-
-    #export basin config to a file
+    #generate basin
     sDirname = os.path.dirname(sFilename_json)
     sFilename =  Path(sFilename_json).stem + '_basins.json'
-    sFilename_basins = os.path.join(sDirname, sFilename)
-    with open(sFilename_basins, 'w', encoding='utf-8') as f:
-        sJson = json.dumps([json.loads(ob.tojson()) for ob in oModel.aBasin], indent = 4)        
-        f.write(sJson)    
-        f.close()
+    sFilename_basins_json = os.path.join(sDirname, sFilename)
 
-    oModel.sFilename_basins = sFilename_basins
+    aBasin = pyflowline_generate_basin_template_configuration_json_file(sFilename_basins_json, nBasin, oModel.sWorkspace_output)
+
+    oModel.aBasin = aBasin
+    oModel.sFilename_basins = sFilename_basins_json
     oModel.export_config_to_json(sFilename_json)
 
     

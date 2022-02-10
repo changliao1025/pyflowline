@@ -46,10 +46,10 @@ else:
 #convert the raw flowline into geojson in WGS84 system        
 #oPyflowline.convert_flowline_to_json()
 #oPyflowline.plot(sVariable_in = 'flowline_filter_json')
-#oPyflowline.flowline_simplification()
+oPyflowline.flowline_simplification()
 #oPyflowline.plot(sVariable_in = 'flowline_simplified')
 #oPyflowline.plot_study_area()
-exit()
+#exit()
 oPyflowline.mesh_generation()
 #oPyflowline.plot(sVariable_in = 'mesh')
 #exit()

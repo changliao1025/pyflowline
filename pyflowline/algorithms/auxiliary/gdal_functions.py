@@ -1,9 +1,9 @@
 import os,sys
+from math import cos, sin, sqrt, acos
 import numpy as np
 import osgeo
-
 from osgeo import  osr, gdal
-from numpy import  cos, sin, sqrt, append, diff
+
 
 #most of these functions are copied from the pyearth package
 
@@ -70,9 +70,9 @@ def calculate_angle_betwen_vertex(x1, y1, x2, y2, x3, y3):
 def longlat_to_3d(lonr, latr):
     """Convert a point given latitude and longitude in radians to
     3-dimensional space, assuming a sphere radius of one."""
-    a = np.cos(latr) * np.cos(lonr)
-    b = np.cos(latr) * np.sin(lonr)
-    c = np.sin(latr)
+    a = cos(latr) * cos(lonr)
+    b = cos(latr) * sin(lonr)
+    c = sin(latr)
     return np.array((a,b,c))
 
 def angle_between_vectors_degrees(u, v):
@@ -87,14 +87,10 @@ def angle_between_vectors_degrees(u, v):
         d = 1
     if d < -1:
         d = -1
-    e = math.acos(d)
+    e = acos(d)
     f = np.degrees(e)
-    #if d < 0:
-    #    f = f + 180.0    
-
     return f
-    #return np.degrees(
-    #    math.acos(np.dot(u, v) / (np.linalg.norm(u) * np.linalg.norm(v))))
+    
 
 def convert_360_to_180(dLongitude_in):
     """[This function is modified from
@@ -299,8 +295,8 @@ def calculate_distance_based_on_lon_lat(lon1, lat1, lon2, lat2):
     # haversine formula 
     dlon = lon2 - lon1 
     dlat = lat2 - lat1 
-    a = np.sin(dlat/2)**2 + cos(lat1) * cos(lat2) * sin(dlon/2)**2
-    c = 2 * np.asin(np.sqrt(a)) 
+    a = sin(dlat/2)**2 + cos(lat1) * cos(lat2) * sin(dlon/2)**2
+    c = 2 * np.arcsin(sqrt(a)) 
     # Radius of earth in kilometers. Use 3956 for miles
     r = 6378137.0
     return c * r
@@ -321,27 +317,27 @@ def calculate_polygon_area(lons, lats,  algorithm = 0, radius = 6378137.0):
 
         #close polygon
         if lats[0]!=lats[-1]:
-            lats = append(lats, lats[0])
-            lons = append(lons, lons[0])
+            lats = np.append(lats, lats[0])
+            lons = np.append(lons, lons[0])
 
         # Get colatitude (a measure of surface distance as an angle)
-        a = sin(lats/2)**2 + cos(lats)* sin(lons/2)**2
-        colat = 2*np.arctan2( sqrt(a), sqrt(1-a) )
+        a = np.sin(lats/2)**2 + np.cos(lats)* np.sin(lons/2)**2
+        colat = 2*np.arctan2( np.sqrt(a), np.sqrt(1-a) )
 
         #azimuth of each point in segment from the arbitrary origin
-        az = np.arctan2(cos(lats) * sin(lons), sin(lats)) % (2*np.pi)
+        az = np.arctan2(np.cos(lats) * np.sin(lons), np.sin(lats)) % (2*np.pi)
 
         # Calculate step sizes
-        # daz = diff(az) % (2*pi)
-        daz = diff(az)
+        # daz = np.diff(az) % (2*pi)
+        daz = np.diff(az)
         daz = (daz + np.pi) % (2 * np.pi) - np.pi
 
         # Determine average surface distance for each step
-        deltas=diff(colat)/2
+        deltas=np.diff(colat)/2
         colat=colat[0:-1]+deltas
 
         # Integral over azimuth is 1-cos(colatitudes)
-        integrands = (1-cos(colat)) * daz
+        integrands = (1-np.cos(colat)) * daz
 
         # Integrate and save the answer as a fraction of the unit sphere.
         # Note that the sum of the integrands will include a factor of 4pi.

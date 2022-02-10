@@ -77,10 +77,9 @@ class CaseClassEncoder(JSONEncoder):
         if isinstance(obj, pylatlon):
             return obj.lCellID
         if isinstance(obj, pympas):
-            return obj.lCellID
-        
+            return obj.lCellID        
         if isinstance(obj, pybasin):
-            return json.loads(obj.tojson())    
+            return obj.lBasinID    
             
         return JSONEncoder.default(self, obj)
 
@@ -134,37 +133,10 @@ class flowlinecase(object):
 
     
     def __init__(self, aParameter,\
-        iFlag_standalone_in= None,\
-             sModel_in = None,\
-                     sWorkspace_output_in = None):
-        
-        if 'sFilename_model_configuration' in aParameter:
-            self.sFilename_model_configuration    = aParameter[ 'sFilename_model_configuration']
-        
-        if 'sWorkspace_bin' in aParameter:
-            self.sWorkspace_bin= aParameter[ 'sWorkspace_bin']
-            
-        if 'sWorkspace_data' in aParameter:
-            self.sWorkspace_data = aParameter[ 'sWorkspace_data']
-        
-        if 'sWorkspace_project' in aParameter:
-            self.sWorkspace_project= aParameter[ 'sWorkspace_project']
-        
-        if sWorkspace_output_in is not None:
-            self.sWorkspace_output = sWorkspace_output_in
-        else:
-            if 'sWorkspace_output' in aParameter:
-                self.sWorkspace_output = aParameter[ 'sWorkspace_output']
-        
-        if 'sRegion' in aParameter:
-            self.sRegion               = aParameter[ 'sRegion']
-        
-        if sModel_in is not None:
-            self.sModel = sModel_in
-        else:
-            if 'sModel' in aParameter:
-                self.sModel                = aParameter[ 'sModel']
-
+            iFlag_standalone_in= None,\
+            sModel_in = None,\
+            sWorkspace_output_in = None):
+        #flags
         if iFlag_standalone_in is not None:
             self.iFlag_standalone = iFlag_standalone_in
         else:
@@ -172,9 +144,17 @@ class flowlinecase(object):
                 self.iFlag_standalone = int(aParameter['iFlag_standalone'])
             else:
                 self.iFlag_standalone=1
-    
+
         if 'iFlag_flowline' in aParameter:
             self.iFlag_flowline             = int(aParameter[ 'iFlag_flowline'])
+        
+        
+
+        if 'iFlag_global' in aParameter:
+            self.iFlag_global             = int(aParameter[ 'iFlag_global'])
+        
+        if 'iFlag_multiple_outlet' in aParameter:
+            self.iFlag_multiple_outlet             = int(aParameter[ 'iFlag_multiple_outlet'])  
         
         if 'iFlag_simplification' in aParameter:
             self.iFlag_simplification = int(aParameter['iFlag_simplification'])
@@ -185,72 +165,27 @@ class flowlinecase(object):
         
         if 'iFlag_save_mesh' in aParameter:
             self.iFlag_save_mesh             = int(aParameter[ 'iFlag_save_mesh'])
+        
+        if 'iFlag_use_mesh_dem' in aParameter:
+            self.iFlag_use_mesh_dem = int(aParameter['iFlag_use_mesh_dem'])
 
         if 'iFlag_rotation' in aParameter:
             self.iFlag_rotation = int(aParameter['iFlag_rotation'])
+        
 
         if 'iFlag_intersect' in aParameter:
             self.iFlag_intersect = int(aParameter['iFlag_intersect'])
-      
-        if 'iFlag_use_mesh_dem' in aParameter:
-            self.iFlag_use_mesh_dem = int(aParameter['iFlag_use_mesh_dem'])
-        
+
         if 'nOutlet' in aParameter:
             self.nOutlet = int(aParameter['nOutlet'])
-
-        if 'iFlag_global' in aParameter:
-            self.iFlag_global             = int(aParameter[ 'iFlag_global'])
-        
-        if 'iFlag_multiple_outlet' in aParameter:
-            self.iFlag_multiple_outlet             = int(aParameter[ 'iFlag_multiple_outlet'])    
-               
+             
         if 'iCase_index' in aParameter:
             iCase_index = int(aParameter['iCase_index'])
         else:
             iCase_index = 1
         sCase_index = "{:03d}".format( iCase_index )
-        sDate   = aParameter[ 'sDate']
-        if sDate is not None:
-            self.sDate= sDate
-        else:
-            self.sDate = sDate_default
-
         self.iCase_index =   iCase_index
-        sCase = self.sModel  + self.sDate + sCase_index
-        self.sCase = sCase
 
-        #the model can be run as part of hexwatershed or standalone
-        if self.iFlag_standalone ==1:
-            sPath = str(Path(self.sWorkspace_output)  /  sCase)
-            self.sWorkspace_output = sPath
-        else:
-            sPath = self.sWorkspace_output
-        
-        Path(sPath).mkdir(parents=True, exist_ok=True)
-
-        if 'sMesh_type' in aParameter:
-            self.sMesh_type =  aParameter['sMesh_type']
-        else:
-            self.sMesh_type = 'hexagon'
-        
-        sMesh_type = self.sMesh_type
-        if sMesh_type =='hexagon': #hexagon
-            self.iMesh_type = 1
-        else:
-            if sMesh_type =='square': #square
-                self.iMesh_type = 2
-            else:
-                if sMesh_type =='latlon': #latlon
-                    self.iMesh_type = 3
-                else:
-                    if sMesh_type =='mpas': #mpas
-                        self.iMesh_type = 4
-                    else:
-                        if sMesh_type =='tin': #tin
-                            self.iMesh_type = 5
-                        else:
-                            print('Unsupported mesh type?')
-         
         if 'dResolution_degree' in aParameter:
             self.dResolution_degree = float(aParameter['dResolution_degree']) 
 
@@ -270,7 +205,10 @@ class flowlinecase(object):
 
         if 'dLatitude_top' in aParameter:
             self.dLatitude_top = float(aParameter['dLatitude_top']) 
-       
+
+        if 'sFilename_model_configuration' in aParameter:
+            self.sFilename_model_configuration    = aParameter[ 'sFilename_model_configuration']
+
         if 'sFilename_spatial_reference' in aParameter:
             self.sFilename_spatial_reference = aParameter['sFilename_spatial_reference']
 
@@ -279,14 +217,84 @@ class flowlinecase(object):
 
         if 'sFilename_mesh_netcdf' in aParameter:
             self.sFilename_mesh_netcdf = aParameter['sFilename_mesh_netcdf']
+        
+        if 'sWorkspace_bin' in aParameter:
+            self.sWorkspace_bin= aParameter[ 'sWorkspace_bin']
+            
+        if 'sWorkspace_data' in aParameter:
+            self.sWorkspace_data = aParameter[ 'sWorkspace_data']
+        
+        if 'sWorkspace_project' in aParameter:
+            self.sWorkspace_project= aParameter[ 'sWorkspace_project']
+        
+        if sWorkspace_output_in is not None:
+            self.sWorkspace_output = sWorkspace_output_in
+        else:
+            if 'sWorkspace_output' in aParameter:
+                self.sWorkspace_output = aParameter[ 'sWorkspace_output']
+        
+        if 'sJob' in aParameter:
+            self.sJob =  aParameter['sJob'] 
+        if 'sRegion' in aParameter:
+            self.sRegion               = aParameter[ 'sRegion']
+        
+        if sModel_in is not None:
+            self.sModel = sModel_in
+        else:
+            if 'sModel' in aParameter:
+                self.sModel                = aParameter[ 'sModel']
+
+                      
+        sDate   = aParameter[ 'sDate']
+        if sDate is not None:
+            self.sDate= sDate
+        else:
+            self.sDate = sDate_default
+        
+        
+        sCase = self.sModel  + self.sDate + sCase_index
+        self.sCase = sCase
+
+        if 'sMesh_type' in aParameter:
+            self.sMesh_type =  aParameter['sMesh_type']
+        else:
+            self.sMesh_type = 'hexagon'
+
+                
+        
+        sMesh_type = self.sMesh_type
+        if sMesh_type =='hexagon': #hexagon
+            self.iMesh_type = 1
+        else:
+            if sMesh_type =='square': #square
+                self.iMesh_type = 2
+            else:
+                if sMesh_type =='latlon': #latlon
+                    self.iMesh_type = 3
+                else:
+                    if sMesh_type =='mpas': #mpas
+                        self.iMesh_type = 4
+                    else:
+                        if sMesh_type =='tin': #tin
+                            self.iMesh_type = 5
+                        else:
+                            print('Unsupported mesh type?')
+        
+        #the model can be run as part of hexwatershed or standalone
+        if self.iFlag_standalone ==1:
+            sPath = str(Path(self.sWorkspace_output)  /  sCase)
+            self.sWorkspace_output = sPath
+        else:
+            sPath = self.sWorkspace_output
+        
+        Path(sPath).mkdir(parents=True, exist_ok=True)
 
         self.aBasin = list()
         if self.iFlag_flowline == 1:
             if 'sFilename_basins' in aParameter:
                 self.sFilename_basins = aParameter['sFilename_basins']
                 with open(self.sFilename_basins) as json_file:
-                    dummy_data = json.load(json_file)   
-    
+                    dummy_data = json.load(json_file)     
                     for i in range(self.nOutlet):
                         sBasin =  "{:03d}".format(i+1)   
                         dummy_basin = dummy_data[i]
@@ -297,16 +305,11 @@ class flowlinecase(object):
                         self.aBasin.append(pBasin)
             else:
                 pass
-            
-        if 'sJob' in aParameter:
-            self.sJob =  aParameter['sJob'] 
-       
+     
 
         #model generated files   
-        self.sFilename_mesh = os.path.join(str(Path(self.sWorkspace_output)  ) , sMesh_type + ".json" )
-               
-        self.sFilename_mesh_info= os.path.join(str(Path(self.sWorkspace_output)  ) , sMesh_type + "_mesh_info.json"  )
-    
+        self.sFilename_mesh = os.path.join(str(Path(self.sWorkspace_output)  ) , sMesh_type + ".json" )               
+        self.sFilename_mesh_info= os.path.join(str(Path(self.sWorkspace_output)  ) , sMesh_type + "_mesh_info.json"  )    
         self.sWorkspace_data_project = str(Path(self.sWorkspace_data ) / self.sWorkspace_project)
                 
         return
@@ -339,7 +342,7 @@ class flowlinecase(object):
         iMesh_type = self.iMesh_type
         iFlag_save_mesh = self.iFlag_save_mesh
         iFlag_rotation = self.iFlag_rotation
-        dResolution = self.dResolution
+        dResolution_degree = self.dResolution_degree
         dResolution_meter = self.dResolution_meter
         sFilename_dem = self.sFilename_dem
         sFilename_spatial_reference = self.sFilename_spatial_reference
@@ -363,7 +366,7 @@ class flowlinecase(object):
                 #not used
                 pass
             else:
-                dResolution = meter_to_degree(dResolution_meter, dLatitude_mean)
+                dResolution_degree = meter_to_degree(dResolution_meter, dLatitude_mean)
 
 
             dX_left = dOriginX
@@ -374,7 +377,7 @@ class flowlinecase(object):
         if iMesh_type ==1: #hexagon
 
             #hexagon edge
-            dResolution_meter = degree_to_meter(dLatitude_mean, dResolution )
+            dResolution_meter = degree_to_meter(dLatitude_mean, dResolution_degree )
             dArea = np.power(dResolution_meter,2.0)
             dLength_edge = np.sqrt(  2.0 * dArea / (3.0* np.sqrt(3.0))  )
             if iFlag_rotation ==0:            
@@ -401,15 +404,15 @@ class flowlinecase(object):
                 return aSquare
             else:
                 if iMesh_type ==3: #latlon
-                    dResolution_meter = degree_to_meter(dLatitude_mean, dResolution)
+                    dResolution_meter = degree_to_meter(dLatitude_mean, dResolution_degree)
                     dArea = np.power(dResolution_meter,2.0)
                     dLatitude_top    = self.dLatitude_top   
                     dLatitude_bot    = self.dLatitude_bot   
                     dLongitude_left  = self.dLongitude_left 
                     dLongitude_right = self.dLongitude_right
-                    ncolumn= int( (dLongitude_right - dLongitude_left) / dResolution )
-                    nrow= int( (dLatitude_top - dLatitude_bot) / dResolution )
-                    aLatlon = create_latlon_mesh(dLongitude_left, dLatitude_bot, dResolution, ncolumn, nrow, \
+                    ncolumn= int( (dLongitude_right - dLongitude_left) / dResolution_degree )
+                    nrow= int( (dLatitude_top - dLatitude_bot) / dResolution_degree )
+                    aLatlon = create_latlon_mesh(dLongitude_left, dLatitude_bot, dResolution_degree, ncolumn, nrow, \
                         sFilename_mesh)
                     return aLatlon
                 else:
@@ -501,8 +504,8 @@ class flowlinecase(object):
         return
 
     def run(self):
-        self.flowline_simplification()
-        self.mesh_generation()
+        #self.flowline_simplification()
+        #self.mesh_generation()
         self.reconstruct_topological_relationship()
         self.export()
         return

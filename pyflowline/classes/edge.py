@@ -170,12 +170,11 @@ class pyedge(object):
     def __ne__(self, other):
         return not self.__eq__(other)
 
-    def tojson(self, skip=None):
+    def tojson(self):
 
         obj = self.__dict__.copy()
-        for sKey in skip:
-            obj.pop(sKey, None)
-        sJson = json.dumps(obj, default=lambda o: o.__dict__, \
+        
+        sJson = json.dumps(obj, \
             sort_keys=True, \
                 indent = 4, \
                     ensure_ascii=True, \

@@ -17,16 +17,19 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--sMesh_type", help = "sMesh_type",  type = str)
 parser.add_argument("--iCase_index", help = "iCase_index",  type = int)
 parser.add_argument("--dResolution_meter", help = "dResolution_meter",  type = float)
+parser.add_argument("--sDate", help = "sDate",  type = str)
 pArgs = parser.parse_args()
 if len(sys.argv) == 1:
-    sMesh_type = 'mpas'
+    sMesh_type = 'hexagon'
     iCase_index = 1
     dResolution_meter=50000
+    sDate='20220201'
 else:
     if len(sys.argv)==4:
         sMesh_type = pArgs.sMesh_type
         iCase_index = pArgs.iCase_index
         dResolution_meter=pArgs.dResolution_meter
+        sDate = pArgs.sDate
     else:
         pass
 
@@ -60,7 +63,7 @@ else:
         
         print(sFilename_configuration_in)
         oPyflowline = pyflowline_read_model_configuration_file(sFilename_configuration_in, \
-            iCase_index_in=iCase_index, dResolution_meter_in=dResolution_meter)
+            iCase_index_in=iCase_index, dResolution_meter_in=dResolution_meter, sDate_in=sDate)
         #print the case information in details
         print(oPyflowline.tojson())
 
@@ -82,7 +85,7 @@ else:
 #aExtent_zoom = [-77.3,-76.5, 40.2,41.0] #braided
 #aExtent_zoom = [-77.3,-76.5, 40.2,41.0] #confluence
 
-#oPyflowline.reconstruct_topological_relationship()
+oPyflowline.reconstruct_topological_relationship()
 #oPyflowline.plot(sVariable_in = 'final')
 #oPyflowline.plot(sVariable_in = 'overlap',aExtent_in=aExtent_full )
 

@@ -134,8 +134,15 @@ class pylatlon(pycell):
 
 
         return iFlag_share
+
     def tojson(self):
-        sJson = json.dumps(self.__dict__, \
+        aSkip = ['aEdge', \
+                'aFlowline']
+
+        obj = self.__dict__.copy()
+        for sKey in aSkip:
+            obj.pop(sKey, None)
+        sJson = json.dumps(obj, \
             sort_keys=True, \
             indent = 4, \
             ensure_ascii=True, \

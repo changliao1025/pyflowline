@@ -834,14 +834,12 @@ class pybasin(object):
 
     def export_flowline_info_to_json(self):
 
-        aSkip = ['aEdge', \
-                'aVertex','aFlowlineID_start_start','aFlowlineID_start_end',
-                'aFlowlineID_end_start','aFlowlineID_end_end']
+        
 
         sFilename_json = self.sFilename_flowline_simplified_info
         sFilename_json = os.path.join(str(Path(self.sWorkspace_output_basin)  ) , sFilename_json  )
         with open(sFilename_json, 'w', encoding='utf-8') as f:
-            sJson = json.dumps([json.loads(ob.tojson(skip=aSkip)) for ob in self.aFlowline_basin_simplified], indent = 4)        
+            sJson = json.dumps([json.loads(ob.tojson()) for ob in self.aFlowline_basin_simplified], indent = 4)        
             f.write(sJson)    
             f.close()
 
@@ -850,15 +848,18 @@ class pybasin(object):
 
         
         with open(sFilename_json, 'w', encoding='utf-8') as f:
-            sJson = json.dumps([json.loads(ob.tojson(skip=aSkip)) for ob in self.aFlowline_basin_conceptual], indent = 4)        
+            sJson = json.dumps([json.loads(ob.tojson()) for ob in self.aFlowline_basin_conceptual], indent = 4)        
             f.write(sJson)    
             f.close()
         return
 
-    def tojson(self, skip=()):
+    def tojson(self):
+        aSkip = ['aFlowline_basin_filtered', \
+                'aFlowline_basin_simplified','aFlowline_basin_conceptual','aConfluence_basin_simplified',
+                'aConfluence_basin_conceptual']
 
         obj = self.__dict__.copy()
-        for sKey in skip:
+        for sKey in aSkip:
             obj.pop(sKey, None)
  
         #sJson = json.dumps(self.__dict__, \
@@ -866,7 +867,7 @@ class pybasin(object):
         #        indent = 4, \
         #            ensure_ascii=True, \
         #                cls=BasinClassEncoder)
-        sJson = json.dumps(obj, default=lambda o: o.__dict__, \
+        sJson = json.dumps(obj, \
             sort_keys=True, \
                 indent = 4, \
                     ensure_ascii=True, \

@@ -224,12 +224,15 @@ class pyflowline(object):
     def __ne__(self, other):
         return not self.__eq__(other)
     
-    def tojson(self, skip=None):
+    def tojson(self):
+        aSkip = ['aEdge', \
+                'aVertex','aFlowlineID_start_start','aFlowlineID_start_end',
+                'aFlowlineID_end_start','aFlowlineID_end_end']
 
         obj = self.__dict__.copy()
-        for sKey in skip:
+        for sKey in aSkip:
             obj.pop(sKey, None)
-        sJson = json.dumps(obj, default=lambda o: o.__dict__, \
+        sJson = json.dumps(obj,  \
             sort_keys=True, \
                 indent = 4, \
                     ensure_ascii=True, \

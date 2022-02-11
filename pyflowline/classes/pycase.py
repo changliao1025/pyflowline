@@ -460,7 +460,7 @@ class flowlinecase(object):
         if iFlag_intersect == 1:
             for pBasin in self.aBasin:
                 aCell_intersect_basin = pBasin.reconstruct_topological_relationship(iMesh_type,sFilename_mesh)
-                aFlowline_conceptual = aFlowline_conceptual + pBasin.aFlowline_basin
+                aFlowline_conceptual = aFlowline_conceptual + pBasin.aFlowline_basin_conceptual
                 aBasin.append(pBasin)
                 aCellID_outlet.append(pBasin.lCellID_outlet)
                 aCell_intersect = aCell_intersect + aCell_intersect_basin
@@ -1177,10 +1177,8 @@ class flowlinecase(object):
         for pBasin in self.aBasin:
             pBasin.export()
 
-        aSkip = ['aBasin', \
-                'aFlowline_simplified','aFlowline_conceptual','aCellID_outlet',
-                'aCell']
-        self.tojson(skip = aSkip )
+        
+        self.tojson()
 
     def export_mesh_info_to_json(self):
         
@@ -1239,12 +1237,15 @@ class flowlinecase(object):
 
         return
 
-    def tojson(self, skip=()):        
+    def tojson(self):  
+        aSkip = ['aBasin', \
+                'aFlowline_simplified','aFlowline_conceptual','aCellID_outlet',
+                'aCell']      
 
         obj = self.__dict__.copy()
-        for sKey in skip:
+        for sKey in aSkip:
             obj.pop(sKey, None)
-        sJson = json.dumps(obj, default=lambda o: o.__dict__, \
+        sJson = json.dumps(obj,\
             sort_keys=True, \
                 indent = 4, \
                     ensure_ascii=True, \
@@ -1259,7 +1260,7 @@ class flowlinecase(object):
         for sKey in aSkip:
             obj.pop(sKey, None)
         with open(sFilename_output, 'w', encoding='utf-8') as f:
-            json.dump(obj.__dict__, f,sort_keys=True, \
+            json.dump(obj, f,sort_keys=True, \
                 ensure_ascii=False, \
                 indent=4, \
                 cls=CaseClassEncoder)

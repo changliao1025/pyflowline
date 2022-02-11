@@ -64,8 +64,8 @@ oPyflowline.reconstruct_topological_relationship()
 #oPyflowline.plot(sVariable_in = 'overlap',aExtent_in=aExtent_full )
 
 #replace conceptual flowline with real flowline length
-
-oPyflowline.evaluate()
+oPyflowline.analyze()
+#oPyflowline.evaluate()
 oPyflowline.export()
 
 #sFilename_dem_flowline ='/qfs/people/liao313/data/hexwatershed/susquehanna/vector/swat/swat10k.shp'

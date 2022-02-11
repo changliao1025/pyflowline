@@ -1,5 +1,10 @@
 [
     {
+        "aConfluence_basin": [
+            0.0,
+            0.0,
+            0.0
+        ],
         "aFlowline_basin": [
             -1,
             -1,
@@ -9,24 +14,8 @@
             -1,
             -1
         ],
-        "aVertex_confluence": [
-            {
-                "dLatitude_degree": 40.40227852908632,
-                "dLongitude_degree": -76.9997915229132
-            },
-            {
-                "dLatitude_degree": 40.88924458940192,
-                "dLongitude_degree": -76.77569170303417
-            },
-            {
-                "dLatitude_degree": 41.96871635607029,
-                "dLongitude_degree": -76.54284414380339
-            }
-        ],
         "dAccumulation_threshold": -90.0,
         "dLatitude_outlet_degree": 39.5569753171024,
-        "dLength_flowline_after_simplification": 971952.797693134,
-        "dLength_flowline_conceptual": 859929.1686997304,
         "dLongitude_outlet_degree": -76.0831369233622,
         "dThreshold_small_river": 90.0,
         "iFlag_dam": 0,
@@ -41,6 +30,7 @@
         "sFilename_flowline_filter": "/qfs/people/liao313/data/hexwatershed/susquehanna/vector/hydrology/streamord7above.shp",
         "sFilename_flowline_filter_json": "/compyfs/liao313/04model/pyflowline/susquehanna/pyflowline20220110001/001/flowline_filter.json",
         "sFilename_flowline_final": "flowline_final.json",
+        "sFilename_flowline_info": "flowline_info.json",
         "sFilename_flowline_intersect": "flowline_intersect_mesh.json",
         "sFilename_flowline_raw": "/qfs/people/liao313/data/hexwatershed/susquehanna/vector/hydrology/allflowline.shp",
         "sFilename_flowline_segment_index_before_intersect": "flowline_segment_index_before_intersect.json",

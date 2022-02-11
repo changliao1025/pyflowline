@@ -17,6 +17,7 @@ from shapely.wkt import loads
 from pyflowline.classes.vertex import pyvertex
 from pyflowline.classes.edge import pyedge
 from pyflowline.classes.flowline import pyflowline
+from pyflowline.classes.confluence import pyconfluence
 from pyflowline.formats.read_flowline import read_flowline_geojson
 from pyflowline.formats.read_nhdplus_flowline_shapefile import read_nhdplus_flowline_shapefile_attribute
 from pyflowline.formats.read_nhdplus_flowline_shapefile import extract_nhdplus_flowline_shapefile_by_attribute
@@ -28,7 +29,7 @@ from pyflowline.formats.export_vertex import export_vertex_to_json
 from pyflowline.algorithms.auxiliary.text_reader_string import text_reader_string
 from pyflowline.algorithms.auxiliary.find_index_in_list import find_vertex_in_list
 from pyflowline.algorithms.auxiliary.calculate_area_of_difference import calculate_area_of_difference_simplified
-from pyflowline.algorithms.auxiliary.gdal_functions import  calculate_angle_betwen_vertex
+
 
 from pyflowline.algorithms.split.find_flowline_vertex import find_flowline_vertex
 from pyflowline.algorithms.split.find_flowline_confluence import find_flowline_confluence
@@ -70,10 +71,11 @@ class BasinClassEncoder(JSONEncoder):
             return obj.lEdgeID        
         if isinstance(obj, pyflowline):
             return obj.lFlowlineID
+        if isinstance(obj, pyconfluence):
+            return obj.dAngle_upstream
         
-        
-        if isinstance(obj, pybasin):
-            return json.loads(obj.tojson())    
+        #if isinstance(obj, pybasin):
+        #    return json.loads(obj.tojson())    
             
         return JSONEncoder.default(self, obj)
 
@@ -108,11 +110,13 @@ class pybasin(object):
     sFilename_flowline_final=''
     sFilename_flowline_edge=''
     sFilename_basin_info=''
+    sFilename_flowline_info=''
     #sFilename_basin_configuration=''
 
     aFlowline_basin=None
-    aVertex_confluence=None
+    #aVertex_confluence=None
     pVertex_outlet=None
+    aConfluence_basin= None
     
     def __init__(self, aParameter):
 
@@ -197,9 +201,9 @@ class pybasin(object):
         self.sFilename_flowline_edge = 'flowline_edge.json'
         self.sFilename_area_of_difference = 'area_of_difference.json'
         self.sFilename_basin_info = 'basin_info.json'
+        self.sFilename_flowline_info = 'flowline_info.json'
         return
         
-
     def flowline_simplification(self):
 
         
@@ -342,9 +346,7 @@ class pybasin(object):
         sFilename_flowline = self.sFilename_flowline_segment_order_before_intersect
         sFilename_flowline_in = os.path.join(sWorkspace_output_basin, sFilename_flowline)
         aFlowline_basin, pSpatial_reference = read_flowline_geojson( sFilename_flowline_in )   
-        self.dLength_flowline_after_simplification = self.calculate_flowline_length(aFlowline_basin)
-
-        
+                
         sFilename_flowline_intersect = self.sFilename_flowline_intersect
         sFilename_flowline_intersect_out = os.path.join(sWorkspace_output_basin, sFilename_flowline_intersect)
         aCell, aCell_intersect_basin, aFlowline_intersect_all = intersect_flowline_with_mesh(iMesh_type, sFilename_mesh, \
@@ -390,8 +392,8 @@ class pybasin(object):
         aVertex = np.array(aVertex)
         aIndex_confluence = np.array(aIndex_confluence)
         if aIndex_confluence.size > 0:        
-            self.aVertex_confluence = aVertex[aIndex_confluence]  
-            
+            aVertex_confluence = aVertex[aIndex_confluence] 
+          
 
         #edge based
         aFlowline_basin_edge, aEdge = split_flowline_to_edge(aFlowline_basin)
@@ -405,17 +407,42 @@ class pybasin(object):
             aAttribute_data=[aStream_segment, aStream_order], aAttribute_field=['iseg','iord'], aAttribute_dtype=['int','int'])
 
         self.aFlowline_basin = aFlowline_basin
+        if aIndex_confluence.size > 0:   
+            self.build_confluence(aVertex_confluence) 
         self.lCellID_outlet = lCellID_outlet
         self.dLongitude_outlet_degree = pVertex_outlet.dLongitude_degree
         self.dLatitude_outlet_degree = pVertex_outlet.dLatitude_degree
-        self.dLength_flowline_conceptual = self.calculate_flowline_length(aFlowline_basin)
+        
 
         return aCell_intersect_basin
-        
-    def evaluate(self, iMesh_type, sMesh_type):
+
+    def build_confluence(self,aVertex_confluence):    
+        #this can only be calculated for confluence
+        self.aConfluence_basin=list()
+        for pVertex in aVertex_confluence:
+            aEdge=list()
+            aFlowline_upstream =list()
+            for pFlowline in self.aFlowline_basin:
+                pVertex_start = pFlowline.pVertex_start
+                pVertex_end = pFlowline.pVertex_end
+                if pVertex_end == pVertex:
+                    #pEdge = pFlowline.aEdge[pFlowline.nEdge-1]
+                    aFlowline_upstream.append(pFlowline)
+                    pass
+                if pVertex_start == pVertex:
+                    pFlowline_downstream=pFlowline
+
+            pConfluence = pyconfluence(pVertex, aFlowline_upstream, pFlowline_downstream)
+            self.aConfluence_basin.append(pConfluence)   
+        return
+
+    def analyze(self):        
+        self.dLength_flowline_conceptual = self.calculate_flowline_length(self.aFlowline_basin)
         self.calculate_river_sinuosity()
         self.calculate_confluence_branching_angle()
-        #self.evaluate_area_of_difference(iMesh_type, sMesh_type)
+        return    
+    def evaluate(self, iMesh_type, sMesh_type):        
+        self.evaluate_area_of_difference(iMesh_type, sMesh_type)
         return
 
     def evaluate_area_of_difference(self, iMesh_type, sMesh_type):
@@ -721,11 +748,11 @@ class pybasin(object):
     
     def export(self):
         self.export_basin_info_to_json()
+        self.export_flowline_info_to_json()
         self.tojson()    
         return
 
     def export_flowline(self, aFlowline_in, sFilename_json_in,iFlag_projected_in = None,  pSpatial_reference_in = None):
-
         export_flowline_to_json(aFlowline_in, sFilename_json_in,\
             iFlag_projected_in= iFlag_projected_in, \
             pSpatial_reference_in = pSpatial_reference_in)
@@ -741,6 +768,18 @@ class pybasin(object):
                     ensure_ascii=True, \
                         cls=BasinClassEncoder)      
             f.write(sJson)    
+            f.close()
+        return
+
+    def export_flowline_info_to_json(self):
+        sFilename_json = self.sFilename_flowline_info
+        sFilename_json = os.path.join(str(Path(self.sWorkspace_output_basin)  ) , sFilename_json  )
+
+        with open(sFilename_json, 'w', encoding='utf-8') as f:
+            
+            sJson = json.dumps([json.loads(ob.tojson()) for ob in self.aFlowline_basin], indent = 4)        
+            f.write(sJson)    
+            
             f.close()
         return
 
@@ -774,41 +813,14 @@ class pybasin(object):
         return dLength
 
     def calculate_river_sinuosity(self):
-
         #the numner of segment
-
         for pFlowline in self.aFlowline_basin:
+            pFlowline.calculate_flowline_sinuosity()    
 
-            pVertex_start = pFlowline.pVertex_start
-            pVertex_end = pFlowline.pVertex_end
-            dDistance = pVertex_start.calculate_distance(pVertex_end)
-
-            pFlowline.dSinuosity = pFlowline.dLength / dDistance
-            
         return
 
     def calculate_confluence_branching_angle(self):
-
-        #this can only be calculated for confluence
-        for pVertex in self.aVertex_confluence:
-            aEdge=list()
-            for pFlowline in self.aFlowline_basin:
-                pVertex_end = pFlowline.pVertex_end
-                if pVertex_end == pVertex:
-                    pEdge = pFlowline.aEdge[pFlowline.nEdge-1]
-                    aEdge.append(pEdge)
-                    pass
-            
-            #normally there are 2 edges meet at confluence
-            #now calcualate the angle
-            if len(aEdge)!=2:
-                print('error')
-            x1 = aEdge[0].pVertex_start.dLongitude_degree
-            y1 = aEdge[0].pVertex_start.dLatitude_degree
-            x2 = pVertex.dLongitude_degree
-            y2 = pVertex.dLatitude_degree
-            x3 = aEdge[1].pVertex_start.dLongitude_degree
-            y3 = aEdge[1].pVertex_start.dLatitude_degree
-            dAngle = calculate_angle_betwen_vertex(x1, y1, x2, y2, x3, y3)
-
+        for pConfluence in self.aConfluence_basin:
+            pConfluence.calculate_branching_angle()    
         return
+    

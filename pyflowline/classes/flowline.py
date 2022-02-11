@@ -1,9 +1,29 @@
 from abc import ABCMeta, abstractmethod
 import numpy as np
 import copy
+import json
+from json import JSONEncoder
 
 from pyflowline.classes.vertex import pyvertex
 from pyflowline.classes.edge import pyedge
+
+
+class FlowlineClassEncoder(JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, np.integer):
+            return int(obj)
+        if isinstance(obj, np.float32):
+            return float(obj)
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        if isinstance(obj, list):
+            pass  
+        if isinstance(obj, pyvertex):
+            return json.loads(obj.tojson()) #lVertexID
+        if isinstance(obj, pyedge):
+            return None         
+            
+        return JSONEncoder.default(self, obj)
 
 class pyflowline(object):
     __metaclass__ = ABCMeta 
@@ -171,7 +191,14 @@ class pyflowline(object):
             pass
 
         return pFlowline_out
-        
+
+    def calculate_flowline_sinuosity(self):
+        pVertex_start = self.pVertex_start
+        pVertex_end = self.pVertex_end
+        dDistance = pVertex_start.calculate_distance(pVertex_end)
+        self.dSinuosity = self.dLength / dDistance
+        return
+
     def __eq__(self, other):  
                      
         iFlag_overlap = 0 
@@ -195,3 +222,12 @@ class pyflowline(object):
 
     def __ne__(self, other):
         return not self.__eq__(other)
+    
+    def tojson(self):
+        sJson = json.dumps(self.__dict__, \
+            sort_keys=True, \
+                indent = 4, \
+                    ensure_ascii=True, \
+                        cls=FlowlineClassEncoder)
+        return sJson
+        

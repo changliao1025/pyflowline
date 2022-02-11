@@ -916,7 +916,7 @@ class flowlinecase(object):
         lID = 0 
         for pBasin in self.aBasin:
             sWorkspace_output_basin=  pBasin.sWorkspace_output_basin            
-            sFilename_out = pBasin.sFilename_flowline_final           
+            sFilename_out = pBasin.sFilename_flowline_conceptual           
             sFilename_json = os.path.join(sWorkspace_output_basin, sFilename_out)
             pDriver = ogr.GetDriverByName('GeoJSON')
             pDataset = pDriver.Open(sFilename_json, gdal.GA_ReadOnly)
@@ -1068,7 +1068,7 @@ class flowlinecase(object):
         lID = 0 
         for pBasin in self.aBasin:
             sWorkspace_output_basin=  pBasin.sWorkspace_output_basin            
-            sFilename_out = pBasin.sFilename_flowline_final           
+            sFilename_out = pBasin.sFilename_flowline_conceptual           
             sFilename_json = os.path.join(sWorkspace_output_basin, sFilename_out)
             pDriver = ogr.GetDriverByName('GeoJSON')
             pDataset = pDriver.Open(sFilename_json, gdal.GA_ReadOnly)

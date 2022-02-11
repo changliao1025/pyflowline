@@ -18,19 +18,24 @@ parser.add_argument("--sMesh_type", help = "sMesh_type",  type = str)
 parser.add_argument("--iCase_index", help = "iCase_index",  type = int)
 parser.add_argument("--dResolution_meter", help = "dResolution_meter",  type = float)
 parser.add_argument("--sDate", help = "sDate",  type = str)
+
+#example
+#python notebook.py --sMesh_type hexagon --iCase_index 1 --dResolution_meter 50000 --sDate 20220201
 pArgs = parser.parse_args()
 if len(sys.argv) == 1:
     sMesh_type = 'hexagon'
-    iCase_index = 1
-    dResolution_meter=50000
+    iCase_index = 2
+    dResolution_meter=10000
     sDate='20220201'
 else:
-    if len(sys.argv)==4:
+    if len(sys.argv)> 1:
         sMesh_type = pArgs.sMesh_type
         iCase_index = pArgs.iCase_index
         dResolution_meter=pArgs.dResolution_meter
         sDate = pArgs.sDate
+        print(sMesh_type, iCase_index, dResolution_meter, sDate)
     else:
+        print(len(sys.argv), 'Missing arguaments')
         pass
 
 iFlag_option = 2
@@ -70,13 +75,13 @@ else:
 #pyflowline can process multiple basins within one singel run
 #the total number of basin is controlled by the nOutlet variable
 #convert the raw flowline into geojson in WGS84 system        
-#oPyflowline.convert_flowline_to_json()
+oPyflowline.convert_flowline_to_json()
 #oPyflowline.plot(sVariable_in = 'flowline_filter_json')
-#oPyflowline.flowline_simplification()
+oPyflowline.flowline_simplification()
 #oPyflowline.plot(sVariable_in = 'flowline_simplified')
 #oPyflowline.plot_study_area()
 #exit()
-#oPyflowline.mesh_generation()
+oPyflowline.mesh_generation()
 #oPyflowline.plot(sVariable_in = 'mesh')
 #exit()
 #aExtent_full = [-78.5,-75.5, 39.2,42.5]

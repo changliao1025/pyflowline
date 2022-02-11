@@ -103,9 +103,9 @@ class pybasin(object):
     sFilename_dam=''
     sFilename_flowline_topo=''
     #before intersect
-    sFilename_flowline_segment_order_before_intersect=''
+    sFilename_flowline_simplified=''
     sFilename_flowline_segment_index_before_intersect=''
-    sFilename_flowline_final=''
+    sFilename_flowline_conceptual=''
     sFilename_flowline_edge=''
     sFilename_basin_info=''
     sFilename_flowline_simplified_info=''
@@ -196,9 +196,9 @@ class pybasin(object):
         self.sBasinID = sBasinID = "{:03d}".format(self.lBasinID)
 
         self.sFilename_flowline_segment_index_before_intersect = 'flowline_segment_index_before_intersect.json'
-        self.sFilename_flowline_segment_order_before_intersect = 'flowline_segment_order_before_intersect.json'
+        self.sFilename_flowline_simplified = 'flowline_simplified.json'
         self.sFilename_flowline_intersect  = 'flowline_intersect_mesh.json'
-        self.sFilename_flowline_final = 'flowline_final.json'
+        self.sFilename_flowline_conceptual = 'flowline_conceptual.json'
         self.sFilename_flowline_edge = 'flowline_edge.json'
         self.sFilename_area_of_difference = 'area_of_difference.json'
         self.sFilename_basin_info = 'basin_info.json'
@@ -321,7 +321,7 @@ class pybasin(object):
         
         #the final vertex info
         aVertex, lIndex_outlet, aIndex_headwater,aIndex_middle, aIndex_confluence, aConnectivity = find_flowline_confluence(aFlowline_basin_simplified,  pVertex_outlet)
-        sFilename_out = 'flowline_vertex_with_confluence_before_intersect.json'
+        sFilename_out = 'vertex_simplified.json'
         sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
         export_vertex_to_json( aVertex,  sFilename_out, aAttribute_data=aConnectivity)
         
@@ -342,7 +342,7 @@ class pybasin(object):
                 aAttribute_data=[aStream_segment], aAttribute_field=['iseg'], aAttribute_dtype=['int'])
         #build stream order 
         aFlowline_basin_simplified, aStream_order = define_stream_order(aFlowline_basin_simplified)
-        sFilename_out = self.sFilename_flowline_segment_order_before_intersect
+        sFilename_out = self.sFilename_flowline_simplified
         sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
         export_flowline_to_json(  aFlowline_basin_simplified, sFilename_out, \
                 aAttribute_data=[aStream_segment, aStream_order], aAttribute_field=['iseg','iord'], aAttribute_dtype=['int','int'])
@@ -354,7 +354,7 @@ class pybasin(object):
     def reconstruct_topological_relationship(self, iMesh_type, sFilename_mesh):
         
         sWorkspace_output_basin = self.sWorkspace_output_basin
-        sFilename_flowline = self.sFilename_flowline_segment_order_before_intersect
+        sFilename_flowline = self.sFilename_flowline_simplified
         sFilename_flowline_in = os.path.join(sWorkspace_output_basin, sFilename_flowline)
         aFlowline_basin_simplified, pSpatial_reference = read_flowline_geojson( sFilename_flowline_in )   
                 
@@ -413,7 +413,7 @@ class pybasin(object):
         sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
         export_flowline_to_json(  aFlowline_basin_edge, sFilename_out)
 
-        sFilename_out = self.sFilename_flowline_final
+        sFilename_out = self.sFilename_flowline_conceptual
         sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
         export_flowline_to_json(  aFlowline_basin_conceptual, sFilename_out, \
             aAttribute_data=[aStream_segment, aStream_order], aAttribute_field=['iseg','iord'], aAttribute_dtype=['int','int'])
@@ -459,7 +459,7 @@ class pybasin(object):
         point['dLatitude_degree'] = self.dLatitude_outlet_degree
         pVertex_outlet_initial=pyvertex(point)
         if self.aFlowline_basin_simplified is None:
-            sFilename_flowline = self.sFilename_flowline_segment_order_before_intersect
+            sFilename_flowline = self.sFilename_flowline_simplified
             sFilename_flowline_in = os.path.join(self.sWorkspace_output_basin, sFilename_flowline)
             aFlowline_simplified,pSpatial_reference = read_flowline_geojson( sFilename_flowline_in )   
             read_flowline_geojson
@@ -476,7 +476,7 @@ class pybasin(object):
         self.dLength_flowline_simplified = self.calculate_flowline_length(self.aFlowline_basin_simplified)
 
         if self.aFlowline_basin_conceptual is None:
-            sFilename_flowline = self.sFilename_flowline_final
+            sFilename_flowline = self.sFilename_flowline_conceptual
             sFilename_flowline_in = os.path.join(self.sWorkspace_output_basin, sFilename_flowline)
             aFlowline_conceptual,pSpatial_reference = read_flowline_geojson( sFilename_flowline_in )   
             read_flowline_geojson
@@ -502,13 +502,12 @@ class pybasin(object):
 
     def evaluate_area_of_difference(self, iMesh_type, sMesh_type):
 
-        sFilename_simplified =  self.sFilename_flowline_segment_order_before_intersect
+        sFilename_simplified =  self.sFilename_flowline_simplified
         sFilename_simplified= os.path.join(self.sWorkspace_output_basin, sFilename_simplified)
 
         sFilename_flowline_edge = self.sFilename_flowline_edge
         sFilename_flowline_edge= os.path.join(self.sWorkspace_output_basin, sFilename_flowline_edge)
 
-        
         #intersect first
         sFilename_output= os.path.join(self.sWorkspace_output_basin, 'flowline_intersect_flowline.json')
         aVertex_intersect = intersect_flowline_with_flowline(sFilename_simplified, sFilename_flowline_edge, sFilename_output)
@@ -616,7 +615,7 @@ class pybasin(object):
                     sFilename_json = os.path.join(sWorkspace_output_basin, sFilename_out)
                     sTitle = 'Simplified flowline'
                 else:
-                    sFilename_out = self.sFilename_flowline_final
+                    sFilename_out = self.sFilename_flowline_conceptual
                     sFilename_json = os.path.join(sWorkspace_output_basin, sFilename_out)
                     sTitle = 'Conceptual flowline'
                 pass

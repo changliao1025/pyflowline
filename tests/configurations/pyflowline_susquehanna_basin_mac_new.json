@@ -22,7 +22,7 @@
         "sFilename_dam": "/Users/liao313/data/hexwatershed/susquehanna/auxiliary/ICoM_dams.csv",
         "sFilename_flowline_filter": "/Users/liao313/data/hexwatershed/susquehanna/vector/hydrology/streamord7above.shp",
         "sFilename_flowline_filter_json": "/Users/liao313/scratch/04model/pyflowline/susquehanna/pyflowline20211217003/001/flowline_filter.json",
-        "sFilename_flowline_final": "flowline_final_001.json",
+        "sFilename_flowline_conceptual": "flowline_final_001.json",
         "sFilename_flowline_intersect": "flowline_intersect_001.json",
         "sFilename_flowline_raw": "/Users/liao313/data/hexwatershed/susquehanna/vector/hydrology/allflowline.shp",
         "sFilename_flowline_segment_index_before_intersect": "flowline_segment_index_before_intersect_001.json",

@@ -1,6 +1,6 @@
-
+import sys
 from pathlib import Path
-
+import argparse
 import logging
 for handler in logging.root.handlers[:]:
     logging.root.removeHandler(handler)
@@ -12,7 +12,25 @@ from pyflowline.classes.pycase import flowlinecase
 from pyflowline.pyflowline_read_model_configuration_file import pyflowline_read_model_configuration_file
 from pyflowline.pyflowline_generate_template_configuration_json_file import pyflowline_generate_template_configuration_json_file
 
-iFlag_option = 1
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--sMesh_type", help = "sMesh_type",  type = str)
+parser.add_argument("--iCase_index", help = "iCase_index",  type = int)
+parser.add_argument("--dResolution_meter", help = "dResolution_meter",  type = float)
+pArgs = parser.parse_args()
+if len(sys.argv) == 1:
+    sMesh_type = 'mpas'
+    iCase_index = 1
+    dResolution_meter=50000
+else:
+    if len(sys.argv)==4:
+        sMesh_type = pArgs.sMesh_type
+        iCase_index = pArgs.iCase_index
+        dResolution_meter=pArgs.dResolution_meter
+    else:
+        pass
+
+iFlag_option = 2
 if iFlag_option ==1:
 
     sPath = str(Path(__file__).parent.resolve())
@@ -29,15 +47,20 @@ else:
         #linux
   
         sPath = str(Path(__file__).parent.resolve())
-        sFilename_configuration_in = sPath +  '/../tests/configurations/pyflowline_susquehanna_hexagon.json' 
-        sFilename_configuration_in = sPath +  '/../tests/configurations/pyflowline_susquehanna_square.json' 
-        #sFilename_configuration_in = sPath +  '/../tests/configurations/pyflowline_susquehanna_latlon.json' 
-        sFilename_configuration_in = sPath +  '/../tests/configurations/pyflowline_susquehanna_mpas.json' 
+        if sMesh_type=='hexagon':
+            sFilename_configuration_in = sPath +  '/../tests/configurations/pyflowline_susquehanna_hexagon.json' 
+        else:
+            if sMesh_type=='square':
+                sFilename_configuration_in = sPath +  '/../tests/configurations/pyflowline_susquehanna_square.json' 
+            else:
+                if sMesh_type=='latlon':
+                    sFilename_configuration_in = sPath +  '/../tests/configurations/pyflowline_susquehanna_latlon.json' 
+                else:
+                    sFilename_configuration_in = sPath +  '/../tests/configurations/pyflowline_susquehanna_mpas.json' 
         
-        #mac
-        #sFilename_configuration_in = '/Users/liao313/workspace/python/pyflowline/configurations/pyflowline_susquehanna_hexagon_mac.json'
         print(sFilename_configuration_in)
-        oPyflowline = pyflowline_read_model_configuration_file(sFilename_configuration_in)
+        oPyflowline = pyflowline_read_model_configuration_file(sFilename_configuration_in, \
+            iCase_index_in=iCase_index, dResolution_meter_in=dResolution_meter)
         #print the case information in details
         print(oPyflowline.tojson())
 

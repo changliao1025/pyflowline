@@ -82,7 +82,7 @@ else:
 #aExtent_zoom = [-77.3,-76.5, 40.2,41.0] #braided
 #aExtent_zoom = [-77.3,-76.5, 40.2,41.0] #confluence
 
-oPyflowline.reconstruct_topological_relationship()
+#oPyflowline.reconstruct_topological_relationship()
 #oPyflowline.plot(sVariable_in = 'final')
 #oPyflowline.plot(sVariable_in = 'overlap',aExtent_in=aExtent_full )
 

@@ -1177,7 +1177,10 @@ class flowlinecase(object):
         for pBasin in self.aBasin:
             pBasin.export()
 
-        self.tojson()
+        aSkip = ['aBasin', \
+                'aFlowline_simplified','aFlowline_conceptual','aCellID_outlet',
+                'aCell']
+        self.tojson(skip = aSkip )
 
     def export_mesh_info_to_json(self):
         
@@ -1236,8 +1239,12 @@ class flowlinecase(object):
 
         return
 
-    def tojson(self):
-        sJson = json.dumps(self.__dict__, \
+    def tojson(self, skip=()):        
+
+        obj = self.__dict__.copy()
+        for sKey in skip:
+            obj.pop(sKey, None)
+        sJson = json.dumps(obj, default=lambda o: o.__dict__, \
             sort_keys=True, \
                 indent = 4, \
                     ensure_ascii=True, \
@@ -1245,8 +1252,14 @@ class flowlinecase(object):
         return sJson
 
     def export_config_to_json(self, sFilename_output):
+        aSkip = ['aBasin', \
+                'aFlowline_simplified','aFlowline_conceptual','aCellID_outlet',
+                'aCell']
+        obj = self.__dict__.copy()
+        for sKey in aSkip:
+            obj.pop(sKey, None)
         with open(sFilename_output, 'w', encoding='utf-8') as f:
-            json.dump(self.__dict__, f,sort_keys=True, \
+            json.dump(obj.__dict__, f,sort_keys=True, \
                 ensure_ascii=False, \
                 indent=4, \
                 cls=CaseClassEncoder)

@@ -1,8 +1,26 @@
 from abc import ABCMeta, abstractmethod
-
+import json
+from json import JSONEncoder
+import numpy as np
+from pyflowline.classes.vertex import pyvertex
 from pyflowline.algorithms.auxiliary.gdal_functions import  calculate_angle_betwen_vertex, \
     calculate_polygon_area, calculate_distance_to_plane
 
+class EdgeClassEncoder(JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, np.integer):
+            return int(obj)
+        if isinstance(obj, np.float32):
+            return float(obj)
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        if isinstance(obj, list):
+            pass  
+        if isinstance(obj, pyvertex):
+            return json.loads(obj.tojson()) #lVertexID
+          
+            
+        return JSONEncoder.default(self, obj)
 
 class pyedge(object):
     __metaclass__ = ABCMeta 
@@ -151,4 +169,16 @@ class pyedge(object):
 
     def __ne__(self, other):
         return not self.__eq__(other)
+
+    def tojson(self, skip=None):
+
+        obj = self.__dict__.copy()
+        for sKey in skip:
+            obj.pop(sKey, None)
+        sJson = json.dumps(obj, default=lambda o: o.__dict__, \
+            sort_keys=True, \
+                indent = 4, \
+                    ensure_ascii=True, \
+                        cls=EdgeClassEncoder)
+        return sJson
 

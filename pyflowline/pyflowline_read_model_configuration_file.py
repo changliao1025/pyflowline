@@ -45,7 +45,7 @@ def pyflowline_read_model_configuration_file(sFilename_configuration_in,\
     if sModel_in is not None:
         sModel = sModel_in
     else:
-        sModel = data['sDate']
+        sModel = data['sModel']
         pass
 
     if sDate_in is not None:

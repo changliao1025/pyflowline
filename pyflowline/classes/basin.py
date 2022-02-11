@@ -1,10 +1,10 @@
 import os
 from pathlib import Path
 from abc import ABCMeta, abstractmethod
+
 import json
 from json import JSONEncoder
 import numpy as np
-
 import matplotlib.pyplot as plt
 import matplotlib.path as mpath
 import matplotlib.patches as mpatches
@@ -73,9 +73,7 @@ class BasinClassEncoder(JSONEncoder):
             return obj.lFlowlineID
         if isinstance(obj, pyconfluence):
             return obj.dAngle_upstream
-        
-        #if isinstance(obj, pybasin):
-        #    return json.loads(obj.tojson())    
+       
             
         return JSONEncoder.default(self, obj)
 
@@ -92,8 +90,8 @@ class pybasin(object):
     dLatitude_outlet_degree = -9999.
     dAccumulation_threshold= 100000.0
     dThreshold_small_river = 10000
-    dLength_flowline_before_simplification = 0.0
-    dLength_flowline_after_simplification = 0.0
+    dLength_flowline_filtered = 0.0
+    dLength_flowline_simplified = 0.0
     dLength_flowline_conceptual = 0.0
 
     dArea_of_difference=0.0
@@ -113,6 +111,7 @@ class pybasin(object):
     sFilename_flowline_simplified_info=''
     sFilename_flowline_conceptual_info=''
     #sFilename_basin_configuration=''
+    aFlowline_basin_filtered=None
     aFlowline_basin_simplified=None
     aFlowline_basin_conceptual=None
     #aVertex_confluence=None
@@ -212,7 +211,7 @@ class pybasin(object):
         
         sFilename_flowline_filter = self.sFilename_flowline_filter
         sFilename_flowline_filter_json = self.sFilename_flowline_filter_json
-        aFlowline_basin_simplified, pSpatial_reference = read_flowline_geojson( sFilename_flowline_filter_json )   
+        aFlowline_basin_filtered, pSpatial_reference = read_flowline_geojson( sFilename_flowline_filter_json )   
         sWorkspace_output_basin = self.sWorkspace_output_basin
         if self.iFlag_dam ==1:
             sFilename_dam = self.sFilename_dam
@@ -235,9 +234,9 @@ class pybasin(object):
                 aNHDPlusID_dams_headwater.append(lNHDPlusID)
                 if lNHDPlusID in aNHDPlusID_filter:
                     #remove by id
-                    for k in range(len(aFlowline_basin_simplified)):
-                        if aFlowline_basin_simplified[k].lNHDPlusID == lNHDPlusID:
-                            aFlowline_basin_simplified.pop(k)
+                    for k in range(len(aFlowline_basin_filtered)):
+                        if aFlowline_basin_filtered[k].lNHDPlusID == lNHDPlusID:
+                            aFlowline_basin_filtered.pop(k)
                             break
                     pass
                 else:                                
@@ -248,15 +247,15 @@ class pybasin(object):
             for i in range(len(aFlowline_dams_headwater)):
                 aFlowline_dams_headwater[i].iFlag_dam = 1
             aFlowline_dams_nonheadwater = extract_nhdplus_flowline_shapefile_by_attribute(sFilename_flowline_raw, aNHDPlusID_dams_nonheadwater )
-            aFlowline_basin_simplified = aFlowline_basin_simplified + aFlowline_dams_headwater + aFlowline_dams_nonheadwater
+            aFlowline_basin_filtered = aFlowline_basin_filtered + aFlowline_dams_headwater + aFlowline_dams_nonheadwater
         else:
             pass
         if self.iFlag_disconnected == 1:                
             #aThreshold = np.full(2, 300.0, dtype=float)
-            #aFlowline_basin_simplified = connect_disconnect_flowline(aFlowline_basin_simplified, aVertex, aThreshold)
+            #aFlowline_basin_filtered = connect_disconnect_flowline(aFlowline_basin_filtered, aVertex, aThreshold)
             #sFilename_out = 'flowline_connect.json'
             #sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)    
-            #export_flowline_to_json(iFlag_projected, aFlowline_basin_simplified,pSpatial_reference_gcs, sFilename_out)
+            #export_flowline_to_json(iFlag_projected, aFlowline_basin_filtered,pSpatial_reference_gcs, sFilename_out)
             pass
         else:
             pass
@@ -264,16 +263,19 @@ class pybasin(object):
         if self.iFlag_debug ==1:
             sFilename_out = 'flowline_before_intersect.json'
             sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)            
-            self.export_flowline(aFlowline_basin_simplified, sFilename_out)
+            self.export_flowline(aFlowline_basin_filtered, sFilename_out)
         #calculate length
-        self.dLength_flowline_before_simplification = self.calculate_flowline_length(aFlowline_basin_simplified)
+        self.aFlowline_basin_filtered = aFlowline_basin_filtered
+        self.dLength_flowline_filtered = self.calculate_flowline_length(aFlowline_basin_filtered)
+
+        #simplification started
         
-        aVertex = find_flowline_vertex(aFlowline_basin_simplified)
+        aVertex = find_flowline_vertex(aFlowline_basin_filtered)
         if self.iFlag_debug ==1:
             sFilename_out = 'flowline_vertex_without_confluence_before_intersect.json'
             sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
             export_vertex_to_json( aVertex, sFilename_out)
-        aFlowline_basin_simplified = split_flowline(aFlowline_basin_simplified, aVertex)
+        aFlowline_basin_simplified = split_flowline(aFlowline_basin_filtered, aVertex)
         if self.iFlag_debug ==1:
             sFilename_out = 'flowline_split_by_point_before_intersect.json'
             sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
@@ -323,7 +325,7 @@ class pybasin(object):
         sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
         export_vertex_to_json( aVertex,  sFilename_out, aAttribute_data=aConnectivity)
         
-        #self.dLength_flowline_after_simplification = self.calculate_flowline_length(aFlowline_basin_simplified)
+        #self.dLength_flowline_simplified = self.calculate_flowline_length(aFlowline_basin_simplified)
         aVertex = np.array(aVertex)
         aIndex_confluence = np.array(aIndex_confluence)
         if aIndex_confluence.size > 0:        
@@ -445,8 +447,50 @@ class pybasin(object):
             aConfluence_basin.append(pConfluence)   
         return aConfluence_basin
 
-    def analyze(self):        
-        self.dLength_flowline_after_simplification = self.calculate_flowline_length(self.aFlowline_basin_simplified)
+    def analyze(self):      
+        if self.aFlowline_basin_filtered is None:
+            sFilename_flowline_filter = self.sFilename_flowline_filter
+            sFilename_flowline_filter_json = self.sFilename_flowline_filter_json
+            self.aFlowline_basin_filtered, pSpatial_reference = read_flowline_geojson( sFilename_flowline_filter_json )   
+            self.dLength_flowline_filtered = self.calculate_flowline_length(self.aFlowline_basin_filtered)
+        
+        point= dict()
+        point['dLongitude_degree'] = self.dLongitude_outlet_degree
+        point['dLatitude_degree'] = self.dLatitude_outlet_degree
+        pVertex_outlet_initial=pyvertex(point)
+        if self.aFlowline_basin_simplified is None:
+            sFilename_flowline = self.sFilename_flowline_segment_order_before_intersect
+            sFilename_flowline_in = os.path.join(self.sWorkspace_output_basin, sFilename_flowline)
+            aFlowline_simplified,pSpatial_reference = read_flowline_geojson( sFilename_flowline_in )   
+            read_flowline_geojson
+            self.aFlowline_basin_simplified = aFlowline_simplified
+            aVertex, lIndex_outlet, aIndex_headwater,aIndex_middle, aIndex_confluence, aConnectivity\
+            = find_flowline_confluence(self.aFlowline_basin_simplified,  pVertex_outlet_initial)  
+            aVertex = np.array(aVertex)
+            aIndex_confluence = np.array(aIndex_confluence)
+            if aIndex_confluence.size > 0:        
+                aVertex_confluence = aVertex[aIndex_confluence] 
+                self.aConfluence_basin_simplified = self.build_confluence(self.aFlowline_basin_simplified, aVertex_confluence)
+
+
+        self.dLength_flowline_simplified = self.calculate_flowline_length(self.aFlowline_basin_simplified)
+
+        if self.aFlowline_basin_conceptual is None:
+            sFilename_flowline = self.sFilename_flowline_final
+            sFilename_flowline_in = os.path.join(self.sWorkspace_output_basin, sFilename_flowline)
+            aFlowline_conceptual,pSpatial_reference = read_flowline_geojson( sFilename_flowline_in )   
+            read_flowline_geojson
+            self.aFlowline_basin_conceptual = aFlowline_conceptual
+            
+            aVertex, lIndex_outlet, aIndex_headwater,aIndex_middle, aIndex_confluence, aConnectivity\
+            = find_flowline_confluence(self.aFlowline_basin_conceptual,  pVertex_outlet_initial)  
+            aVertex = np.array(aVertex)
+            aIndex_confluence = np.array(aIndex_confluence)
+            if aIndex_confluence.size > 0:        
+                aVertex_confluence = aVertex[aIndex_confluence] 
+                self.aConfluence_basin_conceptual = self.build_confluence(self.aFlowline_basin_conceptual, aVertex_confluence)
+
+
         self.dLength_flowline_conceptual = self.calculate_flowline_length(self.aFlowline_basin_conceptual)
         self.calculate_river_sinuosity()
         self.calculate_confluence_branching_angle()
@@ -556,7 +600,7 @@ class pybasin(object):
         aPolygon_out, dArea = calculate_area_of_difference_simplified(aFlowline_all, aVertex_all, sFilename_output)
         print('Area of difference: ', dArea)
         self.dArea_of_difference = dArea
-        self.dDistance_displace = dArea / self.dLength_flowline_after_simplification
+        self.dDistance_displace = dArea / self.dLength_flowline_simplified
         self.plot_area_of_difference(iMesh_type, sMesh_type)
         return
 
@@ -760,7 +804,7 @@ class pybasin(object):
     def export(self):
         self.export_basin_info_to_json()
         self.export_flowline_info_to_json()
-        self.tojson()    
+        #self.tojson()    
         return
 
     def export_flowline(self, aFlowline_in, sFilename_json_in,iFlag_projected_in = None,  pSpatial_reference_in = None):
@@ -772,8 +816,14 @@ class pybasin(object):
         sFilename_json = self.sFilename_basin_info
         sFilename_json = os.path.join(str(Path(self.sWorkspace_output_basin)  ) , sFilename_json  )
 
+        aSkip = ['aFlowline_basin_filtered', \
+                'aFlowline_basin_simplified','aFlowline_basin_conceptual','aConfluence_basin_simplified',
+                'aConfluence_basin_conceptual']
+        obj = self.__dict__.copy()
+        for sKey in aSkip:
+            obj.pop(sKey, None)
         with open(sFilename_json, 'w', encoding='utf-8') as f:
-            sJson = json.dumps(self.__dict__, \
+            sJson = json.dumps(obj, default=lambda o: o.__dict__,\
             sort_keys=True, \
                 indent = 4, \
                     ensure_ascii=True, \
@@ -783,23 +833,40 @@ class pybasin(object):
         return
 
     def export_flowline_info_to_json(self):
+
+        aSkip = ['aEdge', \
+                'aVertex','aFlowlineID_start_start','aFlowlineID_start_end',
+                'aFlowlineID_end_start','aFlowlineID_end_end']
+
         sFilename_json = self.sFilename_flowline_simplified_info
         sFilename_json = os.path.join(str(Path(self.sWorkspace_output_basin)  ) , sFilename_json  )
         with open(sFilename_json, 'w', encoding='utf-8') as f:
-            sJson = json.dumps([json.loads(ob.tojson()) for ob in self.aFlowline_basin_simplified], indent = 4)        
+            sJson = json.dumps([json.loads(ob.tojson(skip=aSkip)) for ob in self.aFlowline_basin_simplified], indent = 4)        
             f.write(sJson)    
             f.close()
 
         sFilename_json = self.sFilename_flowline_conceptual_info
         sFilename_json = os.path.join(str(Path(self.sWorkspace_output_basin)  ) , sFilename_json  )
+
+        
         with open(sFilename_json, 'w', encoding='utf-8') as f:
-            sJson = json.dumps([json.loads(ob.tojson()) for ob in self.aFlowline_basin_conceptual], indent = 4)        
+            sJson = json.dumps([json.loads(ob.tojson(skip=aSkip)) for ob in self.aFlowline_basin_conceptual], indent = 4)        
             f.write(sJson)    
             f.close()
         return
 
-    def tojson(self):
-        sJson = json.dumps(self.__dict__, \
+    def tojson(self, skip=()):
+
+        obj = self.__dict__.copy()
+        for sKey in skip:
+            obj.pop(sKey, None)
+ 
+        #sJson = json.dumps(self.__dict__, \
+        #    sort_keys=True, \
+        #        indent = 4, \
+        #            ensure_ascii=True, \
+        #                cls=BasinClassEncoder)
+        sJson = json.dumps(obj, default=lambda o: o.__dict__, \
             sort_keys=True, \
                 indent = 4, \
                     ensure_ascii=True, \

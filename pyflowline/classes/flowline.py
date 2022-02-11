@@ -1,9 +1,10 @@
 from abc import ABCMeta, abstractmethod
-import numpy as np
+
 import copy
+
 import json
 from json import JSONEncoder
-
+import numpy as np
 from pyflowline.classes.vertex import pyvertex
 from pyflowline.classes.edge import pyedge
 
@@ -21,7 +22,7 @@ class FlowlineClassEncoder(JSONEncoder):
         if isinstance(obj, pyvertex):
             return json.loads(obj.tojson()) #lVertexID
         if isinstance(obj, pyedge):
-            return None         
+            return obj.lEdgeID         
             
         return JSONEncoder.default(self, obj)
 
@@ -223,8 +224,12 @@ class pyflowline(object):
     def __ne__(self, other):
         return not self.__eq__(other)
     
-    def tojson(self):
-        sJson = json.dumps(self.__dict__, \
+    def tojson(self, skip=None):
+
+        obj = self.__dict__.copy()
+        for sKey in skip:
+            obj.pop(sKey, None)
+        sJson = json.dumps(obj, default=lambda o: o.__dict__, \
             sort_keys=True, \
                 indent = 4, \
                     ensure_ascii=True, \

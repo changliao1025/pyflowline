@@ -16,6 +16,8 @@
         "sBasinID": "001",
         "sFilename_area_of_difference": "area_of_difference.json",
         "sFilename_basin_info": "basin_info.json",
+        "sFilename_confluence_conceptual_info": "confluence_conceptual_info.json",
+        "sFilename_confluence_simplified_info": "confluence_simplified_info.json",
         "sFilename_dam": "/qfs/people/liao313/data/hexwatershed/susquehanna/auxiliary/ICoM_dams.csv",
         "sFilename_flowline_conceptual": "flowline_conceptual.json",
         "sFilename_flowline_conceptual_info": "flowline_conceptual_info.json",

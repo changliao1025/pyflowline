@@ -110,6 +110,8 @@ class pybasin(object):
     sFilename_basin_info=''
     sFilename_flowline_simplified_info=''
     sFilename_flowline_conceptual_info=''
+    sFilename_confluence_simplified_info=''
+    sFilename_confluence_conceptual_info=''
     #sFilename_basin_configuration=''
     aFlowline_basin_filtered=None
     aFlowline_basin_simplified=None
@@ -204,6 +206,8 @@ class pybasin(object):
         self.sFilename_basin_info = 'basin_info.json'
         self.sFilename_flowline_conceptual_info = 'flowline_conceptual_info.json'
         self.sFilename_flowline_simplified_info = 'flowline_simplified_info.json'
+        self.sFilename_confluence_conceptual_info = 'confluence_conceptual_info.json'
+        self.sFilename_confluence_simplified_info = 'confluence_simplified_info.json'
         return
         
     def flowline_simplification(self):
@@ -832,6 +836,7 @@ class pybasin(object):
     def export(self):
         self.export_basin_info_to_json()
         self.export_flowline_info_to_json()
+        self.export_confluence_info_to_json()
         #self.tojson()    
         return
 
@@ -880,6 +885,25 @@ class pybasin(object):
             f.write(sJson)    
             f.close()
         return
+
+    def export_confluence_info_to_json(self):
+
+        sFilename_json = self.sFilename_confluence_simplified_info
+        sFilename_json = os.path.join(str(Path(self.sWorkspace_output_basin)  ) , sFilename_json  )
+        with open(sFilename_json, 'w', encoding='utf-8') as f:
+            sJson = json.dumps([json.loads(ob.tojson()) for ob in self.aConfluence_basin_simplified], indent = 4)        
+            f.write(sJson)    
+            f.close()
+
+        sFilename_json = self.sFilename_confluence_conceptual_info
+        sFilename_json = os.path.join(str(Path(self.sWorkspace_output_basin)  ) , sFilename_json  )
+
+        
+        with open(sFilename_json, 'w', encoding='utf-8') as f:
+            sJson = json.dumps([json.loads(ob.tojson()) for ob in self.aConfluence_basin_conceptual], indent = 4)        
+            f.write(sJson)    
+            f.close()
+        return   
 
     def tojson(self):
         aSkip = ['aFlowline_basin_filtered', \

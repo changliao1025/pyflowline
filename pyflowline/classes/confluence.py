@@ -78,7 +78,12 @@ class pyconfluence():
     
     
     def tojson(self):
-        sJson = json.dumps(self.__dict__, \
+        aSkip = ['aFlowline_upstream']
+
+        obj = self.__dict__.copy()
+        for sKey in aSkip:
+            obj.pop(sKey, None)
+        sJson = json.dumps(obj,  \
                 sort_keys=True, \
                 indent = 4, \
                 ensure_ascii=True, \

@@ -806,8 +806,10 @@ class pybasin(object):
         #sFilename  = Path(sFilename_json).stem + '_loop.png'  
               
         sTitle = 'Area of difference'
-        ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True,
+        gl = ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True,
                       linewidth=1, color='gray', alpha=0.3, linestyle='--')
+        gl.xlabel_style = {'size': 8, 'color': 'k', 'rotation':0, 'ha':'right'}
+        gl.ylabel_style = {'size': 8, 'color': 'k', 'rotation':90,'weight': 'normal'}
         ax.set_title( sTitle)  
 
         sText = 'Mesh type: ' + sMesh_type.title()

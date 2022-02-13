@@ -12,7 +12,6 @@ from pyflowline.classes.pycase import flowlinecase
 from pyflowline.pyflowline_read_model_configuration_file import pyflowline_read_model_configuration_file
 from pyflowline.pyflowline_generate_template_configuration_json_file import pyflowline_generate_template_configuration_json_file
 
-
 parser = argparse.ArgumentParser()
 parser.add_argument("--sMesh_type", help = "sMesh_type",  type = str)
 parser.add_argument("--iCase_index", help = "iCase_index",  type = int)
@@ -25,7 +24,7 @@ pArgs = parser.parse_args()
 if len(sys.argv) == 1:
     sMesh_type = 'mpas'
     iCase_index = 10
-    dResolution_meter=10000
+    dResolution_meter=5000
     sDate='20220201'
 else:
     if len(sys.argv)> 1:
@@ -94,15 +93,15 @@ aExtent_zoom = [-77.3,-76.5, 40.2,41.0] #confluence
 
 #oPyflowline.reconstruct_topological_relationship()
 #oPyflowline.plot(sVariable_in = 'final')
-oPyflowline.plot(sVariable_in = 'overlap',aExtent_in=aExtent_zoom )
-exit()
+#oPyflowline.plot(sVariable_in = 'overlap',aExtent_in=aExtent_zoom )
+#exit()
 #replace conceptual flowline with real flowline length
-oPyflowline.analyze()
-#oPyflowline.evaluate()
-oPyflowline.export()
+#oPyflowline.analyze()
+oPyflowline.evaluate()
+#oPyflowline.export()
 
 #sFilename_dem_flowline ='/qfs/people/liao313/data/hexwatershed/susquehanna/vector/swat/swat10k.shp'
-#oPyflowline.compare_with_raster_dem_method(sFilename_dem_flowline,aExtent_in=aExtent_zoom )
+#oPyflowline.compare_with_raster_dem_method(sFilename_dem_flowline,aExtent_in=aExtent_full )
 
 
 

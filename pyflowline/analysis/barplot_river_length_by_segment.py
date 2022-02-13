@@ -15,6 +15,7 @@ iSize_x = 12
 iSize_y =  9
 iDPI = 150
 nData= 6
+nSegment=7
 
 #read data
 nCase = 10
@@ -28,12 +29,12 @@ aMarker=  np.array([  '+',  '^'  , 'o', 'p', 'd', '*'])
 aLabel_legend= np.array(['NHDPlus HR','Simplified','Latlon','Square','Hexagon','MPAS'])
 aHatch = np.array([ '.',   '*', '+', '|', '-', 'o'])
 
-for r in range(nResolution):
-    aData_full = np.full( (7,5),0.0,dtype=float )
-    aCase = np.arange(3) * 3 +1 + r
-    aCase= np.append(aCase,10)
-    iFlag_sim =0
-    for i in range( len( aCase) ):
+for iSeg in range(nSegment):
+    aData_full = np.full((5,3),0.0, dtype=float )
+    aCase = np.arange(3) * 3 + 1 
+    
+    iFlag_sim = 0
+    for iRes in range( nResolution ):
         iCase_index = aCase[i]
         sCase_index = "{:03d}".format( iCase_index )
         sWorkspace_output_case = sWorkspace_output + '/' + 'pyflowline' + sDate + sCase_index
@@ -41,16 +42,18 @@ for r in range(nResolution):
             sFilename_json = sWorkspace_output_case + '/' + '001' + '/'+ 'flowline_simplified_info.json'
             with open(sFilename_json) as json_file:
                 data_sim = json.load(json_file)  
-                for j in range(len(data_sim)):
-                    aData_full[j,0] = float(data_sim[j]['dSinuosity'])
+                data_seg = data_sim[iSeg]
+                
+                aData_full[0,] = float(['dSinuosity'])
                 iFlag_sim = 1
             
     
         sFilename_json = sWorkspace_output_case + '/' + '001' + '/'+ 'flowline_conceptual_info.json'
         with open(sFilename_json) as json_file:
             data_con = json.load(json_file) 
-            for j in range(len(data_con)):
-                    aData_full[j,i+1] = float(data_con[j]['dSinuosity'])
+            data_seg = data_sim[j]
+           
+            aData_full[j,i+1] = float(data_con[j]['dSinuosity'])
                 
 
     sResolution = aResolution[r]

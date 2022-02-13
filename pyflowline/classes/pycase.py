@@ -888,7 +888,7 @@ class flowlinecase(object):
         lID = 0 
         for pBasin in self.aBasin:
             sWorkspace_output_basin=  pBasin.sWorkspace_output_basin                        
-            sFilename = pBasin.sFilename_flowline_segment_order_before_intersect
+            sFilename = pBasin.sFilename_flowline_simplified
             sFilename_out = os.path.join(sWorkspace_output_basin, sFilename)
             sFilename_json = os.path.join(sWorkspace_output_basin, sFilename_out)
             pDriver = ogr.GetDriverByName('GeoJSON')
@@ -950,15 +950,16 @@ class flowlinecase(object):
                 
         
         sTitle = 'Conceptual flowline'
-        sFilename  = Path(sFilename_mesh).stem + '_flowline_final.png'                      
+        sFilename  = Path(sFilename_mesh).stem + '_flowline_conceptual_braided.png'                      
         
         ax.set_extent( aExtent_in )        
 
         ax.coastlines()#resolution='110m')
-        ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True,
+        gl = ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True,
                       linewidth=0.2, color='gray', alpha=0.3, linestyle='--')
-        
-        ax.set_title( sTitle )
+        gl.xlabel_style = {'size': 8, 'color': 'k', 'rotation':0, 'ha':'right'}
+        gl.ylabel_style = {'size': 8, 'color': 'k', 'rotation':90,'weight': 'normal'}
+        #ax.set_title( sTitle )
         sText = 'Mesh type: ' + sMesh_type.title()
         ax.text(0.05, 0.95, sText, \
         verticalalignment='top', horizontalalignment='left',\

@@ -27,25 +27,24 @@ if iFlag_outlet==1:
     #y20 = 971.9 #sim
     y60 = 341.9 #mpas
     y_label = r'Are of difference (km2)'
-    sTitle = r'Susquehanna River Basin'
+    sTitle = r'Susquehanna river basin'
     sFilename_out= '/people/liao313/data/hexwatershed/susquehanna/area_of_diff_compare.png'
 
-
-#a1 =np.array([y10, y10, y10]) 
-#a2 =np.array([y20, y20, y20]) 
 a6 =np.array([y60, y60, y60]) 
 
 iSize_x = 12
 iSize_y =  9
 iDPI = 150
-nData= 4
+nData= 6
+aColor= np.array(create_diverge_rgb_color_hex( 6 ))
+sWorkspace_output = '/compyfs/liao313/04model/pyflowline/susquehanna/'
 
-aLinestyle = [   'solid', 'solid', 'solid', 'dashdot']
+aLinestyle = np.array([  'dotted',  'dotted'  , 'solid', 'solid', 'solid', 'dashdot'])
+aMarker=  np.array([  '+',  '^'  , 'o', 'p', 'd', '*'])
 
-aMarker=  [   'o', 'p', 'd', '*']
-aColor= create_diverge_rgb_color_hex(nData )
-aLabel_legend= ['Latlon','Square','Hexagon','MPAS']
-aHatch = [  '+', '|', '-', 'o']
+aLabel_legend= np.array(['NHDPlus HR','Simplified','Latlon','Square','Hexagon','MPAS'])
+aHatch = np.array([ '.',   '*', '+', '|', '-', 'o'])
+aSubset_index = np.arange(4) + 2
 
 sFormat_x = ''
 
@@ -60,18 +59,18 @@ aData= np.array( [  a3, a4, a5, a6])
 aReference_in= []
 barplot_data_with_reference(aData, \
              aResolution, \
-             aLabel_legend,\
+             aLabel_legend[aSubset_index],\
              sFilename_out,\
                  aReference_in,\
-             dMax_y_in = 6000,\
+             dMax_y_in = 7000,\
              dMin_y_in = 0.0,\
              sFormat_y_in = sFormat_y,
              sLabel_y_in= y_label,\
              ncolumn_in= 2,\
-                 aLinestyle_in = aLinestyle,\
-             aColor_in= aColor,\
-                 aMarker_in = aMarker,\
-             aHatch_in = aHatch,\
+                 aLinestyle_in = aLinestyle[aSubset_index],\
+             aColor_in= aColor[aSubset_index],\
+                 aMarker_in = aMarker[aSubset_index],\
+             aHatch_in = aHatch[aSubset_index],\
              sTitle_in = sTitle)
 
 print('finished')

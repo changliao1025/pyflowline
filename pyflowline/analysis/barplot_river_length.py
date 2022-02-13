@@ -27,7 +27,7 @@ if iFlag_outlet==1:
     y20 = 971.9 #sim
     y60 = 859.9 #mpas
     y_label = r'River length (ratio)'
-    sTitle = r'Susquehanna River Basin'
+    sTitle = r'Susquehanna river basin'
     sFilename_out= '/people/liao313/data/hexwatershed/susquehanna/river_length.png'
 
 
@@ -51,11 +51,8 @@ sFormat_x = ''
 
 sFormat_y = '%.1f'
 
-#need to transpose
-#a = np.array([  a3, a4, a5])
-#a3, a4 , a5= np.transpose(a)
 aData= np.array( [ a1, a2, a3, a4, a5, a6]) 
-aData = aData / (a1)
+aData = aData / (a2)
 
 aReference_in= [0,1]
 barplot_data_with_reference(aData, \

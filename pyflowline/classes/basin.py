@@ -604,6 +604,7 @@ class pybasin(object):
         return
 
     def plot(self, sVariable_in=None):
+        iFlag_label = 0
         sWorkspace_output_basin = self.sWorkspace_output_basin
         if sVariable_in is not None:
             if sVariable_in == 'flowline_filter_json':
@@ -611,13 +612,15 @@ class pybasin(object):
                 sTitle = 'Original flowline'
             else:
                 if sVariable_in == 'flowline_simplified':
-                    sFilename_out = self.sFilename_flowline_segment_index_before_intersect
+                    sFilename_out = self.sFilename_flowline_simplified
                     sFilename_json = os.path.join(sWorkspace_output_basin, sFilename_out)
                     sTitle = 'Simplified flowline'
+                    iFlag_label = 0
                 else:
                     sFilename_out = self.sFilename_flowline_conceptual
                     sFilename_json = os.path.join(sWorkspace_output_basin, sFilename_out)
                     sTitle = 'Conceptual flowline'
+                    iFlag_label = 1
                 pass
         else:
             #default 
@@ -641,8 +644,7 @@ class pybasin(object):
         dLat_max = -90
         dLon_min = 180
         dLon_max = -180          
-        
-
+   
         #ax.add_image(request, 6)    # 5 = zoom level
 
         n_colors = pLayer.GetFeatureCount()
@@ -651,11 +653,14 @@ class pybasin(object):
         for pFeature in pLayer:
             pGeometry_in = pFeature.GetGeometryRef()
             sGeometry_type = pGeometry_in.GetGeometryName()
+            if iFlag_label ==1:
+                iSegment = pFeature.GetField("iseg")
             if sGeometry_type =='LINESTRING':
                 dummy0 = loads( pGeometry_in.ExportToWkt() )
                 aCoords_gcs = dummy0.coords
                 aCoords_gcs= np.array(aCoords_gcs)
                 nvertex = len(aCoords_gcs)
+                
                 for i in range(nvertex):
                     dLon = aCoords_gcs[i][0]
                     dLat = aCoords_gcs[i][1]
@@ -670,6 +675,14 @@ class pybasin(object):
     
                     if dLat < dLat_min:
                         dLat_min = dLat
+                    
+                if nvertex == 2 :
+                    dLon_label = 0.5 * (aCoords_gcs[0][0] + aCoords_gcs[1][0] ) 
+                    dLat_label = 0.5 * (aCoords_gcs[0][1] + aCoords_gcs[1][1] ) 
+                else:
+                    lIndex_mid = int(nvertex/2)    
+                    dLon_label = aCoords_gcs[lIndex_mid][0]
+                    dLat_label = aCoords_gcs[lIndex_mid][1]
     
                 codes = np.full(nvertex, mpath.Path.LINETO, dtype=int )
                 codes[0] = mpath.Path.MOVETO
@@ -677,6 +690,13 @@ class pybasin(object):
                 x, y = zip(*path.vertices)
                 line, = ax.plot(x, y, color= colours[lID],linewidth=1)
                 lID = lID + 1
+                #add label 
+                if iFlag_label ==1:
+                    sText = 'Seg ' + "{:0d}".format( iSegment )
+                    ax.text(dLon_label,dLat_label, sText, \
+                        verticalalignment='center', horizontalalignment='center',\
+                        #transform=ax.transAxes, \
+                        color='black', fontsize=7)
                 
     
         pDataset = pLayer = pFeature  = None    
@@ -684,16 +704,23 @@ class pybasin(object):
         marginx  = (dLon_max - dLon_min) / 20
         marginy  = (dLat_max - dLat_min) / 20
         aExtent_in = [dLon_min - marginx , dLon_max + marginx , dLat_min - marginy , dLat_max + marginy]
-        #aExtent_in = [-76.5,-76.2, 41.6,41.9]
-        #aExtent_in = [-76.95,-76.75, 40.7,40.9]
+        #meander
+        # #aExtent_in = [-76.5,-76.2, 41.6,41.9]
+        aExtent_zoom = [-76.5,-76.2, 41.6,41.9] 
+        #braided
+        aExtent_zoom = [-76.95,-76.75, 40.7,40.9]
+        #confulence
+        #aExtent_zoom = [-77.3,-76.5, 40.2,41.0] 
         sFilename  = Path(sFilename_json).stem + '.png'
-        #sFilename  = Path(sFilename_json).stem + '_meander.png'       
-        #sFilename  = Path(sFilename_json).stem + '_loop.png'  
-        ax.set_extent(aExtent_in)       
+        sFilename  = Path(sFilename_json).stem + '_meander.png'       
+        sFilename  = Path(sFilename_json).stem + '_loop.png'  
+        ax.set_extent(aExtent_zoom)       
     
-        ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True,
+        gl = ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True,
                       linewidth=1, color='gray', alpha=0.3, linestyle='--')
-        ax.set_title( sTitle)       
+        gl.xlabel_style = {'size': 8, 'color': 'k', 'rotation':0, 'ha':'right'}
+        gl.ylabel_style = {'size': 8, 'color': 'k', 'rotation':90,'weight': 'normal'}
+        #ax.set_title( sTitle)       
         
         sFilename_out = os.path.join(sDirname, sFilename)
         plt.savefig(sFilename_out, bbox_inches='tight')

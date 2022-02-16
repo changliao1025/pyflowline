@@ -942,6 +942,22 @@ class flowlinecase(object):
                 pass
             pass
         
+        #dam
+        pSpatial_reference_source = osr.SpatialReference()  
+        pSpatial_reference_source.ImportFromEPSG(4326)
+
+        pSpatial_reference_target = osr.SpatialReference() 
+        for pBasin in self.aBasin:
+            sFilename_dam = pBasin.sFilename_dam
+
+            aData_dam = text_reader_string(sFilename_dam, iSkipline_in =1,cDelimiter_in=',' )
+            ndam = len(aData_dam)
+            for idam in range(ndam):
+                dLon = float(aData_dam[idam, 1])
+                dLat = float(aData_dam[idam, 0])                
+                ax.plot(dLon,dLat,marker = 'x', color='red', markersize=4)
+                pass    
+
         sDirname = os.path.dirname(sFilename_mesh)
         if aExtent_in is None:
             marginx  = (dLon_max - dLon_min) / 20
@@ -950,7 +966,7 @@ class flowlinecase(object):
                 
         
         sTitle = 'Conceptual flowline'
-        sFilename  = Path(sFilename_mesh).stem + '_flowline_conceptual_5k_zoom.png'                      
+        sFilename  = Path(sFilename_mesh).stem + '_flowline_conceptual_dam_zoom.png'                      
         
         ax.set_extent( aExtent_in )        
 

@@ -61,7 +61,7 @@ barplot_data_with_reference(aData, \
              sFilename_out,\
                  aReference_in,\
              dMax_y_in = 1.5,\
-             dMin_y_in = 0.0,\
+             dMin_y_in = 0.5,\
              sFormat_y_in = sFormat_y,
              sLabel_y_in= y_label,\
              ncolumn_in= 3,\

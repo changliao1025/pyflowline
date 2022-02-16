@@ -619,7 +619,7 @@ class pybasin(object):
                     sFilename_out = self.sFilename_flowline_simplified
                     sFilename_json = os.path.join(sWorkspace_output_basin, sFilename_out)
                     sTitle = 'Simplified flowline'
-                    iFlag_label = 0
+                    iFlag_label = 1
                 else:
                     sFilename_out = self.sFilename_flowline_conceptual
                     sFilename_json = os.path.join(sWorkspace_output_basin, sFilename_out)
@@ -708,6 +708,8 @@ class pybasin(object):
         marginx  = (dLon_max - dLon_min) / 20
         marginy  = (dLat_max - dLat_min) / 20
         aExtent_in = [dLon_min - marginx , dLon_max + marginx , dLat_min - marginy , dLat_max + marginy]
+        
+        aExtent_full = [-78.5,-75.5, 39.2,42.5]
         #meander
         # #aExtent_in = [-76.5,-76.2, 41.6,41.9]
         aExtent_zoom = [-76.5,-76.2, 41.6,41.9] 
@@ -716,9 +718,9 @@ class pybasin(object):
         #confulence
         #aExtent_zoom = [-77.3,-76.5, 40.2,41.0] 
         sFilename  = Path(sFilename_json).stem + '.png'
-        sFilename  = Path(sFilename_json).stem + '_meander.png'       
-        sFilename  = Path(sFilename_json).stem + '_loop.png'  
-        ax.set_extent(aExtent_zoom)       
+        #sFilename  = Path(sFilename_json).stem + '_meander.png'       
+        #sFilename  = Path(sFilename_json).stem + '_loop.png'  
+        ax.set_extent(aExtent_full)       
     
         gl = ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True,
                       linewidth=1, color='gray', alpha=0.3, linestyle='--')

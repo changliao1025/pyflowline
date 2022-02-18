@@ -90,6 +90,7 @@ class flowlinecase(object):
     iFlag_standalone=1
     iFlag_global = 0
     iFlag_multiple_outlet = 0
+    iFlag_use_shapefile_extent=1
     iFlag_use_mesh_dem=0
     iFlag_save_mesh = 0
     iFlag_simplification = 1 #user can turn on/off
@@ -168,6 +169,9 @@ class flowlinecase(object):
         
         if 'iFlag_use_mesh_dem' in aParameter:
             self.iFlag_use_mesh_dem = int(aParameter['iFlag_use_mesh_dem'])
+
+        if 'iFlag_use_shapefile_extent' in aParameter:
+            self.iFlag_use_shapefile_extent = int(aParameter['iFlag_use_shapefile_extent'])    
 
         if 'iFlag_rotation' in aParameter:
             self.iFlag_rotation = int(aParameter['iFlag_rotation'])
@@ -348,26 +352,35 @@ class flowlinecase(object):
         sFilename_spatial_reference = self.sFilename_spatial_reference
         sFilename_mesh = self.sFilename_mesh
         if iMesh_type !=4: #hexagon
-            dPixelWidth, dOriginX, dOriginY, nrow, ncolumn, pSpatialRef_dem, pProjection, pGeotransform\
-                 = retrieve_geotiff_metadata(sFilename_dem)
-            spatial_reference_source = pSpatialRef_dem
             spatial_reference_target = osr.SpatialReference()  
             spatial_reference_target.ImportFromEPSG(4326)
+            if self.iFlag_use_shapefile_extent==1:
+                pDriver_shapefile = ogr.GetDriverByName('Esri Shapefile')
+                pDataset_shapefile = pDriver_shapefile.Open(self.sFilename_spatial_reference, 0)
+                pLayer_shapefile = pDataset_shapefile.GetLayer(0)
+                pSpatial_reference = pLayer_shapefile.GetSpatialRef()
+                (dOriginX, dX_right, dY_bot, dOriginY) = pLayer_shapefile.GetExtent() # not in same order as ogrinfo
+                dLongitude_left,  dLatitude_bot= reproject_coordinates(dOriginX, dY_bot,pSpatial_reference,    spatial_reference_target)
+                dLongitude_right, dLatitude_top= reproject_coordinates(dX_right, dOriginY,pSpatial_reference,  spatial_reference_target)
+                dLatitude_mean = 0.5 * (dLatitude_top + dLatitude_bot)
+                pass
+            else:
+                dPixelWidth, dOriginX, dOriginY, nrow, ncolumn, pSpatialRef_dem, pProjection, pGeotransform\
+                     = retrieve_geotiff_metadata(sFilename_dem)
 
-            dY_bot = dOriginY - (nrow+1) * dPixelWidth
-            dLongitude_left,  dLatitude_bot= reproject_coordinates(dOriginX, dY_bot,pSpatialRef_dem,spatial_reference_target)
-            dX_right = dOriginX + (ncolumn +1) * dPixelWidth
+                dY_bot = dOriginY - (nrow+1) * dPixelWidth
+                dLongitude_left,  dLatitude_bot= reproject_coordinates(dOriginX, dY_bot,pSpatialRef_dem,    spatial_reference_target)
+                dX_right = dOriginX + (ncolumn +1) * dPixelWidth
 
-            dLongitude_right, dLatitude_top= reproject_coordinates(dX_right, dOriginY,pSpatialRef_dem,spatial_reference_target)
-            dLatitude_mean = 0.5 * (dLatitude_top + dLatitude_bot)
-
+                dLongitude_right, dLatitude_top= reproject_coordinates(dX_right, dOriginY,pSpatialRef_dem,  spatial_reference_target)
+                dLatitude_mean = 0.5 * (dLatitude_top + dLatitude_bot)
+                pass
 
             if dResolution_meter < 0:
                 #not used
                 pass
             else:
                 dResolution_degree = meter_to_degree(dResolution_meter, dLatitude_mean)
-
 
             dX_left = dOriginX
             dY_top = dOriginY

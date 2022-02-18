@@ -37,7 +37,7 @@ else:
         print(len(sys.argv), 'Missing arguaments')
         pass
 
-iFlag_option = 2
+iFlag_option = 1
 if iFlag_option ==1:
 
     sPath = str(Path(__file__).parent.resolve())
@@ -75,18 +75,18 @@ else:
 #the total number of basin is controlled by the nOutlet variable
 #convert the raw flowline into geojson in WGS84 system        
 #oPyflowline.convert_flowline_to_json()
-aExtent_full = [-78.5,-75.5, 39.2,42.5]
+#aExtent_full = [-78.5,-75.5, 39.2,42.5]
 #aExtent_zoom = [-76.0,-76.5, 39.5,40.0] #outlet
 #aExtent_zoom = [-76.5,-76.2, 41.6,41.9] #meander
 #aExtent_zoom = [-77.3,-76.5, 40.2,41.0] #braided
 #aExtent_zoom = [-77.3,-76.5, 40.2,41.0] #confluence
-aExtent_dam = [-75.75,-76.15, 42.1,42.5]
+#aExtent_dam = [-75.75,-76.15, 42.1,42.5]
 #oPyflowline.plot(sVariable_in = 'flowline_filter_json')
 #oPyflowline.flowline_simplification()
-oPyflowline.plot(sVariable_in = 'flowline_simplified')
+#oPyflowline.plot(sVariable_in = 'flowline_simplified')
 #oPyflowline.plot_study_area()
 #exit()
-#oPyflowline.mesh_generation()
+oPyflowline.mesh_generation()
 #oPyflowline.plot(sVariable_in = 'mesh')
 #exit()
 

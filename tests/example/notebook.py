@@ -41,7 +41,7 @@ iFlag_option = 1
 if iFlag_option ==1:
 
     sPath = str(Path(__file__).parent.resolve())
-    sFilename_configuration_in = sPath +  '/../tests/configurations/template.json' 
+    sFilename_configuration_in = sPath +  '/../configurations/template.json' 
     
     oPyflowline = pyflowline_generate_template_configuration_json_file(sFilename_configuration_in)
     print(oPyflowline.tojson())

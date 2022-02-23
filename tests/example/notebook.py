@@ -1,5 +1,6 @@
 import sys
 from pathlib import Path
+from os.path import realpath
 import argparse
 import logging
 for handler in logging.root.handlers[:]:
@@ -39,20 +40,17 @@ else:
 
 iFlag_option = 1
 if iFlag_option ==1:
-
     sPath = str(Path(__file__).parent.resolve())
     sFilename_configuration_in = sPath +  '/../configurations/template.json' 
-    
     oPyflowline = pyflowline_generate_template_configuration_json_file(sFilename_configuration_in)
     print(oPyflowline.tojson())
-    #now you can customize the model object
+    #now you can customize the model object again
     oPyflowline.iCase_index = 1
     print(oPyflowline.tojson())
 else: 
     if iFlag_option == 2:
         #an example configuration file is provided with the repository, but you need to update this file based on your own case study
         #linux
-  
         sPath = str(Path(__file__).parent.resolve())
         if sMesh_type=='hexagon':
             sFilename_configuration_in = sPath +  '/../tests/configurations/pyflowline_susquehanna_hexagon.json' 
@@ -74,37 +72,17 @@ else:
 #pyflowline can process multiple basins within one singel run
 #the total number of basin is controlled by the nOutlet variable
 #convert the raw flowline into geojson in WGS84 system        
-#oPyflowline.convert_flowline_to_json()
-#aExtent_full = [-78.5,-75.5, 39.2,42.5]
-#aExtent_zoom = [-76.0,-76.5, 39.5,40.0] #outlet
-#aExtent_zoom = [-76.5,-76.2, 41.6,41.9] #meander
-#aExtent_zoom = [-77.3,-76.5, 40.2,41.0] #braided
-#aExtent_zoom = [-77.3,-76.5, 40.2,41.0] #confluence
-#aExtent_dam = [-75.75,-76.15, 42.1,42.5]
-#oPyflowline.plot(sVariable_in = 'flowline_filter_json')
-#oPyflowline.flowline_simplification()
-#oPyflowline.plot(sVariable_in = 'flowline_simplified')
-#oPyflowline.plot_study_area()
-#exit()
+oPyflowline.convert_flowline_to_json()
+
+oPyflowline.flowline_simplification()
+
 oPyflowline.mesh_generation()
-#oPyflowline.plot(sVariable_in = 'mesh')
-#exit()
 
+oPyflowline.reconstruct_topological_relationship()
 
-
-#oPyflowline.reconstruct_topological_relationship()
-#oPyflowline.plot(sVariable_in = 'final')
-#oPyflowline.plot(sVariable_in = 'overlap',aExtent_in=aExtent_dam )
-exit()
-#replace conceptual flowline with real flowline length
 oPyflowline.analyze()
-#oPyflowline.evaluate()
+
 oPyflowline.export()
-
-#sFilename_dem_flowline ='/qfs/people/liao313/data/hexwatershed/susquehanna/vector/swat/swat10k.shp'
-#oPyflowline.compare_with_raster_dem_method(sFilename_dem_flowline,aExtent_in=aExtent_full )
-
-
 
 print('Finished')
 

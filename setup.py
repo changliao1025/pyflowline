@@ -13,14 +13,14 @@ AUTHOR = "Chang Liao"
 AUTHOR_EMAIL = "chang.liao@pnnl.gov"
 URL = "https://github.com/changliao1025/pyflowline"
 VERSION = "0.1.1"
-REQUIRES_PYTHON = ">=3.6.0"
+REQUIRES_PYTHON = ">=3.8.0"
 KEYWORDS = "Earth Science"
 
 REQUIRED = [
     "numpy", 
-    "matplotlib",
     "gdal",
-    "netCDF4"
+    "netCDF4",
+    "shapely"
 ]
 
 CLASSIFY = [

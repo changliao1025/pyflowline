@@ -5,13 +5,8 @@ from abc import ABCMeta, abstractmethod
 import json
 from json import JSONEncoder
 import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib.path as mpath
-import matplotlib.patches as mpatches
-from matplotlib import cm
-import cartopy.crs as ccrs
 
-from osgeo import ogr, osr, gdal
+
 from shapely.wkt import loads
 
 from pyflowline.classes.vertex import pyvertex
@@ -52,8 +47,7 @@ from pyflowline.algorithms.index.define_stream_segment_index import define_strea
 from pyflowline.algorithms.intersect.intersect_flowline_with_mesh import intersect_flowline_with_mesh
 from pyflowline.algorithms.intersect.intersect_flowline_with_flowline import intersect_flowline_with_flowline
 
-#desired_proj = ccrs.Orthographic(central_longitude=-75, central_latitude=42, globe=None)
-desired_proj = ccrs.PlateCarree()
+
 
 class BasinClassEncoder(JSONEncoder):
     def default(self, obj):

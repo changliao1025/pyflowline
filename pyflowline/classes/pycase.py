@@ -9,18 +9,10 @@ import numpy as np
 
 from osgeo import ogr, osr, gdal
 
-import matplotlib.image as mpimg
-import matplotlib.pyplot as plt
-import matplotlib.path as mpath
-import matplotlib.ticker as mticker
-import matplotlib.patches as mpatches
-import matplotlib.cm as cm
+
 
 from shapely.wkt import loads
-from cartopy.mpl.ticker import LongitudeFormatter, LatitudeFormatter
-import cartopy.io.shapereader as shpreader
-from cartopy.feature import ShapelyFeature
-import cartopy.crs as ccrs
+
 
 from pyflowline.classes.mpas import pympas
 from pyflowline.classes.hexagon import pyhexagon
@@ -47,7 +39,7 @@ from pyflowline.mesh.square.create_square_mesh import create_square_mesh
 from pyflowline.mesh.mpas.create_mpas_mesh import create_mpas_mesh
 from pyflowline.mesh.tin.create_tin_mesh import create_tin_mesh
 
-desired_proj = ccrs.PlateCarree()
+
 
 pDate = datetime.datetime.today()
 sDate_default = "{:04d}".format(pDate.year) + "{:02d}".format(pDate.month) + "{:02d}".format(pDate.day)

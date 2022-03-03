@@ -101,6 +101,8 @@ def pyflowline_generate_template_configuration_json_file(sFilename_json, sPath_d
     
     aConfig['iFlag_use_shapefile_extent'] = iFlag_use_shapefile_extent 
     aConfig['iFlag_use_mesh_dem'] = iFlag_use_mesh_dem
+
+    aConfig['iFlag_save_mesh'] = 1
      
     aConfig['nOutlet'] = nBasin
     aConfig['dResolution_degree'] = 0.5

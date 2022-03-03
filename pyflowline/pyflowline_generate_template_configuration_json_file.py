@@ -9,7 +9,7 @@ from pyflowline.classes.basin import pybasin
 
 
 
-def pyflowline_generate_basin_template_configuration_json_file(sFilename_basins_json, nBasin, sWorkspace_output, sPath_data):
+def pyflowline_generate_basin_template_configuration_json_file(sFilename_basins_json, nBasin, sWorkspace_output, sPath_data_input):
     aBasin_out = list()
     for i in range(nBasin):
         sBasin =  "{:03d}".format(i+1)   
@@ -22,13 +22,13 @@ def pyflowline_generate_basin_template_configuration_json_file(sFilename_basins_
         aConfig_basin['dAccumulation_threshold'] = -90
         aConfig_basin['dThreshold_small_river'] = 90
         
-        aConfig_basin['sFilename_dam'] = str(Path(sPath_data)  /  'ICoM_dams.csv')
+        aConfig_basin['sFilename_dam'] = str(Path(sPath_data_input)  /  'ICoM_dams.csv')
         
-        aConfig_basin['sFilename_flowline_filter'] = str(Path(sPath_data)  /  'streamord7above.shp')
+        aConfig_basin['sFilename_flowline_filter'] = str(Path(sPath_data_input)  /  'streamord7above.shp')
         
-        aConfig_basin['sFilename_flowline_raw'] = str(Path(sPath_data)  /  'allflowline.shp')
+        aConfig_basin['sFilename_flowline_raw'] = str(Path(sPath_data_input)  /  'allflowline.shp')
         
-        aConfig_basin['sFilename_flowline_topo'] = str(Path(sPath_data)  /  'flowline.csv')
+        aConfig_basin['sFilename_flowline_topo'] = str(Path(sPath_data_input)  /  'flowline.csv')
         
         aConfig_basin['sWorkspace_output_basin'] = str(Path(sWorkspace_output) / sBasin )
         pBasin = pybasin(aConfig_basin)    
@@ -51,7 +51,7 @@ def pyflowline_generate_template_configuration_json_file(sFilename_json, sPath_d
     if os.path.exists(sFilename_json):         
         os.remove(sFilename_json)
     
-    
+    sPath_data_input = str(Path(sPath_data)  /  'input')
 
     nBasin = 1
 
@@ -85,13 +85,13 @@ def pyflowline_generate_template_configuration_json_file(sFilename_json, sPath_d
     aConfig['sMesh_type'] = 'hexagon'
     aConfig['sJob'] = 'pyflowline'
     aConfig['sDate']= '20220110'
-    aConfig['sFilename_mesh'] = str(Path(sPath_data)  /  'lnd_cull_mesh.nc')
+    aConfig['sFilename_mesh'] = str(Path(sPath_data_input)  /  'lnd_cull_mesh.nc')
     
     aConfig['flowline_info'] = 'flowline_info.json'
     aConfig['sFilename_mesh_info'] = 'mesh_info.json'
     aConfig['sFilename_elevation'] = 'elevation.json'
    
-    aConfig['sFilename_spatial_reference'] =  str(Path(sPath_data)  /  'boundary_proj.shp')
+    aConfig['sFilename_spatial_reference'] =  str(Path(sPath_data_input)  /  'boundary_proj.shp')
    
     
 
@@ -103,7 +103,7 @@ def pyflowline_generate_template_configuration_json_file(sFilename_json, sPath_d
     sFilename_basins_json = os.path.join(sDirname, sFilename)
 
     aBasin = pyflowline_generate_basin_template_configuration_json_file(sFilename_basins_json, nBasin, \
-        oModel.sWorkspace_output,sPath_data)
+        oModel.sWorkspace_output, sPath_data_input)
 
     oModel.aBasin = aBasin
     oModel.sFilename_basins = sFilename_basins_json

@@ -46,6 +46,7 @@ def pyflowline_generate_basin_template_configuration_json_file(sFilename_basins_
     return aBasin_out
 
 def pyflowline_generate_template_configuration_json_file(sFilename_json, sPath_data,\
+          iFlag_standalone_in=None,\
         iFlag_use_mesh_dem_in=None,\
         iFlag_use_shapefile_extent_in=None,\
         iCase_index_in=None, \
@@ -79,7 +80,7 @@ def pyflowline_generate_template_configuration_json_file(sFilename_json, sPath_d
     else:       
         iFlag_use_shapefile_extent = 0
 
-     if sMesh_type_in is not None:
+    if sMesh_type_in is not None:
         sMesh_type = sMesh_type_in
     else:
         sMesh_type = 'hexagon'
@@ -101,8 +102,9 @@ def pyflowline_generate_template_configuration_json_file(sFilename_json, sPath_d
     
     aConfig['iFlag_use_shapefile_extent'] = iFlag_use_shapefile_extent 
     aConfig['iFlag_use_mesh_dem'] = iFlag_use_mesh_dem
-
     aConfig['iFlag_save_mesh'] = 1
+
+    aConfig['iFlag_flowline'] = 1
      
     aConfig['nOutlet'] = nBasin
     aConfig['dResolution_degree'] = 0.5

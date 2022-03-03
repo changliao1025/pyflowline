@@ -40,7 +40,7 @@ def pyflowline_read_model_configuration_file(sFilename_configuration_in,\
     else:       
         iFlag_use_mesh_dem = int(data['iFlag_use_mesh_dem'])
 
-     if sMesh_type_in is not None:
+    if sMesh_type_in is not None:
         sMesh_type = sMesh_type_in
     else:
         sMesh_type = data['sModel']

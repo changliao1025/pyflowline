@@ -102,7 +102,8 @@ def pyflowline_generate_template_configuration_json_file(sFilename_json, sPath_d
     sFilename =  Path(sFilename_json).stem + '_basins.json'
     sFilename_basins_json = os.path.join(sDirname, sFilename)
 
-    aBasin = pyflowline_generate_basin_template_configuration_json_file(sFilename_basins_json, nBasin, oModel.sWorkspace_output)
+    aBasin = pyflowline_generate_basin_template_configuration_json_file(sFilename_basins_json, nBasin, \
+        oModel.sWorkspace_output,sPath_data)
 
     oModel.aBasin = aBasin
     oModel.sFilename_basins = sFilename_basins_json

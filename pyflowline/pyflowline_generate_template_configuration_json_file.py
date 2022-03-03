@@ -85,7 +85,8 @@ def pyflowline_generate_template_configuration_json_file(sFilename_json, sPath_d
     aConfig['sMesh_type'] = 'hexagon'
     aConfig['sJob'] = 'pyflowline'
     aConfig['sDate']= '20220110'
-    aConfig['sFilename_mesh'] = str(Path(sPath_data_input)  /  'lnd_cull_mesh.nc')
+
+    aConfig['sFilename_mesh_netcdf'] = str(Path(sPath_data_input)  /  'lnd_cull_mesh.nc')
     
     aConfig['flowline_info'] = 'flowline_info.json'
     aConfig['sFilename_mesh_info'] = 'mesh_info.json'

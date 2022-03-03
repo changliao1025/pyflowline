@@ -65,11 +65,10 @@ else:
                 if sMesh_type=='latlon':
                     sFilename_configuration_in = realpath( sPath +  '/../configurations/pyflowline_susquehanna_latlon.json' )
                 else:
-                    sFilename_configuration_in = realpath( sPath +  '/../configurations/)pyflowline_susquehanna_mpas.json' 
+                    sFilename_configuration_in = realpath( sPath +  '/../configurations/)pyflowline_susquehanna_mpas.json' )
         
         
-        oPyflowline = pyflowline_read_model_configuration_file(sFilename_configuration_in, \
-            iCase_index_in=iCase_index, dResolution_meter_in=dResolution_meter, sDate_in=sDate)
+        oPyflowline = pyflowline_read_model_configuration_file(sFilename_configuration_in, iCase_index_in=iCase_index, dResolution_meter_in=dResolution_meter, sDate_in=sDate)
         
 
 #pyflowline can process multiple basins within one singel run

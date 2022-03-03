@@ -139,6 +139,7 @@ class flowlinecase(object):
         if 'iFlag_flowline' in aParameter:
             self.iFlag_flowline             = int(aParameter[ 'iFlag_flowline'])
         
+
         
 
         if 'iFlag_global' in aParameter:
@@ -302,6 +303,7 @@ class flowlinecase(object):
      
 
         #model generated files   
+      
         self.sFilename_mesh = os.path.join(str(Path(self.sWorkspace_output)  ) , sMesh_type + ".json" )               
         self.sFilename_mesh_info= os.path.join(str(Path(self.sWorkspace_output)  ) , sMesh_type + "_mesh_info.json"  )    
         self.sWorkspace_data_project = str(Path(self.sWorkspace_data ) / self.sWorkspace_project)

@@ -12,10 +12,8 @@ def pyflowline_read_model_configuration_file(sFilename_configuration_in,\
      iCase_index_in=None, \
          dResolution_degree_in = None,\
          dResolution_meter_in = None,\
+         sMesh_type_in = None, \
              sModel_in = None,\
-         sJob_in=None,\
-         aVariable_in = None, \
-             aValue_in = None, \
                  sDate_in = None,\
                      sWorkspace_output_in = None):
 
@@ -42,6 +40,12 @@ def pyflowline_read_model_configuration_file(sFilename_configuration_in,\
     else:       
         iFlag_use_mesh_dem = int(data['iFlag_use_mesh_dem'])
 
+     if sMesh_type_in is not None:
+        sMesh_type = sMesh_type_in
+    else:
+        sMesh_type = data['sModel']
+        pass
+        
     if sModel_in is not None:
         sModel = sModel_in
     else:

@@ -43,13 +43,52 @@ def pyflowline_generate_basin_template_configuration_json_file(sFilename_basins_
         f.write(sJson)    
         f.close()
 
-    
-
     return aBasin_out
-def pyflowline_generate_template_configuration_json_file(sFilename_json, sPath_data):
+
+def pyflowline_generate_template_configuration_json_file(sFilename_json, sPath_data,\
+        iFlag_use_mesh_dem_in=None,\
+        iFlag_use_shapefile_extent_in=None,\
+        iCase_index_in=None, \
+         dResolution_degree_in = None,\
+         dResolution_meter_in = None,\
+         sDate_in = None,\
+         sMesh_type_in = None, \
+             sModel_in = None,\
+                     sWorkspace_output_in = None):
    
     if os.path.exists(sFilename_json):         
         os.remove(sFilename_json)
+
+    if iCase_index_in is not None:        
+        iCase_index = iCase_index_in
+    else:       
+        iCase_index = 1
+    
+    if iFlag_standalone_in is not None:        
+        iFlag_standalone = iFlag_standalone_in
+    else:       
+        iFlag_standalone = 1
+
+    if iFlag_use_mesh_dem_in is not None:        
+        iFlag_use_mesh_dem = iFlag_use_mesh_dem_in
+    else:       
+        iFlag_use_mesh_dem = 0
+
+    if iFlag_use_shapefile_extent_in is not None:        
+        iFlag_use_shapefile_extent = iFlag_use_shapefile_extent_in
+    else:       
+        iFlag_use_shapefile_extent = 0
+
+     if sMesh_type_in is not None:
+        sMesh_type = sMesh_type_in
+    else:
+        sMesh_type = 'hexagon'
+        pass
+    if sDate_in is not None:
+        sDate = sDate_in
+    else:
+        sDate = '20220202'
+        pass
     
     sPath_data_input = str(Path(sPath_data)  /  'input')
 
@@ -58,11 +97,10 @@ def pyflowline_generate_template_configuration_json_file(sFilename_json, sPath_d
  
     #use a dict to initialize the class
     aConfig = {}
-    aConfig['iFlag_flowline'] = 1
-    aConfig['iFlag_merge_reach'] = 1
     
-    aConfig['iFlag_resample_method'] = 2   
-    aConfig['iFlag_use_shapefile_extent'] = 1 
+    
+    aConfig['iFlag_use_shapefile_extent'] = iFlag_use_shapefile_extent 
+    aConfig['iFlag_use_mesh_dem'] = iFlag_use_mesh_dem
      
     aConfig['nOutlet'] = nBasin
     aConfig['dResolution_degree'] = 0.5
@@ -74,17 +112,17 @@ def pyflowline_generate_template_configuration_json_file(sFilename_json, sPath_d
     aConfig['sFilename_model_configuration']  = sFilename_json 
     aConfig['sWorkspace_data'] = sPath_data
     
-    aConfig['sWorkspace_project'] = 'pyflowline'
+    aConfig['sWorkspace_project'] = 'pyflowline' #not needed
     
     aConfig['sWorkspace_output'] = str(Path(sPath_data)  /  'output')
     
     aConfig['sRegion'] = 'susquehanna'
     aConfig['sModel'] = 'pyflowline'
-    aConfig['iCase_index'] = 1
+    aConfig['iCase_index'] = iCase_index
    
-    aConfig['sMesh_type'] = 'hexagon'
+    aConfig['sMesh_type'] = sMesh_type
     aConfig['sJob'] = 'pyflowline'
-    aConfig['sDate']= '20220110'
+    aConfig['sDate']= sDate
 
     aConfig['sFilename_mesh_netcdf'] = str(Path(sPath_data_input)  /  'lnd_cull_mesh.nc')
     

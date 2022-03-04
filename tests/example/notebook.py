@@ -8,6 +8,23 @@ for handler in logging.root.handlers[:]:
 
 logging.basicConfig(format='%(asctime)s %(message)s')
 logging.warning('is the time Pyflowline simulation started.')
+def is_module_available(module_name):
+    if sys.version_info < (3, 0):
+        # python 2
+        import importlib
+        torch_loader = importlib.find_loader(module_name)
+    elif sys.version_info <= (3, 3):
+        # python 3.0 to 3.3
+        import pkgutil
+        torch_loader = pkgutil.find_loader(module_name)
+    elif sys.version_info >= (3, 4):
+        # python 3.4 and above
+        import importlib
+        torch_loader = importlib.util.find_spec(module_name)
+
+    return torch_loader is not None
+
+iFlag = is_module_available('pyflowline')
 import pyflowline
 from pyflowline.classes.pycase import flowlinecase
 from pyflowline.pyflowline_read_model_configuration_file import pyflowline_read_model_configuration_file

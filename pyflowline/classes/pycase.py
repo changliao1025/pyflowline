@@ -7,7 +7,7 @@ import datetime
 
 import numpy as np
 
-from osgeo import ogr, osr, gdal
+from osgeo import ogr, osr
 
 
 

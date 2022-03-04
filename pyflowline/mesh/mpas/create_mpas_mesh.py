@@ -64,8 +64,6 @@ def create_mpas_mesh(iFlag_global_in, \
 
     #write new netcdf
     for sKey, aValue in pDatasets_in.variables.items():        
-        #print(aValue.datatype)
-        #print(aValue.dimensions)
 
         #we need to filter out unused grids based on mpas specs
         if sKey == 'latCell':
@@ -262,8 +260,7 @@ def create_mpas_mesh(iFlag_global_in, \
                     lNeighborID = pmpas.aNeighbor[i]
                     #find shared edge
                     lEdgeID= aEdgeIndex[i]
-                    #print(lCellID,lNeighborID)
-                    #print(aCellOnEdge[lEdgeID-1])
+                    
                     lIndex = aIndexToEdgeID[lEdgeID-1]
                     dDistance = aDcEdge[lIndex]
                     aDistance.append(dDistance)

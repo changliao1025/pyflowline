@@ -31,7 +31,6 @@ def remove_small_river(aFlowline_in, dThreshold_in):
                         lID = lID + 1 
                         pass
                     else:
-                        #print('small')
                         pass
                 else:        
                     pFlowline.lIndex = lID

@@ -169,13 +169,11 @@ def remove_returning_flowline(iMesh_type_in, aCell_intersect_in, pVertex_outlet_
                 pFlowline.iStream_segment = iSegment_in
                 pFlowline.iStream_order=iStream_order_in
                 aFlowline_out.append(pFlowline)
-            
-            #print(iSegment_in, ': ',aCell_simple)
 
             sort_index = np.argsort(aStream_order)
             
             sort_index = sort_index[::-1]
-            #print(sort_index)
+
             nUpstream = len(aSegment_upstream)
             for i in sort_index:
                 retrieve_flowline_intersect_index(aSegment_upstream[i], aStream_order[i], aVertex_end_upstream[i])
@@ -210,7 +208,6 @@ def remove_returning_flowline(iMesh_type_in, aCell_intersect_in, pVertex_outlet_
                     lCellID_outlet3 = i
                     pass    
                 else:
-                    #print(dDiatance)
                     pass
 
             pass     

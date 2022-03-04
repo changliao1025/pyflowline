@@ -136,13 +136,13 @@ def track_nhdplus_flowline(aNHDPlusID_filter_in, aFromFlowline_in, aToFlowline_i
                         if lNHDPlusID_to==0:
                             pass
                         else:
-                            #print(lNHDPlusID_in, lNHDPlusID_to)
+                       
                             tag_downstream(lNHDPlusID_to)
         return 
 
     if lNHDPlusID_in in aNHDPlusID_filter_in:
         dummy_index = aNHDPlusID_filter_in.index(lNHDPlusID_in)
-        #print( lNHDPlusID, dummy_index)        
+          
     else:
         tag_downstream(lNHDPlusID_in)   
         #remove the first one

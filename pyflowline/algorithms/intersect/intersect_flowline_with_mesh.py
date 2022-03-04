@@ -39,7 +39,6 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh_in, sFilename_flo
     nfeature_flowline = pLayer_flowline.GetFeatureCount()
     pLayerDefinition = pLayer_flowline.GetLayerDefn()
     
-    #print( pSpatial_reference_flowline)
     comparison = pSpatial_reference_mesh.IsSame(pSpatial_reference_flowline)
     if(comparison != 1):
         iFlag_transform = 1

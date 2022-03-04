@@ -225,7 +225,7 @@ def create_hexagon_mesh(iFlag_rotation_in, \
 
 
                 pHexagon.aNeighbor = aNeighbor
-                #print(lCellID_center,aNeighbor)
+           
                 pHexagon.nNeighbor = len(aNeighbor)
                 aHexagon.append(pHexagon)
                 lCellID= lCellID + 1    
@@ -383,7 +383,7 @@ def create_hexagon_mesh(iFlag_rotation_in, \
                     print('error')  
 
                 pHexagon.aNeighbor = aNeighbor
-                #print(lCellID_center,aNeighbor)
+
                 pHexagon.nNeighbor = len(aNeighbor)
                 aHexagon.append(pHexagon)
                 lCellID= lCellID +1

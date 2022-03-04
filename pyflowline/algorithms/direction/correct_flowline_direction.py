@@ -34,7 +34,7 @@ def correct_flowline_direction(aFlowline_in, pVertex_outlet_in):
                 lIndex_outlet = i      
                 pass    
             else:
-                #print(dDiatance)
+          
                 pass
         
     lID = 0 

@@ -41,7 +41,6 @@ def intersect_flowline_with_flowline( sFilename_flowline_a_in, sFilename_flowlin
     else:
         iFlag_id = 0   
     
-    #print( pSpatial_reference_flowline)
     comparison = pSpatial_reference_a.IsSame(pSpatial_reference_b)
     if(comparison != 1):
         iFlag_transform = 1
@@ -130,7 +129,7 @@ def intersect_flowline_with_flowline( sFilename_flowline_a_in, sFilename_flowlin
                                 lVertexID = lVertexID + 1
 
                     else:
-                        #print(pGeometrytype_intersect)                      
+                        pass                  
 
                         point= dict()   
                         point['dLongitude_degree'] = pGeometry_intersect.GetX()

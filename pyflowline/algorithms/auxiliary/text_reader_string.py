@@ -14,12 +14,10 @@ def text_reader_string( sFilename_in,\
     cDelimiter_in = None, 
     iSkipline_in =  None
     """
-    #print(sFilename_in)
-    #print(os.path.isfile(sFilename_in))
+
     aData_out = -1
     if os.path.isfile(sFilename_in):
-        #print('file exist')
-        #check the parameter
+
         if ncolumn_in is not None:
             iFlag_column = 1
             ncolumn_out = ncolumn_in
@@ -123,7 +121,7 @@ def text_reader_string( sFilename_in,\
                 aData_out = np.full( (nrow_out, ncolumn_out), '  ', dtype=object )
                 for iRow in range(nrow_out):
                     dummy1 = ifs.readline()
-                    #print('New line is: ' + dummy1)
+  
                     dummy2 = dummy1.rstrip()
                     if iFlag_iFlag_remove_quota ==1:
                         dummy2=dummy2.replace('"','')
@@ -131,7 +129,7 @@ def text_reader_string( sFilename_in,\
                         pass
 
                     dummy3 = dummy2.split()
-                    #print(dummy3)
+        
                     aData_out[iRow] = dummy3
             else :
                 sLine=(ifs.readline()).rstrip()
@@ -157,10 +155,10 @@ def text_reader_string( sFilename_in,\
                         pass
 
                     dummy3 = dummy2.split()
-                    #print(dummy3)
+               
                     aData_out[iRow] = dummy3
 
-        #print(aData_out)
+
         ifs.close()
 
     else :

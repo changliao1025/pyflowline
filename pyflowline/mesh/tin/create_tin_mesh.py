@@ -58,7 +58,7 @@ sFilename_output_in, sFilename_spatial_reference_in):
     #(x1,y1)-----(x4,y4)
     #...............
     for column in range(0, ncolumn_in):
-        #print(column)
+  
         for row in range(0, nrow_in):
             
 

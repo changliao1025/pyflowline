@@ -174,7 +174,7 @@ class pybasin(object):
             self.sWorkspace_output_basin = aParameter['sWorkspace_output_basin']
         else:
             self.sWorkspace_output_basin   = '.'
-            print('The basin output path is not specified!')
+            
         Path(self.sWorkspace_output_basin).mkdir(parents=True, exist_ok=True)
 
         self.sFilename_flowline_filter_json = os.path.join(str(self.sWorkspace_output_basin ), "flowline_filter.json"  )

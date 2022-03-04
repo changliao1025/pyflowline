@@ -31,8 +31,7 @@ def intersect_flowline_with_vertex( sFilename_flowline_in, sFilename_vertex_in, 
     pSpatial_reference_b = pLayer_vertex.GetSpatialRef()
     nfeature_vertex = pLayer_vertex.GetFeatureCount()
     pLayerDefinition = pLayer_vertex.GetLayerDefn()
-    
-    #print( pSpatial_reference_flowline)
+
     comparison = pSpatial_reference_a.IsSame(pSpatial_reference_b)
     if(comparison != 1):
         iFlag_transform = 1
@@ -95,14 +94,11 @@ def intersect_flowline_with_vertex( sFilename_flowline_in, sFilename_vertex_in, 
                     if pGeometrytype_intersect == 'LINESTRING':
                         npoint = pGeometry_intersect.GetGeometryCount()
                         for i  in range(npoint): 
-                            point = pGeometry_intersect.GetGeometryRef(i)                            
-
-                            
+                            point = pGeometry_intersect.GetGeometryRef(i) 
 
                     else:
-                        print(pGeometrytype_intersect)                      
-
-                                        
+                        pass
+                             
                     
                 else:
                     pass

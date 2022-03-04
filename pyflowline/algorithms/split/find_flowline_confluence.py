@@ -39,7 +39,6 @@ def find_flowline_confluence(aFlowline_in, pVertex_outlet_in):
                 lIndex_outlet = i        
                 pass    
             else:
-                #print(dDiatance)
                 pass
         
     aConnectivity[lIndex_outlet] =0 

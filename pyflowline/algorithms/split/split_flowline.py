@@ -93,7 +93,7 @@ def split_flowline(aFlowline_in, aVertex_in, iFlag_intersect = None, iFlag_use_i
             pass
         else:
             if iPart ==1:
-                print('This flowline does not form any loop')
+                #print('This flowline does not form any loop')
                 if iFlag_use_id is not None:
 
                     pass

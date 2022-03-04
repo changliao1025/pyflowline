@@ -307,7 +307,7 @@ def calculate_area_of_difference_simplified(aFlowline_in, aVertex_all_in, \
                 pass
             else:
                 aList_all.append(aFlowline_list)
-                print(aFlowline_list)
+                
 
     
     pDataset = pDriver_geojson.CreateDataSource(sFilename_output_in) 

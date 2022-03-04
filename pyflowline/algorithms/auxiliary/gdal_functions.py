@@ -156,7 +156,6 @@ def retrieve_geotiff_metadata(sFilename_geotiff_in):
         dPixelWidth = pGeotransform[1]
         pPixelHeight = pGeotransform[5]       
         
-        print( dPixelWidth, dOriginX, dOriginY, nrow, ncolumn)
         return dPixelWidth, dOriginX, dOriginY, nrow, ncolumn, pSpatial_reference, pProjection, pGeotransform
 
 

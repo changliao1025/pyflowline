@@ -23,69 +23,69 @@ def pyflowline_read_model_configuration_file(sFilename_configuration_in,\
     
     # Opening JSON file
     with open(sFilename_configuration_in) as json_file:
-        data = json.load(json_file)   
+        aConfig = json.load(json_file)   
     
     if iCase_index_in is not None:        
         iCase_index = iCase_index_in
     else:       
-        iCase_index = int( data['iCase_index'])
+        iCase_index = int( aConfig['iCase_index'])
     
     if iFlag_standalone_in is not None:        
         iFlag_standalone = iFlag_standalone_in
     else:       
-        iFlag_standalone = int( data['iFlag_standalone'])
+        iFlag_standalone = int( aConfig['iFlag_standalone'])
 
     if iFlag_use_mesh_dem_in is not None:        
         iFlag_use_mesh_dem = iFlag_use_mesh_dem_in
     else:       
-        iFlag_use_mesh_dem = int(data['iFlag_use_mesh_dem'])
+        iFlag_use_mesh_dem = int(aConfig['iFlag_use_mesh_dem'])
 
     if sMesh_type_in is not None:
         sMesh_type = sMesh_type_in
     else:
-        sMesh_type = data['sModel']
+        sMesh_type = aConfig['sModel']
         pass
         
     if sModel_in is not None:
         sModel = sModel_in
     else:
-        sModel = data['sModel']
+        sModel = aConfig['sModel']
         pass
 
     if sDate_in is not None:
         sDate = sDate_in
     else:
-        sDate = data['sDate']
+        sDate = aConfig['sDate']
         pass
 
     if dResolution_degree_in is not None:
         dResolution_degree = dResolution_degree_in
     else:
-        dResolution_degree = data['dResolution_degree']
+        dResolution_degree = aConfig['dResolution_degree']
         pass
 
     if dResolution_meter_in is not None:
         dResolution_meter = dResolution_meter_in
     else:
-        dResolution_meter = data['dResolution_meter']
+        dResolution_meter = aConfig['dResolution_meter']
         pass
 
     if sWorkspace_output_in is not None:
         sWorkspace_output = sWorkspace_output_in
     else:
-        sWorkspace_output = data['sWorkspace_output']
+        sWorkspace_output = aConfig['sWorkspace_output']
         pass
 
     
-    data['iCase_index'] = iCase_index
-    data['iFlag_standalone'] = iFlag_standalone
-    data['iFlag_use_mesh_dem'] = iFlag_use_mesh_dem
-    data['dResolution_degree'] = dResolution_degree
-    data['dResolution_meter'] = dResolution_meter
+    aConfig['iCase_index'] = iCase_index
+    aConfig['iFlag_standalone'] = iFlag_standalone
+    aConfig['iFlag_use_mesh_dem'] = iFlag_use_mesh_dem
+    aConfig['dResolution_degree'] = dResolution_degree
+    aConfig['dResolution_meter'] = dResolution_meter
 
-    data['sDate'] = sDate
-    data['sModel'] = sModel
-    data['sWorkspace_output'] = sWorkspace_output
+    aConfig['sDate'] = sDate
+    aConfig['sModel'] = sModel
+    aConfig['sWorkspace_output'] = sWorkspace_output
    
     
 
@@ -95,11 +95,11 @@ def pyflowline_read_model_configuration_file(sFilename_configuration_in,\
    
    
     
-    #data
+    #aConfig
     
     #simulation
     
-    oPyflowline = flowlinecase(data)
+    oPyflowline = flowlinecase(aConfig)
    
     
     return oPyflowline

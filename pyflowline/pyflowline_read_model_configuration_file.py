@@ -6,16 +6,24 @@ from pyflowline.classes.pycase import flowlinecase
 pDate = datetime.datetime.today()
 sDate_default = "{:04d}".format(pDate.year) + "{:02d}".format(pDate.month) + "{:02d}".format(pDate.day)
 
-def pyflowline_read_model_configuration_file(sFilename_configuration_in,\
-    iFlag_standalone_in= None,\
-        iFlag_use_mesh_dem_in=None,\
-     iCase_index_in=None, \
-         dResolution_degree_in = None,\
-         dResolution_meter_in = None,\
-         sMesh_type_in = None, \
-             sModel_in = None,\
-                 sDate_in = None,\
-                     sWorkspace_output_in = None):
+def pyflowline_read_model_configuration_file(sFilename_configuration_in,   iFlag_standalone_in= None, iFlag_use_mesh_dem_in=None, iCase_index_in=None,   dResolution_degree_in = None,  dResolution_meter_in = None,  sMesh_type_in = None,  sModel_in = None, sDate_in = None,sWorkspace_output_in = None):
+    """read a model configuration
+
+    Args:
+        sFilename_configuration_in (str): _description_
+        iFlag_standalone_in (int, optional): _description_. Defaults to None.
+        iFlag_use_mesh_dem_in (int, optional): _description_. Defaults to None.
+        iCase_index_in (int, optional): _description_. Defaults to None.
+        dResolution_degree_in (float, optional): _description_. Defaults to None.
+        dResolution_meter_in (float, optional): _description_. Defaults to None.
+        sMesh_type_in (str, optional): _description_. Defaults to None.
+        sModel_in (str, optional): _description_. Defaults to None.
+        sDate_in (str, optional): _description_. Defaults to None.
+        sWorkspace_output_in (str, optional): _description_. Defaults to None.
+
+    Returns:
+        _type_: _description_
+    """
 
     if not os.path.isfile(sFilename_configuration_in):
         print(sFilename_configuration_in + ' does not exist')

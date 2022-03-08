@@ -60,9 +60,10 @@ iFlag_option = 1
 if iFlag_option ==1:
 
     
-    sFilename_configuration_in = realpath( sPath +  '/../configurations/template.json' )
-    sPath_data = realpath( sPath +  '/../data/susquehanna' )
-    oPyflowline = pyflowline_generate_template_configuration_json_file(sFilename_configuration_in, sPath_data)
+    sFilename_configuration_in = realpath( sPath +  '/tests/configurations/template.json' )
+    sPath_data = realpath( sPath +  '/data/susquehanna' )
+    oPyflowline = pyflowline_generate_template_configuration_json_file(sFilename_configuration_in,\
+         sPath_data)
     print(oPyflowline.tojson())
     #now you can customize the model object
     oPyflowline.iCase_index = 1

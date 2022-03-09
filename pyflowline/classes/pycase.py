@@ -123,7 +123,7 @@ class flowlinecase(object):
     aCell=list()
 
     
-    def __init__(self, aParameter,\
+    def __init__(self, aConfig_in,\
             iFlag_standalone_in= None,\
             sModel_in = None,\
             sWorkspace_output_in = None):
@@ -131,116 +131,116 @@ class flowlinecase(object):
         if iFlag_standalone_in is not None:
             self.iFlag_standalone = iFlag_standalone_in
         else:
-            if 'iFlag_standalone' in aParameter:
-                self.iFlag_standalone = int(aParameter['iFlag_standalone'])
+            if 'iFlag_standalone' in aConfig_in:
+                self.iFlag_standalone = int(aConfig_in['iFlag_standalone'])
             else:
                 self.iFlag_standalone=1
 
-        if 'iFlag_flowline' in aParameter:
-            self.iFlag_flowline             = int(aParameter[ 'iFlag_flowline'])
+        if 'iFlag_flowline' in aConfig_in:
+            self.iFlag_flowline             = int(aConfig_in[ 'iFlag_flowline'])
         
 
         
 
-        if 'iFlag_global' in aParameter:
-            self.iFlag_global             = int(aParameter[ 'iFlag_global'])
+        if 'iFlag_global' in aConfig_in:
+            self.iFlag_global             = int(aConfig_in[ 'iFlag_global'])
         
-        if 'iFlag_multiple_outlet' in aParameter:
-            self.iFlag_multiple_outlet             = int(aParameter[ 'iFlag_multiple_outlet'])  
+        if 'iFlag_multiple_outlet' in aConfig_in:
+            self.iFlag_multiple_outlet             = int(aConfig_in[ 'iFlag_multiple_outlet'])  
         
-        if 'iFlag_simplification' in aParameter:
-            self.iFlag_simplification = int(aParameter['iFlag_simplification'])
+        if 'iFlag_simplification' in aConfig_in:
+            self.iFlag_simplification = int(aConfig_in['iFlag_simplification'])
 
 
-        if 'iFlag_create_mesh' in aParameter:
-            self.iFlag_create_mesh = int(aParameter['iFlag_create_mesh'])    
+        if 'iFlag_create_mesh' in aConfig_in:
+            self.iFlag_create_mesh = int(aConfig_in['iFlag_create_mesh'])    
         
-        if 'iFlag_save_mesh' in aParameter:
-            self.iFlag_save_mesh             = int(aParameter[ 'iFlag_save_mesh'])
+        if 'iFlag_save_mesh' in aConfig_in:
+            self.iFlag_save_mesh             = int(aConfig_in[ 'iFlag_save_mesh'])
         
-        if 'iFlag_use_mesh_dem' in aParameter:
-            self.iFlag_use_mesh_dem = int(aParameter['iFlag_use_mesh_dem'])
+        if 'iFlag_use_mesh_dem' in aConfig_in:
+            self.iFlag_use_mesh_dem = int(aConfig_in['iFlag_use_mesh_dem'])
 
-        if 'iFlag_use_shapefile_extent' in aParameter:
-            self.iFlag_use_shapefile_extent = int(aParameter['iFlag_use_shapefile_extent'])    
+        if 'iFlag_use_shapefile_extent' in aConfig_in:
+            self.iFlag_use_shapefile_extent = int(aConfig_in['iFlag_use_shapefile_extent'])    
 
-        if 'iFlag_rotation' in aParameter:
-            self.iFlag_rotation = int(aParameter['iFlag_rotation'])
+        if 'iFlag_rotation' in aConfig_in:
+            self.iFlag_rotation = int(aConfig_in['iFlag_rotation'])
         
 
-        if 'iFlag_intersect' in aParameter:
-            self.iFlag_intersect = int(aParameter['iFlag_intersect'])
+        if 'iFlag_intersect' in aConfig_in:
+            self.iFlag_intersect = int(aConfig_in['iFlag_intersect'])
 
-        if 'nOutlet' in aParameter:
-            self.nOutlet = int(aParameter['nOutlet'])
+        if 'nOutlet' in aConfig_in:
+            self.nOutlet = int(aConfig_in['nOutlet'])
              
-        if 'iCase_index' in aParameter:
-            iCase_index = int(aParameter['iCase_index'])
+        if 'iCase_index' in aConfig_in:
+            iCase_index = int(aConfig_in['iCase_index'])
         else:
             iCase_index = 1
         sCase_index = "{:03d}".format( iCase_index )
         self.iCase_index =   iCase_index
 
-        if 'dResolution_degree' in aParameter:
-            self.dResolution_degree = float(aParameter['dResolution_degree']) 
+        if 'dResolution_degree' in aConfig_in:
+            self.dResolution_degree = float(aConfig_in['dResolution_degree']) 
 
-        if 'dResolution_meter' in aParameter:
-            self.dResolution_meter = float(aParameter['dResolution_meter']) 
+        if 'dResolution_meter' in aConfig_in:
+            self.dResolution_meter = float(aConfig_in['dResolution_meter']) 
         else:
             print('Please specify resolution.')
 
-        if 'dLongitude_left' in aParameter:
-            self.dLongitude_left = float(aParameter['dLongitude_left']) 
+        if 'dLongitude_left' in aConfig_in:
+            self.dLongitude_left = float(aConfig_in['dLongitude_left']) 
 
-        if 'dLongitude_right' in aParameter:
-            self.dLongitude_right = float(aParameter['dLongitude_right']) 
+        if 'dLongitude_right' in aConfig_in:
+            self.dLongitude_right = float(aConfig_in['dLongitude_right']) 
 
-        if 'dLatitude_bot' in aParameter:
-            self.dLatitude_bot = float(aParameter['dLatitude_bot']) 
+        if 'dLatitude_bot' in aConfig_in:
+            self.dLatitude_bot = float(aConfig_in['dLatitude_bot']) 
 
-        if 'dLatitude_top' in aParameter:
-            self.dLatitude_top = float(aParameter['dLatitude_top']) 
+        if 'dLatitude_top' in aConfig_in:
+            self.dLatitude_top = float(aConfig_in['dLatitude_top']) 
 
-        if 'sFilename_model_configuration' in aParameter:
-            self.sFilename_model_configuration    = aParameter[ 'sFilename_model_configuration']
+        if 'sFilename_model_configuration' in aConfig_in:
+            self.sFilename_model_configuration    = aConfig_in[ 'sFilename_model_configuration']
 
-        if 'sFilename_spatial_reference' in aParameter:
-            self.sFilename_spatial_reference = aParameter['sFilename_spatial_reference']
+        if 'sFilename_spatial_reference' in aConfig_in:
+            self.sFilename_spatial_reference = aConfig_in['sFilename_spatial_reference']
 
-        if 'sFilename_dem' in aParameter:
-            self.sFilename_dem = aParameter['sFilename_dem']
+        if 'sFilename_dem' in aConfig_in:
+            self.sFilename_dem = aConfig_in['sFilename_dem']
 
-        if 'sFilename_mesh_netcdf' in aParameter:
-            self.sFilename_mesh_netcdf = aParameter['sFilename_mesh_netcdf']
+        if 'sFilename_mesh_netcdf' in aConfig_in:
+            self.sFilename_mesh_netcdf = aConfig_in['sFilename_mesh_netcdf']
         
-        if 'sWorkspace_bin' in aParameter:
-            self.sWorkspace_bin= aParameter[ 'sWorkspace_bin']
+        if 'sWorkspace_bin' in aConfig_in:
+            self.sWorkspace_bin= aConfig_in[ 'sWorkspace_bin']
             
-        if 'sWorkspace_input' in aParameter:
-            self.sWorkspace_input = aParameter[ 'sWorkspace_input']
+        if 'sWorkspace_input' in aConfig_in:
+            self.sWorkspace_input = aConfig_in[ 'sWorkspace_input']
         
-        if 'sWorkspace_project' in aParameter:
-            self.sWorkspace_project= aParameter[ 'sWorkspace_project']
+        if 'sWorkspace_project' in aConfig_in:
+            self.sWorkspace_project= aConfig_in[ 'sWorkspace_project']
         
         if sWorkspace_output_in is not None:
             self.sWorkspace_output = sWorkspace_output_in
         else:
-            if 'sWorkspace_output' in aParameter:
-                self.sWorkspace_output = aParameter[ 'sWorkspace_output']
+            if 'sWorkspace_output' in aConfig_in:
+                self.sWorkspace_output = aConfig_in[ 'sWorkspace_output']
         
-        if 'sJob' in aParameter:
-            self.sJob =  aParameter['sJob'] 
-        if 'sRegion' in aParameter:
-            self.sRegion               = aParameter[ 'sRegion']
+        if 'sJob' in aConfig_in:
+            self.sJob =  aConfig_in['sJob'] 
+        if 'sRegion' in aConfig_in:
+            self.sRegion               = aConfig_in[ 'sRegion']
         
         if sModel_in is not None:
             self.sModel = sModel_in
         else:
-            if 'sModel' in aParameter:
-                self.sModel                = aParameter[ 'sModel']
+            if 'sModel' in aConfig_in:
+                self.sModel                = aConfig_in[ 'sModel']
 
                       
-        sDate   = aParameter[ 'sDate']
+        sDate   = aConfig_in[ 'sDate']
         if sDate is not None:
             self.sDate= sDate
         else:
@@ -250,8 +250,8 @@ class flowlinecase(object):
         sCase = self.sModel  + self.sDate + sCase_index
         self.sCase = sCase
 
-        if 'sMesh_type' in aParameter:
-            self.sMesh_type =  aParameter['sMesh_type']
+        if 'sMesh_type' in aConfig_in:
+            self.sMesh_type =  aConfig_in['sMesh_type']
         else:
             self.sMesh_type = 'hexagon'
 
@@ -277,7 +277,7 @@ class flowlinecase(object):
         
         #the model can be run as part of hexwatershed or standalone
         if self.iFlag_standalone == 1:
-            #in standalone case, will add case information 
+            #in standalone case, will add case information and update output path
             sPath = str(Path(self.sWorkspace_output)  /  sCase)
             self.sWorkspace_output = sPath
         else:
@@ -288,8 +288,8 @@ class flowlinecase(object):
 
         self.aBasin = list()
         if self.iFlag_flowline == 1:
-            if 'sFilename_basins' in aParameter:
-                self.sFilename_basins = aParameter['sFilename_basins']
+            if 'sFilename_basins' in aConfig_in:
+                self.sFilename_basins = aConfig_in['sFilename_basins']
                 with open(self.sFilename_basins) as json_file:
                     dummy_data = json.load(json_file)     
                     for i in range(self.nOutlet):

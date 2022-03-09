@@ -6,7 +6,16 @@ from pyflowline.classes.pycase import flowlinecase
 pDate = datetime.datetime.today()
 sDate_default = "{:04d}".format(pDate.year) + "{:02d}".format(pDate.month) + "{:02d}".format(pDate.day)
 
-def pyflowline_read_model_configuration_file(sFilename_configuration_in,   iFlag_standalone_in= None, iFlag_use_mesh_dem_in=None, iCase_index_in=None,   dResolution_degree_in = None,  dResolution_meter_in = None,  sMesh_type_in = None,  sModel_in = None, sDate_in = None,sWorkspace_output_in = None):
+def pyflowline_read_model_configuration_file(sFilename_configuration_in,   \
+    iFlag_standalone_in= None, \
+        iFlag_use_mesh_dem_in=None, \
+        iCase_index_in=None,   \
+            dResolution_degree_in = None,  \
+            dResolution_meter_in = None,  \
+                sMesh_type_in = None,  \
+                sModel_in = None, \
+                    sDate_in = None,\
+                    sWorkspace_output_in = None):
     """read a model configuration
 
     Args:

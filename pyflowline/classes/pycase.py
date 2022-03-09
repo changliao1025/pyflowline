@@ -276,10 +276,12 @@ class flowlinecase(object):
                             print('Unsupported mesh type?')
         
         #the model can be run as part of hexwatershed or standalone
-        if self.iFlag_standalone ==1:
+        if self.iFlag_standalone == 1:
+            #in standalone case, will add case information 
             sPath = str(Path(self.sWorkspace_output)  /  sCase)
             self.sWorkspace_output = sPath
         else:
+            #use specified output path, also do not add output or input tag
             sPath = self.sWorkspace_output
         
         Path(sPath).mkdir(parents=True, exist_ok=True)

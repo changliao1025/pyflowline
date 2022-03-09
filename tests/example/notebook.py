@@ -41,9 +41,9 @@ parser.add_argument("--sDate", help = "sDate",  type = str)
 pArgs = parser.parse_args()
 if len(sys.argv) == 1:
     sMesh_type = 'mpas'
-    iCase_index = 10
+    iCase_index = 1
     dResolution_meter=5000
-    sDate='20220201'
+    sDate='20220308'
 else:
     if len(sys.argv)> 1:
         sMesh_type = pArgs.sMesh_type
@@ -57,16 +57,15 @@ else:
 
 sPath = str( Path().resolve() )
 iFlag_option = 1
-if iFlag_option ==1:
+if iFlag_option == 1:
 
     
     sFilename_configuration_in = realpath( sPath +  '/tests/configurations/template.json' )
-    sPath_data = realpath( sPath +  '/data/susquehanna' )
+    sWorkspace_data = realpath( sPath +  '/data/susquehanna' )
     oPyflowline = pyflowline_generate_template_configuration_json_file(sFilename_configuration_in,\
-         sPath_data)
+         sWorkspace_data, sMesh_type_in=sMesh_type, iCase_index_in = iCase_index, sDate_in = sDate)
     print(oPyflowline.tojson())
-    #now you can customize the model object
-    oPyflowline.iCase_index = 1
+    
     print(oPyflowline.tojson())
 else: 
     if iFlag_option == 2:

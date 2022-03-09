@@ -98,8 +98,8 @@ class flowlinecase(object):
     dLatitude_bot = -90
     dLatitude_top = 90
     sFilename_model_configuration=''
-    sWorkspace_data=''     
-    sWorkspace_project=''    
+    sWorkspace_input=''     
+    #sWorkspace_project=''    
     sWorkspace_output=''    
     sRegion=''
     sModel=''
@@ -216,8 +216,8 @@ class flowlinecase(object):
         if 'sWorkspace_bin' in aParameter:
             self.sWorkspace_bin= aParameter[ 'sWorkspace_bin']
             
-        if 'sWorkspace_data' in aParameter:
-            self.sWorkspace_data = aParameter[ 'sWorkspace_data']
+        if 'sWorkspace_input' in aParameter:
+            self.sWorkspace_input = aParameter[ 'sWorkspace_input']
         
         if 'sWorkspace_project' in aParameter:
             self.sWorkspace_project= aParameter[ 'sWorkspace_project']
@@ -308,7 +308,6 @@ class flowlinecase(object):
       
         self.sFilename_mesh = os.path.join(str(Path(self.sWorkspace_output)  ) , sMesh_type + ".json" )               
         self.sFilename_mesh_info= os.path.join(str(Path(self.sWorkspace_output)  ) , sMesh_type + "_mesh_info.json"  )    
-        self.sWorkspace_data_project = str(Path(self.sWorkspace_data ) / self.sWorkspace_project)
                 
         return
         

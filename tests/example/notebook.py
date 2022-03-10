@@ -57,32 +57,32 @@ else:
 
 sPath = str( Path().resolve() )
 iFlag_option = 1
+sWorkspace_data = realpath( sPath +  '/data/susquehanna' )
+sWorkspace_input =  str(Path(sWorkspace_data)  /  'input')
+sWorkspace_output=  str(Path(sWorkspace_data)  /  'output')
 if iFlag_option == 1:
 
     
     sFilename_configuration_in = realpath( sPath +  '/tests/configurations/template.json' )
-    sWorkspace_data = realpath( sPath +  '/data/susquehanna' )
+    
     oPyflowline = pyflowline_generate_template_configuration_json_file(sFilename_configuration_in,\
-         sWorkspace_data, sMesh_type_in=sMesh_type, iCase_index_in = iCase_index, sDate_in = sDate)
-    print(oPyflowline.tojson())
+         sWorkspace_input, sWorkspace_output, sMesh_type_in=sMesh_type, iCase_index_in = iCase_index, sDate_in = sDate)
+    
     
     print(oPyflowline.tojson())
 else: 
     if iFlag_option == 2:
-        #an example configuration file is provided with the repository, but you need to update this file based on your own case study
-        #linux
-  
-        
+        #an example configuration file is provided with the repository, but you need to update this file based on your own case study        
         if sMesh_type=='hexagon':
-            sFilename_configuration_in = realpath( sPath +  '/../configurations/pyflowline_susquehanna_hexagon.json' )
+            sFilename_configuration_in = realpath( sPath +  '/tests/configurations/pyflowline_susquehanna_hexagon.json' )
         else:
             if sMesh_type=='square':
-                sFilename_configuration_in = realpath( sPath +  '/../configurations/pyflowline_susquehanna_square.json' )
+                sFilename_configuration_in = realpath( sPath +  '/test/configurations/pyflowline_susquehanna_square.json' )
             else:
                 if sMesh_type=='latlon':
-                    sFilename_configuration_in = realpath( sPath +  '/../configurations/pyflowline_susquehanna_latlon.json' )
+                    sFilename_configuration_in = realpath( sPath +  '/tests/configurations/pyflowline_susquehanna_latlon.json' )
                 else:
-                    sFilename_configuration_in = realpath( sPath +  '/../configurations/)pyflowline_susquehanna_mpas.json' )
+                    sFilename_configuration_in = realpath( sPath +  '/tests/configurations/)pyflowline_susquehanna_mpas.json' )
         
         
         oPyflowline = pyflowline_read_model_configuration_file(sFilename_configuration_in, iCase_index_in=iCase_index, dResolution_meter_in=dResolution_meter, sDate_in=sDate)

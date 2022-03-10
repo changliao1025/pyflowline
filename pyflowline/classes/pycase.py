@@ -98,9 +98,9 @@ class flowlinecase(object):
     dLatitude_bot = -90
     dLatitude_top = 90
     sFilename_model_configuration=''
-    sWorkspace_input=''     
-    #sWorkspace_project=''    
+    sWorkspace_input=''      
     sWorkspace_output=''    
+    #sWorkspace_output_case=''    
     sRegion=''
     sModel=''
     sMesh_type ='hexagon'
@@ -139,9 +139,6 @@ class flowlinecase(object):
         if 'iFlag_flowline' in aConfig_in:
             self.iFlag_flowline             = int(aConfig_in[ 'iFlag_flowline'])
         
-
-        
-
         if 'iFlag_global' in aConfig_in:
             self.iFlag_global             = int(aConfig_in[ 'iFlag_global'])
         
@@ -219,8 +216,7 @@ class flowlinecase(object):
         if 'sWorkspace_input' in aConfig_in:
             self.sWorkspace_input = aConfig_in[ 'sWorkspace_input']
         
-        if 'sWorkspace_project' in aConfig_in:
-            self.sWorkspace_project= aConfig_in[ 'sWorkspace_project']
+       
         
         if sWorkspace_output_in is not None:
             self.sWorkspace_output = sWorkspace_output_in

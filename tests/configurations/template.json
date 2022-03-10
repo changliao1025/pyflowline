@@ -9,7 +9,7 @@
     "iFlag_flowline": 1,
     "iFlag_save_mesh": 1,
     "iFlag_standalone": 1,
-    "iFlag_use_mesh_dem": 0,
+    "iFlag_use_mesh_dem": 1,
     "iFlag_use_shapefile_extent": 0,
     "iMesh_type": 4,
     "nOutlet": 1,

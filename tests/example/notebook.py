@@ -61,7 +61,6 @@ sWorkspace_data = realpath( sPath +  '/data/susquehanna' )
 sWorkspace_input =  str(Path(sWorkspace_data)  /  'input')
 sWorkspace_output=  str(Path(sWorkspace_data)  /  'output')
 if iFlag_option == 1:
-
     
     sFilename_configuration_in = realpath( sPath +  '/tests/configurations/template.json' )
     
@@ -77,7 +76,7 @@ else:
             sFilename_configuration_in = realpath( sPath +  '/tests/configurations/pyflowline_susquehanna_hexagon.json' )
         else:
             if sMesh_type=='square':
-                sFilename_configuration_in = realpath( sPath +  '/test/configurations/pyflowline_susquehanna_square.json' )
+                sFilename_configuration_in = realpath( sPath +  '/tests/configurations/pyflowline_susquehanna_square.json' )
             else:
                 if sMesh_type=='latlon':
                     sFilename_configuration_in = realpath( sPath +  '/tests/configurations/pyflowline_susquehanna_latlon.json' )
@@ -93,8 +92,15 @@ else:
 #convert the raw flowline into geojson in WGS84 system        
 oPyflowline.convert_flowline_to_json()
 
+oPyflowline.aBasin[0].dLatitude_outlet_degree=39.4620
+oPyflowline.aBasin[0].dLongitude_outlet_degree=-76.0093
+
 oPyflowline.flowline_simplification()
 
+oPyflowline.dLongitude_left= -79
+oPyflowline.dLongitude_right= -74.5
+oPyflowline.dLatitude_bot= 39.20
+oPyflowline.dLatitude_top= 42.8
 oPyflowline.mesh_generation()
 
 oPyflowline.reconstruct_topological_relationship()

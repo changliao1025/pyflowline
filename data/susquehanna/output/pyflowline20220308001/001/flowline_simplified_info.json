@@ -1,0 +1,3657 @@
+[
+    {
+        "dLength": 3572.1824616863414,
+        "dSinuosity": 1.060027745869336,
+        "iStream_segment": 215,
+        "lFlowlineID": 0,
+        "lIndex": 0,
+        "nEdge": 6,
+        "nVertex": 7,
+        "pVertex_end": {
+            "dLatitude_degree": 39.545934484148,
+            "dLongitude_degree": -76.076810427196
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 39.573698662955,
+            "dLongitude_degree": -76.0924596025752
+        }
+    },
+    {
+        "dLength": 325.36458898576694,
+        "dSinuosity": 1.0,
+        "iStream_segment": 214,
+        "lFlowlineID": 1,
+        "lIndex": 1,
+        "nEdge": 1,
+        "nVertex": 2,
+        "pVertex_end": {
+            "dLatitude_degree": 39.573698662955,
+            "dLongitude_degree": -76.0924596025752
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 39.5734965936578,
+            "dLongitude_degree": -76.0886768050739
+        }
+    },
+    {
+        "dLength": 7050.208254425396,
+        "dSinuosity": 1.0089237458045688,
+        "iStream_segment": 213,
+        "lFlowlineID": 2,
+        "lIndex": 2,
+        "nEdge": 14,
+        "nVertex": 15,
+        "pVertex_end": {
+            "dLatitude_degree": 39.573698662955,
+            "dLongitude_degree": -76.0924596025752
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 39.6203062820829,
+            "dLongitude_degree": -76.1470307643828
+        }
+    },
+    {
+        "dLength": 3063.5034344694686,
+        "dSinuosity": 1.0106025650697037,
+        "iStream_segment": 212,
+        "lFlowlineID": 3,
+        "lIndex": 3,
+        "nEdge": 5,
+        "nVertex": 6,
+        "pVertex_end": {
+            "dLatitude_degree": 39.6203062820829,
+            "dLongitude_degree": -76.1470307643828
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 39.6460648870666,
+            "dLongitude_degree": -76.1585008272001
+        }
+    },
+    {
+        "dLength": 684.6206043031426,
+        "dSinuosity": 1.0737494827682401,
+        "iStream_segment": 211,
+        "lFlowlineID": 4,
+        "lIndex": 4,
+        "nEdge": 3,
+        "nVertex": 4,
+        "pVertex_end": {
+            "dLatitude_degree": 39.6460648870666,
+            "dLongitude_degree": -76.1585008272001
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 39.6430372789164,
+            "dLongitude_degree": -76.1521866283897
+        }
+    },
+    {
+        "dLength": 26440.96635342814,
+        "dSinuosity": 1.0473850795888227,
+        "iStream_segment": 210,
+        "lFlowlineID": 5,
+        "lIndex": 5,
+        "nEdge": 58,
+        "nVertex": 59,
+        "pVertex_end": {
+            "dLatitude_degree": 39.6460648870666,
+            "dLongitude_degree": -76.1585008272001
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 39.8269466832301,
+            "dLongitude_degree": -76.3363748887028
+        }
+    },
+    {
+        "dLength": 3553.450805581508,
+        "dSinuosity": 1.0377270442271447,
+        "iStream_segment": 209,
+        "lFlowlineID": 6,
+        "lIndex": 6,
+        "nEdge": 16,
+        "nVertex": 17,
+        "pVertex_end": {
+            "dLatitude_degree": 39.8269466832301,
+            "dLongitude_degree": -76.3363748887028
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 39.809161956856,
+            "dLongitude_degree": -76.3036983309407
+        }
+    },
+    {
+        "dLength": 8024.9798706684005,
+        "dSinuosity": 1.1280999140548233,
+        "iStream_segment": 208,
+        "lFlowlineID": 7,
+        "lIndex": 7,
+        "nEdge": 25,
+        "nVertex": 26,
+        "pVertex_end": {
+            "dLatitude_degree": 39.8269466832301,
+            "dLongitude_degree": -76.3363748887028
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 39.8826836641845,
+            "dLongitude_degree": -76.3770927375618
+        }
+    },
+    {
+        "dLength": 37149.34235884465,
+        "dSinuosity": 1.1892168473035492,
+        "iStream_segment": 207,
+        "lFlowlineID": 8,
+        "lIndex": 8,
+        "nEdge": 63,
+        "nVertex": 64,
+        "pVertex_end": {
+            "dLatitude_degree": 39.8826836641845,
+            "dLongitude_degree": -76.3770927375618
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 40.068337221595,
+            "dLongitude_degree": -76.6516905152776
+        }
+    },
+    {
+        "dLength": 1581.039516551915,
+        "dSinuosity": 1.0996144266894412,
+        "iStream_segment": 206,
+        "lFlowlineID": 9,
+        "lIndex": 9,
+        "nEdge": 6,
+        "nVertex": 7,
+        "pVertex_end": {
+            "dLatitude_degree": 40.068337221595,
+            "dLongitude_degree": -76.6516905152776
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 40.0634448202413,
+            "dLongitude_degree": -76.6360710474412
+        }
+    },
+    {
+        "dLength": 2264.9840168529786,
+        "dSinuosity": 1.0021929858396357,
+        "iStream_segment": 205,
+        "lFlowlineID": 10,
+        "lIndex": 10,
+        "nEdge": 3,
+        "nVertex": 4,
+        "pVertex_end": {
+            "dLatitude_degree": 40.068337221595,
+            "dLongitude_degree": -76.6516905152776
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 40.0809866211804,
+            "dLongitude_degree": -76.6724429527321
+        }
+    },
+    {
+        "dLength": 926.0641265657157,
+        "dSinuosity": 1.070698791900587,
+        "iStream_segment": 204,
+        "lFlowlineID": 11,
+        "lIndex": 11,
+        "nEdge": 4,
+        "nVertex": 5,
+        "pVertex_end": {
+            "dLatitude_degree": 40.0809866211804,
+            "dLongitude_degree": -76.6724429527321
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 40.0735412189769,
+            "dLongitude_degree": -76.6753458161563
+        }
+    },
+    {
+        "dLength": 3096.8603951456985,
+        "dSinuosity": 1.0378265242518399,
+        "iStream_segment": 203,
+        "lFlowlineID": 12,
+        "lIndex": 12,
+        "nEdge": 4,
+        "nVertex": 5,
+        "pVertex_end": {
+            "dLatitude_degree": 40.0809866211804,
+            "dLongitude_degree": -76.6724429527321
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 40.1044712812343,
+            "dLongitude_degree": -76.6893360683815
+        }
+    },
+    {
+        "dLength": 603.0468200855614,
+        "dSinuosity": 1.0,
+        "iStream_segment": 202,
+        "lFlowlineID": 13,
+        "lIndex": 13,
+        "nEdge": 1,
+        "nVertex": 2,
+        "pVertex_end": {
+            "dLatitude_degree": 40.1044712812343,
+            "dLongitude_degree": -76.6893360683815
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 40.1020170854088,
+            "dLongitude_degree": -76.6830221039091
+        }
+    },
+    {
+        "dLength": 732.0249555029433,
+        "dSinuosity": 1.0455380000931769,
+        "iStream_segment": 201,
+        "lFlowlineID": 14,
+        "lIndex": 14,
+        "nEdge": 2,
+        "nVertex": 3,
+        "pVertex_end": {
+            "dLatitude_degree": 40.1044712812343,
+            "dLongitude_degree": -76.6893360683815
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 40.108506609727,
+            "dLongitude_degree": -76.6956435698167
+        }
+    },
+    {
+        "dLength": 381.8379964698993,
+        "dSinuosity": 1.0,
+        "iStream_segment": 200,
+        "lFlowlineID": 15,
+        "lIndex": 15,
+        "nEdge": 1,
+        "nVertex": 2,
+        "pVertex_end": {
+            "dLatitude_degree": 40.108506609727,
+            "dLongitude_degree": -76.6956435698167
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 40.1082214130586,
+            "dLongitude_degree": -76.6911742838921
+        }
+    },
+    {
+        "dLength": 52679.46614228887,
+        "dSinuosity": 1.2523061272885914,
+        "iStream_segment": 199,
+        "lFlowlineID": 16,
+        "lIndex": 16,
+        "nEdge": 415,
+        "nVertex": 416,
+        "pVertex_end": {
+            "dLatitude_degree": 40.108506609727,
+            "dLongitude_degree": -76.6956435698167
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 40.3961183451406,
+            "dLongitude_degree": -77.0167967324783
+        }
+    },
+    {
+        "dLength": 1274.0693427987526,
+        "dSinuosity": 1.0289471700700046,
+        "iStream_segment": 198,
+        "lFlowlineID": 17,
+        "lIndex": 17,
+        "nEdge": 8,
+        "nVertex": 9,
+        "pVertex_end": {
+            "dLatitude_degree": 40.3961183451406,
+            "dLongitude_degree": -77.0167967324783
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 40.4065471282639,
+            "dLongitude_degree": -77.0117167456011
+        }
+    },
+    {
+        "dLength": 2281.28256555153,
+        "dSinuosity": 1.0792177191906493,
+        "iStream_segment": 197,
+        "lFlowlineID": 18,
+        "lIndex": 18,
+        "nEdge": 51,
+        "nVertex": 52,
+        "pVertex_end": {
+            "dLatitude_degree": 40.4065471282639,
+            "dLongitude_degree": -77.0117167456011
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 40.4252327498331,
+            "dLongitude_degree": -77.01615613997
+        }
+    },
+    {
+        "dLength": 40163.430207494464,
+        "dSinuosity": 1.5140455391539889,
+        "iStream_segment": 196,
+        "lFlowlineID": 19,
+        "lIndex": 19,
+        "nEdge": 704,
+        "nVertex": 705,
+        "pVertex_end": {
+            "dLatitude_degree": 40.4252327498331,
+            "dLongitude_degree": -77.01615613997
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 40.5346555608164,
+            "dLongitude_degree": -77.2944639539913
+        }
+    },
+    {
+        "dLength": 2268.524506503211,
+        "dSinuosity": 1.085010181967473,
+        "iStream_segment": 195,
+        "lFlowlineID": 20,
+        "lIndex": 20,
+        "nEdge": 56,
+        "nVertex": 57,
+        "pVertex_end": {
+            "dLatitude_degree": 40.5346555608164,
+            "dLongitude_degree": -77.2944639539913
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 40.5276060988451,
+            "dLongitude_degree": -77.3173685518173
+        }
+    },
+    {
+        "dLength": 326.0699009813947,
+        "dSinuosity": 1.268317029538447,
+        "iStream_segment": 194,
+        "lFlowlineID": 21,
+        "lIndex": 21,
+        "nEdge": 10,
+        "nVertex": 11,
+        "pVertex_end": {
+            "dLatitude_degree": 40.5276060988451,
+            "dLongitude_degree": -77.3173685518173
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 40.5299141648717,
+            "dLongitude_degree": -77.3174743531875
+        }
+    },
+    {
+        "dLength": 13463.743605199086,
+        "dSinuosity": 1.3416413043488755,
+        "iStream_segment": 193,
+        "lFlowlineID": 22,
+        "lIndex": 22,
+        "nEdge": 189,
+        "nVertex": 190,
+        "pVertex_end": {
+            "dLatitude_degree": 40.5276060988451,
+            "dLongitude_degree": -77.3173685518173
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 40.5862861580735,
+            "dLongitude_degree": -77.4074434580856
+        }
+    },
+    {
+        "dLength": 1372.1343129078898,
+        "dSinuosity": 1.1106132938035065,
+        "iStream_segment": 192,
+        "lFlowlineID": 23,
+        "lIndex": 23,
+        "nEdge": 26,
+        "nVertex": 27,
+        "pVertex_end": {
+            "dLatitude_degree": 40.5862861580735,
+            "dLongitude_degree": -77.4074434580856
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 40.576700360286,
+            "dLongitude_degree": -77.4000784525004
+        }
+    },
+    {
+        "dLength": 11607.354365102883,
+        "dSinuosity": 1.2364494179303926,
+        "iStream_segment": 191,
+        "lFlowlineID": 24,
+        "lIndex": 24,
+        "nEdge": 244,
+        "nVertex": 245,
+        "pVertex_end": {
+            "dLatitude_degree": 40.5862861580735,
+            "dLongitude_degree": -77.4074434580856
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 40.5879255652942,
+            "dLongitude_degree": -77.5184689963545
+        }
+    },
+    {
+        "dLength": 35382.654455605814,
+        "dSinuosity": 1.613342702082951,
+        "iStream_segment": 190,
+        "lFlowlineID": 25,
+        "lIndex": 25,
+        "nEdge": 625,
+        "nVertex": 626,
+        "pVertex_end": {
+            "dLatitude_degree": 40.5879255652942,
+            "dLongitude_degree": -77.5184689963545
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 40.4774393936413,
+            "dLongitude_degree": -77.7330842088673
+        }
+    },
+    {
+        "dLength": 398.4465612083695,
+        "dSinuosity": 1.0453716496280265,
+        "iStream_segment": 189,
+        "lFlowlineID": 26,
+        "lIndex": 26,
+        "nEdge": 8,
+        "nVertex": 9,
+        "pVertex_end": {
+            "dLatitude_degree": 40.4774393936413,
+            "dLongitude_degree": -77.7330842088673
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 40.4806149257154,
+            "dLongitude_degree": -77.734767543446
+        }
+    },
+    {
+        "dLength": 15472.70682675573,
+        "dSinuosity": 1.176433072681673,
+        "iStream_segment": 188,
+        "lFlowlineID": 27,
+        "lIndex": 27,
+        "nEdge": 221,
+        "nVertex": 222,
+        "pVertex_end": {
+            "dLatitude_degree": 40.4774393936413,
+            "dLongitude_degree": -77.7330842088673
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 40.3895000049133,
+            "dLongitude_degree": -77.8367460377102
+        }
+    },
+    {
+        "dLength": 1448.2054418637274,
+        "dSinuosity": 1.59244445608014,
+        "iStream_segment": 187,
+        "lFlowlineID": 28,
+        "lIndex": 28,
+        "nEdge": 26,
+        "nVertex": 27,
+        "pVertex_end": {
+            "dLatitude_degree": 40.3895000049133,
+            "dLongitude_degree": -77.8367460377102
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 40.3813321360092,
+            "dLongitude_degree": -77.8369593500763
+        }
+    },
+    {
+        "dLength": 28553.50160669892,
+        "dSinuosity": 2.0545702202893845,
+        "iStream_segment": 186,
+        "lFlowlineID": 29,
+        "lIndex": 29,
+        "nEdge": 527,
+        "nVertex": 528,
+        "pVertex_end": {
+            "dLatitude_degree": 40.3895000049133,
+            "dLongitude_degree": -77.8367460377102
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 40.4551915216344,
+            "dLongitude_degree": -77.9761985507381
+        }
+    },
+    {
+        "dLength": 166.86319966830095,
+        "dSinuosity": 1.038133400117009,
+        "iStream_segment": 185,
+        "lFlowlineID": 30,
+        "lIndex": 30,
+        "nEdge": 7,
+        "nVertex": 8,
+        "pVertex_end": {
+            "dLatitude_degree": 40.5879255652942,
+            "dLongitude_degree": -77.5184689963545
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 40.5867131656261,
+            "dLongitude_degree": -77.5195015957268
+        }
+    },
+    {
+        "dLength": 309.6676297365002,
+        "dSinuosity": 1.1548103530791063,
+        "iStream_segment": 184,
+        "lFlowlineID": 31,
+        "lIndex": 31,
+        "nEdge": 8,
+        "nVertex": 9,
+        "pVertex_end": {
+            "dLatitude_degree": 40.5346555608164,
+            "dLongitude_degree": -77.2944639539913
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 40.5363412934193,
+            "dLongitude_degree": -77.2921998214813
+        }
+    },
+    {
+        "dLength": 323.28004187738287,
+        "dSinuosity": 1.002067681940864,
+        "iStream_segment": 183,
+        "lFlowlineID": 32,
+        "lIndex": 32,
+        "nEdge": 4,
+        "nVertex": 5,
+        "pVertex_end": {
+            "dLatitude_degree": 40.4252327498331,
+            "dLongitude_degree": -77.01615613997
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 40.4237589566232,
+            "dLongitude_degree": -77.0128782136665
+        }
+    },
+    {
+        "dLength": 604.2041537603228,
+        "dSinuosity": 1.119565489601572,
+        "iStream_segment": 182,
+        "lFlowlineID": 33,
+        "lIndex": 33,
+        "nEdge": 10,
+        "nVertex": 11,
+        "pVertex_end": {
+            "dLatitude_degree": 40.4065471282639,
+            "dLongitude_degree": -77.0117167456011
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 40.4108253157692,
+            "dLongitude_degree": -77.0147116067419
+        }
+    },
+    {
+        "dLength": 46916.608775687426,
+        "dSinuosity": 1.1868651020256473,
+        "iStream_segment": 181,
+        "lFlowlineID": 34,
+        "lIndex": 34,
+        "nEdge": 122,
+        "nVertex": 123,
+        "pVertex_end": {
+            "dLatitude_degree": 40.3961183451406,
+            "dLongitude_degree": -77.0167967324783
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 40.728490578353,
+            "dLongitude_degree": -76.8522484172211
+        }
+    },
+    {
+        "dLength": 3465.1922937054046,
+        "dSinuosity": 1.005224898312225,
+        "iStream_segment": 180,
+        "lFlowlineID": 35,
+        "lIndex": 35,
+        "nEdge": 6,
+        "nVertex": 7,
+        "pVertex_end": {
+            "dLatitude_degree": 40.728490578353,
+            "dLongitude_degree": -76.8522484172211
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 40.7594391066999,
+            "dLongitude_degree": -76.8536428425559
+        }
+    },
+    {
+        "dLength": 608.1574047697839,
+        "dSinuosity": 1.0,
+        "iStream_segment": 179,
+        "lFlowlineID": 36,
+        "lIndex": 36,
+        "nEdge": 1,
+        "nVertex": 2,
+        "pVertex_end": {
+            "dLatitude_degree": 40.7594391066999,
+            "dLongitude_degree": -76.8536428425559
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 40.7649017052601,
+            "dLongitude_degree": -76.8537472471581
+        }
+    },
+    {
+        "dLength": 278.8049866097192,
+        "dSinuosity": 1.0,
+        "iStream_segment": 178,
+        "lFlowlineID": 37,
+        "lIndex": 37,
+        "nEdge": 1,
+        "nVertex": 2,
+        "pVertex_end": {
+            "dLatitude_degree": 40.7649017052601,
+            "dLongitude_degree": -76.8537472471581
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 40.7668829055459,
+            "dLongitude_degree": -76.8557702498438
+        }
+    },
+    {
+        "dLength": 204.73457840256356,
+        "dSinuosity": 1.0344814965888665,
+        "iStream_segment": 177,
+        "lFlowlineID": 38,
+        "lIndex": 38,
+        "nEdge": 3,
+        "nVertex": 4,
+        "pVertex_end": {
+            "dLatitude_degree": 40.7668829055459,
+            "dLongitude_degree": -76.8557702498438
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 40.7658225066027,
+            "dLongitude_degree": -76.8576543832598
+        }
+    },
+    {
+        "dLength": 209.47869321380927,
+        "dSinuosity": 1.0,
+        "iStream_segment": 176,
+        "lFlowlineID": 39,
+        "lIndex": 39,
+        "nEdge": 1,
+        "nVertex": 2,
+        "pVertex_end": {
+            "dLatitude_degree": 40.7668829055459,
+            "dLongitude_degree": -76.8557702498438
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 40.76872737191,
+            "dLongitude_degree": -76.8562625849642
+        }
+    },
+    {
+        "dLength": 131.75576223589678,
+        "dSinuosity": 1.012191113616499,
+        "iStream_segment": 175,
+        "lFlowlineID": 40,
+        "lIndex": 40,
+        "nEdge": 3,
+        "nVertex": 4,
+        "pVertex_end": {
+            "dLatitude_degree": 40.76872737191,
+            "dLongitude_degree": -76.8562625849642
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 40.7693747055886,
+            "dLongitude_degree": -76.8575483861609
+        }
+    },
+    {
+        "dLength": 626.7331647236125,
+        "dSinuosity": 1.001678216619061,
+        "iStream_segment": 174,
+        "lFlowlineID": 41,
+        "lIndex": 41,
+        "nEdge": 2,
+        "nVertex": 3,
+        "pVertex_end": {
+            "dLatitude_degree": 40.76872737191,
+            "dLongitude_degree": -76.8562625849642
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 40.7743105040659,
+            "dLongitude_degree": -76.8571181900476
+        }
+    },
+    {
+        "dLength": 3658.0273384076663,
+        "dSinuosity": 1.05044683419107,
+        "iStream_segment": 173,
+        "lFlowlineID": 42,
+        "lIndex": 42,
+        "nEdge": 9,
+        "nVertex": 10,
+        "pVertex_end": {
+            "dLatitude_degree": 40.7743105040659,
+            "dLongitude_degree": -76.8571181900476
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 40.8047125586515,
+            "dLongitude_degree": -76.8473844104249
+        }
+    },
+    {
+        "dLength": 999.1026326237675,
+        "dSinuosity": 1.0049025441547512,
+        "iStream_segment": 172,
+        "lFlowlineID": 43,
+        "lIndex": 43,
+        "nEdge": 2,
+        "nVertex": 3,
+        "pVertex_end": {
+            "dLatitude_degree": 40.8047125586515,
+            "dLongitude_degree": -76.8473844104249
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 40.8132452883582,
+            "dLongitude_degree": -76.8438986824498
+        }
+    },
+    {
+        "dLength": 1401.3301529650657,
+        "dSinuosity": 1.004837005029877,
+        "iStream_segment": 171,
+        "lFlowlineID": 44,
+        "lIndex": 44,
+        "nEdge": 3,
+        "nVertex": 4,
+        "pVertex_end": {
+            "dLatitude_degree": 40.8132452883582,
+            "dLongitude_degree": -76.8438986824498
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 40.8239586822562,
+            "dLongitude_degree": -76.8353180204154
+        }
+    },
+    {
+        "dLength": 361.7608523932423,
+        "dSinuosity": 1.0115282999620556,
+        "iStream_segment": 170,
+        "lFlowlineID": 45,
+        "lIndex": 45,
+        "nEdge": 4,
+        "nVertex": 5,
+        "pVertex_end": {
+            "dLatitude_degree": 40.8239586822562,
+            "dLongitude_degree": -76.8353180204154
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 40.8208185494051,
+            "dLongitude_degree": -76.8344206840061
+        }
+    },
+    {
+        "dLength": 985.1797640234486,
+        "dSinuosity": 1.0624234617709154,
+        "iStream_segment": 169,
+        "lFlowlineID": 46,
+        "lIndex": 46,
+        "nEdge": 23,
+        "nVertex": 24,
+        "pVertex_end": {
+            "dLatitude_degree": 40.8208185494051,
+            "dLongitude_degree": -76.8344206840061
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 40.8276109452277,
+            "dLongitude_degree": -76.8280482864907
+        }
+    },
+    {
+        "dLength": 350.94921360467436,
+        "dSinuosity": 1.0308694471514936,
+        "iStream_segment": 168,
+        "lFlowlineID": 47,
+        "lIndex": 47,
+        "nEdge": 5,
+        "nVertex": 6,
+        "pVertex_end": {
+            "dLatitude_degree": 40.8208185494051,
+            "dLongitude_degree": -76.8344206840061
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 40.8180456841143,
+            "dLongitude_degree": -76.8361252158785
+        }
+    },
+    {
+        "dLength": 633.9984005670424,
+        "dSinuosity": 1.0781472697564285,
+        "iStream_segment": 167,
+        "lFlowlineID": 48,
+        "lIndex": 48,
+        "nEdge": 8,
+        "nVertex": 9,
+        "pVertex_end": {
+            "dLatitude_degree": 40.8180456841143,
+            "dLongitude_degree": -76.8361252158785
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 40.8129284861231,
+            "dLongitude_degree": -76.8378576124745
+        }
+    },
+    {
+        "dLength": 289.54188271370566,
+        "dSinuosity": 1.0116520801211546,
+        "iStream_segment": 166,
+        "lFlowlineID": 49,
+        "lIndex": 49,
+        "nEdge": 3,
+        "nVertex": 4,
+        "pVertex_end": {
+            "dLatitude_degree": 40.8180456841143,
+            "dLongitude_degree": -76.8361252158785
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 40.8155422844755,
+            "dLongitude_degree": -76.835351080063
+        }
+    },
+    {
+        "dLength": 1934.0093864161279,
+        "dSinuosity": 1.0030001310311414,
+        "iStream_segment": 165,
+        "lFlowlineID": 50,
+        "lIndex": 50,
+        "nEdge": 6,
+        "nVertex": 7,
+        "pVertex_end": {
+            "dLatitude_degree": 40.8239586822562,
+            "dLongitude_degree": -76.8353180204154
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 40.8374007400325,
+            "dLongitude_degree": -76.8208798244392
+        }
+    },
+    {
+        "dLength": 489.6437681579028,
+        "dSinuosity": 1.0,
+        "iStream_segment": 164,
+        "lFlowlineID": 51,
+        "lIndex": 51,
+        "nEdge": 1,
+        "nVertex": 2,
+        "pVertex_end": {
+            "dLatitude_degree": 40.8374007400325,
+            "dLongitude_degree": -76.8208798244392
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 40.8384059376755,
+            "dLongitude_degree": -76.8152198224555
+        }
+    },
+    {
+        "dLength": 809.2828913719247,
+        "dSinuosity": 1.0060620425945794,
+        "iStream_segment": 163,
+        "lFlowlineID": 52,
+        "lIndex": 52,
+        "nEdge": 7,
+        "nVertex": 8,
+        "pVertex_end": {
+            "dLatitude_degree": 40.8384059376755,
+            "dLongitude_degree": -76.8152198224555
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 40.8311973397417,
+            "dLongitude_degree": -76.8158842834031
+        }
+    },
+    {
+        "dLength": 1168.7463669477363,
+        "dSinuosity": 1.0574525827999808,
+        "iStream_segment": 162,
+        "lFlowlineID": 53,
+        "lIndex": 53,
+        "nEdge": 6,
+        "nVertex": 7,
+        "pVertex_end": {
+            "dLatitude_degree": 40.8384059376755,
+            "dLongitude_degree": -76.8152198224555
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 40.8467950663183,
+            "dLongitude_degree": -76.8082002926699
+        }
+    },
+    {
+        "dLength": 859.155334155466,
+        "dSinuosity": 2.1329744758142923,
+        "iStream_segment": 161,
+        "lFlowlineID": 54,
+        "lIndex": 54,
+        "nEdge": 9,
+        "nVertex": 10,
+        "pVertex_end": {
+            "dLatitude_degree": 40.8467950663183,
+            "dLongitude_degree": -76.8082002926699
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 40.8439127326362,
+            "dLongitude_degree": -76.8053086888053
+        }
+    },
+    {
+        "dLength": 651.6002104476283,
+        "dSinuosity": 1.0948287548000477,
+        "iStream_segment": 160,
+        "lFlowlineID": 55,
+        "lIndex": 55,
+        "nEdge": 5,
+        "nVertex": 6,
+        "pVertex_end": {
+            "dLatitude_degree": 40.8467950663183,
+            "dLongitude_degree": -76.8082002926699
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 40.8416013336562,
+            "dLongitude_degree": -76.8065232874666
+        }
+    },
+    {
+        "dLength": 3373.884041985336,
+        "dSinuosity": 1.045090214423976,
+        "iStream_segment": 159,
+        "lFlowlineID": 56,
+        "lIndex": 56,
+        "nEdge": 12,
+        "nVertex": 13,
+        "pVertex_end": {
+            "dLatitude_degree": 40.8374007400325,
+            "dLongitude_degree": -76.8208798244392
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 40.8624472600413,
+            "dLongitude_degree": -76.801554102539
+        }
+    },
+    {
+        "dLength": 1687.9181651974316,
+        "dSinuosity": 1.0041382070542633,
+        "iStream_segment": 158,
+        "lFlowlineID": 57,
+        "lIndex": 57,
+        "nEdge": 3,
+        "nVertex": 4,
+        "pVertex_end": {
+            "dLatitude_degree": 40.8624472600413,
+            "dLongitude_degree": -76.801554102539
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 40.8767116542377,
+            "dLongitude_degree": -76.7950022446548
+        }
+    },
+    {
+        "dLength": 3433.3209474911787,
+        "dSinuosity": 1.0396836114174062,
+        "iStream_segment": 157,
+        "lFlowlineID": 58,
+        "lIndex": 58,
+        "nEdge": 26,
+        "nVertex": 27,
+        "pVertex_end": {
+            "dLatitude_degree": 40.8767116542377,
+            "dLongitude_degree": -76.7950022446548
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 40.8991424400634,
+            "dLongitude_degree": -76.7693234510198
+        }
+    },
+    {
+        "dLength": 5603.305340512471,
+        "dSinuosity": 1.0491730089249498,
+        "iStream_segment": 156,
+        "lFlowlineID": 59,
+        "lIndex": 59,
+        "nEdge": 44,
+        "nVertex": 45,
+        "pVertex_end": {
+            "dLatitude_degree": 40.8991424400634,
+            "dLongitude_degree": -76.7693234510198
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 40.9256720782845,
+            "dLongitude_degree": -76.716428032378
+        }
+    },
+    {
+        "dLength": 4729.955076337348,
+        "dSinuosity": 1.0285563320034574,
+        "iStream_segment": 155,
+        "lFlowlineID": 60,
+        "lIndex": 60,
+        "nEdge": 33,
+        "nVertex": 34,
+        "pVertex_end": {
+            "dLatitude_degree": 40.9256720782845,
+            "dLongitude_degree": -76.716428032378
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 40.9458697854492,
+            "dLongitude_degree": -76.6687264034651
+        }
+    },
+    {
+        "dLength": 21356.2686183188,
+        "dSinuosity": 1.248353190979636,
+        "iStream_segment": 154,
+        "lFlowlineID": 61,
+        "lIndex": 61,
+        "nEdge": 166,
+        "nVertex": 167,
+        "pVertex_end": {
+            "dLatitude_degree": 40.9458697854492,
+            "dLongitude_degree": -76.6687264034651
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 40.9694703511859,
+            "dLongitude_degree": -76.4676432257124
+        }
+    },
+    {
+        "dLength": 362.0696366384304,
+        "dSinuosity": 1.0144979338149482,
+        "iStream_segment": 153,
+        "lFlowlineID": 62,
+        "lIndex": 62,
+        "nEdge": 4,
+        "nVertex": 5,
+        "pVertex_end": {
+            "dLatitude_degree": 40.9694703511859,
+            "dLongitude_degree": -76.4676432257124
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 40.9675125534626,
+            "dLongitude_degree": -76.4710056277436
+        }
+    },
+    {
+        "dLength": 28108.205613331815,
+        "dSinuosity": 1.0609997475035022,
+        "iStream_segment": 152,
+        "lFlowlineID": 63,
+        "lIndex": 63,
+        "nEdge": 246,
+        "nVertex": 247,
+        "pVertex_end": {
+            "dLatitude_degree": 40.9694703511859,
+            "dLongitude_degree": -76.4676432257124
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.0642959586397,
+            "dLongitude_degree": -76.1783509974736
+        }
+    },
+    {
+        "dLength": 9589.603297900649,
+        "dSinuosity": 1.327016213131917,
+        "iStream_segment": 151,
+        "lFlowlineID": 64,
+        "lIndex": 64,
+        "nEdge": 84,
+        "nVertex": 85,
+        "pVertex_end": {
+            "dLatitude_degree": 41.0642959586397,
+            "dLongitude_degree": -76.1783509974736
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.1205715354896,
+            "dLongitude_degree": -76.1354131959121
+        }
+    },
+    {
+        "dLength": 444.22793360814705,
+        "dSinuosity": 1.2629028517978613,
+        "iStream_segment": 150,
+        "lFlowlineID": 65,
+        "lIndex": 65,
+        "nEdge": 6,
+        "nVertex": 7,
+        "pVertex_end": {
+            "dLatitude_degree": 41.1205715354896,
+            "dLongitude_degree": -76.1354131959121
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.1176210693507,
+            "dLongitude_degree": -76.1369145953355
+        }
+    },
+    {
+        "dLength": 1720.8873131590506,
+        "dSinuosity": 1.0428416932501499,
+        "iStream_segment": 149,
+        "lFlowlineID": 66,
+        "lIndex": 66,
+        "nEdge": 18,
+        "nVertex": 19,
+        "pVertex_end": {
+            "dLatitude_degree": 41.1205715354896,
+            "dLongitude_degree": -76.1354131959121
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.1341855435677,
+            "dLongitude_degree": -76.1432004749922
+        }
+    },
+    {
+        "dLength": 442.3570268737971,
+        "dSinuosity": 1.040208755423204,
+        "iStream_segment": 148,
+        "lFlowlineID": 67,
+        "lIndex": 67,
+        "nEdge": 5,
+        "nVertex": 6,
+        "pVertex_end": {
+            "dLatitude_degree": 41.1341855435677,
+            "dLongitude_degree": -76.1432004749922
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.1303657428281,
+            "dLongitude_degree": -76.1431312062613
+        }
+    },
+    {
+        "dLength": 743.4106492832233,
+        "dSinuosity": 1.2380985759043108,
+        "iStream_segment": 147,
+        "lFlowlineID": 68,
+        "lIndex": 68,
+        "nEdge": 12,
+        "nVertex": 13,
+        "pVertex_end": {
+            "dLatitude_degree": 41.1303657428281,
+            "dLongitude_degree": -76.1431312062613
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.1250856741589,
+            "dLongitude_degree": -76.141667869165
+        }
+    },
+    {
+        "dLength": 574.1868967664293,
+        "dSinuosity": 1.032250342136492,
+        "iStream_segment": 146,
+        "lFlowlineID": 69,
+        "lIndex": 69,
+        "nEdge": 8,
+        "nVertex": 9,
+        "pVertex_end": {
+            "dLatitude_degree": 41.1303657428281,
+            "dLongitude_degree": -76.1431312062613
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.127118338643,
+            "dLongitude_degree": -76.1380892678746
+        }
+    },
+    {
+        "dLength": 14168.171951567749,
+        "dSinuosity": 1.1057568157637438,
+        "iStream_segment": 145,
+        "lFlowlineID": 70,
+        "lIndex": 70,
+        "nEdge": 104,
+        "nVertex": 105,
+        "pVertex_end": {
+            "dLatitude_degree": 41.1341855435677,
+            "dLongitude_degree": -76.1432004749922
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.2152636254535,
+            "dLongitude_degree": -76.0346591915363
+        }
+    },
+    {
+        "dLength": 2882.261168571547,
+        "dSinuosity": 1.0551458942048488,
+        "iStream_segment": 144,
+        "lFlowlineID": 71,
+        "lIndex": 71,
+        "nEdge": 17,
+        "nVertex": 18,
+        "pVertex_end": {
+            "dLatitude_degree": 41.2152636254535,
+            "dLongitude_degree": -76.0346591915363
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.2050932407416,
+            "dLongitude_degree": -76.0643438681148
+        }
+    },
+    {
+        "dLength": 50905.69315399571,
+        "dSinuosity": 1.7335109365194479,
+        "iStream_segment": 143,
+        "lFlowlineID": 72,
+        "lIndex": 72,
+        "nEdge": 442,
+        "nVertex": 443,
+        "pVertex_end": {
+            "dLatitude_degree": 41.2152636254535,
+            "dLongitude_degree": -76.0346591915363
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.4560427606285,
+            "dLongitude_degree": -75.891132015604
+        }
+    },
+    {
+        "dLength": 6709.863315582536,
+        "dSinuosity": 1.1162100417623475,
+        "iStream_segment": 142,
+        "lFlowlineID": 73,
+        "lIndex": 73,
+        "nEdge": 66,
+        "nVertex": 67,
+        "pVertex_end": {
+            "dLatitude_degree": 41.4560427606285,
+            "dLongitude_degree": -75.891132015604
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.5089788593916,
+            "dLongitude_degree": -75.9053720375363
+        }
+    },
+    {
+        "dLength": 9968.518905184153,
+        "dSinuosity": 1.3644931175420705,
+        "iStream_segment": 141,
+        "lFlowlineID": 74,
+        "lIndex": 74,
+        "nEdge": 88,
+        "nVertex": 89,
+        "pVertex_end": {
+            "dLatitude_degree": 41.5089788593916,
+            "dLongitude_degree": -75.9053720375363
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.547532280979,
+            "dLongitude_degree": -75.9763147513888
+        }
+    },
+    {
+        "dLength": 3948.574109265075,
+        "dSinuosity": 1.5649652000161445,
+        "iStream_segment": 140,
+        "lFlowlineID": 75,
+        "lIndex": 75,
+        "nEdge": 36,
+        "nVertex": 37,
+        "pVertex_end": {
+            "dLatitude_degree": 41.547532280979,
+            "dLongitude_degree": -75.9763147513888
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.5584831793982,
+            "dLongitude_degree": -76.002832572623
+        }
+    },
+    {
+        "dLength": 8284.132998134663,
+        "dSinuosity": 5.234135874766087,
+        "iStream_segment": 139,
+        "lFlowlineID": 76,
+        "lIndex": 76,
+        "nEdge": 56,
+        "nVertex": 57,
+        "pVertex_end": {
+            "dLatitude_degree": 41.5584831793982,
+            "dLongitude_degree": -76.002832572623
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.5598521033622,
+            "dLongitude_degree": -76.0217450965905
+        }
+    },
+    {
+        "dLength": 6112.585921355262,
+        "dSinuosity": 1.3841614905266604,
+        "iStream_segment": 138,
+        "lFlowlineID": 77,
+        "lIndex": 77,
+        "nEdge": 57,
+        "nVertex": 58,
+        "pVertex_end": {
+            "dLatitude_degree": 41.5598521033622,
+            "dLongitude_degree": -76.0217450965905
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.5924698698035,
+            "dLongitude_degree": -76.0519283381909
+        }
+    },
+    {
+        "dLength": 597.8686757075417,
+        "dSinuosity": 1.0178360361509466,
+        "iStream_segment": 137,
+        "lFlowlineID": 78,
+        "lIndex": 78,
+        "nEdge": 8,
+        "nVertex": 9,
+        "pVertex_end": {
+            "dLatitude_degree": 41.5924698698035,
+            "dLongitude_degree": -76.0519283381909
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.5974214683642,
+            "dLongitude_degree": -76.0494902715582
+        }
+    },
+    {
+        "dLength": 589.3787189355223,
+        "dSinuosity": 1.2108534514585663,
+        "iStream_segment": 136,
+        "lFlowlineID": 79,
+        "lIndex": 79,
+        "nEdge": 11,
+        "nVertex": 12,
+        "pVertex_end": {
+            "dLatitude_degree": 41.5974214683642,
+            "dLongitude_degree": -76.0494902715582
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.5939391349264,
+            "dLongitude_degree": -76.0530261370214
+        }
+    },
+    {
+        "dLength": 20512.742853040767,
+        "dSinuosity": 1.494942009705344,
+        "iStream_segment": 135,
+        "lFlowlineID": 80,
+        "lIndex": 80,
+        "nEdge": 166,
+        "nVertex": 167,
+        "pVertex_end": {
+            "dLatitude_degree": 41.5974214683642,
+            "dLongitude_degree": -76.0494902715582
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.6502165789547,
+            "dLongitude_degree": -76.1984929888311
+        }
+    },
+    {
+        "dLength": 12930.721796418222,
+        "dSinuosity": 1.83257926661964,
+        "iStream_segment": 134,
+        "lFlowlineID": 81,
+        "lIndex": 81,
+        "nEdge": 113,
+        "nVertex": 114,
+        "pVertex_end": {
+            "dLatitude_degree": 41.6502165789547,
+            "dLongitude_degree": -76.1984929888311
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.6763102316762,
+            "dLongitude_degree": -76.275815938152
+        }
+    },
+    {
+        "dLength": 452.7270830437493,
+        "dSinuosity": 1.073061630170443,
+        "iStream_segment": 133,
+        "lFlowlineID": 82,
+        "lIndex": 82,
+        "nEdge": 8,
+        "nVertex": 9,
+        "pVertex_end": {
+            "dLatitude_degree": 41.6763102316762,
+            "dLongitude_degree": -76.275815938152
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.6730585028882,
+            "dLongitude_degree": -76.2784224781878
+        }
+    },
+    {
+        "dLength": 3052.7581783936675,
+        "dSinuosity": 1.2716304496163615,
+        "iStream_segment": 132,
+        "lFlowlineID": 83,
+        "lIndex": 83,
+        "nEdge": 27,
+        "nVertex": 28,
+        "pVertex_end": {
+            "dLatitude_degree": 41.6763102316762,
+            "dLongitude_degree": -76.275815938152
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.6952174713854,
+            "dLongitude_degree": -76.2897051292599
+        }
+    },
+    {
+        "dLength": 431.4577951929521,
+        "dSinuosity": 1.0747826463628207,
+        "iStream_segment": 131,
+        "lFlowlineID": 84,
+        "lIndex": 84,
+        "nEdge": 9,
+        "nVertex": 10,
+        "pVertex_end": {
+            "dLatitude_degree": 41.6952174713854,
+            "dLongitude_degree": -76.2897051292599
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.695525004199,
+            "dLongitude_degree": -76.2945170671562
+        }
+    },
+    {
+        "dLength": 3598.335934299629,
+        "dSinuosity": 1.2316790656417769,
+        "iStream_segment": 130,
+        "lFlowlineID": 85,
+        "lIndex": 85,
+        "nEdge": 29,
+        "nVertex": 30,
+        "pVertex_end": {
+            "dLatitude_degree": 41.695525004199,
+            "dLongitude_degree": -76.2945170671562
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.7015604617453,
+            "dLongitude_degree": -76.328723961339
+        }
+    },
+    {
+        "dLength": 293.14385512133396,
+        "dSinuosity": 1.0574399247417994,
+        "iStream_segment": 129,
+        "lFlowlineID": 86,
+        "lIndex": 86,
+        "nEdge": 6,
+        "nVertex": 7,
+        "pVertex_end": {
+            "dLatitude_degree": 41.7015604617453,
+            "dLongitude_degree": -76.328723961339
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.7037595919492,
+            "dLongitude_degree": -76.3302890934941
+        }
+    },
+    {
+        "dLength": 626.61622916996,
+        "dSinuosity": 1.0366008293739917,
+        "iStream_segment": 128,
+        "lFlowlineID": 87,
+        "lIndex": 87,
+        "nEdge": 8,
+        "nVertex": 9,
+        "pVertex_end": {
+            "dLatitude_degree": 41.7037595919492,
+            "dLongitude_degree": -76.3302890934941
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.7090687844865,
+            "dLongitude_degree": -76.3287618852306
+        }
+    },
+    {
+        "dLength": 364.4972730220495,
+        "dSinuosity": 1.1087954223821388,
+        "iStream_segment": 127,
+        "lFlowlineID": 88,
+        "lIndex": 88,
+        "nEdge": 6,
+        "nVertex": 7,
+        "pVertex_end": {
+            "dLatitude_degree": 41.7037595919492,
+            "dLongitude_degree": -76.3302890934941
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.7008379960602,
+            "dLongitude_degree": -76.3308648977756
+        }
+    },
+    {
+        "dLength": 6265.001923914588,
+        "dSinuosity": 1.299695728383795,
+        "iStream_segment": 126,
+        "lFlowlineID": 89,
+        "lIndex": 89,
+        "nEdge": 52,
+        "nVertex": 53,
+        "pVertex_end": {
+            "dLatitude_degree": 41.7015604617453,
+            "dLongitude_degree": -76.328723961339
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.7437233358115,
+            "dLongitude_degree": -76.3155040283092
+        }
+    },
+    {
+        "dLength": 8.816190576498995,
+        "dSinuosity": 1.0,
+        "iStream_segment": 125,
+        "lFlowlineID": 90,
+        "lIndex": 90,
+        "nEdge": 1,
+        "nVertex": 2,
+        "pVertex_end": {
+            "dLatitude_degree": 41.7437233358115,
+            "dLongitude_degree": -76.3155040283092
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.7438020023669,
+            "dLongitude_degree": -76.3155162948895
+        }
+    },
+    {
+        "dLength": 1277.593335550579,
+        "dSinuosity": 1.073273770314979,
+        "iStream_segment": 124,
+        "lFlowlineID": 91,
+        "lIndex": 91,
+        "nEdge": 13,
+        "nVertex": 14,
+        "pVertex_end": {
+            "dLatitude_degree": 41.7438020023669,
+            "dLongitude_degree": -76.3155162948895
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.7412693390528,
+            "dLongitude_degree": -76.3294399119128
+        }
+    },
+    {
+        "dLength": 513.1624785872069,
+        "dSinuosity": 1.0611852074421588,
+        "iStream_segment": 123,
+        "lFlowlineID": 92,
+        "lIndex": 92,
+        "nEdge": 9,
+        "nVertex": 10,
+        "pVertex_end": {
+            "dLatitude_degree": 41.7438020023669,
+            "dLongitude_degree": -76.3155162948895
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.743280003195,
+            "dLongitude_degree": -76.3097364231363
+        }
+    },
+    {
+        "dLength": 5999.149786622873,
+        "dSinuosity": 1.2813273203395907,
+        "iStream_segment": 122,
+        "lFlowlineID": 93,
+        "lIndex": 93,
+        "nEdge": 57,
+        "nVertex": 58,
+        "pVertex_end": {
+            "dLatitude_degree": 41.7437233358115,
+            "dLongitude_degree": -76.3155040283092
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.7467779306191,
+            "dLongitude_degree": -76.3717259468489
+        }
+    },
+    {
+        "dLength": 208.0800262173863,
+        "dSinuosity": 1.013015599888354,
+        "iStream_segment": 121,
+        "lFlowlineID": 94,
+        "lIndex": 94,
+        "nEdge": 4,
+        "nVertex": 5,
+        "pVertex_end": {
+            "dLatitude_degree": 41.7467779306191,
+            "dLongitude_degree": -76.3717259468489
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.7452597994026,
+            "dLongitude_degree": -76.3731316835398
+        }
+    },
+    {
+        "dLength": 3953.5496259751967,
+        "dSinuosity": 1.3143046469214468,
+        "iStream_segment": 120,
+        "lFlowlineID": 95,
+        "lIndex": 95,
+        "nEdge": 51,
+        "nVertex": 52,
+        "pVertex_end": {
+            "dLatitude_degree": 41.7467779306191,
+            "dLongitude_degree": -76.3717259468489
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.7715936833379,
+            "dLongitude_degree": -76.3860628634791
+        }
+    },
+    {
+        "dLength": 902.7232313086802,
+        "dSinuosity": 1.0246138820662212,
+        "iStream_segment": 119,
+        "lFlowlineID": 96,
+        "lIndex": 96,
+        "nEdge": 13,
+        "nVertex": 14,
+        "pVertex_end": {
+            "dLatitude_degree": 41.7715936833379,
+            "dLongitude_degree": -76.3860628634791
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.7675311581793,
+            "dLongitude_degree": -76.3951698761963
+        }
+    },
+    {
+        "dLength": 6353.778842312302,
+        "dSinuosity": 1.4385585338052262,
+        "iStream_segment": 118,
+        "lFlowlineID": 97,
+        "lIndex": 97,
+        "nEdge": 67,
+        "nVertex": 68,
+        "pVertex_end": {
+            "dLatitude_degree": 41.7715936833379,
+            "dLongitude_degree": -76.3860628634791
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.7594029075001,
+            "dLongitude_degree": -76.4366841246901
+        }
+    },
+    {
+        "dLength": 870.6847333088288,
+        "dSinuosity": 1.059210773591238,
+        "iStream_segment": 117,
+        "lFlowlineID": 98,
+        "lIndex": 98,
+        "nEdge": 17,
+        "nVertex": 18,
+        "pVertex_end": {
+            "dLatitude_degree": 41.7594029075001,
+            "dLongitude_degree": -76.4366841246901
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.7520533212215,
+            "dLongitude_degree": -76.4376423377621
+        }
+    },
+    {
+        "dLength": 592.5799189137383,
+        "dSinuosity": 1.0712953034406447,
+        "iStream_segment": 116,
+        "lFlowlineID": 99,
+        "lIndex": 99,
+        "nEdge": 10,
+        "nVertex": 11,
+        "pVertex_end": {
+            "dLatitude_degree": 41.7594029075001,
+            "dLongitude_degree": -76.4366841246901
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.7635120998645,
+            "dLongitude_degree": -76.4404295211892
+        }
+    },
+    {
+        "dLength": 1543.0895297166414,
+        "dSinuosity": 1.016493872629105,
+        "iStream_segment": 115,
+        "lFlowlineID": 100,
+        "lIndex": 100,
+        "nEdge": 23,
+        "nVertex": 24,
+        "pVertex_end": {
+            "dLatitude_degree": 41.7635120998645,
+            "dLongitude_degree": -76.4404295211892
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.7771477411645,
+            "dLongitude_degree": -76.4406763651011
+        }
+    },
+    {
+        "dLength": 2321.357494174024,
+        "dSinuosity": 1.1670589330948011,
+        "iStream_segment": 114,
+        "lFlowlineID": 101,
+        "lIndex": 101,
+        "nEdge": 35,
+        "nVertex": 36,
+        "pVertex_end": {
+            "dLatitude_degree": 41.7771477411645,
+            "dLongitude_degree": -76.4406763651011
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.7946228423503,
+            "dLongitude_degree": -76.4456745387731
+        }
+    },
+    {
+        "dLength": 615.3933978221269,
+        "dSinuosity": 1.0559834847148686,
+        "iStream_segment": 113,
+        "lFlowlineID": 102,
+        "lIndex": 102,
+        "nEdge": 11,
+        "nVertex": 12,
+        "pVertex_end": {
+            "dLatitude_degree": 41.7946228423503,
+            "dLongitude_degree": -76.4456745387731
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.7979566366125,
+            "dLongitude_degree": -76.451088669576
+        }
+    },
+    {
+        "dLength": 519.445183769204,
+        "dSinuosity": 1.1003580636029722,
+        "iStream_segment": 112,
+        "lFlowlineID": 103,
+        "lIndex": 103,
+        "nEdge": 12,
+        "nVertex": 13,
+        "pVertex_end": {
+            "dLatitude_degree": 41.7979566366125,
+            "dLongitude_degree": -76.451088669576
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.7997132338114,
+            "dLongitude_degree": -76.4562661361405
+        }
+    },
+    {
+        "dLength": 6625.157701037282,
+        "dSinuosity": 1.2065543758704798,
+        "iStream_segment": 111,
+        "lFlowlineID": 104,
+        "lIndex": 104,
+        "nEdge": 84,
+        "nVertex": 85,
+        "pVertex_end": {
+            "dLatitude_degree": 41.7979566366125,
+            "dLongitude_degree": -76.451088669576
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.8306161823614,
+            "dLongitude_degree": -76.5006858967648
+        }
+    },
+    {
+        "dLength": 902.3686310755814,
+        "dSinuosity": 1.0495727339235577,
+        "iStream_segment": 110,
+        "lFlowlineID": 105,
+        "lIndex": 105,
+        "nEdge": 12,
+        "nVertex": 13,
+        "pVertex_end": {
+            "dLatitude_degree": 41.8306161823614,
+            "dLongitude_degree": -76.5006858967648
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.8256736437625,
+            "dLongitude_degree": -76.5086502679926
+        }
+    },
+    {
+        "dLength": 1952.4110462501678,
+        "dSinuosity": 1.0329865972068772,
+        "iStream_segment": 109,
+        "lFlowlineID": 106,
+        "lIndex": 106,
+        "nEdge": 26,
+        "nVertex": 27,
+        "pVertex_end": {
+            "dLatitude_degree": 41.8306161823614,
+            "dLongitude_degree": -76.5006858967648
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.8470693540487,
+            "dLongitude_degree": -76.4950595911079
+        }
+    },
+    {
+        "dLength": 8903.335061088583,
+        "dSinuosity": 1.0543641086788553,
+        "iStream_segment": 108,
+        "lFlowlineID": 107,
+        "lIndex": 107,
+        "nEdge": 77,
+        "nVertex": 78,
+        "pVertex_end": {
+            "dLatitude_degree": 41.8470693540487,
+            "dLongitude_degree": -76.4950595911079
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.9214408496535,
+            "dLongitude_degree": -76.515119473696
+        }
+    },
+    {
+        "dLength": 3164.71253708196,
+        "dSinuosity": 1.1723999718581495,
+        "iStream_segment": 107,
+        "lFlowlineID": 108,
+        "lIndex": 108,
+        "nEdge": 565,
+        "nVertex": 566,
+        "pVertex_end": {
+            "dLatitude_degree": 41.9214408496535,
+            "dLongitude_degree": -76.515119473696
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.9450140280257,
+            "dLongitude_degree": -76.5074796663756
+        }
+    },
+    {
+        "dLength": 5697.990665008922,
+        "dSinuosity": 1.154631522732531,
+        "iStream_segment": 106,
+        "lFlowlineID": 109,
+        "lIndex": 109,
+        "nEdge": 995,
+        "nVertex": 996,
+        "pVertex_end": {
+            "dLatitude_degree": 41.9450140280257,
+            "dLongitude_degree": -76.5074796663756
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.9884641731958,
+            "dLongitude_degree": -76.4956535559437
+        }
+    },
+    {
+        "dLength": 308.3335186526228,
+        "dSinuosity": 1.060597486822673,
+        "iStream_segment": 105,
+        "lFlowlineID": 110,
+        "lIndex": 110,
+        "nEdge": 59,
+        "nVertex": 60,
+        "pVertex_end": {
+            "dLatitude_degree": 41.9884641731958,
+            "dLongitude_degree": -76.4956535559437
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.9906275018302,
+            "dLongitude_degree": -76.4936852865954
+        }
+    },
+    {
+        "dLength": 58870.706430623126,
+        "dSinuosity": 1.3479727660525413,
+        "iStream_segment": 104,
+        "lFlowlineID": 111,
+        "lIndex": 111,
+        "nEdge": 924,
+        "nVertex": 925,
+        "pVertex_end": {
+            "dLatitude_degree": 41.9906275018302,
+            "dLongitude_degree": -76.4936852865954
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 42.1149990223687,
+            "dLongitude_degree": -75.9925710440888
+        }
+    },
+    {
+        "dLength": 435.4485628873781,
+        "dSinuosity": 1.0039712449604186,
+        "iStream_segment": 103,
+        "lFlowlineID": 112,
+        "lIndex": 112,
+        "nEdge": 2,
+        "nVertex": 3,
+        "pVertex_end": {
+            "dLatitude_degree": 42.1149990223687,
+            "dLongitude_degree": -75.9925710440888
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 42.1165697978028,
+            "dLongitude_degree": -75.9877643464558
+        }
+    },
+    {
+        "dLength": 4387.694924821665,
+        "dSinuosity": 1.0513839786504493,
+        "iStream_segment": 102,
+        "lFlowlineID": 113,
+        "lIndex": 113,
+        "nEdge": 561,
+        "nVertex": 562,
+        "pVertex_end": {
+            "dLatitude_degree": 42.1149990223687,
+            "dLongitude_degree": -75.9925710440888
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 42.0954721865021,
+            "dLongitude_degree": -75.9494367009213
+        }
+    },
+    {
+        "dLength": 37.40420067336554,
+        "dSinuosity": 1.0005568153581694,
+        "iStream_segment": 101,
+        "lFlowlineID": 114,
+        "lIndex": 114,
+        "nEdge": 9,
+        "nVertex": 10,
+        "pVertex_end": {
+            "dLatitude_degree": 42.0954721865021,
+            "dLongitude_degree": -75.9494367009213
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 42.0951483860817,
+            "dLongitude_degree": -75.9495567011215
+        }
+    },
+    {
+        "dLength": 1206.6358472300067,
+        "dSinuosity": 1.0534926588177471,
+        "iStream_segment": 100,
+        "lFlowlineID": 115,
+        "lIndex": 115,
+        "nEdge": 9,
+        "nVertex": 10,
+        "pVertex_end": {
+            "dLatitude_degree": 42.0951483860817,
+            "dLongitude_degree": -75.9495567011215
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 42.0984677218615,
+            "dLongitude_degree": -75.9626816367412
+        }
+    },
+    {
+        "dLength": 1858.3267986161204,
+        "dSinuosity": 1.0450349220000563,
+        "iStream_segment": 99,
+        "lFlowlineID": 116,
+        "lIndex": 116,
+        "nEdge": 353,
+        "nVertex": 354,
+        "pVertex_end": {
+            "dLatitude_degree": 42.0951483860817,
+            "dLongitude_degree": -75.9495567011215
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 42.0877250429897,
+            "dLongitude_degree": -75.9304958291012
+        }
+    },
+    {
+        "dLength": 158.7433517396356,
+        "dSinuosity": 1.0230474724283163,
+        "iStream_segment": 98,
+        "lFlowlineID": 117,
+        "lIndex": 117,
+        "nEdge": 34,
+        "nVertex": 35,
+        "pVertex_end": {
+            "dLatitude_degree": 42.0877250429897,
+            "dLongitude_degree": -75.9304958291012
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 42.0873532425708,
+            "dLongitude_degree": -75.9286856284354
+        }
+    },
+    {
+        "dLength": 1235.1862071248822,
+        "dSinuosity": 1.075122612998604,
+        "iStream_segment": 97,
+        "lFlowlineID": 118,
+        "lIndex": 118,
+        "nEdge": 136,
+        "nVertex": 137,
+        "pVertex_end": {
+            "dLatitude_degree": 42.0877250429897,
+            "dLongitude_degree": -75.9304958291012
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 42.0915915804044,
+            "dLongitude_degree": -75.917601421576
+        }
+    },
+    {
+        "dLength": 340.6381727819526,
+        "dSinuosity": 1.016968823161092,
+        "iStream_segment": 96,
+        "lFlowlineID": 119,
+        "lIndex": 119,
+        "nEdge": 55,
+        "nVertex": 56,
+        "pVertex_end": {
+            "dLatitude_degree": 42.0954721865021,
+            "dLongitude_degree": -75.9494367009213
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 42.0942621847043,
+            "dLongitude_degree": -75.9457240331268
+        }
+    },
+    {
+        "dLength": 177.60471369511345,
+        "dSinuosity": 1.016935705623299,
+        "iStream_segment": 95,
+        "lFlowlineID": 120,
+        "lIndex": 120,
+        "nEdge": 28,
+        "nVertex": 29,
+        "pVertex_end": {
+            "dLatitude_degree": 41.9906275018302,
+            "dLongitude_degree": -76.4936852865954
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.9906505694326,
+            "dLongitude_degree": -76.4957958844678
+        }
+    },
+    {
+        "dLength": 127.95381178831443,
+        "dSinuosity": 1.021482829257149,
+        "iStream_segment": 94,
+        "lFlowlineID": 121,
+        "lIndex": 121,
+        "nEdge": 27,
+        "nVertex": 28,
+        "pVertex_end": {
+            "dLatitude_degree": 41.9906505694326,
+            "dLongitude_degree": -76.4957958844678
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.9899609045253,
+            "dLongitude_degree": -76.4969921514366
+        }
+    },
+    {
+        "dLength": 105.69225697179269,
+        "dSinuosity": 1.0837179646816297,
+        "iStream_segment": 93,
+        "lFlowlineID": 122,
+        "lIndex": 122,
+        "nEdge": 14,
+        "nVertex": 15,
+        "pVertex_end": {
+            "dLatitude_degree": 41.9906505694326,
+            "dLongitude_degree": -76.4957958844678
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.9903835704188,
+            "dLongitude_degree": -76.4969185506017
+        }
+    },
+    {
+        "dLength": 344.22368315703585,
+        "dSinuosity": 1.009180812188033,
+        "iStream_segment": 92,
+        "lFlowlineID": 123,
+        "lIndex": 123,
+        "nEdge": 64,
+        "nVertex": 65,
+        "pVertex_end": {
+            "dLatitude_degree": 41.9884641731958,
+            "dLongitude_degree": -76.4956535559437
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.9894335696987,
+            "dLongitude_degree": -76.4917428910195
+        }
+    },
+    {
+        "dLength": 710.788897109246,
+        "dSinuosity": 1.0892234517404198,
+        "iStream_segment": 91,
+        "lFlowlineID": 124,
+        "lIndex": 124,
+        "nEdge": 123,
+        "nVertex": 124,
+        "pVertex_end": {
+            "dLatitude_degree": 41.9450140280257,
+            "dLongitude_degree": -76.5074796663756
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.9408972524475,
+            "dLongitude_degree": -76.501868993465
+        }
+    },
+    {
+        "dLength": 27784.699505033823,
+        "dSinuosity": 1.4672822663009608,
+        "iStream_segment": 90,
+        "lFlowlineID": 125,
+        "lIndex": 125,
+        "nEdge": 350,
+        "nVertex": 351,
+        "pVertex_end": {
+            "dLatitude_degree": 41.9214408496535,
+            "dLongitude_degree": -76.515119473696
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 42.0250604394962,
+            "dLongitude_degree": -76.6965750781826
+        }
+    },
+    {
+        "dLength": 665.769574122024,
+        "dSinuosity": 1.115264407667471,
+        "iStream_segment": 89,
+        "lFlowlineID": 126,
+        "lIndex": 126,
+        "nEdge": 11,
+        "nVertex": 12,
+        "pVertex_end": {
+            "dLatitude_degree": 42.0250604394962,
+            "dLongitude_degree": -76.6965750781826
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 42.025826676653,
+            "dLongitude_degree": -76.6894301817166
+        }
+    },
+    {
+        "dLength": 3245.232019387879,
+        "dSinuosity": 1.2529254130439442,
+        "iStream_segment": 88,
+        "lFlowlineID": 127,
+        "lIndex": 127,
+        "nEdge": 40,
+        "nVertex": 41,
+        "pVertex_end": {
+            "dLatitude_degree": 42.0250604394962,
+            "dLongitude_degree": -76.6965750781826
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 42.0199195307762,
+            "dLongitude_degree": -76.7271215603874
+        }
+    },
+    {
+        "dLength": 5339.094829887918,
+        "dSinuosity": 1.1446725801342361,
+        "iStream_segment": 87,
+        "lFlowlineID": 128,
+        "lIndex": 128,
+        "nEdge": 112,
+        "nVertex": 113,
+        "pVertex_end": {
+            "dLatitude_degree": 42.0199195307762,
+            "dLongitude_degree": -76.7271215603874
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 42.0541114389183,
+            "dLongitude_degree": -76.7597296527644
+        }
+    },
+    {
+        "dLength": 1379.4318487850567,
+        "dSinuosity": 1.1323777841900096,
+        "iStream_segment": 86,
+        "lFlowlineID": 129,
+        "lIndex": 129,
+        "nEdge": 21,
+        "nVertex": 22,
+        "pVertex_end": {
+            "dLatitude_degree": 42.0541114389183,
+            "dLongitude_degree": -76.7597296527644
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 42.0647163195313,
+            "dLongitude_degree": -76.7633653785093
+        }
+    },
+    {
+        "dLength": 1289.612152581031,
+        "dSinuosity": 1.0800457918186925,
+        "iStream_segment": 85,
+        "lFlowlineID": 130,
+        "lIndex": 130,
+        "nEdge": 42,
+        "nVertex": 43,
+        "pVertex_end": {
+            "dLatitude_degree": 42.0647163195313,
+            "dLongitude_degree": -76.7633653785093
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 42.0719228081735,
+            "dLongitude_degree": -76.7740674864886
+        }
+    },
+    {
+        "dLength": 1322.7745734785021,
+        "dSinuosity": 1.1575116026644816,
+        "iStream_segment": 84,
+        "lFlowlineID": 131,
+        "lIndex": 131,
+        "nEdge": 35,
+        "nVertex": 36,
+        "pVertex_end": {
+            "dLatitude_degree": 42.0719228081735,
+            "dLongitude_degree": -76.7740674864886
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 42.0625401221399,
+            "dLongitude_degree": -76.7684565229017
+        }
+    },
+    {
+        "dLength": 727.25753141333,
+        "dSinuosity": 1.1739853160362486,
+        "iStream_segment": 83,
+        "lFlowlineID": 132,
+        "lIndex": 132,
+        "nEdge": 46,
+        "nVertex": 47,
+        "pVertex_end": {
+            "dLatitude_degree": 42.0625401221399,
+            "dLongitude_degree": -76.7684565229017
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 42.0584965518064,
+            "dLongitude_degree": -76.7633069355904
+        }
+    },
+    {
+        "dLength": 309.3722910455583,
+        "dSinuosity": 1.2012454758950297,
+        "iStream_segment": 82,
+        "lFlowlineID": 133,
+        "lIndex": 133,
+        "nEdge": 19,
+        "nVertex": 20,
+        "pVertex_end": {
+            "dLatitude_degree": 42.0584965518064,
+            "dLongitude_degree": -76.7633069355904
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 42.0563478411993,
+            "dLongitude_degree": -76.7621518251312
+        }
+    },
+    {
+        "dLength": 274.12912366321564,
+        "dSinuosity": 1.0484499956460862,
+        "iStream_segment": 81,
+        "lFlowlineID": 134,
+        "lIndex": 134,
+        "nEdge": 18,
+        "nVertex": 19,
+        "pVertex_end": {
+            "dLatitude_degree": 42.0584965518064,
+            "dLongitude_degree": -76.7633069355904
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 42.0561490498968,
+            "dLongitude_degree": -76.7632039444561
+        }
+    },
+    {
+        "dLength": 197.37970944216661,
+        "dSinuosity": 1.121773192339577,
+        "iStream_segment": 80,
+        "lFlowlineID": 135,
+        "lIndex": 135,
+        "nEdge": 10,
+        "nVertex": 11,
+        "pVertex_end": {
+            "dLatitude_degree": 42.0625401221399,
+            "dLongitude_degree": -76.7684565229017
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 42.0639888427406,
+            "dLongitude_degree": -76.7676050976384
+        }
+    },
+    {
+        "dLength": 8402.47232015823,
+        "dSinuosity": 1.2418732065604337,
+        "iStream_segment": 79,
+        "lFlowlineID": 136,
+        "lIndex": 136,
+        "nEdge": 101,
+        "nVertex": 102,
+        "pVertex_end": {
+            "dLatitude_degree": 42.0719228081735,
+            "dLongitude_degree": -76.7740674864886
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 42.0752028594554,
+            "dLongitude_degree": -76.8558300612982
+        }
+    },
+    {
+        "dLength": 939.6498662418655,
+        "dSinuosity": 1.1086089496630438,
+        "iStream_segment": 78,
+        "lFlowlineID": 137,
+        "lIndex": 137,
+        "nEdge": 30,
+        "nVertex": 31,
+        "pVertex_end": {
+            "dLatitude_degree": 42.0752028594554,
+            "dLongitude_degree": -76.8558300612982
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 42.0789171933085,
+            "dLongitude_degree": -76.8647848353633
+        }
+    },
+    {
+        "dLength": 18835.840743465353,
+        "dSinuosity": 1.244543879337837,
+        "iStream_segment": 77,
+        "lFlowlineID": 138,
+        "lIndex": 138,
+        "nEdge": 355,
+        "nVertex": 356,
+        "pVertex_end": {
+            "dLatitude_degree": 42.0752028594554,
+            "dLongitude_degree": -76.8558300612982
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 42.1260269448695,
+            "dLongitude_degree": -77.0257843410206
+        }
+    },
+    {
+        "dLength": 502.21929565958885,
+        "dSinuosity": 1.022697604373829,
+        "iStream_segment": 76,
+        "lFlowlineID": 139,
+        "lIndex": 139,
+        "nEdge": 25,
+        "nVertex": 26,
+        "pVertex_end": {
+            "dLatitude_degree": 42.1260269448695,
+            "dLongitude_degree": -77.0257843410206
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 42.1219851420618,
+            "dLongitude_degree": -77.0234012513118
+        }
+    },
+    {
+        "dLength": 11962.132439786088,
+        "dSinuosity": 1.4052531249560887,
+        "iStream_segment": 75,
+        "lFlowlineID": 140,
+        "lIndex": 140,
+        "nEdge": 164,
+        "nVertex": 165,
+        "pVertex_end": {
+            "dLatitude_degree": 42.1260269448695,
+            "dLongitude_degree": -77.0257843410206
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 42.1220681232004,
+            "dLongitude_degree": -77.1287458950794
+        }
+    },
+    {
+        "dLength": 1865.0442802904026,
+        "dSinuosity": 1.1426094815666177,
+        "iStream_segment": 74,
+        "lFlowlineID": 141,
+        "lIndex": 141,
+        "nEdge": 38,
+        "nVertex": 39,
+        "pVertex_end": {
+            "dLatitude_degree": 42.1220681232004,
+            "dLongitude_degree": -77.1287458950794
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 42.1081530321555,
+            "dLongitude_degree": -77.1349778937351
+        }
+    },
+    {
+        "dLength": 626.3313270767732,
+        "dSinuosity": 1.262737222590229,
+        "iStream_segment": 73,
+        "lFlowlineID": 142,
+        "lIndex": 142,
+        "nEdge": 12,
+        "nVertex": 13,
+        "pVertex_end": {
+            "dLatitude_degree": 42.1220681232004,
+            "dLongitude_degree": -77.1287458950794
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 42.1241239187376,
+            "dLongitude_degree": -77.1234160950792
+        }
+    },
+    {
+        "dLength": 356.4800154351324,
+        "dSinuosity": 1.0141615239961173,
+        "iStream_segment": 72,
+        "lFlowlineID": 143,
+        "lIndex": 143,
+        "nEdge": 7,
+        "nVertex": 8,
+        "pVertex_end": {
+            "dLatitude_degree": 42.0647163195313,
+            "dLongitude_degree": -76.7633653785093
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 42.064323468277,
+            "dLongitude_degree": -76.7675856144034
+        }
+    },
+    {
+        "dLength": 1143.182727640379,
+        "dSinuosity": 1.3798360130201264,
+        "iStream_segment": 71,
+        "lFlowlineID": 144,
+        "lIndex": 144,
+        "nEdge": 65,
+        "nVertex": 66,
+        "pVertex_end": {
+            "dLatitude_degree": 42.0541114389183,
+            "dLongitude_degree": -76.7597296527644
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 42.0588549550687,
+            "dLongitude_degree": -76.7674536174178
+        }
+    },
+    {
+        "dLength": 3584.593392866677,
+        "dSinuosity": 3.605386178896393,
+        "iStream_segment": 70,
+        "lFlowlineID": 145,
+        "lIndex": 145,
+        "nEdge": 143,
+        "nVertex": 144,
+        "pVertex_end": {
+            "dLatitude_degree": 42.0199195307762,
+            "dLongitude_degree": -76.7271215603874
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 42.0261130761107,
+            "dLongitude_degree": -76.7184593105323
+        }
+    },
+    {
+        "dLength": 350.3082514336392,
+        "dSinuosity": 1.07819786432218,
+        "iStream_segment": 69,
+        "lFlowlineID": 146,
+        "lIndex": 146,
+        "nEdge": 14,
+        "nVertex": 15,
+        "pVertex_end": {
+            "dLatitude_degree": 41.8470693540487,
+            "dLongitude_degree": -76.4950595911079
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.8452211567612,
+            "dLongitude_degree": -76.4920272610827
+        }
+    },
+    {
+        "dLength": 1261.3360682250825,
+        "dSinuosity": 1.5709936991595566,
+        "iStream_segment": 68,
+        "lFlowlineID": 147,
+        "lIndex": 147,
+        "nEdge": 32,
+        "nVertex": 33,
+        "pVertex_end": {
+            "dLatitude_degree": 41.7946228423503,
+            "dLongitude_degree": -76.4456745387731
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.7875660552915,
+            "dLongitude_degree": -76.4436753495904
+        }
+    },
+    {
+        "dLength": 131.77307397035355,
+        "dSinuosity": 1.0255173435205764,
+        "iStream_segment": 67,
+        "lFlowlineID": 148,
+        "lIndex": 148,
+        "nEdge": 3,
+        "nVertex": 4,
+        "pVertex_end": {
+            "dLatitude_degree": 41.7771477411645,
+            "dLongitude_degree": -76.4406763651011
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.7782899390485,
+            "dLongitude_degree": -76.440899763346
+        }
+    },
+    {
+        "dLength": 94.81571264640493,
+        "dSinuosity": 1.007715888181159,
+        "iStream_segment": 66,
+        "lFlowlineID": 149,
+        "lIndex": 149,
+        "nEdge": 2,
+        "nVertex": 3,
+        "pVertex_end": {
+            "dLatitude_degree": 41.7635120998645,
+            "dLongitude_degree": -76.4404295211892
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.7627289013262,
+            "dLongitude_degree": -76.4408555895504
+        }
+    },
+    {
+        "dLength": 359.267767553489,
+        "dSinuosity": 1.0261193057554896,
+        "iStream_segment": 65,
+        "lFlowlineID": 150,
+        "lIndex": 150,
+        "nEdge": 5,
+        "nVertex": 6,
+        "pVertex_end": {
+            "dLatitude_degree": 41.695525004199,
+            "dLongitude_degree": -76.2945170671562
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.6968868023433,
+            "dLongitude_degree": -76.29072012824
+        }
+    },
+    {
+        "dLength": 306.27926945391187,
+        "dSinuosity": 1.1895973978349534,
+        "iStream_segment": 64,
+        "lFlowlineID": 151,
+        "lIndex": 151,
+        "nEdge": 7,
+        "nVertex": 8,
+        "pVertex_end": {
+            "dLatitude_degree": 41.6952174713854,
+            "dLongitude_degree": -76.2897051292599
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.6968754690821,
+            "dLongitude_degree": -76.2875455249962
+        }
+    },
+    {
+        "dLength": 1179.9567116389983,
+        "dSinuosity": 1.1327559077011884,
+        "iStream_segment": 63,
+        "lFlowlineID": 152,
+        "lIndex": 152,
+        "nEdge": 15,
+        "nVertex": 16,
+        "pVertex_end": {
+            "dLatitude_degree": 41.6502165789547,
+            "dLongitude_degree": -76.1984929888311
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.6417463848477,
+            "dLongitude_degree": -76.2038153258676
+        }
+    },
+    {
+        "dLength": 118.13280413027854,
+        "dSinuosity": 1.0077771654725616,
+        "iStream_segment": 62,
+        "lFlowlineID": 153,
+        "lIndex": 153,
+        "nEdge": 3,
+        "nVertex": 4,
+        "pVertex_end": {
+            "dLatitude_degree": 41.5924698698035,
+            "dLongitude_degree": -76.0519283381909
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.5932619354364,
+            "dLongitude_degree": -76.0528561373478
+        }
+    },
+    {
+        "dLength": 952.6716163105219,
+        "dSinuosity": 1.035237447342129,
+        "iStream_segment": 61,
+        "lFlowlineID": 154,
+        "lIndex": 154,
+        "nEdge": 14,
+        "nVertex": 15,
+        "pVertex_end": {
+            "dLatitude_degree": 41.5598521033622,
+            "dLongitude_degree": -76.0217450965905
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.5656780967626,
+            "dLongitude_degree": -76.0295833581701
+        }
+    },
+    {
+        "dLength": 198.95106451429723,
+        "dSinuosity": 1.0466897445529102,
+        "iStream_segment": 60,
+        "lFlowlineID": 155,
+        "lIndex": 155,
+        "nEdge": 4,
+        "nVertex": 5,
+        "pVertex_end": {
+            "dLatitude_degree": 41.5584831793982,
+            "dLongitude_degree": -76.002832572623
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.5591529801079,
+            "dLongitude_degree": -76.0007335735769
+        }
+    },
+    {
+        "dLength": 587.4463667789905,
+        "dSinuosity": 1.0482382677962818,
+        "iStream_segment": 59,
+        "lFlowlineID": 156,
+        "lIndex": 156,
+        "nEdge": 9,
+        "nVertex": 10,
+        "pVertex_end": {
+            "dLatitude_degree": 41.547532280979,
+            "dLongitude_degree": -75.9763147513888
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.5425440845824,
+            "dLongitude_degree": -75.9772227533294
+        }
+    },
+    {
+        "dLength": 489.897268538803,
+        "dSinuosity": 1.1121533965661097,
+        "iStream_segment": 58,
+        "lFlowlineID": 157,
+        "lIndex": 157,
+        "nEdge": 7,
+        "nVertex": 8,
+        "pVertex_end": {
+            "dLatitude_degree": 41.5089788593916,
+            "dLongitude_degree": -75.9053720375363
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.5072020534878,
+            "dLongitude_degree": -75.9006506349655
+        }
+    },
+    {
+        "dLength": 122.35957653977765,
+        "dSinuosity": 1.0,
+        "iStream_segment": 57,
+        "lFlowlineID": 158,
+        "lIndex": 158,
+        "nEdge": 1,
+        "nVertex": 2,
+        "pVertex_end": {
+            "dLatitude_degree": 41.4560427606285,
+            "dLongitude_degree": -75.891132015604
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.4564657627136,
+            "dLongitude_degree": -75.8924856833835
+        }
+    },
+    {
+        "dLength": 250.0038190203166,
+        "dSinuosity": 1.0171539690014362,
+        "iStream_segment": 56,
+        "lFlowlineID": 159,
+        "lIndex": 159,
+        "nEdge": 4,
+        "nVertex": 5,
+        "pVertex_end": {
+            "dLatitude_degree": 41.0642959586397,
+            "dLongitude_degree": -76.1783509974736
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.0660924935609,
+            "dLongitude_degree": -76.1800533996017
+        }
+    },
+    {
+        "dLength": 1440.1389638701055,
+        "dSinuosity": 1.1366001157433412,
+        "iStream_segment": 55,
+        "lFlowlineID": 160,
+        "lIndex": 160,
+        "nEdge": 14,
+        "nVertex": 15,
+        "pVertex_end": {
+            "dLatitude_degree": 40.9458697854492,
+            "dLongitude_degree": -76.6687264034651
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 40.9362355908376,
+            "dLongitude_degree": -76.6767502033621
+        }
+    },
+    {
+        "dLength": 710.1222608158333,
+        "dSinuosity": 1.1672735097306026,
+        "iStream_segment": 54,
+        "lFlowlineID": 161,
+        "lIndex": 161,
+        "nEdge": 14,
+        "nVertex": 15,
+        "pVertex_end": {
+            "dLatitude_degree": 40.9256720782845,
+            "dLongitude_degree": -76.716428032378
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 40.9286156806035,
+            "dLongitude_degree": -76.7225223072722
+        }
+    },
+    {
+        "dLength": 2098.3782378965143,
+        "dSinuosity": 1.0361975454649393,
+        "iStream_segment": 53,
+        "lFlowlineID": 162,
+        "lIndex": 162,
+        "nEdge": 15,
+        "nVertex": 16,
+        "pVertex_end": {
+            "dLatitude_degree": 40.8991424400634,
+            "dLongitude_degree": -76.7693234510198
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 40.8882464492291,
+            "dLongitude_degree": -76.7885944512366
+        }
+    },
+    {
+        "dLength": 6917.198526290399,
+        "dSinuosity": 1.043283566425479,
+        "iStream_segment": 52,
+        "lFlowlineID": 163,
+        "lIndex": 163,
+        "nEdge": 18,
+        "nVertex": 19,
+        "pVertex_end": {
+            "dLatitude_degree": 40.8767116542377,
+            "dLongitude_degree": -76.7950022446548
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 40.9177214632485,
+            "dLongitude_degree": -76.8521443069615
+        }
+    },
+    {
+        "dLength": 279.37365677689235,
+        "dSinuosity": 1.0,
+        "iStream_segment": 51,
+        "lFlowlineID": 164,
+        "lIndex": 164,
+        "nEdge": 1,
+        "nVertex": 2,
+        "pVertex_end": {
+            "dLatitude_degree": 40.9177214632485,
+            "dLongitude_degree": -76.8521443069615
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 40.920087129641,
+            "dLongitude_degree": -76.8532531094696
+        }
+    },
+    {
+        "dLength": 764.6501273156987,
+        "dSinuosity": 1.0111612346422756,
+        "iStream_segment": 50,
+        "lFlowlineID": 165,
+        "lIndex": 165,
+        "nEdge": 3,
+        "nVertex": 4,
+        "pVertex_end": {
+            "dLatitude_degree": 40.920087129641,
+            "dLongitude_degree": -76.8532531094696
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 40.9255694632256,
+            "dLongitude_degree": -76.8585619832707
+        }
+    },
+    {
+        "dLength": 12872.515887586396,
+        "dSinuosity": 1.0694736260257551,
+        "iStream_segment": 49,
+        "lFlowlineID": 166,
+        "lIndex": 166,
+        "nEdge": 33,
+        "nVertex": 34,
+        "pVertex_end": {
+            "dLatitude_degree": 40.920087129641,
+            "dLongitude_degree": -76.8532531094696
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.0280972936123,
+            "dLongitude_degree": -76.8598232023701
+        }
+    },
+    {
+        "dLength": 12513.161095568636,
+        "dSinuosity": 1.0689208951668192,
+        "iStream_segment": 48,
+        "lFlowlineID": 167,
+        "lIndex": 167,
+        "nEdge": 37,
+        "nVertex": 38,
+        "pVertex_end": {
+            "dLatitude_degree": 41.0280972936123,
+            "dLongitude_degree": -76.8598232023701
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.1296717753805,
+            "dLongitude_degree": -76.8959407694168
+        }
+    },
+    {
+        "dLength": 1425.1445066714405,
+        "dSinuosity": 1.1214947737236078,
+        "iStream_segment": 47,
+        "lFlowlineID": 168,
+        "lIndex": 168,
+        "nEdge": 8,
+        "nVertex": 9,
+        "pVertex_end": {
+            "dLatitude_degree": 41.1296717753805,
+            "dLongitude_degree": -76.8959407694168
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.1409189680904,
+            "dLongitude_degree": -76.8933485775016
+        }
+    },
+    {
+        "dLength": 15416.391021306295,
+        "dSinuosity": 1.4189865195881235,
+        "iStream_segment": 46,
+        "lFlowlineID": 169,
+        "lIndex": 169,
+        "nEdge": 39,
+        "nVertex": 40,
+        "pVertex_end": {
+            "dLatitude_degree": 41.1409189680904,
+            "dLongitude_degree": -76.8933485775016
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.2271221081334,
+            "dLongitude_degree": -76.8325448218964
+        }
+    },
+    {
+        "dLength": 1182.2854141765001,
+        "dSinuosity": 1.0572417922631563,
+        "iStream_segment": 45,
+        "lFlowlineID": 170,
+        "lIndex": 170,
+        "nEdge": 5,
+        "nVertex": 6,
+        "pVertex_end": {
+            "dLatitude_degree": 41.2271221081334,
+            "dLongitude_degree": -76.8325448218964
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.2290671754301,
+            "dLongitude_degree": -76.8456489625621
+        }
+    },
+    {
+        "dLength": 843.5212846357126,
+        "dSinuosity": 1.0005648268621048,
+        "iStream_segment": 44,
+        "lFlowlineID": 171,
+        "lIndex": 171,
+        "nEdge": 2,
+        "nVertex": 3,
+        "pVertex_end": {
+            "dLatitude_degree": 41.2290671754301,
+            "dLongitude_degree": -76.8456489625621
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.2300075761993,
+            "dLongitude_degree": -76.8556407676982
+        }
+    },
+    {
+        "dLength": 2227.3792645870917,
+        "dSinuosity": 1.084703371976488,
+        "iStream_segment": 43,
+        "lFlowlineID": 172,
+        "lIndex": 172,
+        "nEdge": 34,
+        "nVertex": 35,
+        "pVertex_end": {
+            "dLatitude_degree": 41.2300075761993,
+            "dLongitude_degree": -76.8556407676982
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.2327765048192,
+            "dLongitude_degree": -76.8313906260981
+        }
+    },
+    {
+        "dLength": 322.8264415563984,
+        "dSinuosity": 1.0015494567054548,
+        "iStream_segment": 42,
+        "lFlowlineID": 173,
+        "lIndex": 173,
+        "nEdge": 2,
+        "nVertex": 3,
+        "pVertex_end": {
+            "dLatitude_degree": 41.2300075761993,
+            "dLongitude_degree": -76.8556407676982
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.2301267099657,
+            "dLongitude_degree": -76.8594875694737
+        }
+    },
+    {
+        "dLength": 675.9048091712257,
+        "dSinuosity": 1.0787762149637266,
+        "iStream_segment": 41,
+        "lFlowlineID": 174,
+        "lIndex": 174,
+        "nEdge": 13,
+        "nVertex": 14,
+        "pVertex_end": {
+            "dLatitude_degree": 41.2301267099657,
+            "dLongitude_degree": -76.8594875694737
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.2322753096147,
+            "dLongitude_degree": -76.8664047742654
+        }
+    },
+    {
+        "dLength": 42.32660840580464,
+        "dSinuosity": 1.0,
+        "iStream_segment": 40,
+        "lFlowlineID": 175,
+        "lIndex": 175,
+        "nEdge": 1,
+        "nVertex": 2,
+        "pVertex_end": {
+            "dLatitude_degree": 41.2322753096147,
+            "dLongitude_degree": -76.8664047742654
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.231935109784,
+            "dLongitude_degree": -76.8661789738858
+        }
+    },
+    {
+        "dLength": 235.12988083517138,
+        "dSinuosity": 1.0434097617531144,
+        "iStream_segment": 39,
+        "lFlowlineID": 176,
+        "lIndex": 176,
+        "nEdge": 6,
+        "nVertex": 7,
+        "pVertex_end": {
+            "dLatitude_degree": 41.231935109784,
+            "dLongitude_degree": -76.8661789738858
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.2310085100136,
+            "dLongitude_degree": -76.8637857720767
+        }
+    },
+    {
+        "dLength": 262.5653623269859,
+        "dSinuosity": 1.0141111129327491,
+        "iStream_segment": 38,
+        "lFlowlineID": 177,
+        "lIndex": 177,
+        "nEdge": 3,
+        "nVertex": 4,
+        "pVertex_end": {
+            "dLatitude_degree": 41.231935109784,
+            "dLongitude_degree": -76.8661789738858
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.2299487107324,
+            "dLongitude_degree": -76.8645702382086
+        }
+    },
+    {
+        "dLength": 8484.967436299932,
+        "dSinuosity": 1.0891903243249637,
+        "iStream_segment": 37,
+        "lFlowlineID": 178,
+        "lIndex": 178,
+        "nEdge": 30,
+        "nVertex": 31,
+        "pVertex_end": {
+            "dLatitude_degree": 41.2322753096147,
+            "dLongitude_degree": -76.8664047742654
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.2422145150607,
+            "dLongitude_degree": -76.9585218224689
+        }
+    },
+    {
+        "dLength": 724.3680989222104,
+        "dSinuosity": 1.0,
+        "iStream_segment": 36,
+        "lFlowlineID": 179,
+        "lIndex": 179,
+        "nEdge": 1,
+        "nVertex": 2,
+        "pVertex_end": {
+            "dLatitude_degree": 41.2422145150607,
+            "dLongitude_degree": -76.9585218224689
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.2437987150506,
+            "dLongitude_degree": -76.9669154273981
+        }
+    },
+    {
+        "dLength": 1175.678107716689,
+        "dSinuosity": 1.0225907731964365,
+        "iStream_segment": 35,
+        "lFlowlineID": 180,
+        "lIndex": 180,
+        "nEdge": 3,
+        "nVertex": 4,
+        "pVertex_end": {
+            "dLatitude_degree": 41.2437987150506,
+            "dLongitude_degree": -76.9669154273981
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.2448861159825,
+            "dLongitude_degree": -76.9805748342043
+        }
+    },
+    {
+        "dLength": 8502.455901500642,
+        "dSinuosity": 1.0337542324333255,
+        "iStream_segment": 34,
+        "lFlowlineID": 181,
+        "lIndex": 181,
+        "nEdge": 31,
+        "nVertex": 32,
+        "pVertex_end": {
+            "dLatitude_degree": 41.2437987150506,
+            "dLongitude_degree": -76.9669154273981
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.2203815508578,
+            "dLongitude_degree": -77.0600956713199
+        }
+    },
+    {
+        "dLength": 9200.135915341772,
+        "dSinuosity": 1.1409837970245371,
+        "iStream_segment": 33,
+        "lFlowlineID": 182,
+        "lIndex": 182,
+        "nEdge": 23,
+        "nVertex": 24,
+        "pVertex_end": {
+            "dLatitude_degree": 41.2203815508578,
+            "dLongitude_degree": -77.0600956713199
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.212630781242,
+            "dLongitude_degree": -77.1558360375401
+        }
+    },
+    {
+        "dLength": 10116.673292093628,
+        "dSinuosity": 1.3298485356596623,
+        "iStream_segment": 32,
+        "lFlowlineID": 183,
+        "lIndex": 183,
+        "nEdge": 31,
+        "nVertex": 32,
+        "pVertex_end": {
+            "dLatitude_degree": 41.212630781242,
+            "dLongitude_degree": -77.1558360375401
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.2114178059525,
+            "dLongitude_degree": -77.246663743605
+        }
+    },
+    {
+        "dLength": 653.954119410278,
+        "dSinuosity": 1.0057633248982294,
+        "iStream_segment": 31,
+        "lFlowlineID": 184,
+        "lIndex": 184,
+        "nEdge": 3,
+        "nVertex": 4,
+        "pVertex_end": {
+            "dLatitude_degree": 41.2114178059525,
+            "dLongitude_degree": -77.246663743605
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.2065950098584,
+            "dLongitude_degree": -77.2510435397072
+        }
+    },
+    {
+        "dLength": 28633.146143351456,
+        "dSinuosity": 1.4677710212814772,
+        "iStream_segment": 30,
+        "lFlowlineID": 185,
+        "lIndex": 185,
+        "nEdge": 115,
+        "nVertex": 116,
+        "pVertex_end": {
+            "dLatitude_degree": 41.2114178059525,
+            "dLongitude_degree": -77.246663743605
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.165407114233,
+            "dLongitude_degree": -77.4713598215525
+        }
+    },
+    {
+        "dLength": 476.6609776267025,
+        "dSinuosity": 1.056628325270447,
+        "iStream_segment": 29,
+        "lFlowlineID": 186,
+        "lIndex": 186,
+        "nEdge": 9,
+        "nVertex": 10,
+        "pVertex_end": {
+            "dLatitude_degree": 41.165407114233,
+            "dLongitude_degree": -77.4713598215525
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.1633832484153,
+            "dLongitude_degree": -77.4666962231174
+        }
+    },
+    {
+        "dLength": 70954.7440537746,
+        "dSinuosity": 1.522131699276349,
+        "iStream_segment": 28,
+        "lFlowlineID": 187,
+        "lIndex": 187,
+        "nEdge": 338,
+        "nVertex": 339,
+        "pVertex_end": {
+            "dLatitude_degree": 41.165407114233,
+            "dLongitude_degree": -77.4713598215525
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.2985864747947,
+            "dLongitude_degree": -77.9992676439983
+        }
+    },
+    {
+        "dLength": 544.7382939467946,
+        "dSinuosity": 1.1759713707876354,
+        "iStream_segment": 27,
+        "lFlowlineID": 188,
+        "lIndex": 188,
+        "nEdge": 8,
+        "nVertex": 9,
+        "pVertex_end": {
+            "dLatitude_degree": 41.2985864747947,
+            "dLongitude_degree": -77.9992676439983
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.2986991458373,
+            "dLongitude_degree": -77.9937308419533
+        }
+    },
+    {
+        "dLength": 1190.9119386439036,
+        "dSinuosity": 1.021632185252504,
+        "iStream_segment": 26,
+        "lFlowlineID": 189,
+        "lIndex": 189,
+        "nEdge": 9,
+        "nVertex": 10,
+        "pVertex_end": {
+            "dLatitude_degree": 41.2985864747947,
+            "dLongitude_degree": -77.9992676439983
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.2996957365494,
+            "dLongitude_degree": -78.0131277025356
+        }
+    },
+    {
+        "dLength": 94.44159782035733,
+        "dSinuosity": 1.0,
+        "iStream_segment": 25,
+        "lFlowlineID": 190,
+        "lIndex": 190,
+        "nEdge": 1,
+        "nVertex": 2,
+        "pVertex_end": {
+            "dLatitude_degree": 41.2996957365494,
+            "dLongitude_degree": -78.0131277025356
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.299652469677,
+            "dLongitude_degree": -78.0142555017075
+        }
+    },
+    {
+        "dLength": 7554.283799638628,
+        "dSinuosity": 1.2512497010175758,
+        "iStream_segment": 24,
+        "lFlowlineID": 191,
+        "lIndex": 191,
+        "nEdge": 66,
+        "nVertex": 67,
+        "pVertex_end": {
+            "dLatitude_degree": 41.2996957365494,
+            "dLongitude_degree": -78.0131277025356
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.3175393017251,
+            "dLongitude_degree": -78.0813090652997
+        }
+    },
+    {
+        "dLength": 6062.616977039439,
+        "dSinuosity": 1.265256983995108,
+        "iStream_segment": 23,
+        "lFlowlineID": 192,
+        "lIndex": 192,
+        "nEdge": 38,
+        "nVertex": 39,
+        "pVertex_end": {
+            "dLatitude_degree": 41.3175393017251,
+            "dLongitude_degree": -78.0813090652997
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.3365282054819,
+            "dLongitude_degree": -78.1327488368578
+        }
+    },
+    {
+        "dLength": 126.18422053315325,
+        "dSinuosity": 1.069267191864889,
+        "iStream_segment": 22,
+        "lFlowlineID": 193,
+        "lIndex": 193,
+        "nEdge": 4,
+        "nVertex": 5,
+        "pVertex_end": {
+            "dLatitude_degree": 41.3175393017251,
+            "dLongitude_degree": -78.0813090652997
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.3171060357887,
+            "dLongitude_degree": -78.0800208659886
+        }
+    },
+    {
+        "dLength": 258.46283182634113,
+        "dSinuosity": 1.0337649834048002,
+        "iStream_segment": 21,
+        "lFlowlineID": 194,
+        "lIndex": 194,
+        "nEdge": 2,
+        "nVertex": 3,
+        "pVertex_end": {
+            "dLatitude_degree": 41.212630781242,
+            "dLongitude_degree": -77.1558360375401
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.2148757797897,
+            "dLongitude_degree": -77.1557479722813
+        }
+    },
+    {
+        "dLength": 870.4635610939183,
+        "dSinuosity": 1.0021434419948951,
+        "iStream_segment": 20,
+        "lFlowlineID": 195,
+        "lIndex": 195,
+        "nEdge": 2,
+        "nVertex": 3,
+        "pVertex_end": {
+            "dLatitude_degree": 41.2203815508578,
+            "dLongitude_degree": -77.0600956713199
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.2199803538758,
+            "dLongitude_degree": -77.070455467892
+        }
+    },
+    {
+        "dLength": 396.96137087452234,
+        "dSinuosity": 1.004469949595331,
+        "iStream_segment": 19,
+        "lFlowlineID": 196,
+        "lIndex": 196,
+        "nEdge": 5,
+        "nVertex": 6,
+        "pVertex_end": {
+            "dLatitude_degree": 41.2422145150607,
+            "dLongitude_degree": -76.9585218224689
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.243093913936,
+            "dLongitude_degree": -76.9539476211988
+        }
+    },
+    {
+        "dLength": 229.6409876023873,
+        "dSinuosity": 1.0,
+        "iStream_segment": 18,
+        "lFlowlineID": 197,
+        "lIndex": 197,
+        "nEdge": 1,
+        "nVertex": 2,
+        "pVertex_end": {
+            "dLatitude_degree": 41.2301267099657,
+            "dLongitude_degree": -76.8594875694737
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.2300541103655,
+            "dLongitude_degree": -76.8622288372752
+        }
+    },
+    {
+        "dLength": 195.7772221338928,
+        "dSinuosity": 1.0126719023356645,
+        "iStream_segment": 17,
+        "lFlowlineID": 198,
+        "lIndex": 198,
+        "nEdge": 4,
+        "nVertex": 5,
+        "pVertex_end": {
+            "dLatitude_degree": 41.2290671754301,
+            "dLongitude_degree": -76.8456489625621
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.2301985745579,
+            "dLongitude_degree": -76.8438970294042
+        }
+    },
+    {
+        "dLength": 425.8227639997159,
+        "dSinuosity": 1.019282285249445,
+        "iStream_segment": 16,
+        "lFlowlineID": 199,
+        "lIndex": 199,
+        "nEdge": 3,
+        "nVertex": 4,
+        "pVertex_end": {
+            "dLatitude_degree": 41.2271221081334,
+            "dLongitude_degree": -76.8325448218964
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.2290917742544,
+            "dLongitude_degree": -76.8367922253872
+        }
+    },
+    {
+        "dLength": 165.44451937073987,
+        "dSinuosity": 1.0,
+        "iStream_segment": 15,
+        "lFlowlineID": 200,
+        "lIndex": 200,
+        "nEdge": 1,
+        "nVertex": 2,
+        "pVertex_end": {
+            "dLatitude_degree": 41.1409189680904,
+            "dLongitude_degree": -76.8933485775016
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.1399313689696,
+            "dLongitude_degree": -76.8948233106852
+        }
+    },
+    {
+        "dLength": 1031.9491593897335,
+        "dSinuosity": 1.033338613481594,
+        "iStream_segment": 14,
+        "lFlowlineID": 201,
+        "lIndex": 201,
+        "nEdge": 5,
+        "nVertex": 6,
+        "pVertex_end": {
+            "dLatitude_degree": 41.1296717753805,
+            "dLongitude_degree": -76.8959407694168
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.13863056985,
+            "dLongitude_degree": -76.8953177765043
+        }
+    },
+    {
+        "dLength": 1260.0370477884637,
+        "dSinuosity": 1.012959618382855,
+        "iStream_segment": 13,
+        "lFlowlineID": 202,
+        "lIndex": 202,
+        "nEdge": 7,
+        "nVertex": 8,
+        "pVertex_end": {
+            "dLatitude_degree": 41.0280972936123,
+            "dLongitude_degree": -76.8598232023701
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 41.0169922329154,
+            "dLongitude_degree": -76.8581770590729
+        }
+    },
+    {
+        "dLength": 316.60187664051523,
+        "dSinuosity": 1.0,
+        "iStream_segment": 12,
+        "lFlowlineID": 203,
+        "lIndex": 203,
+        "nEdge": 1,
+        "nVertex": 2,
+        "pVertex_end": {
+            "dLatitude_degree": 40.9177214632485,
+            "dLongitude_degree": -76.8521443069615
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 40.9164599291368,
+            "dLongitude_degree": -76.8487711042729
+        }
+    },
+    {
+        "dLength": 1117.1861594817901,
+        "dSinuosity": 1.0265034903841914,
+        "iStream_segment": 11,
+        "lFlowlineID": 204,
+        "lIndex": 204,
+        "nEdge": 8,
+        "nVertex": 9,
+        "pVertex_end": {
+            "dLatitude_degree": 40.8624472600413,
+            "dLongitude_degree": -76.801554102539
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 40.8552058649672,
+            "dLongitude_degree": -76.8102390340867
+        }
+    },
+    {
+        "dLength": 790.6972448624903,
+        "dSinuosity": 1.1261430300329522,
+        "iStream_segment": 10,
+        "lFlowlineID": 205,
+        "lIndex": 205,
+        "nEdge": 14,
+        "nVertex": 15,
+        "pVertex_end": {
+            "dLatitude_degree": 40.8132452883582,
+            "dLongitude_degree": -76.8438986824498
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 40.8083518916931,
+            "dLongitude_degree": -76.8491566143539
+        }
+    },
+    {
+        "dLength": 373.5770125257184,
+        "dSinuosity": 1.0496090973979633,
+        "iStream_segment": 9,
+        "lFlowlineID": 206,
+        "lIndex": 206,
+        "nEdge": 5,
+        "nVertex": 6,
+        "pVertex_end": {
+            "dLatitude_degree": 40.8047125586515,
+            "dLongitude_degree": -76.8473844104249
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 40.8076491585096,
+            "dLongitude_degree": -76.8490550137168
+        }
+    },
+    {
+        "dLength": 1009.7303149243518,
+        "dSinuosity": 1.8278480003908795,
+        "iStream_segment": 8,
+        "lFlowlineID": 207,
+        "lIndex": 207,
+        "nEdge": 5,
+        "nVertex": 6,
+        "pVertex_end": {
+            "dLatitude_degree": 40.7743105040659,
+            "dLongitude_degree": -76.8571181900476
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 40.7780727679895,
+            "dLongitude_degree": -76.8528450576649
+        }
+    },
+    {
+        "dLength": 389.511957056689,
+        "dSinuosity": 1.0541982924986515,
+        "iStream_segment": 7,
+        "lFlowlineID": 208,
+        "lIndex": 208,
+        "nEdge": 7,
+        "nVertex": 8,
+        "pVertex_end": {
+            "dLatitude_degree": 40.7780727679895,
+            "dLongitude_degree": -76.8528450576649
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 40.7751913012271,
+            "dLongitude_degree": -76.8506695874876
+        }
+    },
+    {
+        "dLength": 648.5260678014262,
+        "dSinuosity": 1.0208411052757589,
+        "iStream_segment": 6,
+        "lFlowlineID": 209,
+        "lIndex": 209,
+        "nEdge": 6,
+        "nVertex": 7,
+        "pVertex_end": {
+            "dLatitude_degree": 40.7780727679895,
+            "dLongitude_degree": -76.8528450576649
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 40.7723685029607,
+            "dLongitude_degree": -76.853072786364
+        }
+    },
+    {
+        "dLength": 790.9485370330638,
+        "dSinuosity": 1.0336013370562693,
+        "iStream_segment": 5,
+        "lFlowlineID": 210,
+        "lIndex": 210,
+        "nEdge": 5,
+        "nVertex": 6,
+        "pVertex_end": {
+            "dLatitude_degree": 40.7649017052601,
+            "dLongitude_degree": -76.8537472471581
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 40.7717427030426,
+            "dLongitude_degree": -76.8528558523986
+        }
+    },
+    {
+        "dLength": 661.4734412337426,
+        "dSinuosity": 1.0062795387012762,
+        "iStream_segment": 4,
+        "lFlowlineID": 211,
+        "lIndex": 211,
+        "nEdge": 5,
+        "nVertex": 6,
+        "pVertex_end": {
+            "dLatitude_degree": 40.7594391066999,
+            "dLongitude_degree": -76.8536428425559
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 40.7645159069478,
+            "dLongitude_degree": -76.8576245821574
+        }
+    },
+    {
+        "dLength": 685.6482000495996,
+        "dSinuosity": 1.0026530781257106,
+        "iStream_segment": 3,
+        "lFlowlineID": 212,
+        "lIndex": 212,
+        "nEdge": 4,
+        "nVertex": 5,
+        "pVertex_end": {
+            "dLatitude_degree": 40.728490578353,
+            "dLongitude_degree": -76.8522484172211
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 40.7224563798416,
+            "dLongitude_degree": -76.8537671466412
+        }
+    },
+    {
+        "dLength": 577.5182616715052,
+        "dSinuosity": 1.0,
+        "iStream_segment": 2,
+        "lFlowlineID": 213,
+        "lIndex": 213,
+        "nEdge": 1,
+        "nVertex": 2,
+        "pVertex_end": {
+            "dLatitude_degree": 39.8826836641845,
+            "dLongitude_degree": -76.3770927375618
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 39.8775158072342,
+            "dLongitude_degree": -76.3764985337255
+        }
+    },
+    {
+        "dLength": 753.5308105057406,
+        "dSinuosity": 1.1166806925115669,
+        "iStream_segment": 1,
+        "lFlowlineID": 214,
+        "lIndex": 214,
+        "nEdge": 5,
+        "nVertex": 6,
+        "pVertex_end": {
+            "dLatitude_degree": 39.6203062820829,
+            "dLongitude_degree": -76.1470307643828
+        },
+        "pVertex_start": {
+            "dLatitude_degree": 39.6147254144444,
+            "dLongitude_degree": -76.1439589659379
+        }
+    }
+]

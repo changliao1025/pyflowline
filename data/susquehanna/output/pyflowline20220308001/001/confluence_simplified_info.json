@@ -1,0 +1,858 @@
+[
+    {
+        "dAngle_upstream": 138.3446728094671,
+        "pFlowline_downstream": 0,
+        "pVertex_confluence": {
+            "dLatitude_degree": 39.573698662955,
+            "dLongitude_degree": -76.0924596025752
+        }
+    },
+    {
+        "dAngle_upstream": 152.37733435341318,
+        "pFlowline_downstream": 2,
+        "pVertex_confluence": {
+            "dLatitude_degree": 39.6203062820829,
+            "dLongitude_degree": -76.1470307643828
+        }
+    },
+    {
+        "dAngle_upstream": 122.76797897151195,
+        "pFlowline_downstream": 3,
+        "pVertex_confluence": {
+            "dLatitude_degree": 39.6460648870666,
+            "dLongitude_degree": -76.1585008272001
+        }
+    },
+    {
+        "dAngle_upstream": 111.75830618340669,
+        "pFlowline_downstream": 5,
+        "pVertex_confluence": {
+            "dLatitude_degree": 39.8269466832301,
+            "dLongitude_degree": -76.3363748887028
+        }
+    },
+    {
+        "dAngle_upstream": 129.96494232249776,
+        "pFlowline_downstream": 7,
+        "pVertex_confluence": {
+            "dLatitude_degree": 39.8826836641845,
+            "dLongitude_degree": -76.3770927375618
+        }
+    },
+    {
+        "dAngle_upstream": 140.5994003819462,
+        "pFlowline_downstream": 8,
+        "pVertex_confluence": {
+            "dLatitude_degree": 40.068337221595,
+            "dLongitude_degree": -76.6516905152776
+        }
+    },
+    {
+        "dAngle_upstream": 123.90529447267441,
+        "pFlowline_downstream": 10,
+        "pVertex_confluence": {
+            "dLatitude_degree": 40.0809866211804,
+            "dLongitude_degree": -76.6724429527321
+        }
+    },
+    {
+        "dAngle_upstream": 176.41399970238257,
+        "pFlowline_downstream": 12,
+        "pVertex_confluence": {
+            "dLatitude_degree": 40.1044712812343,
+            "dLongitude_degree": -76.6893360683815
+        }
+    },
+    {
+        "dAngle_upstream": 154.11977194594004,
+        "pFlowline_downstream": 14,
+        "pVertex_confluence": {
+            "dLatitude_degree": 40.108506609727,
+            "dLongitude_degree": -76.6956435698167
+        }
+    },
+    {
+        "dAngle_upstream": 28.959599313042148,
+        "pFlowline_downstream": 16,
+        "pVertex_confluence": {
+            "dLatitude_degree": 40.3961183451406,
+            "dLongitude_degree": -77.0167967324783
+        }
+    },
+    {
+        "dAngle_upstream": 138.6467530667301,
+        "pFlowline_downstream": 17,
+        "pVertex_confluence": {
+            "dLatitude_degree": 40.4065471282639,
+            "dLongitude_degree": -77.0117167456011
+        }
+    },
+    {
+        "dAngle_upstream": 102.42252503702903,
+        "pFlowline_downstream": 18,
+        "pVertex_confluence": {
+            "dLatitude_degree": 40.4252327498331,
+            "dLongitude_degree": -77.01615613997
+        }
+    },
+    {
+        "dAngle_upstream": 76.77915271642729,
+        "pFlowline_downstream": 19,
+        "pVertex_confluence": {
+            "dLatitude_degree": 40.5346555608164,
+            "dLongitude_degree": -77.2944639539913
+        }
+    },
+    {
+        "dAngle_upstream": 95.96107569270953,
+        "pFlowline_downstream": 20,
+        "pVertex_confluence": {
+            "dLatitude_degree": 40.5276060988451,
+            "dLongitude_degree": -77.3173685518173
+        }
+    },
+    {
+        "dAngle_upstream": 179.9908206334253,
+        "pFlowline_downstream": 22,
+        "pVertex_confluence": {
+            "dLatitude_degree": 40.5862861580735,
+            "dLongitude_degree": -77.4074434580856
+        }
+    },
+    {
+        "dAngle_upstream": 121.20258348747616,
+        "pFlowline_downstream": 24,
+        "pVertex_confluence": {
+            "dLatitude_degree": 40.5879255652942,
+            "dLongitude_degree": -77.5184689963545
+        }
+    },
+    {
+        "dAngle_upstream": 124.99673852760276,
+        "pFlowline_downstream": 25,
+        "pVertex_confluence": {
+            "dLatitude_degree": 40.4774393936413,
+            "dLongitude_degree": -77.7330842088673
+        }
+    },
+    {
+        "dAngle_upstream": 97.01804465607263,
+        "pFlowline_downstream": 27,
+        "pVertex_confluence": {
+            "dLatitude_degree": 40.3895000049133,
+            "dLongitude_degree": -77.8367460377102
+        }
+    },
+    {
+        "dAngle_upstream": 147.3343494708624,
+        "pFlowline_downstream": 34,
+        "pVertex_confluence": {
+            "dLatitude_degree": 40.728490578353,
+            "dLongitude_degree": -76.8522484172211
+        }
+    },
+    {
+        "dAngle_upstream": 32.286734799327085,
+        "pFlowline_downstream": 35,
+        "pVertex_confluence": {
+            "dLatitude_degree": 40.7594391066999,
+            "dLongitude_degree": -76.8536428425559
+        }
+    },
+    {
+        "dAngle_upstream": 65.26530094564755,
+        "pFlowline_downstream": 36,
+        "pVertex_confluence": {
+            "dLatitude_degree": 40.7649017052601,
+            "dLongitude_degree": -76.8537472471581
+        }
+    },
+    {
+        "dAngle_upstream": 135.42347935530702,
+        "pFlowline_downstream": 37,
+        "pVertex_confluence": {
+            "dLatitude_degree": 40.7668829055459,
+            "dLongitude_degree": -76.8557702498438
+        }
+    },
+    {
+        "dAngle_upstream": 54.27471975184257,
+        "pFlowline_downstream": 39,
+        "pVertex_confluence": {
+            "dLatitude_degree": 40.76872737191,
+            "dLongitude_degree": -76.8562625849642
+        }
+    },
+    {
+        "dAngle_upstream": 37.20650596087572,
+        "pFlowline_downstream": 41,
+        "pVertex_confluence": {
+            "dLatitude_degree": 40.7743105040659,
+            "dLongitude_degree": -76.8571181900476
+        }
+    },
+    {
+        "dAngle_upstream": 69.82487975871797,
+        "pFlowline_downstream": 42,
+        "pVertex_confluence": {
+            "dLatitude_degree": 40.8047125586515,
+            "dLongitude_degree": -76.8473844104249
+        }
+    },
+    {
+        "dAngle_upstream": 126.61793986908688,
+        "pFlowline_downstream": 43,
+        "pVertex_confluence": {
+            "dLatitude_degree": 40.8132452883582,
+            "dLongitude_degree": -76.8438986824498
+        }
+    },
+    {
+        "dAngle_upstream": 122.55623148873367,
+        "pFlowline_downstream": 44,
+        "pVertex_confluence": {
+            "dLatitude_degree": 40.8239586822562,
+            "dLongitude_degree": -76.8353180204154
+        }
+    },
+    {
+        "dAngle_upstream": 162.27679233730066,
+        "pFlowline_downstream": 45,
+        "pVertex_confluence": {
+            "dLatitude_degree": 40.8208185494051,
+            "dLongitude_degree": -76.8344206840061
+        }
+    },
+    {
+        "dAngle_upstream": 57.36021386096199,
+        "pFlowline_downstream": 47,
+        "pVertex_confluence": {
+            "dLatitude_degree": 40.8180456841143,
+            "dLongitude_degree": -76.8361252158785
+        }
+    },
+    {
+        "dAngle_upstream": 51.42779829084439,
+        "pFlowline_downstream": 50,
+        "pVertex_confluence": {
+            "dLatitude_degree": 40.8374007400325,
+            "dLongitude_degree": -76.8208798244392
+        }
+    },
+    {
+        "dAngle_upstream": 125.62792052143936,
+        "pFlowline_downstream": 51,
+        "pVertex_confluence": {
+            "dLatitude_degree": 40.8384059376755,
+            "dLongitude_degree": -76.8152198224555
+        }
+    },
+    {
+        "dAngle_upstream": 128.37397721300331,
+        "pFlowline_downstream": 53,
+        "pVertex_confluence": {
+            "dLatitude_degree": 40.8467950663183,
+            "dLongitude_degree": -76.8082002926699
+        }
+    },
+    {
+        "dAngle_upstream": 144.14056160676304,
+        "pFlowline_downstream": 56,
+        "pVertex_confluence": {
+            "dLatitude_degree": 40.8624472600413,
+            "dLongitude_degree": -76.801554102539
+        }
+    },
+    {
+        "dAngle_upstream": 62.105866887735644,
+        "pFlowline_downstream": 57,
+        "pVertex_confluence": {
+            "dLatitude_degree": 40.8767116542377,
+            "dLongitude_degree": -76.7950022446548
+        }
+    },
+    {
+        "dAngle_upstream": 121.97233977334251,
+        "pFlowline_downstream": 58,
+        "pVertex_confluence": {
+            "dLatitude_degree": 40.8991424400634,
+            "dLongitude_degree": -76.7693234510198
+        }
+    },
+    {
+        "dAngle_upstream": 107.83413626990323,
+        "pFlowline_downstream": 59,
+        "pVertex_confluence": {
+            "dLatitude_degree": 40.9256720782845,
+            "dLongitude_degree": -76.716428032378
+        }
+    },
+    {
+        "dAngle_upstream": 110.50415171037228,
+        "pFlowline_downstream": 60,
+        "pVertex_confluence": {
+            "dLatitude_degree": 40.9458697854492,
+            "dLongitude_degree": -76.6687264034651
+        }
+    },
+    {
+        "dAngle_upstream": 107.49883641956743,
+        "pFlowline_downstream": 61,
+        "pVertex_confluence": {
+            "dLatitude_degree": 40.9694703511859,
+            "dLongitude_degree": -76.4676432257124
+        }
+    },
+    {
+        "dAngle_upstream": 113.19095230927084,
+        "pFlowline_downstream": 63,
+        "pVertex_confluence": {
+            "dLatitude_degree": 41.0642959586397,
+            "dLongitude_degree": -76.1783509974736
+        }
+    },
+    {
+        "dAngle_upstream": 96.39770762057022,
+        "pFlowline_downstream": 64,
+        "pVertex_confluence": {
+            "dLatitude_degree": 41.1205715354896,
+            "dLongitude_degree": -76.1354131959121
+        }
+    },
+    {
+        "dAngle_upstream": 135.93772973260744,
+        "pFlowline_downstream": 66,
+        "pVertex_confluence": {
+            "dLatitude_degree": 41.1341855435677,
+            "dLongitude_degree": -76.1432004749922
+        }
+    },
+    {
+        "dAngle_upstream": 87.2034857181524,
+        "pFlowline_downstream": 67,
+        "pVertex_confluence": {
+            "dLatitude_degree": 41.1303657428281,
+            "dLongitude_degree": -76.1431312062613
+        }
+    },
+    {
+        "dAngle_upstream": 93.73781823411709,
+        "pFlowline_downstream": 70,
+        "pVertex_confluence": {
+            "dLatitude_degree": 41.2152636254535,
+            "dLongitude_degree": -76.0346591915363
+        }
+    },
+    {
+        "dAngle_upstream": 82.93326142585549,
+        "pFlowline_downstream": 72,
+        "pVertex_confluence": {
+            "dLatitude_degree": 41.4560427606285,
+            "dLongitude_degree": -75.891132015604
+        }
+    },
+    {
+        "dAngle_upstream": 130.54611182967926,
+        "pFlowline_downstream": 73,
+        "pVertex_confluence": {
+            "dLatitude_degree": 41.5089788593916,
+            "dLongitude_degree": -75.9053720375363
+        }
+    },
+    {
+        "dAngle_upstream": 132.25036460932083,
+        "pFlowline_downstream": 74,
+        "pVertex_confluence": {
+            "dLatitude_degree": 41.547532280979,
+            "dLongitude_degree": -75.9763147513888
+        }
+    },
+    {
+        "dAngle_upstream": 121.87655433718369,
+        "pFlowline_downstream": 75,
+        "pVertex_confluence": {
+            "dLatitude_degree": 41.5584831793982,
+            "dLongitude_degree": -76.002832572623
+        }
+    },
+    {
+        "dAngle_upstream": 86.66451030409941,
+        "pFlowline_downstream": 76,
+        "pVertex_confluence": {
+            "dLatitude_degree": 41.5598521033622,
+            "dLongitude_degree": -76.0217450965905
+        }
+    },
+    {
+        "dAngle_upstream": 91.56806559442279,
+        "pFlowline_downstream": 77,
+        "pVertex_confluence": {
+            "dLatitude_degree": 41.5924698698035,
+            "dLongitude_degree": -76.0519283381909
+        }
+    },
+    {
+        "dAngle_upstream": 93.66723079402445,
+        "pFlowline_downstream": 78,
+        "pVertex_confluence": {
+            "dLatitude_degree": 41.5974214683642,
+            "dLongitude_degree": -76.0494902715582
+        }
+    },
+    {
+        "dAngle_upstream": 107.52522232835744,
+        "pFlowline_downstream": 80,
+        "pVertex_confluence": {
+            "dLatitude_degree": 41.6502165789547,
+            "dLongitude_degree": -76.1984929888311
+        }
+    },
+    {
+        "dAngle_upstream": 125.90220093272374,
+        "pFlowline_downstream": 81,
+        "pVertex_confluence": {
+            "dLatitude_degree": 41.6763102316762,
+            "dLongitude_degree": -76.275815938152
+        }
+    },
+    {
+        "dAngle_upstream": 98.56071098817094,
+        "pFlowline_downstream": 83,
+        "pVertex_confluence": {
+            "dLatitude_degree": 41.6952174713854,
+            "dLongitude_degree": -76.2897051292599
+        }
+    },
+    {
+        "dAngle_upstream": 153.27934339230225,
+        "pFlowline_downstream": 84,
+        "pVertex_confluence": {
+            "dLatitude_degree": 41.695525004199,
+            "dLongitude_degree": -76.2945170671562
+        }
+    },
+    {
+        "dAngle_upstream": 74.28068971851158,
+        "pFlowline_downstream": 85,
+        "pVertex_confluence": {
+            "dLatitude_degree": 41.7015604617453,
+            "dLongitude_degree": -76.328723961339
+        }
+    },
+    {
+        "dAngle_upstream": 112.78995810754738,
+        "pFlowline_downstream": 86,
+        "pVertex_confluence": {
+            "dLatitude_degree": 41.7037595919492,
+            "dLongitude_degree": -76.3302890934941
+        }
+    },
+    {
+        "dAngle_upstream": 165.97406107518853,
+        "pFlowline_downstream": 89,
+        "pVertex_confluence": {
+            "dLatitude_degree": 41.7437233358115,
+            "dLongitude_degree": -76.3155040283092
+        }
+    },
+    {
+        "dAngle_upstream": 124.87697341543732,
+        "pFlowline_downstream": 90,
+        "pVertex_confluence": {
+            "dLatitude_degree": 41.7438020023669,
+            "dLongitude_degree": -76.3155162948895
+        }
+    },
+    {
+        "dAngle_upstream": 127.13632141066651,
+        "pFlowline_downstream": 93,
+        "pVertex_confluence": {
+            "dLatitude_degree": 41.7467779306191,
+            "dLongitude_degree": -76.3717259468489
+        }
+    },
+    {
+        "dAngle_upstream": 106.57092215700597,
+        "pFlowline_downstream": 95,
+        "pVertex_confluence": {
+            "dLatitude_degree": 41.7715936833379,
+            "dLongitude_degree": -76.3860628634791
+        }
+    },
+    {
+        "dAngle_upstream": 103.28708024610754,
+        "pFlowline_downstream": 97,
+        "pVertex_confluence": {
+            "dLatitude_degree": 41.7594029075001,
+            "dLongitude_degree": -76.4366841246901
+        }
+    },
+    {
+        "dAngle_upstream": 124.78230990496492,
+        "pFlowline_downstream": 99,
+        "pVertex_confluence": {
+            "dLatitude_degree": 41.7635120998645,
+            "dLongitude_degree": -76.4404295211892
+        }
+    },
+    {
+        "dAngle_upstream": 94.31943223621397,
+        "pFlowline_downstream": 100,
+        "pVertex_confluence": {
+            "dLatitude_degree": 41.7771477411645,
+            "dLongitude_degree": -76.4406763651011
+        }
+    },
+    {
+        "dAngle_upstream": 74.23165981241121,
+        "pFlowline_downstream": 101,
+        "pVertex_confluence": {
+            "dLatitude_degree": 41.7946228423503,
+            "dLongitude_degree": -76.4456745387731
+        }
+    },
+    {
+        "dAngle_upstream": 83.91048182381749,
+        "pFlowline_downstream": 102,
+        "pVertex_confluence": {
+            "dLatitude_degree": 41.7979566366125,
+            "dLongitude_degree": -76.451088669576
+        }
+    },
+    {
+        "dAngle_upstream": 112.08498516830647,
+        "pFlowline_downstream": 104,
+        "pVertex_confluence": {
+            "dLatitude_degree": 41.8306161823614,
+            "dLongitude_degree": -76.5006858967648
+        }
+    },
+    {
+        "dAngle_upstream": 101.5125325387067,
+        "pFlowline_downstream": 106,
+        "pVertex_confluence": {
+            "dLatitude_degree": 41.8470693540487,
+            "dLongitude_degree": -76.4950595911079
+        }
+    },
+    {
+        "dAngle_upstream": 143.81472422326598,
+        "pFlowline_downstream": 107,
+        "pVertex_confluence": {
+            "dLatitude_degree": 41.9214408496535,
+            "dLongitude_degree": -76.515119473696
+        }
+    },
+    {
+        "dAngle_upstream": 107.88754437783147,
+        "pFlowline_downstream": 108,
+        "pVertex_confluence": {
+            "dLatitude_degree": 41.9450140280257,
+            "dLongitude_degree": -76.5074796663756
+        }
+    },
+    {
+        "dAngle_upstream": 103.0645580029938,
+        "pFlowline_downstream": 109,
+        "pVertex_confluence": {
+            "dLatitude_degree": 41.9884641731958,
+            "dLongitude_degree": -76.4956535559437
+        }
+    },
+    {
+        "dAngle_upstream": 128.57924741578572,
+        "pFlowline_downstream": 110,
+        "pVertex_confluence": {
+            "dLatitude_degree": 41.9906275018302,
+            "dLongitude_degree": -76.4936852865954
+        }
+    },
+    {
+        "dAngle_upstream": 60.5063442970156,
+        "pFlowline_downstream": 111,
+        "pVertex_confluence": {
+            "dLatitude_degree": 42.1149990223687,
+            "dLongitude_degree": -75.9925710440888
+        }
+    },
+    {
+        "dAngle_upstream": 113.12558660795523,
+        "pFlowline_downstream": 113,
+        "pVertex_confluence": {
+            "dLatitude_degree": 42.0954721865021,
+            "dLongitude_degree": -75.9494367009213
+        }
+    },
+    {
+        "dAngle_upstream": 79.66800420223467,
+        "pFlowline_downstream": 114,
+        "pVertex_confluence": {
+            "dLatitude_degree": 42.0951483860817,
+            "dLongitude_degree": -75.9495567011215
+        }
+    },
+    {
+        "dAngle_upstream": 83.51136481682886,
+        "pFlowline_downstream": 116,
+        "pVertex_confluence": {
+            "dLatitude_degree": 42.0877250429897,
+            "dLongitude_degree": -75.9304958291012
+        }
+    },
+    {
+        "dAngle_upstream": 87.76955576196815,
+        "pFlowline_downstream": 120,
+        "pVertex_confluence": {
+            "dLatitude_degree": 41.9906505694326,
+            "dLongitude_degree": -76.4957958844678
+        }
+    },
+    {
+        "dAngle_upstream": 147.37084942064854,
+        "pFlowline_downstream": 125,
+        "pVertex_confluence": {
+            "dLatitude_degree": 42.0250604394962,
+            "dLongitude_degree": -76.6965750781826
+        }
+    },
+    {
+        "dAngle_upstream": 44.76181469533774,
+        "pFlowline_downstream": 127,
+        "pVertex_confluence": {
+            "dLatitude_degree": 42.0199195307762,
+            "dLongitude_degree": -76.7271215603874
+        }
+    },
+    {
+        "dAngle_upstream": 42.55099799908862,
+        "pFlowline_downstream": 128,
+        "pVertex_confluence": {
+            "dLatitude_degree": 42.0541114389183,
+            "dLongitude_degree": -76.7597296527644
+        }
+    },
+    {
+        "dAngle_upstream": 75.01823696707685,
+        "pFlowline_downstream": 129,
+        "pVertex_confluence": {
+            "dLatitude_degree": 42.0647163195313,
+            "dLongitude_degree": -76.7633653785093
+        }
+    },
+    {
+        "dAngle_upstream": 165.26185374991925,
+        "pFlowline_downstream": 130,
+        "pVertex_confluence": {
+            "dLatitude_degree": 42.0719228081735,
+            "dLongitude_degree": -76.7740674864886
+        }
+    },
+    {
+        "dAngle_upstream": 158.31743371136693,
+        "pFlowline_downstream": 131,
+        "pVertex_confluence": {
+            "dLatitude_degree": 42.0625401221399,
+            "dLongitude_degree": -76.7684565229017
+        }
+    },
+    {
+        "dAngle_upstream": 72.83926630221754,
+        "pFlowline_downstream": 132,
+        "pVertex_confluence": {
+            "dLatitude_degree": 42.0584965518064,
+            "dLongitude_degree": -76.7633069355904
+        }
+    },
+    {
+        "dAngle_upstream": 72.01699858635945,
+        "pFlowline_downstream": 136,
+        "pVertex_confluence": {
+            "dLatitude_degree": 42.0752028594554,
+            "dLongitude_degree": -76.8558300612982
+        }
+    },
+    {
+        "dAngle_upstream": 129.62676092564317,
+        "pFlowline_downstream": 138,
+        "pVertex_confluence": {
+            "dLatitude_degree": 42.1260269448695,
+            "dLongitude_degree": -77.0257843410206
+        }
+    },
+    {
+        "dAngle_upstream": 119.68517402409024,
+        "pFlowline_downstream": 140,
+        "pVertex_confluence": {
+            "dLatitude_degree": 42.1220681232004,
+            "dLongitude_degree": -77.1287458950794
+        }
+    },
+    {
+        "dAngle_upstream": 135.83277762363556,
+        "pFlowline_downstream": 163,
+        "pVertex_confluence": {
+            "dLatitude_degree": 40.9177214632485,
+            "dLongitude_degree": -76.8521443069615
+        }
+    },
+    {
+        "dAngle_upstream": 45.83610657682732,
+        "pFlowline_downstream": 164,
+        "pVertex_confluence": {
+            "dLatitude_degree": 40.920087129641,
+            "dLongitude_degree": -76.8532531094696
+        }
+    },
+    {
+        "dAngle_upstream": 177.74768230673752,
+        "pFlowline_downstream": 166,
+        "pVertex_confluence": {
+            "dLatitude_degree": 41.0280972936123,
+            "dLongitude_degree": -76.8598232023701
+        }
+    },
+    {
+        "dAngle_upstream": 44.502584860474116,
+        "pFlowline_downstream": 167,
+        "pVertex_confluence": {
+            "dLatitude_degree": 41.1296717753805,
+            "dLongitude_degree": -76.8959407694168
+        }
+    },
+    {
+        "dAngle_upstream": 146.76341234465883,
+        "pFlowline_downstream": 168,
+        "pVertex_confluence": {
+            "dLatitude_degree": 41.1409189680904,
+            "dLongitude_degree": -76.8933485775016
+        }
+    },
+    {
+        "dAngle_upstream": 78.07751725663837,
+        "pFlowline_downstream": 169,
+        "pVertex_confluence": {
+            "dLatitude_degree": 41.2271221081334,
+            "dLongitude_degree": -76.8325448218964
+        }
+    },
+    {
+        "dAngle_upstream": 138.60546193274445,
+        "pFlowline_downstream": 170,
+        "pVertex_confluence": {
+            "dLatitude_degree": 41.2290671754301,
+            "dLongitude_degree": -76.8456489625621
+        }
+    },
+    {
+        "dAngle_upstream": 145.55947226955985,
+        "pFlowline_downstream": 171,
+        "pVertex_confluence": {
+            "dLatitude_degree": 41.2300075761993,
+            "dLongitude_degree": -76.8556407676982
+        }
+    },
+    {
+        "dAngle_upstream": 45.47091069212576,
+        "pFlowline_downstream": 173,
+        "pVertex_confluence": {
+            "dLatitude_degree": 41.2301267099657,
+            "dLongitude_degree": -76.8594875694737
+        }
+    },
+    {
+        "dAngle_upstream": 140.78258330077955,
+        "pFlowline_downstream": 174,
+        "pVertex_confluence": {
+            "dLatitude_degree": 41.2322753096147,
+            "dLongitude_degree": -76.8664047742654
+        }
+    },
+    {
+        "dAngle_upstream": 68.0016456142945,
+        "pFlowline_downstream": 175,
+        "pVertex_confluence": {
+            "dLatitude_degree": 41.231935109784,
+            "dLongitude_degree": -76.8661789738858
+        }
+    },
+    {
+        "dAngle_upstream": 148.54249096771287,
+        "pFlowline_downstream": 178,
+        "pVertex_confluence": {
+            "dLatitude_degree": 41.2422145150607,
+            "dLongitude_degree": -76.9585218224689
+        }
+    },
+    {
+        "dAngle_upstream": 28.88958082336436,
+        "pFlowline_downstream": 179,
+        "pVertex_confluence": {
+            "dLatitude_degree": 41.2437987150506,
+            "dLongitude_degree": -76.9669154273981
+        }
+    },
+    {
+        "dAngle_upstream": 48.92280086992762,
+        "pFlowline_downstream": 181,
+        "pVertex_confluence": {
+            "dLatitude_degree": 41.2203815508578,
+            "dLongitude_degree": -77.0600956713199
+        }
+    },
+    {
+        "dAngle_upstream": 130.11344201520217,
+        "pFlowline_downstream": 182,
+        "pVertex_confluence": {
+            "dLatitude_degree": 41.212630781242,
+            "dLongitude_degree": -77.1558360375401
+        }
+    },
+    {
+        "dAngle_upstream": 35.394364736137774,
+        "pFlowline_downstream": 183,
+        "pVertex_confluence": {
+            "dLatitude_degree": 41.2114178059525,
+            "dLongitude_degree": -77.246663743605
+        }
+    },
+    {
+        "dAngle_upstream": 131.25574214633573,
+        "pFlowline_downstream": 185,
+        "pVertex_confluence": {
+            "dLatitude_degree": 41.165407114233,
+            "dLongitude_degree": -77.4713598215525
+        }
+    },
+    {
+        "dAngle_upstream": 117.21905815888637,
+        "pFlowline_downstream": 187,
+        "pVertex_confluence": {
+            "dLatitude_degree": 41.2985864747947,
+            "dLongitude_degree": -77.9992676439983
+        }
+    },
+    {
+        "dAngle_upstream": 53.739211326341724,
+        "pFlowline_downstream": 189,
+        "pVertex_confluence": {
+            "dLatitude_degree": 41.2996957365494,
+            "dLongitude_degree": -78.0131277025356
+        }
+    },
+    {
+        "dAngle_upstream": 128.4694481279113,
+        "pFlowline_downstream": 191,
+        "pVertex_confluence": {
+            "dLatitude_degree": 41.3175393017251,
+            "dLongitude_degree": -78.0813090652997
+        }
+    },
+    {
+        "dAngle_upstream": 71.18256488024929,
+        "pFlowline_downstream": 207,
+        "pVertex_confluence": {
+            "dLatitude_degree": 40.7780727679895,
+            "dLongitude_degree": -76.8528450576649
+        }
+    }
+]

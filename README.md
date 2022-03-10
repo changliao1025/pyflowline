@@ -12,13 +12,10 @@ As of right now, you can install PyFlowline using the following steps:
 
 1. install the dependency packages through Conda 
 
-
 2. install PyFlowline through the PyPI:
     pip install pyflowline
 
-3. (Optional) Install the visualization package through Conda:
-
-4. (Optional) Install the Python JupterNote to run this tutorial.
+3. (Optional) Install the Python JupterNote to run this tutorial.
 
 
 # Usage
@@ -55,6 +52,17 @@ The follow steps are recommended:
 
 7. Navigate to the notebook and run it in your preferred Python IDE.
 
+Because of the Python package dependency issue, the visulization should use a different environment or using the QGIS.
+
+# Acknowledgement
+
+This work was supported by the Earth System Model Development program areas of the U.S. Department of Energy, Office of Science, Office of Biological and Environmental Research as part of the multi-program, collaborative Integrated Coastal Modeling (ICoM) project. The data used for model simulations can be downloaded through the USGS website (\url{https://www.usgs.gov/national-hydrography}). The Pyflowline model can be accessed through the Python Package Index service (\url{https://pypi.org/project/pyflowline/}). 
+
+# Citation
+
+* Liao, Chang, Tian Zhou, Donghui Xu, Richard Barnes, Gautam Bisht, Hong-Yi Li, Zeli Tan, et al. (02/2022AD) 2022. “Advances In Hexagon Mesh-Based Flow Direction Modeling”. Advances In Water Resources 160. Elsevier BV: 104099. doi:10.1016/j.advwatres.2021.104099.
+
+* Liao, C., Tesfa, T., Duan, Z., & Leung, L. R. (2020). Watershed delineation on a hexagonal mesh grid. Environmental Modelling & Software, 128, 104702. https://doi.org/10.1016/j.envsoft.2020.104702
 
 
 

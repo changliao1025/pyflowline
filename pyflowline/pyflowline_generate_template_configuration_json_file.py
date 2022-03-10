@@ -60,7 +60,7 @@ def pyflowline_generate_basin_template_configuration_json_file(sFilename_basins_
 
 def pyflowline_generate_template_configuration_json_file(sFilename_json, \
     sWorkspace_input, sWorkspace_output, iFlag_standalone_in=None, \
-        iFlag_use_mesh_dem_in=None, iFlag_use_shapefile_extent_in=None,  iCase_index_in=None,    dResolution_degree_in = None, dResolution_meter_in = None,   sDate_in = None,  sMesh_type_in = None,    sModel_in = None):
+        iFlag_use_mesh_dem_in=None, iFlag_use_shapefile_extent_in=None,  iCase_index_in=None,  dResolution_degree_in = None, dResolution_meter_in = None,   sDate_in = None,  sMesh_type_in = None,    sModel_in = None):
     """generate pyflowline config template file
 
     Args:
@@ -169,7 +169,7 @@ def pyflowline_generate_template_configuration_json_file(sFilename_json, \
 
     
 
-    aBasin = pyflowline_generate_basin_template_configuration_json_file(sFilename_basins_json, nBasin, sWorkspace_input,  sWorkspace_output)
+    aBasin = pyflowline_generate_basin_template_configuration_json_file(sFilename_basins_json, nBasin, sWorkspace_input,  oModel.sWorkspace_output)
 
     oModel.aBasin = aBasin
     oModel.sFilename_basins = sFilename_basins_json

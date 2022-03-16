@@ -34,7 +34,7 @@ Computational hydrologic simulation often requires high quality river network in
 
 pyflowline takes advantage of Python language's object oriented programming (OOP) architect. The river network and all of its elements (i.e. segment, reach, confluence.) are described as objects. These objects are processed throughout the package when applicable. 
 
-![The data model. \label{fig:oop}](https://github.com/changliao1025/pyflowline/blob/main/docs/figure/basic_element.png?raw=true)
+![The data model. \label{fig:oop}](https://github.com/changliao1025/pyflowline/blob/main/docs/figure/basic_element.png?raw=true | width=400)
 
 
 A brief overview of the features provided by pyflowline is list in Table 1.
@@ -90,6 +90,7 @@ The vertex type information is used to merge segmented flowlines.
 This algorithm merge flowlines so there is only 2 types of flowlines:
 
 1. headwater
+
 2. flowline between confluence
 
 If multiple flowlines are within the same confluence bound, they are merged as one.

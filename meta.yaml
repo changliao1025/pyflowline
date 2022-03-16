@@ -1,29 +1,43 @@
+{% set name = "pyflowline" %}
+{% set version = "0.1.19" %}
+
 package:
-  name: "pyflowline"
-  version: "0.0.1"
+  name: {{ name|lower }}
+  version: {{ version }}
 
 source:
-  git_rev: v0.0.1
-  git_url: https://github.com/changliao1025/pyflowline
+  url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/pyflowline-{{ version }}.tar.gz
+  sha256: f09ee5ddcb1c1fb1b295064060cdaae56e0d509b0e007be0dc8ac7e10cba6ca1
+
+build:
+  noarch: python
+  script: {{ PYTHON }} -m pip install . -vv
+  number: 0
 
 requirements:
   host:
-    - python
-    - setuptools
-  build:
-    - python
+    - pip
+    - python >=3.8
   run:
-    - python
-    - netCDF4
-    - numpy
     - gdal
+    - netcdf4
+    - numpy
+    - python >=3.8
+    - shapely
+
+test:
+  imports:
+    - pyflowline
+  commands:
+    - pip check
+  requires:
+    - pip
 
 about:
   home: https://github.com/changliao1025/pyflowline
-  license: MIT
-  license_familY: MIT
+  summary: River network for Earth Science
+  license: GPL-3.0
   license_file: LICENSE
-  summary: "Python for River Flowline"
 
 extra:
   recipe-maintainers:

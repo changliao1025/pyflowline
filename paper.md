@@ -1,5 +1,5 @@
 ---
-title: 'pyflowline: A Python package for stream networks processing'
+title: 'pyflowline: A Python package for river networks processing'
 
 tags:
   - Python
@@ -34,7 +34,7 @@ Computational hydrologic simulation often requires high quality river network in
 
 pyflowline takes advantage of Python language's object oriented programming (OOP) architect. The river network and all of its elements (i.e. segment, reach, confluence.) are described as objects. These objects are processed throughout the package when applicable. 
 
-![The data model. \label{fig:oop}](https://github.com/changliao1025/pyflowline/blob/main/pyflowline/figure/data_mode.png?raw=true)
+![The data model. \label{fig:oop}](https://github.com/changliao1025/pyflowline/blob/main/pyflowline/docs/figure/basic_element.png?raw=true)
 
 
 A brief overview of the features provided by pyflowline is list in Table 1.
@@ -52,31 +52,26 @@ The overall model workflow includes three components:
 2. Generate mesh based on the spatial extend of flowline and desired resolution
 3. Intersect mesh with flowline, produce topology information
 
-![The workflow of pyflowline. \label{fig:workflow}](https://github.com/changliao1025/pyflowline/blob/main/pyflowline/figure/workflow.png?raw=true)
 
 * Connect disconnected flowline
 
 If two flowlines are disconnected more than the threshold of floating data type error, this algorithm can be used to connect them by providing a nearest point and a searching radius. If a starting or ending vertex falls within the radius, a new flowline will be built based on the existing flowline and the provided point.
 
-![Disconnect flowline. \label{fig:disconnected}](https://github.com/changliao1025/pyflowline/blob/main/pyflowline/figure/disconnect_flowline.png?raw=true)
 
 * Correct flow direction
 
 Due to data quality issue, existing flowline may have incorrect flow direction, which leads to multiple downstream flow direction. The corresponding node connection matrix has rows with multiple 1s. This algorithm scans from the outlet node and searches reversely, once such a row was detected, the corresponding flow direction is flipped.
 
-![Flow direction. \label{fig:direction}](https://github.com/changliao1025/pyflowline/blob/main/pyflowline/figure/flow_direction_matrix.png?raw=true)
 
 * Remove small river
 
 To simplify river network, small river with length less than the user provided threshold is removed. This algorithm only applies to headwater and should be called multiple times to achieve desired performance.
 
-![Small river. \label{fig:small_river}](https://github.com/changliao1025/pyflowline/blob/main/pyflowline/figure/small_river.png?raw=true)
 
 * Remove braided loop
 
 Braided loop occurs when a node has more than one downstream even after flow direction correction. This algorithm removes these loops by only keeping the first detected downstream of any node.
 
-![Remove loops. \label{fig:loops}](https://github.com/changliao1025/pyflowline/blob/main/pyflowline/figure/remove_loop_matrix.png?raw=true)
 
 * Find critical vertex
 
@@ -88,7 +83,6 @@ The start and end vertices of a flowline define its type.
 
 The vertex type information is used to merge segmented flowlines.
 
-![Vertex type. \label{fig:vertex}](https://github.com/changliao1025/pyflowline/blob/main/pyflowline/figure/find_vertex.png?raw=true)
 
 
 * Merge flowline
@@ -100,7 +94,6 @@ This algorithm merge flowlines so there is only 2 types of flowlines:
 
 If multiple flowlines are within the same confluence bound, they are merged as one.
 
-![Merge flowline. \label{fig:merge}](https://github.com/changliao1025/pyflowline/blob/main/pyflowline/figure/merge_flowline.png?raw=true)
 
 * Mesh generation
 
@@ -119,13 +112,8 @@ Based on the intersection results, this algorithm build the upstream-downstream 
 This algorithm simpify the topology information for several unusual scenarios. For example, if a flowline leaves and re-enter the same mesh cell through the same edge, this creates a loop in topology and will be simplified. 
 
 
-
-![Topology simplification. \label{fig:topology_simplification}](https://github.com/changliao1025/pyflowline/blob/main/pyflowline/figure/simplification01.png?raw=true)
-
 In this example, the flowline AH is represented by a list of edges after the intersection. Each edge defines a topology relationship between two cells. For example, edge AB defines flow direction from cell a to cell c.
 Because the topology contains loops: cb-bc-cb-bc, it is simplified as acd, which means the final flow direction is from cell a to c, then to d.
-
-
 
 
 # Example results

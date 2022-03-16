@@ -126,41 +126,25 @@ Screenshot of before and after river networks at zoom-in regions are used to ill
 
 * Remove loop
 
-![Before remove loop. \label{fig:before_remove_loop}](https://github.com/changliao1025/pyflowline/blob/main/pyflowline/figure/before_loop.png?raw=true)
-
-![After remove loop. \label{fig:after_remove_loop}](https://github.com/changliao1025/pyflowline/blob/main/pyflowline/figure/after_loop.png?raw=true)
 
 * Merge flowline
 
-![Before merge flowline. \label{fig:before_merge}](https://github.com/changliao1025/pyflowline/blob/main/pyflowline/figure/before_merge.png?raw=true)
-
-![After merge flowline. \label{fig:after_merge}](https://github.com/changliao1025/pyflowline/blob/main/pyflowline/figure/after_merge.png?raw=true)
 
 * Mesh generation
 
-![Lan Lon mesh. \label{fig:lat_lon_mesh}](https://github.com/changliao1025/pyflowline/blob/main/pyflowline/figure/lat_lon.png?raw=true)
-
-![Sqaure mesh. \label{fig:square_mesh}](https://github.com/changliao1025/pyflowline/blob/main/pyflowline/figure/square.png?raw=true)
-
-![Hexagon mesh. \label{fig:hexagon_mesh}](https://github.com/changliao1025/pyflowline/blob/main/pyflowline/figure/hexagon.png?raw=true)
-
-![Overlap mesh. \label{fig:meshed}](https://github.com/changliao1025/pyflowline/blob/main/pyflowline/figure/meshes.png?raw=true)
 
 
 * Mesh and flowline intersection
 
-![Lat Lon intersect. \label{fig:lat_lon_intersect}](https://github.com/changliao1025/pyflowline/blob/main/pyflowline/figure/lat_lon_intersect.png?raw=true)
-
-![Square intersect. \label{fig:square_intersect}](https://github.com/changliao1025/pyflowline/blob/main/pyflowline/figure/square_intersect.png?raw=true)
-
-![Hexagon intersect. \label{fig:hexagon_intersect}](https://github.com/changliao1025/pyflowline/blob/main/pyflowline/figure/hexagon_intersect.png?raw=true)
 
 # Acknowledgement
 
 The model described in this repository was supported by:
 
 * Laboratory Directed Research and Development (LDRD) Program Quickstarter project at Pacific Northwest National Laboratory. 
+
 * Earth System Model Development and Regional and Global Modeling and Analysis program areas of the U.S. Department of Energy, Office of Science, Office of Biological and Environmental Research as part of the multi-program, collaborative Integrated Coastal Modeling (ICoM) project.
+
 * U.S. Department of Energy Office of Science Biological and Environmental Research through the Earth and Environmental System Modeling program as part of the Energy Exascale Earth System Model (E3SM) project. 
 
 A portion of this research was performed using PNNL Research Computing at Pacific Northwest National Laboratory. 
@@ -170,3 +154,5 @@ PNNL is operated for DOE by Battelle Memorial Institute under contract DE-AC05-7
 # References
 
 1. Liao, C., Tesfa, T., Duan, Z., & Leung, L. R. (2020). Watershed delineation on a hexagonal mesh grid. Environmental Modelling & Software, 128, 104702.
+
+2. Liao, C., Zhou, T., Xu, D., Barnes, R., Bisht, G., Li, H. Y., ... & Leung, L. R. (2022). Advances in hexagon mesh-based flow direction modeling. Advances in Water Resources, 104099.

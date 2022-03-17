@@ -498,6 +498,10 @@ class pybasin(object):
         self.export_basin_info_to_json()
         self.export_flowline_info_to_json()
         self.export_confluence_info_to_json()
+
+        #export basin configuration
+
+        
         
         return
 

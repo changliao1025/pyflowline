@@ -81,9 +81,11 @@ oPyflowline.dLongitude_right= -74.5
 oPyflowline.dLatitude_bot= 39.20
 oPyflowline.dLatitude_top= 42.8
 
-oPyflowline.mesh_generation()
+aCell = oPyflowline.mesh_generation()
 
-oPyflowline.reconstruct_topological_relationship()
+oPyflowline.reconstruct_topological_relationship(aCell)
+
+#rebuild neighbors
 
 oPyflowline.analyze()
 

@@ -71,6 +71,7 @@ class pyconfluence():
             self.dAngle_upstream = calculate_angle_betwen_vertex(x1, y1, x2, y2, x3, y3)
         else:
             print('multiple upstream')
+            print(len(self.aFlowline_upstream))
             self.dAngle_upstream=0.0
 
         return self.dAngle_upstream

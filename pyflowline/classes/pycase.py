@@ -454,13 +454,15 @@ class flowlinecase(object):
                             return
         return
     
-    def reconstruct_topological_relationship(self):
+    def reconstruct_topological_relationship(self, aCell_raw):
         iMesh_type = self.iMesh_type
         iFlag_intersect = self.iFlag_intersect
         sWorkspace_output = self.sWorkspace_output
         nOutlet = self.nOutlet
         sFilename_mesh=self.sFilename_mesh
         self.aCell, pSpatial_reference_mesh = read_mesh_json(iMesh_type, sFilename_mesh)
+
+        self.aCell = self.merge_cell_info(aCell_raw)
         
         aFlowline_conceptual = list()   #store all the flowline
         aCellID_outlet = list()
@@ -500,7 +502,23 @@ class flowlinecase(object):
             return   aFlowline_conceptual, aCellID_outlet
 
         return
+   
+    def merge_cell_info(self, aCell_raw):
 
+        for pCell in self.aCell:
+            for pCell2 in aCell_raw:
+                if pCell.lCellID == pCell2.lCellID:
+
+                    pCell.aNeighbor = pCell2.aNeighbor
+                    pCell.nNeighbor= pCell2.nNeighbor
+                    pCell.aNeighbor_land= pCell2.aNeighbor_land
+                    pCell.nNeighbor_land= pCell2.nNeighbor_land
+                    pCell.aNeighbor_distance= pCell2.aNeighbor_distance
+
+                    break
+
+        return self.aCell
+        
     def analyze(self):
         for pBasin in self.aBasin:
             pBasin.analyze()
@@ -514,8 +532,8 @@ class flowlinecase(object):
 
     def run(self):
         self.flowline_simplification()
-        self.mesh_generation()
-        self.reconstruct_topological_relationship()
+        aCell = self.mesh_generation()
+        self.reconstruct_topological_relationship(aCell)
         self.export()
         return
 

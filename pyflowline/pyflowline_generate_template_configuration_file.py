@@ -125,8 +125,18 @@ def pyflowline_generate_template_configuration_file(sFilename_json, \
     aConfig['iFlag_use_shapefile_extent'] = iFlag_use_shapefile_extent 
     aConfig['iFlag_use_mesh_dem'] = iFlag_use_mesh_dem
     aConfig['iFlag_save_mesh'] = 1
-
     aConfig['iFlag_flowline'] = 1
+    aConfig['iFlag_simplification']=1
+    aConfig['iFlag_create_mesh']=1
+    aConfig['iFlag_intersect']=1
+    aConfig['iFlag_resample_method']=1
+    aConfig['iFlag_global']=0
+    aConfig['iFlag_multiple_outlet']=0
+    aConfig['iFlag_elevation_profile']=1
+    aConfig['iFlag_rotation']=0
+    aConfig['iFlag_stream_burning_topology']=1
+    aConfig['iFlag_save_elevation']=1
+
      
     aConfig['nOutlet'] = nBasin
     aConfig['dResolution_degree'] = 0.5

@@ -286,6 +286,13 @@ class flowlinecase(object):
         if self.iFlag_flowline == 1:
             if 'sFilename_basins' in aConfig_in:
                 self.sFilename_basins = aConfig_in['sFilename_basins']
+
+                if os.path.isfile(self.sFilename_basins):
+                    pass
+                else:
+                    print('This basin configuration file does not exist: ', self.sFilename_basins )
+                    exit()
+
                 with open(self.sFilename_basins) as json_file:
                     dummy_data = json.load(json_file)     
                     for i in range(self.nOutlet):

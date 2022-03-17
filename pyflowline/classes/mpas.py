@@ -29,8 +29,6 @@ class MpasClassEncoder(JSONEncoder):
         
         if isinstance(obj, pympas):
             return obj.lCellID
-        
-          
             
         return JSONEncoder.default(self, obj)
 
@@ -168,6 +166,7 @@ class pympas(pycell):
         obj = self.__dict__.copy()
         for sKey in aSkip:
             obj.pop(sKey, None)
+
         sJson = json.dumps(obj, \
             sort_keys=True, \
             indent = 4, \

@@ -1,4 +1,4 @@
-
+import os
 import numpy as np
 from osgeo import ogr, gdal
 from shapely.wkt import loads
@@ -10,6 +10,14 @@ def read_mesh_json(iMesh_type_in, sFilename_mesh_in):
     convert a shpefile to json format.
     This function should be used for stream flowline only.
     """
+    iReturn_code = 1
+
+    if os.path.isfile(sFilename_mesh_in):
+        pass
+    else:
+        print('This mesh file does not exist: ', sFilename_mesh_in )
+        iReturn_code = 0
+        return iReturn_code
 
     aCell_out=list()
     pDriver_json = ogr.GetDriverByName('GeoJSON') 

@@ -13,7 +13,7 @@ def read_flowline_shapefile(sFilename_shapefile_in):
     """
     iReturn_code = 1
 
-    if os.path.exists(sFilename_shapefile_in):  
+    if os.path.isfile(sFilename_shapefile_in):
         pass
     else:
         print('This shapefile does not exist: ', sFilename_shapefile_in )

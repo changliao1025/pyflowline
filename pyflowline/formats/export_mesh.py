@@ -1,9 +1,23 @@
-
+import os
 import numpy as np
 import json
 
 def export_mesh_info_to_json(iFlag_flowline_in, aCell_in, aFlowline_in, aCellID_outlet_iin, sFilename_json_in):
+    """_summary_
+
+    Args:
+        iFlag_flowline_in (_type_): _description_
+        aCell_in (_type_): _description_
+        aFlowline_in (_type_): _description_
+        aCellID_outlet_iin (_type_): _description_
+        sFilename_json_in (_type_): _description_
+    """
+    if os.path.exists(sFilename_json_in): 
+        #delete it if it exists
+        os.remove(sFilename_json_in)
+        pass
     ncell=len(aCell_in)
+
 
     if iFlag_flowline_in == 1:
         nFlowline = len(aFlowline_in)

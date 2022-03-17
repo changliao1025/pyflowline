@@ -588,6 +588,7 @@ class pybasin(object):
     def convert_flowline_to_json(self):
         sFilename_raw = self.sFilename_flowline_filter            
         sFilename_out = self.sFilename_flowline_filter_json
+        print('This is the filtered flowline:', sFilename_raw )
         convert_shapefile_to_json(1, sFilename_raw, sFilename_out)
         
     def calculate_flowline_length(self, aFlowline_in):

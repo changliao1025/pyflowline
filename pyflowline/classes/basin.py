@@ -577,11 +577,7 @@ class pybasin(object):
         for sKey in aSkip:
             obj.pop(sKey, None)
  
-        #sJson = json.dumps(self.__dict__, \
-        #    sort_keys=True, \
-        #        indent = 4, \
-        #            ensure_ascii=True, \
-        #                cls=BasinClassEncoder)
+    
         sJson = json.dumps(obj, \
             sort_keys=True, \
                 indent = 4, \
@@ -589,6 +585,26 @@ class pybasin(object):
                         cls=BasinClassEncoder)
         return sJson
     
+    def export_config_to_json(self, sFilename_output_in = None):
+        #single basin
+        if sFilename_output_in is not None:
+            sFilename_output = sFilename_output_in
+        else:
+            sFilename_output = os.path.join(self.sWorkspace_output_basin, 'configuration_basin.json' )
+
+        aSkip = ['aFlowline_basin_filtered', \
+                'aFlowline_basin_simplified','aFlowline_basin_conceptual','aConfluence_basin_simplified',
+                'aConfluence_basin_conceptual']
+        obj = self.__dict__.copy()
+        for sKey in aSkip:
+            obj.pop(sKey, None)
+        with open(sFilename_output, 'w', encoding='utf-8') as f:
+            json.dump(obj, f,sort_keys=True, \
+                ensure_ascii=False, \
+                indent=4, \
+                cls=BasinClassEncoder)
+        return
+
     def convert_flowline_to_json(self):
         sFilename_raw = self.sFilename_flowline_filter            
         sFilename_out = self.sFilename_flowline_filter_json

@@ -483,18 +483,16 @@ class flowlinecase(object):
                         pCell.dLength_flowline = pCell2.dLength_flowline
 
             
-            #save basin json info for hexwatershed model
-            sPath = os.path.dirname(self.sFilename_basins)
-            sName = str(Path(self.sFilename_basins).stem ) + '_new.json'
-            sFilename_configuration  =  os.path.join( sPath  , sName)
-
-            with open(sFilename_configuration, 'w', encoding='utf-8') as f:
-                sJson = json.dumps([json.loads(ob.tojson()) for ob in aBasin],\
-                    sort_keys=True, \
-                    indent = 4)        
-
-                f.write(sJson)    
-                f.close()
+            #save basin json info for hexwatershed model, this is updated to a new function
+            #sPath = os.path.dirname(self.sFilename_basins)
+            #sName = str(Path(self.sFilename_basins).stem ) + '_new.json'
+            #sFilename_configuration  =  os.path.join( sPath  , sName)
+            #with open(sFilename_configuration, 'w', encoding='utf-8') as f:
+            #    sJson = json.dumps([json.loads(ob.tojson()) for ob in aBasin],\
+            #        sort_keys=True, \
+            #        indent = 4)   
+            #    f.write(sJson)    
+            #    f.close()
             
             self.aFlowline_conceptual = aFlowline_conceptual
             self.aCellID_outlet = aCellID_outlet
@@ -618,16 +616,103 @@ class flowlinecase(object):
                         cls=CaseClassEncoder)
         return sJson
 
-    def export_config_to_json(self, sFilename_output):
+    def export_config_to_json(self, sFilename_output_in = None):
+
+        if self.iFlag_standalone == 1:
+            if sFilename_output_in is not None:
+                sFilename_output = sFilename_output_in
+            else:
+                #use current output path
+                sFilename_output = os.path.join(self.sWorkspace_output, 'configuration.json' )
+            
+            #all basins            
+            sName = 'configuration_basin.json'
+            sFilename_configuration  =  os.path.join( self.sWorkspace_output  , sName)
+            with open(sFilename_configuration, 'w', encoding='utf-8') as f:
+                sJson = json.dumps([json.loads(ob.tojson()) for ob in self.aBasin],\
+                    sort_keys=True, \
+                    indent = 4)   
+                f.write(sJson)    
+                f.close()
+            #update
+            self.sFilename_basins = sFilename_configuration
+            
+        else:
+            if sFilename_output_in is not None:
+                sFilename_output = sFilename_output_in
+            else:
+                #use parent path
+                sPath = Path(self.sWorkspace_output)                
+                sFilename_output = os.path.join(sPath.parent.absolute(), 'configuration.json' )
+            #all basins
+            sPath = Path(self.sWorkspace_output)
+            sName = 'configuration_basin.json'
+            sFilename_configuration  =  os.path.join( sPath.parent.absolute() , sName)
+            with open(sFilename_configuration, 'w', encoding='utf-8') as f:
+                sJson = json.dumps([json.loads(ob.tojson()) for ob in self.aBasin],\
+                    sort_keys=True, \
+                    indent = 4)   
+                f.write(sJson)    
+                f.close()
+            #update for pyhexwatershed
+            self.sFilename_basins = sFilename_configuration
+            self.sWorkspace_output =   sPath.parent.absolute()
+
+
         aSkip = ['aBasin', \
                 'aFlowline_simplified','aFlowline_conceptual','aCellID_outlet',
                 'aCell']
+
         obj = self.__dict__.copy()
         for sKey in aSkip:
             obj.pop(sKey, None)
+
         with open(sFilename_output, 'w', encoding='utf-8') as f:
             json.dump(obj, f,sort_keys=True, \
                 ensure_ascii=False, \
                 indent=4, \
                 cls=CaseClassEncoder)
+        return
+
+
+    def export_basin_config_to_json(self, sFilename_output_in= None):
+        if self.iFlag_standalone == 1:
+            if sFilename_output_in is not None:
+                sFilename_output = sFilename_output_in
+            else:
+                #use current output path
+                sName = 'configuration_basin.json'
+                sFilename_output  =  os.path.join( self.sWorkspace_output  , sName)                
+            
+            #all basins           
+            
+            with open(sFilename_output, 'w', encoding='utf-8') as f:
+                sJson = json.dumps([json.loads(ob.tojson()) for ob in self.aBasin],\
+                    sort_keys=True, \
+                    indent = 4)   
+                f.write(sJson)    
+                f.close()
+            #update
+            self.sFilename_basins = sFilename_output
+            
+        else:
+            if sFilename_output_in is not None:
+                sFilename_output = sFilename_output_in
+            else:
+                #use current output path
+                sPath = Path(self.sWorkspace_output)
+                sName = 'configuration_basin.json'
+                sFilename_output  =  os.path.join( sPath.parent.absolute() , sName)
+            
+            #all basins           
+            
+            with open(sFilename_output, 'w', encoding='utf-8') as f:
+                sJson = json.dumps([json.loads(ob.tojson()) for ob in self.aBasin],\
+                    sort_keys=True, \
+                    indent = 4)   
+                f.write(sJson)    
+                f.close()
+            #update for pyhexwatershed
+            self.sFilename_basins = sFilename_output
+            
         return

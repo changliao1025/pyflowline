@@ -1,8 +1,13 @@
-# Overview 
-This repository is a tutorial to demonstrate the capability and workflow of the PyFlowline model. In this demo, we will use the Model for Prediction Across Scales (MPAS) mesh (see below) as an example.
-
 # Pyflowline
-The Pyflowline model is a Python package to generate conceptual river networks for hydrologic models. PyFlowline is mesh independent, meaning you can apply it to almost any mesh system including the tradition rectangle mesh, Triangulated Irregular Network (TIN) mesh and MPAS mesh.
+The Pyflowline model is a Python package to generate conceptual river networks for hydrologic models. 
+
+PyFlowline is mesh independent, meaning you can apply it to almost any mesh system including the tradition rectangle mesh, Triangulated Irregular Network (TIN) mesh and MPAS mesh.
+
+This package runs three steps in general:
+1. pre-process the existing vector river flowlines;
+2. mesh generation;
+3. Re-construct the topological relationship using the mesh and flowline intersections.
+
 
 
 # Installation

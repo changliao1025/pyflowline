@@ -4,9 +4,9 @@ The Pyflowline model is a Python package to generate conceptual river networks f
 PyFlowline is mesh independent, meaning you can apply it to almost any mesh system including the tradition rectangle mesh, Triangulated Irregular Network (TIN) mesh and MPAS mesh.
 
 This package runs three steps in general:
-1. pre-process the existing vector river flowlines;
-2. mesh generation;
-3. Re-construct the topological relationship using the mesh and flowline intersections.
+1. pre-process the existing vector river flowlines. In this step, PyFlowline will check the vector dataset and correct undesired flaws such as braided rivers. The output is a much simplified flowline dataset.
+2. mesh generation. In this step, PyFlowline will generate various structured meshes (e.g., rectangle, hexagon). Users can also use other unstructured meshes, which can be coverted to the PyFlowline formart.
+3. Re-construct the topological relationship using the mesh and flowline intersections. In this step, PyFlowline will build the topological relationship between mesh cells using the vector flowline and mesh intersection.
 
 
 
@@ -61,7 +61,7 @@ Because of the Python package dependency issue, the visulization should use a di
 
 # Acknowledgement
 
-This work was supported by the Earth System Model Development program areas of the U.S. Department of Energy, Office of Science, Office of Biological and Environmental Research as part of the multi-program, collaborative Integrated Coastal Modeling (ICoM) project. The data used for model simulations can be downloaded through the USGS website (\url{https://www.usgs.gov/national-hydrography}). The Pyflowline model can be accessed through the Python Package Index service (\url{https://pypi.org/project/pyflowline/}). 
+This work was supported by the Earth System Model Development program areas of the U.S. Department of Energy, Office of Science, Office of Biological and Environmental Research as part of the multi-program, collaborative Integrated Coastal Modeling (ICoM) project. The data used for model simulations can be downloaded through the USGS website (https://www.usgs.gov/national-hydrography). The Pyflowline model can be accessed through the Python Package Index service (https://pypi.org/project/pyflowline/). 
 
 # Citation
 

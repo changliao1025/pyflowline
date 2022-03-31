@@ -1,7 +1,7 @@
 # Pyflowline
 The Pyflowline model is a Python package to generate conceptual river networks for hydrologic models. 
 
-PyFlowline is mesh independent, meaning you can apply it to almost any mesh system including the tradition rectangle mesh, Triangulated Irregular Network (TIN) mesh and MPAS mesh.
+PyFlowline is mesh independent, meaning you can apply it to both structured (e.g., tradition rectangle mesh, latitude-longitude, hexagon) and unstructured mesh systems (e.g., Triangulated Irregular Network (TIN) mesh and MPAS mesh).
 
 This package runs three steps in general:
 1. pre-process the existing vector river flowlines. In this step, PyFlowline will check the vector dataset and correct undesired flaws such as braided rivers. The output is a much simplified flowline dataset.
@@ -11,17 +11,12 @@ This package runs three steps in general:
 
 
 # Installation
-The full deployment of PyFlowline is still under development. It can be installed through either Pythin PyPI or the Conda system, which is recommended because of the dependency packages.
 
-As of right now, you can install PyFlowline using the following steps:
 
-1. install the dependency packages through Conda 
+As of right now, the easiest way you can install PyFlowline is through the Conda platform:
 
-2. install PyFlowline through the PyPI:
-    pip install pyflowline
-
-3. (Optional) Install the Python JupterNote to run this tutorial.
-
+1. install the package from the conda forge channel
+    conda install -c conda-forge pyflowline
 
 # Usage
 We use the notebook.py example file under the the notebook directory to showcase the model workflow.
@@ -39,23 +34,13 @@ The follow steps are recommended:
 
 3. Install dependency packages using conda
 
-    * conda install -c conda-forge numpy
+    * conda install -c conda-forge pyflowline
 
-    * conda install -c conda-forge shapely
+4. Install and setup the Python Jupyter Notebook
 
-    * conda install -c conda-forge netCDF4
+5. Clone this repository and set this environment as the workspace environment
 
-    * conda install -c conda-forge gdal
-
-4. Install PyFlowline
-
-    pip install pyflowline
-
-5. Install and setup the Python Jupyter Notebook
-
-6. Clone this repository and set this environment as the workspace environment
-
-7. Navigate to the notebook and run it in your preferred Python IDE.
+6. Navigate to the notebook and run it in your preferred Python IDE.
 
 Because of the Python package dependency issue, the visulization should use a different environment or using the QGIS.
 

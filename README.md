@@ -16,6 +16,7 @@ This package runs three steps in general:
 As of right now, the easiest way you can install PyFlowline is through the Conda platform:
 
 1. install the package from the conda forge channel
+
     conda install -c conda-forge pyflowline
 
 # Usage

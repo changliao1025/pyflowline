@@ -2,13 +2,13 @@
 
 [![DOI](https://zenodo.org/badge/368338554.svg)](https://zenodo.org/badge/latestdoi/368338554)
 
-The Pyflowline model is a Python package to generate conceptual river networks for hydrologic models. 
+Pyflowline: a mesh-independent river networks generator for hydrologic models. 
 
 PyFlowline is mesh independent, meaning you can apply it to both structured (e.g., tradition rectangle mesh, latitude-longitude, hexagon) and unstructured mesh systems (e.g., Triangulated Irregular Network (TIN) mesh and MPAS mesh).
 
 This package runs three steps in general:
 1. pre-process the existing vector river flowlines. In this step, PyFlowline will check the vector dataset and correct undesired flaws such as braided rivers. The output is a much simplified flowline dataset.
-2. mesh generation. In this step, PyFlowline will generate various structured meshes (e.g., rectangle, hexagon). Users can also use other unstructured meshes, which can be coverted to the PyFlowline format.
+2. mesh generation. In this step, PyFlowline will generate various structured meshes (e.g., rectangle, hexagon). Users can also use other unstructured meshes, which can be converted to the PyFlowline format.
 3. Re-construct the topological relationship using the mesh and flowline intersections. In this step, PyFlowline will build the topological relationship between mesh cells using the vector flowline and mesh intersection.
 
 
@@ -53,10 +53,17 @@ This work was supported by the Earth System Model Development program areas of t
 
 # Citation
 
+If you use this software, please consider the following publications in citation:
+
 * Liao, Chang, Tian Zhou, Donghui Xu, Richard Barnes, Gautam Bisht, Hong-Yi Li, Zeli Tan, et al. (02/2022AD) 2022. “Advances In Hexagon Mesh-Based Flow Direction Modeling”. Advances In Water Resources 160. Elsevier BV: 104099. 
 https://doi.org/10.1016/j.advwatres.2021.104099.
 
 * Liao, C., Tesfa, T., Duan, Z., & Leung, L. R. (2020). Watershed delineation on a hexagonal mesh grid. Environmental Modelling & Software, 128, 104702. https://doi.org/10.1016/j.envsoft.2020.104702
+
+* Liao. C. Pyflowline: a mesh-independent river networks generator for hydrologic models. 
+https://doi.org/10.5281/zenodo.6407299
+
+
 
 
 

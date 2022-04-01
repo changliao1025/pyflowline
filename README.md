@@ -1,4 +1,7 @@
 # Pyflowline
+
+[![DOI](https://zenodo.org/badge/368338554.svg)](https://zenodo.org/badge/latestdoi/368338554)
+
 The Pyflowline model is a Python package to generate conceptual river networks for hydrologic models. 
 
 PyFlowline is mesh independent, meaning you can apply it to both structured (e.g., tradition rectangle mesh, latitude-longitude, hexagon) and unstructured mesh systems (e.g., Triangulated Irregular Network (TIN) mesh and MPAS mesh).

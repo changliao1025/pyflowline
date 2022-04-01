@@ -12,7 +12,6 @@ This package runs three steps in general:
 
 # Installation
 
-
 As of right now, the easiest way you can install PyFlowline is through the Conda platform:
 
 1. install the package from the conda forge channel
@@ -23,7 +22,7 @@ As of right now, the easiest way you can install PyFlowline is through the Conda
 We use the notebook.py example file under the the notebook directory to showcase the model workflow.
 An additional Python package is required for the visualization purpose. 
 
-The follow steps are recommended:
+The following steps are recommended:
 
 1. Open the terminal or use your preferred Conda application to create a new Conda environment:
 

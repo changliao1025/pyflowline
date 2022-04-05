@@ -481,25 +481,16 @@ class flowlinecase(object):
                 for pCell2 in aCell_intersect:
                     if pCell2.lCellID == pCell.lCellID:
                         pCell.dLength_flowline = pCell2.dLength_flowline
-
-            
-            #save basin json info for hexwatershed model, this is updated to a new function
-            #sPath = os.path.dirname(self.sFilename_basins)
-            #sName = str(Path(self.sFilename_basins).stem ) + '_new.json'
-            #sFilename_configuration  =  os.path.join( sPath  , sName)
-            #with open(sFilename_configuration, 'w', encoding='utf-8') as f:
-            #    sJson = json.dumps([json.loads(ob.tojson()) for ob in aBasin],\
-            #        sort_keys=True, \
-            #        indent = 4)   
-            #    f.write(sJson)    
-            #    f.close()
             
             self.aFlowline_conceptual = aFlowline_conceptual
             self.aCellID_outlet = aCellID_outlet
 
-            return   aFlowline_conceptual, aCellID_outlet
+            return self.aCell, aFlowline_conceptual, aCellID_outlet
+        else:
+            return None
+            
 
-        return
+        
    
     def merge_cell_info(self, aCell_raw):
 
@@ -531,9 +522,9 @@ class flowlinecase(object):
     def run(self):
         self.flowline_simplification()
         aCell = self.mesh_generation()
-        self.reconstruct_topological_relationship(aCell)
+        aCell_out, a, b = self.reconstruct_topological_relationship(aCell)
         self.export()
-        return
+        return aCell_out
 
    
     def export(self):

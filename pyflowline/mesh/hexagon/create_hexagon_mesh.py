@@ -185,6 +185,7 @@ def create_hexagon_mesh(iFlag_rotation_in, \
 
                 pHexagon = convert_gcs_coordinates_to_cell(1, dLongitude_center, dLatitude_center, dummy1)
                 pHexagon.lCellID = lCellID
+                dArea = pHexagon.calculate_cell_area()
                 pHexagon.dArea = dArea
                 pHexagon.calculate_edge_length()
                 pHexagon.dLongitude_center_degree = dLongitude_center

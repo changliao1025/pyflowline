@@ -52,7 +52,7 @@ def create_square_mesh(dX_left_in, dY_bot_in, dResolution_meter_in, ncolumn_in, 
     ybottom = dY_bot_in
     yspacing = dResolution_meter_in
 
-    lID =0 
+    lCellID = 1 
     #.........
     #(x2,y2)-----(x3,y3)
     #   |           |
@@ -108,8 +108,8 @@ def create_square_mesh(dX_left_in, dY_bot_in, dResolution_meter_in, ncolumn_in, 
             pPolygon = ogr.Geometry(ogr.wkbPolygon)
             pPolygon.AddGeometry(ring)
 
-            dLon = (x1 + x2 + x3 + x4)/4.0
-            dLat = (y1 + y2 + y3 + y4)/4.0
+            dLongitude_center = (x1 + x2 + x3 + x4)/4.0
+            dLatitude_center = (y1 + y2 + y3 + y4)/4.0
             aCoords = np.full((5,2), -9999.0, dtype=float)
             aCoords[0,0] = x1
             aCoords[0,1] = y1
@@ -123,17 +123,26 @@ def create_square_mesh(dX_left_in, dY_bot_in, dResolution_meter_in, ncolumn_in, 
             aCoords[4,1] = y1
             dummy1= np.array(aCoords)
 
-            pSquare = convert_gcs_coordinates_to_cell(2, dLon, dLat, dummy1)
+            pSquare = convert_gcs_coordinates_to_cell(2, dLongitude_center, dLatitude_center, dummy1)
+
+            pSquare.lCellID = lCellID
             dArea = pSquare.calculate_cell_area()
+            pSquare.dArea = dArea
+            pSquare.calculate_edge_length()
+            pSquare.dLongitude_center_degree = dLongitude_center
+            pSquare.dLatitude_center_degree = dLatitude_center
 
             pFeature.SetGeometry(pPolygon)
-            pFeature.SetField("id", lID)
-            pFeature.SetField("lon", dLon )
-            pFeature.SetField("lat", dLat )
+            pFeature.SetField("id", lCellID)
+            pFeature.SetField("lon", dLongitude_center )
+            pFeature.SetField("lat", dLatitude_center )
             pFeature.SetField("area", dArea )
             pLayer.CreateFeature(pFeature)
 
-            lID = lID + 1
+            #build topoloy
+            aNeighbor=list()
+
+            lCellID = lCellID + 1
             aSquare.append(pSquare)
 
 

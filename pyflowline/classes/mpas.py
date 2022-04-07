@@ -35,15 +35,19 @@ class MpasClassEncoder(JSONEncoder):
 
 
 class pympas(pycell):
+    lCellID  = -1
     
     nFlowline=0
     nVertex =0 
     nEdge=0
+
     dLength=0.0
     dArea=0.0
+
     dX_center_meter=0.0
     dY_center_meter=0.0
     dz_center=0.0
+
     dLongitude_center_degree=0.0
     dLatitude_center_degree=0.0
     dElevation_mean=0.0
@@ -65,7 +69,8 @@ class pympas(pycell):
 
     pVertex_center = None
     aFlowline=None
-    lCellID  = -1
+
+    
     nNeighbor=-1
     nNeighbor_land=-1
     nNeighbor_ocean=-1

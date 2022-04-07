@@ -531,13 +531,14 @@ class pybasin(object):
         return
 
     def export_flowline_info_to_json(self):
-
-        sFilename_json = self.sFilename_flowline_simplified_info
-        sFilename_json = os.path.join(str(Path(self.sWorkspace_output_basin)  ) , sFilename_json  )
-        with open(sFilename_json, 'w', encoding='utf-8') as f:
-            sJson = json.dumps([json.loads(ob.tojson()) for ob in self.aFlowline_basin_simplified], indent = 4)        
-            f.write(sJson)    
-            f.close()
+        iFlag_export_simplified=0
+        if iFlag_export_simplified==1:
+            sFilename_json = self.sFilename_flowline_simplified_info
+            sFilename_json = os.path.join(str(Path(self.sWorkspace_output_basin)  ) , sFilename_json  )
+            with open(sFilename_json, 'w', encoding='utf-8') as f:
+                sJson = json.dumps([json.loads(ob.tojson()) for ob in self.aFlowline_basin_simplified], indent = 4)        
+                f.write(sJson)    
+                f.close()
 
         sFilename_json = self.sFilename_flowline_conceptual_info
         sFilename_json = os.path.join(str(Path(self.sWorkspace_output_basin)  ) , sFilename_json  )
@@ -550,13 +551,14 @@ class pybasin(object):
         return
 
     def export_confluence_info_to_json(self):
-
-        sFilename_json = self.sFilename_confluence_simplified_info
-        sFilename_json = os.path.join(str(Path(self.sWorkspace_output_basin)  ) , sFilename_json  )
-        with open(sFilename_json, 'w', encoding='utf-8') as f:
-            sJson = json.dumps([json.loads(ob.tojson()) for ob in self.aConfluence_basin_simplified], indent = 4)        
-            f.write(sJson)    
-            f.close()
+        iFlag_export_confluence =0
+        if iFlag_export_confluence==1:
+            sFilename_json = self.sFilename_confluence_simplified_info
+            sFilename_json = os.path.join(str(Path(self.sWorkspace_output_basin)  ) , sFilename_json  )
+            with open(sFilename_json, 'w', encoding='utf-8') as f:
+                sJson = json.dumps([json.loads(ob.tojson()) for ob in self.aConfluence_basin_simplified], indent = 4)        
+                f.write(sJson)    
+                f.close()
 
         sFilename_json = self.sFilename_confluence_conceptual_info
         sFilename_json = os.path.join(str(Path(self.sWorkspace_output_basin)  ) , sFilename_json  )

@@ -47,8 +47,7 @@ def read_mesh_json(iMesh_type_in, sFilename_mesh_in):
 
         lCellID = pFeature_mesh.GetField("id")
         dLon = pFeature_mesh.GetField("lon")
-        dLat = pFeature_mesh.GetField("lat")
-        
+        dLat = pFeature_mesh.GetField("lat")        
         dArea = pFeature_mesh.GetField("area")
         if iMesh_type_in == 4:
             dElevation_mean = pFeature_mesh.GetField("elev")

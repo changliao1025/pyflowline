@@ -30,18 +30,43 @@ class HexagonClassEncoder(JSONEncoder):
         return JSONEncoder.default(self, obj)
 
 class pyhexagon(pycell):
-    lIndex=-1      
+    #lIndex=-1      
     lCellID  = -1
     nFlowline=0
+    nVertex =0 
+    nEdge=0
+
+    
+
     dLength=0.0
     dArea=0.0
-    dX_center_meter_meter=0.0
-    dY_center_meter_meter=0.0
+    
+    dX_center_meter=0.0
+    dY_center_meter=0.0
+    dz_center=0.0
+
 
     dLongitude_center_degree=0.0
     dLatitude_center_degree=0.0
+
+    dElevation_mean=-9999
+
+    dLength_flowline=0.0
+
+    iFlag_intersected=-1
+    iFlag_coast = 0
+
+    lCellID_downstream_burned=-1
+    iStream_order_burned=-1
+    iStream_segment_burned=-1
+
     aEdge=None
+    aEdgeID=None
     aVertex=None
+    aVertexID=None
+
+    pVertex_center = None
+
     aFlowline=None
    
     nNeighbor=-1
@@ -52,7 +77,6 @@ class pyhexagon(pycell):
     aNeighbor_ocean=None #the global ID of all neighbors
     aNeighbor_distance = None
 
-    pVertex_center = None
 
     def __init__(self, dLon, dLat, aEdge, aVertex):    
 
@@ -78,7 +102,7 @@ class pyhexagon(pycell):
             self.lCellID_downstream_burned=-1
             self.iStream_order_burned=-1
             self.iStream_segment_burned=-1
-            self.dElevation=-9999.0
+            self.dElevation_mean=-9999.0
 
             pass
         pass

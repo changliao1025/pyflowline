@@ -126,7 +126,8 @@ def create_hexagon_mesh(iFlag_rotation_in, \
                 y.append(y5)
                 y.append(y6)
 
-                x_new , y_new = reproject_coordinates_batch(x, y, pSpatial_reference)
+                x_new , y_new = reproject_coordinates_batch(x, y, pSpatial_reference, \
+                    spatial_reference_target = pSpatial_reference_gcs)
                 x1=x_new[0]
                 x2=x_new[1]
                 x3=x_new[2]
@@ -156,7 +157,6 @@ def create_hexagon_mesh(iFlag_rotation_in, \
     
                 pFeature.SetGeometry(pPolygon)
                 pFeature.SetField("id", lCellID)
-                pLayer.CreateFeature(pFeature)
     
                 #dummy = loads( ring.ExportToWkt() )
                 #aCoords = dummy.exterior.coords
@@ -176,48 +176,71 @@ def create_hexagon_mesh(iFlag_rotation_in, \
                 aCoords[6,1] = y1
            
                 dummy1= np.array(aCoords)
-                pHexagon = convert_pcs_coordinates_to_cell(1, dummy1, pSpatial_reference)
+                dLongitude_center = np.mean(aCoords[0:6,0])
+                dLatitude_center = np.mean(aCoords[0:6,1])
+                pFeature.SetField("lon", dLongitude_center )
+                pFeature.SetField("lat", dLatitude_center )
+                pFeature.SetField("area", dArea )
+                pLayer.CreateFeature(pFeature)
+
+                pHexagon = convert_gcs_coordinates_to_cell(1, dLongitude_center, dLatitude_center, dummy1)
                 pHexagon.lCellID = lCellID
+                pHexagon.dArea = dArea
+                pHexagon.calculate_edge_length()
+                pHexagon.dLongitude_center_degree = dLongitude_center
+                pHexagon.dLatitude_center_degree = dLatitude_center
                 lCellID_center = lCellID
                 #build topoloy
                 aNeighbor=list()
+          
                 if iColumn > 1:#0
                     lCellID0 = lCellID_center - 1
                     aNeighbor.append(lCellID0)
+                    
+                    
 
                 if iRow < nrow_in :#1 and 2
                     if iRow %2 ==0:
                         lCellID1 = ncolumn_in * iRow + iColumn 
                         aNeighbor.append(lCellID1)
+                       
                         if iColumn!=ncolumn_in:
                             lCellID2 = ncolumn_in * iRow + iColumn + 1
                             aNeighbor.append(lCellID2)
+                          
                     else:
                         lCellID2 = ncolumn_in * iRow + iColumn
                         aNeighbor.append(lCellID2)
+                    
                         if iColumn != 1:
                             lCellID1 = ncolumn_in * iRow + iColumn - 1 
                             aNeighbor.append(lCellID1)
+                          
 
                         
                 if iColumn < ncolumn_in:#3
                     lCellID3 = lCellID_center + 1
                     aNeighbor.append(lCellID3)
+             
 
                 if iRow > 1 : #4 and 5
                     if iRow %2 ==1:
                         lCellID4 = ncolumn_in * (iRow-2) + iColumn 
                         aNeighbor.append(lCellID4)
+                        
 
                         if iColumn !=1:
                             lCellID5 = ncolumn_in * (iRow-2) + iColumn -1
                             aNeighbor.append(lCellID5)
+                           
                     else:
                         lCellID5 = ncolumn_in * (iRow-2) + iColumn 
                         aNeighbor.append(lCellID5)
+                     
                         if iColumn!=ncolumn_in:
                             lCellID4 = ncolumn_in * (iRow-2) + iColumn + 1
                             aNeighbor.append(lCellID4)
+                            
 
 
                 if check_if_duplicates(aNeighbor) == 0:
@@ -225,8 +248,12 @@ def create_hexagon_mesh(iFlag_rotation_in, \
 
 
                 pHexagon.aNeighbor = aNeighbor
-           
                 pHexagon.nNeighbor = len(aNeighbor)
+                pHexagon.aNeighbor_land= aNeighbor
+                pHexagon.nNeighbor_land= pHexagon.nNeighbor
+               
+                
+
                 aHexagon.append(pHexagon)
                 lCellID= lCellID + 1    
                 pass
@@ -392,6 +419,17 @@ def create_hexagon_mesh(iFlag_rotation_in, \
        
         
     pDataset = pLayer = pFeature  = None      
+
+    #calculate neighbor distance
+    for pHexagon in aHexagon:
+        aNeighbor = pHexagon.aNeighbor
+        pHexagon.aNeighbor_distance=list()
+        for lCellID1 in aNeighbor:
+            for pHexagon1 in aHexagon:
+                if pHexagon1.lCellID == lCellID1:
+                    dDistance = pHexagon.pVertex_center.calculate_distance( pHexagon1.pVertex_center )
+                    pHexagon.aNeighbor_distance.append(dDistance)
+                    break
 
 
     return aHexagon

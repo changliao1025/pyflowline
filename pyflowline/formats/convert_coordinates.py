@@ -65,6 +65,7 @@ def convert_gcs_coordinates_to_cell(iMesh_type_in, \
                         return None
 
 def convert_pcs_coordinates_to_cell(iMesh_type_in, aCoordinates_pcs_in, pSpatial_reference_in):
+
     npoint = len(aCoordinates_pcs_in)    
     aVertex=list()              
     aEdge=list()    
@@ -84,9 +85,11 @@ def convert_pcs_coordinates_to_cell(iMesh_type_in, aCoordinates_pcs_in, pSpatial
         pEdge = pyedge( aVertex[j], aVertex[j+1] )
         aEdge.append(pEdge)
 
+    
+
     if iMesh_type_in ==1: #hexagon     
 
-        pHexagon = pyhexagon( aEdge, aVertex)
+        pHexagon = pyhexagon(  aEdge, aVertex)
         return pHexagon
     else:
         if iMesh_type_in ==2: #sqaure

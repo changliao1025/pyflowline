@@ -43,8 +43,14 @@ class pyhexagon(pycell):
     aEdge=None
     aVertex=None
     aFlowline=None
-    
+   
+    nNeighbor=-1
+    nNeighbor_land=-1
+    nNeighbor_ocean=-1
     aNeighbor=None #the global ID of all neighbors
+    aNeighbor_land=None #the global ID of all neighbors
+    aNeighbor_ocean=None #the global ID of all neighbors
+    aNeighbor_distance = None
 
     pVertex_center = None
 

@@ -57,20 +57,49 @@ class SquareClassEncoder(JSONEncoder):
         return JSONEncoder.default(self, obj)
 class pysquare(pycell):
     #lIndex=0 
+    lCellID  = -1
+
     nFlowline=0
+    nVertex =0 
+    nEdge=0
+
     dLength=0.0
     dArea=0.0
+
+
     dX_center_meter=0.0
     dY_center_meter=0.0
+    dz_center=0.0
+
     dLongitude_center_degree=0.0
     dLatitude_center_degree=0.0
+    dElevation_mean=0.0
+    dElevation_profile0=0.0
+
+    dLength_flowline=0.0
+
+    iFlag_intersected=-1
+    iFlag_coast = 0
+
+    lCellID_downstream_burned=-1
+    iStream_order_burned=-1
+    iStream_segment_burned=-1
+
     aEdge=None
+    aEdgeID=None
     aVertex=None
-    aFlowline=None
-    lCellID  = -1
-    aNeighbor=None #the global ID of all neighbors
-    nNeighbor=-1
+    aVertexID=None
+
     pVertex_center = None
+    aFlowline=None
+    
+    nNeighbor=-1
+    nNeighbor_land=-1
+    nNeighbor_ocean=-1
+    aNeighbor=None #the global ID of all neighbors
+    aNeighbor_land=None #the global ID of all neighbors
+    aNeighbor_ocean=None #the global ID of all neighbors
+    aNeighbor_distance = None
 
     def __init__(self, dLon, dLat, aEdge, aVertex):    
         nEdge = len(aEdge)

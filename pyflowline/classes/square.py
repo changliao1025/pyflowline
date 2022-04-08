@@ -125,7 +125,7 @@ class pysquare(pycell):
             self.lCellID_downstream_burned=-1
             self.iStream_order_burned=-1
             self.iStream_segment_burned=-1
-            self.dElevation=-9999.0
+            self.dElevation_mean=-9999.0
 
             pass
         pass

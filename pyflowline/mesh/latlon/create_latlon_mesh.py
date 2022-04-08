@@ -52,8 +52,8 @@ def create_latlon_mesh(dLongitude_left_in, dLatitude_bot_in, dResolution_degree_
     #(x1,y1)-----(x4,y4)
     #...............
     aLatlon = list()
-    for iColumn in range(0, ncolumn_in):
-        for iRow in range(0, nrow_in):
+    for iColumn in range(1, ncolumn_in+1):
+        for iRow in range(1, nrow_in+1):
             #define a polygon here
             x1 = xleft + ((iColumn-1) * xspacing)
             y1 = ybottom + ((iRow-1) * yspacing)
@@ -94,6 +94,7 @@ def create_latlon_mesh(dLongitude_left_in, dLatitude_bot_in, dResolution_degree_
             
 
             pLatlon = convert_gcs_coordinates_to_cell(3, dLongitude_center, dLatitude_center, dummy1)
+            pLatlon.lCellID = lCellID
             dArea = pLatlon.calculate_cell_area()
             pLatlon.calculate_edge_length()
             pLatlon.dLongitude_center_degree = dLongitude_center
@@ -106,25 +107,36 @@ def create_latlon_mesh(dLongitude_left_in, dLatitude_bot_in, dResolution_degree_
             pFeature.SetField("area", dArea )
             pLayer.CreateFeature(pFeature)
 
-            
-
-
             lCellID_center = lCellID
-          
-            if iRow > 1:#0
+
+            aNeighbor = list()
+            if iRow > 1:#under
                 lCellID0 = lCellID_center - 1
                 aNeighbor.append(lCellID0)
+                if iColumn > 1:
+                    lCellID2 = lCellID0 - nrow_in
+                    aNeighbor.append(lCellID2)
 
-            if iColumn> 1:#1 ans 2
+            if iColumn> 1:#left
                 lCellID1 = nrow_in * (iColumn-2) + iRow 
-                aNeighbor.append(lCellID1)        
+                aNeighbor.append(lCellID1)  
+                if iRow < nrow_in:
+                    lCellID4 = lCellID1 + 1
+                    aNeighbor.append(lCellID4)      
                     
-            if iRow < nrow_in:#3
+            if iRow < nrow_in:#top
                 lCellID3 = lCellID_center + 1
                 aNeighbor.append(lCellID3)
-            if iColumn  < ncolumn_in  : #4 and 5
+                if iColumn < ncolumn_in:
+                    lCellID6 = lCellID3 + nrow_in
+                    aNeighbor.append(lCellID6) 
+                    
+            if iColumn  < ncolumn_in  : #right
                 lCellID5 = nrow_in * iColumn + iRow 
                 aNeighbor.append(lCellID5)
+                if iRow > 1:
+                    lCellID7 = lCellID5 -1
+                    aNeighbor.append(lCellID7) 
 
             pLatlon.aNeighbor = aNeighbor
             pLatlon.nNeighbor = len(aNeighbor)

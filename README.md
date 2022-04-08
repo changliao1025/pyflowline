@@ -1,8 +1,8 @@
-# Pyflowline
+### `Pyflowline`
 
 [![DOI](https://zenodo.org/badge/368338554.svg)](https://zenodo.org/badge/latestdoi/368338554)
 
-Pyflowline: a mesh-independent river networks generator for hydrologic models. 
+Pyflowline: a mesh-independent river network generator for hydrologic models. 
 
 PyFlowline is mesh independent, meaning you can apply it to both structured (e.g., tradition rectangle mesh, latitude-longitude, hexagon) and unstructured mesh systems (e.g., Triangulated Irregular Network (TIN) mesh and MPAS mesh).
 
@@ -13,7 +13,7 @@ This package runs three steps in general:
 
 
 
-# Installation
+### `Installation`
 
 As of right now, the easiest way you can install PyFlowline is through the Conda platform:
 
@@ -21,7 +21,8 @@ As of right now, the easiest way you can install PyFlowline is through the Conda
 
     conda install -c conda-forge pyflowline
 
-# Usage
+### `Usage`
+
 We use the notebook.py example file under the the notebook directory to showcase the model workflow.
 An additional Python package is required for the visualization purpose. 
 
@@ -47,13 +48,17 @@ The following steps are recommended:
 
 Because of the Python package dependency issue, the visulization should use a different environment or using the QGIS.
 
-# Acknowledgement
+### `Acknowledgement`
 
 This work was supported by the Earth System Model Development program areas of the U.S. Department of Energy, Office of Science, Office of Biological and Environmental Research as part of the multi-program, collaborative Integrated Coastal Modeling (ICoM) project. The data used for model simulations can be downloaded through the USGS website (https://www.usgs.gov/national-hydrography). The Pyflowline model can be accessed through the Python Conda system (https://anaconda.org/conda-forge/pyflowline). 
 
-# Citation
+### `License`
 
-If you use this software, please consider the following publications in citation:
+Please see the LICENSE file.
+
+### `References`
+
+There are a number of publications that describe the algorithms used in `HexWatershed` in detail. If you make use of `HexWatershed` in your work, please consider including a reference to the following:
 
 * Liao, Chang, Tian Zhou, Donghui Xu, Richard Barnes, Gautam Bisht, Hong-Yi Li, Zeli Tan, et al. (02/2022AD) 2022. “Advances In Hexagon Mesh-Based Flow Direction Modeling”. Advances In Water Resources 160. Elsevier BV: 104099. 
 https://doi.org/10.1016/j.advwatres.2021.104099.

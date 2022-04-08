@@ -144,20 +144,33 @@ def create_square_mesh(dX_left_in, dY_bot_in, dResolution_meter_in, ncolumn_in, 
             
             lCellID_center = lCellID
           
-            if iRow > 1:#0
+            if iRow > 1:#under
                 lCellID0 = lCellID_center - 1
                 aNeighbor.append(lCellID0)
+                if iColumn > 1:
+                    lCellID2 = lCellID0 - nrow_in
+                    aNeighbor.append(lCellID2)
 
-            if iColumn> 1:#1 ans 2
+            if iColumn> 1:#left
                 lCellID1 = nrow_in * (iColumn-2) + iRow 
-                aNeighbor.append(lCellID1)        
+                aNeighbor.append(lCellID1)  
+                if iRow < nrow_in:
+                    lCellID4 = lCellID1 + 1
+                    aNeighbor.append(lCellID4)      
                     
-            if iRow < nrow_in:#3
+            if iRow < nrow_in:#top
                 lCellID3 = lCellID_center + 1
                 aNeighbor.append(lCellID3)
-            if iColumn  < ncolumn_in  : #4 and 5
+                if iColumn < ncolumn_in:
+                    lCellID6 = lCellID3 + nrow_in
+                    aNeighbor.append(lCellID6) 
+                    
+            if iColumn  < ncolumn_in  : #right
                 lCellID5 = nrow_in * iColumn + iRow 
                 aNeighbor.append(lCellID5)
+                if iRow > 1:
+                    lCellID7 = lCellID5 -1
+                    aNeighbor.append(lCellID7) 
                
 
 

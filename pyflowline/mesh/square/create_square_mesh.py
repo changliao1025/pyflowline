@@ -59,20 +59,20 @@ def create_square_mesh(dX_left_in, dY_bot_in, dResolution_meter_in, ncolumn_in, 
     #(x1,y1)-----(x4,y4)
     #...............
     aSquare = list()
-    for column in range(0, ncolumn_in):
-        for row in range(0, nrow_in):
+    for iColumn in range(1, ncolumn_in+1):
+        for iRow in range(1, nrow_in+1):
             #define a polygon here
-            x1 = xleft + (column * xspacing)
-            y1 = ybottom + (row * yspacing)
+            x1 = xleft + ((iColumn-1) * xspacing)
+            y1 = ybottom + ((iRow-1) * yspacing)
 
-            x2 = xleft + (column * xspacing)
-            y2 = ybottom + ((row + 1) * yspacing)
+            x2 = xleft + ((iColumn-1) * xspacing)
+            y2 = ybottom + ((iRow ) * yspacing)
 
-            x3 = xleft + ((column + 1) * xspacing)
-            y3 = ybottom + ((row + 1) * yspacing)
+            x3 = xleft + ((iColumn ) * xspacing)
+            y3 = ybottom + ((iRow ) * yspacing)
 
-            x4 = xleft + ((column + 1) * xspacing)
-            y4 = ybottom + (row * yspacing)
+            x4 = xleft + ((iColumn ) * xspacing)
+            y4 = ybottom + ((iRow-1) * yspacing)
 
            
             x = list()
@@ -141,16 +141,50 @@ def create_square_mesh(dX_left_in, dY_bot_in, dResolution_meter_in, ncolumn_in, 
 
             #build topoloy
             aNeighbor=list()
+            
+            lCellID_center = lCellID
+          
+            if iRow > 1:#0
+                lCellID0 = lCellID_center - 1
+                aNeighbor.append(lCellID0)
 
-            lCellID = lCellID + 1
+            if iColumn> 1:#1 ans 2
+                lCellID1 = nrow_in * (iColumn-2) + iRow 
+                aNeighbor.append(lCellID1)        
+                    
+            if iRow < nrow_in:#3
+                lCellID3 = lCellID_center + 1
+                aNeighbor.append(lCellID3)
+            if iColumn  < ncolumn_in  : #4 and 5
+                lCellID5 = nrow_in * iColumn + iRow 
+                aNeighbor.append(lCellID5)
+               
+
+
+
+            pSquare.aNeighbor = aNeighbor
+            pSquare.nNeighbor = len(aNeighbor)
+            pSquare.aNeighbor_land= aNeighbor
+            pSquare.nNeighbor_land= pSquare.nNeighbor
             aSquare.append(pSquare)
 
+
+            lCellID = lCellID + 1
 
             pass
 
     pDataset = pLayer = pFeature  = None      
 
-
+    #calculate neighbor distance
+    for pSquare in aSquare:
+        aNeighbor = pSquare.aNeighbor
+        pSquare.aNeighbor_distance=list()
+        for lCellID1 in aNeighbor:
+            for pSquare1 in aSquare:
+                if pSquare1.lCellID == lCellID1:
+                    dDistance = pSquare.pVertex_center.calculate_distance( pSquare1.pVertex_center )
+                    pSquare.aNeighbor_distance.append(dDistance)
+                    break
 
     return aSquare
 

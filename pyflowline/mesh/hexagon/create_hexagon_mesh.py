@@ -190,6 +190,7 @@ def create_hexagon_mesh(iFlag_rotation_in, \
                 pHexagon.calculate_edge_length()
                 pHexagon.dLongitude_center_degree = dLongitude_center
                 pHexagon.dLatitude_center_degree = dLatitude_center
+
                 lCellID_center = lCellID
                 #build topoloy
                 aNeighbor=list()
@@ -197,8 +198,6 @@ def create_hexagon_mesh(iFlag_rotation_in, \
                 if iColumn > 1:#0
                     lCellID0 = lCellID_center - 1
                     aNeighbor.append(lCellID0)
-                    
-                    
 
                 if iRow < nrow_in :#1 and 2
                     if iRow %2 ==0:
@@ -217,7 +216,6 @@ def create_hexagon_mesh(iFlag_rotation_in, \
                             lCellID1 = ncolumn_in * iRow + iColumn - 1 
                             aNeighbor.append(lCellID1)
                           
-
                         
                 if iColumn < ncolumn_in:#3
                     lCellID3 = lCellID_center + 1
@@ -243,16 +241,13 @@ def create_hexagon_mesh(iFlag_rotation_in, \
                             aNeighbor.append(lCellID4)
                             
 
-
                 if check_if_duplicates(aNeighbor) == 0:
                     print('error')        
-
 
                 pHexagon.aNeighbor = aNeighbor
                 pHexagon.nNeighbor = len(aNeighbor)
                 pHexagon.aNeighbor_land= aNeighbor
                 pHexagon.nNeighbor_land= pHexagon.nNeighbor
-               
                 
 
                 aHexagon.append(pHexagon)
@@ -358,14 +353,21 @@ def create_hexagon_mesh(iFlag_rotation_in, \
                 dummy1= np.array(aCoords)
                 dLongitude_center = np.mean(aCoords[0:6,0])
                 dLatitude_center = np.mean(aCoords[0:6,1])
-                pFeature.SetField("lon", dLongitude_center )
-                pFeature.SetField("lat", dLatitude_center )
-                pFeature.SetField("area", dArea )
-                pLayer.CreateFeature(pFeature)
+                
                 
                 pHexagon = convert_gcs_coordinates_to_cell(1, dLongitude_center, dLatitude_center, dummy1)
                 pHexagon.lCellID = lCellID
                 #build topology
+                dArea = pHexagon.calculate_cell_area()
+                pHexagon.dArea = dArea
+                pHexagon.calculate_edge_length()
+                
+
+                pFeature.SetField("lon", dLongitude_center )
+                pFeature.SetField("lat", dLatitude_center )
+                pFeature.SetField("area", dArea )
+                pLayer.CreateFeature(pFeature)
+
                 lCellID_center = lCellID
                 
                 aNeighbor=list()
@@ -411,9 +413,12 @@ def create_hexagon_mesh(iFlag_rotation_in, \
                     print('error')  
 
                 pHexagon.aNeighbor = aNeighbor
-
                 pHexagon.nNeighbor = len(aNeighbor)
+                pHexagon.aNeighbor_land= aNeighbor
+                pHexagon.nNeighbor_land= pHexagon.nNeighbor
                 aHexagon.append(pHexagon)
+
+
                 lCellID= lCellID +1
     
                 pass

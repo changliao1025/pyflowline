@@ -45,27 +45,27 @@ def create_latlon_mesh(dLongitude_left_in, dLatitude_bot_in, dResolution_degree_
     ybottom = dLatitude_bot_in
     yspacing = dResolution_degree_in
 
-    lID =0 
+    lCellID = 1
     #.........
     #(x2,y2)-----(x3,y3)
     #   |           |
     #(x1,y1)-----(x4,y4)
     #...............
     aLatlon = list()
-    for column in range(0, ncolumn_in):
-        for row in range(0, nrow_in):
+    for iColumn in range(0, ncolumn_in):
+        for iRow in range(0, nrow_in):
             #define a polygon here
-            x1 = xleft + (column * xspacing)
-            y1 = ybottom + (row * yspacing)
+            x1 = xleft + ((iColumn-1) * xspacing)
+            y1 = ybottom + ((iRow-1) * yspacing)
 
-            x2 = xleft + (column * xspacing)
-            y2 = ybottom + ((row + 1) * yspacing)
+            x2 = xleft + ((iColumn-1) * xspacing)
+            y2 = ybottom + ((iRow ) * yspacing)
 
-            x3 = xleft + ((column + 1) * xspacing)
-            y3 = ybottom + ((row + 1) * yspacing)
+            x3 = xleft + ((iColumn ) * xspacing)
+            y3 = ybottom + ((iRow ) * yspacing)
 
-            x4 = xleft + ((column + 1) * xspacing)
-            y4 = ybottom + (row * yspacing)
+            x4 = xleft + ((iColumn ) * xspacing)
+            y4 = ybottom + ((iRow-1) * yspacing)
            
 
             ring = ogr.Geometry(ogr.wkbLinearRing)
@@ -77,8 +77,8 @@ def create_latlon_mesh(dLongitude_left_in, dLatitude_bot_in, dResolution_degree_
             pPolygon = ogr.Geometry(ogr.wkbPolygon)
             pPolygon.AddGeometry(ring)
 
-            dLon = (x1 + x2 + x3 + x4)/4.0
-            dLat = (y1 + y2 + y3 + y4)/4.0
+            dLongitude_center = (x1 + x2 + x3 + x4)/4.0
+            dLatitude_center = (y1 + y2 + y3 + y4)/4.0
             aCoords = np.full((5,2), -9999.0, dtype=float)
             aCoords[0,0] = x1
             aCoords[0,1] = y1
@@ -93,26 +93,61 @@ def create_latlon_mesh(dLongitude_left_in, dLatitude_bot_in, dResolution_degree_
             dummy1= np.array(aCoords)
             
 
-            pLatlon = convert_gcs_coordinates_to_cell(3, dLon, dLat, dummy1)
+            pLatlon = convert_gcs_coordinates_to_cell(3, dLongitude_center, dLatitude_center, dummy1)
             dArea = pLatlon.calculate_cell_area()
-
+            pLatlon.calculate_edge_length()
+            pLatlon.dLongitude_center_degree = dLongitude_center
+            pLatlon.dLatitude_center_degree = dLatitude_center
 
             pFeature.SetGeometry(pPolygon)
-            pFeature.SetField("id", lID)
-            pFeature.SetField("lon", dLon )
-            pFeature.SetField("lat", dLat )
+            pFeature.SetField("id", lCellID)
+            pFeature.SetField("lon", dLongitude_center )
+            pFeature.SetField("lat", dLatitude_center )
             pFeature.SetField("area", dArea )
             pLayer.CreateFeature(pFeature)
 
-            lID = lID + 1
-            aLatlon.append(pLatlon)
+            
 
+
+            lCellID_center = lCellID
+          
+            if iRow > 1:#0
+                lCellID0 = lCellID_center - 1
+                aNeighbor.append(lCellID0)
+
+            if iColumn> 1:#1 ans 2
+                lCellID1 = nrow_in * (iColumn-2) + iRow 
+                aNeighbor.append(lCellID1)        
+                    
+            if iRow < nrow_in:#3
+                lCellID3 = lCellID_center + 1
+                aNeighbor.append(lCellID3)
+            if iColumn  < ncolumn_in  : #4 and 5
+                lCellID5 = nrow_in * iColumn + iRow 
+                aNeighbor.append(lCellID5)
+
+            pLatlon.aNeighbor = aNeighbor
+            pLatlon.nNeighbor = len(aNeighbor)
+            pLatlon.aNeighbor_land= aNeighbor
+            pLatlon.nNeighbor_land= pLatlon.nNeighbor
+            
+            aLatlon.append(pLatlon)
+            lCellID = lCellID + 1
 
             pass
         
     pDataset = pLayer = pFeature  = None      
 
-
+    #calculate neighbor distance
+    for pLatlon in aLatlon:
+        aNeighbor = pLatlon.aNeighbor
+        pLatlon.aNeighbor_distance=list()
+        for lCellID1 in aNeighbor:
+            for pLatlon1 in aLatlon:
+                if pLatlon1.lCellID == lCellID1:
+                    dDistance = pLatlon.pVertex_center.calculate_distance( pLatlon1.pVertex_center )
+                    pLatlon.aNeighbor_distance.append(dDistance)
+                    break
 
     return aLatlon
 

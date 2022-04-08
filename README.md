@@ -2,7 +2,7 @@
 
 [![DOI](https://zenodo.org/badge/368338554.svg)](https://zenodo.org/badge/latestdoi/368338554)
 
-Pyflowline: a mesh-independent river network generator for hydrologic models. 
+Pyflowline: a mesh independent river network generator for hydrologic models. 
 
 PyFlowline is mesh independent, meaning you can apply it to both structured (e.g., tradition rectangle mesh, latitude-longitude, hexagon) and unstructured mesh systems (e.g., Triangulated Irregular Network (TIN) mesh and MPAS mesh).
 

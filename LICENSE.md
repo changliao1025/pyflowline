@@ -1,5 +1,5 @@
 PyFlowline
-A Python package to generate conceptual river networks for hydrologic models.
+A mesh independent river network generator for hydrologic models.
         
 Copyright © 2022, Battelle Memorial Institute
 

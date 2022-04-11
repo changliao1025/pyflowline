@@ -4,6 +4,9 @@ authors:
   - family-names: Liao
     given-names: Chang
     orcid: https://orcid.org/0000-0002-7348-8858  
+  - family-names: Cooper
+    given-names: Matt
+    orcid: https://orcid.org/0000-0002-0165-209X
 title: "Pyflowline: a mesh-independent river networks generator for hydrologic models"
 version: 0.1.22
 doi: 10.5281/zenodo.6407299

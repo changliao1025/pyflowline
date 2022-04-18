@@ -30,7 +30,7 @@ The following steps are recommended:
 
 1. Open the terminal or use your preferred Conda application to create a new Conda environment:
 
-    * conda create --name pyflowline python=3.8
+    * conda create --name pyflowline python=3.8.0
 
 2. Activate the newly crated conda environment
 

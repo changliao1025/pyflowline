@@ -30,6 +30,8 @@ CLASSIFY = [
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
     "Topic :: Scientific/Engineering",
+    "Topic :: Scientific/Engineering :: Hydrology",
+    "Topic :: Scientific/Engineering :: GIS",
     "Topic :: Scientific/Engineering :: Visualization"
 ]
 

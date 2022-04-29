@@ -1,7 +1,4 @@
-
 from pyflowline.classes.flowline import pyflowline
-
-
 def split_flowline_to_edge(aFlowline_in):
     aFlowline_out = list()
     aEdge_out=list()

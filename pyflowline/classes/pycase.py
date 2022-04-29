@@ -4,16 +4,8 @@ from abc import ABCMeta
 import json
 from json import JSONEncoder
 import datetime
-
 import numpy as np
-
 from osgeo import ogr, osr
-
-
-
-from shapely.wkt import loads
-
-
 from pyflowline.classes.mpas import pympas
 from pyflowline.classes.hexagon import pyhexagon
 from pyflowline.classes.latlon import pylatlon
@@ -22,24 +14,16 @@ from pyflowline.classes.vertex import pyvertex
 from pyflowline.classes.basin import pybasin
 from pyflowline.classes.flowline import pyflowline
 from pyflowline.classes.edge import pyedge
-
-from pyflowline.formats.convert_shapefile_to_json import convert_shapefile_to_json_swat
 from pyflowline.formats.read_mesh import read_mesh_json
-
-from pyflowline.algorithms.auxiliary.text_reader_string import text_reader_string
-from pyflowline.algorithms.auxiliary.gdal_functions import reproject_coordinates, reproject_coordinates_batch
+from pyflowline.algorithms.auxiliary.gdal_functions import reproject_coordinates
 from pyflowline.algorithms.auxiliary.gdal_functions  import degree_to_meter
 from pyflowline.algorithms.auxiliary.gdal_functions  import meter_to_degree
-from pyflowline.algorithms.auxiliary.gdal_functions import gdal_read_geotiff_file, retrieve_geotiff_metadata
-from pyflowline.algorithms.auxiliary.gdal_functions import  Google_MetersPerPixel
-
+from pyflowline.algorithms.auxiliary.gdal_functions import retrieve_geotiff_metadata
 from pyflowline.mesh.hexagon.create_hexagon_mesh import create_hexagon_mesh
 from pyflowline.mesh.latlon.create_latlon_mesh import create_latlon_mesh
 from pyflowline.mesh.square.create_square_mesh import create_square_mesh
 from pyflowline.mesh.mpas.create_mpas_mesh import create_mpas_mesh
 from pyflowline.mesh.tin.create_tin_mesh import create_tin_mesh
-
-
 
 pDate = datetime.datetime.today()
 sDate_default = "{:04d}".format(pDate.year) + "{:02d}".format(pDate.month) + "{:02d}".format(pDate.day)

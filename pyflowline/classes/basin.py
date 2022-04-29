@@ -1,7 +1,6 @@
 import os
 from pathlib import Path
 from abc import ABCMeta, abstractmethod
-
 import json
 from json import JSONEncoder
 import numpy as np

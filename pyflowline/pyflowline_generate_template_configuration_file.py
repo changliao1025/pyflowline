@@ -7,8 +7,6 @@ import json
 from pyflowline.classes.pycase import flowlinecase
 from pyflowline.classes.basin import pybasin
 
-
-
 def pyflowline_generate_basin_template_configuration_file(sFilename_basins_json, nBasin, sWorkspace_input_in, sWorkspace_output_in):
     """generate baisn configureation
 
@@ -32,20 +30,14 @@ def pyflowline_generate_basin_template_configuration_file(sFilename_basins_json,
         aConfig_basin['dLatitude_outlet_degree'] = -180
         aConfig_basin['dLongitude_outlet_degree'] = 180
         aConfig_basin['dAccumulation_threshold'] = -90
-        aConfig_basin['dThreshold_small_river'] = 90
-        
-        aConfig_basin['sFilename_dam'] = str(Path(sWorkspace_input_in)  /  'ICoM_dams.csv')
-        
-        aConfig_basin['sFilename_flowline_filter'] = str(Path(sWorkspace_input_in)  /  'streamord7above.shp')
-        
-        aConfig_basin['sFilename_flowline_raw'] = str(Path(sWorkspace_input_in)  /  'allflowline.shp')
-        
-        aConfig_basin['sFilename_flowline_topo'] = str(Path(sWorkspace_input_in)  /  'flowline.csv')
-        
+        aConfig_basin['dThreshold_small_river'] = 90        
+        aConfig_basin['sFilename_dam'] = str(Path(sWorkspace_input_in)  /  'ICoM_dams.csv')        
+        aConfig_basin['sFilename_flowline_filter'] = str(Path(sWorkspace_input_in)  /  'streamord7above.shp')        
+        aConfig_basin['sFilename_flowline_raw'] = str(Path(sWorkspace_input_in)  /  'allflowline.shp')        
+        aConfig_basin['sFilename_flowline_topo'] = str(Path(sWorkspace_input_in)  /  'flowline.csv')        
         aConfig_basin['sWorkspace_output_basin'] = str(Path(sWorkspace_output_in) / sBasin )
         pBasin = pybasin(aConfig_basin)    
-        aBasin_out.append(pBasin)
-        
+        aBasin_out.append(pBasin)        
         pass
         
     #export basin config to a file    
@@ -56,7 +48,6 @@ def pyflowline_generate_basin_template_configuration_file(sFilename_basins_json,
         f.close()
 
     return aBasin_out
-
 
 def pyflowline_generate_template_configuration_file(sFilename_json, \
     sWorkspace_input, sWorkspace_output, iFlag_standalone_in=None, \
@@ -135,9 +126,7 @@ def pyflowline_generate_template_configuration_file(sFilename_json, \
     aConfig['iFlag_elevation_profile']=1
     aConfig['iFlag_rotation']=0
     aConfig['iFlag_stream_burning_topology']=1
-    aConfig['iFlag_save_elevation']=1
-
-     
+    aConfig['iFlag_save_elevation']=1     
     aConfig['nOutlet'] = nBasin
     aConfig['dResolution_degree'] = 0.5
     aConfig['dResolution_meter'] = 50000
@@ -146,46 +135,30 @@ def pyflowline_generate_template_configuration_file(sFilename_json, \
     aConfig['dLatitude_bot'] = -90
     aConfig['dLatitude_top'] = 90
     aConfig['sFilename_model_configuration']  = sFilename_json 
-
-    aConfig['sWorkspace_input'] = sWorkspace_input
-    
-    aConfig['sWorkspace_output'] = sWorkspace_output
-    
-    #aConfig['sWorkspace_project'] = 'pyflowline' #not needed
-    
+    aConfig['sWorkspace_input'] = sWorkspace_input    
+    aConfig['sWorkspace_output'] = sWorkspace_output        
     aConfig['sRegion'] = 'susquehanna'
     aConfig['sModel'] = 'pyflowline'
-    aConfig['iCase_index'] = iCase_index
-   
+    aConfig['iCase_index'] = iCase_index   
     aConfig['sMesh_type'] = sMesh_type
     aConfig['sJob'] = 'pyflowline'
     aConfig['sDate']= sDate
-
     #full path
     aConfig['sFilename_mesh_netcdf'] = str(Path(sWorkspace_input)  /  'lnd_cull_mesh.nc')
-    aConfig['sFilename_spatial_reference'] =  str(Path(sWorkspace_input)  /  'boundary_proj.shp')
-   
+    aConfig['sFilename_spatial_reference'] =  str(Path(sWorkspace_input)  /  'boundary_proj.shp')   
     #relative path
     aConfig['flowline_info'] = 'flowline_info.json'
     aConfig['sFilename_mesh_info'] = 'mesh_info.json'
     aConfig['sFilename_elevation'] = 'elevation.json' 
-
     oModel = flowlinecase(aConfig)
-
     #generate basin
     sDirname = os.path.dirname(sFilename_json)
     sFilename =  Path(sFilename_json).stem + '_basins.json'
-    sFilename_basins_json = os.path.join(sDirname, sFilename)
-
-    
-
+    sFilename_basins_json = os.path.join(sDirname, sFilename)   
     aBasin = pyflowline_generate_basin_template_configuration_file(sFilename_basins_json, nBasin, sWorkspace_input,  oModel.sWorkspace_output)
-
     oModel.aBasin = aBasin
     oModel.sFilename_basins = sFilename_basins_json
-    oModel.export_config_to_json(sFilename_json)
-
-    
+    oModel.export_config_to_json(sFilename_json)    
 
     return oModel
 

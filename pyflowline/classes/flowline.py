@@ -63,7 +63,6 @@ class pyflowline(object):
         self.nEdge = nEdge
         self.pVertex_start = aEdge[0].pVertex_start
         self.pVertex_end =  aEdge[ nEdge-1  ].pVertex_end
-
         nVertex = nEdge +1
         self.aVertex=list()
         for i in range(nEdge):
@@ -113,10 +112,8 @@ class pyflowline(object):
         iFlag_downstream =-1
         v0 = self.pVertex_start
         v1 = self.pVertex_end
-
         v2 = other.pVertex_start
         v3 = other.pVertex_end
-
         if v1 == v2:
             iFlag_downstream =1
         else:
@@ -186,7 +183,6 @@ class pyflowline(object):
             pFlowline_out.dLength = self.dLength + other.dLength
             pFlowline_out.pVertex_start = pVertex_start1
             pFlowline_out.pVertex_end = pVertex_end2
-
             pass
         else:
             pass
@@ -200,10 +196,8 @@ class pyflowline(object):
         self.dSinuosity = self.dLength / dDistance
         return
 
-    def __eq__(self, other):  
-                     
+    def __eq__(self, other):                       
         iFlag_overlap = 0 
-
         nEdge1 = self.nEdge
         nEdge2 = other.nEdge
         if nEdge1 == nEdge2:

@@ -13,27 +13,19 @@ from pyflowline.formats.convert_coordinates import convert_gcs_coordinates_to_ce
 from pyflowline.algorithms.auxiliary.gdal_functions import  reproject_coordinates_batch
 
 def create_square_mesh(dX_left_in, dY_bot_in, dResolution_meter_in, ncolumn_in, nrow_in, \
-    sFilename_output_in, sFilename_spatial_reference_in):
-
-   
+    sFilename_output_in, sFilename_spatial_reference_in):   
     if os.path.exists(sFilename_output_in): 
-        #delete it if it exists
         os.remove(sFilename_output_in)
 
     pDriver_shapefile = ogr.GetDriverByName('Esri Shapefile')
     pDriver_geojson = ogr.GetDriverByName('GeoJSON')
-
     pDataset_shapefile = pDriver_shapefile.Open(sFilename_spatial_reference_in, 0)
     pLayer_shapefile = pDataset_shapefile.GetLayer(0)
-    pSpatial_reference = pLayer_shapefile.GetSpatialRef()   
-        
-
-    pDataset = pDriver_geojson.CreateDataSource(sFilename_output_in)
-    
+    pSpatial_reference = pLayer_shapefile.GetSpatialRef()          
+    pDataset = pDriver_geojson.CreateDataSource(sFilename_output_in)    
     pSpatial_reference_gcs = osr.SpatialReference()  
     pSpatial_reference_gcs.ImportFromEPSG(4326)    # WGS84 lat/lon     
     pSpatial_reference_gcs.SetAxisMappingStrategy(osr.OAMS_TRADITIONAL_GIS_ORDER)
-
     pLayer = pDataset.CreateLayer('cell', pSpatial_reference_gcs, ogr.wkbPolygon)
     # Add one attribute
     pLayer.CreateField(ogr.FieldDefn('id', ogr.OFTInteger64)) #long type for high resolution
@@ -171,24 +163,17 @@ def create_square_mesh(dX_left_in, dY_bot_in, dResolution_meter_in, ncolumn_in, 
                 if iRow > 1:
                     lCellID7 = lCellID5 -1
                     aNeighbor.append(lCellID7) 
-               
-
-
-
+    
             pSquare.aNeighbor = aNeighbor
             pSquare.nNeighbor = len(aNeighbor)
             pSquare.aNeighbor_land= aNeighbor
             pSquare.nNeighbor_land= pSquare.nNeighbor
             aSquare.append(pSquare)
-
-
             lCellID = lCellID + 1
 
             pass
 
-    pDataset = pLayer = pFeature  = None      
-
-    #calculate neighbor distance
+    pDataset = pLayer = pFeature  = None  
     for pSquare in aSquare:
         aNeighbor = pSquare.aNeighbor
         pSquare.aNeighbor_distance=list()

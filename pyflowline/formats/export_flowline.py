@@ -21,7 +21,6 @@ def export_flowline_to_json( aFlowline_in, \
     """
 
     if os.path.exists(sFilename_json_in): 
-        #delete it if it exists
         os.remove(sFilename_json_in)
         pass
 
@@ -152,17 +151,11 @@ def export_flowline_to_shapefile(iFlag_projected_in, aFlowline_in, pSpatial_refe
         iFlag_attribute=0
         pass
 
-
-    #pDriver_json = ogr.GetDriverByName('GeoJSON')
     pDriver_shapefile = ogr.GetDriverByName('ESRI Shapefile')
-    #geojson
-    pDataset_shapefile = pDriver_shapefile.CreateDataSource(sFilename_shapefile_in)  
-    
-
+    pDataset_shapefile = pDriver_shapefile.CreateDataSource(sFilename_shapefile_in)      
     pLayer_shapefile = pDataset_shapefile.CreateLayer('flowline', pSpatial_reference_in, ogr.wkbLineString)
     # Add one attribute
     pLayer_shapefile.CreateField(ogr.FieldDefn('id', ogr.OFTInteger64)) #long type for high resolution
-
     #add the other fields
     if iFlag_attribute ==1:
         for i in range(nAttribute1):
@@ -219,21 +212,16 @@ def export_flowline_to_shapefile(iFlag_projected_in, aFlowline_in, pSpatial_refe
 
   
 
-def export_flowline_info_to_json(aCell, aCell_intersect_in, aFlowline_in, sFilename_json_out):
-    
+def export_flowline_info_to_json(aCell, aCell_intersect_in, aFlowline_in, sFilename_json_out):    
     #export the flowline topology to json
-
     ncell= len(aCell_intersect_in)
     nflowline= len(aFlowline_in)
-
     aLink =list()   
-
     for i in range(1, nflowline+1):
         pFlowline = aFlowline_in[i-1]
         nVertex = pFlowline.nVertex
         nEdge = pFlowline.nEdge
-        for j in range(1, nEdge+1):
-         
+        for j in range(1, nEdge+1):         
             pEdge = pFlowline.aEdge[j-1]
             pVertex_start = pEdge.pVertex_start
             pVertex_end = pEdge.pVertex_end
@@ -247,7 +235,6 @@ def export_flowline_info_to_json(aCell, aCell_intersect_in, aFlowline_in, sFilen
             pEdge_link = pyedge(pVertex_start, pVertex_end)  
             pLink = pycelllink(pMpas_start, pMpas_end, pEdge_link)
             aLink.append(pLink)
-
 
     with open(sFilename_json_out, 'w', encoding='utf-8') as f:
         sJson = json.dumps([json.loads(ob.tojson()) for ob in aLink], indent = 4)

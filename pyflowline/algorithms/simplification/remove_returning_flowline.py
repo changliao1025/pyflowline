@@ -1,24 +1,14 @@
 import copy
 import numpy as np
-
-
 from pyflowline.formats.convert_coordinates import convert_gcs_coordinates_to_flowline
 from pyflowline.algorithms.auxiliary.find_index_in_list import check_if_duplicates
 
-def remove_returning_flowline(iMesh_type_in, aCell_intersect_in, pVertex_outlet_in):
-    
-    aFlowline_out=list()
-    #checking input data 
-    #input hexagon should have at least one flowline inside
-    #input flowline should have order information and segment index?    
-    
+def remove_returning_flowline(iMesh_type_in, aCell_intersect_in, pVertex_outlet_in):    
+    aFlowline_out=list()    
     nCell =  len(aCell_intersect_in)
-
     def simplify_list(aCell_flowline_in):
         aCell_flowline_out = copy.deepcopy(aCell_flowline_in)
-
-        nCell2 = len(aCell_flowline_out)        
-        #check unique
+        nCell2 = len(aCell_flowline_out)          
         iFlag_unique = check_if_duplicates(aCell_flowline_out)
         if iFlag_unique == 1:
             return aCell_flowline_out
@@ -26,36 +16,30 @@ def remove_returning_flowline(iMesh_type_in, aCell_intersect_in, pVertex_outlet_
             for i in range(nCell2):
                 elem=aCell_flowline_out[i]
                 if aCell_flowline_out.count(elem) > 1:
-                    dummy = [i for i, x in enumerate(aCell_flowline_out) if x == elem]
-                    
+                    dummy = [i for i, x in enumerate(aCell_flowline_out) if x == elem]                    
                     start = dummy[0]
                     end = dummy[-1]
                     del aCell_flowline_out[start: end]                     
-                    break
-                    pass
+                    break                    
                 else:
                     pass
 
                 pass             
             
             aCell_flowline_out = simplify_list(aCell_flowline_out)
-
         return   aCell_flowline_out
 
     def retrieve_flowline_intersect_index(iSegment_in, iStream_order_in, pVertex_end_in):
-
         iFlag_found = 1
         pVertex_end_current = pVertex_end_in
-        aCell_flowline=list()
-  
+        aCell_flowline=list()  
         aSegment_upstream = list()
         aVertex_end_upstream = list()
         aStream_order = list()
         iFlag_skip = 0
         iFlag_previous_overlap=0
         while iFlag_found == 1:
-            iFlag_found = 0 
-            
+            iFlag_found = 0             
             for j in range(nCell):
                 pCell = aCell_intersect_in[j]
                 lCellID = pCell.lCellID
@@ -68,18 +52,14 @@ def remove_returning_flowline(iMesh_type_in, aCell_intersect_in, pVertex_outlet_
                     iStream_segment = pFlowline.iStream_segment
                     iStream_order = pFlowline.iStream_order
                     if pVertex_end == pVertex_end_current:
-                        if iStream_segment == iSegment_in:
-                            #found it
-                            # #check length as well
+                        if iStream_segment == iSegment_in:                            
                             dLength = pFlowline.dLength
-
                             iFlag_found2, dummy2 = pCell.which_edge_cross_this_vertex(pVertex_start)
                             iFlag_found3, dummy3 = pCell.which_edge_cross_this_vertex(pVertex_end)
 
                             if iFlag_found2 == 1 and iFlag_found3 == 1: #on the edge
                                 #same edge
-                                if dummy2.is_overlap(dummy3) ==1:
-                                    
+                                if dummy2.is_overlap(dummy3) ==1:                                    
                                     pVertex_end_current = pVertex_start    
                                     aCell_flowline.append(lCellID)
                                     iFlag_found = 1                
@@ -96,19 +76,15 @@ def remove_returning_flowline(iMesh_type_in, aCell_intersect_in, pVertex_outlet_
                                             pass
                                         else:
                                             iFlag_previous_overlap=1
-                                            pass                                      
-                                        
-                                        
+                                            pass                                             
                                         pass
                                     else:
                                         pVertex_end_current = pVertex_start    
                                         aCell_flowline.append(lCellID)
-                                        iFlag_found = 1
-                                        #iFlag_previous_overlap=0
+                                        iFlag_found = 1                                      
                                         pass
 
-                                    pass
-                                
+                                    pass                                
 
                                 pass
 
@@ -133,11 +109,9 @@ def remove_returning_flowline(iMesh_type_in, aCell_intersect_in, pVertex_outlet_
                                 #save the upstream information for new step
                                 aSegment_upstream.append(iStream_segment)
                                 aVertex_end_upstream.append(pVertex_end)
-                                aStream_order.append(iStream_order)
-                               
+                                aStream_order.append(iStream_order)                               
                             
                             pass
-
                     pass
 
                 if iFlag_found == 1:
@@ -145,17 +119,13 @@ def remove_returning_flowline(iMesh_type_in, aCell_intersect_in, pVertex_outlet_
         
         #should have finished search
         if iFlag_found == 0:
-
             #reverse 
             aCell_flowline = aCell_flowline[::-1]
-            #simplify list
-         
+            #simplify list         
             aCell_simple = simplify_list(aCell_flowline)
             #save the output
             nCell3 = len(aCell_simple)
-            aCoordinates = list()
-
-            
+            aCoordinates = list()            
             if nCell3 >1:
                 for i in range(nCell3):
                     lCellID = aCell_simple[i]
@@ -170,10 +140,8 @@ def remove_returning_flowline(iMesh_type_in, aCell_intersect_in, pVertex_outlet_
                 pFlowline.iStream_order=iStream_order_in
                 aFlowline_out.append(pFlowline)
 
-            sort_index = np.argsort(aStream_order)
-            
+            sort_index = np.argsort(aStream_order)            
             sort_index = sort_index[::-1]
-
             nUpstream = len(aSegment_upstream)
             for i in sort_index:
                 retrieve_flowline_intersect_index(aSegment_upstream[i], aStream_order[i], aVertex_end_upstream[i])
@@ -220,57 +188,4 @@ def remove_returning_flowline(iMesh_type_in, aCell_intersect_in, pVertex_outlet_
         
     retrieve_flowline_intersect_index(iStream_segment, iStream_order, pVertex_outlet)
 
-    #remove parallel
-
-    nsegment2 = len(aFlowline_out)
-    aFlowline_out_no_parallel = list()
-    aVertex_all = list()
-
-    #for i in range(iStream_order,0,-1):
-    #    for j in range(nsegment2):
-    #        pFlowline = aFlowline_out[j]
-    #        iord = pFlowline.iStream_order
-    #        pVertex_start = pFlowline.pVertex_start
-    #        pVertex_end = pFlowline.pVertex_end
-    #        nVertex= pFlowline.nVertex
-    #        aVertex = pFlowline.aVertex
-    #        if iord == iStream_order:
-    #            for k in aVertex:
-    #                add_unique_vertex(aVertex_all, k)
-    #                pass
-    #            aFlowline_out_no_parallel.append(pFlowline)
-    #            pass
-    #        else:
-    #            if iord==i:
-    #                if nVertex > 2:
-    #                    iFlag_exist = 0 
-    #                    for m in range(1, nVertex-1,1):
-    #                        pVertex = aVertex[m]
-    #                        iFlag_exist, dummy =  find_vertex_in_list(aVertex_all, pVertex)
-    #                        if iFlag_exist ==1:
-    #                            #there is parallel river in this grid
-    #                            #so we will abandon the whole flowline and its upstream?
-    #                            break
-    #                            pass
-    #                        pass
-    #                    if iFlag_exist ==1:                            
-    #                        pass
-    #                    else:
-    #                        aFlowline_out_no_parallel.append(pFlowline)
-    #                        for m in range( nVertex):
-    #                            add_unique_vertex(aVertex_all, pVertex)
-
-    #                else:
-    #                    add_unique_vertex(aVertex_all, pVertex_start)
-    #                    add_unique_vertex(aVertex_all, pVertex_end)
-    #                    aFlowline_out_no_parallel.append(pFlowline)
-    #                    pass
-    #                pass
-    #        pass
-    #    
-    #    pass
-    
-
-
-
-    return aFlowline_out, aFlowline_out_no_parallel, lCellID_outlet, pVertex_outlet
+    return aFlowline_out, lCellID_outlet, pVertex_outlet

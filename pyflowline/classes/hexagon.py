@@ -34,41 +34,27 @@ class pyhexagon(pycell):
     lCellID  = -1
     nFlowline=0
     nVertex =0 
-    nEdge=0
-
-    
-
+    nEdge=0  
     dLength=0.0
-    dArea=0.0
-    
+    dArea=0.0    
     dX_center_meter=0.0
     dY_center_meter=0.0
     dz_center=0.0
-
-
     dLongitude_center_degree=0.0
     dLatitude_center_degree=0.0
-
     dElevation_mean=-9999
-
     dLength_flowline=0.0
-
     iFlag_intersected=-1
     iFlag_coast = 0
-
     lCellID_downstream_burned=-1
     iStream_order_burned=-1
     iStream_segment_burned=-1
-
     aEdge=None
     aEdgeID=None
     aVertex=None
     aVertexID=None
-
     pVertex_center = None
-
-    aFlowline=None
-   
+    aFlowline=None   
     nNeighbor=-1
     nNeighbor_land=-1
     nNeighbor_ocean=-1
@@ -77,33 +63,25 @@ class pyhexagon(pycell):
     aNeighbor_ocean=None #the global ID of all neighbors
     aNeighbor_distance = None
 
-
     def __init__(self, dLon, dLat, aEdge, aVertex):    
-
         nEdge = len(aEdge)
         if nEdge != 6:
             pass
-        else:
-            
-                
+        else:                       
             self.aEdge = aEdge
             self.aVertex = aVertex #the first one and last one are the same
             self.nEdge = 6
             self.nVertex = 6
             self.dLongitude_center_degree = dLon
-            self.dLatitude_center_degree = dLat
-
-            
+            self.dLatitude_center_degree = dLat            
             pVertex = dict()        
             pVertex['dLongitude_degree'] =self.dLongitude_center_degree
             pVertex['dLatitude_degree'] =self.dLatitude_center_degree           
             self.pVertex_center = pyvertex(pVertex)
-
             self.lCellID_downstream_burned=-1
             self.iStream_order_burned=-1
             self.iStream_segment_burned=-1
             self.dElevation_mean=-9999.0
-
             pass
         pass
     
@@ -127,30 +105,19 @@ class pyhexagon(pycell):
                 iFlag_found =1
                 pEdge_out = pEdge
                 break
-
             else:
                 pass
 
         return iFlag_found, pEdge_out
     
-    def calculate_cell_area(self):
-        #dLength_edge = self.dLength
-
-        #dLength_edge = np.sqrt(  2.0 * dArea / (3.0* np.sqrt(3.0))  )
-        #dArea = dLength_edge * dLength_edge * (3.0* np.sqrt(3.0)) /2.0
-
+    def calculate_cell_area(self):       
         lons=list()
-        lats=list()
-        
-        for i in range(self.nVertex):
-            
+        lats=list()        
+        for i in range(self.nVertex):            
             lons.append( self.aVertex[i].dLongitude_degree )
             lats.append( self.aVertex[i].dLatitude_degree )
 
-
-        self.dArea = calculate_polygon_area( lons, lats)
-
-        
+        self.dArea = calculate_polygon_area( lons, lats)        
         return self.dArea
 
     def calculate_edge_length(self):
@@ -167,13 +134,11 @@ class pyhexagon(pycell):
                     iFlag_share = 1 
                     break
 
-
         return iFlag_share
     
     def tojson(self):
         aSkip = ['aEdge', \
                 'aFlowline']
-
         obj = self.__dict__.copy()
         for sKey in aSkip:
             obj.pop(sKey, None)
@@ -184,6 +149,5 @@ class pyhexagon(pycell):
                 cls=HexagonClassEncoder) 
         return sJson
 
-    def plot():
-        return
+    
 

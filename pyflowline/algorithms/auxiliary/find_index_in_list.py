@@ -41,8 +41,7 @@ def find_vertex_on_edge(aVertex_in, pEdge_in):
     aIndex_order=list()
     aDistance=list()
     nVertex= len(aVertex_in)
-    npoint = 0
-    
+    npoint = 0    
     if nVertex > 0 :
         for i in np.arange( nVertex):
             pVertex = aVertex_in[i]
@@ -64,12 +63,9 @@ def find_vertex_on_edge(aVertex_in, pEdge_in):
             b = np.argsort(x)
             c = np.array(aIndex)
             d= c[b]
-            aIndex_order = list(d)
-        
+            aIndex_order = list(d)        
     else:
         pass
-
-
     
     return iFlag_exist, npoint , aIndex_order
 
@@ -195,7 +191,6 @@ def add_unique_vertex(aVertex_in, pVertex_in):
     if iFlag_exist == 1:
         pass
     else:
-        #add it into the dic
         aVertex_in.append(pVertex_in)
         pass
 
@@ -216,6 +211,5 @@ def find_list_in_list(aList_in, pList_in):
             break
         else:
             iFlag = 0
-
    
     return iFlag

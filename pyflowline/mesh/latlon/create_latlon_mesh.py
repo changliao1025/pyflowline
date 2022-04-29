@@ -9,22 +9,16 @@ from osgeo import ogr, osr
 from pyflowline.classes.latlon import pylatlon
 from pyflowline.formats.convert_coordinates import convert_gcs_coordinates_to_cell
 
-def create_latlon_mesh(dLongitude_left_in, dLatitude_bot_in, dResolution_degree_in, ncolumn_in, nrow_in, sFilename_output_in):
-
-   
+def create_latlon_mesh(dLongitude_left_in, dLatitude_bot_in, dResolution_degree_in, ncolumn_in, nrow_in, sFilename_output_in):   
     if os.path.exists(sFilename_output_in): 
-        #delete it if it exists
         os.remove(sFilename_output_in)
 
-
     #pDriver_shapefile = ogr.GetDriverByName('Esri Shapefile')
-    pDriver_geojson = ogr.GetDriverByName('GeoJSON')
-    
+    pDriver_geojson = ogr.GetDriverByName('GeoJSON')    
     pDataset = pDriver_geojson.CreateDataSource(sFilename_output_in)
     pSpatial_reference_gcs = osr.SpatialReference()  
     pSpatial_reference_gcs.ImportFromEPSG(4326)    # WGS84 lat/lon
     pSpatial_reference_gcs.SetAxisMappingStrategy(osr.OAMS_TRADITIONAL_GIS_ORDER)
-
     pLayer = pDataset.CreateLayer('cell', pSpatial_reference_gcs, ogr.wkbPolygon)
     # Add one attribute
     pLayer.CreateField(ogr.FieldDefn('id', ogr.OFTInteger64)) #long type for high resolution
@@ -33,18 +27,13 @@ def create_latlon_mesh(dLongitude_left_in, dLatitude_bot_in, dResolution_degree_
     pArea_field = ogr.FieldDefn('area', ogr.OFTReal)
     pArea_field.SetWidth(20)
     pArea_field.SetPrecision(2)
-    pLayer.CreateField(pArea_field)
-    
+    pLayer.CreateField(pArea_field)    
     pLayerDefn = pLayer.GetLayerDefn()
-    pFeature = ogr.Feature(pLayerDefn)
-
-    
-
+    pFeature = ogr.Feature(pLayerDefn)    
     xleft = dLongitude_left_in
     xspacing= dResolution_degree_in
     ybottom = dLatitude_bot_in
     yspacing = dResolution_degree_in
-
     lCellID = 1
     #.........
     #(x2,y2)-----(x3,y3)
@@ -65,8 +54,7 @@ def create_latlon_mesh(dLongitude_left_in, dLatitude_bot_in, dResolution_degree_
             y3 = ybottom + ((iRow ) * yspacing)
 
             x4 = xleft + ((iColumn ) * xspacing)
-            y4 = ybottom + ((iRow-1) * yspacing)
-           
+            y4 = ybottom + ((iRow-1) * yspacing)           
 
             ring = ogr.Geometry(ogr.wkbLinearRing)
             ring.AddPoint(x1, y1)
@@ -90,16 +78,13 @@ def create_latlon_mesh(dLongitude_left_in, dLatitude_bot_in, dResolution_degree_
             aCoords[3,1] = y4
             aCoords[4,0] = x1
             aCoords[4,1] = y1
-            dummy1= np.array(aCoords)
-            
-
+            dummy1= np.array(aCoords)           
             pLatlon = convert_gcs_coordinates_to_cell(3, dLongitude_center, dLatitude_center, dummy1)
             pLatlon.lCellID = lCellID
             dArea = pLatlon.calculate_cell_area()
             pLatlon.calculate_edge_length()
             pLatlon.dLongitude_center_degree = dLongitude_center
             pLatlon.dLatitude_center_degree = dLatitude_center
-
             pFeature.SetGeometry(pPolygon)
             pFeature.SetField("id", lCellID)
             pFeature.SetField("lon", dLongitude_center )
@@ -141,8 +126,7 @@ def create_latlon_mesh(dLongitude_left_in, dLatitude_bot_in, dResolution_degree_
             pLatlon.aNeighbor = aNeighbor
             pLatlon.nNeighbor = len(aNeighbor)
             pLatlon.aNeighbor_land= aNeighbor
-            pLatlon.nNeighbor_land= pLatlon.nNeighbor
-            
+            pLatlon.nNeighbor_land= pLatlon.nNeighbor            
             aLatlon.append(pLatlon)
             lCellID = lCellID + 1
 

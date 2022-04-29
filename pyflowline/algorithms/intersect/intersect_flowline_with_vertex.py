@@ -14,7 +14,7 @@ def intersect_flowline_with_vertex( sFilename_flowline_in, sFilename_vertex_in, 
         return
 
     if os.path.exists(sFilename_output_in): 
-        #delete it if it exists
+
         os.remove(sFilename_output_in)
 
     
@@ -78,8 +78,6 @@ def intersect_flowline_with_vertex( sFilename_flowline_in, sFilename_vertex_in, 
             #for pFeature_flowline in pLayer_flowline:
                 pFeature_vertex = pLayer_vertex.GetFeature(j)
                 pGeometry_vertex = pFeature_vertex.GetGeometryRef()
-
-
                 if (pGeometry_vertex.IsValid()):
                     pass
                 else:

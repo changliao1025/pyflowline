@@ -3,8 +3,6 @@ from math import cos, sin, sqrt, acos
 import numpy as np
 import osgeo
 from osgeo import  osr, gdal
-
-
 #most of these functions are copied from the pyearth package
 
 #https://stackoverflow.com/questions/8204998/how-to-check-if-a-pointlonc-latc-lie-on-a-great-circle-running-from-lona-lata
@@ -23,9 +21,7 @@ def calculate_distance_to_plane(x1, y1, x2, y2, x3, y3):
     x3,y3,z3 = c3
     c = (-x1*y3 + x3* y1)/( z1*y3 - z3*y1 )
     b = (  -x1*z3 + x3 * z1 ) / (y1 * z3 - y3*z1)
-
     distance = abs(  x2 + b * y2 + c * z2 )
-
     return distance
 
 def calculate_angle_betwen_vertex_normal(x1, y1, x2, y2, x3, y3):
@@ -36,16 +32,13 @@ def calculate_angle_betwen_vertex_normal(x1, y1, x2, y2, x3, y3):
     a3 = longlat_to_3d(*a)
     b3 = longlat_to_3d(*b)
     c3 = longlat_to_3d(*c)
-
     a3vec = a3 - b3
     c3vec = c3 - b3 
-
     dot=np.dot(a3vec, c3vec)
     g = np.cross(a3vec, c3vec)
     det = np.dot(b3, g)
     angle = np.arctan2(det, dot)
     f = np.degrees(angle) 
-
     if f < 0:
         f = 360 + f
     
@@ -64,7 +57,6 @@ def calculate_angle_betwen_vertex(x1, y1, x2, y2, x3, y3):
     a3vec = a3 - b3
     c3vec = c3 - b3        
     angle3deg = angle_between_vectors_degrees(a3vec, c3vec)
-
     return  angle3deg
     
 def longlat_to_3d(lonr, latr):
@@ -77,8 +69,8 @@ def longlat_to_3d(lonr, latr):
 
 def angle_between_vectors_degrees(u, v):
     """Return the angle between two vectors in any dimension space,
-    in degrees."""
-
+    in degrees.
+    """
     a = np.dot(u, v)
     b = np.linalg.norm(u)
     c = np.linalg.norm(v)
@@ -101,14 +93,10 @@ def convert_360_to_180(dLongitude_in):
 
     Returns:
         [type]: [description]
-    """
- 
+    """ 
     a = int(dLongitude_in /180)
     dLongitude_out = dLongitude_in - a*360.0
-
     return dLongitude_out
-
-
 
 def convert_180_to_360(dLongitude_in):
     """[This function is modified from
@@ -143,19 +131,14 @@ def retrieve_geotiff_metadata(sFilename_geotiff_in):
         sys.exit("Try again!")
     else: 
         pProjection = pDataset.GetProjection()
-        pSpatial_reference = osr.SpatialReference(wkt=pProjection)
-    
-    
+        pSpatial_reference = osr.SpatialReference(wkt=pProjection)    
         ncolumn = pDataset.RasterXSize
-        nrow = pDataset.RasterYSize
-        #nband = pDataset.RasterCount
-
+        nrow = pDataset.RasterYSize        
         pGeotransform = pDataset.GetGeoTransform()
         dOriginX = pGeotransform[0]
         dOriginY = pGeotransform[3]
         dPixelWidth = pGeotransform[1]
-        pPixelHeight = pGeotransform[5]       
-        
+        pPixelHeight = pGeotransform[5]               
         return dPixelWidth, dOriginX, dOriginY, nrow, ncolumn, pSpatial_reference, pProjection, pGeotransform
 
 
@@ -209,18 +192,13 @@ def reproject_coordinates(x_in, y_in, spatial_reference_source, spatial_referenc
 
     Returns:
         [type]: [description]
-    """    
-  
-
+    """      
     if spatial_reference_target is not None:
-
         pass
     else:
         spatial_reference_target = osr.SpatialReference()
-        spatial_reference_target.ImportFromEPSG(4326)
-        
+        spatial_reference_target.ImportFromEPSG(4326)        
         pass
-
     
     if int(osgeo.__version__[0]) >= 3:
     # GDAL 3 changes axis order: https://github.com/OSGeo/gdal/issues/1546
@@ -311,9 +289,7 @@ def calculate_polygon_area(lons, lats,  algorithm = 0, radius = 6378137.0):
     lons = np.deg2rad(lons)
 
     if algorithm==0:
-        # Line integral based on Green's Theorem, assumes spherical Earth
-        
-
+        # Line integral based on Green's Theorem, assumes spherical Earth      
         #close polygon
         if lats[0]!=lats[-1]:
             lats = np.append(lats, lats[0])
@@ -428,9 +404,7 @@ def gdal_read_geotiff_file(sFilename_in):
 
         return aData_out, dPixelWidth, dOriginX, dOriginY, nrow, ncolumn, dMissing_value, pGeotransform, pProjection,  pSpatial_reference
 
-def Google_MetersPerPixel( zoomLevel ):
-
-  
+def Google_MetersPerPixel( zoomLevel ):  
    
    # Return to the caller if there is an error.
    #On_Error, 2

@@ -1,26 +1,22 @@
 
 import numpy as np 
-
 from pyflowline.algorithms.auxiliary.check_head_water import check_head_water
 def define_stream_order(aFlowline_in):
     nFlowline = len(aFlowline_in)
     aFlowline_out = list()
-    # Check to see if shapefile is found.
+    
     if nFlowline == 0 :
         print ('data incomplete')
     else:       
-        aStream_order = np.full(nFlowline, 0, dtype=int)      
-
+        aStream_order = np.full(nFlowline, 0, dtype=int)    
         for i in range(nFlowline):
             pFlowline = aFlowline_in[i]
             pVertex_start=pFlowline.pVertex_start
             if check_head_water(aFlowline_in, pVertex_start)==1:     
                 aStream_order[i] = 1
-                pass
-        
-        #now 
+                pass       
+     
         while aStream_order[0] == 0:
-
             for  i in range(nFlowline):
                 if aStream_order[i] !=0:
                     continue

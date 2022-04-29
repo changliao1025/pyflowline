@@ -1,18 +1,13 @@
 import numpy as np 
-
+from pyflowline.algorithms.auxiliary.check_head_water import check_head_water
 lID=0
 aFlag_process=None
 
-from pyflowline.algorithms.auxiliary.check_head_water import check_head_water
-
-def correct_flowline_direction(aFlowline_in, pVertex_outlet_in):
-        
+def correct_flowline_direction(aFlowline_in, pVertex_outlet_in):        
     #we have to go reversely    
     aFlowline_out= list()   
-
     global lID    
     global aFlag_process
-
     nFlowline = len(aFlowline_in)
     aFlag_process=np.full(nFlowline, 0, dtype =int)
     iFlag_first = 1
@@ -73,8 +68,6 @@ def correct_flowline_direction(aFlowline_in, pVertex_outlet_in):
                 pass
 
             pass
-
-        #print(aUpstream)
         return nUpstream, aUpstream, aReverse
     
     
@@ -85,15 +78,13 @@ def correct_flowline_direction(aFlowline_in, pVertex_outlet_in):
             nUpstream, aUpstream, aReverse = find_upstream_flowline(pVertex_start_in, pVertex_end_in)
             if nUpstream > 0:
                 global lID
-
                 for j in range(nUpstream):
                     pFlowline = aFlowline_in[ aUpstream[j] ] 
                     if (aReverse[j]==1):             
                         pFlowline.reverse()                    
                         pass
                     else:
-                        pass                                  
-                    
+                        pass
                     pFlowline.lIndex = lID
                     aFlowline_out.append(pFlowline)
                     lID = lID + 1

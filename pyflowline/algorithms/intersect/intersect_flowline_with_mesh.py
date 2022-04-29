@@ -16,14 +16,10 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh_in, sFilename_flo
         return
 
     if os.path.exists(sFilename_output_in): 
-        #delete it if it exists
         os.remove(sFilename_output_in)
 
     
     pDriver_geojson = ogr.GetDriverByName( "GeoJSON")
-    #pDriver_shapefile = ogr.GetDriverByName('ESRI Shapefile' )
-
-    #geojson
     aCell=list()
     aCell_intersect=list()
    
@@ -54,15 +50,10 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh_in, sFilename_flo
     pLayerOut.CreateField(ogr.FieldDefn('iseg', ogr.OFTInteger)) #long type for high resolution
     pLayerOut.CreateField(ogr.FieldDefn('iord', ogr.OFTInteger)) #long type for high resolution
     pLayerDefn = pLayerOut.GetLayerDefn()
-    pFeatureOut = ogr.Feature(pLayerDefn)    
-   
-    lID_flowline = 0           
-
-    aFlowline_intersect_all=list()
-    #for i in range (nfeature_mesh):
-    for pFeature_mesh in pLayer_mesh:
-       
-        #pFeature_mesh= pLayer_mesh.GetFeature(i)
+    pFeatureOut = ogr.Feature(pLayerDefn)       
+    lID_flowline = 0          
+    aFlowline_intersect_all=list()   
+    for pFeature_mesh in pLayer_mesh:       
         pGeometry_mesh = pFeature_mesh.GetGeometryRef()        
         dummy0 = loads( pGeometry_mesh.ExportToWkt() )
         aCoords_gcs = dummy0.exterior.coords
@@ -70,49 +61,38 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh_in, sFilename_flo
 
         lCellID = pFeature_mesh.GetField("id")
         dLon = pFeature_mesh.GetField("lon")
-        dLat = pFeature_mesh.GetField("lat")
-        #dElevation = pFeature_mesh.GetField("elev")
+        dLat = pFeature_mesh.GetField("lat")        
         dArea = pFeature_mesh.GetField("area")
-        if (iFlag_transform ==1): #projections are different
+        if (iFlag_transform ==1): 
             pGeometry_mesh.Transform(transform)
-
         if (pGeometry_mesh.IsValid()):
             pass
         else:
             print('Geometry issue')
 
-        #convert geometry to edge
         pGeometrytype_mesh = pGeometry_mesh.GetGeometryName()
         if(pGeometrytype_mesh == 'POLYGON'):            
             pCell = convert_gcs_coordinates_to_cell(iMesh_type_in, dLon, dLat, aCoords_gcs)     
-            pCell.lCellID = lCellID #this information is saved in shapefile            
-            pCell.dArea = dArea #pCell.calculate_cell_area()
+            pCell.lCellID = lCellID             
+            pCell.dArea = dArea 
             pCell.dLength = pCell.calculate_edge_length()
-            pCell.dLength_flowline = pCell.dLength
-                     
+            pCell.dLength_flowline = pCell.dLength                     
             aFlowline_intersect = list()
             iFlag_intersected = 0 
             for j in range (nfeature_flowline):
-            #for pFeature_flowline in pLayer_flowline:
                 pFeature_flowline = pLayer_flowline.GetFeature(j)
                 pGeometry_flowline = pFeature_flowline.GetGeometryRef()
-
                 iStream_segment = pFeature_flowline.GetField("iseg")
                 iStream_order = pFeature_flowline.GetField("iord")
-
                 if (pGeometry_flowline.IsValid()):
                     pass
                 else:
-                    print('Geometry issue')
-                #print(pGeometry_flowline.GetGeometryName())
+                    print('Geometry issue')         
 
                 iFlag_intersect = pGeometry_flowline.Intersects( pGeometry_mesh )
                 if( iFlag_intersect == True):
-
                     iFlag_intersected = 1
                     pGeometry_intersect = pGeometry_flowline.Intersection(pGeometry_mesh)                     
-
-                    #add more process here to 
                     pGeometrytype_intersect = pGeometry_intersect.GetGeometryName()
                     if pGeometrytype_intersect == 'LINESTRING':
                         pFeatureOut.SetGeometry(pGeometry_intersect)
@@ -120,7 +100,6 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh_in, sFilename_flo
                         pFeatureOut.SetField("iseg", iStream_segment)    
                         pFeatureOut.SetField("iord", iStream_order)           
                         pLayerOut.CreateFeature(pFeatureOut)    
-
                         dummy = loads( pGeometry_intersect.ExportToWkt() )
                         aCoords = dummy.coords                
                         dummy1= np.array(aCoords)
@@ -142,7 +121,6 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh_in, sFilename_flo
                                 pFeatureOut.SetField("iseg", iStream_segment)    
                                 pFeatureOut.SetField("iord", iStream_order)           
                                 pLayerOut.CreateFeature(pFeatureOut)    
-
                                 dummy = loads( Line.ExportToWkt() )
                                 aCoords = dummy.coords
                                 dummy1= np.array(aCoords)
@@ -156,13 +134,11 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh_in, sFilename_flo
                                 lID_flowline = lID_flowline + 1
                             pass
                         else:
-                            pass
-                            
+                            pass                            
 
                 else:
                     pass
-
-            #only save the intersected hexagon to output? 
+     
             #now add back to the cell object
             pCell.aFlowline = aFlowline_intersect
             pCell.nFlowline = len(aFlowline_intersect)
@@ -182,7 +158,6 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh_in, sFilename_flo
                 pCell.iFlag_intersected = 0   
                 aCell.append(pCell)
                 pass
-
             
         else:
             pass

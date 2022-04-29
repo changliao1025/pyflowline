@@ -132,8 +132,7 @@ def convert_gcs_coordinates_to_flowline(aCoordinates_in):
         pEdge = pyedge( aVertex[j], aVertex[j+1] )
         aEdge.append(pEdge)
     
-    pLine = pyflowline( aEdge)
-    
+    pLine = pyflowline( aEdge)    
     return pLine
 
 def convert_pcs_coordinates_to_flowline(aCoordinates_in, pSpatial_reference_in):
@@ -146,7 +145,6 @@ def convert_pcs_coordinates_to_flowline(aCoordinates_in, pSpatial_reference_in):
         dummy = dict()
         dummy['x'] =x
         dummy['y'] =y
-
         lon, lat = reproject_coordinates(x, y, pSpatial_reference_in)
         dummy['lon'] = lon
         dummy['lat'] = lat

@@ -1,8 +1,6 @@
 import os
-
 from osgeo import ogr, osr
 from shapely.geometry import Point
-
 
 def export_vertex_to_json(aVertex_in, \
         sFilename_json_in,\
@@ -15,7 +13,6 @@ def export_vertex_to_json(aVertex_in, \
     """
 
     if os.path.exists(sFilename_json_in): 
-        #delete it if it exists
         os.remove(sFilename_json_in)
         pass
     
@@ -51,7 +48,6 @@ def export_vertex_to_json(aVertex_in, \
     lID = 0
     for i in range(nVertex):       
         pVertex = aVertex_in[i]
-
         if iFlag_projected_in ==1:
             dummy1= Point( pVertex.dx, pVertex.dy )
             pass
@@ -60,13 +56,11 @@ def export_vertex_to_json(aVertex_in, \
             pass
 
         pGeometry_out = ogr.CreateGeometryFromWkb(dummy1.wkb)
-        pFeature_out.SetGeometry(pGeometry_out)
-   
+        pFeature_out.SetGeometry(pGeometry_out)   
         pFeature_out.SetField("id", lID)
         if iFlag_attribute ==1:
             pFeature_out.SetField("con", int(aAttribute[i]) )
-        
-        # Add new pFeature_shapefile to output Layer
+                
         pLayer_json.CreateFeature(pFeature_out)        
         lID =  lID + 1
         pass
@@ -87,7 +81,6 @@ def export_vertex_to_shapefile(aVertex_in, sFilename_shapefile_out,\
     """
 
     if os.path.exists(sFilename_shapefile_out): 
-        #delete it if it exists
         os.remove(sFilename_shapefile_out)
         pass
 
@@ -98,13 +91,8 @@ def export_vertex_to_shapefile(aVertex_in, sFilename_shapefile_out,\
         iFlag_attribute=0
 
     nVertex = len(aVertex_in)
-
-    #pDriver = ogr.GetDriverByName('GeoJSON')
     pDriver = ogr.GetDriverByName('ESRI Shapefile')
-    #geojson
     pDataset_json = pDriver.CreateDataSource(sFilename_shapefile_out)
-
-
     pLayer_json = pDataset_json.CreateLayer('vertex', pSpatial_reference_in, ogr.wkbPoint)
     # Add one attribute
     pLayer_json.CreateField(ogr.FieldDefn('id', ogr.OFTInteger64)) #long type for high resolution
@@ -114,13 +102,9 @@ def export_vertex_to_shapefile(aVertex_in, sFilename_shapefile_out,\
 
     pLayerDefn = pLayer_json.GetLayerDefn()
     pFeature_out = ogr.Feature(pLayerDefn)
-
     lID = 0
-
-
     for i in range(nVertex):       
         pVertex = aVertex_in[i]
-
         if iFlag_projected_in ==1:
             dummy1= Point( pVertex.dx, pVertex.dy )             
             pass
@@ -129,8 +113,7 @@ def export_vertex_to_shapefile(aVertex_in, sFilename_shapefile_out,\
             pass
 
         pGeometry_out = ogr.CreateGeometryFromWkb(dummy1.wkb)
-        pFeature_out.SetGeometry(pGeometry_out)
-   
+        pFeature_out.SetGeometry(pGeometry_out)   
         pFeature_out.SetField("id", lID)
         if iFlag_attribute ==1:
             pFeature_out.SetField("con", int(aAttribute[i]) )

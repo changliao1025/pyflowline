@@ -1,15 +1,10 @@
-
 from pyflowline.algorithms.auxiliary.check_head_water import check_head_water
-
 def remove_small_river(aFlowline_in, dThreshold_in):
-
     nFlowline = len(aFlowline_in)
     aFlowline_out=list()        
-
     if nFlowline == 1:
         aFlowline_out.append(aFlowline_in[0])
     else:
-
         lID = 0        
         for i in range(nFlowline):
             pFlowline = aFlowline_in[i]      
@@ -17,7 +12,6 @@ def remove_small_river(aFlowline_in, dThreshold_in):
             pVertex_start = pFlowline.pVertex_start
             pVertex_end = pFlowline.pVertex_end
             dLength = pFlowline.calculate_length()
-
             if iFlag_dam ==1:
                 pFlowline.lIndex = lID
                 aFlowline_out.append(pFlowline)

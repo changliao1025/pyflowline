@@ -34,8 +34,7 @@ class pycelllink(object):
         self.pEdge_link = pEdge_link_in
         return
     
-    def tojson(self):
-        
+    def tojson(self):        
         sJson = json.dumps(self.__dict__, \
             ensure_ascii=True, \
                 indent=4, \

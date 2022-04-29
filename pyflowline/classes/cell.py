@@ -12,6 +12,5 @@ class pycell(metaclass=ABCMeta):
 
     @abstractmethod
     def calculate_cell_area(self, aEdge):
-
         pass
 

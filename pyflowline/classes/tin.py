@@ -4,8 +4,7 @@ from pyflowline.classes.vertex import pyvertex
 from pyflowline.classes.edge import pyedge
 from pyflowline.classes.cell import pycell
 
-class pytin(pycell):
-    
+class pytin(pycell):    
     nFlowline=0
     nVertex =0 
     nEdge=0
@@ -19,29 +18,23 @@ class pytin(pycell):
     lCellID  = -1
     aNeighbor=None #the global ID of all neighbors
     nNeighbor=-1
-
     def __init__(self, aEdge,aVertex, dLon, dLat):       
         nEdge = len(aEdge)
         if nEdge !=3:
             pass
-        else:
-            
-                
+        else:           
             self.aEdge = aEdge
             self.aVertex = aVertex #the first one and last one are the same
             self.nEdge = len(aEdge)
             self.nVertex = len(aVertex) - 1
-
             self.dLongitude_center = dLon
             self.dLatitude_center = dLat
             pVertex = dict()        
             pVertex['lon'] =self.dLongitude_center
             pVertex['lat'] =self.dLatitude_center           
             self.pVertex_center = pyvertex(pVertex)
-
             pass
-        pass
-    
+        pass    
    
     def has_this_edge(self, pEdge_in):
         iFlag_found = 0
@@ -63,19 +56,16 @@ class pytin(pycell):
                 iFlag_found =1
                 pEdge_out = pEdge
                 break
-
             else:
                 pass
 
         return iFlag_found, pEdge_out
     
-    def calculate_cell_area(self):
-           
+    def calculate_cell_area(self):           
         self.dArea = 0.0
         return self.dArea
 
-    def calculate_edge_length(self):
-        
+    def calculate_edge_length(self):        
         self.dLength_edge =0.0
         return self.dLength_edge
     
@@ -86,6 +76,5 @@ class pytin(pycell):
                 if pEdge.is_overlap(pEdge2) ==1 :
                     iFlag_share = 1 
                     break
-
 
         return iFlag_share

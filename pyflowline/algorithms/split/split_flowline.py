@@ -2,26 +2,19 @@
 import numpy as np
 from pyflowline.classes.edge import pyedge
 from pyflowline.classes.flowline import pyflowline
-
 from pyflowline.algorithms.auxiliary.find_index_in_list import find_vertex_in_list, find_vertex_on_edge
-
-
 def split_flowline(aFlowline_in, aVertex_in, iFlag_intersect = None, iFlag_use_id=None):
     aFlowline_out = list()
     nFlowline = len(aFlowline_in)
-
     for i in range(nFlowline):
         pFlowline = aFlowline_in[i]
         iStream_order = pFlowline.iStream_order
         iStream_segment = pFlowline.iStream_segment
-        lFlowlineID = pFlowline.lFlowlineID
-        
+        lFlowlineID = pFlowline.lFlowlineID        
         iFlag_dam = pFlowline.iFlag_dam
         nVertex = pFlowline.nVertex
         nEdge= pFlowline.nEdge
-
-        iPart = 0
-        
+        iPart = 0        
         aVertex  = list() #the actual vertex of ROI
         aVertex_all = list() #include vertex that is not ROI, but we need them to subset 
         for j in range(nEdge):
@@ -32,8 +25,7 @@ def split_flowline(aFlowline_in, aVertex_in, iFlag_intersect = None, iFlag_use_i
             iFlag_exist, lIndex = find_vertex_in_list( aVertex_in,  pVertex)
             if iFlag_exist == 1:                
                 iPart = iPart + 1
-                aVertex.append(pVertex)
-            
+                aVertex.append(pVertex)            
                 
             if iFlag_intersect is not None:
                 if iFlag_use_id is not None:
@@ -67,7 +59,6 @@ def split_flowline(aFlowline_in, aVertex_in, iFlag_intersect = None, iFlag_use_i
                             aVertex_all.append(pVertex_dummy)
 
                 else:
-
                     iFlag_exist, npoint, aIndex = find_vertex_on_edge( aVertex_in,  pEdge)
                     #they must be ordered
                     if iFlag_exist==1:
@@ -87,7 +78,6 @@ def split_flowline(aFlowline_in, aVertex_in, iFlag_intersect = None, iFlag_use_i
             aVertex.append(pVertex)
             pass
 
-
         if iPart == 0 :
             print('Something is wrong')
             pass
@@ -95,7 +85,6 @@ def split_flowline(aFlowline_in, aVertex_in, iFlag_intersect = None, iFlag_use_i
             if iPart ==1:
                 #print('This flowline does not form any loop')
                 if iFlag_use_id is not None:
-
                     pass
                 pass
             else:
@@ -126,12 +115,8 @@ def split_flowline(aFlowline_in, aVertex_in, iFlag_intersect = None, iFlag_use_i
                             pFlowline1.iStream_order = iStream_order
                             pFlowline1.iFlag_dam = iFlag_dam
                             aFlowline_out.append(pFlowline1)
-                        pass
-                    
+                        pass                    
                     pass
-
-
-
                 pass   
 
     return aFlowline_out

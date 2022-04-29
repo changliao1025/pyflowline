@@ -12,7 +12,7 @@ DESCRIPTION = \
 AUTHOR = "Chang Liao"
 AUTHOR_EMAIL = "chang.liao@pnnl.gov"
 URL = "https://github.com/changliao1025/pyflowline"
-VERSION = "0.1.24"
+VERSION = "0.1.25"
 REQUIRES_PYTHON = ">=3.8.0"
 KEYWORDS = "Earth Science"
 
@@ -44,7 +44,6 @@ try:
 
 except FileNotFoundError:
     LONG_DESCRIPTION = DESCRIPTION
-
 
 setup(
     name=NAME,

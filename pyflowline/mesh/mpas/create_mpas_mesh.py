@@ -4,7 +4,6 @@ import numpy as np
 from osgeo import ogr, osr
 from netCDF4 import Dataset
 from pyflowline.classes.mpas import pympas
-
 from pyflowline.formats.convert_attributes import convert_gcs_attributes_to_cell
 from pyflowline.algorithms.auxiliary.gdal_functions import convert_360_to_180
 
@@ -22,49 +21,38 @@ def create_mpas_mesh(iFlag_global_in, \
         print('Mesh file does not exist!')
         exit
     
-    if os.path.exists(sFilename_output_in): 
-        #delete it if it exists
+    if os.path.exists(sFilename_output_in):  
         os.remove(sFilename_output_in)
 
     pDatasets_in = Dataset(sFilename_mesh_netcdf_in)
 
     netcdf_format = pDatasets_in.file_format
-    pDriver_geojson = ogr.GetDriverByName('GeoJSON')
-    #pDriver_shapefile = ogr.GetDriverByName('ESRI Shapefile')
-  
+    pDriver_geojson = ogr.GetDriverByName('GeoJSON')     
     pSpatial_reference_gcs = osr.SpatialReference()  
-    pSpatial_reference_gcs.ImportFromEPSG(4326)    # WGS84 lat/lon
-
-    
+    pSpatial_reference_gcs.ImportFromEPSG(4326)    # WGS84 lat/lon    
     #geojson
     if iFlag_save_mesh_in ==1:
         pDataset = pDriver_geojson.CreateDataSource(sFilename_output_in)
-
         pLayer = pDataset.CreateLayer('cell', pSpatial_reference_gcs, ogr.wkbPolygon)
         # Add one attribute
         pLayer.CreateField(ogr.FieldDefn('id', ogr.OFTInteger64)) #long type for high resolution
         pLayer.CreateField(ogr.FieldDefn('lon', ogr.OFTReal)) #long type for high resolution
         pLayer.CreateField(ogr.FieldDefn('lat', ogr.OFTReal)) #long type for high resolution
-
         pArea_field = ogr.FieldDefn('area', ogr.OFTReal)
         pArea_field.SetWidth(20)
         pArea_field.SetPrecision(2)
         pLayer.CreateField(pArea_field)
-
         if iFlag_use_mesh_dem == 1:
             pLayer.CreateField(ogr.FieldDefn('elev', ogr.OFTReal)) #float type for high resolution
             pLayer.CreateField(ogr.FieldDefn('elev0', ogr.OFTReal)) #float type for high resolution
         else:
-
             pass
     
         pLayerDefn = pLayer.GetLayerDefn()
-        pFeature = ogr.Feature(pLayerDefn)
-        
+        pFeature = ogr.Feature(pLayerDefn)        
 
     #write new netcdf
-    for sKey, aValue in pDatasets_in.variables.items():        
-
+    for sKey, aValue in pDatasets_in.variables.items():      
         #we need to filter out unused grids based on mpas specs
         if sKey == 'latCell':
             latCell0 = aValue
@@ -157,46 +145,35 @@ def create_mpas_mesh(iFlag_global_in, \
         
 
     aLatitudeVertex = latVertex0[:] / math.pi * 180
-    aLongitudeVertex = lonVertex0[:] / math.pi * 180
-    
+    aLongitudeVertex = lonVertex0[:] / math.pi * 180    
     #convert unit 
     aLatitudeCell = latCell0[:] / math.pi * 180
     aLongitudeCell = lonCell0[:] / math.pi * 180
-
     aCellsOnCell = cellsOnCell0[:]
     aCellOnEdge = cellsOnEdge0[:]
-
     aEdgesOnCell = edgesOnCell0[:]
     aVertexOnCell = verticesOnCell0[:]
-    aVertexOnEdge0 = verticesOnEdge0[:]
-    
+    aVertexOnEdge0 = verticesOnEdge0[:]    
     aIndexToCellID = indexToCellID0[:]
     aIndexToEdgeID = indexToEdgeID0[:]
     aIndexToVertexID = indexToVertexID0[:]
-
     aBed_elevation = bed_elevation0[:]
     aIce_thickness = ice_thickness0[:]
     aCellArea = areaCell0[:]
     aDcEdge = dcEdge0[:]
-    aBed_elevation_profile = bed_elevation_profile0[:]  #elevation
-    
-    ncell = len(aIndexToCellID)
- 
+    aBed_elevation_profile = bed_elevation_profile0[:]  #elevation    
+    ncell = len(aIndexToCellID) 
     aMpas = list()
     for i in range(ncell):
         dLat = convert_360_to_180 (aLatitudeCell[i])
         dLon = convert_360_to_180 (aLongitudeCell[i])
-
         if dLat > dLatitude_bot_in and dLat < dLatitude_top_in and dLon > dLongitude_left_in and dLon < dLongitude_right_in:
-
             #get cell edge
             lCellID = int(aIndexToCellID[i])
             dElevation_mean = float(aBed_elevation[i])
             dElevation_profile0 = float(aBed_elevation_profile[i,0])
-
             dThickness_ice = float( aIce_thickness[i] )
             dArea = float(aCellArea[i])
-
             if dThickness_ice > 0:
                 continue
             else:
@@ -241,9 +218,7 @@ def create_mpas_mesh(iFlag_global_in, \
 
                     pLayer.CreateFeature(pFeature)
 
-                pmpas = convert_gcs_attributes_to_cell(4, dLon, dLat, aCoords, aVertexIndex, aEdgeIndex, aVertexIndexOnEdge)
-                #calculate area 
-                #pmpas.calculate_cell_area()
+                pmpas = convert_gcs_attributes_to_cell(4, dLon, dLat, aCoords, aVertexIndex, aEdgeIndex, aVertexIndexOnEdge)               
                 pmpas.dArea = dArea
                 pmpas.calculate_edge_length()
                 pmpas.dLength_flowline = pmpas.dLength_edge #Default
@@ -254,13 +229,11 @@ def create_mpas_mesh(iFlag_global_in, \
                 pmpas.nNeighbor=len(aNeighborIndex)
                 pmpas.aNeighbor_land=aNeighborIndex
                 pmpas.nNeighbor_land=len(aNeighborIndex)
-
                 aDistance=list()
                 for i in range(pmpas.nNeighbor):
                     lNeighborID = pmpas.aNeighbor[i]
                     #find shared edge
-                    lEdgeID= aEdgeIndex[i]
-                    
+                    lEdgeID= aEdgeIndex[i]                    
                     lIndex = aIndexToEdgeID[lEdgeID-1]
                     dDistance = aDcEdge[lIndex]
                     aDistance.append(dDistance)

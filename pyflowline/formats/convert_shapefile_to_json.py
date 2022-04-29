@@ -46,9 +46,7 @@ def convert_shapefile_to_json_swat(iFlag_type_in, sFilename_shapefile_in, sFilen
         pass
     else:
         if iFlag_type_in == 1:
-            aFlowline_basin, pSpatial_reference = read_flowline_shapefile_swat( sFilename_shapefile_in )    
-            #convert it
-
+            aFlowline_basin, pSpatial_reference = read_flowline_shapefile_swat( sFilename_shapefile_in )     
             iFlag_projected = 0
             pSpatial_reference_gcs = osr.SpatialReference()
             pSpatial_reference_gcs.ImportFromEPSG(4326)

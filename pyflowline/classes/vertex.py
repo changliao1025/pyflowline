@@ -2,7 +2,6 @@ from abc import ABCMeta
 import numpy as np
 import json
 from json import JSONEncoder
-
 from pyflowline.algorithms.auxiliary.gdal_functions import calculate_distance_based_on_lon_lat
 
 class VertexClassEncoder(JSONEncoder):
@@ -10,8 +9,7 @@ class VertexClassEncoder(JSONEncoder):
         if isinstance(obj, np.integer):
             return int(obj)
         if isinstance(obj, np.ndarray):
-            return obj.tolist()
-        
+            return obj.tolist()        
         return JSONEncoder.default(self, obj)
 
 class pyvertex(object):
@@ -26,8 +24,7 @@ class pyvertex(object):
     dLatitude_degree=0.0
     dLongitude_radian=0.0
     dLatitude_radian=0.0
-    dElevation=0.0
-    
+    dElevation=0.0    
     def __init__(self, aParameter):
         if 'x' in aParameter:            
             self.dX_meter             = float(aParameter['x'])

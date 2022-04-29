@@ -131,5 +131,6 @@ dmypy.json
 .pyre/
 
 #unused for development testing
+retired
 unused
 core.*

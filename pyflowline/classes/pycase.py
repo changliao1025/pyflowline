@@ -504,7 +504,7 @@ class flowlinecase(object):
         return
 
     def run(self):
-        #self.flowline_simplification()
+        self.flowline_simplification()
         aCell = self.mesh_generation()
         aCell_out, a, b = self.reconstruct_topological_relationship(aCell)
         

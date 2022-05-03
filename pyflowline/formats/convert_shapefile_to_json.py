@@ -1,5 +1,5 @@
-
-from osgeo import  osr
+import os
+from osgeo import osr
 from pyflowline.formats.read_flowline import read_flowline_shapefile, read_flowline_shapefile_swat
 from pyflowline.formats.export_flowline import export_flowline_to_json
 
@@ -12,6 +12,13 @@ def convert_shapefile_to_json(iFlag_type_in, sFilename_shapefile_in, sFilename_g
         sFilename_shapefile_in ([type]): [description]
         sFilename_geojson_in ([type]): [description]
     """
+    if os.path.isfile(sFilename_shapefile_in):
+        pass
+    else:
+        print('This shapefile does not exist: ', sFilename_shapefile_in )
+        iReturn_code = 0
+        return iReturn_code
+
 
     if iFlag_type_in ==0:
         pass

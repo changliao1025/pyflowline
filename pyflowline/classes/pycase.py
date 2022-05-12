@@ -120,8 +120,7 @@ class flowlinecase(object):
             else:
                 self.iFlag_standalone=1
 
-        if 'iFlag_flowline' in aConfig_in:
-            self.iFlag_flowline             = int(aConfig_in[ 'iFlag_flowline'])
+  
         
         if 'iFlag_global' in aConfig_in:
             self.iFlag_global             = int(aConfig_in[ 'iFlag_global'])
@@ -267,28 +266,26 @@ class flowlinecase(object):
         Path(sPath).mkdir(parents=True, exist_ok=True)
 
         self.aBasin = list()
-        if self.iFlag_flowline == 1:
-            if 'sFilename_basins' in aConfig_in:
-                self.sFilename_basins = aConfig_in['sFilename_basins']
-
-                if os.path.isfile(self.sFilename_basins):
-                    pass
-                else:
-                    print('This basin configuration file does not exist: ', self.sFilename_basins )
-                    exit()
-
-                with open(self.sFilename_basins) as json_file:
-                    dummy_data = json.load(json_file)     
-                    for i in range(self.nOutlet):
-                        sBasin =  "{:03d}".format(i+1)   
-                        dummy_basin = dummy_data[i]
-                        dummy_basin['sWorkspace_output_basin'] = str(Path(self.sWorkspace_output) / sBasin )
-                        
-                        pBasin = pybasin(dummy_basin)
     
-                        self.aBasin.append(pBasin)
-            else:
+        if 'sFilename_basins' in aConfig_in:
+            self.sFilename_basins = aConfig_in['sFilename_basins']
+            if os.path.isfile(self.sFilename_basins):
                 pass
+            else:
+                print('This basin configuration file does not exist: ', self.sFilename_basins )
+                exit()
+            with open(self.sFilename_basins) as json_file:
+                dummy_data = json.load(json_file)     
+                for i in range(self.nOutlet):
+                    sBasin =  "{:03d}".format(i+1)   
+                    dummy_basin = dummy_data[i]
+                    dummy_basin['sWorkspace_output_basin'] = str(Path(self.sWorkspace_output) / sBasin )
+                    
+                    pBasin = pybasin(dummy_basin)
+
+                    self.aBasin.append(pBasin)
+        else:
+            pass
      
 
         #model generated files   
@@ -496,8 +493,6 @@ class flowlinecase(object):
         for pBasin in self.aBasin:
             pBasin.analyze()
         return
-        
-    
 
     def setup(self):
         self.convert_flowline_to_json()
@@ -519,55 +514,42 @@ class flowlinecase(object):
 
         self.tojson()
 
-    def export_mesh_info_to_json(self):
-        
+    def export_mesh_info_to_json(self):        
         aCell_all = self.aCell
         sFilename_json = self.sFilename_mesh_info
-        ncell=len(aCell_all)
-        iFlag_flowline = self.iFlag_flowline
+        ncell=len(aCell_all)  
         aCellID_outlet = self.aCellID_outlet
-
-        aFlowline = self.aFlowline_conceptual
-
-        if iFlag_flowline == 1:
-            nFlowline = len(aFlowline)
-            for i in range(nFlowline):
-                pFlowline = aFlowline[i]
-                nEdge = pFlowline.nEdge
-                nVertex = pFlowline.nVertex
-                aEdge = pFlowline.aEdge
-
-                iStream_segment = pFlowline.iStream_segment
-                iStream_order = pFlowline.iStream_order
-
-                for j in range(nEdge):
-                    pEdge = aEdge[j]
-                    pVertex_start = pEdge.pVertex_start
-                    pVertex_end = pEdge.pVertex_end
-                    for k in range(ncell):
-                        pVertex_center = aCell_all[k].pVertex_center
-
-                        if pVertex_center == pVertex_start:
-                            aCell_all[k].iStream_segment_burned = iStream_segment
-                            aCell_all[k].iStream_order_burned = iStream_order
-
-                            for l in range(ncell):
-                                pVertex_center2 = aCell_all[l].pVertex_center
-                                lCellID = aCell_all[l].lCellID
-                                if pVertex_center2 == pVertex_end:
-                                    aCell_all[k].lCellID_downstream_burned = lCellID
-                                    if lCellID in aCellID_outlet:
-                                        aCell_all[l].iStream_segment_burned = iStream_segment
-                                        aCell_all[l].iStream_order_burned = iStream_order
-
-                                    break
-                                
-                                
-
-                pass
-        else:
-            #only mesh, no flowline
+        aFlowline = self.aFlowline_conceptual   
+        nFlowline = len(aFlowline)
+        for i in range(nFlowline):
+            pFlowline = aFlowline[i]
+            nEdge = pFlowline.nEdge
+            nVertex = pFlowline.nVertex
+            aEdge = pFlowline.aEdge
+            iStream_segment = pFlowline.iStream_segment
+            iStream_order = pFlowline.iStream_order
+            for j in range(nEdge):
+                pEdge = aEdge[j]
+                pVertex_start = pEdge.pVertex_start
+                pVertex_end = pEdge.pVertex_end
+                for k in range(ncell):
+                    pVertex_center = aCell_all[k].pVertex_center
+                    if pVertex_center == pVertex_start:
+                        aCell_all[k].iStream_segment_burned = iStream_segment
+                        aCell_all[k].iStream_order_burned = iStream_order
+                        for l in range(ncell):
+                            pVertex_center2 = aCell_all[l].pVertex_center
+                            lCellID = aCell_all[l].lCellID
+                            if pVertex_center2 == pVertex_end:
+                                aCell_all[k].lCellID_downstream_burned = lCellID
+                                if lCellID in aCellID_outlet:
+                                    aCell_all[l].iStream_segment_burned = iStream_segment
+                                    aCell_all[l].iStream_order_burned = iStream_order
+                                break
+                            
+                            
             pass
+        
 
         with open(sFilename_json, 'w', encoding='utf-8') as f:
             sJson = json.dumps([json.loads(ob.tojson()) for ob in aCell_all], indent = 4)        

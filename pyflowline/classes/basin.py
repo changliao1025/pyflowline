@@ -119,6 +119,11 @@ class pybasin(object):
         else:
             self.iFlag_dam   = 0
         
+        if 'iFlag_debug' in aParameter:            
+            self.iFlag_debug             = int(aParameter['iFlag_debug'])
+        else:
+            self.iFlag_debug   = 0
+        
         if 'dLongitude_outlet_degree' in aParameter:            
             self.dLongitude_outlet_degree             = float(aParameter['dLongitude_outlet_degree'])
         else:
@@ -348,8 +353,7 @@ class pybasin(object):
 
         #from this point, aFlowline_basin is conceptual
         #segment based
-        aFlowline_basin_conceptual, lCellID_outlet, pVertex_outlet \
-            = remove_returning_flowline(iMesh_type, aCell_intersect_basin, pVertex_outlet_initial)
+        aFlowline_basin_conceptual, lCellID_outlet, pVertex_outlet = remove_returning_flowline(iMesh_type, aCell_intersect_basin, pVertex_outlet_initial)
         if self.iFlag_debug ==1:
             sFilename_out = 'flowline_simplified_after_intersect.json'
             sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)  

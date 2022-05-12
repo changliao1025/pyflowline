@@ -67,7 +67,7 @@ def remove_returning_flowline(iMesh_type_in, aCell_intersect_in, pVertex_outlet_
                                     
                                     pass
                                 else:
-                                    if dLength < 0.1*pCell.dLength : #because it taks a short cut                                        
+                                    if dLength < (0.1*pCell.dLength) : #because it taks a short cut                                        
                                         pVertex_end_current = pVertex_start   
                                         iFlag_found = 1                                          
                                         if iFlag_previous_overlap ==1: 

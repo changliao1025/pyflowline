@@ -6,7 +6,6 @@
     "dResolution_degree": 0.5,
     "dResolution_meter": 50000.0,
     "iCase_index": 1,
-    "iFlag_flowline": 1,
     "iFlag_save_mesh": 1,
     "iFlag_standalone": 1,
     "iFlag_use_mesh_dem": 1,

@@ -62,6 +62,7 @@ class flowlinecase(object):
     iCase_index= 0
     sMesh_type = 1
     iFlag_standalone=1
+    iFlag_flowline = 1
     iFlag_global = 0
     iFlag_multiple_outlet = 0
     iFlag_use_shapefile_extent=1
@@ -121,6 +122,11 @@ class flowlinecase(object):
                 self.iFlag_standalone=1
 
   
+        if 'iFlag_flowline' in aConfig_in:
+            self.iFlag_flowline             = int(aConfig_in[ 'iFlag_flowline'])
+        else:
+            #without iFlag_flowline the model is a mesh generator
+            self.iFlag_flowline=1
         
         if 'iFlag_global' in aConfig_in:
             self.iFlag_global             = int(aConfig_in[ 'iFlag_global'])
@@ -130,10 +136,17 @@ class flowlinecase(object):
         
         if 'iFlag_simplification' in aConfig_in:
             self.iFlag_simplification = int(aConfig_in['iFlag_simplification'])
-
+            #if simplification is desired, then we must activate flowline flag
+            #it can be turn off only when a previous simplification was done and you dont want to redo it
+        else:
+            self.iFlag_simplification  = 1
+        if self.iFlag_simplification ==1:
+            self.iFlag_flowline = 1
 
         if 'iFlag_create_mesh' in aConfig_in:
-            self.iFlag_create_mesh = int(aConfig_in['iFlag_create_mesh'])    
+            self.iFlag_create_mesh = int(aConfig_in['iFlag_create_mesh'])  
+        else:  
+            self.iFlag_create_mesh=1
         
         if 'iFlag_save_mesh' in aConfig_in:
             self.iFlag_save_mesh             = int(aConfig_in[ 'iFlag_save_mesh'])
@@ -150,6 +163,8 @@ class flowlinecase(object):
 
         if 'iFlag_intersect' in aConfig_in:
             self.iFlag_intersect = int(aConfig_in['iFlag_intersect'])
+        else:
+            self.iFlag_intersect=1
 
         if 'nOutlet' in aConfig_in:
             self.nOutlet = int(aConfig_in['nOutlet'])
@@ -288,8 +303,7 @@ class flowlinecase(object):
             pass
      
 
-        #model generated files   
-      
+        #model generated files         
         self.sFilename_mesh = os.path.join(str(Path(self.sWorkspace_output)  ) , sMesh_type + ".json" )               
         self.sFilename_mesh_info= os.path.join(str(Path(self.sWorkspace_output)  ) , sMesh_type + "_mesh_info.json"  )    
                 
@@ -297,159 +311,161 @@ class flowlinecase(object):
         
 
     def convert_flowline_to_json(self):
-        for pBasin in self.aBasin:            
-            pBasin.convert_flowline_to_json()
-            pass
+        if self.iFlag_flowline == 1:
+            for pBasin in self.aBasin:            
+                pBasin.convert_flowline_to_json()
+                pass
+
+        return
  
     def flowline_simplification(self):
         aFlowline_out = list()   #store all the flowline
+        #export the outlet into a single file
+        aOutlet = list()
         if self.iFlag_simplification == 1: 
             for pBasin in self.aBasin:
                 aFlowline_basin = pBasin.flowline_simplification()                
                 aFlowline_out = aFlowline_out + aFlowline_basin
-
-            self.aFlowline_simplified = aFlowline_out
-
-        #export the outlet into a since file
-        aOutlet = list()
-        if self.iFlag_simplification == 1: 
-            for pBasin in self.aBasin:
                 aOutlet.append(pBasin.pVertex_outlet)
+            
+            self.aFlowline_simplified = aFlowline_out
+              
 
         return aFlowline_out
     
     def mesh_generation(self):        
-        iFlag_global =  self.iFlag_global
-        iMesh_type = self.iMesh_type
-        iFlag_save_mesh = self.iFlag_save_mesh
-        iFlag_rotation = self.iFlag_rotation
-        dResolution_degree = self.dResolution_degree
-        dResolution_meter = self.dResolution_meter
-        sFilename_dem = self.sFilename_dem
-        sFilename_spatial_reference = self.sFilename_spatial_reference
-        sFilename_mesh = self.sFilename_mesh
-        if iMesh_type !=4: #hexagon
-            spatial_reference_target = osr.SpatialReference()  
-            spatial_reference_target.ImportFromEPSG(4326)
-            if self.iFlag_use_shapefile_extent==1:
-                pDriver_shapefile = ogr.GetDriverByName('Esri Shapefile')
-                pDataset_shapefile = pDriver_shapefile.Open(self.sFilename_spatial_reference, 0)
-                pLayer_shapefile = pDataset_shapefile.GetLayer(0)
-                pSpatial_reference = pLayer_shapefile.GetSpatialRef()
-                (dOriginX, dX_right, dY_bot, dOriginY) = pLayer_shapefile.GetExtent() # not in same order as ogrinfo
-                dLongitude_left,  dLatitude_bot= reproject_coordinates(dOriginX, dY_bot,pSpatial_reference,    spatial_reference_target)
-                dLongitude_right, dLatitude_top= reproject_coordinates(dX_right, dOriginY,pSpatial_reference,  spatial_reference_target)
-                dLatitude_mean = 0.5 * (dLatitude_top + dLatitude_bot)
-                pass
-            else:
-                dPixelWidth, dOriginX, dOriginY, nrow, ncolumn, pSpatialRef_dem, pProjection, pGeotransform\
-                     = retrieve_geotiff_metadata(sFilename_dem)
-
-                dY_bot = dOriginY - (nrow+1) * dPixelWidth
-                dLongitude_left,  dLatitude_bot= reproject_coordinates(dOriginX, dY_bot,pSpatialRef_dem,    spatial_reference_target)
-                dX_right = dOriginX + (ncolumn +1) * dPixelWidth
-
-                dLongitude_right, dLatitude_top= reproject_coordinates(dX_right, dOriginY,pSpatialRef_dem,  spatial_reference_target)
-                dLatitude_mean = 0.5 * (dLatitude_top + dLatitude_bot)
-                pass
-
-            if dResolution_meter < 0:
-                #not used
-                pass
-            else:
-                dResolution_degree = meter_to_degree(dResolution_meter, dLatitude_mean)
-
-            dX_left = dOriginX
-            dY_top = dOriginY
-        else:
-            pass
-
-        if iMesh_type ==1: #hexagon
-
-            #hexagon edge
-            dResolution_meter = degree_to_meter(dLatitude_mean, dResolution_degree )
-            dArea = np.power(dResolution_meter,2.0)
-            dLength_edge = np.sqrt(  2.0 * dArea / (3.0* np.sqrt(3.0))  )
-            if iFlag_rotation ==0:            
-                dX_spacing = dLength_edge * np.sqrt(3.0)
-                dY_spacing = dLength_edge * 1.5
-                ncolumn= int( (dX_right - dX_left) / dX_spacing )
-                nrow= int( (dY_top - dY_bot) / dY_spacing ) 
-            else:            
-                dX_spacing = dLength_edge * 1.5
-                dY_spacing = dLength_edge * np.sqrt(3.0)    
-                ncolumn= int( (dX_right - dX_left) / dX_spacing )+1
-                nrow= int( (dY_top - dY_bot) / dY_spacing )
-
-            aHexagon = create_hexagon_mesh(iFlag_rotation, dX_left, dY_bot, dResolution_meter, ncolumn, nrow, \
-                sFilename_mesh, sFilename_spatial_reference)
-            return aHexagon
-        else:
-            if iMesh_type ==2: #sqaure
-                ncolumn= int( (dX_right - dX_left) / dResolution_meter )
-                nrow= int( (dY_top - dY_bot) / dResolution_meter )
-
-                aSquare = create_square_mesh(dX_left, dY_bot, dResolution_meter, ncolumn, nrow, \
-                    sFilename_mesh, sFilename_spatial_reference)
-                return aSquare
-            else:
-                if iMesh_type ==3: #latlon
-                    dResolution_meter = degree_to_meter(dLatitude_mean, dResolution_degree)
-                    dArea = np.power(dResolution_meter,2.0)
-                    dLatitude_top    = self.dLatitude_top   
-                    dLatitude_bot    = self.dLatitude_bot   
-                    dLongitude_left  = self.dLongitude_left 
-                    dLongitude_right = self.dLongitude_right
-                    ncolumn= int( (dLongitude_right - dLongitude_left) / dResolution_degree )
-                    nrow= int( (dLatitude_top - dLatitude_bot) / dResolution_degree )
-                    aLatlon = create_latlon_mesh(dLongitude_left, dLatitude_bot, dResolution_degree, ncolumn, nrow, \
-                        sFilename_mesh)
-                    return aLatlon
+        if self.iFlag_create_mesh ==1:
+            iFlag_global =  self.iFlag_global
+            iMesh_type = self.iMesh_type
+            iFlag_save_mesh = self.iFlag_save_mesh
+            iFlag_rotation = self.iFlag_rotation
+            dResolution_degree = self.dResolution_degree
+            dResolution_meter = self.dResolution_meter
+            sFilename_dem = self.sFilename_dem
+            sFilename_spatial_reference = self.sFilename_spatial_reference
+            sFilename_mesh = self.sFilename_mesh
+            if iMesh_type !=4: #hexagon
+                spatial_reference_target = osr.SpatialReference()  
+                spatial_reference_target.ImportFromEPSG(4326)
+                if self.iFlag_use_shapefile_extent==1:
+                    pDriver_shapefile = ogr.GetDriverByName('Esri Shapefile')
+                    pDataset_shapefile = pDriver_shapefile.Open(self.sFilename_spatial_reference, 0)
+                    pLayer_shapefile = pDataset_shapefile.GetLayer(0)
+                    pSpatial_reference = pLayer_shapefile.GetSpatialRef()
+                    (dOriginX, dX_right, dY_bot, dOriginY) = pLayer_shapefile.GetExtent() # not in same order as ogrinfo
+                    dLongitude_left,  dLatitude_bot= reproject_coordinates(dOriginX, dY_bot,pSpatial_reference,    spatial_reference_target)
+                    dLongitude_right, dLatitude_top= reproject_coordinates(dX_right, dOriginY,pSpatial_reference,  spatial_reference_target)
+                    dLatitude_mean = 0.5 * (dLatitude_top + dLatitude_bot)
+                    pass
                 else:
-                    if iMesh_type == 4: #mpas
-                        iFlag_use_mesh_dem = self.iFlag_use_mesh_dem
-                        sFilename_mesh_netcdf = self.sFilename_mesh_netcdf
+                    dPixelWidth, dOriginX, dOriginY, nrow, ncolumn, pSpatialRef_dem, pProjection, pGeotransform\
+                         = retrieve_geotiff_metadata(sFilename_dem)
+
+                    dY_bot = dOriginY - (nrow+1) * dPixelWidth
+                    dLongitude_left,  dLatitude_bot= reproject_coordinates(dOriginX, dY_bot,pSpatialRef_dem,    spatial_reference_target)
+                    dX_right = dOriginX + (ncolumn +1) * dPixelWidth
+
+                    dLongitude_right, dLatitude_top= reproject_coordinates(dX_right, dOriginY,pSpatialRef_dem,  spatial_reference_target)
+                    dLatitude_mean = 0.5 * (dLatitude_top + dLatitude_bot)
+                    pass
+
+                if dResolution_meter < 0:
+                    #not used
+                    pass
+                else:
+                    dResolution_degree = meter_to_degree(dResolution_meter, dLatitude_mean)
+
+                dX_left = dOriginX
+                dY_top = dOriginY
+            else:
+                pass
+
+            if iMesh_type ==1: #hexagon
+                #hexagon edge
+                dResolution_meter = degree_to_meter(dLatitude_mean, dResolution_degree )
+                dArea = np.power(dResolution_meter,2.0)
+                dLength_edge = np.sqrt(  2.0 * dArea / (3.0* np.sqrt(3.0))  )
+                if iFlag_rotation ==0:            
+                    dX_spacing = dLength_edge * np.sqrt(3.0)
+                    dY_spacing = dLength_edge * 1.5
+                    ncolumn= int( (dX_right - dX_left) / dX_spacing )
+                    nrow= int( (dY_top - dY_bot) / dY_spacing ) 
+                else:            
+                    dX_spacing = dLength_edge * 1.5
+                    dY_spacing = dLength_edge * np.sqrt(3.0)    
+                    ncolumn= int( (dX_right - dX_left) / dX_spacing )+1
+                    nrow= int( (dY_top - dY_bot) / dY_spacing )
+
+                aHexagon = create_hexagon_mesh(iFlag_rotation, dX_left, dY_bot, dResolution_meter, ncolumn, nrow, \
+                    sFilename_mesh, sFilename_spatial_reference)
+                return aHexagon
+            else:
+                if iMesh_type ==2: #sqaure
+                    ncolumn= int( (dX_right - dX_left) / dResolution_meter )
+                    nrow= int( (dY_top - dY_bot) / dResolution_meter )
+
+                    aSquare = create_square_mesh(dX_left, dY_bot, dResolution_meter, ncolumn, nrow, \
+                        sFilename_mesh, sFilename_spatial_reference)
+                    return aSquare
+                else:
+                    if iMesh_type ==3: #latlon
+                        dResolution_meter = degree_to_meter(dLatitude_mean, dResolution_degree)
+                        dArea = np.power(dResolution_meter,2.0)
                         dLatitude_top    = self.dLatitude_top   
                         dLatitude_bot    = self.dLatitude_bot   
                         dLongitude_left  = self.dLongitude_left 
                         dLongitude_right = self.dLongitude_right
-                        aMpas = create_mpas_mesh(iFlag_global, iFlag_use_mesh_dem, iFlag_save_mesh, \
-                              dLongitude_left, dLongitude_right,  dLatitude_top, dLatitude_bot, \
-                                    sFilename_mesh_netcdf,      sFilename_mesh)
-                        return aMpas
+                        ncolumn= int( (dLongitude_right - dLongitude_left) / dResolution_degree )
+                        nrow= int( (dLatitude_top - dLatitude_bot) / dResolution_degree )
+                        aLatlon = create_latlon_mesh(dLongitude_left, dLatitude_bot, dResolution_degree, ncolumn, nrow, \
+                            sFilename_mesh)
+                        return aLatlon
                     else:
-                        if iMesh_type ==5: #tin this one need to be updated because central location issue
-                            #tin edge
-                            dArea = np.power(dResolution_meter,2.0)
-                            dLength_edge = np.sqrt(  4.0 * dArea /  np.sqrt(3.0) )  
-                            dX_shift = 0.5 * dLength_edge
-                            dY_shift = 0.5 * dLength_edge * np.sqrt(3.0) 
-                            dX_spacing = dX_shift * 2
-                            dY_spacing = dY_shift
-                            ncolumn= int( (dX_right - dX_left) / dX_shift )
-                            nrow= int( (dY_top - dY_bot) / dY_spacing ) 
-                            aTin = create_tin_mesh(dX_left, dY_bot, dResolution_meter, ncolumn, nrow,sFilename_mesh, sFilename_spatial_reference)
-                            return aTin
+                        if iMesh_type == 4: #mpas
+                            iFlag_use_mesh_dem = self.iFlag_use_mesh_dem
+                            sFilename_mesh_netcdf = self.sFilename_mesh_netcdf
+                            dLatitude_top    = self.dLatitude_top   
+                            dLatitude_bot    = self.dLatitude_bot   
+                            dLongitude_left  = self.dLongitude_left 
+                            dLongitude_right = self.dLongitude_right
+                            aMpas = create_mpas_mesh(iFlag_global, iFlag_use_mesh_dem, iFlag_save_mesh, \
+                                  dLongitude_left, dLongitude_right,  dLatitude_top, dLatitude_bot, \
+                                        sFilename_mesh_netcdf,      sFilename_mesh)
+                            return aMpas
                         else:
-                            print('Unsupported mesh type?')
-                            return
+                            if iMesh_type ==5: #tin this one need to be updated because central location issue
+                                #tin edge
+                                dArea = np.power(dResolution_meter,2.0)
+                                dLength_edge = np.sqrt(  4.0 * dArea /  np.sqrt(3.0) )  
+                                dX_shift = 0.5 * dLength_edge
+                                dY_shift = 0.5 * dLength_edge * np.sqrt(3.0) 
+                                dX_spacing = dX_shift * 2
+                                dY_spacing = dY_shift
+                                ncolumn= int( (dX_right - dX_left) / dX_shift )
+                                nrow= int( (dY_top - dY_bot) / dY_spacing ) 
+                                aTin = create_tin_mesh(dX_left, dY_bot, dResolution_meter, ncolumn, nrow,sFilename_mesh, sFilename_spatial_reference)
+                                return aTin
+                            else:
+                                print('Unsupported mesh type?')
+                                return
+        else:
+            pass
         return
     
     def reconstruct_topological_relationship(self, aCell_raw):
-        iMesh_type = self.iMesh_type
         iFlag_intersect = self.iFlag_intersect
-        sWorkspace_output = self.sWorkspace_output
-        nOutlet = self.nOutlet
-        sFilename_mesh=self.sFilename_mesh
-        self.aCell, pSpatial_reference_mesh = read_mesh_json(iMesh_type, sFilename_mesh)
-
-        self.aCell = self.merge_cell_info(aCell_raw)
-        
-        aFlowline_conceptual = list()   #store all the flowline
-        aCellID_outlet = list()
-        aBasin = list()
-        aCell_intersect=list()
         if iFlag_intersect == 1:
+            iMesh_type = self.iMesh_type        
+            sWorkspace_output = self.sWorkspace_output
+            nOutlet = self.nOutlet
+            sFilename_mesh=self.sFilename_mesh
+            self.aCell, pSpatial_reference_mesh = read_mesh_json(iMesh_type, sFilename_mesh)
+            self.aCell = self.merge_cell_info(aCell_raw)        
+            aFlowline_conceptual = list()   #store all the flowline
+            aCellID_outlet = list()
+            aBasin = list()
+            aCell_intersect=list()
+        
             for pBasin in self.aBasin:
                 aCell_intersect_basin = pBasin.reconstruct_topological_relationship(iMesh_type,sFilename_mesh)
                 aFlowline_conceptual = aFlowline_conceptual + pBasin.aFlowline_basin_conceptual
@@ -478,7 +494,6 @@ class flowlinecase(object):
         for pCell in self.aCell:
             for pCell2 in aCell_raw:
                 if pCell.lCellID == pCell2.lCellID:
-
                     pCell.aNeighbor = pCell2.aNeighbor
                     pCell.nNeighbor= pCell2.nNeighbor
                     pCell.aNeighbor_land= pCell2.aNeighbor_land
@@ -490,18 +505,25 @@ class flowlinecase(object):
         return self.aCell
         
     def analyze(self):
-        for pBasin in self.aBasin:
-            pBasin.analyze()
+        if self.iFlag_flowline == 1:
+            for pBasin in self.aBasin:
+                pBasin.analyze()
         return
 
     def setup(self):
-        self.convert_flowline_to_json()
+        if self.iFlag_flowline == 1:
+            self.convert_flowline_to_json()
         return
 
     def run(self):
-        self.flowline_simplification()
-        aCell = self.mesh_generation()
-        aCell_out, a, b = self.reconstruct_topological_relationship(aCell)
+        if self.iFlag_flowline == 1:
+            self.flowline_simplification()        
+            aCell = self.mesh_generation()
+            aCell_out, a, b = self.reconstruct_topological_relationship(aCell)
+        else:
+            #only mesh generator
+            aCell = self.mesh_generation()
+            aCell_out = aCell
         
         return aCell_out
 
@@ -509,45 +531,55 @@ class flowlinecase(object):
     def export(self):
         
         self.export_mesh_info_to_json()
-        for pBasin in self.aBasin:
-            pBasin.export()
+        if self.iFlag_flowline ==1:
+            for pBasin in self.aBasin:
+                pBasin.export()
 
         self.tojson()
 
     def export_mesh_info_to_json(self):        
         aCell_all = self.aCell
         sFilename_json = self.sFilename_mesh_info
-        ncell=len(aCell_all)  
-        aCellID_outlet = self.aCellID_outlet
-        aFlowline = self.aFlowline_conceptual   
-        nFlowline = len(aFlowline)
-        for i in range(nFlowline):
-            pFlowline = aFlowline[i]
-            nEdge = pFlowline.nEdge
-            nVertex = pFlowline.nVertex
-            aEdge = pFlowline.aEdge
-            iStream_segment = pFlowline.iStream_segment
-            iStream_order = pFlowline.iStream_order
-            for j in range(nEdge):
-                pEdge = aEdge[j]
-                pVertex_start = pEdge.pVertex_start
-                pVertex_end = pEdge.pVertex_end
-                for k in range(ncell):
-                    pVertex_center = aCell_all[k].pVertex_center
-                    if pVertex_center == pVertex_start:
-                        aCell_all[k].iStream_segment_burned = iStream_segment
-                        aCell_all[k].iStream_order_burned = iStream_order
-                        for l in range(ncell):
-                            pVertex_center2 = aCell_all[l].pVertex_center
-                            lCellID = aCell_all[l].lCellID
-                            if pVertex_center2 == pVertex_end:
-                                aCell_all[k].lCellID_downstream_burned = lCellID
-                                if lCellID in aCellID_outlet:
-                                    aCell_all[l].iStream_segment_burned = iStream_segment
-                                    aCell_all[l].iStream_order_burned = iStream_order
-                                break
-                            
-                            
+        ncell=len(aCell_all)
+        iFlag_flowline = self.iFlag_flowline 
+        if iFlag_flowline == 1: #if there is conceptual flowline 
+            aCellID_outlet = self.aCellID_outlet
+            aFlowline = self.aFlowline_conceptual
+            nFlowline = len(aFlowline)
+            for i in range(nFlowline):
+                pFlowline = aFlowline[i]
+                nEdge = pFlowline.nEdge
+                nVertex = pFlowline.nVertex
+                aEdge = pFlowline.aEdge
+                iStream_segment = pFlowline.iStream_segment
+                iStream_order = pFlowline.iStream_order
+                for j in range(nEdge):
+                    pEdge = aEdge[j]
+                    pVertex_start = pEdge.pVertex_start
+                    pVertex_end = pEdge.pVertex_end
+                    for k in range(ncell):
+                        pVertex_center = aCell_all[k].pVertex_center
+
+                        if pVertex_center == pVertex_start:
+                            aCell_all[k].iStream_segment_burned = iStream_segment
+                            aCell_all[k].iStream_order_burned = iStream_order
+
+                            for l in range(ncell):
+                                pVertex_center2 = aCell_all[l].pVertex_center
+                                lCellID = aCell_all[l].lCellID
+                                if pVertex_center2 == pVertex_end:
+                                    aCell_all[k].lCellID_downstream_burned = lCellID
+                                    if lCellID in aCellID_outlet:
+                                        aCell_all[l].iStream_segment_burned = iStream_segment
+                                        aCell_all[l].iStream_order_burned = iStream_order
+
+                                    break
+                                
+                                
+
+                pass
+        else:
+            #only mesh, no flowline
             pass
         
 
@@ -641,8 +673,7 @@ class flowlinecase(object):
                 sName = 'configuration_basin.json'
                 sFilename_output  =  os.path.join( self.sWorkspace_output  , sName)                
             
-            #all basins           
-            
+            #all basins 
             with open(sFilename_output, 'w', encoding='utf-8') as f:
                 sJson = json.dumps([json.loads(ob.tojson()) for ob in self.aBasin],\
                     sort_keys=True, \
@@ -661,8 +692,7 @@ class flowlinecase(object):
                 sName = 'configuration_basin.json'
                 sFilename_output  =  os.path.join( sPath.parent.absolute() , sName)
             
-            #all basins           
-            
+            #all basins                       
             with open(sFilename_output, 'w', encoding='utf-8') as f:
                 sJson = json.dumps([json.loads(ob.tojson()) for ob in self.aBasin],\
                     sort_keys=True, \

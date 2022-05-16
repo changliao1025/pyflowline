@@ -111,6 +111,7 @@ class flowlinecase(object):
     def __init__(self, aConfig_in,\
             iFlag_standalone_in= None,\
             sModel_in = None,\
+            sDate_in = None,\
             sWorkspace_output_in = None):
         #flags
         if iFlag_standalone_in is not None:
@@ -282,23 +283,26 @@ class flowlinecase(object):
 
         self.aBasin = list()
     
-        if 'sFilename_basins' in aConfig_in:
-            self.sFilename_basins = aConfig_in['sFilename_basins']
-            if os.path.isfile(self.sFilename_basins):
-                pass
-            else:
-                print('This basin configuration file does not exist: ', self.sFilename_basins )
-                exit()
-            with open(self.sFilename_basins) as json_file:
-                dummy_data = json.load(json_file)     
-                for i in range(self.nOutlet):
-                    sBasin =  "{:03d}".format(i+1)   
-                    dummy_basin = dummy_data[i]
-                    dummy_basin['sWorkspace_output_basin'] = str(Path(self.sWorkspace_output) / sBasin )
-                    
-                    pBasin = pybasin(dummy_basin)
+        if self.iFlag_flowline==1:
+            if 'sFilename_basins' in aConfig_in:
+                self.sFilename_basins = aConfig_in['sFilename_basins']
+                if os.path.isfile(self.sFilename_basins):
+                    pass
+                else:
+                    print('This basin configuration file does not exist: ', self.sFilename_basins )
+                    exit()
+                with open(self.sFilename_basins) as json_file:
+                    dummy_data = json.load(json_file)     
+                    for i in range(self.nOutlet):
+                        sBasin =  "{:03d}".format(i+1)   
+                        dummy_basin = dummy_data[i]
+                        dummy_basin['sWorkspace_output_basin'] = str(Path(self.sWorkspace_output) /     sBasin )
 
-                    self.aBasin.append(pBasin)
+                        pBasin = pybasin(dummy_basin)
+
+                        self.aBasin.append(pBasin)
+            else:
+                pass
         else:
             pass
      
@@ -523,6 +527,7 @@ class flowlinecase(object):
         else:
             #only mesh generator
             aCell = self.mesh_generation()
+            self.aCell = aCell      
             aCell_out = aCell
         
         return aCell_out

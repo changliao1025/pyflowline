@@ -5,7 +5,7 @@ from shapely.geometry import Point, LineString
 from pyflowline.classes.edge import pyedge
 from pyflowline.classes.link import pycelllink
 
-def export_flowline_to_json( aFlowline_in, \
+def export_flowline_to_geojson( aFlowline_in, \
     sFilename_json_in, \
     iFlag_projected_in= None, \
     pSpatial_reference_in=None, \

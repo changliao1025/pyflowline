@@ -51,15 +51,14 @@ def pyflowline_generate_basin_template_configuration_file(sFilename_basins_json,
 
 def pyflowline_generate_template_configuration_file(sFilename_json, \
     sWorkspace_input, sWorkspace_output, iFlag_standalone_in=None, \
-        iFlag_use_mesh_dem_in=None, iFlag_use_shapefile_extent_in=None,  iCase_index_in=None,  dResolution_degree_in = None, dResolution_meter_in = None,   sDate_in = None,  sMesh_type_in = None,    sModel_in = None):
+        iFlag_use_mesh_dem_in=None,  iCase_index_in=None,  dResolution_degree_in = None, dResolution_meter_in = None,   sDate_in = None,  sMesh_type_in = None,    sModel_in = None):
     """generate pyflowline config template file
 
     Args:
         sFilename_json (str): _description_
         sWorkspace_input (str): _description_
         iFlag_standalone_in (int, optional): _description_. Defaults to None.
-        iFlag_use_mesh_dem_in (int, optional): _description_. Defaults to None.
-        iFlag_use_shapefile_extent_in (int, optional): _description_. Defaults to None.
+        iFlag_use_mesh_dem_in (int, optional): _description_. Defaults to None.        
         iCase_index_in (int, optional): _description_. Defaults to None.
         dResolution_degree_in (float, optional): _description_. Defaults to None.
         dResolution_meter_in (float, optional): _description_. Defaults to None.
@@ -89,10 +88,10 @@ def pyflowline_generate_template_configuration_file(sFilename_json, \
     else:       
         iFlag_use_mesh_dem = 0
 
-    if iFlag_use_shapefile_extent_in is not None:        
-        iFlag_use_shapefile_extent = iFlag_use_shapefile_extent_in
-    else:       
-        iFlag_use_shapefile_extent = 0
+    #if iFlag_use_shapefile_extent_in is not None:        
+    #    iFlag_use_shapefile_extent = iFlag_use_shapefile_extent_in
+    #else:       
+    #    iFlag_use_shapefile_extent = 0
 
     if sMesh_type_in is not None:
         sMesh_type = sMesh_type_in
@@ -113,7 +112,7 @@ def pyflowline_generate_template_configuration_file(sFilename_json, \
     aConfig = {}
     
     
-    aConfig['iFlag_use_shapefile_extent'] = iFlag_use_shapefile_extent 
+    #aConfig['iFlag_use_shapefile_extent'] = iFlag_use_shapefile_extent 
     aConfig['iFlag_use_mesh_dem'] = iFlag_use_mesh_dem
     aConfig['iFlag_save_mesh'] = 1
     aConfig['iFlag_simplification']=1

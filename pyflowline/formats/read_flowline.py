@@ -164,6 +164,11 @@ def read_flowline_geojson(sFilename_geojson_in):
         iFlag_id = 1
     else:
         iFlag_id = 0
+    if 'NHDPlusID' in schema:
+        iFlag_NHDPlusID = 1
+    else:
+        iFlag_NHDPlusID = 0
+    
 
     lID = 0
     for pFeature_geojson in pLayer_geojson:
@@ -179,6 +184,11 @@ def read_flowline_geojson(sFilename_geojson_in):
             lFlowlineID = pFeature_geojson.GetField("id")
         else:
             lFlowlineID = -1
+
+        if iFlag_NHDPlusID ==1:
+            lNHDPlusID = pFeature_geojson.GetField("NHDPlusID")
+        else:
+            lNHDPlusID = -1
         
         if sGeometry_type =='LINESTRING':
             dummy = loads( pGeometry_in.ExportToWkt() )
@@ -188,6 +198,7 @@ def read_flowline_geojson(sFilename_geojson_in):
             pLine.lIndex = lID
             pLine.iStream_segment = iStream_segment
             pLine.lFlowlineID = lFlowlineID
+            pLine.lNHDPlusID = lNHDPlusID
             aFlowline.append(pLine)
             lID = lID + 1            
         else:

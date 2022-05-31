@@ -18,7 +18,7 @@ KEYWORDS = "Earth Science"
 
 REQUIRED = [
     "numpy", 
-    "gdal",
+    "gdal=3.2",
     "netCDF4",
     "shapely"
 ]

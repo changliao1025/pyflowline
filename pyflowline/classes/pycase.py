@@ -65,7 +65,7 @@ class flowlinecase(object):
     iFlag_flowline = 1
     iFlag_global = 0
     iFlag_multiple_outlet = 0
-    iFlag_use_shapefile_extent=1
+    #iFlag_use_shapefile_extent=1
     iFlag_use_mesh_dem=0
     iFlag_save_mesh = 0
     iFlag_simplification = 1 #user can turn on/off
@@ -155,8 +155,8 @@ class flowlinecase(object):
         if 'iFlag_use_mesh_dem' in aConfig_in:
             self.iFlag_use_mesh_dem = int(aConfig_in['iFlag_use_mesh_dem'])
 
-        if 'iFlag_use_shapefile_extent' in aConfig_in:
-            self.iFlag_use_shapefile_extent = int(aConfig_in['iFlag_use_shapefile_extent'])    
+        #if 'iFlag_use_shapefile_extent' in aConfig_in:
+        #    self.iFlag_use_shapefile_extent = int(aConfig_in['iFlag_use_shapefile_extent'])    
 
         if 'iFlag_rotation' in aConfig_in:
             self.iFlag_rotation = int(aConfig_in['iFlag_rotation'])
@@ -308,16 +308,16 @@ class flowlinecase(object):
      
 
         #model generated files         
-        self.sFilename_mesh = os.path.join(str(Path(self.sWorkspace_output)  ) , sMesh_type + ".json" )               
+        self.sFilename_mesh = os.path.join(str(Path(self.sWorkspace_output)  ) , sMesh_type + ".geojson" )               
         self.sFilename_mesh_info= os.path.join(str(Path(self.sWorkspace_output)  ) , sMesh_type + "_mesh_info.json"  )    
                 
         return
         
 
-    def convert_flowline_to_json(self):
+    def convert_flowline_to_geojson(self):
         if self.iFlag_flowline == 1:
             for pBasin in self.aBasin:            
-                pBasin.convert_flowline_to_json()
+                pBasin.convert_flowline_to_geojson()
                 pass
 
         return
@@ -348,30 +348,28 @@ class flowlinecase(object):
             sFilename_dem = self.sFilename_dem
             sFilename_spatial_reference = self.sFilename_spatial_reference
             sFilename_mesh = self.sFilename_mesh
-            if iMesh_type !=4: #hexagon
+            if iMesh_type !=4: #mpas
                 spatial_reference_target = osr.SpatialReference()  
                 spatial_reference_target.ImportFromEPSG(4326)
-                if self.iFlag_use_shapefile_extent==1:
-                    pDriver_shapefile = ogr.GetDriverByName('Esri Shapefile')
-                    pDataset_shapefile = pDriver_shapefile.Open(self.sFilename_spatial_reference, 0)
-                    pLayer_shapefile = pDataset_shapefile.GetLayer(0)
-                    pSpatial_reference = pLayer_shapefile.GetSpatialRef()
-                    (dOriginX, dX_right, dY_bot, dOriginY) = pLayer_shapefile.GetExtent() # not in same order as ogrinfo
-                    dLongitude_left,  dLatitude_bot= reproject_coordinates(dOriginX, dY_bot,pSpatial_reference,    spatial_reference_target)
-                    dLongitude_right, dLatitude_top= reproject_coordinates(dX_right, dOriginY,pSpatial_reference,  spatial_reference_target)
-                    dLatitude_mean = 0.5 * (dLatitude_top + dLatitude_bot)
-                    pass
-                else:
-                    dPixelWidth, dOriginX, dOriginY, nrow, ncolumn, pSpatialRef_dem, pProjection, pGeotransform\
-                         = retrieve_geotiff_metadata(sFilename_dem)
-
-                    dY_bot = dOriginY - (nrow+1) * dPixelWidth
-                    dLongitude_left,  dLatitude_bot= reproject_coordinates(dOriginX, dY_bot,pSpatialRef_dem,    spatial_reference_target)
-                    dX_right = dOriginX + (ncolumn +1) * dPixelWidth
-
-                    dLongitude_right, dLatitude_top= reproject_coordinates(dX_right, dOriginY,pSpatialRef_dem,  spatial_reference_target)
-                    dLatitude_mean = 0.5 * (dLatitude_top + dLatitude_bot)
-                    pass
+                #if self.iFlag_use_shapefile_extent==1:
+                #    pDriver_shapefile = ogr.GetDriverByName('Esri Shapefile')
+                #    pDataset_shapefile = pDriver_shapefile.Open(self.sFilename_spatial_reference, 0)
+                #    pLayer_shapefile = pDataset_shapefile.GetLayer(0)
+                #    pSpatial_reference = pLayer_shapefile.GetSpatialRef()
+                #    (dOriginX, dX_right, dY_bot, dOriginY) = pLayer_shapefile.GetExtent() # not in same order as ogrinfo
+                #    dLongitude_left,  dLatitude_bot= reproject_coordinates(dOriginX, dY_bot,pSpatial_reference,    spatial_reference_target)
+                #    dLongitude_right, dLatitude_top= reproject_coordinates(dX_right, dOriginY,pSpatial_reference,  spatial_reference_target)
+                #    dLatitude_mean = 0.5 * (dLatitude_top + dLatitude_bot)
+                #    pass
+                #else:
+                dPixelWidth, dOriginX, dOriginY, nrow, ncolumn, pSpatialRef_dem, pProjection, pGeotransform\
+                     = retrieve_geotiff_metadata(sFilename_dem)
+                dY_bot = dOriginY - (nrow+1) * dPixelWidth
+                dLongitude_left,  dLatitude_bot= reproject_coordinates(dOriginX, dY_bot,pSpatialRef_dem,    spatial_reference_target)
+                dX_right = dOriginX + (ncolumn +1) * dPixelWidth
+                dLongitude_right, dLatitude_top= reproject_coordinates(dX_right, dOriginY,pSpatialRef_dem,  spatial_reference_target)
+                dLatitude_mean = 0.5 * (dLatitude_top + dLatitude_bot)
+                    #pass
 
                 if dResolution_meter < 0:
                     #not used
@@ -517,6 +515,7 @@ class flowlinecase(object):
     def setup(self):
         if self.iFlag_flowline == 1:
             self.convert_flowline_to_json()
+            pass
         return
 
     def run(self):

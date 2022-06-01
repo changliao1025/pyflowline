@@ -62,6 +62,7 @@ def remove_returning_flowline(iMesh_type_in, aCell_intersect_in, pVertex_outlet_
                                 if dummy2.is_overlap(dummy3) ==1:                                    
                                     pVertex_end_current = pVertex_start    
                                     aCell_flowline.append(lCellID)
+                                    #print(lCellID)
                                     iFlag_found = 1                
                                     iFlag_previous_overlap =1
                                     
@@ -72,6 +73,7 @@ def remove_returning_flowline(iMesh_type_in, aCell_intersect_in, pVertex_outlet_
                                         iFlag_found = 1                                          
                                         if iFlag_previous_overlap ==1: 
                                             aCell_flowline.append(lCellID)              
+                                            #print(lCellID)
                                             iFlag_previous_overlap=0
                                             pass
                                         else:
@@ -81,6 +83,7 @@ def remove_returning_flowline(iMesh_type_in, aCell_intersect_in, pVertex_outlet_
                                     else:
                                         pVertex_end_current = pVertex_start    
                                         aCell_flowline.append(lCellID)
+                                        #print(lCellID)
                                         iFlag_found = 1                                      
                                         pass
 

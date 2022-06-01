@@ -68,7 +68,7 @@ def convert_shapefile_to_geojson(iFlag_type_in, sFilename_shapefile_in, sFilenam
             pSpatial_reference_gcs = osr.SpatialReference()
             pSpatial_reference_gcs.ImportFromEPSG(4326)
             pSpatial_reference_gcs.SetAxisMappingStrategy(osr.OAMS_TRADITIONAL_GIS_ORDER)
-            export_flowline_to_json(aFlowline_basin, sFilename_geojson_in)
+            export_flowline_to_geojson(aFlowline_basin, sFilename_geojson_in)
         else:
             if iFlag_type_in == 2:
                 #polygon
@@ -95,7 +95,7 @@ def convert_shapefile_to_geojson_swat(iFlag_type_in, sFilename_shapefile_in, sFi
             pSpatial_reference_gcs = osr.SpatialReference()
             pSpatial_reference_gcs.ImportFromEPSG(4326)
             pSpatial_reference_gcs.SetAxisMappingStrategy(osr.OAMS_TRADITIONAL_GIS_ORDER)
-            export_flowline_to_json(aFlowline_basin, sFilename_geojson_in)
+            export_flowline_to_geojson(aFlowline_basin, sFilename_geojson_in)
         else:
             if iFlag_type_in == 2:
                 #polygon

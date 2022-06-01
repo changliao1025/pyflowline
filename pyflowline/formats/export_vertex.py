@@ -2,7 +2,7 @@ import os
 from osgeo import ogr, osr
 from shapely.geometry import Point
 
-def export_vertex_to_json(aVertex_in, \
+def export_vertex_to_geojson(aVertex_in, \
         sFilename_json_in,\
         iFlag_projected_in=None,\
         pSpatial_reference_in=None, \

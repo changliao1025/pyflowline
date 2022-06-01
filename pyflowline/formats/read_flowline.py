@@ -190,20 +190,34 @@ def read_flowline_geojson(sFilename_geojson_in):
         else:
             lNHDPlusID = -1
         
-        if sGeometry_type =='LINESTRING':
-            dummy = loads( pGeometry_in.ExportToWkt() )
-            aCoords = dummy.coords
-            dummy1= np.array(aCoords)
-            pLine = convert_gcs_coordinates_to_flowline(dummy1)
-            pLine.lIndex = lID
-            pLine.iStream_segment = iStream_segment
-            pLine.lFlowlineID = lFlowlineID
-            pLine.lNHDPlusID = lNHDPlusID
-            aFlowline.append(pLine)
-            lID = lID + 1            
+        if(sGeometry_type == 'MULTILINESTRING'):
+            aLine = ogr.ForceToLineString(pGeometry_in)
+            for Line in aLine: 
+                dummy = loads( Line.ExportToWkt() )
+                aCoords = dummy.coords                
+                dummy1= np.array(aCoords)
+                pLine = convert_gcs_coordinates_to_flowline(dummy1)
+                pLine.lIndex = lID
+                pLine.lFlowlineID = lFlowlineID
+                pLine.lNHDPlusID= lNHDPlusID
+                aFlowline.append(pLine)
+                lID = lID + 1
+        
         else:
-            print(sGeometry_type)
-            pass        
+            if sGeometry_type =='LINESTRING':
+                dummy = loads( pGeometry_in.ExportToWkt() )
+                aCoords = dummy.coords
+                dummy1= np.array(aCoords)
+                pLine = convert_gcs_coordinates_to_flowline(dummy1)
+                pLine.lIndex = lID
+                pLine.iStream_segment = iStream_segment
+                pLine.lFlowlineID = lFlowlineID
+                pLine.lNHDPlusID = lNHDPlusID
+                aFlowline.append(pLine)
+                lID = lID + 1            
+            else:
+                print(sGeometry_type)
+                pass        
 
 
     return aFlowline, pSpatialRef_geojson

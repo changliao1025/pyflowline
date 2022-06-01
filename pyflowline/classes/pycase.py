@@ -514,7 +514,7 @@ class flowlinecase(object):
 
     def setup(self):
         if self.iFlag_flowline == 1:
-            self.convert_flowline_to_json()
+            self.convert_flowline_to_geojson()
             pass
         return
 

@@ -9,7 +9,7 @@ for handler in logging.root.handlers[:]:
 logging.basicConfig(format='%(asctime)s %(message)s')
 logging.warning('is the time Pyflowline simulation started.')
 
-from pyflowline.pyflowline_generate_template_configuration_file import pyflowline_generate_template_configuration_file
+from pyflowline.pyflowline_create_template_configuration_file import pyflowline_create_template_configuration_file
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--sMesh_type", help = "sMesh_type",  type = str)
@@ -44,7 +44,7 @@ sWorkspace_output=  str(Path(sWorkspace_data)  /  'output')
 
 sFilename_configuration_in = realpath( sPath +  '/tests/configurations/template.json' )
     
-oPyflowline = pyflowline_generate_template_configuration_file(sFilename_configuration_in,\
+oPyflowline = pyflowline_create_template_configuration_file(sFilename_configuration_in,\
          sWorkspace_input, sWorkspace_output, iFlag_use_mesh_dem_in = 1,sMesh_type_in=sMesh_type, iCase_index_in = iCase_index, sDate_in = sDate)
     
 print(oPyflowline.tojson())

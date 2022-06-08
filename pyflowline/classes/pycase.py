@@ -451,6 +451,9 @@ class flowlinecase(object):
                                 print('Unsupported mesh type?')
                                 return
         else:
+            #read mesh?
+            iMesh_type = self.iMesh_type
+
             pass
         return
     
@@ -522,7 +525,10 @@ class flowlinecase(object):
         if self.iFlag_flowline == 1:
             self.flowline_simplification()        
             aCell = self.mesh_generation()
-            aCell_out, a, b = self.reconstruct_topological_relationship(aCell)
+            if self.iFlag_create_mesh ==1:
+                aCell_out, a, b = self.reconstruct_topological_relationship(aCell)
+            else:
+                pass
         else:
             #only mesh generator
             aCell = self.mesh_generation()

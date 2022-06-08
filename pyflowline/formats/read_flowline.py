@@ -148,6 +148,11 @@ def read_flowline_geojson(sFilename_geojson_in):
 
     aFlowline=list()
     pDriver_geojson = ogr.GetDriverByName('GeoJSON')   
+    if os.path.isfile(sFilename_geojson_in):
+        print(sFilename_geojson_in)
+    else:
+        print('This geojson file does not exist: ', sFilename_geojson_in )
+        exit()
     pDataset_geojson = pDriver_geojson.Open(sFilename_geojson_in, gdal.GA_ReadOnly)
     pLayer_geojson = pDataset_geojson.GetLayer(0)
     pSpatialRef_geojson = pLayer_geojson.GetSpatialRef()

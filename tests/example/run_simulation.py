@@ -11,7 +11,7 @@ logging.warning('is the time Pyflowline simulation started.')
 
 from pyflowline.classes.pycase import flowlinecase
 from pyflowline.pyflowline_read_model_configuration_file import pyflowline_read_model_configuration_file
-from pyflowline.pyflowline_generate_template_configuration_file import pyflowline_generate_template_configuration_file
+from pyflowline.pyflowline_create_template_configuration_file import pyflowline_create_template_configuration_file
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--sMesh_type", help = "sMesh_type",  type = str)

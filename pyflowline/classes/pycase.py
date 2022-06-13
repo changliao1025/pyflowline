@@ -82,6 +82,7 @@ class flowlinecase(object):
     dLongitude_right = 180
     dLatitude_bot = -90
     dLatitude_top = 90
+    dElevation_mean=-9999.0
     sFilename_model_configuration=''
     sWorkspace_input=''      
     sWorkspace_output=''    
@@ -470,13 +471,43 @@ class flowlinecase(object):
             aCellID_outlet = list()
             aBasin = list()
             aCell_intersect=list()
-        
+            ncell=len(self.aCell)
             for pBasin in self.aBasin:
                 aCell_intersect_basin = pBasin.reconstruct_topological_relationship(iMesh_type,sFilename_mesh)
                 aFlowline_conceptual = aFlowline_conceptual + pBasin.aFlowline_basin_conceptual
                 aBasin.append(pBasin)
                 aCellID_outlet.append(pBasin.lCellID_outlet)
                 aCell_intersect = aCell_intersect + aCell_intersect_basin
+
+                #set topology here
+                nFlowline = len(pBasin.aFlowline_basin_conceptual)
+                for i in range(nFlowline):
+                    pFlowline = pBasin.aFlowline_basin_conceptual[i]
+                    nEdge = pFlowline.nEdge
+                    nVertex = pFlowline.nVertex
+                    aEdge = pFlowline.aEdge
+                    iStream_segment = pFlowline.iStream_segment
+                    iStream_order = pFlowline.iStream_order
+                    for j in range(nEdge):
+                        pEdge = aEdge[j]
+                        pVertex_start = pEdge.pVertex_start
+                        pVertex_end = pEdge.pVertex_end
+                        for k in range(ncell):
+                            pVertex_center = self.aCell[k].pVertex_center
+                            if pVertex_center == pVertex_start:
+                                self.aCell[k].iStream_segment_burned = iStream_segment
+                                self.aCell[k].iStream_order_burned = iStream_order
+                                for l in range(ncell):
+                                    pVertex_center2 = self.aCell[l].pVertex_center
+                                    lCellID = self.aCell[l].lCellID
+                                    if pVertex_center2 == pVertex_end:
+                                        self.aCell[k].lCellID_downstream_burned = lCellID
+                                        if lCellID ==  pBasin.lCellID_outlet:
+                                            self.aCell[l].iStream_segment_burned = iStream_segment
+                                            self.aCell[l].iStream_order_burned = iStream_order
+
+                                        break
+
 
                 #update length?
             for pCell in self.aCell:
@@ -553,41 +584,7 @@ class flowlinecase(object):
         ncell=len(aCell_all)
         iFlag_flowline = self.iFlag_flowline 
         if iFlag_flowline == 1: #if there is conceptual flowline 
-            aCellID_outlet = self.aCellID_outlet
-            aFlowline = self.aFlowline_conceptual
-            nFlowline = len(aFlowline)
-            for i in range(nFlowline):
-                pFlowline = aFlowline[i]
-                nEdge = pFlowline.nEdge
-                nVertex = pFlowline.nVertex
-                aEdge = pFlowline.aEdge
-                iStream_segment = pFlowline.iStream_segment
-                iStream_order = pFlowline.iStream_order
-                for j in range(nEdge):
-                    pEdge = aEdge[j]
-                    pVertex_start = pEdge.pVertex_start
-                    pVertex_end = pEdge.pVertex_end
-                    for k in range(ncell):
-                        pVertex_center = aCell_all[k].pVertex_center
-
-                        if pVertex_center == pVertex_start:
-                            aCell_all[k].iStream_segment_burned = iStream_segment
-                            aCell_all[k].iStream_order_burned = iStream_order
-
-                            for l in range(ncell):
-                                pVertex_center2 = aCell_all[l].pVertex_center
-                                lCellID = aCell_all[l].lCellID
-                                if pVertex_center2 == pVertex_end:
-                                    aCell_all[k].lCellID_downstream_burned = lCellID
-                                    if lCellID in aCellID_outlet:
-                                        aCell_all[l].iStream_segment_burned = iStream_segment
-                                        aCell_all[l].iStream_order_burned = iStream_order
-
-                                    break
-                                
-                                
-
-                pass
+            pass
         else:
             #only mesh, no flowline
             pass

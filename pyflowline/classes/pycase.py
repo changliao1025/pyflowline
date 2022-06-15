@@ -365,10 +365,34 @@ class flowlinecase(object):
                 #else:
                 dPixelWidth, dOriginX, dOriginY, nrow, ncolumn, pSpatialRef_dem, pProjection, pGeotransform\
                      = retrieve_geotiff_metadata(sFilename_dem)
-                dY_bot = dOriginY - (nrow+1) * dPixelWidth
-                dLongitude_left,  dLatitude_bot= reproject_coordinates(dOriginX, dY_bot,pSpatialRef_dem,    spatial_reference_target)
-                dX_right = dOriginX + (ncolumn +1) * dPixelWidth
-                dLongitude_right, dLatitude_top= reproject_coordinates(dX_right, dOriginY,pSpatialRef_dem,  spatial_reference_target)
+
+                #lower left
+                dX_lowerleft  = dOriginX
+                dY_lowerleft = dOriginY - (nrow+1) * dPixelWidth
+                dLongitude_left0,  dLatitude_bot0= reproject_coordinates(dX_lowerleft, dY_lowerleft,pSpatialRef_dem,    spatial_reference_target)
+                
+                #upper right
+                dX_upperright = dOriginX + (ncolumn +1) * dPixelWidth
+                dY_upperright = dOriginY
+                dLongitude_right0, dLatitude_top0= reproject_coordinates(dX_upperright, dY_upperright,pSpatialRef_dem,  spatial_reference_target)
+                
+                #lower right
+                dX_lowerright = dOriginX + (ncolumn +1) * dPixelWidth
+                dY_lowerright = dOriginY - (nrow+1) * dPixelWidth
+                
+                dLongitude_right1,  dLatitude_bot1= reproject_coordinates(dX_lowerright, dY_lowerright,pSpatialRef_dem,    spatial_reference_target)
+                
+                #uppler left     
+                dX_upperleft   = dOriginX
+                dY_upperleft   =  dOriginY
+                dLongitude_left1, dLatitude_top1= reproject_coordinates(dX_upperleft, dY_upperleft,pSpatialRef_dem,  spatial_reference_target)
+                
+                dLatitude_top = np.max([dLatitude_top0, dLatitude_top1])
+                dLatitude_bot = np.min([dLatitude_bot0, dLatitude_bot1])
+
+                dLongitude_left = np.min([dLongitude_left0, dLongitude_left1])
+                dLongitude_right = np.max([dLongitude_right0, dLongitude_right1])
+
                 dLatitude_mean = 0.5 * (dLatitude_top + dLatitude_bot)
                     #pass
 
@@ -378,8 +402,8 @@ class flowlinecase(object):
                 else:
                     dResolution_degree = meter_to_degree(dResolution_meter, dLatitude_mean)
 
-                dX_left = dOriginX
-                dY_top = dOriginY
+                dX_lowerleft = dOriginX
+                dY_upperleft = dOriginY
             else:
                 pass
 
@@ -391,33 +415,45 @@ class flowlinecase(object):
                 if iFlag_rotation ==0:            
                     dX_spacing = dLength_edge * np.sqrt(3.0)
                     dY_spacing = dLength_edge * 1.5
-                    ncolumn= int( (dX_right - dX_left) / dX_spacing )
-                    nrow= int( (dY_top - dY_bot) / dY_spacing ) 
+                    ncolumn= int( (dX_lowerright - dX_lowerleft) / dX_spacing )
+                    nrow= int( (dY_upperleft - dY_lowerleft) / dY_spacing ) 
                 else:            
                     dX_spacing = dLength_edge * 1.5
                     dY_spacing = dLength_edge * np.sqrt(3.0)    
-                    ncolumn= int( (dX_right - dX_left) / dX_spacing )+1
-                    nrow= int( (dY_top - dY_bot) / dY_spacing )
+                    ncolumn= int( (dX_lowerright - dX_lowerleft) / dX_spacing )+1
+                    nrow= int( (dY_upperleft - dY_lowerleft) / dY_spacing )
 
-                aHexagon = create_hexagon_mesh(iFlag_rotation, dX_left, dY_bot, dResolution_meter, ncolumn, nrow, \
+                aHexagon = create_hexagon_mesh(iFlag_rotation, dX_lowerleft, dY_lowerleft, dResolution_meter, ncolumn, nrow, \
                     sFilename_mesh, sFilename_spatial_reference)
                 return aHexagon
             else:
                 if iMesh_type ==2: #sqaure
-                    ncolumn= int( (dX_right - dX_left) / dResolution_meter )
-                    nrow= int( (dY_top - dY_bot) / dResolution_meter )
+                    ncolumn= int( (dX_lowerright - dX_lowerleft) / dResolution_meter )
+                    nrow= int( (dY_upperleft - dY_lowerleft) / dResolution_meter )
 
-                    aSquare = create_square_mesh(dX_left, dY_bot, dResolution_meter, ncolumn, nrow, \
+                    aSquare = create_square_mesh(dX_lowerleft, dY_lowerleft, dResolution_meter, ncolumn, nrow, \
                         sFilename_mesh, sFilename_spatial_reference)
                     return aSquare
                 else:
                     if iMesh_type ==3: #latlon
                         dResolution_meter = degree_to_meter(dLatitude_mean, dResolution_degree)
                         dArea = np.power(dResolution_meter,2.0)
-                        dLatitude_top    = self.dLatitude_top   
-                        dLatitude_bot    = self.dLatitude_bot   
-                        dLongitude_left  = self.dLongitude_left 
-                        dLongitude_right = self.dLongitude_right
+                        if self.iFlag_global == 0:
+                            if self.iFlag_multiple_outlet == 0:
+                                #in a single watershed, we use dem to control domain
+                                pass
+                            else:
+                                dLatitude_top    = self.dLatitude_top   
+                                dLatitude_bot    = self.dLatitude_bot   
+                                dLongitude_left  = self.dLongitude_left 
+                                dLongitude_right = self.dLongitude_right
+
+                        else:
+                            dLatitude_top    = self.dLatitude_top   
+                            dLatitude_bot    = self.dLatitude_bot   
+                            dLongitude_left  = self.dLongitude_left 
+                            dLongitude_right = self.dLongitude_right
+
                         ncolumn= int( (dLongitude_right - dLongitude_left) / dResolution_degree )
                         nrow= int( (dLatitude_top - dLatitude_bot) / dResolution_degree )
                         aLatlon = create_latlon_mesh(dLongitude_left, dLatitude_bot, dResolution_degree, ncolumn, nrow, \
@@ -444,9 +480,9 @@ class flowlinecase(object):
                                 dY_shift = 0.5 * dLength_edge * np.sqrt(3.0) 
                                 dX_spacing = dX_shift * 2
                                 dY_spacing = dY_shift
-                                ncolumn= int( (dX_right - dX_left) / dX_shift )
-                                nrow= int( (dY_top - dY_bot) / dY_spacing ) 
-                                aTin = create_tin_mesh(dX_left, dY_bot, dResolution_meter, ncolumn, nrow,sFilename_mesh, sFilename_spatial_reference)
+                                ncolumn= int( (dX_lowerright - dX_lowerleft) / dX_shift )
+                                nrow= int( (dY_upperleft - dY_lowerleft) / dY_spacing ) 
+                                aTin = create_tin_mesh(dX_lowerleft, dY_lowerleft, dResolution_meter, ncolumn, nrow,sFilename_mesh, sFilename_spatial_reference)
                                 return aTin
                             else:
                                 print('Unsupported mesh type?')

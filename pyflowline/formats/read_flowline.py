@@ -48,8 +48,9 @@ def read_flowline_shapefile(sFilename_shapefile_in):
             print('Geometry issue')
 
         if(sGeometry_type == 'MULTILINESTRING'):
-            aLine = ogr.ForceToLineString(pGeometry_in)
-            for Line in aLine: 
+            nLine = pGeometry_in.GetGeometryCount()
+            for i in range(nLine):
+                Line = pGeometry_in.GetGeometryRef(i)
                 dummy = loads( Line.ExportToWkt() )
                 aCoords = dummy.coords                
                 dummy1= np.array(aCoords)
@@ -113,8 +114,9 @@ def read_flowline_shapefile_swat(sFilename_shapefile_in):
             print('Geometry issue')
 
         if(sGeometry_type == 'MULTILINESTRING'):
-            aLine = ogr.ForceToLineString(pGeometry_in)
-            for Line in aLine: 
+            nLine = pGeometry_in.GetGeometryCount()
+            for i in range(nLine):
+                Line = pGeometry_in.GetGeometryRef(i) 
                 dummy = loads( Line.ExportToWkt() )
                 aCoords = dummy.coords      
                 dummy1= np.array(aCoords)
@@ -200,12 +202,7 @@ def read_flowline_geojson(sFilename_geojson_in):
             nLine = pGeometry_in.GetGeometryCount()
             for i in range(nLine):
                 Line = pGeometry_in.GetGeometryRef(i)
-                dummy = loads( Line.ExportToWkt() )
-            
-            #aLine = MultiLineString(pGeometry_in)
-            #aLine = ogr.ForceToLineString(pGeometry_in)
-            #for Line in aLine: 
-                #dummy = loads( Line.ExportToWkt() )
+                dummy = loads( Line.ExportToWkt() )   
                 aCoords = dummy.coords                
                 dummy1= np.array(aCoords)
                 pLine = convert_gcs_coordinates_to_flowline(dummy1)

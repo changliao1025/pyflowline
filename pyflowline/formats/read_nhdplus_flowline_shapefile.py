@@ -86,8 +86,9 @@ def extract_nhdplus_flowline_shapefile_by_attribute(sFilename_shapefile_in, aAtt
             print('Geometry issue')
         if lNHDPlusID in aAttribute_in:
             if(sGeometry_type == 'MULTILINESTRING'):
-                aLine = ogr.ForceToLineString(pGeometry_in)
-                for Line in aLine: 
+                nLine = pGeometry_in.GetGeometryCount()
+                for i in range(nLine):
+                    Line = pGeometry_in.GetGeometryRef(i)
                     dummy = loads( Line.ExportToWkt() )
                     aCoords = dummy.coords                    
                     dummy1= np.array(aCoords)

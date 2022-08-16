@@ -114,9 +114,9 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh_in, sFilename_flo
                     
                     else:
                         if(pGeometrytype_intersect == 'MULTILINESTRING'):
-                            nLine = pGeometrytype_intersect.GetGeometryCount()
+                            nLine = pGeometry_intersect.GetGeometryCount()
                             for i in range(nLine):
-                                Line = pGeometrytype_intersect.GetGeometryRef(i) 
+                                Line = pGeometry_intersect.GetGeometryRef(i) 
                                 pFeatureOut.SetGeometry(Line)
                                 pFeatureOut.SetField("id", lID_flowline)         
                                 pFeatureOut.SetField("iseg", iStream_segment)    

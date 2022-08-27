@@ -291,7 +291,7 @@ class pybasin(object):
                 sFilename_out = 'flowline_large_'+ sStep +'_before_intersect.geojson'
                 sFilename_out =os.path.join(sWorkspace_output_basin, sFilename_out)
                 export_flowline_to_geojson( aFlowline_basin_simplified,  sFilename_out)
-            aVertex, lIndex_outlet, aIndex_headwater,aIndex_middle, aIndex_confluence, aConnectivity = find_flowline_confluence(aFlowline_basin_simplified,  pVertex_outlet)
+            aVertex, lIndex_outlet, aIndex_headwater,aIndex_middle, aIndex_confluence, aConnectivity, pVertex_outlet = find_flowline_confluence(aFlowline_basin_simplified,  pVertex_outlet)
             if self.iFlag_debug ==1:
                 sFilename_out = 'flowline_vertex_with_confluence_'+ sStep +'_before_intersect.geojson'
                 sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
@@ -305,7 +305,7 @@ class pybasin(object):
                 break
         
         #the final vertex info
-        aVertex, lIndex_outlet, aIndex_headwater,aIndex_middle, aIndex_confluence, aConnectivity = find_flowline_confluence(aFlowline_basin_simplified,  pVertex_outlet)
+        aVertex, lIndex_outlet, aIndex_headwater,aIndex_middle, aIndex_confluence, aConnectivity, pVertex_outlet = find_flowline_confluence(aFlowline_basin_simplified,  pVertex_outlet)
         sFilename_out = 'vertex_simplified.geojson'
         sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
         export_vertex_to_geojson( aVertex,  sFilename_out, aAttribute_data=aConnectivity)
@@ -388,7 +388,7 @@ class pybasin(object):
             sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
             export_flowline_to_geojson( aFlowline_basin_conceptual,  sFilename_out)
   
-        aVertex, lIndex_outlet, aIndex_headwater,aIndex_middle, aIndex_confluence, aConnectivity\
+        aVertex, lIndex_outlet, aIndex_headwater,aIndex_middle, aIndex_confluence, aConnectivity, pVertex_outlet\
             = find_flowline_confluence(aFlowline_basin_conceptual,  pVertex_outlet)
         if self.iFlag_debug ==1:
             sFilename_out = 'flowline_vertex_with_confluence_after_intersect.geojson'
@@ -397,7 +397,7 @@ class pybasin(object):
         
         #segment based
         aFlowline_basin_conceptual = merge_flowline( aFlowline_basin_conceptual,aVertex, pVertex_outlet, aIndex_headwater,aIndex_middle, aIndex_confluence  )                          
-        aVertex, lIndex_outlet, aIndex_headwater,aIndex_middle, aIndex_confluence, aConnectivity\
+        aVertex, lIndex_outlet, aIndex_headwater,aIndex_middle, aIndex_confluence, aConnectivity, pVertex_outlet\
             = find_flowline_confluence(aFlowline_basin_conceptual,  pVertex_outlet)        
         aFlowline_basin_conceptual, aStream_segment = define_stream_segment_index(aFlowline_basin_conceptual)
         aFlowline_basin_conceptual, aStream_order = define_stream_order(aFlowline_basin_conceptual)
@@ -465,7 +465,7 @@ class pybasin(object):
             aFlowline_simplified,pSpatial_reference = read_flowline_geojson( sFilename_flowline_in )   
             read_flowline_geojson
             self.aFlowline_basin_simplified = aFlowline_simplified
-            aVertex, lIndex_outlet, aIndex_headwater,aIndex_middle, aIndex_confluence, aConnectivity\
+            aVertex, lIndex_outlet, aIndex_headwater,aIndex_middle, aIndex_confluence, aConnectivity, pVertex_outlet\
             = find_flowline_confluence(self.aFlowline_basin_simplified,  pVertex_outlet_initial)  
             aVertex = np.array(aVertex)
             aIndex_confluence = np.array(aIndex_confluence)
@@ -481,7 +481,7 @@ class pybasin(object):
             aFlowline_conceptual, pSpatial_reference = read_flowline_geojson( sFilename_flowline_in )   
             self.aFlowline_basin_conceptual = aFlowline_conceptual
             
-            aVertex, lIndex_outlet, aIndex_headwater,aIndex_middle, aIndex_confluence, aConnectivity\
+            aVertex, lIndex_outlet, aIndex_headwater,aIndex_middle, aIndex_confluence, aConnectivity, pVertex_outlet\
             = find_flowline_confluence(self.aFlowline_basin_conceptual,  pVertex_outlet_initial)  
             aVertex = np.array(aVertex)
             aIndex_confluence = np.array(aIndex_confluence)
@@ -657,14 +657,14 @@ class pybasin(object):
         aFlowline_simplified,pSpatial_reference = read_flowline_geojson( sFilename_simplified )   
         aVertex_simplified, lIndex_outlet_simplified, \
             aIndex_headwater_simplified, aIndex_middle, \
-                aIndex_confluence_simplified, aConnectivity\
+                aIndex_confluence_simplified, aConnectivity, pVertex_outlet\
                 = find_flowline_confluence(aFlowline_simplified,  pVertex_outlet)
 
         
         aFlowline_conceptual,pSpatial_reference = read_flowline_geojson( sFilename_flowline_edge ) 
         aVertex_conceptual, lIndex_outlet_conceptual, \
             aIndex_headwater_conceptual, aIndex_middle_conceptual, \
-            aIndex_confluence_conceptual,  aConnectivity \
+            aIndex_confluence_conceptual,  aConnectivity, pVertex_outlet \
                 = find_flowline_confluence(aFlowline_conceptual,  pVertex_outlet)
 
         #merge intersect with confluence

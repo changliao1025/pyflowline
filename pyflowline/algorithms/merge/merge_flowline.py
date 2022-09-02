@@ -27,6 +27,7 @@ def merge_flowline(aFlowline_in, aVertex_in, \
     def merge_flowline_reach(lIndex_in, pVertex_start_in, pVertex_end_in):
         global lID
         pFlowline = aFlowline_in[lIndex_in]
+        iSegment = pFlowline.iStream_segment
         pVertex_current = pVertex_start_in
         
         while (find_vertex_in_list(aVertex_middle, pVertex_current)[0] ==1):            
@@ -42,6 +43,7 @@ def merge_flowline(aFlowline_in, aVertex_in, \
                 else:
                     pass
 
+        pFlowline.iStream_segment = iSegment              
         pFlowline.lIndex = lID
         aFlowline_out.append(pFlowline)        
         lID = lID + 1        

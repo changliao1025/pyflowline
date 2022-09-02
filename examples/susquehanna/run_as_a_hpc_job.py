@@ -29,10 +29,7 @@ iCase_index = 1
 sPath = str( Path().resolve() )
 sSlurm = 'short'
 
-
-
 aExtent_full = [-78.5,-75.5, 39.2,42.5]
-
 aExtent_meander = [-76.5,-76.2, 41.6,41.9] #meander
 aExtent_braided = [-77.3,-76.5, 40.2,41.0] #braided
 aExtent_confluence = [-77.3,-76.5, 40.2,41.0] #confluence
@@ -65,13 +62,9 @@ for iMesh_type in range(1, 5):
     if iMesh_type != 4:
         for iResolution in range(1, 4):    
             dResolution_meter = aResolution_meter[iResolution-1]
-
             oPyflowline = pyflowline_read_model_configuration_file(sFilename_configuration_in, \
             iCase_index_in=iCase_index, dResolution_meter_in=dResolution_meter, sDate_in=sDate)
-
-            #oPyflowline.create_hpc_job(sSlurm_in =sSlurm )  
-            print(iCase_index)            
-            
+            oPyflowline.create_hpc_job(sSlurm_in =sSlurm )    
             sFilename =  'filtered_flowline.png'
             #oPyflowline.plot(sFilename, sVariable_in = 'flowline_filter', aExtent_in =aExtent_full  )
             sFilename =  'conceptual_flowline_with_mesh.png'

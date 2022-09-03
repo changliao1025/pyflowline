@@ -29,7 +29,6 @@ pProjection_map = ccrs.Orthographic(central_longitude =  0.50*(-149.5+(-146.5)),
         central_latitude = 0.50*(68.1+70.35), globe=None)
         
 """ Imported methods
-
 from ._visual import __plot
 from ._visual import __plot_study_area
 from ._visual import __plot_mesh

@@ -1,6 +1,6 @@
-import os
+import os, stat
 from pathlib import Path
-def __create_hpc_job(self, sSlurm_in=None):
+def _create_hpc_job(self, sSlurm_in=None):
     """create a HPC job for this simulation
     """
     os.chdir(self.sWorkspace_output)

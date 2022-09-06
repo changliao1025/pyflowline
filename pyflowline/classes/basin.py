@@ -97,8 +97,8 @@ class pybasin(object):
     aConfluence_basin_simplified= None
     aConfluence_basin_conceptual= None
     
-    from ._visual import __basinplot as __plot    
-    from ._visual import __plot_area_of_difference
+    from ._visual import _basinplot
+    from ._visual import _plot_area_of_difference
     
     def __init__(self, aParameter):
 

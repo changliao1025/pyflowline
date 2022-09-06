@@ -187,6 +187,9 @@ class pyflowline(object):
         else:
             pass
 
+        #is this necessary
+        #pFlowline_out.iStream_segment = self.iStream_segment
+
         return pFlowline_out
 
     def calculate_flowline_sinuosity(self):

@@ -1,4 +1,4 @@
-import os
+import os, stat
 from pathlib import Path
 from abc import ABCMeta
 import json
@@ -71,9 +71,7 @@ class flowlinecase(object):
     iFlag_simplification = 1 #user can turn on/off
     iFlag_create_mesh=1
     iFlag_intersect = 1
-    
     iFlag_rotation=0
-
     nOutlet = 1 #by default , there shoule ne only one ouelet
     dResolution_degree=0.0
     dResolution_meter=0.0
@@ -108,7 +106,12 @@ class flowlinecase(object):
     aCellID_outlet = list()
     aCell=list()
 
-    
+    from ._visual import __plot
+    from ._visual import __plot_study_area
+    from ._visual import __plot_mesh
+    from ._visual import __plot_mesh_with_flowline
+    from ._visual import __compare_with_raster_dem_method
+    from ._hpc import __create_hpc_job
     def __init__(self, aConfig_in,\
             iFlag_standalone_in= None,\
             sModel_in = None,\
@@ -295,7 +298,7 @@ class flowlinecase(object):
                 with open(self.sFilename_basins) as json_file:
                     dummy_data = json.load(json_file)     
                     for i in range(self.nOutlet):
-                        sBasin =  "{:03d}".format(i+1)   
+                        sBasin =  "{:04d}".format(i+1)   
                         dummy_basin = dummy_data[i]
                         dummy_basin['sWorkspace_output_basin'] = str(Path(self.sWorkspace_output) /     sBasin )
 
@@ -352,17 +355,7 @@ class flowlinecase(object):
             if iMesh_type !=4: #mpas
                 spatial_reference_target = osr.SpatialReference()  
                 spatial_reference_target.ImportFromEPSG(4326)
-                #if self.iFlag_use_shapefile_extent==1:
-                #    pDriver_shapefile = ogr.GetDriverByName('Esri Shapefile')
-                #    pDataset_shapefile = pDriver_shapefile.Open(self.sFilename_spatial_reference, 0)
-                #    pLayer_shapefile = pDataset_shapefile.GetLayer(0)
-                #    pSpatial_reference = pLayer_shapefile.GetSpatialRef()
-                #    (dOriginX, dX_right, dY_bot, dOriginY) = pLayer_shapefile.GetExtent() # not in same order as ogrinfo
-                #    dLongitude_left,  dLatitude_bot= reproject_coordinates(dOriginX, dY_bot,pSpatial_reference,    spatial_reference_target)
-                #    dLongitude_right, dLatitude_top= reproject_coordinates(dX_right, dOriginY,pSpatial_reference,  spatial_reference_target)
-                #    dLatitude_mean = 0.5 * (dLatitude_top + dLatitude_bot)
-                #    pass
-                #else:
+               
                 dPixelWidth, dOriginX, dOriginY, nrow, ncolumn, pSpatialRef_dem, pProjection, pGeotransform\
                      = retrieve_geotiff_metadata(sFilename_dem)
 
@@ -558,9 +551,6 @@ class flowlinecase(object):
         else:
             return None
             
-
-        
-   
     def merge_cell_info(self, aCell_raw):
 
         for pCell in self.aCell:
@@ -604,6 +594,10 @@ class flowlinecase(object):
         
         return aCell_out
 
+    def evaluate(self):
+        for pBasin in self.aBasin:
+            pBasin.evaluate(self.iMesh_type, self.sMesh_type)
+        return
    
     def export(self):
         
@@ -706,7 +700,6 @@ class flowlinecase(object):
                 cls=CaseClassEncoder)
         return
 
-
     def export_basin_config_to_json(self, sFilename_output_in= None):
         if self.iFlag_standalone == 1:
             if sFilename_output_in is not None:
@@ -746,3 +739,5 @@ class flowlinecase(object):
             self.sFilename_basins = sFilename_output
             
         return
+
+    

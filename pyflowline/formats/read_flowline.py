@@ -3,6 +3,7 @@ import numpy as np
 from osgeo import ogr, osr, gdal
 
 from shapely.wkt import loads
+from shapely.geometry import  MultiLineString, mapping, shape
 
 from pyflowline.formats.convert_coordinates import convert_gcs_coordinates_to_flowline
 
@@ -47,8 +48,9 @@ def read_flowline_shapefile(sFilename_shapefile_in):
             print('Geometry issue')
 
         if(sGeometry_type == 'MULTILINESTRING'):
-            aLine = ogr.ForceToLineString(pGeometry_in)
-            for Line in aLine: 
+            nLine = pGeometry_in.GetGeometryCount()
+            for i in range(nLine):
+                Line = pGeometry_in.GetGeometryRef(i)
                 dummy = loads( Line.ExportToWkt() )
                 aCoords = dummy.coords                
                 dummy1= np.array(aCoords)
@@ -112,8 +114,9 @@ def read_flowline_shapefile_swat(sFilename_shapefile_in):
             print('Geometry issue')
 
         if(sGeometry_type == 'MULTILINESTRING'):
-            aLine = ogr.ForceToLineString(pGeometry_in)
-            for Line in aLine: 
+            nLine = pGeometry_in.GetGeometryCount()
+            for i in range(nLine):
+                Line = pGeometry_in.GetGeometryRef(i) 
                 dummy = loads( Line.ExportToWkt() )
                 aCoords = dummy.coords      
                 dummy1= np.array(aCoords)
@@ -177,7 +180,7 @@ def read_flowline_geojson(sFilename_geojson_in):
 
     lID = 0
     for pFeature_geojson in pLayer_geojson:
-        pGeometry_geojson = pFeature_geojson.GetGeometryRef()
+        #pGeometry_geojson = pFeature_geojson.GetGeometryRef()
         pGeometry_in = pFeature_geojson.GetGeometryRef()
         sGeometry_type = pGeometry_in.GetGeometryName()
         if iFlag_segment ==1:
@@ -196,9 +199,10 @@ def read_flowline_geojson(sFilename_geojson_in):
             lNHDPlusID = -1
         
         if(sGeometry_type == 'MULTILINESTRING'):
-            aLine = ogr.ForceToLineString(pGeometry_in)
-            for Line in aLine: 
-                dummy = loads( Line.ExportToWkt() )
+            nLine = pGeometry_in.GetGeometryCount()
+            for i in range(nLine):
+                Line = pGeometry_in.GetGeometryRef(i)
+                dummy = loads( Line.ExportToWkt() )   
                 aCoords = dummy.coords                
                 dummy1= np.array(aCoords)
                 pLine = convert_gcs_coordinates_to_flowline(dummy1)

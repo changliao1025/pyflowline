@@ -103,6 +103,8 @@ def pyflowline_read_model_configuration_file(sFilename_configuration_in,   \
     aConfig['sDate'] = sDate
     aConfig['sModel'] = sModel
     aConfig['sWorkspace_output'] = sWorkspace_output
+
+    aConfig["sFilename_model_configuration"] = sFilename_configuration_in
    
     
 

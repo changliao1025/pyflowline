@@ -29,28 +29,31 @@ pProjection_map = ccrs.Orthographic(central_longitude =  0.50*(-149.5+(-146.5)),
         central_latitude = 0.50*(68.1+70.35), globe=None)
         
 """ Imported methods
-from ._visual import __plot
-from ._visual import __plot_study_area
-from ._visual import __plot_mesh
-from ._visual import __plot_mesh_with_flowline
-from ._visual import __compare_with_raster_dem_method
+from ._visual import _plot
+from ._visual import _plot_study_area
+from ._visual import _plot_mesh
+from ._visual import _plot_mesh_with_flowline
+from ._visual import _compare_with_raster_dem_method
 """
 
-def __plot(self, sFilename_in,iFlag_title=None, sVariable_in=None, aExtent_in = None, pProjection_map_in = None):
+def _plot(self, sFilename_in,iFlag_title=None, sVariable_in=None, aExtent_in = None, pProjection_map_in = None):
     if sVariable_in == 'mesh':
-        self.__plot_mesh(sFilename_in)
+        self._plot_mesh(sFilename_in, aExtent_in= aExtent_in, pProjection_map_in= pProjection_map_in)
     else:            
         if sVariable_in == 'overlap':
-            self.__plot_mesh_with_flowline( sFilename_in, iFlag_title= iFlag_title, aExtent_in= aExtent_in)
+            self._plot_mesh_with_flowline( sFilename_in, iFlag_title= iFlag_title, aExtent_in= aExtent_in, pProjection_map_in= pProjection_map_in)
         else:            
             
             for pBasin in self.aBasin:            
-                pBasin.__plot(self.iCase_index, self.iMesh_type, self.sMesh_type,sFilename_in,iFlag_title= iFlag_title, sVariable_in= sVariable_in)
+                pBasin._basin_plot(self.iCase_index, self.iMesh_type, self.sMesh_type,sFilename_in,\
+                    iFlag_title= iFlag_title, \
+                    sVariable_in= sVariable_in, \
+                        pProjection_map_in= pProjection_map_in)
             pass
     
     return
     
-def __plot_study_area(self, sFilename_boundary_in = None, sFilename_slope_in = None):
+def _plot_study_area(self, sFilename_boundary_in = None, sFilename_slope_in = None, sFilename_nhd_in = None):
     sWorkspace_output_case = self.sWorkspace_output
     fig = plt.figure(dpi=300)
     fig.set_figwidth( 4 )
@@ -105,6 +108,7 @@ def __plot_study_area(self, sFilename_boundary_in = None, sFilename_slope_in = N
     u = utm.from_latlon(dLatitude_center, dLongitude_center)
     gl = ax_dem.gridlines(crs=ccrs.PlateCarree(), draw_labels=True,
                   linewidth=1, color='gray', alpha=0.3, linestyle='--')
+
     gl.left_labels=False
     gl.top_labels=False        
    
@@ -116,7 +120,13 @@ def __plot_study_area(self, sFilename_boundary_in = None, sFilename_slope_in = N
     # default of 'ha' is center, often causes trouble when text rotation isnot zero
     gl.xlabel_style = {'size': XTEXT_SIZE, 'color': 'k', 'rotation':0,'ha':'right'}
     gl.ylabel_style = {'size': YTEXT_SIZE, 'color': 'k', 'rotation':90, 'weight': 'normal'}
-    sFilename_nhd = '/qfs/people/liao313/data/hexwatershed/susquehannavector/hydrology/nhd_proj.shp'
+
+    
+    if sFilename_nhd_in is None:
+        sFilename_nhd = '/qfs/people/liao313/data/hexwatershed/susquehannavector/hydrology/nhd_proj.shp'
+    else:
+        sFilename_nhd = sFilename_nhd_in
+    
     reader = shpreader.Reader(sFilename_nhd)
     shape_feature = ShapelyFeature(reader.geometries(),
                             dem_proj, facecolor='none')
@@ -135,15 +145,14 @@ def __plot_study_area(self, sFilename_boundary_in = None, sFilename_slope_in = N
             x,y = reproject_coordinates(dLon, dLat, pSpatial_reference_source, pSpatial_reference_target )
             ax_dem.plot(x,y,marker = 'x', color='red', markersize=4)
             pass
-    ax_cb= fig.add_axes([0.2, 0.2, 0.02, 0.5])
-    
+
+    ax_cb= fig.add_axes([0.2, 0.2, 0.02, 0.5])    
     cb = plt.colorbar(demplot, cax = ax_cb, extend = 'both')
     cb.ax.get_yaxis().set_ticks_position('left')
     cb.ax.get_yaxis().labelpad = 10
     cb.ax.set_ylabel('Unit: meter', rotation=270)
     cb.ax.tick_params(labelsize=6) 
-    #google earth
-    zone = u[2]
+    #google earth   
     ge_proj = ccrs.Mercator()#central_longitude=dLongitude_center)
     
     pSpatial_reference_source = osr.SpatialReference()  
@@ -245,10 +254,9 @@ def __plot_study_area(self, sFilename_boundary_in = None, sFilename_slope_in = N
     sFilename_out = os.path.join(sWorkspace_output_case, sFilename)
     plt.savefig(sFilename_out, bbox_inches='tight')
     
-    
     return
 
-def __plot_mesh(self, sFilename_in, aExtent_in=None):
+def _plot_mesh(self, sFilename_in, aExtent_in=None, pProjection_map_in = None):
     sWorkspace_output_case = self.sWorkspace_output
     sFilename_json  =  self.sFilename_mesh
     sMesh_type = self.sMesh_type
@@ -296,10 +304,11 @@ def __plot_mesh(self, sFilename_in, aExtent_in=None):
     if aExtent_in is None:
         marginx  = (dLon_max - dLon_min) / 20
         marginy  = (dLat_max - dLat_min) / 20
-        aExtent_in = [dLon_min - marginx , dLon_max + marginx , dLat_min -marginy , dLat_max + marginy]
-   
+        aExtent = [dLon_min - marginx , dLon_max + marginx , dLat_min -marginy , dLat_max + marginy]
+    else:
+        aExtent = aExtent_in
     
-    ax.set_extent( aExtent_in )  
+    ax.set_extent( aExtent )  
 
     #add mesh info
     ax.set_title( sMesh_type.title() +  ' mesh')
@@ -315,7 +324,7 @@ def __plot_mesh(self, sFilename_in, aExtent_in=None):
       
     return
 
-def __plot_mesh_with_flowline(self, sFilename_in, iFlag_title=None, aExtent_in=None):
+def _plot_mesh_with_flowline(self, sFilename_in, iFlag_title=None, aExtent_in=None, pProjection_map_in = None):
     sWorkspace_output_case = self.sWorkspace_output
     sFilename_mesh  =  self.sFilename_mesh
     sMesh_type = self.sMesh_type
@@ -433,12 +442,13 @@ def __plot_mesh_with_flowline(self, sFilename_in, iFlag_title=None, aExtent_in=N
     if aExtent_in is None:
         marginx  = (dLon_max - dLon_min) / 20
         marginy  = (dLat_max - dLat_min) / 20
-        aExtent_in = [dLon_min - marginx , dLon_max + marginx , dLat_min -marginy , dLat_max + marginy]           
-            
+        aExtent = [dLon_min - marginx , dLon_max + marginx , dLat_min -marginy , dLat_max + marginy]           
+    else:
+        aExtent = aExtent_in       
     
     sTitle = 'Conceptual flowline'                     
     
-    ax.set_extent( aExtent_in )        
+    ax.set_extent( aExtent )        
     ax.coastlines()
     gl = ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True,
                   linewidth=0.2, color='gray', alpha=0.3, linestyle='--')
@@ -488,7 +498,7 @@ def __plot_mesh_with_flowline(self, sFilename_in, iFlag_title=None, aExtent_in=N
     plt.close(fig)
     return
 
-def __compare_with_raster_dem_method(self, sFilename_dem_flowline, sFilename_in, aExtent_in=None):
+def _compare_with_raster_dem_method(self, sFilename_dem_flowline, sFilename_in, aExtent_in=None, pProjection_map_in = None):
     sWorkspace_output_case = self.sWorkspace_output
     sFilename_mesh  =  self.sFilename_mesh
     sMesh_type = self.sMesh_type
@@ -616,11 +626,13 @@ def __compare_with_raster_dem_method(self, sFilename_dem_flowline, sFilename_in,
     if aExtent_in is None:
         marginx  = (dLon_max - dLon_min) / 20
         marginy  = (dLat_max - dLat_min) / 20
-        aExtent_in = [dLon_min - marginx , dLon_max + marginx , dLat_min -marginy , dLat_max + marginy]          
+        aExtent = [dLon_min - marginx , dLon_max + marginx , dLat_min -marginy , dLat_max + marginy]     
+    else:
+        aExtent = aExtent_in       
    
     sTitle = 'Conceptual flowline'                 
     
-    ax.set_extent( aExtent_in )        
+    ax.set_extent( aExtent )        
     ax.coastlines()#resolution='110m')
     gl = ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True,
                   linewidth=0.2, color='gray', alpha=0.3, linestyle='--')
@@ -661,7 +673,7 @@ def __compare_with_raster_dem_method(self, sFilename_dem_flowline, sFilename_in,
     plt.close(fig)
     return
   
-def __basinplot(self, iCase_index, iMesh_type, sMesh_type, sFilename_in, iFlag_title=None, sVariable_in=None, aExtent_in = None):
+def _basinplot(self, iCase_index, iMesh_type, sMesh_type, sFilename_in, iFlag_title=None, sVariable_in=None, aExtent_in = None, pProjection_map_in = None):
     iFlag_label = 0
     sWorkspace_output_basin = self.sWorkspace_output_basin
     if sVariable_in is not None:
@@ -777,13 +789,17 @@ def __basinplot(self, iCase_index, iMesh_type, sMesh_type, sFilename_in, iFlag_t
 
     pDataset = pLayer = pFeature  = None    
    
-    marginx  = (dLon_max - dLon_min) / 20
-    marginy  = (dLat_max - dLat_min) / 20
+    
+
     if aExtent_in is None:
-        aExtent_in = [dLon_min - marginx , dLon_max + marginx , dLat_min - marginy , dLat_max + marginy]
+        marginx  = (dLon_max - dLon_min) / 20
+        marginy  = (dLat_max - dLat_min) / 20
+        aExtent = [dLon_min - marginx , dLon_max + marginx , dLat_min - marginy , dLat_max + marginy]
+    else:
+        aExtent = aExtent  
  
     
-    ax.set_extent(aExtent_in)       
+    ax.set_extent(aExtent)       
 
     gl = ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True,
                   linewidth=1, color='gray', alpha=0.3, linestyle='--')
@@ -807,7 +823,7 @@ def __basinplot(self, iCase_index, iMesh_type, sMesh_type, sFilename_in, iFlag_t
 
     return
 
-def __plot_area_of_difference(self, iCase_index, iMesh_type, sMesh_type, sFilename_in, aExtent_in = None):
+def _plot_area_of_difference(self, iCase_index, iMesh_type, sMesh_type, sFilename_in, aExtent_in = None, pProjection_map_in = None):
     #request = cimgt.OSM()
     sFilename_json = self.sFilename_area_of_difference
     sFilename_json = os.path.join(self.sWorkspace_output_basin, sFilename_json)
@@ -868,12 +884,15 @@ def __plot_area_of_difference(self, iCase_index, iMesh_type, sMesh_type, sFilena
     pDataset = pLayer = pFeature  = None    
     
     
-    marginx  = (dLon_max - dLon_min) / 20
-    marginy  = (dLat_max - dLat_min) / 20
+    
     if aExtent_in is None:
-        aExtent_in = [dLon_min - marginx , dLon_max + marginx , dLat_min - marginy , dLat_max + marginy]
+        marginx  = (dLon_max - dLon_min) / 20
+        marginy  = (dLat_max - dLat_min) / 20
+        aExtent = [dLon_min - marginx , dLon_max + marginx , dLat_min - marginy , dLat_max + marginy]
+    else:
+        aExtent = aExtent_in
         
-    ax.set_extent( aExtent_in )      
+    ax.set_extent( aExtent )      
           
     sTitle = 'Area of difference'
     gl = ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True,

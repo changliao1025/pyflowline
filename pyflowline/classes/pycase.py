@@ -106,12 +106,12 @@ class flowlinecase(object):
     aCellID_outlet = list()
     aCell=list()
 
-    from ._visual import __plot
-    from ._visual import __plot_study_area
-    from ._visual import __plot_mesh
-    from ._visual import __plot_mesh_with_flowline
-    from ._visual import __compare_with_raster_dem_method
-    from ._hpc import __create_hpc_job
+    from ._visual import _plot
+    from ._visual import _plot_study_area
+    from ._visual import _plot_mesh
+    from ._visual import _plot_mesh_with_flowline
+    from ._visual import _compare_with_raster_dem_method
+    from ._hpc import _create_hpc_job
     def __init__(self, aConfig_in,\
             iFlag_standalone_in= None,\
             sModel_in = None,\

@@ -1,39 +1,39 @@
 import os, sys
 from pathlib import Path
 from os.path import realpath
-import argparse
-import logging
-for handler in logging.root.handlers[:]:
-    logging.root.removeHandler(handler)
 
-logging.basicConfig(format='%(asctime)s %(message)s')
-logging.warning('is the time Pyflowline simulation started.')
-
-from pyflowline.classes.pycase import flowlinecase
 from pyflowline.pyflowline_read_model_configuration_file import pyflowline_read_model_configuration_file
 
-sDate='20220630'
 
-dataPath = str(Path(__file__).parents[2]) # data is located two dir's up
-
-sWorkspace_data = realpath( dataPath +  '/data/susquehanna' )
+#===================================
+#set up workspace path
+#===================================
+sPath_config = str( Path().resolve() )
+sPath_data = str(Path(__file__).parents[2]) # data is located two dir's up
+sWorkspace_data = realpath( sPath_data +  '/data/susquehanna' )
 sWorkspace_input =  str(Path(sWorkspace_data)  /  'input')
 sWorkspace_output=  str(Path(sWorkspace_data)  /  'output')
 
-#an examples configuration file is provided with the repository, but you need to update this file based on your own case study
-sMesh = 'latlon'
-aResolution_meter = [5000, 10000, 50000]
-iCase_index = 1
-sPath = str( Path().resolve() )
-
-sFilename_configuration_in = realpath( sPath +  '/examples/susquehanna/pyflowline_susquehanna_latlon.json' )
-       
+#===================================
+#you need to update this file based on your own case study
+#===================================
+sFilename_configuration_in = realpath( sPath_config +  '/examples/susquehanna/pyflowline_susquehanna_latlon.json' )
 if os.path.isfile(sFilename_configuration_in):
     pass
 else:
     print('This configuration does not exist: ', sFilename_configuration_in )
+
+#===================================
+#setup case information
+#===================================
+iCase_index = 1
+aResolution_meter = [5000, 10000, 50000]
+nResolution = len(aResolution_meter)
+sMesh = 'latlon'
+sDate='20220630'
+
   
-for iResolution in range(1, 4):    
+for iResolution in range(1, nResolution + 1):    
     dResolution_meter = aResolution_meter[iResolution-1]
     oPyflowline = pyflowline_read_model_configuration_file(sFilename_configuration_in, \
     iCase_index_in=iCase_index, dResolution_meter_in=dResolution_meter, sDate_in=sDate)
@@ -47,8 +47,5 @@ for iResolution in range(1, 4):
     oPyflowline.evaluate()
     oPyflowline.export()
     iCase_index= iCase_index+1
-           
-print('Finished')
 
-logging.basicConfig(format='%(asctime)s %(message)s')
-logging.warning('is the time Pyflowline simulation finished.')
+print('Finished')

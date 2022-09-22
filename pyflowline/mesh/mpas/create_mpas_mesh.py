@@ -234,7 +234,8 @@ def create_mpas_mesh(iFlag_global_in, \
                     lNeighborID = pmpas.aNeighbor[i]
                     #find shared edge
                     lEdgeID= aEdgeIndex[i]                    
-                    lIndex = aIndexToEdgeID[lEdgeID-1]
+                    #lIndex = aIndexToEdgeID[lEdgeID-1]
+                    lIndex = lEdgeID-1
                     dDistance = aDcEdge[lIndex]
                     aDistance.append(dDistance)
                     pass

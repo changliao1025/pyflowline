@@ -11,7 +11,7 @@ sPath_parent = str(Path(__file__).parents[2]) # data is located two dir's up
 sPath_data = realpath( sPath_parent +  '/data/susquehanna' )
 sWorkspace_input =  str(Path(sPath_data)  /  'input')
 sWorkspace_output=  str(Path(sPath_data)  /  'output')
-
+sWorkspace_output=  '/compyfs/liao313/04model/pyflowline/susquehanna'
 
 #===================================
 #you need to update this file based on your own case study
@@ -25,9 +25,9 @@ else:
 #===================================
 #setup case information
 #===================================
-iCase_index = 1
+iCase_index = 13
 sMesh = 'mpas'
-sDate='20220630'
+sDate='20220901'
 
 
 oPyflowline = pyflowline_read_model_configuration_file(sFilename_configuration_in, \
@@ -35,7 +35,7 @@ oPyflowline = pyflowline_read_model_configuration_file(sFilename_configuration_i
 oPyflowline.aBasin[0].dLatitude_outlet_degree=39.462000
 oPyflowline.aBasin[0].dLongitude_outlet_degree=-76.009300
 oPyflowline.setup()
-oPyflowline.flowline_simplification()
+#oPyflowline.flowline_simplification()
 aCell = oPyflowline.mesh_generation()
 oPyflowline.reconstruct_topological_relationship(aCell)
 oPyflowline.analyze()

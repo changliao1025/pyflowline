@@ -64,6 +64,8 @@ class pybasin(object):
     iFlag_debug = 0
     iFlag_disconnected =0
     iFlag_dam=0
+
+    iFlag_break_by_distance = 0
     dLongitude_outlet_degree = -9999.
     dLatitude_outlet_degree = -9999.
     dAccumulation_threshold= 100000.0
@@ -74,6 +76,7 @@ class pybasin(object):
 
     dArea_of_difference=0.0
     dDistance_displace = 0.0
+    dThreshold_break_by_distance = 100.0 
     sWorkspace_output_basin=''
     sFilename_flowline_raw=''    
     sFilename_flowline_filter=''

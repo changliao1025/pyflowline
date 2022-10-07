@@ -72,10 +72,12 @@ class flowlinecase(object):
     iFlag_create_mesh=1
     iFlag_intersect = 1
     iFlag_rotation=0
+    iFlag_break_by_distance = 0  #if the distance between two vertice are far, 
     nOutlet = 1 #by default , there shoule ne only one ouelet
     dResolution_degree=0.0
     dResolution_meter=0.0
     dThreshold_small_river=0.0
+    dThreshold_break_by_distance = 100.0 
     dLongitude_left = -180
     dLongitude_right = 180
     dLatitude_bot = -90
@@ -170,6 +172,11 @@ class flowlinecase(object):
             self.iFlag_intersect = int(aConfig_in['iFlag_intersect'])
         else:
             self.iFlag_intersect=1
+        
+        if 'iFlag_break_by_distance' in aConfig_in:
+            self.iFlag_break_by_distance = int(aConfig_in['iFlag_break_by_distance'])
+        else:
+            self.iFlag_break_by_distance=0
 
         if 'nOutlet' in aConfig_in:
             self.nOutlet = int(aConfig_in['nOutlet'])
@@ -188,6 +195,9 @@ class flowlinecase(object):
             self.dResolution_meter = float(aConfig_in['dResolution_meter']) 
         else:
             print('Please specify resolution.')
+
+        if 'dThreshold_break_by_distance' in aConfig_in:
+            self.dThreshold_break_by_distance = float(aConfig_in['dThreshold_break_by_distance']) 
 
         if 'dLongitude_left' in aConfig_in:
             self.dLongitude_left = float(aConfig_in['dLongitude_left']) 

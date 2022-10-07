@@ -89,6 +89,15 @@ class pyedge(object):
             iFlag_downstream=0
 
         return iFlag_downstream
+    
+    def break_by_length(self,dLength_in):
+        aEdge_out=list()
+        if self.dLength <=aEdge_out:
+            aEdge_out.append(self)
+        else:
+            #find location from up to down
+            pass
+        return aEdge_out
 
     def reverse(self):
         v0 = self.pVertex_start

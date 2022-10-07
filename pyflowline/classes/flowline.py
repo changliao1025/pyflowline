@@ -191,6 +191,23 @@ class pyflowline(object):
         #pFlowline_out.iStream_segment = self.iStream_segment
 
         return pFlowline_out
+    
+    def break_by_length(self, dDistance):
+        aEdge=list()
+        pFlowline_out=None
+        for edge in self.aEdge:
+            edge.calculate_length()
+            if edge.length > dDistance:
+                #break it
+                aEdge0=edge.break_by_length()
+                for edge0 in aEdge0:
+                    aEdge.append(edge0)
+                pass
+            else:
+                aEdge.append(edge)
+                pass
+        pFlowline_out=pyflowline(aEdge)
+        return pFlowline_out
 
     def calculate_flowline_sinuosity(self):
         pVertex_start = self.pVertex_start

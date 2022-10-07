@@ -21,7 +21,7 @@ from pyflowline.algorithms.split.find_flowline_vertex import find_flowline_verte
 from pyflowline.algorithms.split.find_flowline_confluence import find_flowline_confluence
 from pyflowline.algorithms.split.split_flowline import split_flowline
 from pyflowline.algorithms.split.split_flowline_to_edge import split_flowline_to_edge
-from pyflowline.algorithms.split.break_flowline_by_length import break_flowline_by_length
+from pyflowline.algorithms.split.split_by_length import split_flowline_by_length
 from pyflowline.algorithms.merge.merge_flowline import merge_flowline
 from pyflowline.algorithms.direction.correct_flowline_direction import correct_flowline_direction
 from pyflowline.algorithms.loop.remove_flowline_loop import remove_flowline_loop
@@ -340,7 +340,7 @@ class pybasin(object):
                 aAttribute_data=[aStream_segment, aStream_order], aAttribute_field=['iseg','iord'], aAttribute_dtype=['int','int'])
         
         if self.iFlag_break_by_distance==1:
-            aFlowline_basin_simplified = break_flowline_by_length(aFlowline_basin_simplified, self.dThreshold_break_by_distance)
+            aFlowline_basin_simplified = split_flowline_by_length(aFlowline_basin_simplified, self.dThreshold_break_by_distance)
 
         self.aFlowline_basin_simplified= aFlowline_basin_simplified
         return aFlowline_basin_simplified

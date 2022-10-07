@@ -3,6 +3,7 @@ import json
 from json import JSONEncoder
 import numpy as np
 from pyflowline.classes.vertex import pyvertex
+from pyflowline.algorithms.split.split_by_length import split_edge_by_length
 from pyflowline.algorithms.auxiliary.gdal_functions import  calculate_angle_betwen_vertex, \
     calculate_polygon_area, calculate_distance_to_plane
 
@@ -90,12 +91,13 @@ class pyedge(object):
 
         return iFlag_downstream
     
-    def break_by_length(self,dLength_in):
+    def split_by_length(self,dLength_in):
         aEdge_out=list()
         if self.dLength <=aEdge_out:
             aEdge_out.append(self)
         else:
             #find location from up to down
+            aEdge_out=split_edge_by_length(self)
             pass
         return aEdge_out
 

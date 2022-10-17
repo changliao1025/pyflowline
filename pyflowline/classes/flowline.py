@@ -197,9 +197,9 @@ class pyflowline(object):
         pFlowline_out=None
         for edge in self.aEdge:
             edge.calculate_length()
-            if edge.length > dDistance:
+            if edge.dLength > dDistance:
                 #break it
-                aEdge0=edge.split_by_length()
+                aEdge0=edge.split_by_length(dDistance)
                 for edge0 in aEdge0:
                     aEdge.append(edge0)
                 pass

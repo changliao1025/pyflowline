@@ -97,7 +97,7 @@ class pyedge(object):
             aEdge_out.append(self)
         else:
             #find location from up to down
-            aEdge_out=split_edge_by_length(self)
+            aEdge_out=split_edge_by_length(self, dLength_in)
             pass
         return aEdge_out
 

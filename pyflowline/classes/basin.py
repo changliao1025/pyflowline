@@ -77,7 +77,7 @@ class pybasin(object):
 
     dArea_of_difference=0.0
     dDistance_displace = 0.0
-    dThreshold_break_by_distance = 100.0 
+    dThreshold_break_by_distance = 5000.0 
     sWorkspace_output_basin=''
     sFilename_flowline_raw=''    
     sFilename_flowline_filter=''
@@ -186,6 +186,7 @@ class pybasin(object):
         #geojson
         self.sFilename_flowline_segment_index_before_intersect = 'flowline_segment_index_before_intersect.geojson'
         self.sFilename_flowline_simplified = 'flowline_simplified.geojson'
+        self.sFilename_flowline_split = 'flowline_split.geojson'
         self.sFilename_flowline_intersect  = 'flowline_intersect_mesh.geojson'
         self.sFilename_flowline_conceptual = 'flowline_conceptual.geojson'
         self.sFilename_flowline_edge = 'flowline_edge.geojson'
@@ -340,7 +341,10 @@ class pybasin(object):
                 aAttribute_data=[aStream_segment, aStream_order], aAttribute_field=['iseg','iord'], aAttribute_dtype=['int','int'])
         
         if self.iFlag_break_by_distance==1:
-            aFlowline_basin_simplified = split_flowline_by_length(aFlowline_basin_simplified, self.dThreshold_break_by_distance)
+            aFlowline_basin_simplified_split = split_flowline_by_length(aFlowline_basin_simplified, self.dThreshold_break_by_distance)
+            sFilename_out = self.sFilename_flowline_split
+            sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
+            export_flowline_to_geojson(  aFlowline_basin_simplified_split, sFilename_out  )
 
         self.aFlowline_basin_simplified= aFlowline_basin_simplified
         return aFlowline_basin_simplified

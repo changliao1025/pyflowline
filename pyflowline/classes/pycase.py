@@ -77,7 +77,7 @@ class flowlinecase(object):
     dResolution_degree=0.0
     dResolution_meter=0.0
     dThreshold_small_river=0.0
-    dThreshold_break_by_distance = 100.0 
+    dThreshold_break_by_distance = 5000.0 
     dLongitude_left = -180
     dLongitude_right = 180
     dLatitude_bot = -90

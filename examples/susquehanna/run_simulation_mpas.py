@@ -25,7 +25,7 @@ else:
 #===================================
 #setup case information
 #===================================
-iCase_index = 13
+iCase_index = 17
 sMesh = 'mpas'
 sDate='20220901'
 
@@ -35,7 +35,7 @@ oPyflowline = pyflowline_read_model_configuration_file(sFilename_configuration_i
 oPyflowline.aBasin[0].dLatitude_outlet_degree=39.462000
 oPyflowline.aBasin[0].dLongitude_outlet_degree=-76.009300
 oPyflowline.setup()
-#oPyflowline.flowline_simplification()
+oPyflowline.flowline_simplification()
 aCell = oPyflowline.mesh_generation()
 oPyflowline.reconstruct_topological_relationship(aCell)
 oPyflowline.analyze()

@@ -55,8 +55,7 @@ def convert_shapefile_to_geojson(iFlag_type_in, sFilename_shapefile_in, sFilenam
         iReturn_code = 0
         return iReturn_code
 
-
-    if iFlag_type_in ==0:
+    if iFlag_type_in == 0:
         pass
     else:
         if iFlag_type_in == 1:

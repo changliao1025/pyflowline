@@ -366,7 +366,8 @@ def _plot_mesh_with_flowline(self, sFilename_in, iFlag_title=None, aExtent_in=No
             polygon = mpatches.Polygon(aCoords_gcs[:,0:2], closed=True,  linewidth=0.25, \
                 alpha=0.8, edgecolor = 'black',facecolor='none', \
                     transform=ccrs.PlateCarree() )
-            ax.add_patch(polygon)                   
+            ax.add_patch(polygon)    
+                           
     #draw base flowline first with black color
     lID = 0 
     for pBasin in self.aBasin:

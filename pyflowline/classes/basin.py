@@ -9,7 +9,7 @@ from pyflowline.classes.edge import pyedge
 from pyflowline.classes.flowline import pyflowline
 from pyflowline.classes.confluence import pyconfluence
 from pyflowline.formats.read_flowline import read_flowline_geojson
-from pyflowline.formats.read_nhdplus_flowline_shapefile import read_nhdplus_flowline_shapefile_attribute
+from pyflowline.formats.read_nhdplus_flowline_shapefile import read_nhdplus_flowline_shapefile_attribute, read_nhdplus_flowline_geojson_attribute
 from pyflowline.formats.read_nhdplus_flowline_shapefile import extract_nhdplus_flowline_shapefile_by_attribute
 from pyflowline.formats.read_nhdplus_flowline_shapefile import track_nhdplus_flowline
 from pyflowline.formats.convert_flowline_to_geojson import convert_flowline_to_geojson
@@ -205,16 +205,20 @@ class pybasin(object):
         sFilename_flowline_filter = self.sFilename_flowline_filter
         sFilename_flowline_filter_geojson = self.sFilename_flowline_filter_geojson
         aFlowline_basin_filtered, pSpatial_reference = read_flowline_geojson( sFilename_flowline_filter_geojson )   
+        print(len(aFlowline_basin_filtered))
         sWorkspace_output_basin = self.sWorkspace_output_basin
         if self.iFlag_dam ==1:
             sFilename_dam = self.sFilename_dam
+            #obtain dam lookup table C
             aData_dam = text_reader_string(sFilename_dam, iSkipline_in =1,cDelimiter_in=',' )
             sFilename_flowline_topo = self.sFilename_flowline_topo
+            #obtain whole topology B
             aData_flowline_topo = text_reader_string(sFilename_flowline_topo, iSkipline_in =1,cDelimiter_in=',' )
             aFromFlowline = aData_flowline_topo[:,1].astype(int).ravel()
             aToFlowline = aData_flowline_topo[:,2].astype(int).ravel()
             sFilename_flowline_raw = self.sFilename_flowline_raw
-            aNHDPlusID_filter = read_nhdplus_flowline_shapefile_attribute(sFilename_flowline_filter)
+            #find A lookup table
+            aNHDPlusID_filter = read_nhdplus_flowline_geojson_attribute(sFilename_flowline_filter)
             aNHDPlusID_raw = read_nhdplus_flowline_shapefile_attribute(sFilename_flowline_raw)
             ndam = len(aData_dam)
             aNHDPlusID_dams_headwater = list()
@@ -223,24 +227,29 @@ class pybasin(object):
                 dLon = float(aData_dam[j][1])
                 dLat = float(aData_dam[j][0])
                 sDam = aData_dam[j][4]            
+                #individual ID
                 lNHDPlusID = int(aData_dam[j][5])
                 aNHDPlusID_dams_headwater.append(lNHDPlusID)
-                if lNHDPlusID in aNHDPlusID_filter:
+                #if lNHDPlusID in aNHDPlusID_filter:
+                if lNHDPlusID in aNHDPlusID_filter: #this is already included in A
                     #remove by id
                     for k in range(len(aFlowline_basin_filtered)):
+                        #remove this flowline by ID
                         if aFlowline_basin_filtered[k].lNHDPlusID == lNHDPlusID:
                             aFlowline_basin_filtered.pop(k)
                             break
                     pass
-                else:                                
+                else:                      
+                    #not in A, so we need to trace it down          
                     aNHDPlusID_dam_nonheadwater = track_nhdplus_flowline(aNHDPlusID_filter, aFromFlowline, aToFlowline, lNHDPlusID)
-                    aNHDPlusID_filter = aNHDPlusID_filter + aNHDPlusID_dams_headwater+ aNHDPlusID_dam_nonheadwater  
+                    aNHDPlusID_filter = aNHDPlusID_filter + aNHDPlusID_dams_headwater + aNHDPlusID_dam_nonheadwater  
                     aNHDPlusID_dams_nonheadwater = aNHDPlusID_dams_nonheadwater + aNHDPlusID_dam_nonheadwater
             aFlowline_dams_headwater = extract_nhdplus_flowline_shapefile_by_attribute(sFilename_flowline_raw, aNHDPlusID_dams_headwater )
             for i in range(len(aFlowline_dams_headwater)):
                 aFlowline_dams_headwater[i].iFlag_dam = 1
             aFlowline_dams_nonheadwater = extract_nhdplus_flowline_shapefile_by_attribute(sFilename_flowline_raw, aNHDPlusID_dams_nonheadwater )
             aFlowline_basin_filtered = aFlowline_basin_filtered + aFlowline_dams_headwater + aFlowline_dams_nonheadwater
+            print(len(aFlowline_basin_filtered))
         else:
             pass
         if self.iFlag_disconnected == 1:

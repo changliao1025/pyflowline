@@ -34,6 +34,36 @@ def read_nhdplus_flowline_shapefile_attribute(sFilename_shapefile_in):
     #aFromNode, aToNode, 
     return aNHDPlusID
 
+def read_nhdplus_flowline_geojson_attribute(sFilename_geojson_in):
+    """
+    convert a shpefile to json format.
+    This function should be used for stream flowline only.
+    """
+
+    iReturn_code = 1
+    if os.path.isfile(sFilename_geojson_in):
+        pass
+    else:
+        print('This geojson does not exist: ', sFilename_geojson_in )
+        iReturn_code = 0
+        return iReturn_code
+
+    aNHDPlusID=list()
+    pDriver_shapefile = ogr.GetDriverByName('GeoJSON')
+   
+    pDataset_shapefile = pDriver_shapefile.Open(sFilename_geojson_in, gdal.GA_ReadOnly)
+    pLayer_shapefile = pDataset_shapefile.GetLayer(0)
+    pSpatialRef_shapefile = pLayer_shapefile.GetSpatialRef()            
+    for pFeature_shapefile in pLayer_shapefile:        
+        pGeometry_in = pFeature_shapefile.GetGeometryRef()
+        sGeometry_type = pGeometry_in.GetGeometryName()        
+        lNHDPlusID = int(pFeature_shapefile.GetField("NHDPlusID"))
+        aNHDPlusID.append(lNHDPlusID)        
+    
+    #we also need to spatial reference
+    #aFromNode, aToNode, 
+    return aNHDPlusID
+
 def extract_nhdplus_flowline_shapefile_by_attribute(sFilename_shapefile_in, aAttribute_in):
     """_summary_
 

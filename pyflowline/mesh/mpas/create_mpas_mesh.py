@@ -3,18 +3,24 @@ import math
 import numpy as np
 from osgeo import ogr, osr
 from netCDF4 import Dataset
+from shapely.wkt import loads
 from pyflowline.classes.mpas import pympas
 from pyflowline.formats.convert_attributes import convert_gcs_attributes_to_cell
 from pyflowline.algorithms.auxiliary.gdal_functions import convert_360_to_180
 
+#def create_mpas_mesh(iFlag_global_in, \
+#    iFlag_use_mesh_dem, \
+#        iFlag_save_mesh_in, \
+#        dLongitude_left_in, dLongitude_right_in,\
+#    dLatitude_top_in, dLatitude_bot_in, \
+#     sFilename_mesh_netcdf_in, \
+#         sFilename_output_in):
 def create_mpas_mesh(iFlag_global_in, \
     iFlag_use_mesh_dem, \
         iFlag_save_mesh_in, \
-        dLongitude_left_in, dLongitude_right_in,\
-    dLatitude_top_in, dLatitude_bot_in, \
+       pPolygon_in, \
      sFilename_mesh_netcdf_in, \
-         sFilename_output_in):
-    
+         sFilename_output_in):    
     if (os.path.exists(sFilename_mesh_netcdf_in)):
         pass
     else:
@@ -167,7 +173,18 @@ def create_mpas_mesh(iFlag_global_in, \
     for i in range(ncell):
         dLat = convert_360_to_180 (aLatitudeCell[i])
         dLon = convert_360_to_180 (aLongitudeCell[i])
-        if dLat > dLatitude_bot_in and dLat < dLatitude_top_in and dLon > dLongitude_left_in and dLon < dLongitude_right_in:
+        pCenter = ogr.Geometry(ogr.wkbPoint)
+        pCenter.AddPoint(dLon, dLat)
+        pCenter1 = loads( pCenter.ExportToWkt() )
+        #old method
+        #if dLat > dLatitude_bot_in and dLat < dLatitude_top_in and dLon > dLongitude_left_in and dLon < dLongitude_right_in:
+
+        #new method;
+        #point_geom = point.GetGeometryRef()
+        #polygon_geom = polygon.GetGeometryRef()
+        #print point_geom.Within(polygon_geom)
+        iFlag = pCenter1.within(pPolygon_in)
+        if ( iFlag == True ):
             #get cell edge
             lCellID = int(aIndexToCellID[i])
             dElevation_mean = float(aBed_elevation[i])

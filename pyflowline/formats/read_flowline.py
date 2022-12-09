@@ -152,7 +152,8 @@ def read_flowline_geojson(sFilename_geojson_in):
     aFlowline=list()
     pDriver_geojson = ogr.GetDriverByName('GeoJSON')   
     if os.path.isfile(sFilename_geojson_in):
-        print(sFilename_geojson_in)
+        #print(sFilename_geojson_in)
+        pass
     else:
         print('This geojson file does not exist: ', sFilename_geojson_in )
         exit()

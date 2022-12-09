@@ -10,6 +10,7 @@ def find_flowline_confluence(aFlowline_in, pVertex_outlet_in):
     aIndex_headwater=list()
     aIndex_confluence=list()
     aIndex_middle =list()
+    lIndex_outlet = -1
     for i in range(0, nFlowline):      
         pFlowline = aFlowline_in[i]
         pVertex_start = pFlowline.pVertex_start
@@ -27,6 +28,7 @@ def find_flowline_confluence(aFlowline_in, pVertex_outlet_in):
         if iFlag_first ==1:
             dDiatance_min = dDiatance                
             lIndex_outlet = i            
+            pVertex_outlet_out =  pVertex
             iFlag_first=0
         else:
             if  dDiatance < dDiatance_min:

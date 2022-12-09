@@ -181,7 +181,7 @@ class pybasin(object):
         else:
             self.sFilename_flowline_topo   =''
 
-        self.sBasinID = sBasinID = "{:03d}".format(self.lBasinID)
+        self.sBasinID  = "{:08d}".format(self.lBasinID)
 
         #geojson
         self.sFilename_flowline_segment_index_before_intersect = 'flowline_segment_index_before_intersect.geojson'
@@ -200,14 +200,14 @@ class pybasin(object):
         return
         
     def flowline_simplification(self):
-
-        
+                
         sFilename_flowline_filter = self.sFilename_flowline_filter
         sFilename_flowline_filter_geojson = self.sFilename_flowline_filter_geojson
         aFlowline_basin_filtered, pSpatial_reference = read_flowline_geojson( sFilename_flowline_filter_geojson )   
-        print(len(aFlowline_basin_filtered))
+        #print(len(aFlowline_basin_filtered))
         sWorkspace_output_basin = self.sWorkspace_output_basin
-        if self.iFlag_dam ==1:
+        if self.iFlag_dam == 1:
+            nFlowline_before = len(aFlowline_basin_filtered)
             sFilename_dam = self.sFilename_dam
             #obtain dam lookup table C
             aData_dam = text_reader_string(sFilename_dam, iSkipline_in =1,cDelimiter_in=',' )
@@ -249,8 +249,10 @@ class pybasin(object):
                 aFlowline_dams_headwater[i].iFlag_dam = 1
             aFlowline_dams_nonheadwater = extract_nhdplus_flowline_shapefile_by_attribute(sFilename_flowline_raw, aNHDPlusID_dams_nonheadwater )
             aFlowline_basin_filtered = aFlowline_basin_filtered + aFlowline_dams_headwater + aFlowline_dams_nonheadwater
-            print(len(aFlowline_basin_filtered))
+            nFlowline_after = len(aFlowline_basin_filtered)
+            print('Basin ',  self.sBasinID, ' has dam', nFlowline_before, nFlowline_after)
         else:
+            print('Basin ',  self.sBasinID, ' has no dam')
             pass
         if self.iFlag_disconnected == 1:
             #not used anymore                
@@ -282,7 +284,7 @@ class pybasin(object):
             sFilename_out = 'flowline_split_by_point_before_intersect.geojson'
             sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
             export_flowline_to_geojson(aFlowline_basin_simplified, sFilename_out)
-        #ues location to find outlet
+        #use location to find outlet
         point= dict()   
         point['dLongitude_degree'] = self.dLongitude_outlet_degree
         point['dLatitude_degree'] = self.dLatitude_outlet_degree
@@ -430,6 +432,9 @@ class pybasin(object):
         if aIndex_confluence.size > 0:        
             aVertex_confluence = aVertex[aIndex_confluence] 
             self.aConfluence_basin_conceptual = self.build_confluence(aFlowline_basin_conceptual, aVertex_confluence) 
+        else:
+            #there is no confluence
+            pass
           
 
         #edge based
@@ -568,8 +573,8 @@ class pybasin(object):
         return
 
     def export_confluence_info_to_json(self):
-        iFlag_export_confluence =0
-        if iFlag_export_confluence==1:
+        #iFlag_export_confluence =0
+        if self.aConfluence_basin_simplified is not None:
             sFilename_json = self.sFilename_confluence_simplified_info
             sFilename_json = os.path.join(str(Path(self.sWorkspace_output_basin)  ) , sFilename_json  )
             with open(sFilename_json, 'w', encoding='utf-8') as f:
@@ -577,13 +582,15 @@ class pybasin(object):
                 f.write(sJson)    
                 f.close()
 
-        sFilename_json = self.sFilename_confluence_conceptual_info
-        sFilename_json = os.path.join(str(Path(self.sWorkspace_output_basin)  ) , sFilename_json  )
-        
-        with open(sFilename_json, 'w', encoding='utf-8') as f:
-            sJson = json.dumps([json.loads(ob.tojson()) for ob in self.aConfluence_basin_conceptual], indent = 4)        
-            f.write(sJson)    
-            f.close()
+        if self.aConfluence_basin_conceptual is not None:
+            sFilename_json = self.sFilename_confluence_conceptual_info
+            sFilename_json = os.path.join(str(Path(self.sWorkspace_output_basin)  ) , sFilename_json  )
+
+            with open(sFilename_json, 'w', encoding='utf-8') as f:
+                sJson = json.dumps([json.loads(ob.tojson()) for ob in self.aConfluence_basin_conceptual], indent = 4)        
+                f.write(sJson)    
+                f.close()
+                
         return   
 
     def tojson(self):
@@ -626,7 +633,7 @@ class pybasin(object):
     def convert_flowline_to_geojson(self):
         sFilename_raw = self.sFilename_flowline_filter            
         sFilename_out = self.sFilename_flowline_filter_geojson
-        print('This is the filtered flowline:', sFilename_raw )
+        print('Basin '+ self.sBasinID + ': initial flowline:', sFilename_raw )
         convert_flowline_to_geojson(1, sFilename_raw, sFilename_out)
         
     def calculate_flowline_length(self, aFlowline_in):

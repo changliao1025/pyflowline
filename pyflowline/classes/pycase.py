@@ -6,6 +6,7 @@ from json import JSONEncoder
 import datetime
 import numpy as np
 from osgeo import ogr, osr
+from shapely.wkt import loads
 from pyflowline.classes.mpas import pympas
 from pyflowline.classes.hexagon import pyhexagon
 from pyflowline.classes.latlon import pylatlon
@@ -316,12 +317,10 @@ class flowlinecase(object):
                 with open(self.sFilename_basins) as json_file:
                     dummy_data = json.load(json_file)     
                     for i in range(self.nOutlet):
-                        sBasin =  "{:04d}".format(i+1)   
+                        sBasin =  "{:08d}".format(i+1)   
                         dummy_basin = dummy_data[i]
-                        dummy_basin['sWorkspace_output_basin'] = str(Path(self.sWorkspace_output) /     sBasin )
-
+                        dummy_basin['sWorkspace_output_basin'] = str(Path(self.sWorkspace_output) / sBasin )
                         pBasin = pybasin(dummy_basin)
-
                         self.aBasin.append(pBasin)
             else:
                 pass
@@ -349,7 +348,8 @@ class flowlinecase(object):
         #export the outlet into a single file
         aOutlet = list()
         if self.iFlag_simplification == 1: 
-            for pBasin in self.aBasin:
+            for i in range(0, self.nOutlet,1):
+                pBasin = self.aBasin[i]
                 aFlowline_basin = pBasin.flowline_simplification()                
                 aFlowline_out = aFlowline_out + aFlowline_basin
                 aOutlet.append(pBasin.pVertex_outlet)
@@ -482,7 +482,7 @@ class flowlinecase(object):
                             dLongitude_right = self.dLongitude_right
 
                             if iFlag_mesh_boundary ==1:
-                                #create a pBoundarygon based on 
+                                #create a polygon based on 
                                 #read boundary 
                                 pBoundary = read_mesh_boundary(self.sFilename_mesh_boundary)
 
@@ -496,17 +496,18 @@ class flowlinecase(object):
                                 pRing.AddPoint(dLongitude_right, dLatitude_bot)
                                 pRing.AddPoint(dLongitude_left, dLatitude_bot)
                                 pRing.AddPoint(dLongitude_left, dLatitude_top)
-                                pBoundary = ogr.Geometry(ogr.wkbpBoundarygon)
+                                pBoundary = ogr.Geometry(ogr.wkbPolygon)
                                 pBoundary.AddGeometry(pRing)
+                                pBoundary_rec = loads( pBoundary.ExportToWkt() )
 
                                 #old method using rectange
                                 #aMpas = create_mpas_mesh(iFlag_global, iFlag_use_mesh_dem, iFlag_save_mesh, \
                                 #  dLongitude_left, dLongitude_right,  dLatitude_top, dLatitude_bot, \
                                 #        sFilename_mesh_netcdf,      sFilename_mesh)
 
-                                #new method using pBoundarygon object
+                                #new method using polygon object
                                 aMpas = create_mpas_mesh(iFlag_global, iFlag_use_mesh_dem, iFlag_save_mesh, \
-                                  pBoundary,       sFilename_mesh_netcdf,      sFilename_mesh)
+                                  pBoundary_rec,       sFilename_mesh_netcdf,      sFilename_mesh)
                             return aMpas
                         else:
                             if iMesh_type ==5: #tin this one need to be updated because central location issue

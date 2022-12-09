@@ -22,7 +22,11 @@ def merge_flowline(aFlowline_in, aVertex_in, \
     aVertex_headwater=aVertex[aIndex_headwater]    
     aVertex_middle=aVertex[aIndex_middle]   
     if aIndex_confluence.size > 0:        
+        iFlag_confluence = 1
         aVertex_confluence=aVertex[aIndex_confluence]    
+    else:
+        iFlag_confluence = 0
+        pass
     
     def merge_flowline_reach(lIndex_in, pVertex_start_in, pVertex_end_in):
         global lID
@@ -61,6 +65,7 @@ def merge_flowline(aFlowline_in, aVertex_in, \
                         merge_flowline_reach(k, pVertex_start, pVertex_end)
                                 
     
+    #find outlet
     iFlag_first=1
     for i in range(nFlowline):        
         pFlowline = aFlowline_in[i]                
@@ -83,16 +88,21 @@ def merge_flowline(aFlowline_in, aVertex_in, \
     pVertex_start = pFlowline.pVertex_start
     pVertex_end = pFlowline.pVertex_end   
 
-    if  (find_vertex_in_list(aVertex_confluence, pVertex_end)[0] ==1):
-        for i in range(nFlowline):
-            pFlowline = aFlowline_in[i]  
-            pVertex_start_dummy = pFlowline.pVertex_start
-            pVertex_end_dummy = pFlowline.pVertex_end
+    #now start from outlet
+    if iFlag_confluence == 1:
+        #check whether outlet is a confluence
+        if  (find_vertex_in_list(aVertex_confluence, pVertex_end)[0] ==1):
+            for i in range(nFlowline):
+                pFlowline = aFlowline_in[i]  
+                pVertex_start_dummy = pFlowline.pVertex_start
+                pVertex_end_dummy = pFlowline.pVertex_end
 
-            if pVertex_end == pVertex_end_dummy:
-                #this is 
-                merge_flowline_reach(i, pVertex_start_dummy, pVertex_end_dummy)  
-        pass
+                if pVertex_end == pVertex_end_dummy:
+                    #this is 
+                    merge_flowline_reach(i, pVertex_start_dummy, pVertex_end_dummy)  
+            pass
+        else:
+            merge_flowline_reach(lIndex_outlet, pVertex_start, pVertex_end)   
     else:
         merge_flowline_reach(lIndex_outlet, pVertex_start, pVertex_end)   
     return aFlowline_out

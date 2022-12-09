@@ -8,13 +8,7 @@ from pyflowline.classes.mpas import pympas
 from pyflowline.formats.convert_attributes import convert_gcs_attributes_to_cell
 from pyflowline.algorithms.auxiliary.gdal_functions import convert_360_to_180
 
-#def create_mpas_mesh(iFlag_global_in, \
-#    iFlag_use_mesh_dem, \
-#        iFlag_save_mesh_in, \
-#        dLongitude_left_in, dLongitude_right_in,\
-#    dLatitude_top_in, dLatitude_bot_in, \
-#     sFilename_mesh_netcdf_in, \
-#         sFilename_output_in):
+
 def create_mpas_mesh(iFlag_global_in, \
     iFlag_use_mesh_dem, \
         iFlag_save_mesh_in, \

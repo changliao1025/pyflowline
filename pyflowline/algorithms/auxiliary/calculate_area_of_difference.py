@@ -4,7 +4,8 @@ from osgeo import ogr, osr
 from shapely.ops import polygonize
 from pyflowline.algorithms.auxiliary.gdal_functions import  calculate_angle_betwen_vertex_normal
 from pyflowline.algorithms.auxiliary.gdal_functions import calculate_polygon_area
-from pyflowline.algorithms.auxiliary.find_index_in_list import find_list_in_list, find_vertex_in_list
+from pyflowline.algorithms.auxiliary.find_index_in_list import find_list_in_list #, find_vertex_in_list
+from pyflowline.algorithms.cython.kernel import find_vertex_in_list
 
 def calculate_area_of_difference_raw(sFilename_a, sFilename_b):
     #not yet supported

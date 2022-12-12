@@ -82,9 +82,10 @@ class pyflowline(object):
     def calculate_length(self):
         dLength =0.0
         #loop though
-        for edge in self.aEdge:
-            edge.calculate_length()
-            dLength = dLength + edge.dLength
+        for i in range(self.nEdge):
+        #for edge in self.aEdge:
+            self.aEdge[i].calculate_length()
+            dLength = dLength + self.aEdge[i].dLength
 
         #assing
         self.dLength= dLength

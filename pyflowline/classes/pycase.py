@@ -348,7 +348,7 @@ class flowlinecase(object):
         #export the outlet into a single file
         aOutlet = list()
         if self.iFlag_simplification == 1: 
-            for i in range(0, self.nOutlet,1):
+            for i in range(self.nOutlet):
                 pBasin = self.aBasin[i]
                 aFlowline_basin = pBasin.flowline_simplification()                
                 aFlowline_out = aFlowline_out + aFlowline_basin
@@ -360,6 +360,7 @@ class flowlinecase(object):
         return aFlowline_out
     
     def mesh_generation(self):      
+        print('Start mesh generation.')
         aCell_out = list()  
         if self.iFlag_create_mesh ==1:
             iFlag_global =  self.iFlag_global
@@ -530,9 +531,11 @@ class flowlinecase(object):
             iMesh_type = self.iMesh_type
             aCell_out = read_mesh_json_w_topology(iMesh_type, self.sFilename_mesh)
             pass
+        print('Finish mesh generation.')
         return aCell_out
     
     def reconstruct_topological_relationship(self, aCell_raw):
+        print('Start topology reconstruction.')
         iFlag_intersect = self.iFlag_intersect
         if iFlag_intersect == 1:
             iMesh_type = self.iMesh_type        
@@ -591,9 +594,10 @@ class flowlinecase(object):
             
             self.aFlowline_conceptual = aFlowline_conceptual
             self.aCellID_outlet = aCellID_outlet
-
+            print('Finish topology reconstruction.')
             return self.aCell, aFlowline_conceptual, aCellID_outlet
         else:
+            
             return None
             
     def merge_cell_info(self, aCell_raw):

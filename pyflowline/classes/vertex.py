@@ -3,7 +3,9 @@ import numpy as np
 import json
 from json import JSONEncoder
 #from pyflowline.classes.nvector import pynvector
-from pyflowline.algorithms.auxiliary.gdal_functions import calculate_distance_based_on_lon_lat
+#from pyflowline.algorithms.auxiliary.gdal_functions import calculate_distance_based_on_lon_lat
+
+from pyflowline.algorithms.cython.kernel import calculate_distance_based_on_lon_lat
 
 class VertexClassEncoder(JSONEncoder):
     def default(self, obj):
@@ -72,6 +74,7 @@ class pyvertex(object):
         
         c = self.calculate_distance(other)
         if( c < 1.0E-6 ): #be careful
+            #print(self.dLongitude_degree ,self.dLatitude_degree , other.dLongitude_degree, other.dLatitude_degree)
             iFlag = 1
         else:
             iFlag = 0       

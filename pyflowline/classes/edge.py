@@ -4,8 +4,12 @@ from json import JSONEncoder
 import numpy as np
 from pyflowline.classes.vertex import pyvertex
 from pyflowline.algorithms.split.split_by_length import split_edge_by_length
-from pyflowline.algorithms.auxiliary.gdal_functions import  calculate_angle_betwen_vertex, \
-    calculate_polygon_area, calculate_distance_to_plane
+#from pyflowline.algorithms.auxiliary.gdal_functions import  calculate_angle_betwen_vertex
+#from pyflowline.algorithms.auxiliary.gdal_functions import  calculate_polygon_area
+#from pyflowline.algorithms.auxiliary.gdal_functions import calculate_distance_to_plane
+
+from pyflowline.algorithms.cython.kernel import calculate_angle_betwen_vertex
+from pyflowline.algorithms.cython.kernel import calculate_distance_to_plane
 
 class EdgeClassEncoder(JSONEncoder):
     def default(self, obj):
@@ -146,7 +150,7 @@ class pyedge(object):
                  pVertex_end.dLongitude_degree,pVertex_end.dLatitude_degree)
             lons = [pVertex_start.dLongitude_degree,pVertex_in.dLongitude_degree,pVertex_end.dLongitude_degree]
             lats = [pVertex_start.dLatitude_degree, pVertex_in.dLatitude_degree, pVertex_end.dLatitude_degree]
-            dArea = calculate_polygon_area(lons, lats)
+            #dArea = calculate_polygon_area(lons, lats)
 
             if  angle3deg > 178 and d3 < 1.0: #care
                 iFlag = 1

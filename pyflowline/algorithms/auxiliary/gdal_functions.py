@@ -6,6 +6,8 @@ from osgeo import ogr, osr, gdal
 from shapely.wkt import loads
 #most of these functions are copied from the pyearth package
 
+from pyflowline.algorithms.cython.kernel import longlat_to_3d
+
 #https://stackoverflow.com/questions/8204998/how-to-check-if-a-pointlonc-latc-lie-on-a-great-circle-running-from-lona-lata
 def calculate_distance_to_plane(x1, y1, x2, y2, x3, y3):
     

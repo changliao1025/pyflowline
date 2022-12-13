@@ -56,9 +56,7 @@ def intersect_flowline_with_vertex( sFilename_flowline_in, sFilename_vertex_in, 
        
         #pFeature_mesh= pLayer_mesh.GetFeature(i)
         pGeometry_flowline = pFeature_flowline.GetGeometryRef()        
-        dummy0 = loads( pGeometry_flowline.ExportToWkt() )
-        aCoords_gcs = dummy0.coords
-        aCoords_gcs= np.array(aCoords_gcs)       
+      
 
         if (iFlag_transform ==1): #projections are different
             pGeometry_flowline.Transform(transform)

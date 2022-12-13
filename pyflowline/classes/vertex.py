@@ -71,9 +71,9 @@ class pyvertex(object):
     
     def __eq__(self, other):
         iFlag = -1
-        
+        dThreshold_in = 1.0E-6        
         c = self.calculate_distance(other)
-        if( c < 1.0E-6 ): #be careful
+        if( c <= dThreshold_in ): #be careful
             #print(self.dLongitude_degree ,self.dLatitude_degree , other.dLongitude_degree, other.dLatitude_degree)
             iFlag = 1
         else:

@@ -1,13 +1,11 @@
 import numpy as np 
 from pyflowline.algorithms.auxiliary.check_head_water import check_head_water
 lID=0
-aFlag_process=None
-aFlowline_out= list() 
-def correct_flowline_direction(aFlowline_in, pVertex_outlet_in):        
+def correct_flowline_direction(aFlowline_in, pVertex_outlet_in):    
+    aFlowline_out= list()     
     #we have to go reversely    
-    global aFlowline_out
+    aFlag_process=None
     global lID    
-    global aFlag_process     
     nFlowline = len(aFlowline_in)
     aFlag_process=np.full(nFlowline, 0, dtype =int)
     iFlag_first = 1
@@ -40,7 +38,6 @@ def correct_flowline_direction(aFlowline_in, pVertex_outlet_in):
     pVertex_start = pFlowline.pVertex_start
     pVertex_end = pFlowline.pVertex_end
     lID = lID + 1    
-
     #we might find more than 1 upstream    
     def find_upstream_flowline(pVertex_start_in, pVertex_end_in):
         nUpstream = 0 
@@ -72,7 +69,7 @@ def correct_flowline_direction(aFlowline_in, pVertex_outlet_in):
     
     
     def tag_upstream(pVertex_start_in, pVertex_end_in):
-        global aFlowline_out
+        
         global lID
         if(check_head_water(aFlowline_in, pVertex_start_in)==1):            
             pass

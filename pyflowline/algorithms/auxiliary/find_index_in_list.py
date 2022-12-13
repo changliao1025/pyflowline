@@ -174,28 +174,28 @@ def check_if_duplicates(aList_in):
     return iFlag_unique
 
 
-def add_unique_vertex(aVertex_in, pVertex_in):
-    """[add a vertex to a list if it is not already included]
-
-    Args:
-        aVertex_in ([type]): [description]
-        pVertex_in ([type]): [description]
-
-    Returns:
-        [type]: [description]
-    """
-    iFlag_exist = 0
-    nVertex = len(aVertex_in)     
-
-    iFlag_exist, dummy =  find_vertex_in_list(aVertex_in, pVertex_in)
-
-    if iFlag_exist == 1:
-        pass
-    else:
-        aVertex_in.append(pVertex_in)
-        pass
-
-    return aVertex_in, iFlag_exist
+#def add_unique_vertex(aVertex_in, pVertex_in):
+#    """[add a vertex to a list if it is not already included]
+#
+#    Args:
+#        aVertex_in ([type]): [description]
+#        pVertex_in ([type]): [description]
+#
+#    Returns:
+#        [type]: [description]
+#    """
+#    iFlag_exist = 0
+#    nVertex = len(aVertex_in)     
+#
+#    iFlag_exist, dummy =  find_vertex_in_list(aVertex_in, pVertex_in)
+#
+#    if iFlag_exist == 1:
+#        pass
+#    else:
+#        aVertex_in.append(pVertex_in)
+#        pass
+#
+#    return aVertex_in, iFlag_exist
 
 
 def find_list_in_list(aList_in, pList_in):

@@ -56,7 +56,7 @@ cpdef  convert_360_to_180(double dLongitude_in):
     return dLongitude_out
 
 @cython.boundscheck(False)  # deactivate bnds checking
-cpdef  find_vertex_in_list(list aVertex_in, pVertex_in):
+cpdef  find_vertex_in_list(list aVertex_in, pVertex_in, double dThreshold_in = 1.0E-6):
     """[find the index of a vertex in a list]
 
     Args:
@@ -70,13 +70,16 @@ cpdef  find_vertex_in_list(list aVertex_in, pVertex_in):
     cdef int iFlag_exist = 0
     cdef int lIndex= -1
     cdef int nVertex
+    cdef double dDistance
     nVertex= len(aVertex_in)
 
     if nVertex > 0 :
 
         for i in range(nVertex):
             pVertex = aVertex_in[i]
-            if pVertex == pVertex_in:
+            dDistance = pVertex.calculate_distance(pVertex_in)
+            #if pVertex == pVertex_in:
+            if dDistance < dThreshold_in:
                 iFlag_exist = 1      
                 lIndex = i 
                 break                
@@ -128,7 +131,7 @@ cpdef find_vertex_on_edge(list aVertex_in, pEdge_in):
     return iFlag_exist, npoint , aIndex_order
 
 @cython.boundscheck(False)  # deactivate bnds checking
-cpdef add_unique_vertex(list aVertex_in, pVertex_in):
+cpdef add_unique_vertex(list aVertex_in, pVertex_in, double dThreshold_in = 1.0E-6):
     """[add a vertex to a list if it is not already included]
 
     Args:
@@ -144,7 +147,7 @@ cpdef add_unique_vertex(list aVertex_in, pVertex_in):
     iFlag_exist = 0
     nVertex = len(aVertex_in)     
 
-    iFlag_exist, dummy =  find_vertex_in_list(aVertex_in, pVertex_in)
+    iFlag_exist, dummy =  find_vertex_in_list(aVertex_in, pVertex_in, dThreshold_in)
 
     if iFlag_exist == 1:
         pass

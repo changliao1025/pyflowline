@@ -1,7 +1,9 @@
 
 import numpy as np
-from pyflowline.algorithms.auxiliary.find_index_in_list import find_vertex_in_list
-from pyflowline.algorithms.auxiliary.find_index_in_list import add_unique_vertex
+#from pyflowline.algorithms.auxiliary.find_index_in_list import find_vertex_in_list
+#from pyflowline.algorithms.auxiliary.find_index_in_list import add_unique_vertex
+from pyflowline.algorithms.cython.kernel import find_vertex_in_list
+from pyflowline.algorithms.cython.kernel import add_unique_vertex
 from pyflowline.algorithms.auxiliary.check_head_water import check_head_water
 
 def find_flowline_confluence(aFlowline_in, pVertex_outlet_in):    
@@ -10,6 +12,7 @@ def find_flowline_confluence(aFlowline_in, pVertex_outlet_in):
     aIndex_headwater=list()
     aIndex_confluence=list()
     aIndex_middle =list()
+    lIndex_outlet = -1
     for i in range(0, nFlowline):      
         pFlowline = aFlowline_in[i]
         pVertex_start = pFlowline.pVertex_start
@@ -27,6 +30,7 @@ def find_flowline_confluence(aFlowline_in, pVertex_outlet_in):
         if iFlag_first ==1:
             dDiatance_min = dDiatance                
             lIndex_outlet = i            
+            pVertex_outlet_out =  pVertex
             iFlag_first=0
         else:
             if  dDiatance < dDiatance_min:

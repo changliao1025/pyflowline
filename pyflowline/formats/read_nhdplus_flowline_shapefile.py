@@ -34,6 +34,36 @@ def read_nhdplus_flowline_shapefile_attribute(sFilename_shapefile_in):
     #aFromNode, aToNode, 
     return aNHDPlusID
 
+def read_nhdplus_flowline_geojson_attribute(sFilename_geojson_in):
+    """
+    convert a shpefile to json format.
+    This function should be used for stream flowline only.
+    """
+
+    iReturn_code = 1
+    if os.path.isfile(sFilename_geojson_in):
+        pass
+    else:
+        print('This geojson does not exist: ', sFilename_geojson_in )
+        iReturn_code = 0
+        return iReturn_code
+
+    aNHDPlusID=list()
+    pDriver_shapefile = ogr.GetDriverByName('GeoJSON')
+   
+    pDataset_shapefile = pDriver_shapefile.Open(sFilename_geojson_in, gdal.GA_ReadOnly)
+    pLayer_shapefile = pDataset_shapefile.GetLayer(0)
+    pSpatialRef_shapefile = pLayer_shapefile.GetSpatialRef()            
+    for pFeature_shapefile in pLayer_shapefile:        
+        pGeometry_in = pFeature_shapefile.GetGeometryRef()
+        sGeometry_type = pGeometry_in.GetGeometryName()        
+        lNHDPlusID = int(pFeature_shapefile.GetField("NHDPlusID"))
+        aNHDPlusID.append(lNHDPlusID)        
+    
+    #we also need to spatial reference
+    #aFromNode, aToNode, 
+    return aNHDPlusID
+
 def extract_nhdplus_flowline_shapefile_by_attribute(sFilename_shapefile_in, aAttribute_in):
     """_summary_
 
@@ -77,7 +107,8 @@ def extract_nhdplus_flowline_shapefile_by_attribute(sFilename_shapefile_in, aAtt
     for pFeature_shapefile in pLayer_shapefile:        
         pGeometry_in = pFeature_shapefile.GetGeometryRef()
         sGeometry_type = pGeometry_in.GetGeometryName()       
-        lNHDPlusID = int(pFeature_shapefile.GetField("NHDPlusID"))            
+        lNHDPlusID = int(pFeature_shapefile.GetField("NHDPlusID"))        
+        
         if (iFlag_transform ==1): 
             pGeometry_in.Transform(pTransform)
         if (pGeometry_in.IsValid()):
@@ -85,12 +116,15 @@ def extract_nhdplus_flowline_shapefile_by_attribute(sFilename_shapefile_in, aAtt
         else:
             print('Geometry issue')
         if lNHDPlusID in aAttribute_in:
+            
             if(sGeometry_type == 'MULTILINESTRING'):
                 nLine = pGeometry_in.GetGeometryCount()
                 for i in range(nLine):
                     Line = pGeometry_in.GetGeometryRef(i)
-                    dummy = loads( Line.ExportToWkt() )
-                    aCoords = dummy.coords                    
+                    aCoords = list()
+                    for i in range(0,  Line.GetPointCount()):                   
+                        pt = Line.GetPoint(i)
+                        aCoords.append( [ pt[0], pt[1]])                      
                     dummy1= np.array(aCoords)
                     pLine = convert_gcs_coordinates_to_flowline(dummy1)
                     pLine.lIndex = lID                    
@@ -98,8 +132,10 @@ def extract_nhdplus_flowline_shapefile_by_attribute(sFilename_shapefile_in, aAtt
                     lID = lID + 1
             else:
                 if sGeometry_type =='LINESTRING':
-                    dummy = loads( pGeometry_in.ExportToWkt() )
-                    aCoords = dummy.coords                   
+                    aCoords = list()
+                    for i in range(0, pGeometry_in.GetPointCount()):                   
+                        pt = pGeometry_in.GetPoint(i)
+                        aCoords.append( [ pt[0], pt[1]])                  
                     dummy1= np.array(aCoords)
                     pLine = convert_gcs_coordinates_to_flowline(dummy1)
                     pLine.lIndex = lID                    
@@ -132,8 +168,7 @@ def track_nhdplus_flowline(aNHDPlusID_filter_in, aFromFlowline_in, aToFlowline_i
                         lNHDPlusID_to = aToFlowline_in[dummy_index[0][i]   ]                    
                         if lNHDPlusID_to==0:
                             pass
-                        else:
-                       
+                        else:                       
                             tag_downstream(lNHDPlusID_to)
         return 
 

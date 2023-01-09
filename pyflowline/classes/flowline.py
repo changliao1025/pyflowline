@@ -82,9 +82,10 @@ class pyflowline(object):
     def calculate_length(self):
         dLength =0.0
         #loop though
-        for edge in self.aEdge:
-            edge.calculate_length()
-            dLength = dLength + edge.dLength
+        for i in range(self.nEdge):
+        #for edge in self.aEdge:
+            self.aEdge[i].calculate_length()
+            dLength = dLength + self.aEdge[i].dLength
 
         #assing
         self.dLength= dLength
@@ -190,6 +191,23 @@ class pyflowline(object):
         #is this necessary
         #pFlowline_out.iStream_segment = self.iStream_segment
 
+        return pFlowline_out
+    
+    def split_by_length(self, dDistance):
+        aEdge=list()
+        pFlowline_out=None
+        for edge in self.aEdge:
+            edge.calculate_length()
+            if edge.dLength > dDistance:
+                #break it
+                aEdge0=edge.split_by_length(dDistance)
+                for edge0 in aEdge0:
+                    aEdge.append(edge0)
+                pass
+            else:
+                aEdge.append(edge)
+                pass
+        pFlowline_out=pyflowline(aEdge)
         return pFlowline_out
 
     def calculate_flowline_sinuosity(self):

@@ -2,7 +2,10 @@
 import numpy as np
 from pyflowline.classes.edge import pyedge
 from pyflowline.classes.flowline import pyflowline
-from pyflowline.algorithms.auxiliary.find_index_in_list import find_vertex_in_list, find_vertex_on_edge
+#from pyflowline.algorithms.auxiliary.find_index_in_list import find_vertex_on_edge
+from pyflowline.algorithms.cython.kernel import find_vertex_on_edge
+from pyflowline.algorithms.cython.kernel import find_vertex_in_list
+
 def split_flowline(aFlowline_in, aVertex_in, iFlag_intersect = None, iFlag_use_id=None):
     aFlowline_out = list()
     nFlowline = len(aFlowline_in)
@@ -59,7 +62,7 @@ def split_flowline(aFlowline_in, aVertex_in, iFlag_intersect = None, iFlag_use_i
                             aVertex_all.append(pVertex_dummy)
 
                 else:
-                    iFlag_exist, npoint, aIndex = find_vertex_on_edge( aVertex_in,  pEdge)
+                    iFlag_exist, npoint, aIndex = find_vertex_on_edge( aVertex_in, pEdge)
                     #they must be ordered
                     if iFlag_exist==1:
                         for m in range(npoint):

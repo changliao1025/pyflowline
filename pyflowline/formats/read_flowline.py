@@ -51,8 +51,10 @@ def read_flowline_shapefile(sFilename_shapefile_in):
             nLine = pGeometry_in.GetGeometryCount()
             for i in range(nLine):
                 Line = pGeometry_in.GetGeometryRef(i)
-                dummy = loads( Line.ExportToWkt() )
-                aCoords = dummy.coords                
+                aCoords = list()
+                for i in range(0,  Line.GetPointCount()):                   
+                    pt = Line.GetPoint(i)
+                    aCoords.append( [ pt[0], pt[1]])       
                 dummy1= np.array(aCoords)
                 pLine = convert_gcs_coordinates_to_flowline(dummy1)
                 pLine.lIndex = lID
@@ -62,8 +64,10 @@ def read_flowline_shapefile(sFilename_shapefile_in):
                
         else:
             if sGeometry_type =='LINESTRING':
-                dummy = loads( pGeometry_in.ExportToWkt() )
-                aCoords = dummy.coords                
+                aCoords = list()
+                for i in range(0, pGeometry_in.GetPointCount()):                   
+                    pt = pGeometry_in.GetPoint(i)
+                    aCoords.append( [ pt[0], pt[1]])                
                 dummy1= np.array(aCoords)
                 pLine = convert_gcs_coordinates_to_flowline(dummy1)
                 pLine.lIndex = lID
@@ -117,8 +121,10 @@ def read_flowline_shapefile_swat(sFilename_shapefile_in):
             nLine = pGeometry_in.GetGeometryCount()
             for i in range(nLine):
                 Line = pGeometry_in.GetGeometryRef(i) 
-                dummy = loads( Line.ExportToWkt() )
-                aCoords = dummy.coords      
+                aCoords = list()
+                for i in range(0,  Line.GetPointCount()):                   
+                    pt = Line.GetPoint(i)
+                    aCoords.append( [ pt[0], pt[1]])    
                 dummy1= np.array(aCoords)
                 pLine = convert_gcs_coordinates_to_flowline(dummy1)
                 pLine.lIndex = lID            
@@ -127,8 +133,10 @@ def read_flowline_shapefile_swat(sFilename_shapefile_in):
                
         else:
             if sGeometry_type =='LINESTRING':
-                dummy = loads( pGeometry_in.ExportToWkt() )
-                aCoords = dummy.coords               
+                aCoords = list()
+                for i in range(0, pGeometry_in.GetPointCount()):                   
+                    pt = pGeometry_in.GetPoint(i)
+                    aCoords.append( [ pt[0], pt[1]])               
                 dummy1= np.array(aCoords)
                 pLine = convert_gcs_coordinates_to_flowline(dummy1)
                 pLine.lIndex = lID       
@@ -152,7 +160,8 @@ def read_flowline_geojson(sFilename_geojson_in):
     aFlowline=list()
     pDriver_geojson = ogr.GetDriverByName('GeoJSON')   
     if os.path.isfile(sFilename_geojson_in):
-        print(sFilename_geojson_in)
+        #print(sFilename_geojson_in)
+        pass
     else:
         print('This geojson file does not exist: ', sFilename_geojson_in )
         exit()
@@ -202,8 +211,11 @@ def read_flowline_geojson(sFilename_geojson_in):
             nLine = pGeometry_in.GetGeometryCount()
             for i in range(nLine):
                 Line = pGeometry_in.GetGeometryRef(i)
-                dummy = loads( Line.ExportToWkt() )   
-                aCoords = dummy.coords                
+       
+                aCoords = list()
+                for i in range(0,  Line.GetPointCount()):                   
+                    pt = Line.GetPoint(i)
+                    aCoords.append( [ pt[0], pt[1]])                
                 dummy1= np.array(aCoords)
                 pLine = convert_gcs_coordinates_to_flowline(dummy1)
                 pLine.lIndex = lID
@@ -214,8 +226,11 @@ def read_flowline_geojson(sFilename_geojson_in):
         
         else:
             if sGeometry_type =='LINESTRING':
-                dummy = loads( pGeometry_in.ExportToWkt() )
-                aCoords = dummy.coords
+                  
+                aCoords = list()
+                for i in range(0, pGeometry_in.GetPointCount()):                   
+                    pt = pGeometry_in.GetPoint(i)
+                    aCoords.append( [ pt[0], pt[1]])               
                 dummy1= np.array(aCoords)
                 pLine = convert_gcs_coordinates_to_flowline(dummy1)
                 pLine.lIndex = lID

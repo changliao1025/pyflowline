@@ -28,9 +28,9 @@ def convert_flowline_to_geojson(iFlag_type_in, sFilename_geojson_in, sFilename_g
             #convert it
 
             iFlag_projected = 0
-            pSpatial_reference_gcs = osr.SpatialReference()
-            pSpatial_reference_gcs.ImportFromEPSG(4326)
-            pSpatial_reference_gcs.SetAxisMappingStrategy(osr.OAMS_TRADITIONAL_GIS_ORDER)
+            #pSpatial_reference_gcs = osr.SpatialReference()
+            #pSpatial_reference_gcs.ImportFromEPSG(4326)
+            #pSpatial_reference_gcs.SetAxisMappingStrategy(osr.OAMS_TRADITIONAL_GIS_ORDER)
             export_flowline_to_geojson(aFlowline_basin, sFilename_geojson_out)
         else:
             if iFlag_type_in == 2:
@@ -55,8 +55,7 @@ def convert_shapefile_to_geojson(iFlag_type_in, sFilename_shapefile_in, sFilenam
         iReturn_code = 0
         return iReturn_code
 
-
-    if iFlag_type_in ==0:
+    if iFlag_type_in == 0:
         pass
     else:
         if iFlag_type_in == 1:

@@ -4,8 +4,10 @@ import json
 from json import JSONEncoder
 from pyflowline.classes.vertex import pyvertex
 from pyflowline.classes.flowline import pyflowline
-from pyflowline.algorithms.auxiliary.gdal_functions import calculate_distance_based_on_lon_lat
-from pyflowline.algorithms.auxiliary.gdal_functions import  calculate_angle_betwen_vertex
+
+#from pyflowline.algorithms.auxiliary.gdal_functions import  calculate_angle_betwen_vertex
+
+from pyflowline.algorithms.cython.kernel import calculate_angle_betwen_vertex
 
 class ConfluenceClassEncoder(JSONEncoder):
     def default(self, obj):

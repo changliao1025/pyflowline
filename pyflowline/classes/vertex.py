@@ -2,7 +2,10 @@ from abc import ABCMeta
 import numpy as np
 import json
 from json import JSONEncoder
-from pyflowline.algorithms.auxiliary.gdal_functions import calculate_distance_based_on_lon_lat
+#from pyflowline.classes.nvector import pynvector
+#from pyflowline.algorithms.auxiliary.gdal_functions import calculate_distance_based_on_lon_lat
+
+from pyflowline.algorithms.cython.kernel import calculate_distance_based_on_lon_lat
 
 class VertexClassEncoder(JSONEncoder):
     def default(self, obj):
@@ -39,16 +42,39 @@ class pyvertex(object):
         try:     
             self.dLongitude_degree      = float(aParameter['dLongitude_degree'])                 
             self.dLatitude_degree       = float(aParameter['dLatitude_degree'])
+
+            self.dLongitude_radian = np.radians(self.dLongitude_degree)
+            self.dLatitude_radian = np.radians(self.dLatitude_degree)
         except:
             print('Initialization of vertex failed!')
         
         return
+
+    def toNvector(self): 
+        #note: replicated in LatLon_NvectorEllipsoidal
+        a = self.dLatitude_radian
+        b = self.dLongitude_radian
+        c = np.sin(a)
+        e = np.cos(a)
+        d = np.sin(b) 
+        f = np.cos(b)
+        #// right-handed vector: x -> 0°E,0°N; y -> 90°E,0°N, z -> 90°N
+        x = e * f
+        y = e * d
+        z = c
+        point =dict()
+        point['x'] = x
+        point['y'] = y
+        point['z'] = z
+        pNvector = pynvector(point)
+        return pNvector
     
     def __eq__(self, other):
         iFlag = -1
-        
+        dThreshold_in = 1.0E-6        
         c = self.calculate_distance(other)
-        if( c < 1.0E-6 ): #be careful
+        if( c <= dThreshold_in ): #be careful
+            #print(self.dLongitude_degree ,self.dLatitude_degree , other.dLongitude_degree, other.dLatitude_degree)
             iFlag = 1
         else:
             iFlag = 0       
@@ -75,5 +101,55 @@ class pyvertex(object):
         return sJson
 
   
+class pynvector(object):
+    __metaclass__ = ABCMeta 
+    dX=-9999
+    dY=-9999
+    dZ=-9999
 
+    def __init__(self, aParameter):
+        if 'x' in aParameter:            
+            self.dX           = float(aParameter['x'])
+        
+        if 'y' in aParameter:            
+            self.dY            = float(aParameter['y'])
+        
+        if 'z' in aParameter:            
+            self.dZ             = float(aParameter['z'])
+        self.dLength = self.calculate_length()
+        self.dX = self.dX/self.dLength
+        self.dY = self.dY /self.dLength
+        self.dZ= self.dZ /self.dLength
+
+        return
+    def calculate_length(self):
+        self.dLength = np.sqrt( self.dX * self.dX + self.dY * self.dY + self.dZ * self.dZ )
+        return self.dLength
+
+    def plus(self, other):
+        point =dict()
+        point['x'] = self.dX + other.dX
+        point['y'] = self.dY + other.dY
+        point['z'] = self.dZ + other.dZ
+
+        pnv = pynvector( point )
+
+        return pnv
+
+    def toLatLon(self):
+
+        x = self.dX
+        y = self.dY
+        z = self.dZ
+
+        a = np.arctan2(z, np.sqrt(x*x + y*y))
+        b = np.arctan2(y, x)
+
+        point0= dict()   
+        point0['dLongitude_degree'] = np.degrees(b)
+        point0['dLatitude_degree'] = np.degrees(a)
+
+        pv = pyvertex(point0)
+        return pv
+        
 

@@ -2,8 +2,11 @@ import os,sys
 from math import cos, sin, sqrt, acos
 import numpy as np
 import osgeo
-from osgeo import  osr, gdal
+from osgeo import ogr, osr, gdal
+from shapely.wkt import loads
 #most of these functions are copied from the pyearth package
+
+from pyflowline.algorithms.cython.kernel import longlat_to_3d
 
 #https://stackoverflow.com/questions/8204998/how-to-check-if-a-pointlonc-latc-lie-on-a-great-circle-running-from-lona-lata
 def calculate_distance_to_plane(x1, y1, x2, y2, x3, y3):
@@ -83,7 +86,6 @@ def angle_between_vectors_degrees(u, v):
     f = np.degrees(e)
     return f
     
-
 def convert_360_to_180(dLongitude_in):
     """[This function is modified from
     http://www.idlcoyote.com/map_tips/lonconvert.html]
@@ -141,7 +143,6 @@ def retrieve_geotiff_metadata(sFilename_geotiff_in):
         pPixelHeight = pGeotransform[5]               
         return dPixelWidth, dOriginX, dOriginY, nrow, ncolumn, pSpatial_reference, pProjection, pGeotransform
 
-
 def degree_to_meter(dLatitude_in, dResolution_degree_in):
     """[Conver a degree-based resolution to meter-based resolution]
 
@@ -178,8 +179,6 @@ def meter_to_degree(dResolution_meter_in, dLatitude_mean_in):
     dResolution_degree= dResolution_meter_in/(2*np.pi * dRadius2) * 360.0
 
     return dResolution_degree
-
-
 
 def reproject_coordinates(x_in, y_in, spatial_reference_source, spatial_reference_target=None):
     """[Reproject coordinates from one reference to another. By default to WGS84.]
@@ -259,7 +258,6 @@ def reproject_coordinates_batch(aX_in, aY_in, spatial_reference_source, spatial_
         y_new.append(y1)
     
     return x_new,y_new
-
 
 def calculate_distance_based_on_lon_lat(lon1, lat1, lon2, lat2):
     """
@@ -342,7 +340,6 @@ def calculate_polygon_area(aLon_in, aLat_in,  algorithm = 0):
         #https://trs.jpl.nasa.gov/handle/2014/41271
         #TODO
         pass
-
 
 def gdal_read_geotiff_file(sFilename_in):
     """Read a Geotiff format raster file.
@@ -429,4 +426,47 @@ def Google_MetersPerPixel( zoomLevel ):
    
    # Return the value.
    return metersPerPixel
+
+def read_mesh_boundary(sFilename_boundary_in):
+    """
+    convert a shpefile to json format.
+    This function should be used for stream flowline only.
+    """
+    iReturn_code = 1
+    if os.path.isfile(sFilename_boundary_in):
+        pass
+    else:
+        print('This mesh file does not exist: ', sFilename_boundary_in )
+        iReturn_code = 0
+        return iReturn_code
+
+    aCell_out=list()
+    pDriver_json = ogr.GetDriverByName('GeoJSON')    
+    pDataset_mesh = pDriver_json.Open(sFilename_boundary_in, gdal.GA_ReadOnly)
+    pLayer_mesh = pDataset_mesh.GetLayer(0)
+    pSpatial_reference_out = pLayer_mesh.GetSpatialRef()
+    ldefn = pLayer_mesh.GetLayerDefn()   
+
+    #we also need to spatial reference
+    for pFeature_mesh in pLayer_mesh:
+        pGeometry_mesh = pFeature_mesh.GetGeometryRef()                     
+        pGeometrytype_boundary = pGeometry_mesh.GetGeometryName()
+        if(pGeometrytype_boundary == 'POLYGON'):       
+            pBoundary_out = pGeometry_mesh  
+        else:
+            if(pGeometrytype_boundary == 'MULTIPOLYGON'):    
+                nLine = pGeometry_mesh.GetGeometryCount()
+                for i in range(nLine):
+                    pBoundary = pGeometry_mesh.GetGeometryRef(i)
+               
+                pass
+            else:
+                pass
+            pass   
+            
+            
+    pBoundary_out = loads( pBoundary.ExportToWkt() )
+    return pBoundary_out
+    
+
    

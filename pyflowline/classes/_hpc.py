@@ -23,13 +23,13 @@ def _create_hpc_job(self, sSlurm_in=None):
         +  'sMesh_type_in="'+ str(self.sMesh_type) +'"' \
         + ')'  +   '\n'   
     ofs_pyflowline.write(sLine)
-    if self.iFlag_flowline==1:
-        sLine = 'oPyflowline.aBasin[0].dLatitude_outlet_degree=' \
-            +  "{:0f}".format(self.aBasin[0].dLatitude_outlet_degree)+ '\n'   
-        ofs_pyflowline.write(sLine)
-        sLine = 'oPyflowline.aBasin[0].dLongitude_outlet_degree=' \
-            + "{:0f}".format(self.aBasin[0].dLongitude_outlet_degree)+ '\n'   
-        ofs_pyflowline.write(sLine)        
+    #if self.iFlag_flowline==1:
+    #    sLine = 'oPyflowline.aBasin[0].dLatitude_outlet_degree=' \
+    #        +  "{:0f}".format(self.aBasin[0].dLatitude_outlet_degree)+ '\n'   
+    #    ofs_pyflowline.write(sLine)
+    #    sLine = 'oPyflowline.aBasin[0].dLongitude_outlet_degree=' \
+    #        + "{:0f}".format(self.aBasin[0].dLongitude_outlet_degree)+ '\n'   
+    #    ofs_pyflowline.write(sLine)        
     sLine = 'oPyflowline.setup()' + '\n'   
     ofs_pyflowline.write(sLine)
     
@@ -46,8 +46,8 @@ def _create_hpc_job(self, sSlurm_in=None):
     sLine = 'oPyflowline.analyze()' + '\n'   
     ofs_pyflowline.write(sLine)      
     
-    sLine = 'oPyflowline.evaluate()' + '\n'   
-    ofs_pyflowline.write(sLine) 
+    #sLine = 'oPyflowline.evaluate()' + '\n'   
+    #ofs_pyflowline.write(sLine) 
     
     sLine = 'oPyflowline.export()' + '\n'   
     ofs_pyflowline.write(sLine)

@@ -7,17 +7,16 @@ from pyflowline.pyflowline_read_model_configuration_file import pyflowline_read_
 #===================================
 #set up workspace path
 #===================================
-sPath_config = str( Path().resolve() )
-sPath_data = str(Path(__file__).parents[2]) # data is located two dir's up
-sWorkspace_data = realpath( sPath_data +  '/data/susquehanna' )
-sWorkspace_input =  str(Path(sWorkspace_data)  /  'input')
-sWorkspace_output=  str(Path(sWorkspace_data)  /  'output')
-
+sPath_parent = str(Path(__file__).parents[2]) # data is located two dir's up
+sPath_data = realpath( sPath_parent +  '/data/susquehanna' )
+sWorkspace_input =  str(Path(sPath_data)  /  'input')
+sWorkspace_output=  str(Path(sPath_data)  /  'output')
+sWorkspace_output=  '/compyfs/liao313/04model/pyflowline/susquehanna'
 
 #===================================
 #you need to update this file based on your own case study
 #===================================
-sFilename_configuration_in = realpath( sPath_config +  '/examples/susquehanna/pyflowline_susquehanna_mpas.json' )
+sFilename_configuration_in = realpath( sPath_parent +  '/examples/susquehanna/pyflowline_susquehanna_mpas.json' )
 if os.path.isfile(sFilename_configuration_in):
     pass
 else:
@@ -26,9 +25,9 @@ else:
 #===================================
 #setup case information
 #===================================
-iCase_index = 1
+iCase_index = 17
 sMesh = 'mpas'
-sDate='20220630'
+sDate='20220901'
 
 
 oPyflowline = pyflowline_read_model_configuration_file(sFilename_configuration_in, \

@@ -100,8 +100,12 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh_in, sFilename_flo
                         pFeatureOut.SetField("iseg", iStream_segment)    
                         pFeatureOut.SetField("iord", iStream_order)           
                         pLayerOut.CreateFeature(pFeatureOut)    
-                        dummy = loads( pGeometry_intersect.ExportToWkt() )
-                        aCoords = dummy.coords                
+                 
+                        aCoords = list()
+                        for i in range(0, pGeometry_intersect.GetPointCount()): 
+                            pt = pGeometry_intersect.GetPoint(i)
+                            aCoords.append( [ pt[0], pt[1]]) 
+                   
                         dummy1= np.array(aCoords)
                         pLine = convert_gcs_coordinates_to_flowline(dummy1)
                         pLine.calculate_length()
@@ -122,8 +126,11 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh_in, sFilename_flo
                                 pFeatureOut.SetField("iseg", iStream_segment)    
                                 pFeatureOut.SetField("iord", iStream_order)           
                                 pLayerOut.CreateFeature(pFeatureOut)    
-                                dummy = loads( Line.ExportToWkt() )
-                                aCoords = dummy.coords
+                                aCoords = list()
+                                for i in range(0, Line.GetPointCount()): 
+                                    pt = Line.GetPoint(i)
+                                    aCoords.append( [ pt[0], pt[1]]) 
+                                
                                 dummy1= np.array(aCoords)
                                 pLine = convert_gcs_coordinates_to_flowline(dummy1)
                                 pLine.calculate_length()

@@ -1,73 +1,74 @@
 import copy
 import numpy as np
+from pyflowline.algorithms.cython.kernel import find_vertex_in_list
 
-def find_vertex_in_list(aVertex_in, pVertex_in):
-    """[find the index of a vertex in a list]
+#def find_vertex_in_list(aVertex_in, pVertex_in):
+#    """[find the index of a vertex in a list]
+#
+#    Args:
+#        aVertex_in ([type]): [description]
+#        pVertex_in ([type]): [description]
+#
+#    Returns:
+#        [type]: [description]
+#    """
+#
+#    iFlag_exist = 0
+#    lIndex= -1
+#    nVertex= len(aVertex_in)
+#
+#    if nVertex > 0 :
+#        for i in np.arange( nVertex):
+#            pVertex = aVertex_in[i]
+#            if pVertex == pVertex_in:
+#                iFlag_exist = 1      
+#                lIndex = i 
+#                break                
+#            else:
+#                pass
+#
+#        pass        
+#        
+#    else:
+#        pass
+#    
+#    return iFlag_exist, lIndex
 
-    Args:
-        aVertex_in ([type]): [description]
-        pVertex_in ([type]): [description]
-
-    Returns:
-        [type]: [description]
-    """
-
-    iFlag_exist = 0
-    lIndex= -1
-    nVertex= len(aVertex_in)
-
-    if nVertex > 0 :
-        for i in np.arange( nVertex):
-            pVertex = aVertex_in[i]
-            if pVertex == pVertex_in:
-                iFlag_exist = 1      
-                lIndex = i 
-                break                
-            else:
-                pass
-
-        pass        
-        
-    else:
-        pass
-    
-    return iFlag_exist, lIndex
 
 
-
-def find_vertex_on_edge(aVertex_in, pEdge_in):
-    iFlag_exist = 0
-    aIndex= list()
-    aIndex_order=list()
-    aDistance=list()
-    nVertex= len(aVertex_in)
-    npoint = 0    
-    if nVertex > 0 :
-        for i in np.arange( nVertex):
-            pVertex = aVertex_in[i]
-            iFlag_overlap, dDistance, diff = pEdge_in.check_vertex_on_edge(pVertex)
-            if iFlag_overlap == 1:                
-                iFlag_exist = 1                      
-                aDistance.append(dDistance)
-                aIndex.append(i) 
-                npoint = npoint + 1          
-            else:                
-                if  diff < 1.0:
-                    iFlag_overlap = pEdge_in.check_vertex_on_edge(pVertex)
-                   
-                pass
-
-        #re-order 
-        if iFlag_exist == 1 :
-            x = np.array(aDistance)
-            b = np.argsort(x)
-            c = np.array(aIndex)
-            d= c[b]
-            aIndex_order = list(d)        
-    else:
-        pass
-    
-    return iFlag_exist, npoint , aIndex_order
+#def find_vertex_on_edge(aVertex_in, pEdge_in):
+#    iFlag_exist = 0
+#    aIndex= list()
+#    aIndex_order=list()
+#    aDistance=list()
+#    nVertex= len(aVertex_in)
+#    npoint = 0    
+#    if nVertex > 0 :
+#        for i in np.arange( nVertex):
+#            pVertex = aVertex_in[i]
+#            iFlag_overlap, dDistance, diff = pEdge_in.check_vertex_on_edge(pVertex)
+#            if iFlag_overlap == 1:                
+#                iFlag_exist = 1                      
+#                aDistance.append(dDistance)
+#                aIndex.append(i) 
+#                npoint = npoint + 1          
+#            else:                
+#                if  diff < 1.0:
+#                    iFlag_overlap = pEdge_in.check_vertex_on_edge(pVertex)
+#                   
+#                pass
+#
+#        #re-order 
+#        if iFlag_exist == 1 :
+#            x = np.array(aDistance)
+#            b = np.argsort(x)
+#            c = np.array(aIndex)
+#            d= c[b]
+#            aIndex_order = list(d)        
+#    else:
+#        pass
+#    
+#    return iFlag_exist, npoint , aIndex_order
 
 
 def find_edge_in_list(aEdge_in, pEdge_in):
@@ -173,28 +174,28 @@ def check_if_duplicates(aList_in):
     return iFlag_unique
 
 
-def add_unique_vertex(aVertex_in, pVertex_in):
-    """[add a vertex to a list if it is not already included]
-
-    Args:
-        aVertex_in ([type]): [description]
-        pVertex_in ([type]): [description]
-
-    Returns:
-        [type]: [description]
-    """
-    iFlag_exist = 0
-    nVertex = len(aVertex_in)     
-
-    iFlag_exist, dummy =  find_vertex_in_list(aVertex_in, pVertex_in)
-
-    if iFlag_exist == 1:
-        pass
-    else:
-        aVertex_in.append(pVertex_in)
-        pass
-
-    return aVertex_in, iFlag_exist
+#def add_unique_vertex(aVertex_in, pVertex_in):
+#    """[add a vertex to a list if it is not already included]
+#
+#    Args:
+#        aVertex_in ([type]): [description]
+#        pVertex_in ([type]): [description]
+#
+#    Returns:
+#        [type]: [description]
+#    """
+#    iFlag_exist = 0
+#    nVertex = len(aVertex_in)     
+#
+#    iFlag_exist, dummy =  find_vertex_in_list(aVertex_in, pVertex_in)
+#
+#    if iFlag_exist == 1:
+#        pass
+#    else:
+#        aVertex_in.append(pVertex_in)
+#        pass
+#
+#    return aVertex_in, iFlag_exist
 
 
 def find_list_in_list(aList_in, pList_in):

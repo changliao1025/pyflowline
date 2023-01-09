@@ -6,6 +6,7 @@ from json import JSONEncoder
 import datetime
 import numpy as np
 from osgeo import ogr, osr
+from shapely.wkt import loads
 from pyflowline.classes.mpas import pympas
 from pyflowline.classes.hexagon import pyhexagon
 from pyflowline.classes.latlon import pylatlon
@@ -14,11 +15,12 @@ from pyflowline.classes.vertex import pyvertex
 from pyflowline.classes.basin import pybasin
 from pyflowline.classes.flowline import pyflowline
 from pyflowline.classes.edge import pyedge
-from pyflowline.formats.read_mesh import read_mesh_json
+from pyflowline.formats.read_mesh import read_mesh_json, read_mesh_json_w_topology
 from pyflowline.algorithms.auxiliary.gdal_functions import reproject_coordinates
 from pyflowline.algorithms.auxiliary.gdal_functions  import degree_to_meter
 from pyflowline.algorithms.auxiliary.gdal_functions  import meter_to_degree
 from pyflowline.algorithms.auxiliary.gdal_functions import retrieve_geotiff_metadata
+from pyflowline.algorithms.auxiliary.gdal_functions import read_mesh_boundary
 from pyflowline.mesh.hexagon.create_hexagon_mesh import create_hexagon_mesh
 from pyflowline.mesh.latlon.create_latlon_mesh import create_latlon_mesh
 from pyflowline.mesh.square.create_square_mesh import create_square_mesh
@@ -65,6 +67,7 @@ class flowlinecase(object):
     iFlag_flowline = 1
     iFlag_global = 0
     iFlag_multiple_outlet = 0
+    iFlag_mesh_boundary = 0
     #iFlag_use_shapefile_extent=1
     iFlag_use_mesh_dem=0
     iFlag_save_mesh = 0
@@ -72,16 +75,19 @@ class flowlinecase(object):
     iFlag_create_mesh=1
     iFlag_intersect = 1
     iFlag_rotation=0
+    iFlag_break_by_distance = 0  #if the distance between two vertice are far, 
     nOutlet = 1 #by default , there shoule ne only one ouelet
     dResolution_degree=0.0
     dResolution_meter=0.0
     dThreshold_small_river=0.0
+    dThreshold_break_by_distance = 5000.0 
     dLongitude_left = -180
     dLongitude_right = 180
     dLatitude_bot = -90
     dLatitude_top = 90
     dElevation_mean=-9999.0
     sFilename_model_configuration=''
+    sFilename_mesh_boundary = ''
     sWorkspace_input=''      
     sWorkspace_output=''    
     #sWorkspace_output_case=''    
@@ -135,6 +141,9 @@ class flowlinecase(object):
         
         if 'iFlag_global' in aConfig_in:
             self.iFlag_global             = int(aConfig_in[ 'iFlag_global'])
+
+        if 'iFlag_mesh_boundary' in aConfig_in:
+            self.iFlag_mesh_boundary             = int(aConfig_in[ 'iFlag_mesh_boundary'])
         
         if 'iFlag_multiple_outlet' in aConfig_in:
             self.iFlag_multiple_outlet             = int(aConfig_in[ 'iFlag_multiple_outlet'])  
@@ -170,6 +179,11 @@ class flowlinecase(object):
             self.iFlag_intersect = int(aConfig_in['iFlag_intersect'])
         else:
             self.iFlag_intersect=1
+        
+        if 'iFlag_break_by_distance' in aConfig_in:
+            self.iFlag_break_by_distance = int(aConfig_in['iFlag_break_by_distance'])
+        else:
+            self.iFlag_break_by_distance=0
 
         if 'nOutlet' in aConfig_in:
             self.nOutlet = int(aConfig_in['nOutlet'])
@@ -189,6 +203,9 @@ class flowlinecase(object):
         else:
             print('Please specify resolution.')
 
+        if 'dThreshold_break_by_distance' in aConfig_in:
+            self.dThreshold_break_by_distance = float(aConfig_in['dThreshold_break_by_distance']) 
+
         if 'dLongitude_left' in aConfig_in:
             self.dLongitude_left = float(aConfig_in['dLongitude_left']) 
 
@@ -204,6 +221,9 @@ class flowlinecase(object):
         if 'sFilename_model_configuration' in aConfig_in:
             self.sFilename_model_configuration    = aConfig_in[ 'sFilename_model_configuration']
 
+        if 'sFilename_mesh_boundary' in aConfig_in:
+            self.sFilename_mesh_boundary    = aConfig_in[ 'sFilename_mesh_boundary']
+
         if 'sFilename_spatial_reference' in aConfig_in:
             self.sFilename_spatial_reference = aConfig_in['sFilename_spatial_reference']
 
@@ -217,8 +237,7 @@ class flowlinecase(object):
             self.sWorkspace_bin= aConfig_in[ 'sWorkspace_bin']
             
         if 'sWorkspace_input' in aConfig_in:
-            self.sWorkspace_input = aConfig_in[ 'sWorkspace_input']
-        
+            self.sWorkspace_input = aConfig_in[ 'sWorkspace_input']       
        
         
         if sWorkspace_output_in is not None:
@@ -298,12 +317,10 @@ class flowlinecase(object):
                 with open(self.sFilename_basins) as json_file:
                     dummy_data = json.load(json_file)     
                     for i in range(self.nOutlet):
-                        sBasin =  "{:04d}".format(i+1)   
+                        sBasin =  "{:08d}".format(i+1)   
                         dummy_basin = dummy_data[i]
-                        dummy_basin['sWorkspace_output_basin'] = str(Path(self.sWorkspace_output) /     sBasin )
-
+                        dummy_basin['sWorkspace_output_basin'] = str(Path(self.sWorkspace_output) / sBasin )
                         pBasin = pybasin(dummy_basin)
-
                         self.aBasin.append(pBasin)
             else:
                 pass
@@ -331,7 +348,8 @@ class flowlinecase(object):
         #export the outlet into a single file
         aOutlet = list()
         if self.iFlag_simplification == 1: 
-            for pBasin in self.aBasin:
+            for i in range(self.nOutlet):
+                pBasin = self.aBasin[i]
                 aFlowline_basin = pBasin.flowline_simplification()                
                 aFlowline_out = aFlowline_out + aFlowline_basin
                 aOutlet.append(pBasin.pVertex_outlet)
@@ -341,7 +359,9 @@ class flowlinecase(object):
 
         return aFlowline_out
     
-    def mesh_generation(self):        
+    def mesh_generation(self):      
+        print('Start mesh generation.')
+        aCell_out = list()  
         if self.iFlag_create_mesh ==1:
             iFlag_global =  self.iFlag_global
             iMesh_type = self.iMesh_type
@@ -456,13 +476,39 @@ class flowlinecase(object):
                         if iMesh_type == 4: #mpas
                             iFlag_use_mesh_dem = self.iFlag_use_mesh_dem
                             sFilename_mesh_netcdf = self.sFilename_mesh_netcdf
+                            iFlag_mesh_boundary = self.iFlag_mesh_boundary
                             dLatitude_top    = self.dLatitude_top   
                             dLatitude_bot    = self.dLatitude_bot   
                             dLongitude_left  = self.dLongitude_left 
                             dLongitude_right = self.dLongitude_right
-                            aMpas = create_mpas_mesh(iFlag_global, iFlag_use_mesh_dem, iFlag_save_mesh, \
-                                  dLongitude_left, dLongitude_right,  dLatitude_top, dLatitude_bot, \
-                                        sFilename_mesh_netcdf,      sFilename_mesh)
+
+                            if iFlag_mesh_boundary ==1:
+                                #create a polygon based on 
+                                #read boundary 
+                                pBoundary = read_mesh_boundary(self.sFilename_mesh_boundary)
+
+                                aMpas = create_mpas_mesh(iFlag_global, iFlag_use_mesh_dem, iFlag_save_mesh, \
+                                  pBoundary,       sFilename_mesh_netcdf,      sFilename_mesh)
+                                pass
+                            else:
+                                pRing = ogr.Geometry(ogr.wkbLinearRing)
+                                pRing.AddPoint(dLongitude_left, dLatitude_top)
+                                pRing.AddPoint(dLongitude_right, dLatitude_top)
+                                pRing.AddPoint(dLongitude_right, dLatitude_bot)
+                                pRing.AddPoint(dLongitude_left, dLatitude_bot)
+                                pRing.AddPoint(dLongitude_left, dLatitude_top)
+                                pBoundary = ogr.Geometry(ogr.wkbPolygon)
+                                pBoundary.AddGeometry(pRing)
+                                pBoundary_rec = loads( pBoundary.ExportToWkt() )
+
+                                #old method using rectange
+                                #aMpas = create_mpas_mesh(iFlag_global, iFlag_use_mesh_dem, iFlag_save_mesh, \
+                                #  dLongitude_left, dLongitude_right,  dLatitude_top, dLatitude_bot, \
+                                #        sFilename_mesh_netcdf,      sFilename_mesh)
+
+                                #new method using polygon object
+                                aMpas = create_mpas_mesh(iFlag_global, iFlag_use_mesh_dem, iFlag_save_mesh, \
+                                  pBoundary_rec,       sFilename_mesh_netcdf,      sFilename_mesh)
                             return aMpas
                         else:
                             if iMesh_type ==5: #tin this one need to be updated because central location issue
@@ -483,11 +529,13 @@ class flowlinecase(object):
         else:
             #read mesh?
             iMesh_type = self.iMesh_type
-
+            aCell_out = read_mesh_json_w_topology(iMesh_type, self.sFilename_mesh)
             pass
-        return
+        print('Finish mesh generation.')
+        return aCell_out
     
     def reconstruct_topological_relationship(self, aCell_raw):
+        print('Start topology reconstruction.')
         iFlag_intersect = self.iFlag_intersect
         if iFlag_intersect == 1:
             iMesh_type = self.iMesh_type        
@@ -546,9 +594,10 @@ class flowlinecase(object):
             
             self.aFlowline_conceptual = aFlowline_conceptual
             self.aCellID_outlet = aCellID_outlet
-
+            print('Finish topology reconstruction.')
             return self.aCell, aFlowline_conceptual, aCellID_outlet
         else:
+            
             return None
             
     def merge_cell_info(self, aCell_raw):
@@ -579,10 +628,11 @@ class flowlinecase(object):
         return
 
     def run(self):
+        aCell_out = None
         if self.iFlag_flowline == 1:
             self.flowline_simplification()        
             aCell = self.mesh_generation()
-            if self.iFlag_create_mesh ==1:
+            if self.iFlag_intersect ==1:
                 aCell_out, a, b = self.reconstruct_topological_relationship(aCell)
             else:
                 pass

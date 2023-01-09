@@ -129,8 +129,12 @@ def convert_gcs_coordinates_to_flowline(aCoordinates_in):
         
     aEdge=list()
     for j in range(npoint-1):
-        pEdge = pyedge( aVertex[j], aVertex[j+1] )
-        aEdge.append(pEdge)
+        if aVertex[j] == aVertex[j+1]:
+            print('Two vertices are the same')
+            pass
+        else:
+            pEdge = pyedge( aVertex[j], aVertex[j+1] )
+            aEdge.append(pEdge)
     
     pLine = pyflowline( aEdge)    
     return pLine

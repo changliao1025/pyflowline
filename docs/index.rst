@@ -18,6 +18,7 @@ Table of contents
    application/application
    algorithm/algorithm
    api/api
+   references
    history
    support
    contribution

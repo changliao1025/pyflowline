@@ -1,5 +1,5 @@
 ---
-title: 'pyflowline: A Python package for river networks processing'
+title: 'pyflowline: a mesh independent river network generator for hydrologic models'
 
 tags:
   - Python
@@ -25,7 +25,7 @@ bibliography: paper.bib
 
 # Summary
 
-Computational hydrologic simulation often requires high quality river network information as inputs. Preparation of river network information can be challenging, especially if the hydrology model is based on unstructured mesh. In this study, we develope a Python package to automate river network preparation. It resolves issues including disconnected river, braided network. It also produces spatially-distributed cell-to-cell topology information, which can be used for precise river routing. The package supports various mesh types including traditional projected coordinate system, geographic coordinate system and unstructured mesh.
+Spatial-distributed hydrologic models often requires high quality river network information as inputs. Preparation of river network information can be challenging, especially when unstructured meshes are used. To resolve this challenge, we develope a Python package to automate river network generation. It resolves issues including disconnected river, braided network. It also produces spatially-distributed cell-to-cell topology information, which can be used for precise river routing. The package supports various mesh types including traditional projected coordinate system, geographic coordinate system and unstructured mesh.
 
 # Statement of need
 
@@ -146,11 +146,9 @@ Screenshot of before and after river networks at zoom-in regions are used to ill
 
 The model described in this repository was supported by:
 
-* Laboratory Directed Research and Development (LDRD) Program Quickstarter project at Pacific Northwest National Laboratory. 
-
 * Earth System Model Development and Regional and Global Modeling and Analysis program areas of the U.S. Department of Energy, Office of Science, Office of Biological and Environmental Research as part of the multi-program, collaborative Integrated Coastal Modeling (ICoM) project.
 
-* U.S. Department of Energy Office of Science Biological and Environmental Research through the Earth and Environmental System Modeling program as part of the Energy Exascale Earth System Model (E3SM) project. 
+* Earth System Model Development and Regional and Global Modeling and Analysis program areas of the U.S. Department of Energy, Office of Science, Office of Biological and Environmental Research as part of the multi-program, collaborative Interdisciplinary Research for Arctic Coastal Environments (InteRFACE) project.
 
 A portion of this research was performed using PNNL Research Computing at Pacific Northwest National Laboratory. 
 

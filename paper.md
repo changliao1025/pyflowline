@@ -25,7 +25,7 @@ bibliography: paper.bib
 
 # Summary
 
-Spatial-distributed hydrologic models often requires high quality river network information as inputs. Preparation of river network information can be challenging, especially when unstructured meshes are used. To resolve this challenge, we develope a Python package to automate river network generation. It resolves issues including disconnected river, braided network. It also produces spatially-distributed cell-to-cell topology information, which can be used for precise river routing. The package supports various mesh types including traditional projected coordinate system, geographic coordinate system and unstructured mesh.
+Spatial-distributed hydrologic models often requires high quality river network information as inputs. Preparation of river network information can be challenging, especially when unstructured meshes are used. To address this challenge, we develope a Python package to automate river network generation. It resolves issues including disconnected river, braided network. It also produces spatially-distributed cell-to-cell topology information, which can be used for precise river routing. The package supports various mesh types including traditional projected coordinate system, geographic coordinate system and unstructured mesh.
 
 # Statement of need
 

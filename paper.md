@@ -25,7 +25,7 @@ bibliography: paper.bib
 
 # Summary
 
-Spatial-distributed hydrologic models often requires high quality river network information as inputs. Preparation of river network information can be challenging, especially when unstructured meshes are used. To address this challenge, we develope a Python package to automate river network generation. It resolves issues including disconnected river, braided network. It also produces spatially-distributed cell-to-cell topology information, which can be used for precise river routing. The package supports various mesh types including traditional projected coordinate system, geographic coordinate system and unstructured mesh.
+Spatially-distributed hydrologic models often require high-quality river network information as inputs. Generation of river network information can be challenging, especially when unstructured meshes are used. To address this challenge, we developed a Python package to automate river network generation. It resolves issues, including disconnected and braided river networks. It also produces spatially-distributed cell-to-cell topology information, which can be used for river routing. The package supports various mesh types, including traditional rectangle and unstructured meshes.
 
 # Statement of need
 
@@ -36,7 +36,7 @@ Spatial-distributed hydrologic models often requires high quality river network 
 
 # Algorithms and implementation
 
-pyflowline takes advantage of Python language's object oriented programming (OOP) architect. The river network and all of its elements (i.e. segment, reach, confluence.) are described as objects. These objects are processed throughout the package when applicable. 
+Pyflowline takes advantage of Python language's object-oriented programming (OOP) architecture. We describe the river network and its elements (i.e., segment, reach, confluence.) as objects processed throughout the package when applicable. 
 
 ![The data model. \label{fig:oop}](https://github.com/changliao1025/pyflowline/blob/main/docs/figure/basic_element.png?raw=true)
 

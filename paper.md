@@ -1,5 +1,5 @@
 ---
-title: 'pyflowline: a mesh independent river network generator for hydrologic models'
+title: 'pyflowline: a mesh-independent river network generator for hydrologic models'
 
 tags:
   - Python
@@ -25,24 +25,21 @@ bibliography: paper.bib
 
 # Summary
 
-Spatially-distributed hydrologic models often require high-quality river network information as inputs. Generation of river network information can be challenging, especially when unstructured meshes are used. To address this challenge, we developed a Python package to automate river network generation. It resolves issues, including disconnected and braided river networks. It also produces spatially-distributed cell-to-cell topology information, which can be used for river routing. The package supports various mesh types, including traditional rectangle and unstructured meshes.
+Spatially-distributed hydrologic models often require high-quality river network information as inputs. Generation of river network information can be challenging, especially when the hydrologic models use unstructured meshes. We developed a mesh-independent river network generation Python package to address this challenge. It resolves issues, including disconnected and braided river networks. It also produces spatially-distributed cell-to-cell topology information, which can be used for river routing. The package supports various mesh types, including traditional rectangle and unstructured meshes.
 
 # Statement of need
-
-For a given vector river network and spatial discretization (mesh), how to generate the mesh cell-based conceptual river network
-remains a challenge. Most existing methods can only accept the traditional structured rectangle meshes.
-As a result, there is a need to develop a mesh independent river network representation method for unstructured mesh-based hydrologic models.
+For a given vector river network and spatial discretization (mesh), generating the mesh cell-based conceptual river network remains challenging. Most existing methods can only accept structured rectangle meshes.
+As a result, there is a need to develop a mesh-independent river network representation method for unstructured mesh-based hydrologic models.
 
 # Model features
-
-Pyflowline uses Python language's object-oriented programming (OOP) architecture to describe the river network and its elements (i.e., segment, reach, confluence.) as objects processed throughout the package when applicable. 
+Pyflowline uses Python's object-oriented programming (OOP) architecture to describe the river network and its elements (i.e., segment, reach, confluence.) as objects processed throughout the package when applicable. 
 
 ![The data model. \label{fig:oop}](https://github.com/changliao1025/pyflowline/blob/main/docs/figure/basic_element.png?raw=true)
 
 
 Pyflowline provides the following features:
 
-1. It uses JSON as the file I/O format. For spatial dataset, i.e., vector river network, GEOJSON is used.
+1. It uses JSON as the file I/O format. For spatial datasets, i.e., vector river network, GEOJSON is used.
 2. It supports both structured and unstructured meshes.
 3. It supports both regional scale and global scale (through AABB tree and Cython) simulations.
 
@@ -50,12 +47,11 @@ Pyflowline provides the following features:
 # Example
 
 A case study was performed for the Susquehanna River Basin (SRB).
+Screenshots of before and after river networks at zoom-in regions are used to illustrate the capability of the model.
 
-Screenshot of before and after river networks at zoom-in regions are used to illustrate the capability of model.
+# Acknowledgment
 
-# Acknowledgement
-
-The model described in this repository was supported by:
+The model described in this repository was supported by the following:
 
 * Earth System Model Development and Regional and Global Modeling and Analysis program areas of the U.S. Department of Energy, Office of Science, Office of Biological and Environmental Research as part of the multi-program, collaborative Integrated Coastal Modeling (ICoM) project.
 
@@ -67,6 +63,5 @@ PNNL is operated for DOE by Battelle Memorial Institute under contract DE-AC05-7
 
 # References
 
-1. Liao, C., Tesfa, T., Duan, Z., & Leung, L. R. (2020). Watershed delineation on a hexagonal mesh grid. Environmental Modelling & Software, 128, 104702.
-
-2. Liao, C., Zhou, T., Xu, D., Barnes, R., Bisht, G., Li, H. Y., ... & Leung, L. R. (2022). Advances in hexagon mesh-based flow direction modeling. Advances in Water Resources, 104099.
+* Liao. C. Cooper, M (2022) Pyflowline: a mesh independent river network generator for hydrologic models. Zenodo.
+https://doi.org/10.5281/zenodo.6407299

@@ -29,6 +29,8 @@ Spatially-distributed hydrologic models often require high-quality river network
 
 # Statement of need
 
+For a given vector-based river network and spatial discretization (mesh), how to generate the mesh cell-based conceptual river network
+remains a challenge. Most existing methods can only accept the traditional structured rectangle meshes. Few methods can accept the unstructured meshes.
 
 
 

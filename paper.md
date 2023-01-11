@@ -29,35 +29,31 @@ Spatially-distributed hydrologic models often require high-quality river network
 
 # Statement of need
 
-For a given vector-based river network and spatial discretization (mesh), how to generate the mesh cell-based conceptual river network
-remains a challenge. Most existing methods can only accept the traditional structured rectangle meshes. Few methods can accept the unstructured meshes.
-
-
-
-
+For a given vector river network and spatial discretization (mesh), how to generate the mesh cell-based conceptual river network
+remains a challenge. Most existing methods can only accept the traditional structured rectangle meshes.
+As a result, there is a need to develop a mesh independent river network representation method for unstructured mesh-based hydrologic models.
 
 # Algorithms and implementation
 
-Pyflowline takes advantage of Python language's object-oriented programming (OOP) architecture. We describe the river network and its elements (i.e., segment, reach, confluence.) as objects processed throughout the package when applicable. 
+Pyflowline uses Python language's object-oriented programming (OOP) architecture to describe the river network and its elements (i.e., segment, reach, confluence.) as objects processed throughout the package when applicable. 
 
 ![The data model. \label{fig:oop}](https://github.com/changliao1025/pyflowline/blob/main/docs/figure/basic_element.png?raw=true)
 
 
-A brief overview of the features provided by pyflowline is list in Table 1.
+Pyflowline provides the following features:
 
-1. It uses JSON/GeoJSON as the internal exchange file format. Most objects within the package can be imported and exported during runtime;
-2. It relies on the open source Geospatial Data Abstraction Library (GDAL) and a few other Python packages to process geospatial data type;
-3. It supports traditional projected coordinate system (PCS), geographic coordinate system (GCS), hexagon and other unstructured mesh for spatially distributed simulations;
+1. It uses JSON/GeoJSON as the file I/O format. All the river network objects can be imported and exported as a JSON file;
+2. It uses open source Geospatial Data Abstraction Library (GDAL) and a few other Python packages to process geospatial data type;
+3. It supports both structured and unstructured meshes;
 4. It provides several algorithms to automate the river network simplification, generalization, etc.
 
 * Overall model structure
 
 The overall model workflow includes three components:
 
-1. Preprocess flowline
-2. Generate mesh based on the spatial extend of flowline and desired resolution
-3. Intersect mesh with flowline, produce topology information
-
+1. Preprocess vector river network
+2. Generate or import meshes
+3. Intersect mesh with flowline, and generate conceptual river network
 
 * Connect disconnected flowline
 

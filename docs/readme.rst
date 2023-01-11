@@ -8,7 +8,7 @@ Overview
 
 
 
-Pyflowline is a Python package to process river network for Earth Science. It supports the HexWatershed.
+Pyflowline is a mesh-independent river network generator for hydrologic models.
 
 
 ***********

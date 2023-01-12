@@ -33,8 +33,9 @@ In most cases, you can install PyFlowline through the Conda system:
 
     conda install -c conda-forge pyflowline
 
+To enable the `cython` feature, the user needs to build the cython code under the `./pyflowline/algorithms/cython` directory following the cython user guide (https://cython.readthedocs.io/en/latest/index.html).
 
+In most cases, if a C/C++ compiler is available on the system, run the following command:
 
-
-
+    python setup.py build_ext --inplace
 

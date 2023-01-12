@@ -14,9 +14,10 @@ Table of contents
    :numbered:
    
    readme
-   installation/installation
-   application/application
+   installation/installation   
+   data/data
    algorithm/algorithm
+   application/application
    api/api
    references
    history

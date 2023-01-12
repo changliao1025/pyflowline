@@ -9,6 +9,8 @@ Overview
 
 This document provides the instruction to install the PyFlowline Python package.
 
+PyFlowline is available on both PyPI (https://pypi.org/project/pyflowline/) and Conda (https://anaconda.org/conda-forge/pyflowline).
+
 ************
 Requirements
 ************

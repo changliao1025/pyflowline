@@ -65,7 +65,7 @@ Flowline confluence extraction
 ==============================
 Merge flowline
 ==============================
-This algorithm merges flowlines so there are only 2 types of flowlines:
+This algorithm merges flowlines, so there are only two types of flowlines:
 
 1. headwaters
 

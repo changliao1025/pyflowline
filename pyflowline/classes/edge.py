@@ -4,12 +4,18 @@ from json import JSONEncoder
 import numpy as np
 from pyflowline.classes.vertex import pyvertex
 from pyflowline.algorithms.split.split_by_length import split_edge_by_length
-#from pyflowline.algorithms.auxiliary.gdal_functions import  calculate_angle_betwen_vertex
+#
 #from pyflowline.algorithms.auxiliary.gdal_functions import  calculate_polygon_area
-#from pyflowline.algorithms.auxiliary.gdal_functions import calculate_distance_to_plane
+#
 
-from pyflowline.algorithms.cython.kernel import calculate_angle_betwen_vertex
-from pyflowline.algorithms.cython.kernel import calculate_distance_to_plane
+import importlib
+iFlag_cython = importlib.util.find_spec("cython") 
+if iFlag_cython is not None:
+    from pyflowline.algorithms.cython.kernel import calculate_angle_betwen_vertex
+    from pyflowline.algorithms.cython.kernel import calculate_distance_to_plane
+else:
+    from pyflowline.algorithms.auxiliary.gdal_functions import  calculate_angle_betwen_vertex
+    from pyflowline.algorithms.auxiliary.gdal_functions import calculate_distance_to_plane
 
 class EdgeClassEncoder(JSONEncoder):
     def default(self, obj):

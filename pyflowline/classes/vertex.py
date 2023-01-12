@@ -3,9 +3,15 @@ import numpy as np
 import json
 from json import JSONEncoder
 #from pyflowline.classes.nvector import pynvector
-#from pyflowline.algorithms.auxiliary.gdal_functions import calculate_distance_based_on_lon_lat
+#
+import importlib
+iFlag_cython = importlib.util.find_spec("cython") 
+if iFlag_cython is not None:
+    from pyflowline.algorithms.cython.kernel import calculate_distance_based_on_lon_lat
+else:
+    from pyflowline.algorithms.auxiliary.gdal_functions import calculate_distance_based_on_lon_lat
 
-from pyflowline.algorithms.cython.kernel import calculate_distance_based_on_lon_lat
+
 
 class VertexClassEncoder(JSONEncoder):
     def default(self, obj):

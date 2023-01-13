@@ -75,11 +75,11 @@ Remove braided flowlines
 A braided loop occurs when a vertex has more than one downstream, even after the flow direction correction. This algorithm removes these loops by only keeping the first detected downstream of any vertex.
 
 
-.. image:: ../figures/before_loop.png
+.. image:: ../../figures/before_loop.png
   :width: 400
   :alt: Before loop removal
 
-.. image:: ../figures/after_loop.png
+.. image:: ../../figures/after_loop.png
   :width: 400
   :alt: After loop removal
 

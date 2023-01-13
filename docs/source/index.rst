@@ -13,7 +13,7 @@ Table of contents
    :maxdepth: 3
    :numbered:
    
-   readme
+   /readme
    installation/installation   
    data/data
    algorithm/algorithm

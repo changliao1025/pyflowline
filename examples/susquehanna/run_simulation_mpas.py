@@ -1,7 +1,6 @@
 import os, sys
 from pathlib import Path
 from os.path import realpath
-
 from pyflowline.pyflowline_read_model_configuration_file import pyflowline_read_model_configuration_file
 
 #===================================

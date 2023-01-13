@@ -8,7 +8,7 @@ Basic
 
 River networks are represented using three basic elements: vertex, edge, and flowline.
 
-.. image:: docs/figures/basic_element.png
+.. image:: ../figures/basic_element.png
   :width: 400
   :alt: Basic element
 

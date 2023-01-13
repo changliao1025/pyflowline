@@ -36,6 +36,7 @@ Step 2
 The script setups some paths, which should be adjusted based on a real case.
 
 ::   
+    
     sPath_parent = str(Path(__file__).parents[2]) # data is located two dir's up
     sPath_data = realpath( sPath_parent +  '/data/susquehanna' )
     sWorkspace_input =  str(Path(sPath_data)  /  'input')

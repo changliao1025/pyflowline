@@ -120,7 +120,11 @@ This algorithm divides such kind of edges until they meet the requirement.
 Mesh generation
 *************************
 
+PyFlowline provides several algorithms to generate structured meshes, including latitude-longitude, projected, hexagon, triangel meshes.
 
+The hexagon mesh generator also provide an option for a 60 degree rotation.
+
+Before PyFlowline uses the geographic coordinate system (GCS) execusively to all the computational geometry, all the meshes are converted the GCS system. See the hexagon mesh for an example.
 
 ==============================
 Structured mesh
@@ -138,9 +142,15 @@ Projected
 Hexagon
 ------------------
 
+----------
+Triangle
+----------
+
 ==============================
 Unstructured mesh
 ==============================
+
+PyFlowline does not provide the unstructured mesh generations. Instead, the user should use third-party generators such as the JIGSAW to generate the mesh files. PyFlowline only provides algorithms to import these mesh files and convert them to PyFlowline supported mesh data type.
 
 ------------------
 MPAS

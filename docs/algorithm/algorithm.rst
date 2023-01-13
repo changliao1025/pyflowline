@@ -7,11 +7,11 @@ Algorithm
 Overview
 *************************
 
-A list of algorithms are implemented to carry out the following operations:
+A list of algorithms is implemented to carry out the following operations:
 
 1. Flowline simplification
 2. Mesh generations
-3. Topological relationshio reconstruction
+3. Topological relationship reconstruction
 
 *************************
 Flowline simplification
@@ -33,7 +33,7 @@ Currently, this algorithm does not include the upstream of a dam.
 Flowline vertex extraction
 ==============================
 
-The vertices that make up flowline are used in several algorithms. Among them, the start and end vertices of a flowline also define the flowline type. 
+The vertices that make up flowlines are used in several algorithms. Among them, a flowline's start and end vertices also define the flowline type. 
 
 * If the start vertex has no upstream, the flowline is a headwater.
 * If the start or end vertex has only one upstream or downstream, it is a middle flowline and can be merged with others. 
@@ -62,7 +62,7 @@ Remove small river
 To simplify the river networks, small rivers with lengths less than the user-provided threshold are removed. This algorithm only applies to headwater and should be called multiple times to achieve desired performance.
 
 (Optional)
-When the dam burning is turned on, the dam associated flowlines are always retained even its length is less than the user-provided threhold.
+When the dam burning is turned on, the dam-associated flowlines are always retained even if their lengths are less than the user-provided threshold.
 
 ==============================
 Remove braided flowlines
@@ -75,7 +75,7 @@ A braided loop occurs when a vertex has more than one downstream, even after the
 Flowline confluence extraction
 ==============================
 
-This algorithms scans the whole network and defines the vertices that has more then one upstream flowlines as river confluences.
+This algorithm scans the whole network and defines the vertices that have more than one upstream flowline as river confluences.
 
 ==============================
 Merge flowline
@@ -114,26 +114,26 @@ Split flowline by length
 
 (Optional)
 
-In some cases, it is desirable to impose a maximum flowline edge length so it can be used in other application.
-This algorithm divides such kind of edges until they meet the requirement.
+In some cases, it is desirable to impose a maximum flowline edge length so it can be used in other applications.
+This algorithm divides such kinds of edges until they meet the requirement.
 
 *************************
 Mesh generation
 *************************
 
-PyFlowline provides several algorithms to generate structured meshes, including latitude-longitude, projected, hexagon, triangel meshes.
+PyFlowline provides several algorithms to generate structured meshes, including latitude-longitude, projected, hexagon, triangle meshes.
 
-The hexagon mesh generator also provide an option for a 60 degree rotation.
+The hexagon mesh generator also provides an option for a 60-degree rotation.
 
-Before PyFlowline uses the geographic coordinate system (GCS) execusively to all the computational geometry, all the meshes are converted the GCS system. See the hexagon mesh for an example.
+PyFlowline uses the geographic coordinate system (GCS) exclusively for all the computational geometry, all the meshes are converted to the GCS system. See the hexagon mesh for an example.
 
 ==============================
 Structured mesh
 ==============================
 
-In general, the mesh generator creates mesh cells one by one in a pre-defined row-column order. The generator calculates the locations of all vertices of each mesh cell. Depending on whether the mesh is GCS or PCS, the coordinates may be converted back to GCS.
+In general, the mesh generator creates mesh cells one by one in a pre-defined row-column order. The generator calculates the locations of all vertices of each mesh cell. The coordinates may be converted back to GCS depending on whether the mesh is GCS or PCS.
 
-Usually, the boundary of the domain is defined in the configuration file and algorithm always starts from the lower left.
+Usually, the domain's boundary is defined in the configuration file, and the algorithm starts from the lower left.
 
 ------------------
 Latitude-longitude
@@ -157,7 +157,7 @@ Triangle
 Unstructured mesh
 ==============================
 
-PyFlowline does not provide the unstructured mesh generations. Instead, the user should use third-party generators such as the JIGSAW to generate the mesh files. PyFlowline only provides algorithms to import these mesh files and convert them to PyFlowline supported mesh data type.
+PyFlowline does not provide unstructured mesh generations. Instead, the user should use third-party generators such as the JIGSAW to generate the mesh files. PyFlowline only provides algorithms to import these mesh files and convert them to PyFlowline-supported mesh data type.
 
 ------------------
 MPAS
@@ -175,16 +175,19 @@ Topological relationship reconstruction
 Mesh and flowline intersection
 ==============================
 
-This algorithm calls the GDAL APIs to intersect the mesh with the vector simplified river network. Each stream segment is borken into reaches.
+This algorithm calls the GDAL APIs to intersect the mesh with the simplified river network. Each stream segment is broken into reaches.
+
+
+
+=======================================
+Topological relationship reconstruction
+=======================================
+
+After the intersection, this algorithm rebuilds the topologic relationship using the entrance and exit vertices of each reach to construct the reach-based or cell center-based river network.
+
 
 ==============================
 Remove returning flowline
 ==============================
 
 This algorithm simplifies the topology information for several unusual scenarios. For example, if a flowline leaves and reenters the same mesh cell through the same edge, this creates a loop in topology and will be simplified. 
-
-=======================================
-Topological relationship reconstruction
-=======================================
-
-After the intersection, this algorithm rebuild the topologic relationship using the entrance and exit vertices of each reach to contruct the reach-based or cell center-based river network.

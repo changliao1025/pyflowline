@@ -81,7 +81,8 @@ This algorithms scans the whole network and defines the vertices that has more t
 Merge flowline
 ==============================
 
-This algorithm merges flowlines so there are only 2 types of flowlines:
+This algorithm merges flowlines, so there are only two types of flowlines:
+
 
 1. headwaters
 

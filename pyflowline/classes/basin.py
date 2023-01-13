@@ -3,6 +3,7 @@ from pathlib import Path
 from abc import ABCMeta, abstractmethod
 import json
 from json import JSONEncoder
+
 import numpy as np
 from pyflowline.classes.timer import pytimer
 from pyflowline.classes.vertex import pyvertex
@@ -19,9 +20,15 @@ from pyflowline.formats.export_flowline import export_flowline_to_geojson
 from pyflowline.formats.export_vertex import export_vertex_to_geojson
 from pyflowline.algorithms.auxiliary.text_reader_string import text_reader_string
 
-#from pyflowline.algorithms.auxiliary.find_index_in_list import find_vertex_in_list
+#
 
-from pyflowline.algorithms.cython.kernel import find_vertex_in_list
+import importlib
+iFlag_cython = importlib.util.find_spec("cython") 
+if iFlag_cython is not None:
+    from pyflowline.algorithms.cython.kernel import find_vertex_in_list
+else:
+    from pyflowline.algorithms.auxiliary.find_index_in_list import find_vertex_in_list
+
 
 from pyflowline.algorithms.split.find_flowline_vertex import find_flowline_vertex
 from pyflowline.algorithms.split.find_flowline_confluence import find_flowline_confluence

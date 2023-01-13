@@ -130,9 +130,15 @@ Before PyFlowline uses the geographic coordinate system (GCS) execusively to all
 Structured mesh
 ==============================
 
+In general, the mesh generator creates mesh cells one by one in a pre-defined row-column order. The generator calculates the locations of all vertices of each mesh cell. Depending on whether the mesh is GCS or PCS, the coordinates may be converted back to GCS.
+
+Usually, the boundary of the domain is defined in the configuration file and algorithm always starts from the lower left.
+
 ------------------
 Latitude-longitude
 ------------------
+
+
 
 ------------------
 Projected
@@ -168,17 +174,16 @@ Topological relationship reconstruction
 Mesh and flowline intersection
 ==============================
 
+This algorithm calls the GDAL APIs to intersect the mesh with the vector simplified river network. Each stream segment is borken into reaches.
+
 ==============================
 Remove returning flowline
 ==============================
 
 This algorithm simplifies the topology information for several unusual scenarios. For example, if a flowline leaves and reenters the same mesh cell through the same edge, this creates a loop in topology and will be simplified. 
 
-
-==============================
-Split flowline to edge
-==============================
-
 =======================================
 Topological relationship reconstruction
 =======================================
+
+After the intersection, this algorithm rebuild the topologic relationship using the entrance and exit vertices of each reach to contruct the reach-based or cell center-based river network.

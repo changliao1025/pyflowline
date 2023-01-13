@@ -55,6 +55,10 @@ Flow direction correction
 Due to data quality issues, the existing flowlines may have incorrect flow directions, which lead to multiple downstream flow directions. 
 The corresponding node connection matrix has rows with multiple **1**s. This algorithm scans from the outlet vertex and searches reversely; once such a row is detected, the corresponding flow direction is reversed.
 
+.. image:: docs/figures/flow_direction_matrix.png
+  :width: 400
+  :alt: Flow direction correction
+
 ==============================
 Remove small river
 ==============================
@@ -70,6 +74,14 @@ Remove braided flowlines
 
 A braided loop occurs when a vertex has more than one downstream, even after the flow direction correction. This algorithm removes these loops by only keeping the first detected downstream of any vertex.
 
+
+.. image:: docs/figures/before_loop.png
+  :width: 400
+  :alt: Before loop removal
+
+.. image:: docs/figures/after_loop.png
+  :width: 400
+  :alt: After loop removal
 
 ==============================
 Flowline confluence extraction
@@ -89,6 +101,12 @@ This algorithm merges flowlines, so there are only two types of flowlines:
 2. flowline between the confluences
 
 If there are multiple flowlines within the same confluence bound, they are merged as one.
+
+.. image:: docs/figures/merge_flowline.png
+  :width: 400
+  :alt: Flowline merge
+
+
 
 ==============================
 Flowline confluence definition

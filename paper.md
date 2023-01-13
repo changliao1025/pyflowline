@@ -34,7 +34,7 @@ As a result, there is a need to develop a mesh-independent river network represe
 # Model features
 Pyflowline uses Python's object-oriented programming (OOP) architecture to describe the river network and its elements (i.e., segment, reach, confluence.) as objects processed throughout the package when applicable. 
 
-![The data model. \label{fig:oop}](https://github.com/changliao1025/pyflowline/blob/main/docs/figure/basic_element.png?raw=true)
+![The data model. \label{fig:oop}](https://github.com/changliao1025/pyflowline/blob/main/docs/figures/basic_element.png?raw=true)
 
 
 Pyflowline provides the following features:

@@ -55,7 +55,7 @@ Flow direction correction
 Due to data quality issues, the existing flowlines may have incorrect flow directions, which lead to multiple downstream flow directions. 
 The corresponding node connection matrix has rows with multiple **1**s. This algorithm scans from the outlet vertex and searches reversely; once such a row is detected, the corresponding flow direction is reversed.
 
-.. image:: ../figures/flow_direction_matrix.png
+.. image:: ../../figures/flow_direction_matrix.png
   :width: 400
   :alt: Flow direction correction
 
@@ -102,7 +102,7 @@ This algorithm merges flowlines, so there are only two types of flowlines:
 
 If there are multiple flowlines within the same confluence bound, they are merged as one.
 
-.. image:: ../figures/merge_flowline.png
+.. image:: ../../figures/merge_flowline.png
   :width: 400
   :alt: Flowline merge
 

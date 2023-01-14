@@ -22,6 +22,9 @@ class VertexClassEncoder(JSONEncoder):
         return JSONEncoder.default(self, obj)
 
 class pyvertex(object):
+    """
+    The vertex basic element class.
+    """
     __metaclass__ = ABCMeta  
     lIndex=-1 #this index will be used for array
     lVertexID=-1

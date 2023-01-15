@@ -2,4 +2,9 @@
 API Reference
 #############
 
-.. autodoxygenindex::
+.. doxygenindex::
+.. doxygenfunction::
+.. doxygenstruct::
+.. doxygenenum::
+.. doxygentypedef::
+.. doxygenclass::

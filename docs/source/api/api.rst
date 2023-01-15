@@ -3,7 +3,8 @@ API Reference
 #############
 
 .. autodoxygenindex::
-   :maxdepth: 2
+   :project: pyflowline
+
 
    
 

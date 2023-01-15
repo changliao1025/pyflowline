@@ -44,7 +44,7 @@ breathe_projects = {}
 
 if read_the_docs_build:
     input_dir = '../../pyflowline'
-    output_dir = '../build'
+    output_dir = '../_build'
     configureDoxyfile(input_dir, output_dir)
     subprocess.call('doxygen', shell=True)
     breathe_projects['pyflowline'] = output_dir + '/xml'
@@ -53,7 +53,7 @@ if read_the_docs_build:
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 #...
-extensions = [ "breathe" ]
+extensions = ['sphinx.ext.autodoc', "breathe" ]
 #...
 
 # Breathe Configuration
@@ -96,7 +96,7 @@ release = '1.0'
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
-exclude_patterns = ['build']
+exclude_patterns = ['_build', 'breathe/*']
 
 # The reST default role (used for this markup: `text`) to use for all
 # documents.

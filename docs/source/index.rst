@@ -10,7 +10,7 @@ Welcome to pyflowline's documentation!
    :maxdepth: 3
    :numbered:
    
-   /readme
+   readme
    installation/installation   
    data/data
    algorithm/algorithm
@@ -20,6 +20,7 @@ Welcome to pyflowline's documentation!
    support
    contribution
    api/api
+   authors
 
 Addendum
 --------

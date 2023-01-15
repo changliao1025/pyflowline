@@ -10,7 +10,7 @@ __pycache__backup/
 
 # Distribution / packaging
 .Python
-build/
+_build/
 develop-eggs/
 dist/
 downloads/
@@ -71,7 +71,7 @@ instance/
 .scrapy
 
 # Sphinx documentation
-docs/build/
+docs/_build/
 
 # PyBuilder
 target/

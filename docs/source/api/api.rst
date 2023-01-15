@@ -3,7 +3,7 @@ API Reference
 #############
 
 .. autodoxygenindex::
-   :project: pyflowline
+   :project: auto
 
 
    

@@ -1,6 +1,12 @@
 
-#from pyflowline.algorithms.auxiliary.find_index_in_list import add_unique_vertex
-from pyflowline.algorithms.cython.kernel import add_unique_vertex
+
+import importlib
+iFlag_cython = importlib.util.find_spec("cython") 
+if iFlag_cython is not None:
+    from pyflowline.algorithms.cython.kernel import add_unique_vertex
+else:
+    from pyflowline.algorithms.auxiliary.find_index_in_list import add_unique_vertex
+
 def find_flowline_vertex(aFlowline_in, dThreshold_in=1.0E-6): 
     nFlowline = len(aFlowline_in) 
     aVertex=list()

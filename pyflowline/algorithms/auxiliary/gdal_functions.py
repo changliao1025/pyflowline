@@ -6,7 +6,16 @@ from osgeo import ogr, osr, gdal
 from shapely.wkt import loads
 #most of these functions are copied from the pyearth package
 
-from pyflowline.algorithms.cython.kernel import longlat_to_3d
+
+
+import importlib
+iFlag_cython = importlib.util.find_spec("cython") 
+if iFlag_cython is not None:
+    from pyflowline.algorithms.cython.kernel import longlat_to_3d
+else:
+    from pyflowline.algorithms.auxiliary.longlat_to_3d import longlat_to_3d
+
+
 
 #https://stackoverflow.com/questions/8204998/how-to-check-if-a-pointlonc-latc-lie-on-a-great-circle-running-from-lona-lata
 def calculate_distance_to_plane(x1, y1, x2, y2, x3, y3):
@@ -62,13 +71,7 @@ def calculate_angle_betwen_vertex(x1, y1, x2, y2, x3, y3):
     angle3deg = angle_between_vectors_degrees(a3vec, c3vec)
     return  angle3deg
     
-def longlat_to_3d(lonr, latr):
-    """Convert a point given latitude and longitude in radians to
-    3-dimensional space, assuming a sphere radius of one."""
-    a = cos(latr) * cos(lonr)
-    b = cos(latr) * sin(lonr)
-    c = sin(latr)
-    return np.array((a,b,c))
+
 
 def angle_between_vectors_degrees(u, v):
     """Return the angle between two vectors in any dimension space,

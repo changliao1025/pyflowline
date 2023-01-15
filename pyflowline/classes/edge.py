@@ -4,9 +4,7 @@ from json import JSONEncoder
 import numpy as np
 from pyflowline.classes.vertex import pyvertex
 from pyflowline.algorithms.split.split_by_length import split_edge_by_length
-#
-#from pyflowline.algorithms.auxiliary.gdal_functions import  calculate_polygon_area
-#
+
 
 import importlib
 iFlag_cython = importlib.util.find_spec("cython") 

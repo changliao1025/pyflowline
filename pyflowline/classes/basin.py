@@ -27,7 +27,7 @@ iFlag_cython = importlib.util.find_spec("cython")
 if iFlag_cython is not None:
     from pyflowline.algorithms.cython.kernel import find_vertex_in_list
 else:
-    from pyflowline.algorithms.auxiliary.find_index_in_list import find_vertex_in_list
+    from pyflowline.algorithms.auxiliary.find_vertex_in_list import find_vertex_in_list
 
 
 from pyflowline.algorithms.split.find_flowline_vertex import find_flowline_vertex

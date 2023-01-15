@@ -2,9 +2,15 @@
 import numpy as np
 from pyflowline.classes.edge import pyedge
 from pyflowline.classes.flowline import pyflowline
-#from pyflowline.algorithms.auxiliary.find_index_in_list import find_vertex_on_edge
-from pyflowline.algorithms.cython.kernel import find_vertex_on_edge
-from pyflowline.algorithms.cython.kernel import find_vertex_in_list
+
+import importlib
+iFlag_cython = importlib.util.find_spec("cython") 
+if iFlag_cython is not None:
+    from pyflowline.algorithms.cython.kernel import find_vertex_on_edge
+    from pyflowline.algorithms.cython.kernel import find_vertex_in_list
+else:
+    from pyflowline.algorithms.auxiliary.find_index_in_list import find_vertex_on_edge    
+    from pyflowline.algorithms.auxiliary.find_vertex_in_list import find_vertex_in_list
 
 def split_flowline(aFlowline_in, aVertex_in, iFlag_intersect = None, iFlag_use_id=None):
     aFlowline_out = list()

@@ -6,9 +6,15 @@ from netCDF4 import Dataset
 from shapely.wkt import loads
 from pyflowline.classes.mpas import pympas
 from pyflowline.formats.convert_attributes import convert_gcs_attributes_to_cell
-#from pyflowline.algorithms.auxiliary.gdal_functions import convert_360_to_180
 
-from pyflowline.algorithms.cython.kernel import convert_360_to_180
+
+import importlib
+iFlag_cython = importlib.util.find_spec("cython") 
+if iFlag_cython is not None:
+    from pyflowline.algorithms.cython.kernel import convert_360_to_180
+else:
+    from pyflowline.algorithms.auxiliary.gdal_functions import convert_360_to_180
+
 
 
 def create_mpas_mesh(iFlag_global_in, \

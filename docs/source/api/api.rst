@@ -2,3 +2,4 @@
 API Reference
 #############
 
+.. autodoxygenindex::

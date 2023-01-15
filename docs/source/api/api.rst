@@ -2,21 +2,12 @@
 API Reference
 #############
 
-==========
-Containers
-==========
-
-.. toctree::
+.. autodoxygenindex::
    :maxdepth: 2
 
    
 
-==========
-Algorithms
-==========
 
-.. toctree::
-   :maxdepth: 2
 
   
 

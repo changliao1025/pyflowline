@@ -2,16 +2,3 @@
 API Reference
 #############
 
-.. autodoxygenindex::
-
-
-
-   
-
-
-
-  
-
-
-
-

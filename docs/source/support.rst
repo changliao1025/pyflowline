@@ -2,5 +2,5 @@
 Support
 #######
 
-Limited support is provided through Issue:
+Support is provided through Issue.
 

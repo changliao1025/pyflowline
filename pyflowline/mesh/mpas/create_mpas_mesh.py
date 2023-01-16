@@ -15,8 +15,6 @@ if iFlag_cython is not None:
 else:
     from pyflowline.algorithms.auxiliary.gdal_functions import convert_360_to_180
 
-
-
 def create_mpas_mesh(iFlag_global_in, \
     iFlag_use_mesh_dem, \
         iFlag_save_mesh_in, \

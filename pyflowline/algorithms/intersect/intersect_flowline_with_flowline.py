@@ -3,8 +3,14 @@ import numpy as np
 from osgeo import ogr, osr
 from shapely.wkt import loads
 from pyflowline.classes.vertex import pyvertex
-#from pyflowline.algorithms.auxiliary.find_index_in_list import find_vertex_in_list
-from pyflowline.algorithms.cython.kernel import find_vertex_in_list
+
+
+import importlib
+iFlag_cython = importlib.util.find_spec("cython") 
+if iFlag_cython is not None:
+    from pyflowline.algorithms.cython.kernel import find_vertex_in_list
+else:
+    from pyflowline.algorithms.auxiliary.find_vertex_in_list import find_vertex_in_list
 
 def intersect_flowline_with_flowline( sFilename_flowline_a_in, sFilename_flowline_b_in, sFilename_output_in):
     if  os.path.exists(sFilename_flowline_a_in) and  os.path.exists(sFilename_flowline_b_in) : 

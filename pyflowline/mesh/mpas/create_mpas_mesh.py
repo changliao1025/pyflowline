@@ -6,17 +6,36 @@ from netCDF4 import Dataset
 from shapely.wkt import loads
 from pyflowline.classes.mpas import pympas
 from pyflowline.formats.convert_attributes import convert_gcs_attributes_to_cell
-#from pyflowline.algorithms.auxiliary.gdal_functions import convert_360_to_180
-
-from pyflowline.algorithms.cython.kernel import convert_360_to_180
 
 
-def create_mpas_mesh(iFlag_global_in, \
-    iFlag_use_mesh_dem, \
-        iFlag_save_mesh_in, \
-       pPolygon_in, \
-     sFilename_mesh_netcdf_in, \
-         sFilename_output_in):    
+import importlib
+iFlag_cython = importlib.util.find_spec("cython") 
+if iFlag_cython is not None:
+    from pyflowline.algorithms.cython.kernel import convert_360_to_180
+else:
+    from pyflowline.algorithms.auxiliary.gdal_functions import convert_360_to_180
+
+def create_mpas_mesh(iFlag_global_in, 
+    iFlag_use_mesh_dem, 
+    iFlag_save_mesh_in, 
+    pPolygon_in, 
+    sFilename_mesh_netcdf_in, 
+    sFilename_output_in): 
+    """
+    _summary_
+
+    Args:
+        iFlag_global_in (_type_): _description_
+        iFlag_use_mesh_dem (_type_): _description_
+        iFlag_save_mesh_in (_type_): _description_
+        pPolygon_in (_type_): _description_
+        sFilename_mesh_netcdf_in (_type_): _description_
+        sFilename_output_in (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
+       
     if (os.path.exists(sFilename_mesh_netcdf_in)):
         pass
     else:

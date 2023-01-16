@@ -12,8 +12,25 @@ from pyflowline.formats.convert_coordinates import convert_gcs_coordinates_to_ce
 
 from pyflowline.algorithms.auxiliary.gdal_functions import  reproject_coordinates_batch
 
-def create_square_mesh(dX_left_in, dY_bot_in, dResolution_meter_in, ncolumn_in, nrow_in, \
+def create_square_mesh(dX_left_in, dY_bot_in, dResolution_meter_in, ncolumn_in, nrow_in, 
     sFilename_output_in, sFilename_spatial_reference_in):   
+    """
+    _summary_
+
+    Args:
+        dX_left_in (_type_): _description_
+        dY_bot_in (_type_): _description_
+        dResolution_meter_in (_type_): _description_
+        ncolumn_in (_type_): _description_
+        nrow_in (_type_): _description_
+        sFilename_output_in (_type_): _description_
+        sFilename_spatial_reference_in (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
+
+
     if os.path.exists(sFilename_output_in): 
         os.remove(sFilename_output_in)
 

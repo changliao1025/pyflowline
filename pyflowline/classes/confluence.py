@@ -5,9 +5,17 @@ from json import JSONEncoder
 from pyflowline.classes.vertex import pyvertex
 from pyflowline.classes.flowline import pyflowline
 
-#from pyflowline.algorithms.auxiliary.gdal_functions import  calculate_angle_betwen_vertex
+#
 
-from pyflowline.algorithms.cython.kernel import calculate_angle_betwen_vertex
+
+import importlib
+iFlag_cython = importlib.util.find_spec("cython") 
+if iFlag_cython is not None:
+    from pyflowline.algorithms.cython.kernel import calculate_angle_betwen_vertex
+else:
+    from pyflowline.algorithms.auxiliary.gdal_functions import  calculate_angle_betwen_vertex
+
+
 
 class ConfluenceClassEncoder(JSONEncoder):
     def default(self, obj):

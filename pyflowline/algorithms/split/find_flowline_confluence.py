@@ -1,10 +1,17 @@
 
 import numpy as np
-#from pyflowline.algorithms.auxiliary.find_index_in_list import find_vertex_in_list
-#from pyflowline.algorithms.auxiliary.find_index_in_list import add_unique_vertex
-from pyflowline.algorithms.cython.kernel import find_vertex_in_list
-from pyflowline.algorithms.cython.kernel import add_unique_vertex
+
 from pyflowline.algorithms.auxiliary.check_head_water import check_head_water
+
+
+import importlib
+iFlag_cython = importlib.util.find_spec("cython") 
+if iFlag_cython is not None:
+    from pyflowline.algorithms.cython.kernel import add_unique_vertex
+    from pyflowline.algorithms.cython.kernel import find_vertex_in_list
+else:
+    from pyflowline.algorithms.auxiliary.find_index_in_list import add_unique_vertex
+    from pyflowline.algorithms.auxiliary.find_vertex_in_list import find_vertex_in_list
 
 def find_flowline_confluence(aFlowline_in, pVertex_outlet_in):    
     nFlowline = len(aFlowline_in) 

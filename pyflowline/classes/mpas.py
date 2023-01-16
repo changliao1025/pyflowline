@@ -35,6 +35,15 @@ class MpasClassEncoder(JSONEncoder):
 
 
 class pympas(pycell):
+    """
+    MPAS class
+
+    Args:
+        pycell (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
     lCellID  = -1    
     nFlowline=0
     nVertex =0 

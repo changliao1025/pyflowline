@@ -25,7 +25,7 @@ class pyvertex(object):
     """
     The vertex basic element class.
     """
-    __metaclass__ = ABCMeta  
+  
     lIndex=-1 #this index will be used for array
     lVertexID=-1
     lFlowlineID = -1  #we use this id only for intersect
@@ -111,7 +111,14 @@ class pyvertex(object):
 
   
 class pynvector(object):
-    __metaclass__ = ABCMeta 
+    """vector class
+
+    Args:
+        object (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
     dX=-9999
     dY=-9999
     dZ=-9999

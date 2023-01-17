@@ -60,8 +60,8 @@ class CaseClassEncoder(JSONEncoder):
         return JSONEncoder.default(self, obj)
 
 class flowlinecase(object):
-    __metaclass__ = ABCMeta
     iCase_index= 0
+    
     sMesh_type = 1
     iFlag_standalone=1
     iFlag_flowline = 1

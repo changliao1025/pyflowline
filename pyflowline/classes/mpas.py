@@ -36,7 +36,7 @@ class MpasClassEncoder(JSONEncoder):
 
 class pympas(pycell):
     """
-    MPAS class
+    MPAS cell class
 
     Args:
         pycell (_type_): _description_

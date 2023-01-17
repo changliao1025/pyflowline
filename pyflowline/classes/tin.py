@@ -4,7 +4,16 @@ from pyflowline.classes.vertex import pyvertex
 from pyflowline.classes.edge import pyedge
 from pyflowline.classes.cell import pycell
 
-class pytin(pycell):    
+class pytin(pycell):   
+    """tin class
+
+    Args:
+        pycell (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
+
     nFlowline=0
     nVertex =0 
     nEdge=0

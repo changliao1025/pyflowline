@@ -30,6 +30,15 @@ class LatlonClassEncoder(JSONEncoder):
             
         return JSONEncoder.default(self, obj)
 class pylatlon(pycell):
+    """latlon cell class
+
+    Args:
+        pycell (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
+
     lCellID  = -1
     nFlowline=0
     nVertex =0 

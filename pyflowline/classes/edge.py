@@ -32,7 +32,16 @@ class EdgeClassEncoder(JSONEncoder):
         return JSONEncoder.default(self, obj)
 
 class pyedge(object):
-    __metaclass__ = ABCMeta 
+    """edge class
+
+    Args:
+        object (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
+
+
     lEdgeID=-1
     lIndex=-1
     pVertex_start = None

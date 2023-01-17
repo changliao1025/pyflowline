@@ -5,9 +5,6 @@ from json import JSONEncoder
 from pyflowline.classes.vertex import pyvertex
 from pyflowline.classes.flowline import pyflowline
 
-#
-
-
 import importlib
 iFlag_cython = importlib.util.find_spec("cython") 
 if iFlag_cython is not None:
@@ -18,6 +15,11 @@ else:
 
 
 class ConfluenceClassEncoder(JSONEncoder):
+    """Confluence Class Encoder
+
+    Args:
+        JSONEncoder (_type_): _description_
+    """
     def default(self, obj):
         if isinstance(obj, np.integer):
             return int(obj)
@@ -35,7 +37,12 @@ class ConfluenceClassEncoder(JSONEncoder):
         return JSONEncoder.default(self, obj)
 
 class pyconfluence():
-    __metaclass__ = ABCMeta  
+    """confluence class
+
+    Returns:
+        _type_: _description_
+    """
+
     lIndex=-1 
     lConfluenceID=-1    
     pVertex_confluence=None    

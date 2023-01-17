@@ -24,6 +24,15 @@ class LinkClassEncoder(JSONEncoder):
         return JSONEncoder.default(self, obj)
 
 class pycelllink(object):
+    """link class
+
+    Args:
+        object (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
+
     lIndex=0
     pCell_start=None
     pCell_end=None

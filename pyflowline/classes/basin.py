@@ -1,6 +1,5 @@
 import os, sys
 from pathlib import Path
-from abc import ABCMeta, abstractmethod
 import json
 from json import JSONEncoder
 
@@ -12,7 +11,7 @@ from pyflowline.classes.flowline import pyflowline
 from pyflowline.classes.confluence import pyconfluence
 
 from pyflowline.formats.read_flowline import read_flowline_geojson
-from pyflowline.formats.read_nhdplus_flowline_shapefile import read_nhdplus_flowline_shapefile_attribute, read_nhdplus_flowline_geojson_attribute
+from pyflowline.formats.read_nhdplus_flowline_shapefile import  read_nhdplus_flowline_geojson_attribute
 from pyflowline.formats.read_nhdplus_flowline_shapefile import extract_nhdplus_flowline_shapefile_by_attribute
 from pyflowline.formats.read_nhdplus_flowline_shapefile import track_nhdplus_flowline
 from pyflowline.formats.convert_flowline_to_geojson import convert_flowline_to_geojson
@@ -48,6 +47,11 @@ from pyflowline.algorithms.intersect.intersect_flowline_with_flowline import int
 from pyflowline.algorithms.auxiliary.calculate_area_of_difference import calculate_area_of_difference_simplified
 
 class BasinClassEncoder(JSONEncoder):
+    """Basin class encoder
+
+    Args:
+        JSONEncoder (_type_): _description_
+    """
     def default(self, obj):
         if isinstance(obj, np.integer):
             return int(obj)
@@ -72,6 +76,14 @@ class BasinClassEncoder(JSONEncoder):
 
 
 class pybasin(object):
+    """Basin class
+
+    Args:
+        object (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
     lBasinID =1 
     sBasinID=''
     lCellID_outlet=-1

@@ -2,5 +2,5 @@
 API Reference
 #############
 
-.. doxygenfunction::
-.. doxygenclass::
+
+.. doxygenindex::

@@ -10,7 +10,7 @@ Overview
 A list of algorithms is implemented to carry out the following operations:
 
 1. Flowline simplification
-2. Mesh generations
+2. Mesh generation
 3. Topological relationship reconstruction
 
 *************************
@@ -153,23 +153,37 @@ In general, the mesh generator creates mesh cells one by one in a pre-defined ro
 
 Usually, the domain's boundary is defined in the configuration file, and the algorithm starts from the lower left.
 
+------------------------
+Latitude-longitude mesh
+------------------------
+
+1. Coordinates of 4 vertices are calculated, then a cell is defined.
+2. Repeat until all cells are generated
+
+
 ------------------
-Latitude-longitude
+Projected mesh
 ------------------
 
 
+1. Coordinates of 4 vertices are calculated, and the coordinates are re-projected to GCS. Then a cell is defined.
+2. Repeat until all cells are generated
 
 ------------------
-Projected
+Hexagon mesh
 ------------------
 
-------------------
-Hexagon
-------------------
 
-----------
-Triangle
-----------
+1. Coordinates of 6 vertices are calculated, and the coordinates are re-projected to GCS. Then a cell is defined.
+2. Repeat until all cells are generated
+
+----------------
+Triangle mesh
+----------------
+
+
+1. Coordinates of 3 vertices are calculated, and the coordinates are re-projected to GCS. Then a cell is defined.
+2. Repeat until all cells are generated
 
 ==============================
 Unstructured mesh
@@ -181,9 +195,13 @@ PyFlowline does not provide unstructured mesh generations. Instead, the user sho
 MPAS
 ------------------
 
+Supported by `JIGSAW`
+
 ------------------
 TIN
 ------------------
+
+Not yet supported
 
 *******************************************
 Topological relationship reconstruction

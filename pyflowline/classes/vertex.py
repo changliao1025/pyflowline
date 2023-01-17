@@ -26,7 +26,8 @@ class pyvertex(object):
     The vertex basic element class.
     """
   
-    lIndex=-1 #this index will be used for array
+    lIndex=-1 
+    """this index will be used for array - class variable"""
     lVertexID=-1
     lFlowlineID = -1  #we use this id only for intersect
     dX_meter=-9999
@@ -37,6 +38,7 @@ class pyvertex(object):
     dLongitude_radian=0.0
     dLatitude_radian=0.0
     dElevation=0.0    
+    """the vertex elevation - class variable"""
     def __init__(self, aParameter):
         if 'x' in aParameter:            
             self.dX_meter             = float(aParameter['x'])
@@ -49,18 +51,26 @@ class pyvertex(object):
         
         #longitude and latitude are always required     
         try:     
-            self.dLongitude_degree      = float(aParameter['dLongitude_degree'])                 
+            self.dLongitude_degree      = float(aParameter['dLongitude_degree'])      
+            """dLongitude_degree - instance variable"""           
             self.dLatitude_degree       = float(aParameter['dLatitude_degree'])
+            """dLatitude_degree - instance variable"""
 
             self.dLongitude_radian = np.radians(self.dLongitude_degree)
             self.dLatitude_radian = np.radians(self.dLatitude_degree)
+            
         except:
             print('Initialization of vertex failed!')
         
         return
 
     def toNvector(self): 
-        #note: replicated in LatLon_NvectorEllipsoidal
+        """note: replicated in LatLon_NvectorEllipsoidal
+
+        Returns:
+            _type_: _description_
+        """
+        
         a = self.dLatitude_radian
         b = self.dLongitude_radian
         c = np.sin(a)

@@ -3,5 +3,5 @@ API Reference
 #############
 
 
-.. doxygenclass:: pycase
-.. doxygenclass:: pyvertex
+.. doxygenclass:: pyflowline::classes::pycase
+.. doxygenclass:: pyflowline::classes::pyvertex

@@ -2,5 +2,6 @@
 API Reference
 #############
 
-.. doxygenfunction::
-.. doxygenclass::
+
+.. doxygenclass:: pycase
+.. doxygenclass:: pyvertex

@@ -30,7 +30,15 @@ class HexagonClassEncoder(JSONEncoder):
         return JSONEncoder.default(self, obj)
 
 class pyhexagon(pycell):
-    #lIndex=-1      
+    """hexagon cell class
+
+    Args:
+        pycell (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
+       
     lCellID  = -1
     nFlowline=0
     nVertex =0 

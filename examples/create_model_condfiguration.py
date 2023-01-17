@@ -2,12 +2,6 @@ import sys
 from pathlib import Path
 from os.path import realpath
 import argparse
-import logging
-for handler in logging.root.handlers[:]:
-    logging.root.removeHandler(handler)
-
-logging.basicConfig(format='%(asctime)s %(message)s')
-logging.warning('is the time Pyflowline simulation started.')
 
 from pyflowline.pyflowline_create_template_configuration_file import pyflowline_create_template_configuration_file
 
@@ -37,7 +31,7 @@ else:
         pass
 
 sPath = str( Path().resolve() )
-iFlag_option = 1
+
 sWorkspace_data = realpath( sPath +  '/data/susquehanna' )
 sWorkspace_input =  str(Path(sWorkspace_data)  /  'input')
 sWorkspace_output=  str(Path(sWorkspace_data)  /  'output')
@@ -51,5 +45,3 @@ print(oPyflowline.tojson())
 
 print('Finished')
 
-logging.basicConfig(format='%(asctime)s %(message)s')
-logging.warning('is the time Pyflowline simulation finished.')

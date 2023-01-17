@@ -27,7 +27,14 @@ class FlowlineClassEncoder(JSONEncoder):
         return JSONEncoder.default(self, obj)
 
 class pyflowline(object):
-    __metaclass__ = ABCMeta 
+    """flowline class
+
+    Args:
+        object (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
 
     lFlowlineID=-1
     lIndex=-1

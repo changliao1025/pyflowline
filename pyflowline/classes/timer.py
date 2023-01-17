@@ -4,6 +4,8 @@ class TimerError(Exception):
     """A custom exception used to report errors in use of Timer class"""
 
 class pytimer:
+    """timer class
+    """
     def __init__(self):
         self._start_time = None
 

@@ -78,7 +78,7 @@ class pympas(pycell):
     aNeighbor_distance = None
 
     def __init__(self, dLon, dLat, aEdge, aVertex):
-        """initilize the mpas class instance
+        """Initilize the mpas class instance
 
         Args:
             dLon (float): The center location longitude
@@ -117,6 +117,14 @@ class pympas(pycell):
     
    
     def has_this_edge(self, pEdge_in):
+        """Check whether the cell contains an edge
+
+        Args:
+            pEdge_in (pyedge): the to be checked edge
+
+        Returns:
+            int: 1 if contains; or else 0
+        """
         iFlag_found = 0
         for pEdge in self.aEdge:
             if pEdge.is_overlap(pEdge_in):
@@ -128,6 +136,14 @@ class pympas(pycell):
         return iFlag_found
 
     def which_edge_cross_this_vertex(self, pVertex_in):
+        """When a flowline intersects with a cell, this function finds out which edge is intersected
+
+        Args:
+            pVertex_in (pyvertex): the intersected vertex
+
+        Returns:
+            tuple: (1, edge) if contains; or else (0, None) 
+        """
         iFlag_found = 0
         pEdge_out = None
         for pEdge in self.aEdge:
@@ -141,7 +157,12 @@ class pympas(pycell):
 
         return iFlag_found, pEdge_out
     
-    def calculate_cell_area(self): #not used anymore
+    def calculate_cell_area(self):
+        """Calculate the area of a cell, this function is not used for mpas cell
+
+        Returns:
+            float: cell area
+        """
         lons=list()
         lats=list()        
         for i in range(self.nVertex):            
@@ -151,11 +172,24 @@ class pympas(pycell):
         self.dArea = calculate_polygon_area(lons,lats )
         return self.dArea
 
-    def calculate_edge_length(self):        
+    def calculate_edge_length(self):
+        """Calculate the effective cell length/resolution
+
+        Returns:
+            float: effective cell length/resolution
+        """
         self.dLength_edge = np.sqrt( self.dArea )
         return self.dLength_edge
     
     def share_edge(self, other):
+        """Check if two cells share an edge
+
+        Args:
+            other (pympas): the other cell
+
+        Returns:
+            int: 1 if shared, 0 if not
+        """
         iFlag_share = 0
         for pEdge in self.aEdge:
             for pEdge2 in other.aEdge:
@@ -167,6 +201,11 @@ class pympas(pycell):
 
     
     def tojson(self):
+        """Convert a cell into a json object
+
+        Returns:
+            json: A json object
+        """
         aSkip = ['aEdge', \
                 'aFlowline']
         obj = self.__dict__.copy()

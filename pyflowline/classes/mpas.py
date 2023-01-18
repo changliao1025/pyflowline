@@ -39,12 +39,12 @@ class pympas(pycell):
     MPAS cell class
 
     Args:
-        pycell (_type_): _description_
+        pycell (object): _description_
 
     Returns:
-        _type_: _description_
+        object: _description_
     """
-    lCellID  = -1    
+    lCellID  = -1  
     nFlowline=0
     nVertex =0 
     nEdge=0
@@ -77,7 +77,17 @@ class pympas(pycell):
     aNeighbor_ocean=None #the global ID of all neighbors
     aNeighbor_distance = None
 
-    def __init__(self, dLon, dLat, aEdge, aVertex):    
+    def __init__(self, dLon, dLat, aEdge, aVertex):
+        """initilize the mpas class instance
+
+        Args:
+            dLon (float): The center location longitude
+            dLat (float): The center location latitude
+            aEdge (list): The list of edge instances
+            aVertex (list): The list of vertex instances
+        """
+       
+
         nEdge = len(aEdge)
         if nEdge < 3 or nEdge > 8:
             print('At lease 3 edges are required!')

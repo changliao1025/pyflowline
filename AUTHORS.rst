@@ -11,6 +11,6 @@ Development Lead
 Contributors
 ------------
 
-* Matt Cooper, Pacific Northwest National Laboratory
+* Matt G Cooper, Pacific Northwest National Laboratory
 
 None yet. Why not be the first?

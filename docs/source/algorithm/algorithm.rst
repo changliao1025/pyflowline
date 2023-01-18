@@ -45,7 +45,7 @@ Split flowline
 
 With all the flowlines and vertices, the algorithm split the flowlines into a minimal set that meets the following requirement:
 
-* All flowlines' start and end vertices are made up by the vertex loop-up table.
+* All flowlines' starting and ending vertices are made up by the vertex loop-up table.
 
 * No flowline has a middle vertex that belongs to the same look-up table.
 
@@ -54,7 +54,7 @@ Flow direction correction
 ==============================
 
 Due to data quality issues, the existing flowlines may have incorrect flow directions, which lead to multiple downstream flow directions. 
-The corresponding node connection matrix has rows with multiple *1* s. This algorithm scans from the outlet vertex and searches reversely; once such a row is detected, the corresponding flow direction is reversed.
+The corresponding node connection matrix has rows with multiple *1*s. This algorithm scans from the outlet vertex and searches reversely; once such a row is detected, the corresponding flow direction is reversed.
 
 .. image:: ../../figures/flow_direction_matrix.png
   :width: 400
@@ -119,13 +119,13 @@ After the flowlines are in the final format, the confluences are redefined using
 Stream segment index
 ==============================
 
-This algorithm defines the stream segment index using the class method.
+This algorithm defines the stream segment index using their topologic relationship..
 
 ==============================
 Stream segment order
 ==============================
 
-This algorithm defines the stream order based on the stream segment topology.
+This algorithm defines the stream order based on the stream segment topology and the classic stream order, also called Hack's stream order or Gravelius' stream order method.
 
 ==============================
 Split flowline by length
@@ -142,7 +142,7 @@ Mesh generation
 
 PyFlowline provides several algorithms to generate structured meshes, including latitude-longitude, projected, hexagon, triangle meshes.
 
-The hexagon mesh generator also provides an option for a 60-degree rotation.
+The hexagon mesh generator also provides an option for a 60-degree rotation (https://www.redblobgames.com/grids/hexagons/#basics).
 
 PyFlowline uses the geographic coordinate system (GCS) exclusively for all the computational geometry, all the meshes are converted to the GCS system. See the hexagon mesh for an example.
 
@@ -150,7 +150,7 @@ PyFlowline uses the geographic coordinate system (GCS) exclusively for all the c
 Structured mesh
 ==============================
 
-In general, the mesh generator creates mesh cells one by one in a pre-defined row-column order. The generator calculates the locations of all vertices of each mesh cell. The coordinates may be converted back to GCS depending on whether the mesh is GCS or PCS.
+In general, the mesh generator creates mesh cells one by one in a pre-defined row-column order starting from the lower left corner. The generator calculates the locations of all vertices of each mesh cell. The coordinates will be converted back to GCS if the mesh is in PCS.
 
 Usually, the domain's boundary is defined in the configuration file, and the algorithm starts from the lower left.
 
@@ -167,7 +167,7 @@ Projected mesh
 ------------------
 
 
-1. Coordinates of 4 vertices are calculated, and the coordinates are re-projected to GCS. Then a cell is defined.
+1. Coordinates of 4 vertices are calculated and re-projected to GCS, then a cell is defined.
 2. Repeat until all cells are generated
 
 ------------------
@@ -175,7 +175,7 @@ Hexagon mesh
 ------------------
 
 
-1. Coordinates of 6 vertices are calculated, and the coordinates are re-projected to GCS. Then a cell is defined.
+1. Coordinates of 6 vertices are calculated and re-projected to GCS, then a cell is defined.
 2. Repeat until all cells are generated
 
 ----------------
@@ -183,7 +183,7 @@ Triangle mesh
 ----------------
 
 
-1. Coordinates of 3 vertices are calculated, and the coordinates are re-projected to GCS. Then a cell is defined.
+1. Coordinates of 3 vertices are calculated and re-projected to GCS, then a cell is defined.
 2. Repeat until all cells are generated
 
 ==============================
@@ -204,6 +204,12 @@ TIN
 
 Not yet supported
 
+------------------
+DGGrid
+------------------
+
+Not yet supported
+
 *******************************************
 Topological relationship reconstruction
 *******************************************
@@ -212,7 +218,7 @@ Topological relationship reconstruction
 Mesh and flowline intersection
 ==============================
 
-This algorithm calls the GDAL APIs to intersect the mesh with the simplified river network. Each stream segment is broken into reaches.
+This algorithm calls the GDAL (https://gdal.org/) APIs to intersect the mesh with the simplified river network. Each stream segment is broken into reaches.
 
 
 

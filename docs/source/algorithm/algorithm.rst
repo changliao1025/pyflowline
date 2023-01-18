@@ -33,11 +33,11 @@ Currently, this algorithm does not include the upstream of a dam.
 Flowline vertex extraction
 ==============================
 
-The vertices that make up flowlines are used in several algorithms. Among them, a flowline's start and end vertices also define the flowline type. 
+The vertices that make up flowlines are used in several algorithms. Among them, a flowline's starting and ending vertices also define the flowline type. 
 
-* If the start vertex has no upstream, the flowline is a headwater.
-* If the start or end vertex has only one upstream or downstream, it is a middle flowline and can be merged with others. 
-* If a start vertex has more than one upstream vertices, it is a river confluence.
+* If the starting vertex has no upstream, the flowline is a headwater.
+* If the starting or ending vertex has only one upstream or downstream, it is a middle flowline and can be merged with others. 
+* If a starting vertex has more than one upstream vertices, it is a river confluence.
 
 ==============================
 Split flowline
@@ -46,6 +46,7 @@ Split flowline
 With all the flowlines and vertices, the algorithm split the flowlines into a minimal set that meets the following requirement:
 
 * All flowlines' start and end vertices are made up by the vertex loop-up table.
+
 * No flowline has a middle vertex that belongs to the same look-up table.
 
 ==============================

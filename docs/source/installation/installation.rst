@@ -19,19 +19,19 @@ If the Conda system is used to install the PyFlowline package, conda will automa
 
 The dependency packages can also be installed manually.
 
-* `numpy``
+* `numpy`
 * `gdal`
 * `netCDF4`
 * `shapely`
 * `cython` (optional)
 * `cartopy` (optional, for visualization)
-* `matplotlib (optional, for visualization)
+* `matplotlib` (optional, for visualization)
 
 ***********
 Instruction 
 ***********
 
-In most cases, you can install PyFlowline through the Conda system:
+You can install PyFlowline through the Conda system:
 
     conda install -c conda-forge pyflowline
 

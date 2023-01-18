@@ -4,7 +4,7 @@ Contribution
 ############
 
 
-Pyflowline was developed and maintainced by
+PyFlowline was developed and maintained by
 
 * Chang Liao (Pacific Northwest National Laboratory)
 

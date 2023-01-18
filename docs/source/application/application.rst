@@ -17,7 +17,7 @@ Model simulation
 Step 1
 ================
 
-The example 'run_simulation_mpas.py' script import a few packages and functions.
+The example `run_simulation_mpas.py` script import a few packages and functions.
 
 ::
 
@@ -26,7 +26,7 @@ The example 'run_simulation_mpas.py' script import a few packages and functions.
     from os.path import realpath
     from pyflowline.pyflowline_read_model_configuration_file import pyflowline_read_model_configuration_file
 
-The 'pyflowline_read_model_configuration_file' function reads in a JSON configuration file and loads all the necessary model parameters. 
+The `pyflowline_read_model_configuration_file` function reads in a JSON configuration file and loads all the necessary model parameters. 
 
 
 ================

@@ -90,6 +90,7 @@ An example parent JSON file is provided below:
 
 +--------------------------------+------------+-----------------------------------------+----------------+-------------------------------------+
 | Parameter                      | Data type  | Usage                                   | Default value  | Note                                |
+|                                |            |                                         |                |                                     |
 +================================+============+=========================================+================+=====================================+
 | sFilename_model_configuration  | string     | The filename of the configuration file  | None           | It will be automatically generated  |
 | sWorkspace_data                | string     | The workspace of data                   |                |                                     |
@@ -149,6 +150,7 @@ An example child JSON file is provided below:
 
 +--------------------------------+------------+-----------------------------------------+----------------+-------------------------------------+
 | Parameter                      | Data type  | Usage                                   | Default value  | Note                                |
+|                                |            |                                         |                |                                     |
 +================================+============+=========================================+================+=====================================+
 | dLatitude_outlet_degree        | string     | The latitude of outlet                  | None           | It will be automatically generated  |
 | dLongitude_outlet_degree       | string     | The longitude of outlet                 |                |                                     |

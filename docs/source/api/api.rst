@@ -3,4 +3,13 @@ API Reference
 #############
 
 
-.. doxygenindex::
+*********
+Class
+*********
+
+.. doxygenclass:: pybasin
+    
+
+*********
+Function
+*********

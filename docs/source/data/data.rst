@@ -95,21 +95,21 @@ An example parent JSON file is provided below:
 | sWorkspace_data                | string     | The workspace of data                   |                |                                     |
 | sWorkspace_output              | string     | The output workspace                    |                |                                     |
 | sWorkspace_project             | string     | The project workspace                   |                |                                     |
-| sWorkspace_bin                 | string     | The workspace for binary executable     |                |                                     |
+| sWorkspace_bin                 | string     | The workspace for binary executable     |                | Reserved for HexWatershed model     |
 | sRegion                        | string     | Study region                            |                |                                     |
 | sModel                         | string     | Model name                              |                |                                     |
 | sJob                           | string     | HPC batch job name                      |                |                                     |
 | iFlag_standalone               | int        | Flag to run pyflowlone standalone       |  1             |                                     |
-| iFlag_create_mesh              | int        | Flag to create mesh                     |                |                                     |
-| iFlag_save_mesh                | int        | Flag to save mesh                       |                |                                     |
-| iFlag_simplification           | int        | Flag to simplification                  |                |                                     |
-| iFlag_intersect                | int        | Flag to intersect                       |                |                                     |
-| iFlag_flowline                 | int        | Flag for flowline                       |                |                                     |
-| iFlag_use_mesh_dem             | int        | Flag to use DEM data                    |                |                                     |
-| iFlag_global                   | int        | Flag to run on global scale             |                |                                     |
-| iFlag_multiple_outlet          | int        | Flag to run with multi-outlet           |                |                                     |
-| iFlag_rotation                 | int        | Flag for hexagon rotation               |                |                                     |
-| iCase_index                    | int        | Index of case                           |                |                                     |
+| iFlag_create_mesh              | int        | Flag to create mesh                     |  1             |                                     |
+| iFlag_save_mesh                | int        | Flag to save mesh                       |  1             |                                     |
+| iFlag_simplification           | int        | Flag to simplification                  |  1             |                                     |
+| iFlag_intersect                | int        | Flag to intersect                       |  1             |                                     |
+| iFlag_flowline                 | int        | Flag for flowline                       |  1             |                                     |
+| iFlag_use_mesh_dem             | int        | Flag to use DEM data                    |  0             |                                     |
+| iFlag_global                   | int        | Flag to run on global scale             |  0             |                                     |
+| iFlag_multiple_outlet          | int        | Flag to run with multi-outlet           |  0             |                                     |
+| iFlag_rotation                 | int        | Flag for hexagon rotation               |  0             |                                     |
+| iCase_index                    | int        | Index of case                           |  1             |                                     |
 | iMesh_type                     | int        | Type of mesh                            |                |                                     |
 | dLongitude_left                | float      | Boundary                                |                |                                     |
 | dLongitude_right               | float      | Boundary                                |                |                                     |
@@ -120,7 +120,7 @@ An example parent JSON file is provided below:
 | sDate                          | string     | Date of simulation                      |                |                                     |
 | sMesh_type                     | string     | Mesh type                               |                |                                     |
 | sFilename_spatial_reference    | string     | Spatial reference                       |                |                                     |
-| sFilename_dem                  | string     | DEM file                                |                |                                     |
+| sFilename_dem                  | string     | DEM file                                |                |  Reserved for HexWatershed model    |
 | sFilename_mesh_netcdf          | string     | Netcdf mesh file                        |                |                                     |
 | sFilename_basins               | string     | Filename of child JSON file             |                |                                     |
 +--------------------------------+------------+-----------------------------------------+----------------+-------------------------------------+
@@ -150,18 +150,18 @@ An example child JSON file is provided below:
 +--------------------------------+------------+-----------------------------------------+----------------+-------------------------------------+
 | Parameter                      | Data type  | Usage                                   | Default value  | Note                                |
 +================================+============+=========================================+================+=====================================+
-| dLatitude_outlet_degree        | string     | The filename of the configuration file  | None           | It will be automatically generated  |
-| dLongitude_outlet_degree       | string     | The workspace of data                   |                |                                     |
-| dAccumulation_threshold        | string     | The output workspace                    |                |                                     |
-| dThreshold_small_river         | string     | The project workspace                   |                |                                     |
-| iFlag_dam                      | string     | The workspace for binary executable     |                |                                     |
-| iFlag_debug                    | string     | Study region                            |                |                                     |
-| iFlag_disconnected             | string     | Model name                              |                |                                     |
-| lBasinID                       | string     | HPC batch job name                      |                |                                     |
-| sFilename_dam                  | int        | Flag to run pyflowlone standalone       |  1             |                                     |
-| sFilename_flowline_filter      | int        | Flag to create mesh                     |                |                                     |
-| sFilename_flowline_raw         | int        | Flag to save mesh                       |                |                                     |
-| sFilename_flowline_topo        | int        | Flag to simplification                  |                |                                     |
+| dLatitude_outlet_degree        | string     | The latitude of outlet                  | None           | It will be automatically generated  |
+| dLongitude_outlet_degree       | string     | The longitude of outlet                 |                |                                     |
+| dAccumulation_threshold        | string     | The flow accumulation threshold         |                |                                     |
+| dThreshold_small_river         | string     | The small river threshold               |                |                                     |
+| iFlag_dam                      | string     | Flag for dam burning                    |  0             |                                     |
+| iFlag_debug                    | string     | Flag to turn on debug info              |  0             |                                     |
+| iFlag_disconnected             | string     | Flag for disconnected flowline          |  0             |                                     |
+| lBasinID                       | string     | Basin/watershed ID                      |  0             |                                     |
+| sFilename_dam                  | int        | Filename of dam file                    |  1             |                                     |
+| sFilename_flowline_filter      | int        | Filename of original flowline file      |                |                                     |
+| sFilename_flowline_raw         | int        | Filename of flowline including dam      |                |                                     |
+| sFilename_flowline_topo        | int        | Filename of dam topology                |                |                                     |
 +--------------------------------+------------+-----------------------------------------+----------------+-------------------------------------+
 
 

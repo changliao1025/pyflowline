@@ -16,7 +16,7 @@ Class
 .. doxygenclass:: pyflowline::classes::edge::pyedge
     :members:
 
-.. doxygenclass:: pyflowline::classes::pyflowline::pyflowline
+.. doxygenclass:: pyflowline::classes::flowline::pyflowline
     :members:
 
 .. doxygenclass:: pyflowline::classes::hexagon::pyhexagon

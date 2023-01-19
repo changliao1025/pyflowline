@@ -41,11 +41,14 @@ File I/O
 Inputs
 ==============================
 
+
+
+
 PyFlowline uses two configuration files to manage all the input information. Within this configuration file, it stores major model input parameters paths to input files. 
 
 These two configuration files have a parent-child relationship:
 1. The parent configuration file stores parameters for the whole domain, and
-2. The child configuration file stores parameters for each single watershed.
+2. The child configuration file stores parameters for every single watershed.
 
 Both configuration files are in JSON format.
 
@@ -212,3 +215,34 @@ An example child JSON file is provided below:
 ==============================
 Outputs
 ==============================
+
+After the PyFlowline simulation, the output workspace has a structure like this:
+
+
+::
+
+    pyflowlinecase 
+    ├── 00000001          
+    │   ├── basin_info.json
+    │   └── conceptual_flowline.geojson
+    │   └── ...
+    ├── 00000002          
+    │   ├── basin_info.json
+    │   └── conceptual_flowline.geojson
+    │   └── ...
+    ├── mpas_mesh_info.json          
+    ├── mpas.geojson
+    ├── run_pyflowline.py          
+    ├── submit.job
+    ├── stdout.out
+    └── stderr.err
+
+At the root directory, three files `submit.job`, `stdout.out`, `stderr.err` are HPC associated files.
+
+The `run_pyflowline.py` is the python script that was ran by the HPC job. If you are running on a local machine, you can run this script directly.
+
+The `mpas_mesh_info.json` is the model output that has all the information.
+
+The `mpas.geojson` is the model generated mesh file in the GEOJSON format.
+
+The sub-folders `00000001` et. al, are results for every watershed. Within each watershed sub-folder, there are both json and geojson result files.

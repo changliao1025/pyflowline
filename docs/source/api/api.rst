@@ -7,7 +7,7 @@ API Reference
 Class
 *********
 
-.. doxygenclass:: pyflowline::pybasin
+.. doxygenclass:: pyflowline::classes::basin::pybasin
 
 
 *********

@@ -7,8 +7,8 @@ API Reference
 Class
 *********
 
-.. doxygenclass:: pybasin
-    
+.. doxygenclass:: pyflowline::pybasin
+
 
 *********
 Function

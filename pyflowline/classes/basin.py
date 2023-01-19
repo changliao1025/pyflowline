@@ -130,6 +130,12 @@ class pybasin(object):
     from ._visual import _plot_area_of_difference
     
     def __init__(self, aParameter):
+        """
+        Initialize the subbasin class instance
+
+        Args:
+            aParameter (dict): _description_
+        """
 
         if 'lBasinID' in aParameter:            
             self.lBasinID             = int(aParameter['lBasinID'])
@@ -225,6 +231,12 @@ class pybasin(object):
         return
         
     def flowline_simplification(self):
+        """
+        Run the subbasin flowline simplification
+
+        Returns:
+            _type_: _description_
+        """
         print('Start flowline simplification:',  self.sBasinID)
         sWorkspace_output_basin = self.sWorkspace_output_basin
         
@@ -478,6 +490,16 @@ class pybasin(object):
         return aFlowline_basin_simplified
 
     def reconstruct_topological_relationship(self, iMesh_type, sFilename_mesh):
+        """
+        Run the subbasin topologic relationship reconstruction
+
+        Args:
+            iMesh_type (int): _description_
+            sFilename_mesh (str): _description_
+
+        Returns:
+            _type_: _description_
+        """
         print('Start topology reconstruction:',  self.sBasinID)
         
         ptimer = pytimer()
@@ -588,6 +610,16 @@ class pybasin(object):
         return aCell_intersect_basin
 
     def build_confluence(self, aFlowline_basin_in, aVertex_confluence_in):    
+        """
+        Build the conflence
+
+        Args:
+            aFlowline_basin_in (list): _description_
+            aVertex_confluence_in (list): _description_
+
+        Returns:
+            _type_: _description_
+        """
         #this can only be calculated for confluence
         aConfluence_basin=list()
         for pVertex in aVertex_confluence_in:   
@@ -605,7 +637,11 @@ class pybasin(object):
             aConfluence_basin.append(pConfluence)   
         return aConfluence_basin
 
-    def analyze(self):      
+    def analyze(self):
+        """
+        Analyze the subbasin results
+        """
+           
         if self.aFlowline_basin_filtered is None:
             sFilename_flowline_filter = self.sFilename_flowline_filter
             sFilename_flowline_filter_geojson = self.sFilename_flowline_filter_geojson
@@ -652,17 +688,32 @@ class pybasin(object):
         return    
     
     def export(self):
+        """
+        Export the subbasin outputs
+        """
         self.export_basin_info_to_json()
         self.export_flowline_info_to_json()
         self.export_confluence_info_to_json()        
         return
 
     def export_flowline(self, aFlowline_in, sFilename_json_in,iFlag_projected_in = None,  pSpatial_reference_in = None):
+        """
+        Export the subbasin flowline to geojson
+
+        Args:
+            aFlowline_in (_type_): _description_
+            sFilename_json_in (_type_): _description_
+            iFlag_projected_in (_type_, optional): _description_. Defaults to None.
+            pSpatial_reference_in (_type_, optional): _description_. Defaults to None.
+        """
         export_flowline_to_geojson(aFlowline_in, sFilename_json_in,\
             iFlag_projected_in= iFlag_projected_in, \
             pSpatial_reference_in = pSpatial_reference_in)
 
     def export_basin_info_to_json(self):
+        """
+        Export the subbasin basin information
+        """
         sFilename_json = self.sFilename_basin_info
         sFilename_json = os.path.join(str(Path(self.sWorkspace_output_basin)  ) , sFilename_json  )
 
@@ -683,6 +734,9 @@ class pybasin(object):
         return
 
     def export_flowline_info_to_json(self):
+        """
+        Export the flowline info to json
+        """
         iFlag_export_simplified=0
         if iFlag_export_simplified==1:
             sFilename_json = self.sFilename_flowline_simplified_info
@@ -703,6 +757,9 @@ class pybasin(object):
         return
 
     def export_confluence_info_to_json(self):
+        """
+        Export the confluence info to json
+        """
         #iFlag_export_confluence =0
         if self.aConfluence_basin_simplified is not None:
             sFilename_json = self.sFilename_confluence_simplified_info
@@ -724,6 +781,12 @@ class pybasin(object):
         return   
 
     def tojson(self):
+        """
+        Export the subbasin class instance to json
+
+        Returns:
+            _type_: _description_
+        """
         aSkip = ['aFlowline_basin_filtered', \
                 'aFlowline_basin_simplified','aFlowline_basin_conceptual','aConfluence_basin_simplified',
                 'aConfluence_basin_conceptual']
@@ -741,6 +804,12 @@ class pybasin(object):
         return sJson
     
     def export_config_to_json(self, sFilename_output_in = None):
+        """
+        Export the subbasin configuration to json
+
+        Args:
+            sFilename_output_in (str, optional): _description_. Defaults to None.
+        """
         #single basin
         if sFilename_output_in is not None:
             sFilename_output = sFilename_output_in
@@ -761,12 +830,24 @@ class pybasin(object):
         return
 
     def convert_flowline_to_geojson(self):
+        """
+        Convert the user-provided flowline to geojson
+        """
         sFilename_raw = self.sFilename_flowline_filter            
         sFilename_out = self.sFilename_flowline_filter_geojson
         print('Basin '+ self.sBasinID + ': initial flowline:', sFilename_raw )
         convert_flowline_to_geojson(1, sFilename_raw, sFilename_out)
         
     def calculate_flowline_length(self, aFlowline_in):
+        """
+        Calculate the length of all flowlines
+
+        Args:
+            aFlowline_in (_type_): _description_
+
+        Returns:
+            _type_: _description_
+        """
         dLength = 0.0
         nflowline = len(aFlowline_in)
         for i in range(nflowline):
@@ -776,6 +857,9 @@ class pybasin(object):
         return dLength
 
     def calculate_river_sinuosity(self):
+        """
+        Calcualte the the river sinuosity
+        """
         for pFlowline in self.aFlowline_basin_simplified:
             pFlowline.calculate_flowline_sinuosity() 
 
@@ -785,17 +869,35 @@ class pybasin(object):
         return
 
     def calculate_confluence_branching_angle(self):
+        """
+        Calcualte the the river confluence branching angle
+        """
         for pConfluence in self.aConfluence_basin_simplified:
             pConfluence.calculate_branching_angle()
         for pConfluence in self.aConfluence_basin_conceptual:
             pConfluence.calculate_branching_angle()    
         return
     
-    def evaluate(self, iMesh_type, sMesh_type):        
+    def evaluate(self, iMesh_type, sMesh_type):
+        """
+        Evaluate the model performance
+
+        Args:
+            iMesh_type (int): _description_
+            sMesh_type (str): _description_
+        """
+
         self.evaluate_area_of_difference(iMesh_type, sMesh_type)
         return
 
     def evaluate_area_of_difference(self, iMesh_type, sMesh_type):
+        """
+        Evaluate the model performance using area of difference
+
+        Args:
+            iMesh_type (int): _description_
+            sMesh_type (str): _description_
+        """
 
         sFilename_simplified =  self.sFilename_flowline_simplified
         sFilename_simplified= os.path.join(self.sWorkspace_output_basin, sFilename_simplified)

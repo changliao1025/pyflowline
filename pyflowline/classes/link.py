@@ -24,13 +24,14 @@ class LinkClassEncoder(JSONEncoder):
         return JSONEncoder.default(self, obj)
 
 class pycelllink(object):
-    """link class
+    """
+    The cell link class
 
     Args:
-        object (_type_): _description_
+        object (obj): None
 
     Returns:
-        _type_: _description_
+        pycelllink: A link object
     """
 
     lIndex=0
@@ -38,12 +39,26 @@ class pycelllink(object):
     pCell_end=None
     pEdge_link = None
     def __init__(self, pCell_start_in, pCell_end_in, pEdge_link_in):
+        """
+        Initilize a link object
+
+        Args:
+            pCell_start_in (pycell): The starting cell object
+            pCell_end_in (pycell): The ending cell object
+            pEdge_link_in (pyedge): An edge object that links two cells
+        """
         self.pCell_start = pCell_start_in
         self.pCell_end = pCell_end_in
         self.pEdge_link = pEdge_link_in
         return
     
-    def tojson(self):        
+    def tojson(self):
+        """
+        Convert a cell link object to a json string
+
+        Returns:
+            json str: A json string
+        """
         sJson = json.dumps(self.__dict__, \
             ensure_ascii=True, \
                 indent=4, \

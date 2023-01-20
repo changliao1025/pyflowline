@@ -16,7 +16,9 @@ Within PyFlowline, these three elements are combined with several other data str
 
 .. image:: ../../figures/structure_pyflowline.png
   :width: 400
-  :alt: PyFlowline structure. This is a domain containing two watersheds/basins. Each basin has an outlet. Within each basin, there are several subbasins and confluences. The lower right is a zoom-in view of a flowline.
+  :alt: PyFlowline structure. 
+  
+This figure illustrates a domain containing two watersheds/basins. Each basin has an outlet. Within each basin, there are several subbasins and confluences. The lower right is a zoom-in view of a flowline.
 
 ****************************************************
 Spatial references and computational geometry

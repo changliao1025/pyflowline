@@ -15,9 +15,9 @@ else:
 
 class VertexClassEncoder(JSONEncoder):
     def default(self, obj):
-        if isinstance(obj, np.integer):
+        if isobject(obj, np.integer):
             return int(obj)
-        if isinstance(obj, np.ndarray):
+        if isobject(obj, np.ndarray):
             return obj.tolist()        
         return JSONEncoder.default(self, obj)
 
@@ -52,9 +52,9 @@ class pyvertex(object):
         #longitude and latitude are always required     
         try:     
             self.dLongitude_degree      = float(aParameter['dLongitude_degree'])      
-            """dLongitude_degree - instance variable"""           
+            """dLongitude_degree - object variable"""           
             self.dLatitude_degree       = float(aParameter['dLatitude_degree'])
-            """dLatitude_degree - instance variable"""
+            """dLatitude_degree - object variable"""
 
             self.dLongitude_radian = np.radians(self.dLongitude_degree)
             self.dLatitude_radian = np.radians(self.dLatitude_degree)

@@ -30,13 +30,14 @@ class LatlonClassEncoder(JSONEncoder):
             
         return JSONEncoder.default(self, obj)
 class pylatlon(pycell):
-    """latlon cell class
+    """
+    The latlon cell class
 
     Args:
-        pycell (_type_): _description_
+        pycell (obj): None
 
     Returns:
-        _type_: _description_
+        pylatlon: A latlon cell object
     """
 
     lCellID  = -1
@@ -72,7 +73,16 @@ class pylatlon(pycell):
     aNeighbor_ocean=None #the global ID of all neighbors
     aNeighbor_distance = None
 
-    def __init__(self, dLon, dLat, aEdge, aVertex):    
+    def __init__(self, dLon, dLat, aEdge, aVertex):
+        """
+        Initilize a latlon cell object
+
+        Args:
+            dLon (float): The longitude of center 
+            dLat (float): The latitude of center 
+            aEdge (list [pyedge]): A list of edges that define the latlon cell
+            aVertex (list [pyvertex]): A list of vertices the define the latlon
+        """
         nEdge = len(aEdge)
         if nEdge != 4:
             pass
@@ -95,6 +105,15 @@ class pylatlon(pycell):
         pass
     
     def has_this_edge(self, pEdge_in):
+        """
+        Check whether the latlon contains an edge
+
+        Args:
+            pEdge_in (pyedge): The edge to be checked
+
+        Returns:
+            int: 1 if found, 0 if not
+        """
         iFlag_found = 0
         for pEdge in self.aEdge:
             if pEdge.is_overlap(pEdge_in):
@@ -106,6 +125,15 @@ class pylatlon(pycell):
         return iFlag_found
 
     def which_edge_cross_this_vertex(self, pVertex_in):
+        """
+        Find which edge overlap with a vertex
+
+        Args:
+            pVertex_in (pyvertex): The vertex to be checked
+
+        Returns:
+            tuple [int, pyedge]: 1 if found, with the edge object; 0 if not found
+        """
         iFlag_found = 0
         pEdge_out = None
         for pEdge in self.aEdge:
@@ -121,6 +149,12 @@ class pylatlon(pycell):
         return iFlag_found, pEdge_out
 
     def calculate_cell_area(self):
+        """
+        Calculate the area of the latlon cell
+
+        Returns:
+            float: The area in m2
+        """
         lons=list()
         lats=list()        
         for i in range(self.nVertex):            
@@ -131,12 +165,27 @@ class pylatlon(pycell):
         return self.dArea
 
     def calculate_edge_length(self):
+        """
+        Calculate the effective length of the latlon cell
+
+        Returns:
+            float: The effective length
+        """ 
         dArea = self.dArea
         dLength_edge = np.sqrt(   dArea   )
         self.dLength = dLength_edge
         return dLength_edge
 
     def share_edge(self, other):
+        """
+        Check whether a latlon shares an edge with another latlon
+
+        Args:
+            other (pylatlon): The other latlon cell
+
+        Returns:
+            int: 1 if share, 0 if not
+        """
         iFlag_share = 0
         for pEdge in self.aEdge:
             for pEdge2 in other.aEdge:
@@ -147,6 +196,12 @@ class pylatlon(pycell):
         return iFlag_share
 
     def tojson(self):
+        """
+        Convert a latlon object to a json string
+
+        Returns:
+            json str: A json string
+        """
         aSkip = ['aEdge', \
                 'aFlowline']
         obj = self.__dict__.copy()

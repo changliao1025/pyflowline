@@ -27,13 +27,13 @@ class FlowlineClassEncoder(JSONEncoder):
         return JSONEncoder.default(self, obj)
 
 class pyflowline(object):
-    """flowline class
+    """The pyflowline class
 
     Args:
-        object (_type_): _description_
+        object (object): None
 
     Returns:
-        _type_: _description_
+        pyflowline: The flowline object
     """
 
     lFlowlineID=-1
@@ -64,7 +64,13 @@ class pyflowline(object):
     aFlowlineID_end_start = None
     aFlowlineID_end_end = None
     
-    def __init__(self, aEdge):    
+    def __init__(self, aEdge):
+        """
+        Initilize a flowline object
+
+        Args:
+            aEdge (list [pyedge]): A list of edge objects
+        """
         self.aEdge = aEdge
         nEdge  = len(aEdge)
         self.nEdge = nEdge
@@ -87,6 +93,12 @@ class pyflowline(object):
         return
 
     def calculate_length(self):
+        """
+        Calcualte the length
+
+        Returns:
+            float: The length of the flowline
+        """
         dLength =0.0
         #loop though
         for i in range(self.nEdge):
@@ -99,9 +111,16 @@ class pyflowline(object):
 
         return dLength
 
-    
-    
     def check_upstream(self, other):
+        """
+        Check whether another flowline is upstream or not
+
+        Args:
+            other (pyflowline): The other flowline
+
+        Returns:
+            int: 1 if it is, 0 if not
+        """
         iFlag_upstream =-1
         v0 = self.pVertex_start
         v1 = self.pVertex_end
@@ -117,6 +136,15 @@ class pyflowline(object):
         return iFlag_upstream
 
     def check_downstream(self, other):
+        """
+        Check whether another flowline is downstream or not 
+
+        Args:
+            other (pyflowline): The other flowline
+
+        Returns:
+            int: 1 if it is, 0 if not
+        """
         iFlag_downstream =-1
         v0 = self.pVertex_start
         v1 = self.pVertex_end
@@ -130,9 +158,9 @@ class pyflowline(object):
         return iFlag_downstream
     
     def reverse(self):
-        '''
-        reverse the direction of a flowline
-        '''
+        """
+        Reverse a flowline
+        """
         aVertex = self.aVertex 
         nVertex = self.nVertex
         aVertex_new = list()
@@ -153,6 +181,15 @@ class pyflowline(object):
         self.pVertex_end =  aEdge[ nEdge-1  ].pVertex_end
 
     def merge_upstream(self, other):
+        """
+        Merge two flowlines as one
+
+        Args:
+            other (pyflowline): The other flowline
+
+        Returns:
+            pyflowline: The merged flowline
+        """
         pFlowline_out = copy.deepcopy(other)    
         
         iFlag_dam1 = other.iFlag_dam
@@ -201,6 +238,15 @@ class pyflowline(object):
         return pFlowline_out
     
     def split_by_length(self, dDistance):
+        """
+        Split a flowline using the length threshold
+
+        Args:
+            dDistance (float): The length threshold for each edge
+
+        Returns:
+            pyflowline: The updated flowline
+        """
         aEdge=list()
         pFlowline_out=None
         for edge in self.aEdge:
@@ -218,13 +264,25 @@ class pyflowline(object):
         return pFlowline_out
 
     def calculate_flowline_sinuosity(self):
+        """
+        Calculate the sinuosoty of a flowline
+        """
         pVertex_start = self.pVertex_start
         pVertex_end = self.pVertex_end
         dDistance = pVertex_start.calculate_distance(pVertex_end)
         self.dSinuosity = self.dLength / dDistance
         return
 
-    def __eq__(self, other):                       
+    def __eq__(self, other):
+        """
+        Check whether two flowline are equivalent
+
+        Args:
+            other (pyflowline): The other flowline
+
+        Returns:
+            int: 1 if equivalent, 0 if not
+        """
         iFlag_overlap = 0 
         nEdge1 = self.nEdge
         nEdge2 = other.nEdge
@@ -244,9 +302,24 @@ class pyflowline(object):
         return iFlag_overlap
 
     def __ne__(self, other):
+        """
+        Check whether two flowline are equivalent
+
+        Args:
+            other (pyflowline): The other flowline
+
+        Returns:
+            int: 0 if equivalent, 1 if not
+        """
         return not self.__eq__(other)
     
     def tojson(self):
+        """
+        Convert a pyflowline object to a json string
+
+        Returns:
+            json str: A json string
+        """
         aSkip = ['aEdge', \
                 'aVertex','aFlowlineID_start_start','aFlowlineID_start_end',
                 'aFlowlineID_end_start','aFlowlineID_end_end']

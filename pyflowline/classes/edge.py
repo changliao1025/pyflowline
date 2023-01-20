@@ -32,13 +32,13 @@ class EdgeClassEncoder(JSONEncoder):
         return JSONEncoder.default(self, obj)
 
 class pyedge(object):
-    """edge class
+    """The pyedge class
 
     Args:
-        object (_type_): _description_
+        object (object): None
 
     Returns:
-        _type_: _description_
+        pyedge: A edge object
     """
 
 
@@ -51,6 +51,13 @@ class pyedge(object):
     lIndex_downstream=-1
 
     def __init__(self, pVertex_start_in, pVertex_end_in):
+        """
+        Initilize a pyedge object
+
+        Args:
+            pVertex_start_in (pyvertex): The starting vertex
+            pVertex_end_in (pyvertex): The ending vertex
+        """
         if pVertex_start_in == pVertex_end_in:
             print('The two vertices are the same')    
         else:
@@ -61,15 +68,27 @@ class pyedge(object):
         return
 
     def calculate_length(self):
+        """
+        Calcualate the length of the edge
+
+        Returns:
+            float: The length of the edge
+        """
         dLength =0.0
         dLength = self.pVertex_start.calculate_distance( self.pVertex_end)
         self.dLength= dLength
         return dLength
 
     def check_shared_vertex(self, other):
-        '''
-        check whether two edges are sharing the same vertex
-        '''
+        """
+        Check whether two edges are sharing the same vertex
+
+        Args:
+            other (pyedge): The other edge object to be checked
+
+        Returns:
+            int: Flag, 1: shared; 0: non-sharing
+        """
         iFlag_shared =-1
         v0 = self.pVertex_start
         v1 = self.pVertex_end
@@ -83,6 +102,15 @@ class pyedge(object):
         return iFlag_shared
     
     def check_upstream(self, other):
+        """
+        Check whether another edge is the upstream of current edge
+
+        Args:
+            other (pyedge): The other edge object to be checked
+
+        Returns:
+            int: Flag, 1: upstream; 0: non-upstream
+        """
         iFlag_upstream =-1
         v0 = self.pVertex_start
         v1 = self.pVertex_end
@@ -96,6 +124,16 @@ class pyedge(object):
         return iFlag_upstream
 
     def check_downstream(self, other):
+        """
+        Check whether another edge is the downstream of current edge
+
+
+        Args:
+            other (pyedge): The other edge object to be checked
+
+        Returns:
+            int: Flag, 1: downstream; 0: non-downstream
+        """
         iFlag_downstream =-1
         v0 = self.pVertex_start
         v1 = self.pVertex_end
@@ -109,22 +147,44 @@ class pyedge(object):
         return iFlag_downstream
     
     def split_by_length(self,dLength_in):
+        """
+        Split an edge using the threshold
+
+        Args:
+            dLength_in (float): The length threshold
+
+        Returns:
+            list [pyedge]: A list of edge objects, length of 1 if it meets the requirement
+        """
         aEdge_out=list()
         if self.dLength <=aEdge_out:
             aEdge_out.append(self)
         else:
             #find location from up to down
-            aEdge_out=split_edge_by_length(self, dLength_in)
+            aEdge_out = split_edge_by_length(self, dLength_in)
             pass
         return aEdge_out
 
     def reverse(self):
+        """
+        Reverse an edge
+        """
         v0 = self.pVertex_start
         v1 = self.pVertex_end
         self.pVertex_start = v1
         self.pVertex_end = v0
+        return
     
     def is_overlap(self, pEdge_in):
+        """
+        Check if two edges overlap each other
+
+        Args:
+            pEdge_in (pyedge): The other edge to be checked
+
+        Returns:
+            int: 1 if overlap; 0 if not
+        """
         iFlag_overlap = 0
         pVertex_start1 = self.pVertex_start
         pVertex_end1 = self.pVertex_end
@@ -142,6 +202,15 @@ class pyedge(object):
         return iFlag_overlap
 
     def check_vertex_on_edge(self, pVertex_in):
+        """
+        Check if a vertex on an edge
+
+        Args:
+            pVertex_in (pyvertex): The vertex to be checked
+
+        Returns:
+            tuple[int, float, float]: 1 if it is on; 0 if not. Length and distance are calculated if on.
+        """
         iFlag =0 
         dDistance = -1
         dDistance_plane = 9999
@@ -176,14 +245,38 @@ class pyedge(object):
 
         return iFlag, dDistance, dDistance_plane
     
-    def __eq__(self, other):                
+    def __eq__(self, other):
+        """
+        Check if two edges are equivalent
+
+        Args:
+            other (pyedge): The other edge
+
+        Returns:
+            int: 1 if equivalent; 0 if not
+        """
         iFlag_overlap = self.is_overlap(other)  
         return iFlag_overlap
 
     def __ne__(self, other):
+        """
+        Check if two edges are equivalent
+
+        Args:
+            other (pyedge): The other edge
+
+        Returns:
+            int: 0 if equivalent; 1 if not
+        """
         return not self.__eq__(other)
 
     def tojson(self):
+        """
+        Convert an edge object to a json string
+
+        Returns:
+            json str: A json string
+        """
 
         obj = self.__dict__.copy()
         

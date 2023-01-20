@@ -37,10 +37,10 @@ class ConfluenceClassEncoder(JSONEncoder):
         return JSONEncoder.default(self, obj)
 
 class pyconfluence():
-    """confluence class
-
+    """
+    The pyconfluence class
     Returns:
-        _type_: _description_
+        object: A confluence object
     """
 
     lIndex=-1 
@@ -49,7 +49,15 @@ class pyconfluence():
     pFlowline_downstream=None
     aFlowline_upstream=list()
     dAngle_upstream=0.0    
-    def __init__(self, pVertex_center, aFlowline_upstream_in, pFlowline_downstream_in):        
+    def __init__(self, pVertex_center, aFlowline_upstream_in, pFlowline_downstream_in):
+        """
+        Initialize a pyconfluence object
+
+        Args:
+            pVertex_center (pyvertex): The center vertex
+            aFlowline_upstream_in (list [pyflowline]): A list of upstream flowlines
+            pFlowline_downstream_in (pyflowline): The downstream flowline
+        """
         try:     
             self.pVertex_confluence      = pVertex_center       
             self.aFlowline_upstream      = aFlowline_upstream_in  
@@ -60,7 +68,13 @@ class pyconfluence():
         
         return
     
-    def calculate_branching_angle(self):        
+    def calculate_branching_angle(self):
+        """
+        Calcualte the confluence branching angle (https://www.pnas.org/doi/10.1073/pnas.1215218109)
+
+        Returns:
+            float: The branching angle in degree
+        """
         #normally there are 2 edges meet at confluence        
         if len(self.aFlowline_upstream)==2:
             pFlowline1 = self.aFlowline_upstream[0]
@@ -82,6 +96,12 @@ class pyconfluence():
         return self.dAngle_upstream    
     
     def tojson(self):
+        """
+        Convert a pyconfluence object to json
+
+        Returns:
+            json str: A json string
+        """
         aSkip = ['aFlowline_upstream']
         obj = self.__dict__.copy()
         for sKey in aSkip:

@@ -34,7 +34,7 @@ class pyhexagon(pycell):
     The hexagon cell class
 
     Args:
-        pycell (_type_): None
+        pycell (obj): None
 
     Returns:
         pyhexagon: A hexagon object

@@ -34,7 +34,7 @@ Class
 .. doxygenclass:: pyflowline::classes::basin::pybasin
     :members:
 
-.. doxygenclass:: pyflowline::classes::pycase::pycase
+.. doxygenclass:: pyflowline::classes::pycase::flowlinecase
     :members:
 
 .. doxygenclass:: pyflowline::classes::link::pycelllink

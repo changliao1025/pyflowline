@@ -60,6 +60,15 @@ class CaseClassEncoder(JSONEncoder):
         return JSONEncoder.default(self, obj)
 
 class flowlinecase(object):
+    """
+    The flowline case class
+
+    Args:
+        object (obj): None
+
+    Returns:
+        flowlinecase: A flowlinecase object
+    """
     iCase_index= 0
     
     sMesh_type = 1
@@ -118,11 +127,21 @@ class flowlinecase(object):
     from ._visual import _plot_mesh_with_flowline
     from ._visual import _compare_with_raster_dem_method
     from ._hpc import _create_hpc_job
-    def __init__(self, aConfig_in,\
-            iFlag_standalone_in= None,\
-            sModel_in = None,\
-            sDate_in = None,\
+    def __init__(self, aConfig_in,
+            iFlag_standalone_in= None,
+            sModel_in = None,
+            sDate_in = None,
             sWorkspace_output_in = None):
+        """
+        Initialize a flowlinecase object
+
+        Args:
+            aConfig_in (dict): A dictionary of parameters
+            iFlag_standalone_in (int, optional): Flag for whether run the case standalone. Defaults to None.
+            sModel_in (str, optional): The model name. Defaults to None.
+            sDate_in (str, optional): The case date. Defaults to None.
+            sWorkspace_output_in (str, optional): The output workspace. Defaults to None.
+        """
         #flags
         if iFlag_standalone_in is not None:
             self.iFlag_standalone = iFlag_standalone_in
@@ -359,7 +378,13 @@ class flowlinecase(object):
 
         return aFlowline_out
     
-    def mesh_generation(self):      
+    def mesh_generation(self):
+        """
+        The mesh generation operation
+
+        Returns:
+            list [pycell]: A list of cell object
+        """
         print('Start mesh generation.')
         aCell_out = list()  
         if self.iFlag_create_mesh ==1:
@@ -535,6 +560,15 @@ class flowlinecase(object):
         return aCell_out
     
     def reconstruct_topological_relationship(self, aCell_raw):
+        """
+        The topological relationship reconstruction operation
+
+        Args:
+            aCell_raw (list [pycell]): A list of intersected cell objects
+
+        Returns:
+            tuple [list [pycell], list [pyflowline], list [long]]: A list of cells, flowlines, and outlet cell IDs.
+        """
         print('Start topology reconstruction.')
         iFlag_intersect = self.iFlag_intersect
         if iFlag_intersect == 1:
@@ -601,6 +635,15 @@ class flowlinecase(object):
             return None
             
     def merge_cell_info(self, aCell_raw):
+        """
+        Merge cell information after reconstruction
+
+        Args:
+            aCell_raw (list [pycell]): The original cell information that contains neighbor definition
+
+        Returns:
+            list [pycell]: The updated list of cell objects.
+        """
 
         for pCell in self.aCell:
             for pCell2 in aCell_raw:
@@ -616,18 +659,30 @@ class flowlinecase(object):
         return self.aCell
         
     def analyze(self):
+        """
+        Analyze the domain results for every watershed
+        """
         if self.iFlag_flowline == 1:
             for pBasin in self.aBasin:
                 pBasin.analyze()
         return
 
     def setup(self):
+        """
+        Set up the flowlinecase
+        """
         if self.iFlag_flowline == 1:
             self.convert_flowline_to_geojson()
             pass
         return
 
     def run(self):
+        """
+        Run the flowlinecase simulation
+
+        Returns:
+            list: A list of cell objects
+        """
         aCell_out = None
         if self.iFlag_flowline == 1:
             self.flowline_simplification()        
@@ -645,20 +700,30 @@ class flowlinecase(object):
         return aCell_out
 
     def evaluate(self):
+        """
+        Evaluate the model performance
+        """
         for pBasin in self.aBasin:
             pBasin.evaluate(self.iMesh_type, self.sMesh_type)
         return
    
     def export(self):
-        
+        """
+        Export the model outputs
+        """        
         self.export_mesh_info_to_json()
         if self.iFlag_flowline ==1:
             for pBasin in self.aBasin:
                 pBasin.export()
 
         self.tojson()
+        return
 
-    def export_mesh_info_to_json(self):        
+    def export_mesh_info_to_json(self):
+        """
+        Export the mesh information to a json file
+        """
+
         aCell_all = self.aCell
         sFilename_json = self.sFilename_mesh_info
         ncell=len(aCell_all)
@@ -677,7 +742,13 @@ class flowlinecase(object):
 
         return
 
-    def tojson(self):  
+    def tojson(self): 
+        """
+        Convert the flowline case object to a json string
+
+        Returns:
+            json str: A json string
+        """
         aSkip = ['aBasin', \
                 'aFlowline_simplified','aFlowline_conceptual','aCellID_outlet',
                 'aCell']      
@@ -693,6 +764,12 @@ class flowlinecase(object):
         return sJson
 
     def export_config_to_json(self, sFilename_output_in = None):
+        """
+        Export the configuration to a json file
+
+        Args:
+            sFilename_output_in (str, optional): The json filename. Defaults to None.
+        """
 
         if self.iFlag_standalone == 1:
             if sFilename_output_in is not None:
@@ -751,6 +828,12 @@ class flowlinecase(object):
         return
 
     def export_basin_config_to_json(self, sFilename_output_in= None):
+        """
+        Export the member basin configuration to a json file
+
+        Args:
+            sFilename_output_in (str, optional): The json filename. Defaults to None.
+        """
         if self.iFlag_standalone == 1:
             if sFilename_output_in is not None:
                 sFilename_output = sFilename_output_in

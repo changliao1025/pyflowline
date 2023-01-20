@@ -15,16 +15,24 @@ else:
 
 class VertexClassEncoder(JSONEncoder):
     def default(self, obj):
-        if isobject(obj, np.integer):
+        if isinstance(obj, np.integer):
             return int(obj)
-        if isobject(obj, np.ndarray):
+        if isinstance(obj, np.ndarray):
             return obj.tolist()        
         return JSONEncoder.default(self, obj)
 
 class pyvertex(object):
     """
-    The vertex basic element class.
+    The vertex class
+
+    Args:
+        object (_type_): None
+
+    Returns:
+        pyvertex: A vertex object
     """
+ 
+    
   
     lIndex=-1 
     """this index will be used for array - class variable"""
@@ -38,8 +46,15 @@ class pyvertex(object):
     dLongitude_radian=0.0
     dLatitude_radian=0.0
     dElevation=0.0    
-    """the vertex elevation - class variable"""
+    
     def __init__(self, aParameter):
+        """
+        Initilize a vertex object
+
+        Args:           
+            aParameter (dict): A dictionary parameters
+        """
+
         if 'x' in aParameter:            
             self.dX_meter             = float(aParameter['x'])
         
@@ -65,10 +80,11 @@ class pyvertex(object):
         return
 
     def toNvector(self): 
-        """note: replicated in LatLon_NvectorEllipsoidal
+        """
+        Note: replicated in LatLon_NvectorEllipsoidal
 
         Returns:
-            _type_: _description_
+            pynvector: A nvector object
         """
         
         a = self.dLatitude_radian
@@ -89,6 +105,15 @@ class pyvertex(object):
         return pNvector
     
     def __eq__(self, other):
+        """
+        Check whether two vertices are equivalent
+
+        Args:
+            other (pyvertex): The other vertex
+
+        Returns:
+            int: 1 if equivalent, 0 if not
+        """
         iFlag = -1
         dThreshold_in = 1.0E-6        
         c = self.calculate_distance(other)
@@ -101,17 +126,42 @@ class pyvertex(object):
         return iFlag
 
     def __ne__(self, other):
+        """
+        Check whether two vertices are equivalent
+
+        Args:
+            other (pyvertex): The other vertex
+
+        Returns:
+            int: 0 if equivalent, 1 if not
+        """
         return not self.__eq__(other)
     
-    def calculate_distance(self, other):                
+    def calculate_distance(self, other):
+        """
+        Calculate the distance between two vertices
+
+        Args:
+            other (pyvertex): The other vertex
+
+        Returns:
+            float: The great circle distance
+        """
+        dDistance = 0.0
         lon1 = self.dLongitude_degree
         lat1 = self.dLatitude_degree    
         lon2 = other.dLongitude_degree
         lat2 = other.dLatitude_degree
-        dDistance = calculate_distance_based_on_lon_lat(lon1,  lat1, lon2, lat2)        
+        dDistance = calculate_distance_based_on_lon_lat(lon1, lat1, lon2, lat2)        
         return dDistance
     
     def tojson(self):
+        """
+        Convert a vecter object to a json string
+
+        Returns:
+            json str: A json string
+        """
         sJson = json.dumps(self.__dict__, \
                 sort_keys=True, \
                 indent = 4, \
@@ -121,7 +171,8 @@ class pyvertex(object):
 
   
 class pynvector(object):
-    """vector class
+    """
+    The vector class
 
     Args:
         object (_type_): _description_

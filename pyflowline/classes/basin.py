@@ -82,7 +82,7 @@ class pybasin(object):
         (object): None
 
     Returns:
-        None: A subbasin object
+        None: A basin object
     """
     lBasinID =1 
     sBasinID=''
@@ -131,7 +131,7 @@ class pybasin(object):
     
     def __init__(self, aParameter):
         """
-        Initialize the subbasin class object
+        Initialize the basin class object
 
         Args:
             aParameter (dict): Dictionary for parameters
@@ -232,7 +232,7 @@ class pybasin(object):
         
     def flowline_simplification(self):
         """
-        Run the subbasin flowline simplification
+        Run the basin flowline simplification
 
         Returns:
             list [pyflowline]: A list of simplified flowline
@@ -491,7 +491,7 @@ class pybasin(object):
 
     def reconstruct_topological_relationship(self, iMesh_type, sFilename_mesh):
         """
-        Run the subbasin topologic relationship reconstruction
+        Run the basin topologic relationship reconstruction
 
         Args:
             iMesh_type (int): Mesh type
@@ -614,11 +614,11 @@ class pybasin(object):
         Build the conflence
 
         Args:
-            aFlowline_basin_in (list [pyflowline]): A list of flowlines in this subbasin
-            aVertex_confluence_in (list [pyconfluence]): A list of vertices in this subbasin
+            aFlowline_basin_in (list [pyflowline]): A list of flowlines in this basin
+            aVertex_confluence_in (list [pyconfluence]): A list of vertices in this basin
 
         Returns:
-            list [pyconfluence]: A list of confluences in this subbasin
+            list [pyconfluence]: A list of confluences in this basin
         """
         #this can only be calculated for confluence
         aConfluence_basin=list()
@@ -639,7 +639,7 @@ class pybasin(object):
 
     def analyze(self):
         """
-        Analyze the subbasin results including length, sinuosity, and breaching angle
+        Analyze the basin results including length, sinuosity, and breaching angle
         """
            
         if self.aFlowline_basin_filtered is None:
@@ -689,7 +689,7 @@ class pybasin(object):
     
     def export(self):
         """
-        Export the subbasin outputs in json format
+        Export the basin outputs in json format
         """
         self.export_basin_info_to_json()
         self.export_flowline_info_to_json()
@@ -698,7 +698,7 @@ class pybasin(object):
 
     def export_flowline(self, aFlowline_in, sFilename_json_in,iFlag_projected_in = None,  pSpatial_reference_in = None):
         """
-        Export the subbasin flowline to geojson
+        Export the basin flowline to geojson
 
         Args:
             aFlowline_in (list [pyflowline]): A list of flowlines
@@ -714,7 +714,7 @@ class pybasin(object):
 
     def export_basin_info_to_json(self):
         """
-        Export the subbasin basin object to json
+        Export the basin basin object to json
         """
         sFilename_json = self.sFilename_basin_info
         sFilename_json = os.path.join(str(Path(self.sWorkspace_output_basin)  ) , sFilename_json  )
@@ -784,7 +784,7 @@ class pybasin(object):
 
     def tojson(self):
         """
-        Export the subbasin object to json
+        Export the basin object to json
 
         Returns:
             json str: A json string
@@ -807,7 +807,7 @@ class pybasin(object):
     
     def export_config_to_json(self, sFilename_output_in = None):
         """
-        Export the subbasin object to json using the encoder
+        Export the basin object to json using the encoder
 
         Args:
             sFilename_output_in (str, optional): The json filename. Defaults to None.

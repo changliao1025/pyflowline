@@ -12,6 +12,11 @@ River networks are represented using three basic elements: vertex, edge, and flo
   :width: 400
   :alt: Basic element
 
+Within PyFlowline, these three elements are combined with several other data structures.
+
+.. image:: ../../figures/structure_pyflowline.png
+  :width: 400
+  :alt: PyFlowline structure
 
 ****************************************************
 Spatial references and computational geometry
@@ -40,8 +45,6 @@ File I/O
 ==============================
 Inputs
 ==============================
-
-
 
 
 PyFlowline uses two configuration files to manage all the input information. Within this configuration file, it stores major model input parameters paths to input files. 

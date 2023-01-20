@@ -30,13 +30,14 @@ class HexagonClassEncoder(JSONEncoder):
         return JSONEncoder.default(self, obj)
 
 class pyhexagon(pycell):
-    """hexagon cell class
+    """
+    The hexagon cell class
 
     Args:
-        pycell (_type_): _description_
+        pycell (_type_): None
 
     Returns:
-        _type_: _description_
+        pyhexagon: A hexagon object
     """
        
     lCellID  = -1
@@ -71,7 +72,16 @@ class pyhexagon(pycell):
     aNeighbor_ocean=None #the global ID of all neighbors
     aNeighbor_distance = None
 
-    def __init__(self, dLon, dLat, aEdge, aVertex):    
+    def __init__(self, dLon, dLat, aEdge, aVertex):
+        """
+        Initilize a hexagon cell object
+
+        Args:
+            dLon (float): The longitude of center 
+            dLat (float): The latitude of center 
+            aEdge (list [pyedge]): A list of edges that define the hexagon
+            aVertex (list [pyvertex]): A list of vertices the define the hexagon
+        """
         nEdge = len(aEdge)
         if nEdge != 6:
             pass
@@ -94,6 +104,15 @@ class pyhexagon(pycell):
         pass
     
     def has_this_edge(self, pEdge_in):
+        """
+        Check whether the hexagon contains an edge
+
+        Args:
+            pEdge_in (pyedge): The edge to be checked
+
+        Returns:
+            int: 1 if found, 0 if not
+        """
         iFlag_found = 0
         for pEdge in self.aEdge:
             if pEdge.is_overlap(pEdge_in):
@@ -105,6 +124,15 @@ class pyhexagon(pycell):
         return iFlag_found
 
     def which_edge_cross_this_vertex(self, pVertex_in):
+        """
+        Find which edge overlap with a vertex
+
+        Args:
+            pVertex_in (pyvertex): The vertex to be checked
+
+        Returns:
+            tuple [int, pyedge]: 1 if found, with the edge object; 0 if not found
+        """
         iFlag_found = 0
         pEdge_out = None
         for pEdge in self.aEdge:
@@ -118,7 +146,14 @@ class pyhexagon(pycell):
 
         return iFlag_found, pEdge_out
     
-    def calculate_cell_area(self):       
+    def calculate_cell_area(self):
+        """
+        Calculate the area of the hexagon cell
+
+        Returns:
+            float: The area in m2
+        """
+
         lons=list()
         lats=list()        
         for i in range(self.nVertex):            
@@ -129,12 +164,27 @@ class pyhexagon(pycell):
         return self.dArea
 
     def calculate_edge_length(self):
+        """
+        Calculate the effective length of the hexagon cell
+
+        Returns:
+            float: The effective length
+        """
         dArea = self.dArea
         dLength_edge = np.sqrt(  2.0 * dArea / (3.0* np.sqrt(3.0))  )
         self.dLength = dLength_edge
         return dLength_edge
     
     def share_edge(self, other):
+        """
+        Check whether a hexagon shares an edge with another hexagon
+
+        Args:
+            other (pyhexagon): The other hexagon
+
+        Returns:
+            int: 1 if share, 0 if not
+        """
         iFlag_share = 0
         for pEdge in self.aEdge:
             for pEdge2 in other.aEdge:
@@ -145,8 +195,15 @@ class pyhexagon(pycell):
         return iFlag_share
     
     def tojson(self):
+        """
+        Convert a hexagon object to a json string
+
+        Returns:
+            json str: A json string
+        """
         aSkip = ['aEdge', \
                 'aFlowline']
+                
         obj = self.__dict__.copy()
         for sKey in aSkip:
             obj.pop(sKey, None)

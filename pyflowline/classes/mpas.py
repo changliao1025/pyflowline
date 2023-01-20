@@ -12,22 +12,22 @@ from pyflowline.algorithms.auxiliary.gdal_functions import calculate_polygon_are
 
 class MpasClassEncoder(JSONEncoder):
     def default(self, obj):
-        if isinstance(obj, np.integer):
+        if isobject(obj, np.integer):
             return int(obj)
-        if isinstance(obj, np.float32):
+        if isobject(obj, np.float32):
             return float(obj)
-        if isinstance(obj, np.ndarray):
+        if isobject(obj, np.ndarray):
             return obj.tolist()
-        if isinstance(obj, list):
+        if isobject(obj, list):
             pass  
-        if isinstance(obj, pyvertex):
+        if isobject(obj, pyvertex):
             return json.loads(obj.tojson()) #lVertexID
-        if isinstance(obj, pyedge):
+        if isobject(obj, pyedge):
             return obj.lEdgeID        
-        if isinstance(obj, pyflowline):
+        if isobject(obj, pyflowline):
             return obj.lFlowlineID
         
-        if isinstance(obj, pympas):
+        if isobject(obj, pympas):
             return obj.lCellID
             
         return JSONEncoder.default(self, obj)
@@ -36,13 +36,13 @@ class MpasClassEncoder(JSONEncoder):
 
 class pympas(pycell):
     """
-    MPAS cell class
+    The MPAS cell class
 
     Args:
-        pycell (object): _description_
+        pycell (object): None
 
     Returns:
-        object: _description_
+        pympas: A mpas cell object
     """
     lCellID  = -1  
     nFlowline=0
@@ -78,15 +78,15 @@ class pympas(pycell):
     aNeighbor_distance = None
 
     def __init__(self, dLon, dLat, aEdge, aVertex):
-        """Initilize the mpas class instance
+        """
+        Initilize a mpas cell object
 
         Args:
-            dLon (float): The center location longitude
-            dLat (float): The center location latitude
-            aEdge (list): The list of edge instances
-            aVertex (list): The list of vertex instances
+            dLon (float): The longitude of center 
+            dLat (float): The latitude of center 
+            aEdge (list [pyedge]): A list of edges that define the hexagon
+            aVertex (list [pyvertex]): A list of vertices the define the hexagon
         """
-       
 
         nEdge = len(aEdge)
         if nEdge < 3 or nEdge > 8:
@@ -117,7 +117,8 @@ class pympas(pycell):
     
    
     def has_this_edge(self, pEdge_in):
-        """Check whether the cell contains an edge
+        """
+        Check whether the cell contains an edge
 
         Args:
             pEdge_in (pyedge): the to be checked edge
@@ -136,7 +137,8 @@ class pympas(pycell):
         return iFlag_found
 
     def which_edge_cross_this_vertex(self, pVertex_in):
-        """When a flowline intersects with a cell, this function finds out which edge is intersected
+        """
+        When a flowline intersects with a cell, this function finds out which edge is intersected
 
         Args:
             pVertex_in (pyvertex): the intersected vertex
@@ -158,7 +160,8 @@ class pympas(pycell):
         return iFlag_found, pEdge_out
     
     def calculate_cell_area(self):
-        """Calculate the area of a cell, this function is not used for mpas cell
+        """
+        Calculate the area of a cell, this function is not used for mpas cell
 
         Returns:
             float: cell area
@@ -173,7 +176,8 @@ class pympas(pycell):
         return self.dArea
 
     def calculate_edge_length(self):
-        """Calculate the effective cell length/resolution
+        """
+        Calculate the effective cell length/resolution
 
         Returns:
             float: effective cell length/resolution
@@ -182,7 +186,8 @@ class pympas(pycell):
         return self.dLength_edge
     
     def share_edge(self, other):
-        """Check if two cells share an edge
+        """
+        Check if two cells share an edge
 
         Args:
             other (pympas): the other cell
@@ -201,10 +206,11 @@ class pympas(pycell):
 
     
     def tojson(self):
-        """Convert a cell into a json object
+        """
+        Convert a cell into a json string
 
         Returns:
-            json: A json object
+            json str: A json string
         """
         aSkip = ['aEdge', \
                 'aFlowline']

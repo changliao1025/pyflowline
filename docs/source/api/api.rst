@@ -7,10 +7,11 @@ API Reference
 Class
 *********
 
-.. doxygenclass:: pyflowline::classes::vertex::pyvertex
-    :members:
+==============
+Basic elements
+==============
 
-.. doxygenclass:: pyflowline::classes::confluence::pyconfluence
+.. doxygenclass:: pyflowline::classes::vertex::pyvertex
     :members:
 
 .. doxygenclass:: pyflowline::classes::edge::pyedge
@@ -18,6 +19,12 @@ Class
 
 .. doxygenclass:: pyflowline::classes::flowline::pyflowline
     :members:
+
+
+
+==============
+Mesh cell
+==============
 
 .. doxygenclass:: pyflowline::classes::hexagon::pyhexagon
     :members:
@@ -31,15 +38,19 @@ Class
 .. doxygenclass:: pyflowline::classes::mpas::pympas
     :members:
 
+=====================
+Others
+=====================
+
 .. doxygenclass:: pyflowline::classes::basin::pybasin
     :members:
 
 .. doxygenclass:: pyflowline::classes::pycase::flowlinecase
     :members:
 
+.. doxygenclass:: pyflowline::classes::confluence::pyconfluence
+    :members:
+
 .. doxygenclass:: pyflowline::classes::link::pycelllink
     :members:
 
-*********
-Function
-*********

@@ -25,13 +25,15 @@ bibliography: paper.bib
 
 # Summary
 
-Spatially-distributed hydrologic models often require high-quality river network information as inputs. Generation of river network information can be challenging, especially when the hydrologic models use unstructured meshes. We developed a mesh-independent river network generation Python package to address this challenge. It resolves issues, including disconnected and braided river networks. It also produces spatially-distributed cell-to-cell topology information, which can be used for river routing. The package supports various mesh types, including traditional rectangle and unstructured meshes.
+Spatially-distributed hydrologic models often require high-quality river network information as inputs. Generation of river network information can be challenging, especially when the hydrologic models use unstructured meshes. We developed a mesh-independent river network generation Python package to address this challenge. It resolves several issues in existing braided river networks. It also produces spatially-distributed cell-to-cell topology information, which can be used for river routing. The package supports various mesh types, including traditional rectangle and unstructured meshes.
 
 # Statement of need
+
 For a given vector river network and spatial discretization (mesh), generating the mesh cell-based conceptual river network remains challenging. Most existing methods can only accept structured rectangle meshes.
 As a result, there is a need to develop a mesh-independent river network representation method for unstructured mesh-based hydrologic models.
 
 # Model features
+
 Pyflowline uses Python's object-oriented programming (OOP) architecture to describe the river network and its elements (i.e., segment, reach, confluence.) as objects processed throughout the package when applicable. 
 
 ![The data model. \label{fig:oop}](https://github.com/changliao1025/pyflowline/blob/main/docs/figures/basic_element.png?raw=true)

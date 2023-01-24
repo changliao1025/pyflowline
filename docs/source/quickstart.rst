@@ -18,3 +18,4 @@ Users can run a PyFlowline simulation in the following steps:
 5. Open the preferred Python IDE and run the  `examples/susquehanna/run_simulation_mpas.py` Python script. Optionally, you can also run the `notebooks/pyflowline.ipynb` notebook.
 6. You should produce a list of model outputs in the `data/susquehanna/output` folder.
 
+If you encountered any issues, refer to the FAQ or submit a Github issue (https://github.com/changliao1025/pyflowline/issues).

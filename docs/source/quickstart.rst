@@ -12,7 +12,7 @@ Users can run a PyFlowline simulation in the following steps:
     * `cython` (optional, for performance)
     * `cartopy` (optional, for visualization)
     * `matplotlib` (optional, for visualization)
-    * `utm` (optional, for visualization)
+    
 2. Clone the latest PyFlowline repository from https://github.com/changliao1025/pyflowline. Or Install the PyFlowline through Conda for a released version.
 3. Download the additional large files (DEM and MPAS mesh) and move them under the `data/susquehanna/input` folder.
 4. Change the `sFilename_mesh_netcdf`, `sFilename_basins`, and `sFilename_flowline_filter` to the actual paths,

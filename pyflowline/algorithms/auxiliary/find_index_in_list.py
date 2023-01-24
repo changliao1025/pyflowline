@@ -149,7 +149,7 @@ def check_if_duplicates(aList_in):
     return iFlag_unique
 
 
-def add_unique_vertex(aVertex_in, pVertex_in):
+def add_unique_vertex(aVertex_in, pVertex_in, dThreshold_in = 1.0E-6):
     """[add a vertex to a list if it is not already included]
 
     Args:
@@ -162,7 +162,7 @@ def add_unique_vertex(aVertex_in, pVertex_in):
     iFlag_exist = 0
     nVertex = len(aVertex_in)     
 
-    iFlag_exist, dummy =  find_vertex_in_list(aVertex_in, pVertex_in)
+    iFlag_exist, dummy =  find_vertex_in_list(aVertex_in, pVertex_in, dThreshold_in)
 
     if iFlag_exist == 1:
         pass

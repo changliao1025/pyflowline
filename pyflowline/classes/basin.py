@@ -53,21 +53,21 @@ class BasinClassEncoder(JSONEncoder):
         JSONEncoder (_type_): _description_
     """
     def default(self, obj):
-        if isobject(obj, np.integer):
+        if isinstance(obj, np.integer):
             return int(obj)
-        if isobject(obj, np.float32):
+        if isinstance(obj, np.float32):
             return float(obj)
-        if isobject(obj, np.ndarray):
+        if isinstance(obj, np.ndarray):
             return obj.tolist()
-        if isobject(obj, list):
+        if isinstance(obj, list):
             pass  
-        if isobject(obj, pyvertex):
+        if isinstance(obj, pyvertex):
             return json.loads(obj.tojson()) #lVertexID
-        if isobject(obj, pyedge):
+        if isinstance(obj, pyedge):
             return obj.lEdgeID        
-        if isobject(obj, pyflowline):
+        if isinstance(obj, pyflowline):
             return obj.lFlowlineID
-        if isobject(obj, pyconfluence):
+        if isinstance(obj, pyconfluence):
             return obj.dAngle_upstream
        
             

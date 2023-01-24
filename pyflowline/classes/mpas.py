@@ -12,22 +12,22 @@ from pyflowline.algorithms.auxiliary.gdal_functions import calculate_polygon_are
 
 class MpasClassEncoder(JSONEncoder):
     def default(self, obj):
-        if isobject(obj, np.integer):
+        if isinstance(obj, np.integer):
             return int(obj)
-        if isobject(obj, np.float32):
+        if isinstance(obj, np.float32):
             return float(obj)
-        if isobject(obj, np.ndarray):
+        if isinstance(obj, np.ndarray):
             return obj.tolist()
-        if isobject(obj, list):
+        if isinstance(obj, list):
             pass  
-        if isobject(obj, pyvertex):
+        if isinstance(obj, pyvertex):
             return json.loads(obj.tojson()) #lVertexID
-        if isobject(obj, pyedge):
+        if isinstance(obj, pyedge):
             return obj.lEdgeID        
-        if isobject(obj, pyflowline):
+        if isinstance(obj, pyflowline):
             return obj.lFlowlineID
         
-        if isobject(obj, pympas):
+        if isinstance(obj, pympas):
             return obj.lCellID
             
         return JSONEncoder.default(self, obj)

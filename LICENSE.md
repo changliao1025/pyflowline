@@ -1,5 +1,6 @@
 PyFlowline
-A mesh independent river network generator for hydrologic models.
+
+A mesh-independent river network generator for hydrologic models.
         
 Copyright © 2022, Battelle Memorial Institute
 

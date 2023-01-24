@@ -16,7 +16,9 @@ Within PyFlowline, these three elements are combined with several other data str
 
 .. image:: ../../figures/structure_pyflowline.png
   :width: 400
-  :alt: PyFlowline structure. This is a domain containing two watersheds/basins. Each basin has an outlet. Within each basin, there are several subbasins and confluences. The lower right is a zoom-in view of a flowline.
+  :alt: PyFlowline structure. 
+  
+This figure illustrates a domain containing two watersheds/basins. Each basin has an outlet. Within each basin, there are several subbasins and confluences. The lower right is a zoom-in view of a flowline.
 
 ****************************************************
 Spatial references and computational geometry
@@ -100,21 +102,21 @@ An example parent JSON file is provided below:
 +================================+============+=========================================+================+=====================================+
 | sFilename_model_configuration  | string     | The filename of the configuration file  | None           | It will be automatically generated  |
 +--------------------------------+------------+-----------------------------------------+----------------+-------------------------------------+
-| sWorkspace_data                | string     | The workspace of data                   | None           | None                                |
+| sWorkspace_data                | string     | The workspace of data                   | None           | Unused                              |
 +--------------------------------+------------+-----------------------------------------+----------------+-------------------------------------+
-| sWorkspace_output              | string     | The output workspace                    | None           | None                                |
+| sWorkspace_output              | string     | The output workspace                    | None           | The output folder                   |
 +--------------------------------+------------+-----------------------------------------+----------------+-------------------------------------+
-| sWorkspace_project             | string     | The project workspace                   | None           | None                                |
+| sWorkspace_project             | string     | The project workspace                   | None           | Unused                              |
 +--------------------------------+------------+-----------------------------------------+----------------+-------------------------------------+
 | sWorkspace_bin                 | string     | The workspace for binary executable     | None           | Reserved for HexWatershed model     |
 +--------------------------------+------------+-----------------------------------------+----------------+-------------------------------------+
 | sRegion                        | string     | Study region                            | None           | None                                |
 +--------------------------------+------------+-----------------------------------------+----------------+-------------------------------------+
-| sModel                         | string     | Model name                              | None           | None                                |
+| sModel                         | string     | Model name                              | pyflowline     | None                                |
 +--------------------------------+------------+-----------------------------------------+----------------+-------------------------------------+
 | sJob                           | string     | HPC batch job name                      | pyflowline     | None                                |
 +--------------------------------+------------+-----------------------------------------+----------------+-------------------------------------+
-| iFlag_standalone               | int        | Flag to run pyflowlone standalone       |  1             | None                                |
+| iFlag_standalone               | int        | Flag to run pyflowlone standalone       |  1             | 0 when called by hexwatershed       |
 +--------------------------------+------------+-----------------------------------------+----------------+-------------------------------------+
 | iFlag_create_mesh              | int        | Flag to create mesh                     |  1             | None                                |
 +--------------------------------+------------+-----------------------------------------+----------------+-------------------------------------+
@@ -126,7 +128,7 @@ An example parent JSON file is provided below:
 +--------------------------------+------------+-----------------------------------------+----------------+-------------------------------------+
 | iFlag_flowline                 | int        | Flag for flowline                       |  1             | None                                |
 +--------------------------------+------------+-----------------------------------------+----------------+-------------------------------------+
-| iFlag_use_mesh_dem             | int        | Flag to use DEM data                    |  0             | None                                |
+| iFlag_use_mesh_dem             | int        | Flag to use DEM data                    |  0             | Not used                            |
 +--------------------------------+------------+-----------------------------------------+----------------+-------------------------------------+
 | iFlag_global                   | int        | Flag to run on global scale             |  0             | None                                |
 +--------------------------------+------------+-----------------------------------------+----------------+-------------------------------------+
@@ -156,9 +158,9 @@ An example parent JSON file is provided below:
 +--------------------------------+------------+-----------------------------------------+----------------+-------------------------------------+
 | sFilename_spatial_reference    | string     | Spatial reference                       |  None          | None                                |
 +--------------------------------+------------+-----------------------------------------+----------------+-------------------------------------+
-| sFilename_dem                  | string     | DEM file                                |  None          |  Reserved for HexWatershed model    |
+| sFilename_dem                  | string     | DEM file                                |  None          | Reserved for HexWatershed model     |
 +--------------------------------+------------+-----------------------------------------+----------------+-------------------------------------+
-| sFilename_mesh_netcdf          | string     | Netcdf mesh file                        |  None          | None                                |
+| sFilename_mesh_netcdf          | string     | Netcdf mesh file                        |  None          |                                     |
 +--------------------------------+------------+-----------------------------------------+----------------+-------------------------------------+
 | sFilename_basins               | string     | Filename of child JSON file             |  None          | None                                |
 +--------------------------------+------------+-----------------------------------------+----------------+-------------------------------------+
@@ -189,7 +191,7 @@ An example child JSON file is provided below:
 | Parameter                      | Data type  | Usage                                   | Default value  | Note                                |
 |                                |            |                                         |                |                                     |
 +================================+============+=========================================+================+=====================================+
-| dLatitude_outlet_degree        | string     | The latitude of outlet                  | None           | It will be automatically generated  |
+| dLatitude_outlet_degree        | string     | The latitude of outlet                  | None           |                                     |
 +--------------------------------+------------+-----------------------------------------+----------------+-------------------------------------+
 | dLongitude_outlet_degree       | string     | The longitude of outlet                 |                |                                     |
 +--------------------------------+------------+-----------------------------------------+----------------+-------------------------------------+
@@ -205,13 +207,13 @@ An example child JSON file is provided below:
 +--------------------------------+------------+-----------------------------------------+----------------+-------------------------------------+
 | lBasinID                       | string     | Basin/watershed ID                      |  0             |                                     |
 +--------------------------------+------------+-----------------------------------------+----------------+-------------------------------------+
-| sFilename_dam                  | int        | Filename of dam file                    |  1             |                                     |
+| sFilename_dam                  | int        | Filename of dam file                    |  1             | Only used for dam burning           |
 +--------------------------------+------------+-----------------------------------------+----------------+-------------------------------------+
-| sFilename_flowline_filter      | int        | Filename of original flowline file      |                |                                     |
+| sFilename_flowline_filter      | int        | Filename of original flowline file      |                | GeoJSON format                      |
 +--------------------------------+------------+-----------------------------------------+----------------+-------------------------------------+
-| sFilename_flowline_raw         | int        | Filename of flowline including dam      |                |                                     |
+| sFilename_flowline_raw         | int        | Filename of flowline including dam      |                | Only used for dam burning           |
 +--------------------------------+------------+-----------------------------------------+----------------+-------------------------------------+
-| sFilename_flowline_topo        | int        | Filename of dam topology                |                |                                     |
+| sFilename_flowline_topo        | int        | Filename of dam topology                |                | Only used for dam burning           |
 +--------------------------------+------------+-----------------------------------------+----------------+-------------------------------------+
 
 

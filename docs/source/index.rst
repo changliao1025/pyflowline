@@ -11,6 +11,7 @@ Welcome to pyflowline's documentation!
    :numbered:
    
    readme
+   quickstart
    installation/installation   
    data/data
    algorithm/algorithm

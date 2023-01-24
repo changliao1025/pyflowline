@@ -26,26 +26,26 @@ else:
 #setup case information
 #===================================
 iCase_index = 1
-aResolution_meter = [5000, 10000, 50000]
-nResolution = len(aResolution_meter)
+dResolution_meter = 50000
+
 sMesh = 'hexagon'
-sDate='20220630'
+sDate='20230101'
 
   
-for iResolution in range(1, nResolution + 1):    
-    dResolution_meter = aResolution_meter[iResolution-1]
-    oPyflowline = pyflowline_read_model_configuration_file(sFilename_configuration_in, \
-    iCase_index_in=iCase_index, dResolution_meter_in=dResolution_meter, sDate_in=sDate)
-    oPyflowline.aBasin[0].dLatitude_outlet_degree=39.462000
-    oPyflowline.aBasin[0].dLongitude_outlet_degree=-76.009300
-    oPyflowline.setup()
-    oPyflowline.flowline_simplification()
-    aCell = oPyflowline.mesh_generation()
-    oPyflowline.reconstruct_topological_relationship(aCell)
-    oPyflowline.analyze()
-    oPyflowline.evaluate()
-    oPyflowline.export()
-    iCase_index= iCase_index+1
+  
+    
+oPyflowline = pyflowline_read_model_configuration_file(sFilename_configuration_in, \
+iCase_index_in=iCase_index, dResolution_meter_in=dResolution_meter, sDate_in=sDate)
+oPyflowline.aBasin[0].dLatitude_outlet_degree=39.462000
+oPyflowline.aBasin[0].dLongitude_outlet_degree=-76.009300
+oPyflowline.setup()
+oPyflowline.flowline_simplification()
+aCell = oPyflowline.mesh_generation()
+oPyflowline.reconstruct_topological_relationship(aCell)
+oPyflowline.analyze()
+oPyflowline.evaluate()
+oPyflowline.export()
+iCase_index= iCase_index+1
            
 print('Finished')
 

@@ -51,7 +51,7 @@ As a result, there is a need to develop a mesh-independent river network represe
 
 It was designed using a unified framework that all the computational geometry algorithms are implemented on a sphere, which allows both regional and global scale simulations. It was designed using a mesh-independent approach so that both structured and unstructured meshes are supported. Other mesh structures such as triangular irregular networks (`TIN`) or discrete global grid systems (`DGGs`) can be easily adopted.
 
-`PyFlowline` is a core component within the `HexWatershed` model, which is a mesh-independent flow direction model. `PyFlowline` has supported several scientific studies forcing on coupled Earth system models [@Feng:2022; @Liao:2022]. A workshop tutorial was also provided online and in-person. 
+`PyFlowline` is a core component within the `HexWatershed` model, which is a mesh-independent flow direction model. `PyFlowline` has supported several scientific studies forcing on coupled Earth system models [@Feng:2022; @Liao:2022; @Cooper:2022]. A workshop tutorial was also provided online and in-person. 
 
 # Model features
 

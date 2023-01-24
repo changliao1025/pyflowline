@@ -134,3 +134,6 @@ dmypy.json
 retired
 unused
 core.*
+*.nc
+*.tif
+*.tiff

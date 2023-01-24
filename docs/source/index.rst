@@ -21,6 +21,7 @@ Welcome to pyflowline's documentation!
    support
    contribution
    api/api
+   faq
    authors
 
 Addendum

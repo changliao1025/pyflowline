@@ -67,6 +67,8 @@ Pyflowline provides the following features:
 A case study was provided for the Susquehanna River Basin (SRB) in the Mid-Atlantic region of the United States.
 You can either use the `Python` scripts within the `examples` folder or the `notebooks` to test the model.
 
+Model documentation is hosted at https://pyflowline.readthedocs.io/en/latest/.
+
 # Acknowledgment
 
 The model described in this repository was supported by the following:

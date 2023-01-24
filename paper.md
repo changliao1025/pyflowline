@@ -27,14 +27,29 @@ bibliography: paper.bib
 
 # Summary
 
-Spatially-distributed hydrologic models often require river network datasets as model inputs. Generation of these river network datasets can be challenging, especially when unstructured meshes are used. Therefore we developed a mesh-independent river network generation Python package to address existing challenges. 
-This package can be used to generate several key river parameters, including the river network's topologic relationship.
-It also supports various mesh types for both structured and unstructured mesh-based hydrologic models.
+**River networks** are important features in hydrologic models. 
+
+For spatially-distributed hydrologic models, the representation of river networks also needs to consider the model's spatial discretization, i.e., meshes.
+
+Existing methods generally do not support unstructured meshes.
+
+Therefore we developed a mesh-independent river network generation Python package, i.e., `PyFlowline` to close the gap. 
+
+This package can be used to generate the **conceptual river networks** and their topologic relationship.
+
+It also supports both **structured** and **unstructured** meshes.
 
 # Statement of need
 
-For a given vector river network and any spatial discretization (mesh), generating the mesh cell-based conceptual river network remains challenging. Most existing methods can only accept structured rectangle meshes.
+For a given **vector river network** and any **mesh**, generating the mesh cell-based conceptual river network remains challenging. 
+
+Existing methods can only accept structured rectangle meshes, and cannot be used if the hdyrologic models use the unstructured meshes.
+
 As a result, there is a need to develop a mesh-independent river network representation method for unstructured mesh-based hydrologic models.
+
+`PyFlowline` is a Python package to generate river networks for hydrologic models. It uses the Object-Oriented Programming (OOP) approach to represent the river networks and mesh cell relationships. It was designed to unify both regional and global scale river network representation.
+
+`PyFlowline` is a core component within the `HexWatershed` model, which is a mesh-independent flow direction model. `PyFlowline` has supported several scientific studies already.
 
 # Model features
 

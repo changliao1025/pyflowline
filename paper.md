@@ -3,7 +3,9 @@ title: 'pyflowline: a mesh-independent river network generator for hydrologic mo
 
 tags:
   - Python
-  - Hydrology
+  - hydrologic model
+  - river networks
+  - mesh
   - geographic information system
 
 authors:
@@ -25,11 +27,13 @@ bibliography: paper.bib
 
 # Summary
 
-Spatially-distributed hydrologic models often require high-quality river network information as inputs. Generation of river network information can be challenging, especially when the hydrologic models use unstructured meshes. We developed a mesh-independent river network generation Python package to address this challenge. It resolves several issues in existing braided river networks. It also produces spatially-distributed cell-to-cell topology information, which can be used for river routing. The package supports various mesh types, including traditional rectangle and unstructured meshes.
+Spatially-distributed hydrologic models often require river network datasets as model inputs. Generation of these river network datasets can be challenging, especially when unstructured meshes are used. Therefore we developed a mesh-independent river network generation Python package to address existing challenges. 
+This package can be used to generate several key river parameters, including the river network's topologic relationship.
+It also supports various mesh types for both structured and unstructured mesh-based hydrologic models.
 
 # Statement of need
 
-For a given vector river network and spatial discretization (mesh), generating the mesh cell-based conceptual river network remains challenging. Most existing methods can only accept structured rectangle meshes.
+For a given vector river network and any spatial discretization (mesh), generating the mesh cell-based conceptual river network remains challenging. Most existing methods can only accept structured rectangle meshes.
 As a result, there is a need to develop a mesh-independent river network representation method for unstructured mesh-based hydrologic models.
 
 # Model features

@@ -2,13 +2,15 @@ import os, sys
 from pathlib import Path
 from os.path import realpath
 
-from pyflowline.pyflowline_read_model_configuration_file import pyflowline_read_model_configuration_file
-
 
 #===================================
 #set up workspace path
 #===================================
 sPath_parent = str(Path(__file__).parents[2]) # data is located two dir's up
+sPath_parent = str(Path(__file__).parents[2]) # data is located two dir's up
+import sys
+sys.path.append(sPath_parent)
+from pyflowline.pyflowline_read_model_configuration_file import pyflowline_read_model_configuration_file
 sPath_data = realpath( sPath_parent +  '/data/susquehanna' )
 sWorkspace_input =  str(Path(sPath_data)  /  'input')
 sWorkspace_output=  str(Path(sPath_data)  /  'output')
@@ -41,8 +43,6 @@ oPyflowline.setup()
 oPyflowline.flowline_simplification()
 aCell = oPyflowline.mesh_generation()
 oPyflowline.reconstruct_topological_relationship(aCell)
-oPyflowline.analyze()
-oPyflowline.evaluate()
 oPyflowline.export()
 
 

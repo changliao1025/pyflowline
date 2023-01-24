@@ -39,8 +39,6 @@ oPyflowline.setup()
 oPyflowline.flowline_simplification()
 aCell = oPyflowline.mesh_generation()
 oPyflowline.reconstruct_topological_relationship(aCell)
-oPyflowline.analyze()
-oPyflowline.evaluate()
 oPyflowline.export()
 
 print('Finished')

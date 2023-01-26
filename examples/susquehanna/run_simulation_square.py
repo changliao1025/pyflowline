@@ -7,7 +7,6 @@ from os.path import realpath
 #set up workspace path
 #===================================
 sPath_parent = str(Path(__file__).parents[2]) # data is located two dir's up
-sPath_parent = str(Path(__file__).parents[2]) # data is located two dir's up
 import sys
 sys.path.append(sPath_parent)
 from pyflowline.pyflowline_read_model_configuration_file import pyflowline_read_model_configuration_file

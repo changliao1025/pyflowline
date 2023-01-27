@@ -13,6 +13,10 @@ authors:
     orcid: 0000-0002-7348-8858    
     affiliation: 1
 
+  - name: Matt G Cooper
+    orcid: 0000-0002-0165-209X 
+    affiliation: 1
+
 affiliations:
  - name: Atmospheric Sciences and Global Change, Pacific Northwest National Laboratory, Richland, WA, USA
    index: 1 

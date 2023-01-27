@@ -42,6 +42,10 @@ The following steps are recommended:
 5. Navigate to the examples and run the python scripts in your preferred Python IDE.
 The visualization features require additional Python packages; please refer to `Documentation` (https://pyflowline.readthedocs.io/) for details on visualization.
 
+For a quick start, see
+
+https://pyflowline.readthedocs.io/en/latest/quickstart.html
+
 ### Acknowledgment
 
 This work was supported by the Earth System Model Development program areas of the U.S. Department of Energy, Office of Science, Office of Biological and Environmental Research as part of the multi-program, collaborative Integrated Coastal Modeling (ICoM) project and the Interdisciplinary Research for Arctic Coastal Environments (InteRFACE) project. 

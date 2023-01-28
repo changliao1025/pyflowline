@@ -2,14 +2,13 @@ import os, sys
 from pathlib import Path
 import json
 from json import JSONEncoder
-
 import numpy as np
+
 from pyflowline.classes.timer import pytimer
 from pyflowline.classes.vertex import pyvertex
 from pyflowline.classes.edge import pyedge
 from pyflowline.classes.flowline import pyflowline
 from pyflowline.classes.confluence import pyconfluence
-
 from pyflowline.formats.read_flowline import read_flowline_geojson
 from pyflowline.formats.read_nhdplus_flowline_shapefile import  read_nhdplus_flowline_geojson_attribute
 from pyflowline.formats.read_nhdplus_flowline_shapefile import extract_nhdplus_flowline_shapefile_by_attribute
@@ -19,15 +18,12 @@ from pyflowline.formats.export_flowline import export_flowline_to_geojson
 from pyflowline.formats.export_vertex import export_vertex_to_geojson
 from pyflowline.algorithms.auxiliary.text_reader_string import text_reader_string
 
-#
-
 import importlib
 iFlag_cython = importlib.util.find_spec("cython") 
 if iFlag_cython is not None:
     from pyflowline.algorithms.cython.kernel import find_vertex_in_list
 else:
     from pyflowline.algorithms.auxiliary.find_vertex_in_list import find_vertex_in_list
-
 
 from pyflowline.algorithms.split.find_flowline_vertex import find_flowline_vertex
 from pyflowline.algorithms.split.find_flowline_confluence import find_flowline_confluence
@@ -70,10 +66,7 @@ class BasinClassEncoder(JSONEncoder):
         if isinstance(obj, pyconfluence):
             return obj.dAngle_upstream
        
-            
         return JSONEncoder.default(self, obj)
-
-
 
 class pybasin(object):
     """Basin class

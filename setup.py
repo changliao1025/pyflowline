@@ -59,5 +59,8 @@ setup(
     url=URL,
     packages=find_packages(),
     install_requires=REQUIRED,
-    classifiers=CLASSIFY
+    classifiers=CLASSIFY,
+    extras_require={
+        'visualization': ['matplotlib', 'cartopy']
+    }
 )

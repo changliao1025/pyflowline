@@ -9,35 +9,48 @@ Overview
 
 This document provides the instruction to install the PyFlowline Python package.
 
-PyFlowline is available on both PyPI (https://pypi.org/project/pyflowline/) and Conda (https://anaconda.org/conda-forge/pyflowline).
+Two different options are provided for different applications.
 
 ************
 Requirements
 ************
 
-If the Conda system is used to install the PyFlowline package, conda will automatically install the dependency packages.
+We recommend the users to use the Conda system to install the PyFlowline package.
 
-The dependency packages can also be installed manually.
+Conda can be installed on Linux, MacOS, and Windows systems. 
+Please refer to the conda website for details on how to install Conda: 
+https://docs.conda.io/en/latest/
+
+After Conda is available on your system, you can create a conda environment for your application.
+Then you use use either the Option A or B to install PyFlowline in the newly created environment.
+
+==========
+Option A
+==========
+
+In this option, you will use conda to install the released PyFlowline package, but not necessaily the latest version.
+Conda will automatically install all the dependency packages.
+
+    conda install -c conda-forge pyflowline
+
+
+==========
+Option B
+==========
+
+In this option, you have the oppotunity to install the `nightly` version.
+
+First, you need to clone the PyFlowline package from GitHub directly.
+
+
+install the dependency packages using the `requirements.txt`.
+
+The following dependency packages will be installed.
 
 * `numpy`
 * `gdal`
 * `netCDF4`
 * `shapely`
-* `cython` (optional)
-* `cartopy` (optional, for visualization)
-* `matplotlib` (optional, for visualization)
-
-***********
-Instruction 
-***********
-
-You can install PyFlowline through the Conda system:
-
-    conda install -c conda-forge pyflowline
-
-To enable the `cython` feature, the user needs to build the cython code under the `./pyflowline/algorithms/cython` directory following the cython user guide (https://cython.readthedocs.io/en/latest/index.html).
-
-In most cases, if a C/C++ compiler is available on the system, run the following command:
 
     python setup.py build_ext --inplace
 

@@ -29,13 +29,6 @@ from pyflowline.algorithms.auxiliary.gdal_functions import gdal_read_geotiff_fil
 pProjection_map = ccrs.Orthographic(central_longitude =  0.50*(-149.5+(-146.5)), \
         central_latitude = 0.50*(68.1+70.35), globe=None)
         
-""" Imported methods
-from ._visual import _plot
-from ._visual import _plot_study_area
-from ._visual import _plot_mesh
-from ._visual import _plot_mesh_with_flowline
-from ._visual import _compare_with_raster_dem_method
-"""
 
 def _plot(self, sFilename_in,iFlag_title=None, sVariable_in=None, aExtent_in = None, pProjection_map_in = None):
     if sVariable_in == 'mesh':

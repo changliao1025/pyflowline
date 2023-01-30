@@ -118,9 +118,17 @@ class pybasin(object):
     pVertex_outlet=None
     aConfluence_basin_simplified= None
     aConfluence_basin_conceptual= None
+
     
-    from ._visual import _basinplot
-    from ._visual import _plot_area_of_difference
+    iFlag_visual = importlib.util.find_spec("cartopy") 
+    if iFlag_visual is not None:
+        from ._visual import _basinplot
+        from ._visual import _plot_area_of_difference 
+    else:
+        pass
+
+    
+    
     
     def __init__(self, aParameter):
         """

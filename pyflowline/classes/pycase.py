@@ -4,6 +4,7 @@ from abc import ABCMeta
 import json
 from json import JSONEncoder
 import datetime
+import importlib
 import numpy as np
 from osgeo import ogr, osr
 from shapely.wkt import loads
@@ -121,12 +122,19 @@ class flowlinecase(object):
     aCellID_outlet = list()
     aCell=list()
 
-    from ._visual import _plot
-    from ._visual import _plot_study_area
-    from ._visual import _plot_mesh
-    from ._visual import _plot_mesh_with_flowline
-    from ._visual import _compare_with_raster_dem_method
+    iFlag_visual = importlib.util.find_spec("cartopy") 
+    if iFlag_visual is not None:
+        from ._visual import _plot
+        from ._visual import _plot_study_area
+        from ._visual import _plot_mesh
+        from ._visual import _plot_mesh_with_flowline
+        from ._visual import _compare_with_raster_dem_method
+    else:
+        pass
+
+        
     from ._hpc import _create_hpc_job
+    
     def __init__(self, aConfig_in,
             iFlag_standalone_in= None,
             sModel_in = None,

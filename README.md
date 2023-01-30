@@ -22,7 +22,7 @@ Please refer to the official documentation (https://pyflowline.readthedocs.io/) 
 
 ### Application
 
-To demonstrate the model capability, several examples are provided in the `examples` folder.
+We provide several examples in the `examples` folder to demonstrate the model capability.
 
 
 ### Acknowledgment
@@ -45,7 +45,7 @@ Copyright © 2022, Battelle Memorial Institute
 
 ### References
 
-There are several publications that describe the algorithms used in `PyFlowline` in detail. If you make use of `PyFlowline` in your work, please consider including a reference to the following:
+Several publications describe the algorithms used in `PyFlowline` in detail. If you make use of `PyFlowline` in your work, please consider including a reference to the following:
 
 * Liao. C. Cooper, M (2022) Pyflowline: a mesh independent river network generator for hydrologic models. Zenodo.
 https://doi.org/10.5281/zenodo.6407299

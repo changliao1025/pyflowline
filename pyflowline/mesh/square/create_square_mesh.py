@@ -3,16 +3,15 @@
 #longitude left and latitude bottom and nrow and ncolumn and resolution is used to define the rectangle
 #because it is mesh, it represent the edge instead of center
 #we will use gdal api for most operations
-import os, sys
+import os
 from osgeo import ogr, osr
 import numpy as np
+from shapely.wkt import loads
 from pyflowline.classes.square import pysquare
 from pyflowline.formats.convert_coordinates import convert_gcs_coordinates_to_cell
-
-
 from pyflowline.algorithms.auxiliary.gdal_functions import  reproject_coordinates_batch
 
-def create_square_mesh(dX_left_in, dY_bot_in, dResolution_meter_in, ncolumn_in, nrow_in, 
+def create_square_mesh(dX_left_in, dY_bot_in, dResolution_meter_in, ncolumn_in, nrow_in, pPolygon_in,
     sFilename_output_in, sFilename_spatial_reference_in):   
     """
     _summary_
@@ -83,7 +82,6 @@ def create_square_mesh(dX_left_in, dY_bot_in, dResolution_meter_in, ncolumn_in, 
             x4 = xleft + ((iColumn ) * xspacing)
             y4 = ybottom + ((iRow-1) * yspacing)
 
-           
             x = list()
             x.append(x1)
             x.append(x2)
@@ -106,8 +104,7 @@ def create_square_mesh(dX_left_in, dY_bot_in, dResolution_meter_in, ncolumn_in, 
             y2=y_new[1]
             y3=y_new[2]
             y4=y_new[3]        
-           
-
+    
             ring = ogr.Geometry(ogr.wkbLinearRing)
             ring.AddPoint(x1, y1)
             ring.AddPoint(x2, y2)
@@ -117,8 +114,6 @@ def create_square_mesh(dX_left_in, dY_bot_in, dResolution_meter_in, ncolumn_in, 
             pPolygon = ogr.Geometry(ogr.wkbPolygon)
             pPolygon.AddGeometry(ring)
 
-            dLongitude_center = (x1 + x2 + x3 + x4)/4.0
-            dLatitude_center = (y1 + y2 + y3 + y4)/4.0
             aCoords = np.full((5,2), -9999.0, dtype=float)
             aCoords[0,0] = x1
             aCoords[0,1] = y1
@@ -130,76 +125,104 @@ def create_square_mesh(dX_left_in, dY_bot_in, dResolution_meter_in, ncolumn_in, 
             aCoords[3,1] = y4
             aCoords[4,0] = x1
             aCoords[4,1] = y1
+
             dummy1= np.array(aCoords)
+            dLongitude_center = np.mean(aCoords[0:4,0])
+            dLatitude_center = np.mean(aCoords[0:4,1])     
 
-            pSquare = convert_gcs_coordinates_to_cell(2, dLongitude_center, dLatitude_center, dummy1)
+            pCenter = ogr.Geometry(ogr.wkbPoint)
+            pCenter.AddPoint(dLongitude_center, dLatitude_center)
+            pCenter1 = loads( pCenter.ExportToWkt() )
+            iFlag = pCenter1.within(pPolygon_in)
+            if ( iFlag == True ):
+                pSquare = convert_gcs_coordinates_to_cell(2, dLongitude_center, dLatitude_center, dummy1)
+                pSquare.lCellID = lCellID
+                dArea = pSquare.calculate_cell_area()
+                pSquare.calculate_edge_length()
 
-            pSquare.lCellID = lCellID
-            dArea = pSquare.calculate_cell_area()
-            pSquare.dArea = dArea
-            pSquare.calculate_edge_length()
-            pSquare.dLongitude_center_degree = dLongitude_center
-            pSquare.dLatitude_center_degree = dLatitude_center
+                pFeature.SetGeometry(pPolygon)
+                pFeature.SetField("id", lCellID)
+                pFeature.SetField("lon", dLongitude_center )
+                pFeature.SetField("lat", dLatitude_center )
+                pFeature.SetField("area", dArea )
+                pLayer.CreateFeature(pFeature)
 
-            pFeature.SetGeometry(pPolygon)
-            pFeature.SetField("id", lCellID)
-            pFeature.SetField("lon", dLongitude_center )
-            pFeature.SetField("lat", dLatitude_center )
-            pFeature.SetField("area", dArea )
-            pLayer.CreateFeature(pFeature)
+                #build topoloy
+                aNeighbor=list()
 
-            #build topoloy
-            aNeighbor=list()
-            
-            lCellID_center = lCellID
-          
-            if iRow > 1:#under
-                lCellID0 = lCellID_center - 1
-                aNeighbor.append(lCellID0)
-                if iColumn > 1:
-                    lCellID2 = lCellID0 - nrow_in
-                    aNeighbor.append(lCellID2)
+                lCellID_center = lCellID
 
-            if iColumn> 1:#left
-                lCellID1 = nrow_in * (iColumn-2) + iRow 
-                aNeighbor.append(lCellID1)  
-                if iRow < nrow_in:
-                    lCellID4 = lCellID1 + 1
-                    aNeighbor.append(lCellID4)      
-                    
-            if iRow < nrow_in:#top
-                lCellID3 = lCellID_center + 1
-                aNeighbor.append(lCellID3)
-                if iColumn < ncolumn_in:
-                    lCellID6 = lCellID3 + nrow_in
-                    aNeighbor.append(lCellID6) 
-                    
-            if iColumn  < ncolumn_in  : #right
-                lCellID5 = nrow_in * iColumn + iRow 
-                aNeighbor.append(lCellID5)
-                if iRow > 1:
-                    lCellID7 = lCellID5 -1
-                    aNeighbor.append(lCellID7) 
-    
-            pSquare.aNeighbor = aNeighbor
-            pSquare.nNeighbor = len(aNeighbor)
-            pSquare.aNeighbor_land= aNeighbor
-            pSquare.nNeighbor_land= pSquare.nNeighbor
-            aSquare.append(pSquare)
-            lCellID = lCellID + 1
+                if iRow > 1:#under
+                    lCellID0 = lCellID_center - 1
+                    aNeighbor.append(lCellID0)
+                    if iColumn > 1:
+                        lCellID2 = lCellID0 - nrow_in
+                        aNeighbor.append(lCellID2)
 
-            pass
+                if iColumn> 1:#left
+                    lCellID1 = nrow_in * (iColumn-2) + iRow 
+                    aNeighbor.append(lCellID1)  
+                    if iRow < nrow_in:
+                        lCellID4 = lCellID1 + 1
+                        aNeighbor.append(lCellID4)      
+
+                if iRow < nrow_in:#top
+                    lCellID3 = lCellID_center + 1
+                    aNeighbor.append(lCellID3)
+                    if iColumn < ncolumn_in:
+                        lCellID6 = lCellID3 + nrow_in
+                        aNeighbor.append(lCellID6) 
+
+                if iColumn  < ncolumn_in  : #right
+                    lCellID5 = nrow_in * iColumn + iRow 
+                    aNeighbor.append(lCellID5)
+                    if iRow > 1:
+                        lCellID7 = lCellID5 -1
+                        aNeighbor.append(lCellID7) 
+
+                pSquare.aNeighbor = aNeighbor
+                pSquare.nNeighbor = len(aNeighbor)
+                pSquare.aNeighbor_land= aNeighbor
+                pSquare.nNeighbor_land= pSquare.nNeighbor
+                aSquare.append(pSquare)
+                lCellID = lCellID + 1
+
+                pass
 
     pDataset = pLayer = pFeature  = None  
-    for pSquare in aSquare:
+
+    aSquare_out = list()
+    ncell = len(aSquare)
+    aCellID  = list()
+    for i in range(ncell):
+        pCell = aSquare[i]
+        lCellID = pCell.lCellID
+        aCellID.append(lCellID)
+    for i in range(ncell):
+        pCell = aSquare[i]
+        aNeighbor = pCell.aNeighbor
+        nNeighbor = pCell.nNeighbor
+        aNeighbor_new = list()
+        nNeighbor_new = 0 
+        for j in range(nNeighbor):
+            lNeighbor = int(aNeighbor[j])
+            if lNeighbor in aCellID:
+                nNeighbor_new = nNeighbor_new + 1 
+                aNeighbor_new.append(lNeighbor)
+        pCell.nNeighbor_land= len(aNeighbor_new)
+        pCell.aNeighbor_land = aNeighbor_new
+        pCell.nNeighbor_ocean = pCell.nVertex - pCell.nNeighbor_land
+        aSquare_out.append(pCell)
+
+    for pSquare in aSquare_out:
         aNeighbor = pSquare.aNeighbor
         pSquare.aNeighbor_distance=list()
         for lCellID1 in aNeighbor:
-            for pSquare1 in aSquare:
+            for pSquare1 in aSquare_out:
                 if pSquare1.lCellID == lCellID1:
                     dDistance = pSquare.pVertex_center.calculate_distance( pSquare1.pVertex_center )
                     pSquare.aNeighbor_distance.append(dDistance)
                     break
 
-    return aSquare
+    return aSquare_out
 

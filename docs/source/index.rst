@@ -16,13 +16,15 @@ Welcome to pyflowline's documentation!
    data/data
    algorithm/algorithm
    application/application
+   visualization
    references
    history
+   authors
    support
    contribution
-   api/api
    faq
-   authors
+   api/api   
+   
 
 Addendum
 --------

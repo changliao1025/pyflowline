@@ -1,13 +1,11 @@
-from abc import ABCMeta, abstractmethod
+
 
 import copy
-
 import json
 from json import JSONEncoder
 import numpy as np
 from pyflowline.classes.vertex import pyvertex
 from pyflowline.classes.edge import pyedge
-
 
 class FlowlineClassEncoder(JSONEncoder):
     def default(self, obj):

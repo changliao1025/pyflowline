@@ -1,6 +1,9 @@
-import os, sys
-from pathlib import Path
+import os
 import json
+#dependency packages
+import numpy as np
+from osgeo import  osr, gdal, ogr
+from shapely.wkt import loads
 import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
 import matplotlib.path as mpath
@@ -13,11 +16,9 @@ import cartopy.io.shapereader as shpreader
 from cartopy.feature import ShapelyFeature
 import cartopy.crs as ccrs
 
-from osgeo import  osr, gdal, ogr
-import numpy as np
 import requests
-import utm
-from shapely.wkt import loads
+#import utm
+
 from pyflowline.algorithms.auxiliary.text_reader_string import text_reader_string
 from pyflowline.algorithms.auxiliary.gdal_functions import Google_MetersPerPixel
 from pyflowline.algorithms.auxiliary.gdal_functions import reproject_coordinates, reproject_coordinates_batch
@@ -28,13 +29,6 @@ from pyflowline.algorithms.auxiliary.gdal_functions import gdal_read_geotiff_fil
 pProjection_map = ccrs.Orthographic(central_longitude =  0.50*(-149.5+(-146.5)), \
         central_latitude = 0.50*(68.1+70.35), globe=None)
         
-""" Imported methods
-from ._visual import _plot
-from ._visual import _plot_study_area
-from ._visual import _plot_mesh
-from ._visual import _plot_mesh_with_flowline
-from ._visual import _compare_with_raster_dem_method
-"""
 
 def _plot(self, sFilename_in,iFlag_title=None, sVariable_in=None, aExtent_in = None, pProjection_map_in = None):
     if sVariable_in == 'mesh':
@@ -105,7 +99,8 @@ def _plot_study_area(self, sFilename_boundary_in = None, sFilename_slope_in = No
         ax_dem.spines[axis].set_linewidth(0.5)
     # increase tick width
     ax_dem.tick_params(width=0.5)
-    u = utm.from_latlon(dLatitude_center, dLongitude_center)
+    # unused code
+    # u = utm.from_latlon(dLatitude_center, dLongitude_center)
     gl = ax_dem.gridlines(crs=ccrs.PlateCarree(), draw_labels=True,
                   linewidth=1, color='gray', alpha=0.3, linestyle='--')
 

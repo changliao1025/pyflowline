@@ -1,18 +1,15 @@
-from abc import ABCMeta
-import numpy as np
+import importlib
 import json
 from json import JSONEncoder
+import numpy as np
 from pyflowline.classes.vertex import pyvertex
 from pyflowline.classes.flowline import pyflowline
 
-import importlib
 iFlag_cython = importlib.util.find_spec("cython") 
 if iFlag_cython is not None:
     from pyflowline.algorithms.cython.kernel import calculate_angle_betwen_vertex
 else:
     from pyflowline.algorithms.auxiliary.gdal_functions import  calculate_angle_betwen_vertex
-
-
 
 class ConfluenceClassEncoder(JSONEncoder):
     """Confluence Class Encoder
@@ -49,6 +46,7 @@ class pyconfluence():
     pFlowline_downstream=None
     aFlowline_upstream=list()
     dAngle_upstream=0.0    
+
     def __init__(self, pVertex_center, aFlowline_upstream_in, pFlowline_downstream_in):
         """
         Initialize a pyconfluence object

@@ -1,19 +1,18 @@
 import os
 import numpy as np
 from osgeo import ogr, osr
+import importlib
+
 from shapely.ops import polygonize
 from pyflowline.algorithms.auxiliary.gdal_functions import  calculate_angle_betwen_vertex_normal
 from pyflowline.algorithms.auxiliary.gdal_functions import calculate_polygon_area
 from pyflowline.algorithms.auxiliary.find_index_in_list import find_list_in_list 
 
-
-import importlib
 iFlag_cython = importlib.util.find_spec("cython") 
 if iFlag_cython is not None:
     from pyflowline.algorithms.cython.kernel import find_vertex_in_list
 else:
     from pyflowline.algorithms.auxiliary.find_vertex_in_list import find_vertex_in_list
-
 
 
 def calculate_area_of_difference_raw(sFilename_a, sFilename_b):
@@ -25,7 +24,7 @@ def calculate_area_of_difference_simplified(aFlowline_in, aVertex_all_in, sFilen
         os.remove(sFilename_output_in)
         pass
 
-    pDriver_geojson = ogr.GetDriverByName( "GeoJSON")
+    pDriver_geojson = ogr.GetDriverByName("GeoJSON")
     nFlowline = len(aFlowline_in)
     nVeretx = len(aVertex_all_in)
     #rebuild index

@@ -2,6 +2,7 @@ import os, sys
 from pathlib import Path
 import json
 from json import JSONEncoder
+import importlib
 import numpy as np
 
 from pyflowline.classes.timer import pytimer
@@ -18,12 +19,7 @@ from pyflowline.formats.export_flowline import export_flowline_to_geojson
 from pyflowline.formats.export_vertex import export_vertex_to_geojson
 from pyflowline.algorithms.auxiliary.text_reader_string import text_reader_string
 
-import importlib
-iFlag_cython = importlib.util.find_spec("cython") 
-if iFlag_cython is not None:
-    from pyflowline.algorithms.cython.kernel import find_vertex_in_list
-else:
-    from pyflowline.algorithms.auxiliary.find_vertex_in_list import find_vertex_in_list
+
 
 from pyflowline.algorithms.split.find_flowline_vertex import find_flowline_vertex
 from pyflowline.algorithms.split.find_flowline_confluence import find_flowline_confluence
@@ -41,6 +37,12 @@ from pyflowline.algorithms.index.define_stream_segment_index import define_strea
 from pyflowline.algorithms.intersect.intersect_flowline_with_mesh import intersect_flowline_with_mesh
 from pyflowline.algorithms.intersect.intersect_flowline_with_flowline import intersect_flowline_with_flowline
 from pyflowline.algorithms.auxiliary.calculate_area_of_difference import calculate_area_of_difference_simplified
+
+iFlag_cython = importlib.util.find_spec("cython") 
+if iFlag_cython is not None:
+    from pyflowline.algorithms.cython.kernel import find_vertex_in_list
+else:
+    from pyflowline.algorithms.auxiliary.find_vertex_in_list import find_vertex_in_list
 
 class BasinClassEncoder(JSONEncoder):
     """Basin class encoder
@@ -127,9 +129,6 @@ class pybasin(object):
     else:
         pass
 
-    
-    
-    
     def __init__(self, aParameter):
         """
         Initialize the basin class object

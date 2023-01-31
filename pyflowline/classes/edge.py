@@ -1,12 +1,11 @@
-from abc import ABCMeta, abstractmethod
+
 import json
 from json import JSONEncoder
+import importlib
 import numpy as np
 from pyflowline.classes.vertex import pyvertex
 from pyflowline.algorithms.split.split_by_length import split_edge_by_length
 
-
-import importlib
 iFlag_cython = importlib.util.find_spec("cython") 
 if iFlag_cython is not None:
     from pyflowline.algorithms.cython.kernel import calculate_angle_betwen_vertex

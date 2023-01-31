@@ -1,13 +1,12 @@
 
-import numpy as np
+
 import json
 from json import JSONEncoder
-
+import numpy as np
 from pyflowline.classes.vertex import pyvertex
 from pyflowline.classes.edge import pyedge
 from pyflowline.classes.cell import pycell
 from pyflowline.classes.flowline import pyflowline
-
 from pyflowline.algorithms.auxiliary.gdal_functions import calculate_polygon_area
 
 class MpasClassEncoder(JSONEncoder):

@@ -1,8 +1,7 @@
 
 import json
-import numpy as np
 from json import JSONEncoder
-
+import numpy as np
 from pyflowline.classes.vertex import pyvertex
 from pyflowline.classes.edge import pyedge
 from pyflowline.classes.cell import pycell

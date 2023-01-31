@@ -1,8 +1,31 @@
-
+import json
+from json import JSONEncoder
 import numpy as np
+
 from pyflowline.classes.vertex import pyvertex
 from pyflowline.classes.edge import pyedge
 from pyflowline.classes.cell import pycell
+from pyflowline.classes.flowline import pyflowline
+
+class TINClassEncoder(JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, np.integer):
+            return int(obj)
+        if isinstance(obj, np.float32):
+            return float(obj)
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        if isinstance(obj, list):
+            pass  
+        if isinstance(obj, pyvertex):
+            return json.loads(obj.tojson()) #lVertexID
+        if isinstance(obj, pyedge):
+            return obj.lEdgeID        
+        if isinstance(obj, pyflowline):
+            return obj.lFlowlineID
+        if isinstance(obj, pytin):
+            return obj.lCellID     
+        return JSONEncoder.default(self, obj)
 
 class pytin(pycell):   
     """tin class
@@ -87,3 +110,22 @@ class pytin(pycell):
                     break
 
         return iFlag_share
+
+    def tojson(self):
+        """
+        Convert a tin object to a json string
+
+        Returns:
+            json str: A json string
+        """
+        aSkip = ['aEdge', \
+                'aFlowline']
+        obj = self.__dict__.copy()
+        for sKey in aSkip:
+            obj.pop(sKey, None)
+        sJson = json.dumps(obj, \
+            sort_keys=True, \
+            indent = 4, \
+            ensure_ascii=True, \
+            cls=TINClassEncoder)
+        return sJson

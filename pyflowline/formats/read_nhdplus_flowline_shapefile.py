@@ -1,7 +1,6 @@
 import os
 import numpy as np
 from osgeo import ogr, osr, gdal
-from shapely.wkt import loads
 from pyflowline.formats.convert_coordinates import convert_gcs_coordinates_to_flowline
 
 def read_nhdplus_flowline_shapefile_attribute(sFilename_shapefile_in):

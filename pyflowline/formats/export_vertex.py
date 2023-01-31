@@ -2,15 +2,23 @@ import os
 from osgeo import ogr, osr
 from shapely.geometry import Point
 
-def export_vertex_to_geojson(aVertex_in, \
-        sFilename_json_in,\
-        iFlag_projected_in=None,\
-        pSpatial_reference_in=None, \
+def export_vertex_to_geojson(aVertex_in, 
+        sFilename_json_in,
+        iFlag_projected_in=None,
+        pSpatial_reference_in=None, 
         aAttribute_data=None):
     """
-    convert a shapefile to json format.
+    Convert a shapefile to json format.
     This function should be used for stream flowline only.
+
+    Args:
+        aVertex_in (_type_): _description_
+        sFilename_json_in (_type_): _description_
+        iFlag_projected_in (_type_, optional): _description_. Defaults to None.
+        pSpatial_reference_in (_type_, optional): _description_. Defaults to None.
+        aAttribute_data (_type_, optional): _description_. Defaults to None.
     """
+    
 
     if os.path.exists(sFilename_json_in): 
         os.remove(sFilename_json_in)

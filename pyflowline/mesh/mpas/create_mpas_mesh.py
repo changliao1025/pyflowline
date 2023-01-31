@@ -1,14 +1,12 @@
 import os
 import math
+import importlib
 import numpy as np
 from osgeo import ogr, osr
 from netCDF4 import Dataset
 from shapely.wkt import loads
-from pyflowline.classes.mpas import pympas
 from pyflowline.formats.convert_attributes import convert_gcs_attributes_to_cell
 
-
-import importlib
 iFlag_cython = importlib.util.find_spec("cython") 
 if iFlag_cython is not None:
     from pyflowline.algorithms.cython.kernel import convert_360_to_180
@@ -22,12 +20,12 @@ def create_mpas_mesh(iFlag_global_in,
     sFilename_mesh_netcdf_in, 
     sFilename_output_in): 
     """
-    _summary_
+    Create a MPAS mesh
 
     Args:
-        iFlag_global_in (_type_): _description_
-        iFlag_use_mesh_dem (_type_): _description_
-        iFlag_save_mesh_in (_type_): _description_
+        iFlag_global_in (int): _description_
+        iFlag_use_mesh_dem (int): _description_
+        iFlag_save_mesh_in (int): _description_
         pPolygon_in (_type_): _description_
         sFilename_mesh_netcdf_in (_type_): _description_
         sFilename_output_in (_type_): _description_
@@ -191,13 +189,8 @@ def create_mpas_mesh(iFlag_global_in,
         pCenter = ogr.Geometry(ogr.wkbPoint)
         pCenter.AddPoint(dLon, dLat)
         pCenter1 = loads( pCenter.ExportToWkt() )
-        #old method
-        #if dLat > dLatitude_bot_in and dLat < dLatitude_top_in and dLon > dLongitude_left_in and dLon < dLongitude_right_in:
-
-        #new method;
-        #point_geom = point.GetGeometryRef()
-        #polygon_geom = polygon.GetGeometryRef()
-        #print point_geom.Within(polygon_geom)
+        
+        
         iFlag = pCenter1.within(pPolygon_in)
         if ( iFlag == True ):
             #get cell edge

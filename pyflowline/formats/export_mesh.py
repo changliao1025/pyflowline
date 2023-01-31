@@ -1,9 +1,9 @@
 import os
-import numpy as np
 import json
 
 def export_mesh_info_to_json(aCell_in, aFlowline_in, aCellID_outlet_iin, sFilename_json_in):
-    """_summary_
+    """
+    Export the mesh information into a json file
 
     Args:
         aCell_in (_type_): _description_

@@ -18,7 +18,6 @@ def convert_flowline_to_geojson(iFlag_type_in, sFilename_geojson_in, sFilename_g
         iReturn_code = 0
         return iReturn_code
 
-
     if iFlag_type_in ==0:
         pass
     else:
@@ -39,6 +38,7 @@ def convert_flowline_to_geojson(iFlag_type_in, sFilename_geojson_in, sFilename_g
 
 
     return
+
 #this one need to be updated
 def convert_shapefile_to_geojson(iFlag_type_in, sFilename_shapefile_in, sFilename_geojson_in):
     """Convert a shapefile to a json file

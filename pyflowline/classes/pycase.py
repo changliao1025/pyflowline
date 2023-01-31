@@ -114,7 +114,6 @@ class flowlinecase(object):
     sFilename_mesh_info=''
     sFilename_mesh_netcdf=''
     
-
     aBasin = list()
     aFlowline_simplified=list()
     aFlowline_conceptual=list()
@@ -131,7 +130,6 @@ class flowlinecase(object):
     else:
         pass
 
-        
     from ._hpc import _create_hpc_job
     
     def __init__(self, aConfig_in,
@@ -467,43 +465,85 @@ class flowlinecase(object):
                     dY_spacing = dLength_edge * np.sqrt(3.0)    
                     ncolumn= int( (dX_lowerright - dX_lowerleft) / dX_spacing )+1
                     nrow= int( (dY_upperleft - dY_lowerleft) / dY_spacing )
+                
+                if iFlag_mesh_boundary ==1:
+                    #create a polygon based on real boundary 
+                    pBoundary = read_mesh_boundary(self.sFilename_mesh_boundary)
+                    
+                    aHexagon = create_hexagon_mesh(iFlag_rotation, dX_lowerleft, dY_lowerleft, dResolution_meter, ncolumn, nrow, pBoundary,\
+                        sFilename_mesh, sFilename_spatial_reference)
+                    pass
+                else:
+                    pRing = ogr.Geometry(ogr.wkbLinearRing)
+                    pRing.AddPoint(dLongitude_left, dLatitude_top)
+                    pRing.AddPoint(dLongitude_right, dLatitude_top)
+                    pRing.AddPoint(dLongitude_right, dLatitude_bot)
+                    pRing.AddPoint(dLongitude_left, dLatitude_bot)
+                    pRing.AddPoint(dLongitude_left, dLatitude_top)
+                    pBoundary = ogr.Geometry(ogr.wkbPolygon)
+                    pBoundary.AddGeometry(pRing)
+                    pBoundary_rec = loads( pBoundary.ExportToWkt() )
 
-                aHexagon = create_hexagon_mesh(iFlag_rotation, dX_lowerleft, dY_lowerleft, dResolution_meter, ncolumn, nrow, \
-                    sFilename_mesh, sFilename_spatial_reference)
+                    aHexagon = create_hexagon_mesh(iFlag_rotation, dX_lowerleft, dY_lowerleft, dResolution_meter, ncolumn, nrow, pBoundary_rec,\
+                        sFilename_mesh, sFilename_spatial_reference)
+
                 return aHexagon
             else:
                 if iMesh_type ==2: #sqaure
                     ncolumn= int( (dX_lowerright - dX_lowerleft) / dResolution_meter )
                     nrow= int( (dY_upperleft - dY_lowerleft) / dResolution_meter )
+                    if iFlag_mesh_boundary ==1:
+                        #create a polygon based on real boundary 
+                        pBoundary = read_mesh_boundary(self.sFilename_mesh_boundary)
 
-                    aSquare = create_square_mesh(dX_lowerleft, dY_lowerleft, dResolution_meter, ncolumn, nrow, \
-                        sFilename_mesh, sFilename_spatial_reference)
-                    return aSquare
+                        aSquare = create_square_mesh(dX_lowerleft, dY_lowerleft, dResolution_meter, ncolumn, nrow, pBoundary ,\
+                            sFilename_mesh, sFilename_spatial_reference)
+                        pass
+                    else:
+                        pRing = ogr.Geometry(ogr.wkbLinearRing)
+                        pRing.AddPoint(dLongitude_left, dLatitude_top)
+                        pRing.AddPoint(dLongitude_right, dLatitude_top)
+                        pRing.AddPoint(dLongitude_right, dLatitude_bot)
+                        pRing.AddPoint(dLongitude_left, dLatitude_bot)
+                        pRing.AddPoint(dLongitude_left, dLatitude_top)
+                        pBoundary = ogr.Geometry(ogr.wkbPolygon)
+                        pBoundary.AddGeometry(pRing)
+                        pBoundary_rec = loads( pBoundary.ExportToWkt() )
+                        aSquare = create_square_mesh(dX_lowerleft, dY_lowerleft, dResolution_meter, ncolumn, nrow, pBoundary_rec, \
+                            sFilename_mesh, sFilename_spatial_reference)
+                        return aSquare
                 else:
                     if iMesh_type ==3: #latlon
                         dResolution_meter = degree_to_meter(dLatitude_mean, dResolution_degree)
                         dArea = np.power(dResolution_meter,2.0)
-                        if self.iFlag_global == 0:
-                            if self.iFlag_multiple_outlet == 0:
-                                #in a single watershed, we use dem to control domain
-                                pass
-                            else:
-                                dLatitude_top    = self.dLatitude_top   
-                                dLatitude_bot    = self.dLatitude_bot   
-                                dLongitude_left  = self.dLongitude_left 
-                                dLongitude_right = self.dLongitude_right
-
-                        else:
-                            dLatitude_top    = self.dLatitude_top   
-                            dLatitude_bot    = self.dLatitude_bot   
-                            dLongitude_left  = self.dLongitude_left 
-                            dLongitude_right = self.dLongitude_right
-
                         ncolumn= int( (dLongitude_right - dLongitude_left) / dResolution_degree )
                         nrow= int( (dLatitude_top - dLatitude_bot) / dResolution_degree )
-                        aLatlon = create_latlon_mesh(dLongitude_left, dLatitude_bot, dResolution_degree, ncolumn, nrow, \
-                            sFilename_mesh)
+                         
+                        if iFlag_mesh_boundary ==1:
+                            #create a polygon based on real boundary 
+                            pBoundary = read_mesh_boundary(self.sFilename_mesh_boundary)
+                            aLatlon = create_latlon_mesh(dLongitude_left, dLatitude_bot, dResolution_degree, ncolumn, nrow,pBoundary, \
+                                    sFilename_mesh)
+                            pass
+                        else:
+                            pRing = ogr.Geometry(ogr.wkbLinearRing)
+                            pRing.AddPoint(dLongitude_left, dLatitude_top)
+                            pRing.AddPoint(dLongitude_right, dLatitude_top)
+                            pRing.AddPoint(dLongitude_right, dLatitude_bot)
+                            pRing.AddPoint(dLongitude_left, dLatitude_bot)
+                            pRing.AddPoint(dLongitude_left, dLatitude_top)
+                            pBoundary = ogr.Geometry(ogr.wkbPolygon)
+                            pBoundary.AddGeometry(pRing)
+                            pBoundary_rec = loads( pBoundary.ExportToWkt() )
+                            aLatlon = create_latlon_mesh(dLongitude_left, dLatitude_bot, dResolution_degree, ncolumn, nrow,pBoundary_rec, \
+                                    sFilename_mesh)
+                            
+                            pass
+
                         return aLatlon
+                            
+
+                        
                     else:
                         if iMesh_type == 4: #mpas
                             iFlag_use_mesh_dem = self.iFlag_use_mesh_dem

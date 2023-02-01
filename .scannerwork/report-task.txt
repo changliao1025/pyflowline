@@ -1,0 +1,6 @@
+projectKey=pyflowline
+serverUrl=https://sonarqube.pnnl.gov
+serverVersion=9.7.1.62043
+dashboardUrl=https://sonarqube.pnnl.gov/dashboard?id=pyflowline
+ceTaskId=AYYOoseWxRO0yVq9Fev4
+ceTaskUrl=https://sonarqube.pnnl.gov/api/ce/task?id=AYYOoseWxRO0yVq9Fev4

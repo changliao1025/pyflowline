@@ -64,7 +64,7 @@ def convert_gcs_attributes_to_cell(iMesh_type_in, dLongitude_center_in, dLatitud
                     if iMesh_type_in ==5: #tin
                         pTin = pytin(dLongitude_center_in, dLatitude_center_in, aEdge, aVertex)
                         return pTin
-                        pass
+                    
                     else:
                         print('What mesh type are you using?')
                         return None
@@ -126,7 +126,7 @@ def convert_pcs_attributes_to_cell(iMesh_type_in, \
                     if iMesh_type_in ==5: #tin
                         pTin = pytin( aEdge, aVertex)
                         return pTin
-                        pass
+                   
                     else:
                         print('What mesh type are you using?')
                         return None

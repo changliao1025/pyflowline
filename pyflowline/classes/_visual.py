@@ -792,7 +792,7 @@ def _basinplot(self, iCase_index, iMesh_type, sMesh_type, sFilename_in, iFlag_ti
         marginy  = (dLat_max - dLat_min) / 20
         aExtent = [dLon_min - marginx , dLon_max + marginx , dLat_min - marginy , dLat_max + marginy]
     else:
-        aExtent = aExtent  
+        aExtent = aExtent_in  
  
     
     ax.set_extent(aExtent)       

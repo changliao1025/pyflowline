@@ -359,8 +359,7 @@ class pybasin(object):
             #sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)    
             #export_flowline_to_geojson(iFlag_projected, aFlowline_basin_filtered,pSpatial_reference_gcs, sFilename_out)
             pass
-        else:
-            pass
+        
             
         if self.iFlag_debug ==1:
             sFilename_out = 'flowline_before_intersect.geojson'
@@ -656,7 +655,7 @@ class pybasin(object):
             sFilename_flowline = self.sFilename_flowline_simplified
             sFilename_flowline_in = os.path.join(self.sWorkspace_output_basin, sFilename_flowline)
             aFlowline_simplified,pSpatial_reference = read_flowline_geojson( sFilename_flowline_in )   
-            read_flowline_geojson
+        
             self.aFlowline_basin_simplified = aFlowline_simplified
             aVertex, lIndex_outlet, aIndex_headwater,aIndex_middle, aIndex_confluence, aConnectivity, pVertex_outlet\
             = find_flowline_confluence(self.aFlowline_basin_simplified,  pVertex_outlet_initial)  

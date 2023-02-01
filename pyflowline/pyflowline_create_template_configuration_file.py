@@ -1,6 +1,6 @@
-import os, sys
+import os
 from pathlib import Path
-from os.path import realpath
+
 #use this function to generate an initial json file for hexwatershed
 import json
 #once it's generated, you can modify it and use it for different simulations
@@ -40,8 +40,7 @@ def pyflowline_create_basin_template_configuration_file(sFilename_basins_json, n
         aBasin_out.append(pBasin)        
         pass
         
-    #export basin config to a file    
-    sFilename_basins_json = sFilename_basins_json 
+    #export basin config to a file     
     with open(sFilename_basins_json, 'w', encoding='utf-8') as f:
         sJson = json.dumps([json.loads(ob.tojson()) for ob in aBasin_out], indent = 4)        
         f.write(sJson)    

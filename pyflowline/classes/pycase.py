@@ -397,6 +397,7 @@ class flowlinecase(object):
             iMesh_type = self.iMesh_type
             iFlag_save_mesh = self.iFlag_save_mesh
             iFlag_rotation = self.iFlag_rotation
+            iFlag_mesh_boundary = self.iFlag_mesh_boundary
             dResolution_degree = self.dResolution_degree
             dResolution_meter = self.dResolution_meter
             sFilename_dem = self.sFilename_dem
@@ -547,8 +548,7 @@ class flowlinecase(object):
                     else:
                         if iMesh_type == 4: #mpas
                             iFlag_use_mesh_dem = self.iFlag_use_mesh_dem
-                            sFilename_mesh_netcdf = self.sFilename_mesh_netcdf
-                            iFlag_mesh_boundary = self.iFlag_mesh_boundary
+                            sFilename_mesh_netcdf = self.sFilename_mesh_netcdf                            
                             dLatitude_top    = self.dLatitude_top   
                             dLatitude_bot    = self.dLatitude_bot   
                             dLongitude_left  = self.dLongitude_left 
@@ -775,11 +775,11 @@ class flowlinecase(object):
         sFilename_json = self.sFilename_mesh_info
         ncell=len(aCell_all)
         iFlag_flowline = self.iFlag_flowline 
-        if iFlag_flowline == 1: #if there is conceptual flowline 
-            pass
-        else:
-            #only mesh, no flowline
-            pass
+        #if iFlag_flowline == 1: #if there is conceptual flowline 
+        #    pass
+        #else:
+        #    #only mesh, no flowline
+        #    pass
         
 
         with open(sFilename_json, 'w', encoding='utf-8') as f:

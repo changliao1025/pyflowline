@@ -230,7 +230,7 @@ def calculate_area_of_difference_simplified(aFlowline_in, aVertex_all_in, sFilen
                     if (pVertex_stop == pVertex_origin):                        
                         iFlag_loop = 1
                         return iFlag_loop, aFlowline_list
-                        pass
+                      
                     else:
                         iFlag_vertex_exist, index_dummy = find_vertex_in_list(aVertex_list, pVertex_stop)
                         if iFlag_vertex_exist ==1:

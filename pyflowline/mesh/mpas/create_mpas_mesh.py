@@ -38,7 +38,7 @@ def create_mpas_mesh(iFlag_global_in,
         pass
     else:
         print('Mesh file does not exist!')
-        exit
+        return
     
     if os.path.exists(sFilename_output_in):  
         os.remove(sFilename_output_in)

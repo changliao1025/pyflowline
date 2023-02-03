@@ -12,7 +12,7 @@ This package generates the mesh cell-based conceptual river networks using the f
 3. `Topological relationship reconstruction`: PyFlowline reconstructs the topological relationship using the mesh and flowline intersections. 
 
 
-### Quick start
+### Quickstart
 
 https://pyflowline.readthedocs.io/en/latest/quickstart.html
 

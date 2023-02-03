@@ -1,5 +1,5 @@
 #####################
-Quick Start
+Quickstart
 #####################
 
 Users can run a PyFlowline simulation in the following steps:

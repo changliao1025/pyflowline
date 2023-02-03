@@ -1,6 +1,5 @@
 import os
 from pathlib import Path
-
 #use this function to generate an initial json file for hexwatershed
 import json
 #once it's generated, you can modify it and use it for different simulations

@@ -44,6 +44,9 @@ if iFlag_cython is not None:
 else:
     from pyflowline.algorithms.auxiliary.find_vertex_in_list import find_vertex_in_list
 
+
+sys.setrecursionlimit(10000)
+
 class BasinClassEncoder(JSONEncoder):
     """Basin class encoder
 

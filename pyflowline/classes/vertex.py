@@ -159,7 +159,15 @@ class pyvertex(object):
         Returns:
             json str: A json string
         """
-        sJson = json.dumps(self.__dict__, \
+        aSkip = ['dLongitude_radian', \
+                'dLatitude_radian']
+
+        obj = self.__dict__.copy()
+        for sKey in aSkip:
+            obj.pop(sKey, None)
+            
+        #sJson = json.dumps(self.__dict__, \
+        sJson = json.dumps(obj, \
                 sort_keys=True, \
                 indent = 4, \
                 ensure_ascii=True, \

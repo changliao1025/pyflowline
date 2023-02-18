@@ -26,23 +26,23 @@ from pyflowline.formats.convert_flowline_to_geojson import convert_shapefile_to_
 from pyflowline.algorithms.auxiliary.gdal_functions import gdal_read_geotiff_file, retrieve_geotiff_metadata
 
 #the orthographic projection should be used on a sphere, this might be provided as an input
-pProjection_map = ccrs.Orthographic(central_longitude =  0.50*(-149.5+(-146.5)), \
-        central_latitude = 0.50*(68.1+70.35), globe=None)
+#pProjection_map = ccrs.Orthographic(central_longitude =  0.0, \
+#        central_latitude = 0.0, globe=None)
         
+#pProjection_map = ccrs.Orthographic(central_longitude =  0.50*(dLon_max+dLon_min),  central_latitude = 0.50*(dLat_max+dLat_min), globe=None)
 
-def _plot(self, sFilename_in,iFlag_title=None, sVariable_in=None, aExtent_in = None, pProjection_map_in = None):
+def _plot(self, sFilename_in,iFlag_title=None, sVariable_in=None, aExtent_in = None):
     if sVariable_in == 'mesh':
-        self._plot_mesh(sFilename_in, aExtent_in= aExtent_in, pProjection_map_in= pProjection_map_in)
+        self._plot_mesh(sFilename_in, aExtent_in= aExtent_in)
     else:            
         if sVariable_in == 'overlap':
-            self._plot_mesh_with_flowline( sFilename_in, iFlag_title= iFlag_title, aExtent_in= aExtent_in, pProjection_map_in= pProjection_map_in)
+            self._plot_mesh_with_flowline( sFilename_in, iFlag_title= iFlag_title, aExtent_in= aExtent_in)
         else:            
             
             for pBasin in self.aBasin:            
                 pBasin._basin_plot(self.iCase_index, self.iMesh_type, self.sMesh_type,sFilename_in,\
                     iFlag_title= iFlag_title, \
-                    sVariable_in= sVariable_in, \
-                        pProjection_map_in= pProjection_map_in)
+                    sVariable_in= sVariable_in)
             pass
     
     return
@@ -254,23 +254,16 @@ def _plot_study_area(self, sFilename_boundary_in = None, sFilename_slope_in = No
 def _plot_mesh(self, sFilename_in, aExtent_in=None, pProjection_map_in = None):
     sWorkspace_output_case = self.sWorkspace_output
     sFilename_json  =  self.sFilename_mesh
-    sMesh_type = self.sMesh_type
-    fig = plt.figure(dpi=300)
-    fig.set_figwidth( 4 )
-    fig.set_figheight( 4 )
-    ax = fig.add_axes([0.1, 0.15, 0.75, 0.7] , projection=pProjection_map )
-    ax.set_global()
+    sMesh_type = self.sMesh_type    
     pDriver = ogr.GetDriverByName('GeoJSON')
     pDataset = pDriver.Open(sFilename_json, gdal.GA_ReadOnly)
     pLayer = pDataset.GetLayer(0)
-
     pSrs = osr.SpatialReference()  
     pSrs.ImportFromEPSG(4326)    # WGS84 lat/lon
     dLat_min = 90
     dLat_max = -90
     dLon_min = 180
     dLon_max = -180
-    
     for pFeature in pLayer:
         pGeometry_in = pFeature.GetGeometryRef()
         sGeometry_type = pGeometry_in.GetGeometryName()
@@ -291,6 +284,21 @@ def _plot_mesh(self, sFilename_in, aExtent_in=None, pProjection_map_in = None):
                     dLat_max = dLat
                 if dLat < dLat_min:
                     dLat_min = dLat
+    pProjection_map = ccrs.Orthographic(central_longitude =  0.50*(dLon_max+dLon_min),  central_latitude = 0.50*(dLat_max+dLat_min), globe=None)
+    fig = plt.figure(dpi=300)
+    fig.set_figwidth( 4 )
+    fig.set_figheight( 4 )
+    ax = fig.add_axes([0.1, 0.15, 0.75, 0.7] , projection=pProjection_map )
+    ax.set_global()
+    for pFeature in pLayer:
+        pGeometry_in = pFeature.GetGeometryRef()
+        sGeometry_type = pGeometry_in.GetGeometryName()
+        lID =0 
+        if sGeometry_type =='POLYGON':
+            dummy0 = loads( pGeometry_in.ExportToWkt() )
+            aCoords_gcs = dummy0.exterior.coords
+            aCoords_gcs= np.array(aCoords_gcs)
+            
             polygon = mpatches.Polygon(aCoords_gcs[:,0:2], closed=True, linewidth=0.25, \
                 alpha=0.8, edgecolor = 'black',facecolor='none', \
                     transform=ccrs.PlateCarree() )
@@ -323,11 +331,7 @@ def _plot_mesh_with_flowline(self, sFilename_in, iFlag_title=None, aExtent_in=No
     sWorkspace_output_case = self.sWorkspace_output
     sFilename_mesh  =  self.sFilename_mesh
     sMesh_type = self.sMesh_type
-    fig = plt.figure( dpi=300 )
-    fig.set_figwidth( 4 )
-    fig.set_figheight( 4 )
-    ax = fig.add_axes([0.1, 0.15, 0.75, 0.7] , projection=pProjection_map )
-    ax.set_global()
+    
     pDriver = ogr.GetDriverByName('GeoJSON')
     pDataset = pDriver.Open(sFilename_mesh, gdal.GA_ReadOnly)
     pLayer = pDataset.GetLayer(0)
@@ -338,7 +342,6 @@ def _plot_mesh_with_flowline(self, sFilename_in, iFlag_title=None, aExtent_in=No
     dLat_max = -90
     dLon_min = 180
     dLon_max = -180
-    
     for pFeature in pLayer:
         pGeometry_in = pFeature.GetGeometryRef()
         sGeometry_type = pGeometry_in.GetGeometryName()            
@@ -358,6 +361,20 @@ def _plot_mesh_with_flowline(self, sFilename_in, iFlag_title=None, aExtent_in=No
                     dLat_max = dLat
                 if dLat < dLat_min:
                     dLat_min = dLat
+    pProjection_map = ccrs.Orthographic(central_longitude =  0.50*(dLon_max+dLon_min),  central_latitude = 0.50*(dLat_max+dLat_min), globe=None)
+    fig = plt.figure( dpi=300 )
+    fig.set_figwidth( 4 )
+    fig.set_figheight( 4 )
+    ax = fig.add_axes([0.1, 0.15, 0.75, 0.7] , projection=pProjection_map )
+    ax.set_global()
+    for pFeature in pLayer:
+        pGeometry_in = pFeature.GetGeometryRef()
+        sGeometry_type = pGeometry_in.GetGeometryName()            
+        if sGeometry_type =='POLYGON':
+            dummy0 = loads( pGeometry_in.ExportToWkt() )
+            aCoords_gcs = dummy0.exterior.coords
+            aCoords_gcs= np.array(aCoords_gcs)
+            
             polygon = mpatches.Polygon(aCoords_gcs[:,0:2], closed=True,  linewidth=0.25, \
                 alpha=0.8, edgecolor = 'black',facecolor='none', \
                     transform=ccrs.PlateCarree() )
@@ -498,11 +515,7 @@ def _compare_with_raster_dem_method(self, sFilename_dem_flowline, sFilename_in, 
     sWorkspace_output_case = self.sWorkspace_output
     sFilename_mesh  =  self.sFilename_mesh
     sMesh_type = self.sMesh_type
-    fig = plt.figure( dpi=300 )
-    fig.set_figwidth( 4 )
-    fig.set_figheight( 4 )
-    ax = fig.add_axes([0.1, 0.15, 0.75, 0.7] , projection=pProjection_map )
-    ax.set_global()
+    
     pDriver = ogr.GetDriverByName('GeoJSON')
     pDataset = pDriver.Open(sFilename_mesh, gdal.GA_ReadOnly)
     pLayer = pDataset.GetLayer(0)
@@ -513,7 +526,6 @@ def _compare_with_raster_dem_method(self, sFilename_dem_flowline, sFilename_in, 
     dLat_max = -90
     dLon_min = 180
     dLon_max = -180
-    
     for pFeature in pLayer:
         pGeometry_in = pFeature.GetGeometryRef()
         sGeometry_type = pGeometry_in.GetGeometryName()            
@@ -533,6 +545,19 @@ def _compare_with_raster_dem_method(self, sFilename_dem_flowline, sFilename_in, 
                     dLat_max = dLat
                 if dLat < dLat_min:
                     dLat_min = dLat
+    pProjection_map = ccrs.Orthographic(central_longitude =  0.50*(dLon_max+dLon_min),  central_latitude = 0.50*(dLat_max+dLat_min), globe=None)
+    fig = plt.figure( dpi=300 )
+    fig.set_figwidth( 4 )
+    fig.set_figheight( 4 )
+    ax = fig.add_axes([0.1, 0.15, 0.75, 0.7] , projection=pProjection_map )
+    ax.set_global()
+    for pFeature in pLayer:
+        pGeometry_in = pFeature.GetGeometryRef()
+        sGeometry_type = pGeometry_in.GetGeometryName()            
+        if sGeometry_type =='POLYGON':
+            dummy0 = loads( pGeometry_in.ExportToWkt() )
+            aCoords_gcs = dummy0.exterior.coords
+            aCoords_gcs= np.array(aCoords_gcs)            
             polygon = mpatches.Polygon(aCoords_gcs[:,0:2], closed=True,  linewidth=0.25, \
                 alpha=0.8, edgecolor = 'black',facecolor='none', \
                     transform=ccrs.PlateCarree() )
@@ -708,10 +733,7 @@ def _basinplot(self, iCase_index, iMesh_type, sMesh_type, sFilename_in, iFlag_ti
         sFilename_json = self.sFilename_flowline_conceptual
     
     #request = cimgt.OSM()
-    fig = plt.figure( dpi=300)
-    fig.set_figwidth( 4 )
-    fig.set_figheight( 4 )
-    ax = fig.add_axes([0.1, 0.15, 0.75, 0.8] , projection=pProjection_map ) #request.crs
+    
     
     pDriver = ogr.GetDriverByName('GeoJSON')
     pDataset = pDriver.Open(sFilename_json, gdal.GA_ReadOnly)
@@ -724,12 +746,7 @@ def _basinplot(self, iCase_index, iMesh_type, sMesh_type, sFilename_in, iFlag_ti
     dLat_min = 90
     dLat_max = -90
     dLon_min = 180
-    dLon_max = -180          
-
-
-    n_colors = pLayer.GetFeatureCount()
-    
-    colours = cm.rainbow(np.linspace(0, 1, n_colors))
+    dLon_max = -180   
     for pFeature in pLayer:
         pGeometry_in = pFeature.GetGeometryRef()
         sGeometry_type = pGeometry_in.GetGeometryName()
@@ -755,7 +772,27 @@ def _basinplot(self, iCase_index, iMesh_type, sMesh_type, sFilename_in, iFlag_ti
                     dLat_max = dLat
 
                 if dLat < dLat_min:
-                    dLat_min = dLat
+                    dLat_min = dLat       
+
+    pProjection_map = ccrs.Orthographic(central_longitude =  0.50*(dLon_max+dLon_min),  central_latitude = 0.50*(dLat_max+dLat_min), globe=None)
+    fig = plt.figure( dpi=300)
+    fig.set_figwidth( 4 )
+    fig.set_figheight( 4 )
+    ax = fig.add_axes([0.1, 0.15, 0.75, 0.8] , projection=pProjection_map ) #request.crs
+    ax.set_global()
+    n_colors = pLayer.GetFeatureCount()    
+    colours = cm.rainbow(np.linspace(0, 1, n_colors))
+    for pFeature in pLayer:
+        pGeometry_in = pFeature.GetGeometryRef()
+        sGeometry_type = pGeometry_in.GetGeometryName()
+        if iFlag_label ==1:
+            iSegment = pFeature.GetField("iseg")
+        if sGeometry_type =='LINESTRING':
+            dummy0 = loads( pGeometry_in.ExportToWkt() )
+            aCoords_gcs = dummy0.coords
+            aCoords_gcs= np.array(aCoords_gcs)
+            aCoords_gcs = aCoords_gcs[:,0:2]
+            nvertex = len(aCoords_gcs)           
                 
             if nvertex == 2 :
                 dLon_label = 0.5 * (aCoords_gcs[0][0] + aCoords_gcs[1][0] ) 
@@ -784,9 +821,6 @@ def _basinplot(self, iCase_index, iMesh_type, sMesh_type, sFilename_in, iFlag_ti
             
 
     pDataset = pLayer = pFeature  = None    
-   
-    
-
     if aExtent_in is None:
         marginx  = (dLon_max - dLon_min) / 20
         marginy  = (dLat_max - dLat_min) / 20
@@ -824,10 +858,7 @@ def _plot_area_of_difference(self, iCase_index, iMesh_type, sMesh_type, sFilenam
     sFilename_json = self.sFilename_area_of_difference
     sFilename_json = os.path.join(self.sWorkspace_output_basin, sFilename_json)
     
-    fig = plt.figure( dpi=300)
-    fig.set_figwidth( 4 )
-    fig.set_figheight( 4 )
-    ax = fig.add_axes([0.1, 0.15, 0.75, 0.8] , projection=pProjection_map ) #request.crs
+    
     
     pDriver = ogr.GetDriverByName('GeoJSON')
     pDataset = pDriver.Open(sFilename_json, gdal.GA_ReadOnly)
@@ -841,12 +872,6 @@ def _plot_area_of_difference(self, iCase_index, iMesh_type, sMesh_type, sFilenam
     dLat_max = -90
     dLon_min = 180
     dLon_max = -180          
-    
-    #ax.add_image(request, 6)    # 5 = zoom level
-    n_colors = pLayer.GetFeatureCount()
-    
-    colours = cm.rainbow(np.linspace(0, 1, n_colors))
-    lID=0
     for pFeature in pLayer:
         pGeometry_in = pFeature.GetGeometryRef()
         sGeometry_type = pGeometry_in.GetGeometryName()
@@ -869,6 +894,24 @@ def _plot_area_of_difference(self, iCase_index, iMesh_type, sMesh_type, sFilenam
 
                 if dLat < dLat_min:
                     dLat_min = dLat
+    pProjection_map = ccrs.Orthographic(central_longitude =  0.50*(dLon_max+dLon_min),  central_latitude = 0.50*(dLat_max+dLat_min), globe=None)
+    fig = plt.figure( dpi=300)
+    fig.set_figwidth( 4 )
+    fig.set_figheight( 4 )
+    ax = fig.add_axes([0.1, 0.15, 0.75, 0.8] , projection=pProjection_map ) #request.crs
+    ax.set_global()
+    n_colors = pLayer.GetFeatureCount()
+    
+    colours = cm.rainbow(np.linspace(0, 1, n_colors))
+    lID=0
+    for pFeature in pLayer:
+        pGeometry_in = pFeature.GetGeometryRef()
+        sGeometry_type = pGeometry_in.GetGeometryName()
+        if sGeometry_type =='POLYGON':
+            dummy0 = loads( pGeometry_in.ExportToWkt() )
+            aCoords_gcs = dummy0.exterior.coords
+            aCoords_gcs= np.array(aCoords_gcs)
+            
 
             polygon = mpatches.Polygon(aCoords_gcs[:,0:2], closed=True,  linewidth=0.25, \
                 alpha=0.8, edgecolor = 'red',facecolor='red', \
@@ -878,8 +921,6 @@ def _plot_area_of_difference(self, iCase_index, iMesh_type, sMesh_type, sFilenam
             
 
     pDataset = pLayer = pFeature  = None    
-    
-    
     
     if aExtent_in is None:
         marginx  = (dLon_max - dLon_min) / 20

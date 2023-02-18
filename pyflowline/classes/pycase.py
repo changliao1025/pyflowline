@@ -647,24 +647,32 @@ class flowlinecase(object):
                     iStream_segment = pFlowline.iStream_segment
                     iStream_order = pFlowline.iStream_order
                     for j in range(nEdge):
-                        pEdge = aEdge[j]
-                        pVertex_start = pEdge.pVertex_start
-                        pVertex_end = pEdge.pVertex_end
-                        for k in range(ncell):
-                            pVertex_center = self.aCell[k].pVertex_center
-                            if pVertex_center == pVertex_start:
-                                self.aCell[k].iStream_segment_burned = iStream_segment
-                                self.aCell[k].iStream_order_burned = iStream_order
-                                for l in range(ncell):
-                                    pVertex_center2 = self.aCell[l].pVertex_center
-                                    lCellID = self.aCell[l].lCellID
-                                    if pVertex_center2 == pVertex_end:
-                                        self.aCell[k].lCellID_downstream_burned = lCellID
-                                        if lCellID ==  pBasin.lCellID_outlet:
-                                            self.aCell[l].iStream_segment_burned = iStream_segment
-                                            self.aCell[l].iStream_order_burned = iStream_order
+                        try:
+                            pEdge = aEdge[j]
+                            pVertex_start = pEdge.pVertex_start
+                            pVertex_end = pEdge.pVertex_end
+                            for k in range(ncell):
+                                pVertex_center = self.aCell[k].pVertex_center
+                                if pVertex_center == pVertex_start:
+                                    self.aCell[k].iStream_segment_burned = iStream_segment
+                                    self.aCell[k].iStream_order_burned = iStream_order
+                                    for l in range(ncell):
+                                        pVertex_center2 = self.aCell[l].pVertex_center
+                                        lCellID = self.aCell[l].lCellID
+                                        if pVertex_center2 == pVertex_end:
+                                            self.aCell[k].lCellID_downstream_burned = lCellID
+                                            if lCellID ==  pBasin.lCellID_outlet:
+                                                self.aCell[l].iStream_segment_burned = iStream_segment
+                                                self.aCell[l].iStream_order_burned = iStream_order
 
-                                        break
+                                            break
+                        except:
+                            print(pFlowline.tojson())
+                            print(pEdge.tojson())
+                            print(pVertex_start.tojson())
+                            print(pVertex_end.tojson())
+                            pass
+
 
 
                 #update length?

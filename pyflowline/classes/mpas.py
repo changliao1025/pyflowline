@@ -88,8 +88,8 @@ class pympas(pycell):
         """
 
         nEdge = len(aEdge)
-        if nEdge < 3 or nEdge > 8:
-            print('At lease 3 edges are required!')
+        if nEdge < 3 or nEdge > 9:
+            print('At lease 3 edges are required!', nEdge)
             pass
         else:                          
             self.aEdge = aEdge

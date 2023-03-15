@@ -31,16 +31,16 @@ from pyflowline.algorithms.auxiliary.gdal_functions import gdal_read_geotiff_fil
         
 #pProjection_map = ccrs.Orthographic(central_longitude =  0.50*(dLon_max+dLon_min),  central_latitude = 0.50*(dLat_max+dLat_min), globe=None)
 
-def _plot(self, sFilename_in,iFlag_title=None, sVariable_in=None, aExtent_in = None):
+def _plot(self, sFilename_in=None,iFlag_title=None, sVariable_in=None, aExtent_in = None):
     if sVariable_in == 'mesh':
-        self._plot_mesh(sFilename_in, aExtent_in= aExtent_in)
+        self._plot_mesh(sFilename_in=sFilename_in, aExtent_in= aExtent_in)
     else:            
         if sVariable_in == 'overlap':
-            self._plot_mesh_with_flowline( sFilename_in, iFlag_title= iFlag_title, aExtent_in= aExtent_in)
+            self._plot_mesh_with_flowline( sFilename_in=sFilename_in, iFlag_title= iFlag_title, aExtent_in= aExtent_in)
         else:            
             
             for pBasin in self.aBasin:            
-                pBasin._basin_plot(self.iCase_index, self.iMesh_type, self.sMesh_type,sFilename_in,\
+                pBasin._basin_plot(self.iCase_index, self.iMesh_type, self.sMesh_type, sFilename_in=sFilename_in,\
                     iFlag_title= iFlag_title, \
                     sVariable_in= sVariable_in)
             pass
@@ -251,7 +251,7 @@ def _plot_study_area(self, sFilename_boundary_in = None, sFilename_slope_in = No
     
     return
 
-def _plot_mesh(self, sFilename_in, aExtent_in=None, pProjection_map_in = None):
+def _plot_mesh(self, sFilename_in=None, aExtent_in=None, pProjection_map_in = None):
     sWorkspace_output_case = self.sWorkspace_output
     sFilename_json  =  self.sFilename_mesh
     sMesh_type = self.sMesh_type    
@@ -320,14 +320,18 @@ def _plot_mesh(self, sFilename_in, aExtent_in=None, pProjection_map_in = None):
     ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True,
                   linewidth=1, color='gray', alpha=0.3, linestyle='--')
     sDirname = os.path.dirname(sFilename_json)
-    #sFilename  = Path(sFilename_json).stem + '.png'
-    sFilename_out = os.path.join(sDirname, sFilename_in)
-    plt.savefig(sFilename_out, bbox_inches='tight')
+
+    if sFilename_in is None:
+        plt.show()
+    else:
+        sFilename_out = os.path.join(sDirname, sFilename_in)
+        plt.savefig(sFilename_out, bbox_inches='tight')
+
     pDataset = pLayer = pFeature  = None   
       
     return
 
-def _plot_mesh_with_flowline(self, sFilename_in, iFlag_title=None, aExtent_in=None, pProjection_map_in = None):
+def _plot_mesh_with_flowline(self, sFilename_in=None, iFlag_title=None, aExtent_in=None, pProjection_map_in = None):
     sWorkspace_output_case = self.sWorkspace_output
     sFilename_mesh  =  self.sFilename_mesh
     sMesh_type = self.sMesh_type
@@ -503,12 +507,15 @@ def _plot_mesh_with_flowline(self, sFilename_in, iFlag_title=None, aExtent_in=No
             transform=ax.transAxes, \
             color='black', fontsize=8)
     
-    
-    sFilename_out = os.path.join(sDirname, sFilename_in)
-    plt.savefig(sFilename_out, bbox_inches='tight')
+    if sFilename_in is None:
+        plt.show()
+    else:
+        sFilename_out = os.path.join(sDirname, sFilename_in)
+        plt.savefig(sFilename_out, bbox_inches='tight')
+        plt.close(fig)
     pDataset = pLayer = pFeature  = None   
     
-    plt.close(fig)
+    
     return
 
 def _compare_with_raster_dem_method(self, sFilename_dem_flowline, sFilename_in, aExtent_in=None, pProjection_map_in = None):
@@ -694,7 +701,7 @@ def _compare_with_raster_dem_method(self, sFilename_dem_flowline, sFilename_in, 
     plt.close(fig)
     return
   
-def _basinplot(self, iCase_index, iMesh_type, sMesh_type, sFilename_in, iFlag_title=None, sVariable_in=None, aExtent_in = None, pProjection_map_in = None):
+def _basinplot(self, iCase_index, iMesh_type, sMesh_type, sFilename_in=None, iFlag_title=None, sVariable_in=None, aExtent_in = None, pProjection_map_in = None):
     iFlag_label = 0
     sWorkspace_output_basin = self.sWorkspace_output_basin
     if sVariable_in is not None:
@@ -845,11 +852,13 @@ def _basinplot(self, iCase_index, iMesh_type, sMesh_type, sFilename_in, iFlag_ti
         else:
             pass
          
+    if sFilename_in is None:
+        plt.show()
+    else:
+        sFilename_out = os.path.join(self.sWorkspace_output_basin, sFilename_in)
+        plt.savefig(sFilename_out, bbox_inches='tight')
+        plt.close(fig)
     
-    sFilename_out = os.path.join(self.sWorkspace_output_basin, sFilename_in)
-    plt.savefig(sFilename_out, bbox_inches='tight')
-    plt.close(fig)
-    #plt.clf()
 
     return
 

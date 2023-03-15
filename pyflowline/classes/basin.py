@@ -217,6 +217,19 @@ class pybasin(object):
 
         self.sBasinID  = "{:08d}".format(self.lBasinID)
 
+
+        if not os.path.isfile(self.sFilename_flowline_filter):
+            print("The filtered flowline file does not exist!")
+            exit
+        if self.iFlag_dam==1:
+            if not os.path.isfile(self.sFilename_flowline_raw):
+                print("The raw flowline file does not exist!")
+                exit
+            if not os.path.isfile(self.sFilename_flowline_topo):
+                print("The flowline topology file does not exist!")
+                exit
+            pass
+
         #geojson
         self.sFilename_flowline_segment_index_before_intersect = 'flowline_segment_index_before_intersect.geojson'
         self.sFilename_flowline_simplified = 'flowline_simplified.geojson'

@@ -168,6 +168,8 @@ class flowlinecase(object):
 
         if 'iFlag_mesh_boundary' in aConfig_in:
             self.iFlag_mesh_boundary             = int(aConfig_in[ 'iFlag_mesh_boundary'])
+        else:
+            self.iFlag_mesh_boundary=0
         
         if 'iFlag_multiple_outlet' in aConfig_in:
             self.iFlag_multiple_outlet             = int(aConfig_in[ 'iFlag_multiple_outlet'])  
@@ -248,8 +250,15 @@ class flowlinecase(object):
         if 'sFilename_mesh_boundary' in aConfig_in:
             self.sFilename_mesh_boundary    = aConfig_in[ 'sFilename_mesh_boundary']
 
+            if self.iFlag_mesh_boundary==1:
+                if not os.path.isfile(self.sFilename_mesh_boundary ):
+                    print("The mesh boundary file does not exist!")
+                    exit
+                pass
+
         if 'sFilename_spatial_reference' in aConfig_in:
             self.sFilename_spatial_reference = aConfig_in['sFilename_spatial_reference']
+
 
         if 'sFilename_dem' in aConfig_in:
             self.sFilename_dem = aConfig_in['sFilename_dem']
@@ -327,6 +336,15 @@ class flowlinecase(object):
             sPath = self.sWorkspace_output
         
         Path(sPath).mkdir(parents=True, exist_ok=True)
+
+        if self.iMesh_type == 4:
+            if not os.path.isfile(self.sFilename_mesh_netcdf ):
+                print("The MPAS mesh file does not exist!")
+                exit
+        else:
+            if not os.path.isfile(self.sFilename_dem ):
+                print("The DEM file does not exist!")
+                exit
 
         self.aBasin = list()
     

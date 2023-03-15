@@ -119,7 +119,7 @@ class pyflowline(object):
         Returns:
             int: 1 if it is, 0 if not
         """
-        iFlag_upstream =-1
+        iFlag_upstream = -1
         v0 = self.pVertex_start
         v1 = self.pVertex_end
 

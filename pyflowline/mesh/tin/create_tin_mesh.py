@@ -2,44 +2,40 @@ import os, sys
 
 import numpy as np
 
-
-from osgeo import ogr
+from osgeo import ogr, osr
+from shapely.wkt import loads
 from pyflowline.classes.tin import pytin
 
 from pyflowline.formats.convert_coordinates import convert_pcs_coordinates_to_cell
+from pyflowline.formats.convert_coordinates import convert_gcs_coordinates_to_cell
+from pyflowline.algorithms.auxiliary.find_index_in_list import check_if_duplicates
+from pyflowline.algorithms.auxiliary.gdal_functions import reproject_coordinates_batch
 
-def create_tin_mesh(dX_left_in, dY_bot_in, dResolution_meter_in, ncolumn_in, nrow_in,
+def create_tin_mesh(dX_left_in, dY_bot_in, dResolution_meter_in, ncolumn_in, nrow_in, pPolygon_in,
 sFilename_output_in, sFilename_spatial_reference_in):
      
     
     if os.path.exists(sFilename_output_in): 
         #delete it if it exists
         os.remove(sFilename_output_in)
-    
+
     pDriver_shapefile = ogr.GetDriverByName('Esri Shapefile')
 
-    
-    pDataset = pDriver_shapefile.CreateDataSource(sFilename_output_in)
-    
     pDataset_shapefile = pDriver_shapefile.Open(sFilename_spatial_reference_in, 0)
     pLayer_shapefile = pDataset_shapefile.GetLayer(0)
-    pSrs = pLayer_shapefile.GetSpatialRef()
-
-    #pSrs = osr.SpatialReference()  
-    #pSrs.ImportFromEPSG(4326)    # WGS84 lat/lon
-
-    pLayer = pDataset.CreateLayer('cell', pSrs, ogr.wkbPolygon)
-    # Add one attribute
-    pLayer.CreateField(ogr.FieldDefn('id', ogr.OFTInteger64)) #long type for high resolution
+    pSpatial_reference = pLayer_shapefile.GetSpatialRef()  
     
+    pDriver_geojson = ogr.GetDriverByName('GeoJSON')     
+    pSpatial_reference_gcs = osr.SpatialReference()  
+    pSpatial_reference_gcs.ImportFromEPSG(4326)    # WGS84 lat/lon     
+    pDataset = pDriver_geojson.CreateDataSource(sFilename_output_in)
+    pLayer = pDataset.CreateLayer('cell', pSpatial_reference_gcs, ogr.wkbPolygon)
+    # Add one attribute
+    pLayer.CreateField(ogr.FieldDefn('id', ogr.OFTInteger64)) #long type for high resolution    
     pLayerDefn = pLayer.GetLayerDefn()
     pFeature = ogr.Feature(pLayerDefn)
-
-    
-
     xleft = dX_left_in
     ybottom = dY_bot_in
-
     dArea = np.power(dResolution_meter_in,2.0)
     #tin edge
     dLength_edge = np.sqrt(  4.0 * dArea /  np.sqrt(3.0) )  
@@ -48,7 +44,8 @@ sFilename_output_in, sFilename_spatial_reference_in):
     dX_spacing = dX_shift * 2
     dY_spacing = dY_shift
 
-    lID =0 
+    
+    lCellID = 1
 
     #geojson
     aTin=list()
@@ -96,40 +93,67 @@ sFilename_output_in, sFilename_spatial_reference_in):
                     y3 = y1 + dY_spacing
                          
 
-                   
+            x = list()
+            x.append(x1)
+            x.append(x2)
+            x.append(x3)
+          
+            y = list()
+            y.append(y1)
+            y.append(y2)
+            y.append(y3)
+         
+            x_new , y_new = reproject_coordinates_batch(x, y, pSpatial_reference)
+            x1=x_new[0]
+            x2=x_new[1]
+            x3=x_new[2]
            
-            aCoords = np.full((4,2), -9999.0, dtype=float)
+            y1=y_new[0]
+            y2=y_new[1]
+            y3=y_new[2]
+          
 
             ring = ogr.Geometry(ogr.wkbLinearRing)
             ring.AddPoint(x1, y1)
             ring.AddPoint(x2, y2)
-            ring.AddPoint(x3, y3)
-            
+            ring.AddPoint(x3, y3)         
             ring.AddPoint(x1, y1)
             pPolygon = ogr.Geometry(ogr.wkbPolygon)
             pPolygon.AddGeometry(ring)
-
-            pFeature.SetGeometry(pPolygon)
-            pFeature.SetField("id", lID)
-            pLayer.CreateFeature(pFeature)
-
-            lID = lID + 1
-
-            #dummy = loads( ring.ExportToWkt() )
-            #aCoords = dummy.exterior.coords
+            aCoords = np.full((4,2), -9999.0, dtype=float)
             aCoords[0,0] = x1
             aCoords[0,1] = y1
             aCoords[1,0] = x2
             aCoords[1,1] = y2
             aCoords[2,0] = x3
-            aCoords[2,1] = y3
-            
+            aCoords[2,1] = y3         
             aCoords[3,0] = x1
             aCoords[3,1] = y1
-            
+                
             dummy1= np.array(aCoords)
-            pHexagon = convert_pcs_coordinates_to_cell(1, dummy1)
-            aTin.append(pHexagon)
+            dLongitude_center = np.mean(aCoords[0:3,0])
+            dLatitude_center = np.mean(aCoords[0:3,1])     
+            pCenter = ogr.Geometry(ogr.wkbPoint)
+            pCenter.AddPoint(dLongitude_center, dLatitude_center)
+            pCenter1 = loads( pCenter.ExportToWkt() )
+            iFlag = pCenter1.within(pPolygon_in)
+            if ( iFlag == True ):         
+           
+                pTIN = convert_gcs_coordinates_to_cell(5, dLongitude_center, dLatitude_center, dummy1)
+                pTIN.lCellID = lCellID
+                dArea = pTIN.calculate_cell_area()
+                pTIN.dArea = dArea
+                pTIN.calculate_edge_length() 
+                
+                pFeature.SetGeometry(pPolygon)
+                pFeature.SetField("id", lCellID)
+                pFeature.SetField("lon", dLongitude_center )
+                pFeature.SetField("lat", dLatitude_center )
+                pFeature.SetField("area", dArea )
+                pLayer.CreateFeature(pFeature)
+                          
+                aTin.append(pTIN)
+                lCellID = lCellID + 1   
 
             pass
         

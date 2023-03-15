@@ -88,15 +88,15 @@ class pyedge(object):
         Returns:
             int: Flag, 1: shared; 0: non-sharing
         """
-        iFlag_shared =-1
+        iFlag_shared = -1
         v0 = self.pVertex_start
         v1 = self.pVertex_end
         v2 = other.pVertex_start
         v3 = other.pVertex_end
-        if v0 == v2 or v0 == v2 or v1==v2 or v1==v3:
-            iFlag_shared =1
+        if v0 == v2 or v0 == v3 or v1==v2 or v1==v3:
+            iFlag_shared = 1
         else:
-            iFlag_shared=0
+            iFlag_shared = 0
 
         return iFlag_shared
     
@@ -110,7 +110,7 @@ class pyedge(object):
         Returns:
             int: Flag, 1: upstream; 0: non-upstream
         """
-        iFlag_upstream =-1
+        iFlag_upstream = -1
         v0 = self.pVertex_start
         v1 = self.pVertex_end
         v2 = other.pVertex_start
@@ -133,7 +133,7 @@ class pyedge(object):
         Returns:
             int: Flag, 1: downstream; 0: non-downstream
         """
-        iFlag_downstream =-1
+        iFlag_downstream = -1
         v0 = self.pVertex_start
         v1 = self.pVertex_end
         v2 = other.pVertex_start

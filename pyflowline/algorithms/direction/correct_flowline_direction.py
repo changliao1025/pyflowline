@@ -1,3 +1,5 @@
+import sys
+sys.setrecursionlimit(10000)
 import numpy as np 
 from pyflowline.algorithms.auxiliary.check_head_water import check_head_water
 lID=0

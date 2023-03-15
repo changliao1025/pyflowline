@@ -99,7 +99,7 @@ def remove_returning_flowline(iMesh_type_in, aCell_intersect_in, pVertex_outlet_
                                 pass                            
                                 
                             break
-                            pass
+                            
                         else:
                             iFlag_found2, dummy2 = pCell.which_edge_cross_this_vertex(pVertex_start)
                             iFlag_found3, dummy3 = pCell.which_edge_cross_this_vertex(pVertex_end)

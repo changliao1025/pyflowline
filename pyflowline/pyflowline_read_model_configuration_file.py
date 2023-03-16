@@ -1,4 +1,5 @@
 import os 
+from pathlib import Path
 import datetime
 import json
 from pyflowline.classes.pycase import flowlinecase
@@ -90,7 +91,15 @@ def pyflowline_read_model_configuration_file(sFilename_configuration_in,   \
         sWorkspace_output = sWorkspace_output_in
     else:
         sWorkspace_output = aConfig['sWorkspace_output']
-        pass
+        #try to create this output folder first using 
+    
+    try:
+        print(sWorkspace_output)
+        Path(sWorkspace_output).mkdir(parents=True, exist_ok=True)
+    except ValueError:
+        print("The specified output workspace cannot be created!")
+        exit
+    
 
     
     aConfig['iCase_index'] = iCase_index

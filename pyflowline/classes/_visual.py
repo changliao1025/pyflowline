@@ -25,24 +25,17 @@ from pyflowline.algorithms.auxiliary.gdal_functions import reproject_coordinates
 from pyflowline.formats.convert_flowline_to_geojson import convert_shapefile_to_geojson_swat
 from pyflowline.algorithms.auxiliary.gdal_functions import gdal_read_geotiff_file, retrieve_geotiff_metadata
 
-#the orthographic projection should be used on a sphere, this might be provided as an input
-#pProjection_map = ccrs.Orthographic(central_longitude =  0.0, \
-#        central_latitude = 0.0, globe=None)
-        
-#pProjection_map = ccrs.Orthographic(central_longitude =  0.50*(dLon_max+dLon_min),  central_latitude = 0.50*(dLat_max+dLat_min), globe=None)
-
-def _plot(self, sFilename_in=None,iFlag_title=None, sVariable_in=None, aExtent_in = None):
+def plot(self, sFilename_in=None,iFlag_title = None, sVariable_in=None, aExtent_in = None):
     if sVariable_in == 'mesh':
         self._plot_mesh(sFilename_in=sFilename_in, aExtent_in= aExtent_in)
     else:            
         if sVariable_in == 'overlap':
-            self._plot_mesh_with_flowline( sFilename_in=sFilename_in, iFlag_title= iFlag_title, aExtent_in= aExtent_in)
+            self._plot_mesh_with_flowline( sFilename_in=sFilename_in, iFlag_title= iFlag_title, aExtent_in=aExtent_in)
         else:            
-            
-            for pBasin in self.aBasin:            
-                pBasin._basin_plot(self.iCase_index, self.iMesh_type, self.sMesh_type, sFilename_in=sFilename_in,\
+            for pBasin in self.aBasin:  
+                pBasin.basin_plot(self.iCase_index, self.iMesh_type, self.sMesh_type, sFilename_in=sFilename_in,\
                     iFlag_title= iFlag_title, \
-                    sVariable_in= sVariable_in)
+                    sVariable_in= sVariable_in, aExtent_in=aExtent_in)
             pass
     
     return
@@ -284,7 +277,12 @@ def _plot_mesh(self, sFilename_in=None, aExtent_in=None, pProjection_map_in = No
                     dLat_max = dLat
                 if dLat < dLat_min:
                     dLat_min = dLat
-    pProjection_map = ccrs.Orthographic(central_longitude =  0.50*(dLon_max+dLon_min),  central_latitude = 0.50*(dLat_max+dLat_min), globe=None)
+
+    if pProjection_map_in is not None:
+        pProjection_map = pProjection_map_in
+    else:
+        pProjection_map = ccrs.Orthographic(central_longitude =  0.50*(dLon_max+dLon_min),  central_latitude = 0.50*(dLat_max+dLat_min), globe=None)
+   
     fig = plt.figure(dpi=300)
     fig.set_figwidth( 4 )
     fig.set_figheight( 4 )
@@ -365,7 +363,12 @@ def _plot_mesh_with_flowline(self, sFilename_in=None, iFlag_title=None, aExtent_
                     dLat_max = dLat
                 if dLat < dLat_min:
                     dLat_min = dLat
-    pProjection_map = ccrs.Orthographic(central_longitude =  0.50*(dLon_max+dLon_min),  central_latitude = 0.50*(dLat_max+dLat_min), globe=None)
+
+    if pProjection_map_in is not None:
+        pProjection_map = pProjection_map_in
+    else:
+        pProjection_map = ccrs.Orthographic(central_longitude =  0.50*(dLon_max+dLon_min),  central_latitude = 0.50*(dLat_max+dLat_min), globe=None)
+    
     fig = plt.figure( dpi=300 )
     fig.set_figwidth( 4 )
     fig.set_figheight( 4 )
@@ -407,7 +410,7 @@ def _plot_mesh_with_flowline(self, sFilename_in=None, iFlag_title=None, aExtent_
                 codes[0] = mpath.Path.MOVETO
                 path = mpath.Path(aCoords_gcs, codes)            
                 x, y = zip(*path.vertices)
-                line, = ax.plot(x, y, color= 'black', linewidth=0.5)
+                line, = ax.plot(x, y, color= 'black', linewidth=0.5,  transform=ccrs.PlateCarree())
                 lID = lID + 1
             pass
         pass
@@ -435,7 +438,7 @@ def _plot_mesh_with_flowline(self, sFilename_in=None, iFlag_title=None, aExtent_
                 codes[0] = mpath.Path.MOVETO
                 path = mpath.Path(aCoords_gcs, codes)            
                 x, y = zip(*path.vertices)
-                line, = ax.plot(x, y, color= colours[lID], linewidth=1)
+                line, = ax.plot(x, y, color= colours[lID], linewidth=1, transform=ccrs.PlateCarree())
                 lID = lID + 1
             pass
         pass
@@ -701,7 +704,8 @@ def _compare_with_raster_dem_method(self, sFilename_dem_flowline, sFilename_in, 
     plt.close(fig)
     return
   
-def _basinplot(self, iCase_index, iMesh_type, sMesh_type, sFilename_in=None, iFlag_title=None, sVariable_in=None, aExtent_in = None, pProjection_map_in = None):
+def basin_plot(self, iCase_index, iMesh_type, sMesh_type, sFilename_in=None, 
+               iFlag_title=None, sVariable_in=None, aExtent_in = None, pProjection_map_in = None):
     iFlag_label = 0
     sWorkspace_output_basin = self.sWorkspace_output_basin
     if sVariable_in is not None:
@@ -717,13 +721,19 @@ def _basinplot(self, iCase_index, iMesh_type, sMesh_type, sFilename_in=None, iFl
                     sFilename_out = self.sFilename_flowline_simplified
                     sFilename_json = os.path.join(sWorkspace_output_basin, sFilename_out)
                     sTitle = 'Simplified flowline'
-                    iFlag_label = 1
+                    if aExtent_in is None:
+                        iFlag_label = 1
+                    else:
+                        iFlag_label=0
                 else:
                     if sVariable_in == 'flowline_conceptual':
                         sFilename_out = self.sFilename_flowline_conceptual
                         sFilename_json = os.path.join(sWorkspace_output_basin, sFilename_out)
                         sTitle = 'Conceptual flowline'
-                        iFlag_label = 1
+                        if aExtent_in is None:
+                            iFlag_label = 1
+                        else:
+                            iFlag_label=0
                     else:
                         if sVariable_in == 'aof':
                             sFilename_out = 'area_of_difference.geojson'
@@ -740,7 +750,6 @@ def _basinplot(self, iCase_index, iMesh_type, sMesh_type, sFilename_in=None, iFl
         sFilename_json = self.sFilename_flowline_conceptual
     
     #request = cimgt.OSM()
-    
     
     pDriver = ogr.GetDriverByName('GeoJSON')
     pDataset = pDriver.Open(sFilename_json, gdal.GA_ReadOnly)
@@ -781,18 +790,25 @@ def _basinplot(self, iCase_index, iMesh_type, sMesh_type, sFilename_in=None, iFl
                 if dLat < dLat_min:
                     dLat_min = dLat       
 
-    pProjection_map = ccrs.Orthographic(central_longitude =  0.50*(dLon_max+dLon_min),  central_latitude = 0.50*(dLat_max+dLat_min), globe=None)
+    if pProjection_map_in is not None:
+        pProjection_map = pProjection_map_in
+    else:
+        pProjection_map = ccrs.Orthographic(central_longitude =  0.50*(dLon_max+dLon_min),  
+                                            central_latitude = 0.50*(dLat_max+dLat_min), globe=None)
+    
     fig = plt.figure( dpi=300)
     fig.set_figwidth( 4 )
     fig.set_figheight( 4 )
     ax = fig.add_axes([0.1, 0.15, 0.75, 0.8] , projection=pProjection_map ) #request.crs
     ax.set_global()
+
+
     n_colors = pLayer.GetFeatureCount()    
     colours = cm.rainbow(np.linspace(0, 1, n_colors))
     for pFeature in pLayer:
         pGeometry_in = pFeature.GetGeometryRef()
         sGeometry_type = pGeometry_in.GetGeometryName()
-        if iFlag_label ==1:
+        if iFlag_label == 1:
             iSegment = pFeature.GetField("iseg")
         if sGeometry_type =='LINESTRING':
             dummy0 = loads( pGeometry_in.ExportToWkt() )
@@ -814,30 +830,29 @@ def _basinplot(self, iCase_index, iMesh_type, sMesh_type, sFilename_in=None, iFl
             path = mpath.Path(aCoords_gcs, codes)            
             x, y = zip(*path.vertices)
             if n_colors < 10:
-                line, = ax.plot(x, y, color= colours[lID],linewidth=1)
+                line, = ax.plot(x, y, color= colours[lID],linewidth=1,  transform=ccrs.PlateCarree())
             else:
-                line, = ax.plot(x, y, color= 'black',linewidth=1)
+                line, = ax.plot(x, y, color= 'black',linewidth=1, transform=ccrs.PlateCarree())
             lID = lID + 1
             #add label 
             if iFlag_label ==1:
                 sText = 'Seg ' + "{:0d}".format( iSegment )
-                ax.text(dLon_label,dLat_label, sText, \
-                    verticalalignment='center', horizontalalignment='center',\
-                    #transform=ax.transAxes, \
+                ax.text(dLon_label,dLat_label, sText,  transform=ccrs.PlateCarree(), \
+                    verticalalignment='center', horizontalalignment='center',
                     color='black', fontsize=7)
             
 
     pDataset = pLayer = pFeature  = None    
+
     if aExtent_in is None:
         marginx  = (dLon_max - dLon_min) / 20
         marginy  = (dLat_max - dLat_min) / 20
         aExtent = [dLon_min - marginx , dLon_max + marginx , dLat_min - marginy , dLat_max + marginy]
     else:
-        aExtent = aExtent_in  
- 
+        aExtent = aExtent_in 
     
-    ax.set_extent(aExtent)       
-
+    ax.set_extent(aExtent) 
+    
     gl = ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True,
                   linewidth=1, color='gray', alpha=0.3, linestyle='--')
     gl.xlocator = mticker.MaxNLocator(5)

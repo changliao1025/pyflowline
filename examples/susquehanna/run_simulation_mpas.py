@@ -5,7 +5,7 @@ from os.path import realpath
 #set up workspace path
 #===================================
 sPath_parent = str(Path(__file__).parents[2]) # data is located two dir's up
-import sys
+
 sys.path.append(sPath_parent)
 from pyflowline.pyflowline_read_model_configuration_file import pyflowline_read_model_configuration_file
 
@@ -26,17 +26,25 @@ else:
 #===================================
 #setup case information
 #===================================
-iCase_index = 4
+iCase_index = 1
 sMesh = 'mpas'
 sDate='20230101'
 
 
-oPyflowline = pyflowline_read_model_configuration_file(sFilename_configuration_in, \
+oPyflowline = pyflowline_read_model_configuration_file(sFilename_configuration_in, 
     iCase_index_in=iCase_index, sDate_in=sDate)
+
+
 oPyflowline.aBasin[0].dLatitude_outlet_degree=39.462000
 oPyflowline.aBasin[0].dLongitude_outlet_degree=-76.009300
+
 oPyflowline.setup()
-oPyflowline.flowline_simplification()
+
+
+#oPyflowline.flowline_simplification()
+#oPyflowline.plot( sVariable_in = 'flowline_simplified' )
+
+
 aCell = oPyflowline.mesh_generation()
 oPyflowline.reconstruct_topological_relationship(aCell)
 oPyflowline.export()

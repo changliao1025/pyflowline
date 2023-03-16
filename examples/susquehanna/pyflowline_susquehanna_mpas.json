@@ -9,6 +9,7 @@
     "sJob": "hex",   
     "iFlag_standalone": 1,      
     "iFlag_create_mesh": 1,
+    "iFlag_mesh_boundary": 1,
     "iFlag_save_mesh" :1 ,
     "iFlag_simplification": 1,
     "iFlag_intersect": 1,
@@ -29,6 +30,7 @@
     "sMesh_type": "mpas",       
     "sFilename_spatial_reference": "/qfs/people/liao313/workspace/python/pyhexwatershed_icom/data/susquehanna/input/boundary_proj_buff.shp",
     "sFilename_dem": "/qfs/people/liao313/workspace/python/pyhexwatershed_icom/data/susquehanna/input/dem_buff_ext.tif",     
-    "sFilename_mesh_netcdf": "/qfs/people/liao313/data/icom/mesh/delaware_lnd_60_30_5_2_v1/lnd_cull_mesh.nc",    
+    "sFilename_mesh_netcdf": "/Users/liao313/workspace/python/pyflowline/data/susquehanna/input/lnd_cull_mesh.nc",    
+    "sFilename_mesh_boundary": "/Users/liao313/workspace/python/pyflowline/data/susquehanna/input/mesh_boundary_buffer.geojson",
     "sFilename_basins": "/Users/liao313/workspace/python/pyflowline/examples/susquehanna/pyflowline_susquehanna_basins.json"
 }

@@ -127,7 +127,7 @@ class pybasin(object):
     
     iFlag_visual = importlib.util.find_spec("cartopy") 
     if iFlag_visual is not None:
-        from ._visual import _basinplot
+        from ._visual import basin_plot
         from ._visual import _plot_area_of_difference 
     else:
         pass

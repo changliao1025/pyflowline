@@ -122,7 +122,7 @@ class flowlinecase(object):
 
     iFlag_visual = importlib.util.find_spec("cartopy") 
     if iFlag_visual is not None:
-        from ._visual import _plot
+        from ._visual import plot
         from ._visual import _plot_study_area
         from ._visual import _plot_mesh
         from ._visual import _plot_mesh_with_flowline
@@ -253,7 +253,7 @@ class flowlinecase(object):
             if self.iFlag_mesh_boundary==1:
                 if not os.path.isfile(self.sFilename_mesh_boundary ):
                     print("The mesh boundary file does not exist!")
-                    exit
+                    exit()
                 pass
 
         if 'sFilename_spatial_reference' in aConfig_in:
@@ -340,11 +340,11 @@ class flowlinecase(object):
         if self.iMesh_type == 4:
             if not os.path.isfile(self.sFilename_mesh_netcdf ):
                 print("The MPAS mesh file does not exist!")
-                exit
+                exit()
         else:
             if not os.path.isfile(self.sFilename_dem ):
                 print("The DEM file does not exist!")
-                exit
+                exit()
 
         self.aBasin = list()
     
@@ -685,6 +685,7 @@ class flowlinecase(object):
 
                                             break
                         except:
+                            print("error in step")
                             print(pFlowline.tojson())
                             print(pEdge.tojson())
                             print(pVertex_start.tojson())

@@ -49,7 +49,7 @@ Inputs
 ==============================
 
 
-PyFlowline uses two configuration files to manage all the input information. Within this configuration file, it stores major model input parameters paths to input files. 
+PyFlowline uses two configuration files to manage all the input information. Within this configuration file, it stores major model input parameters and paths to input files. 
 
 These two configuration files have a parent-child relationship:
 1. The parent configuration file stores parameters for the whole domain, and

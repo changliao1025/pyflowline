@@ -33,7 +33,7 @@ The `pyflowline_read_model_configuration_file` function reads in a JSON configur
 Step 2
 ================
 
-The script setups some paths, which should be adjusted based on a real case.
+The script sets up some paths, which should be adjusted based on a real case and your local directory structure.
 
 ::   
     
@@ -41,7 +41,7 @@ The script setups some paths, which should be adjusted based on a real case.
     sPath_data = realpath( sPath_parent +  '/data/susquehanna' )
     sWorkspace_input =  str(Path(sPath_data)  /  'input')
     sWorkspace_output=  str(Path(sPath_data)  /  'output')
-    sWorkspace_output=  '/compyfs/liao313/04model/pyflowline/susquehanna'
+    sWorkspace_output=  '/full/path/to/pyflowline/data/susquehanna/output'
 
 ================
 Step 3

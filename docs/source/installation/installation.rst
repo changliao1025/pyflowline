@@ -15,14 +15,14 @@ Two different options are provided below.
 Requirements
 ************
 
-We recommend that users to use the Conda system to install the PyFlowline package.
+We recommend to use the Conda system to install the PyFlowline package.
 
 Conda can be installed on Linux, MacOS, and Windows systems. 
 Please refer to the conda website for details on how to install Conda: 
 https://docs.conda.io/en/latest/
 
-After Conda is available on your system, you can create a conda environment for your application.
-Then you use Option A or B to install PyFlowline in the newly created environment.
+After Conda is available on your system, you can create a conda environment for your application of PyFlowline.
+Then use Option A or B to install PyFlowline in the newly created environment.
 
 ==========
 Option A

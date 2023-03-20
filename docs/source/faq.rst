@@ -20,12 +20,17 @@ Frequently Asked Questions
    Anaconda:
 
    `export PROJ_LIB=/people/user/.conda/envs/hexwatershed/share/proj`
+   `export PROJ_LIB=$HOME/opt/anaconda3/envs/pyflowline/share/proj`
 
    Miniconda:
 
    `export PROJ_LIB=/opt/miniconda3/envs/hexwatershed/share/proj`
 
-4. What if my model doesn't produce the correct or expected answer?
+4. I am getting errors using the plot functions
+
+   If you receive an error related to `GeoAxesSubplot`, make sure you have cartopy version 0.21.0 installed in your environment. Optionally, downgrade matplotlib to 3.5.2. 
+
+5. What if my model doesn't produce the correct or expected answer?
    
    Answer: There are several hidden assumptions within the workflow. For example, if you provide the DEM and river network for two different regions, the program won't be able to tell you that. A visual inspection of your data is important.
    

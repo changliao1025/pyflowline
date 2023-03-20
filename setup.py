@@ -61,6 +61,6 @@ setup(
     install_requires=REQUIRED,
     classifiers=CLASSIFY,
     extras_require={
-        'visualization': ['matplotlib', 'cartopy']
+        'visualization': ['matplotlib', 'cartopy>=0.21.0']
     }
 )

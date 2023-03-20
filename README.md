@@ -7,27 +7,26 @@ PyFlowline: a mesh-independent river network generator for hydrologic models.
 PyFlowline is mesh independent, meaning you can apply it to both structured (e.g., traditional rectangle mesh, latitude-longitude, hexagon) and unstructured mesh systems (e.g., Triangulated Irregular Network (TIN) mesh and Model for Prediction Across Scales (MPAS) mesh).
 
 This package generates the mesh cell-based conceptual river networks using the following steps:
-1. `Flowline simplification`: PyFlowline checks the vector dataset and corrects undesired flowlines, such as braided rivers. 
-2. `Mesh generation`: PyFlowline generates structured meshes (e.g., rectangle, hexagon) or imports user-provided unstructured meshes into the PyFlowline-compatible GEOJSON format.
-3. `Topological relationship reconstruction`: PyFlowline reconstructs the topological relationship using the mesh and flowline intersections. 
 
+1. `Flowline simplification`: PyFlowline checks the vector dataset and corrects undesired flowlines, such as braided rivers.
+2. `Mesh generation`: PyFlowline generates structured meshes (e.g., rectangle, hexagon) or imports user-provided unstructured meshes into the PyFlowline-compatible GEOJSON format.
+3. `Topological relationship reconstruction`: PyFlowline reconstructs the topological relationship using the mesh and flowline intersections.
 
 ### Quickstart
 
-https://pyflowline.readthedocs.io/en/latest/quickstart.html
+Please refer to the [quickstart documentation](https://pyflowline.readthedocs.io/en/latest/quickstart.html) for details on how to get started using the PyFlowline package.
 
 ### Installation
 
-Please refer to the official documentation (https://pyflowline.readthedocs.io/) for details on how to install the PyFlowline package.
+Please refer to the [official documentation](https://pyflowline.readthedocs.io/) for details on how to install the PyFlowline package.
 
 ### Application
 
-We provide several examples in the `examples` folder to demonstrate the model capability.
-
+We provide several examples in the `examples` folder to demonstrate the model capability. We also recommend starting with the `notebooks/mpas_example.ipynb` notebook, after following the Quickstart and Installation instructions.
 
 ### Acknowledgment
 
-This work was supported by the Earth System Model Development program areas of the U.S. Department of Energy, Office of Science, Office of Biological and Environmental Research as part of the multi-program, collaborative Integrated Coastal Modeling (ICoM) project and the Interdisciplinary Research for Arctic Coastal Environments (InteRFACE) project. 
+This work was supported by the Earth System Model Development program areas of the U.S. Department of Energy, Office of Science, Office of Biological and Environmental Research as part of the multi-program, collaborative Integrated Coastal Modeling (ICoM) project and the Interdisciplinary Research for Arctic Coastal Environments (InteRFACE) project.
 
 ### License
 
@@ -51,10 +50,3 @@ Several publications describe the algorithms used in `PyFlowline` in detail. If 
 https://doi.org/10.5281/zenodo.6407299
 
 * Liao, C., Zhou, T., Xu, D., Cooper, M. G., Engwirda, D., Li, H.-Y., & Leung, L. R. (2023). Topological relationship-based flow direction modeling: Mesh-independent river networks representation. Journal of Advances in Modeling Earth Systems, 15, e2022MS003089. https://doi.org/10.1029/2022MS003089
-
-
-
-
-
-    
-

@@ -9,7 +9,7 @@
         "iFlag_disconnected": 0,
         "lBasinID": 1,
         "sFilename_dam": "/qfs/people/liao313/data/hexwatershed/susquehanna/auxiliary/ICoM_dams.csv",
-        "sFilename_flowline_filter": "/Users/liao313/workspace/python/pyflowline/data/susquehanna/input/flowline.geojson",
+        "sFilename_flowline_filter": "/Users/coop558/myprojects/python/pyflowline/data/susquehanna/input/flowline.geojson",
         "sFilename_flowline_raw": "/qfs/people/liao313/data/hexwatershed/susquehanna/vector/hydrology/allflowline.shp",
         "sFilename_flowline_topo": "/qfs/people/liao313/data/hexwatershed/susquehanna/auxiliary/flowline.csv"
         

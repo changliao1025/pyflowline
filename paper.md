@@ -31,11 +31,11 @@ River networks are crucial in hydrologic and Earth system models. Accurately rep
 
 # Statement of need
 
-Generating a mesh cell-based conceptual river network for a given vector-based river network and arbitrary mesh geometry is a major challenge in hydrologic model configuration. Existing methods are typically limited to structured rectangular meshes such as 30m x 30m cartesian grids for high-resolution watershed-scale modeling or 0.5 degree x 0.5 degree geographic grids for global climate modeling. Structured meshes have fixed cartesian or geographic grid-cell sizes, which can be limiting for coupled land-river-ocean continuum simulations, which are often based on unstructured meshes [@Darren:2021]. However, unstructured meshes offer a flexible structure with variable grid-cell sizes and shapes. This flexibility makes them ideal for adapting to complex geometry such as river channels and coastlines.Thus, unstructured meshes are increasingly being adopted in hydrologic modeling.
+Generating a mesh cell-based conceptual river network for a given vector-based river network and arbitrary mesh geometry is a major challenge in hydrologic model configuration. Existing methods are typically limited to structured rectangular meshes such as 30m x 30m cartesian grids for high-resolution watershed-scale modeling or 0.5 degree x 0.5 degree geographic grids for global climate modeling. Structured meshes have fixed cartesian or geographic grid-cell sizes, which can be limiting for coupled land-river-ocean continuum simulations, which are often based on unstructured meshes [@Engwirda:2021]. However, unstructured meshes offer a flexible structure with variable grid-cell sizes and shapes. This flexibility makes them ideal for adapting to complex geometry such as river channels and coastlines.Thus, unstructured meshes are increasingly being adopted in hydrologic modeling.
 
 Although unstructured meshes offer flexibility, the additional effort required to generate a computational river network that aligns with the mesh topology limits their adoption. A mesh-independent river network representation method that supports both unstructured and structured mesh-based hydrologic models could address this limitation. PyFlowline is a Python package that provides a framework for generating river networks for hydrologic models, meeting the identified need. Using an object-oriented programming approach, PyFlowline represents river network elements and mesh cell relationships. It relies on open-source Python libraries like GDAL and Cython for data input/output and spatial data operations.
 
-The computational geometry algorithms used in PyFlowline are designed and implemented using a unified spherical framework, making it suitable for regional and global-scale simulations. Moreover, PyFlowline is mesh-independent, supporting both structured and unstructured meshes. It can quickly adopt other mesh types, such as triangulated irregular networks (TIN) or discrete global grid systems (DGGs). PyFlowline is a core component of the HexWatershed model, a mesh-independent flow direction model. Several scientific studies focused on coupled Earth system models [@Feng:2022; @Liao:2022; @Cooper:2022] have utilized PyFlowline. A workshop tutorial has also been provided online and in person to support its implementation
+The computational geometry algorithms used in PyFlowline are designed and implemented using a unified spherical framework, making it suitable for regional and global-scale simulations. Moreover, PyFlowline is mesh-independent, supporting both structured and unstructured meshes. It can quickly adopt other mesh types, such as triangulated irregular networks (TIN) or discrete global grid systems (DGGs). PyFlowline is a core component of the HexWatershed model, a mesh-independent flow direction model. Several scientific studies focused on coupled Earth system models [@Feng:2022; @Liao:2022] have utilized PyFlowline. A workshop tutorial has also been provided online and in person to support its implementation
 
 
 # Model features
@@ -71,12 +71,4 @@ PNNL is operated for DOE by Battelle Memorial Institute under contract DE-AC05-7
 
 
 # References
-
-* Engwirda, D., & Liao, C. (2021). ‘UNIFIED’LAGUERRE-POWER MESHES FOR COUPLED EARTH SYSTEM MODELLING. Zenodo. https://doi.org/10.5281/zenodo.5558988
-
-* Feng, D., Tan, Z., Engwirda, D., Liao, C., Xu, D., Bisht, G., Zhou, T., Li, H.-Y., and Leung, L. R.: Investigating coastal backwater effects and flooding in the coastal zone using a global river transport model on an unstructured mesh, Hydrol. Earth Syst. Sci., 26, 5473–5491, https://doi.org/10.5194/hess-26-5473-2022, 2022.
-
-* Liao. C. Cooper, M (2022) Pyflowline: a mesh-independent river network generator for hydrologic models. Zenodo. https://doi.org/10.5281/zenodo.6407299
-
-* Liao, C., Zhou, T., Xu, D., Cooper, M. G., Engwirda, D., Li, H.-Y., & Leung, L. R. (2023). Topological relationship-based flow direction modeling: Mesh-independent river networks representation. Journal of Advances in Modeling Earth Systems, 15, e2022MS003089. https://doi.org/10.1029/2022MS003089
 

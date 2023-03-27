@@ -44,8 +44,6 @@ PyFlowline uses Python's OOP architecture to describe river networks using three
 
 ![The data model. \label{fig:oop}](https://github.com/changliao1025/pyflowline/blob/main/docs/figures/basic_element.png?raw=true)
 
-Pyflowline provides the following features:
-
 PyFlowline provides several key features, including
 
 1. Support for both structured and unstructured meshes, with JSON as the default file I/O format. For geospatial datasets such as vector river networks, GEOJSON is used.

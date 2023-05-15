@@ -8,7 +8,7 @@ from setuptools import setup, find_packages, Command
 
 NAME = "pyflowline"
 DESCRIPTION = \
-    "A mesh independent river network generator for hydrologic models"
+    "A mesh-independent river network generator for hydrologic models"
 AUTHOR = "Chang Liao"
 AUTHOR_EMAIL = "chang.liao@pnnl.gov"
 URL = "https://github.com/changliao1025/pyflowline"

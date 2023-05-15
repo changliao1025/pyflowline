@@ -17,7 +17,6 @@ from cartopy.feature import ShapelyFeature
 import cartopy.crs as ccrs
 
 import requests
-#import utm
 
 from pyflowline.algorithms.auxiliary.text_reader_string import text_reader_string
 from pyflowline.algorithms.auxiliary.gdal_functions import Google_MetersPerPixel
@@ -265,18 +264,10 @@ def _plot_mesh(self, sFilename_in=None, aExtent_in=None, pProjection_map_in = No
             dummy0 = loads( pGeometry_in.ExportToWkt() )
             aCoords_gcs = dummy0.exterior.coords
             aCoords_gcs= np.array(aCoords_gcs)
-            nvertex = len(aCoords_gcs)
-            for i in range(nvertex):
-                dLon = aCoords_gcs[i][0]
-                dLat = aCoords_gcs[i][1]
-                if dLon > dLon_max:
-                    dLon_max = dLon
-                if dLon < dLon_min:
-                    dLon_min = dLon
-                if dLat > dLat_max:
-                    dLat_max = dLat
-                if dLat < dLat_min:
-                    dLat_min = dLat
+            dLon_max = np.max( [dLon_max, np.max(aCoords_gcs[:,0])] )
+            dLon_min = np.min( [dLon_min, np.min(aCoords_gcs[:,0])] )
+            dLat_max = np.max( [dLat_max, np.max(aCoords_gcs[:,1])] )
+            dLat_min = np.min( [dLat_min, np.min(aCoords_gcs[:,1])] ) 
 
     if pProjection_map_in is not None:
         pProjection_map = pProjection_map_in
@@ -351,18 +342,10 @@ def _plot_mesh_with_flowline(self, sFilename_in=None, iFlag_title=None, aExtent_
             dummy0 = loads( pGeometry_in.ExportToWkt() )
             aCoords_gcs = dummy0.exterior.coords
             aCoords_gcs= np.array(aCoords_gcs)
-            nvertex = len(aCoords_gcs)
-            for i in range(nvertex):
-                dLon = aCoords_gcs[i][0]
-                dLat = aCoords_gcs[i][1]
-                if dLon > dLon_max:
-                    dLon_max = dLon
-                if dLon < dLon_min:
-                    dLon_min = dLon
-                if dLat > dLat_max:
-                    dLat_max = dLat
-                if dLat < dLat_min:
-                    dLat_min = dLat
+            dLon_max = np.max( [dLon_max, np.max(aCoords_gcs[:,0])] )
+            dLon_min = np.min( [dLon_min, np.min(aCoords_gcs[:,0])] )
+            dLat_max = np.max( [dLat_max, np.max(aCoords_gcs[:,1])] )
+            dLat_min = np.min( [dLat_min, np.min(aCoords_gcs[:,1])] ) 
 
     if pProjection_map_in is not None:
         pProjection_map = pProjection_map_in
@@ -773,22 +756,10 @@ def basin_plot(self, iCase_index, iMesh_type, sMesh_type, sFilename_in=None,
             aCoords_gcs = dummy0.coords
             aCoords_gcs= np.array(aCoords_gcs)
             aCoords_gcs = aCoords_gcs[:,0:2]
-            nvertex = len(aCoords_gcs)
-            
-            for i in range(nvertex):
-                dLon = aCoords_gcs[i][0]
-                dLat = aCoords_gcs[i][1]
-                if dLon > dLon_max:
-                    dLon_max = dLon
-                
-                if dLon < dLon_min:
-                    dLon_min = dLon
-                
-                if dLat > dLat_max:
-                    dLat_max = dLat
-
-                if dLat < dLat_min:
-                    dLat_min = dLat       
+            dLon_max = np.max( [dLon_max, np.max(aCoords_gcs[:,0])] )
+            dLon_min = np.min( [dLon_min, np.min(aCoords_gcs[:,0])] )
+            dLat_max = np.max( [dLat_max, np.max(aCoords_gcs[:,1])] )
+            dLat_min = np.min( [dLat_min, np.min(aCoords_gcs[:,1])] )     
 
     if pProjection_map_in is not None:
         pProjection_map = pProjection_map_in
@@ -878,11 +849,9 @@ def basin_plot(self, iCase_index, iMesh_type, sMesh_type, sFilename_in=None,
     return
 
 def _plot_area_of_difference(self, iCase_index, iMesh_type, sMesh_type, sFilename_in, aExtent_in = None, pProjection_map_in = None):
-    #request = cimgt.OSM()
+    
     sFilename_json = self.sFilename_area_of_difference
     sFilename_json = os.path.join(self.sWorkspace_output_basin, sFilename_json)
-    
-    
     
     pDriver = ogr.GetDriverByName('GeoJSON')
     pDataset = pDriver.Open(sFilename_json, gdal.GA_ReadOnly)
@@ -903,21 +872,12 @@ def _plot_area_of_difference(self, iCase_index, iMesh_type, sMesh_type, sFilenam
             dummy0 = loads( pGeometry_in.ExportToWkt() )
             aCoords_gcs = dummy0.exterior.coords
             aCoords_gcs= np.array(aCoords_gcs)
-            nvertex = len(aCoords_gcs)
-            for i in range(nvertex):
-                dLon = aCoords_gcs[i][0]
-                dLat = aCoords_gcs[i][1]
-                if dLon > dLon_max:
-                    dLon_max = dLon
-                
-                if dLon < dLon_min:
-                    dLon_min = dLon
-                
-                if dLat > dLat_max:
-                    dLat_max = dLat
-
-                if dLat < dLat_min:
-                    dLat_min = dLat
+            dLon_max = np.max( [dLon_max, np.max(aCoords_gcs[:,0])] )
+            dLon_min = np.min( [dLon_min, np.min(aCoords_gcs[:,0])] )
+            dLat_max = np.max( [dLat_max, np.max(aCoords_gcs[:,1])] )
+            dLat_min = np.min( [dLat_min, np.min(aCoords_gcs[:,1])] ) 
+            
+    
     pProjection_map = ccrs.Orthographic(central_longitude =  0.50*(dLon_max+dLon_min),  central_latitude = 0.50*(dLat_max+dLat_min), globe=None)
     fig = plt.figure( dpi=300)
     fig.set_figwidth( 4 )

@@ -363,7 +363,7 @@ class pybasin(object):
             print('Basin ',  self.sBasinID, ' has no dam')
             sFilename_flowline_filter = self.sFilename_flowline_filter
             aFlowline_basin_filtered, pSpatial_reference = read_flowline_geojson( sFilename_flowline_filter ) 
-            aVertex_filtered = find_flowline_vertex(aFlowline_basin_filtered)  
+            #aVertex_filtered = find_flowline_vertex(aFlowline_basin_filtered)  
     
             pass
         sys.stdout.flush()
@@ -395,9 +395,12 @@ class pybasin(object):
             export_vertex_to_geojson( aVertex, sFilename_out)
         
         ptimer.start()
-        nFlowline_before = len(aFlowline_basin_filtered)
-        aFlowline_basin_simplified = split_flowline(aFlowline_basin_filtered, aVertex)
-        nFlowline_after = len(aFlowline_basin_simplified)
+        try:
+            nFlowline_before = len(aFlowline_basin_filtered)
+            aFlowline_basin_simplified = split_flowline(aFlowline_basin_filtered, aVertex)
+            nFlowline_after = len(aFlowline_basin_simplified)
+        except:
+            print(nFlowline_before)
         ptimer.stop()
         print('Basin ',  self.sBasinID, 'split flowline', nFlowline_before, nFlowline_after)
         if self.iFlag_debug ==1:
@@ -411,9 +414,13 @@ class pybasin(object):
         pVertex_outlet=pyvertex(point)
 
         ptimer.start()
-        nFlowline_before = len(aFlowline_basin_simplified)
-        aFlowline_basin_simplified = correct_flowline_direction(aFlowline_basin_simplified,  pVertex_outlet )
-        nFlowline_after = len(aFlowline_basin_simplified)
+        try:
+            nFlowline_before = len(aFlowline_basin_simplified)        
+            aFlowline_basin_simplified = correct_flowline_direction(aFlowline_basin_simplified,  pVertex_outlet )
+            nFlowline_after = len(aFlowline_basin_simplified)
+        except:
+            print(nFlowline_before)
+            
         ptimer.stop()
         
         print('Basin ',  self.sBasinID, 'flow direction', nFlowline_before, nFlowline_after)

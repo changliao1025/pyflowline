@@ -12,7 +12,7 @@ DESCRIPTION = \
 AUTHOR = "Chang Liao"
 AUTHOR_EMAIL = "chang.liao@pnnl.gov"
 URL = "https://github.com/changliao1025/pyflowline"
-VERSION = "0.2.2"
+VERSION = "0.2.3"
 REQUIRES_PYTHON = ">=3.8.0"
 KEYWORDS = "Earth Science"
 
@@ -61,6 +61,6 @@ setup(
     install_requires=REQUIRED,
     classifiers=CLASSIFY,
     extras_require={
-        'visualization': ['matplotlib', 'cartopy>=0.21.0']
+        'visualization': ['cython', 'matplotlib', 'cartopy>=0.21.0']
     }
 )

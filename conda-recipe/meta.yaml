@@ -1,0 +1,49 @@
+{% set name = "hexwatershed" %}
+{% set git_rev = "main" %}
+{% set version = "0.2.3" %}
+
+package:
+  name: {{ name|lower }}
+  version: {{ version }}
+
+source:
+  path: $RECIPE_DIR/../..
+
+build:  
+  noarch: python
+  number: 0
+  
+requirements:  
+  
+  build:
+    - python >=3.8    
+    - setuptools
+    - pip
+  
+  host:
+    - python >=3.8  
+    - pip
+ 
+  run:
+    - python >=3.8
+    - numpy
+    - matplotlib-base
+    - gdal
+    - netCDF4
+
+test:
+  imports:
+    - pyflowline
+  
+
+about:
+  home: https://github.com/changliao1025/pyflowline
+  summary: A mesh-independent river network generator for hydrologic models.
+  license: BSD-2-Clause
+  license_file: LICENSE.md
+
+extra:
+  channels:
+    - conda-forge
+  recipe-maintainers:
+    - changliao1025

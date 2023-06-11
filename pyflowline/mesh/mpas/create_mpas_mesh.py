@@ -16,9 +16,11 @@ else:
 def create_mpas_mesh(iFlag_global_in, 
     iFlag_use_mesh_dem, 
     iFlag_save_mesh_in, 
-    pPolygon_in, 
+    
     sFilename_mesh_netcdf_in, 
-    sFilename_output_in): 
+    sFilename_output_in,
+    iFlag_antarctic_in=None,
+    pBoundary_in = None): 
     """
     Create a MPAS mesh
 
@@ -26,13 +28,23 @@ def create_mpas_mesh(iFlag_global_in,
         iFlag_global_in (int): _description_
         iFlag_use_mesh_dem (int): _description_
         iFlag_save_mesh_in (int): _description_
-        pPolygon_in (_type_): _description_
+        pBoundary_in (_type_): _description_
         sFilename_mesh_netcdf_in (_type_): _description_
         sFilename_output_in (_type_): _description_
 
     Returns:
         _type_: _description_
     """
+
+    if iFlag_antarctic_in is None:
+        iFlag_antarctic=0
+    else:
+        iFlag_antarctic=1
+
+    if pBoundary_in is None:
+        pBoundary = None
+    else:
+        pBoundary = pBoundary_in
        
     if (os.path.exists(sFilename_mesh_netcdf_in)):
         pass
@@ -42,6 +54,8 @@ def create_mpas_mesh(iFlag_global_in,
     
     if os.path.exists(sFilename_output_in):  
         os.remove(sFilename_output_in)
+
+    iFlag_remove_ice = 0
 
     pDatasets_in = Dataset(sFilename_mesh_netcdf_in)
 
@@ -186,12 +200,22 @@ def create_mpas_mesh(iFlag_global_in,
     for i in range(ncell):
         dLat = convert_360_to_180 (aLatitudeCell[i])
         dLon = convert_360_to_180 (aLongitudeCell[i])
-        pCenter = ogr.Geometry(ogr.wkbPoint)
-        pCenter.AddPoint(dLon, dLat)
-        pCenter1 = loads( pCenter.ExportToWkt() )
-        
-        
-        iFlag = pCenter1.within(pPolygon_in)
+
+        if iFlag_antarctic == 1:
+            #if it is antarctic, we dont need the boundary
+            if dLat < -60:
+                iFlag = True
+            else:  
+                iFlag = False
+            pass
+        else:
+            pCenter = ogr.Geometry(ogr.wkbPoint)
+            pCenter.AddPoint(dLon, dLat)
+            pCenter1 = loads( pCenter.ExportToWkt() )   
+            iFlag = pCenter1.within(pBoundary)
+            pass 
+
+
         if ( iFlag == True ):
             #get cell edge
             lCellID = int(aIndexToCellID[i])
@@ -199,76 +223,83 @@ def create_mpas_mesh(iFlag_global_in,
             dElevation_profile0 = float(aBed_elevation_profile[i,0])
             dThickness_ice = float( aIce_thickness[i] )
             dArea = float(aCellArea[i])
-            if dThickness_ice > 0:
-                continue
+            if iFlag_remove_ice == 1:
+                if dThickness_ice > 0 :
+                    continue
+                else:
+                    pass
             else:
-                aCellOnCellIndex = np.array(aCellsOnCell[i,:])
-                aEdgesOnCellIndex = np.array(aEdgesOnCell[i,:])
-                aVertexOnCellIndex = np.array(aVertexOnCell[i,:])
-                dummy0 = np.where(aVertexOnCellIndex > 0)
-                aVertexIndex = aVertexOnCellIndex[dummy0]
-                dummy1 = np.where(aEdgesOnCellIndex > 0)
-                aEdgeIndex= aEdgesOnCellIndex[dummy1]
-                dummy2 = np.where(aCellOnCellIndex > 0)
-                aNeighborIndex= (aCellOnCellIndex[dummy2]).astype(int)
-                aVertexIndexOnEdge = np.array(aVertexOnEdge0[aEdgeIndex-1,:]).astype((int))
-                aLonVertex = aLongitudeVertex[aVertexIndex-1]
-                aLatVertex = aLatitudeVertex[aVertexIndex-1]
-                nVertex = len(aLonVertex)
-                ring = ogr.Geometry(ogr.wkbLinearRing)
-                aCoords = np.full((nVertex,2), -9999.0, dtype=float)
+                pass
+            aCellOnCellIndex = np.array(aCellsOnCell[i,:])
+            aEdgesOnCellIndex = np.array(aEdgesOnCell[i,:])
+            aVertexOnCellIndex = np.array(aVertexOnCell[i,:])
+            dummy0 = np.where(aVertexOnCellIndex > 0)
+            aVertexIndex = aVertexOnCellIndex[dummy0]
+            dummy1 = np.where(aEdgesOnCellIndex > 0)
+            aEdgeIndex= aEdgesOnCellIndex[dummy1]
+            dummy2 = np.where(aCellOnCellIndex > 0)
+            aNeighborIndex= (aCellOnCellIndex[dummy2]).astype(int)
+            aVertexIndexOnEdge = np.array(aVertexOnEdge0[aEdgeIndex-1,:]).astype((int))
+            aLonVertex = aLongitudeVertex[aVertexIndex-1]
+            aLatVertex = aLatitudeVertex[aVertexIndex-1]
+            nVertex = len(aLonVertex)
+            ring = ogr.Geometry(ogr.wkbLinearRing)
+            aCoords = np.full((nVertex,2), -9999.0, dtype=float)
+            
+            for j in range(nVertex):
+                x1 = convert_360_to_180(aLonVertex[j])
+                y1 = aLatVertex[j]      
+                ring.AddPoint(x1, y1)
+                aCoords[j,0] = x1
+                aCoords[j,1] = y1
+                pass
 
-                for j in range(nVertex):
-                    x1 = convert_360_to_180(aLonVertex[j])
-                    y1 = aLatVertex[j]      
-                    ring.AddPoint(x1, y1)
-                    aCoords[j,0] = x1
-                    aCoords[j,1] = y1
-                    pass
+            if iFlag_save_mesh_in ==1:
+                x1 = convert_360_to_180(aLonVertex[0])
+                y1 = aLatVertex[0]
+                ring.AddPoint(x1, y1) #double check            
+                pPolygon = ogr.Geometry(ogr.wkbPolygon)
+                pPolygon.AddGeometry(ring)
+                pFeature.SetGeometry(pPolygon)
+                pFeature.SetField("id", int(lCellID) )
+                pFeature.SetField("lon", dLon )
+                pFeature.SetField("lat", dLat )
+                pFeature.SetField("area", dArea )
+                if iFlag_use_mesh_dem == 1:
+                    pFeature.SetField("elev", dElevation_mean )
+                    pFeature.SetField("elev0", dElevation_profile0 )
+                pLayer.CreateFeature(pFeature)
 
-                if iFlag_save_mesh_in ==1:
-                    x1 = convert_360_to_180(aLonVertex[0])
-                    y1 = aLatVertex[0]
-                    ring.AddPoint(x1, y1) #double check            
-                    pPolygon = ogr.Geometry(ogr.wkbPolygon)
-                    pPolygon.AddGeometry(ring)
-                    pFeature.SetGeometry(pPolygon)
-                    pFeature.SetField("id", int(lCellID) )
-                    pFeature.SetField("lon", dLon )
-                    pFeature.SetField("lat", dLat )
-                    pFeature.SetField("area", dArea )
-                    if iFlag_use_mesh_dem == 1:
-                        pFeature.SetField("elev", dElevation_mean )
-                        pFeature.SetField("elev0", dElevation_profile0 )
-
-                    pLayer.CreateFeature(pFeature)
-
-                pmpas = convert_gcs_attributes_to_cell(4, dLon, dLat, aCoords, aVertexIndex, aEdgeIndex, aVertexIndexOnEdge)               
-                pmpas.dArea = dArea
-                pmpas.calculate_edge_length()
-                pmpas.dLength_flowline = pmpas.dLength_edge #Default
-                pmpas.lCellID = lCellID
-                pmpas.dElevation_mean  = dElevation_mean
-                pmpas.dElevation_profile0 = dElevation_profile0
-                pmpas.aNeighbor=aNeighborIndex
-                pmpas.nNeighbor=len(aNeighborIndex)
-                pmpas.aNeighbor_land=aNeighborIndex
-                pmpas.nNeighbor_land=len(aNeighborIndex)
-                aDistance=list()
-                for i in range(pmpas.nNeighbor):
-                    lNeighborID = pmpas.aNeighbor[i]
-                    #find shared edge
-                    lEdgeID= aEdgeIndex[i]                    
-                    #lIndex = aIndexToEdgeID[lEdgeID-1]
-                    lIndex = lEdgeID-1
-                    dDistance = aDcEdge[lIndex]
-                    aDistance.append(dDistance)
-                    pass
-
-                pmpas.aNeighbor_distance = aDistance
-                aMpas.append(pmpas)
-                #get vertex
-
+            pmpas = convert_gcs_attributes_to_cell(4, dLon, dLat, aCoords, aVertexIndex, aEdgeIndex, aVertexIndexOnEdge)               
+            pmpas.dArea = dArea
+            pmpas.calculate_edge_length()
+            pmpas.dLength_flowline = pmpas.dLength_edge #Default
+            pmpas.lCellID = lCellID
+            pmpas.dElevation_mean  = dElevation_mean
+            pmpas.dElevation_profile0 = dElevation_profile0
+            pmpas.aNeighbor=aNeighborIndex
+            pmpas.nNeighbor=len(aNeighborIndex)
+            pmpas.aNeighbor_land=aNeighborIndex
+            pmpas.nNeighbor_land=len(aNeighborIndex)
+            aDistance=list()
+            for i in range(pmpas.nNeighbor):
+                lNeighborID = pmpas.aNeighbor[i]
+                #find shared edge
+                lEdgeID= aEdgeIndex[i]                    
+                #lIndex = aIndexToEdgeID[lEdgeID-1]
+                lIndex = lEdgeID-1
+                dDistance = aDcEdge[lIndex]
+                aDistance.append(dDistance)
+                pass
+            pmpas.aNeighbor_distance = aDistance
+            aMpas.append(pmpas)
+            #get vertex
+        else:
+            #if dLat< -54:
+            #    print(dLon, dLat)
+            #else:
+            #    pass
+            pass
         pass
 
     #for maps we need to clean some cell because they were not actually in the domain

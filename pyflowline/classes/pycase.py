@@ -75,6 +75,7 @@ class flowlinecase(object):
     iFlag_standalone=1
     iFlag_flowline = 1
     iFlag_global = 0
+    iFlag_antarctic = 0
     iFlag_multiple_outlet = 0
     iFlag_mesh_boundary = 0
     #iFlag_use_shapefile_extent=1
@@ -165,6 +166,9 @@ class flowlinecase(object):
         
         if 'iFlag_global' in aConfig_in:
             self.iFlag_global             = int(aConfig_in[ 'iFlag_global'])
+
+        if 'iFlag_antarctic' in aConfig_in:
+            self.iFlag_antarctic             = int(aConfig_in[ 'iFlag_antarctic'])    
 
         if 'iFlag_mesh_boundary' in aConfig_in:
             self.iFlag_mesh_boundary             = int(aConfig_in[ 'iFlag_mesh_boundary'])
@@ -401,7 +405,7 @@ class flowlinecase(object):
 
         return aFlowline_out
     
-    def mesh_generation(self):
+    def mesh_generation(self, iFlag_antarctic_in=None):
         """
         The mesh generation operation
 
@@ -409,6 +413,11 @@ class flowlinecase(object):
             list [pycell]: A list of cell object
         """
         print('Start mesh generation.')
+        if iFlag_antarctic_in is None:
+            iFlag_antarctic=0
+        else:
+            iFlag_antarctic=1
+
         aCell_out = list()  
         if self.iFlag_create_mesh ==1:
             iFlag_global =  self.iFlag_global
@@ -572,33 +581,34 @@ class flowlinecase(object):
                             dLongitude_left  = self.dLongitude_left 
                             dLongitude_right = self.dLongitude_right
 
-                            if iFlag_mesh_boundary ==1:
-                                #create a polygon based on 
-                                #read boundary 
-                                pBoundary = read_mesh_boundary(self.sFilename_mesh_boundary)
-
-                                aMpas = create_mpas_mesh(iFlag_global, iFlag_use_mesh_dem, iFlag_save_mesh, \
-                                  pBoundary,       sFilename_mesh_netcdf,      sFilename_mesh)
+                            if iFlag_antarctic ==1:                                                             
+                                aMpas = create_mpas_mesh(iFlag_global, iFlag_use_mesh_dem, iFlag_save_mesh, 
+                                            sFilename_mesh_netcdf, sFilename_mesh, iFlag_antarctic_in=iFlag_antarctic_in )
                                 pass
                             else:
-                                pRing = ogr.Geometry(ogr.wkbLinearRing)
-                                pRing.AddPoint(dLongitude_left, dLatitude_top)
-                                pRing.AddPoint(dLongitude_right, dLatitude_top)
-                                pRing.AddPoint(dLongitude_right, dLatitude_bot)
-                                pRing.AddPoint(dLongitude_left, dLatitude_bot)
-                                pRing.AddPoint(dLongitude_left, dLatitude_top)
-                                pBoundary = ogr.Geometry(ogr.wkbPolygon)
-                                pBoundary.AddGeometry(pRing)
-                                pBoundary_rec = loads( pBoundary.ExportToWkt() )
 
-                                #old method using rectange
-                                #aMpas = create_mpas_mesh(iFlag_global, iFlag_use_mesh_dem, iFlag_save_mesh, \
-                                #  dLongitude_left, dLongitude_right,  dLatitude_top, dLatitude_bot, \
-                                #        sFilename_mesh_netcdf,      sFilename_mesh)
+                                if iFlag_mesh_boundary ==1:
+                                    #create a polygon based on 
+                                    #read boundary 
+                                    pBoundary = read_mesh_boundary(self.sFilename_mesh_boundary)
 
-                                #new method using polygon object
-                                aMpas = create_mpas_mesh(iFlag_global, iFlag_use_mesh_dem, iFlag_save_mesh, \
-                                  pBoundary_rec,       sFilename_mesh_netcdf,      sFilename_mesh)
+                                    aMpas = create_mpas_mesh(iFlag_global, iFlag_use_mesh_dem, iFlag_save_mesh, 
+                                       sFilename_mesh_netcdf,  sFilename_mesh, iFlag_antarctic_in=iFlag_antarctic_in, pBoundary_in = pBoundary)
+                                    pass
+                                else:
+                                    pRing = ogr.Geometry(ogr.wkbLinearRing)
+                                    pRing.AddPoint(dLongitude_left, dLatitude_top)
+                                    pRing.AddPoint(dLongitude_right, dLatitude_top)
+                                    pRing.AddPoint(dLongitude_right, dLatitude_bot)
+                                    pRing.AddPoint(dLongitude_left, dLatitude_bot)
+                                    pRing.AddPoint(dLongitude_left, dLatitude_top)
+                                    pBoundary = ogr.Geometry(ogr.wkbPolygon)
+                                    pBoundary.AddGeometry(pRing)
+                                    pBoundary_rec = loads( pBoundary.ExportToWkt() )
+                                  
+                                    #new method using polygon object
+                                    aMpas = create_mpas_mesh(iFlag_global, iFlag_use_mesh_dem, iFlag_save_mesh, \
+                                           sFilename_mesh_netcdf, sFilename_mesh, iFlag_antarctic_in= iFlag_antarctic_in, pBoundary_in = pBoundary_rec  )
                             return aMpas
                         else:
                             if iMesh_type ==5: #tin this one need to be updated because central location issue
@@ -767,7 +777,7 @@ class flowlinecase(object):
                 pass
         else:
             #only mesh generator
-            aCell = self.mesh_generation()
+            aCell = self.mesh_generation(iFlag_antarctic_in= self.iFlag_antarctic)
             self.aCell = aCell      
             aCell_out = aCell
         

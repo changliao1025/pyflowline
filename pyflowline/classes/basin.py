@@ -17,7 +17,7 @@ from pyflowline.formats.read_nhdplus_flowline_shapefile import track_nhdplus_flo
 from pyflowline.formats.convert_flowline_to_geojson import convert_flowline_to_geojson
 from pyflowline.formats.export_flowline import export_flowline_to_geojson
 from pyflowline.formats.export_vertex import export_vertex_to_geojson
-from pyflowline.algorithms.auxiliary.text_reader_string import text_reader_string
+from pyflowline.external.pyearth.toolbox.reader.text_reader_string import text_reader_string
 
 
 

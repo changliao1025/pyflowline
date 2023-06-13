@@ -11,7 +11,7 @@ iFlag_cython = importlib.util.find_spec("cython")
 if iFlag_cython is not None:
     from pyflowline.algorithms.cython.kernel import convert_360_to_180
 else:
-    from pyflowline.algorithms.auxiliary.gdal_functions import convert_360_to_180
+    from pyflowline.external.pyearth.gis.gdal.gdal_functions import convert_360_to_180
 
 def create_mpas_mesh(iFlag_global_in, 
     iFlag_use_mesh_dem, 
@@ -39,7 +39,7 @@ def create_mpas_mesh(iFlag_global_in,
     if iFlag_antarctic_in is None:
         iFlag_antarctic=0
     else:
-        iFlag_antarctic=1
+        iFlag_antarctic=iFlag_antarctic_in
 
     if pBoundary_in is None:
         pBoundary = None
@@ -198,8 +198,24 @@ def create_mpas_mesh(iFlag_global_in,
     ncell = len(aIndexToCellID) 
     aMpas = list()
     for i in range(ncell):
+        #center
         dLat = convert_360_to_180 (aLatitudeCell[i])
         dLon = convert_360_to_180 (aLongitudeCell[i])
+
+        #vertex
+        aCellOnCellIndex = np.array(aCellsOnCell[i,:])
+        aEdgesOnCellIndex = np.array(aEdgesOnCell[i,:])
+        aVertexOnCellIndex = np.array(aVertexOnCell[i,:])
+        dummy0 = np.where(aVertexOnCellIndex > 0)
+        aVertexIndex = aVertexOnCellIndex[dummy0]
+        dummy1 = np.where(aEdgesOnCellIndex > 0)
+        aEdgeIndex= aEdgesOnCellIndex[dummy1]
+        dummy2 = np.where(aCellOnCellIndex > 0)
+        aNeighborIndex= (aCellOnCellIndex[dummy2]).astype(int)
+        aVertexIndexOnEdge = np.array(aVertexOnEdge0[aEdgeIndex-1,:]).astype((int))
+        aLonVertex = aLongitudeVertex[aVertexIndex-1]
+        aLatVertex = aLatitudeVertex[aVertexIndex-1]
+        nVertex = len(aLonVertex)
 
         if iFlag_antarctic == 1:
             #if it is antarctic, we dont need the boundary
@@ -209,10 +225,20 @@ def create_mpas_mesh(iFlag_global_in,
                 iFlag = False
             pass
         else:
-            pCenter = ogr.Geometry(ogr.wkbPoint)
-            pCenter.AddPoint(dLon, dLat)
-            pCenter1 = loads( pCenter.ExportToWkt() )   
-            iFlag = pCenter1.within(pBoundary)
+            #we will check vertex insteaf of center
+            iFlag = False
+            for j in range(nVertex):
+                x1 = convert_360_to_180(aLonVertex[j])
+                y1 = aLatVertex[j]                
+                pVertex = ogr.Geometry(ogr.wkbPoint)
+                pVertex.AddPoint(x1, y1)
+                pVertex1 = loads( pVertex.ExportToWkt() )   
+                iFlag = pVertex1.within(pBoundary)
+                if iFlag == True:
+                    break
+                else:
+                    continue
+                
             pass 
 
 
@@ -230,19 +256,7 @@ def create_mpas_mesh(iFlag_global_in,
                     pass
             else:
                 pass
-            aCellOnCellIndex = np.array(aCellsOnCell[i,:])
-            aEdgesOnCellIndex = np.array(aEdgesOnCell[i,:])
-            aVertexOnCellIndex = np.array(aVertexOnCell[i,:])
-            dummy0 = np.where(aVertexOnCellIndex > 0)
-            aVertexIndex = aVertexOnCellIndex[dummy0]
-            dummy1 = np.where(aEdgesOnCellIndex > 0)
-            aEdgeIndex= aEdgesOnCellIndex[dummy1]
-            dummy2 = np.where(aCellOnCellIndex > 0)
-            aNeighborIndex= (aCellOnCellIndex[dummy2]).astype(int)
-            aVertexIndexOnEdge = np.array(aVertexOnEdge0[aEdgeIndex-1,:]).astype((int))
-            aLonVertex = aLongitudeVertex[aVertexIndex-1]
-            aLatVertex = aLatitudeVertex[aVertexIndex-1]
-            nVertex = len(aLonVertex)
+            
             ring = ogr.Geometry(ogr.wkbLinearRing)
             aCoords = np.full((nVertex,2), -9999.0, dtype=float)
             

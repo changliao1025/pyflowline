@@ -5,7 +5,7 @@ from pyflowline.classes.vertex import pyvertex
 from pyflowline.classes.edge import pyedge
 from pyflowline.classes.cell import pycell
 from pyflowline.classes.flowline import pyflowline
-from pyflowline.algorithms.auxiliary.gdal_functions import calculate_polygon_area
+from pyflowline.external.pyearth.gis.gdal.gdal_functions import calculate_polygon_area
 
 class HexagonClassEncoder(JSONEncoder):
     def default(self, obj):

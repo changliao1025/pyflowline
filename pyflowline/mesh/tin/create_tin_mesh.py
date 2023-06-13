@@ -9,7 +9,8 @@ from pyflowline.classes.tin import pytin
 from pyflowline.formats.convert_coordinates import convert_pcs_coordinates_to_cell
 from pyflowline.formats.convert_coordinates import convert_gcs_coordinates_to_cell
 from pyflowline.algorithms.auxiliary.find_index_in_list import check_if_duplicates
-from pyflowline.algorithms.auxiliary.gdal_functions import reproject_coordinates_batch
+
+from pyflowline.external.pyearth.gis.gdal.gdal_functions import reproject_coordinates_batch
 
 def create_tin_mesh(dX_left_in, dY_bot_in, dResolution_meter_in, ncolumn_in, nrow_in, pPolygon_in,
 sFilename_output_in, sFilename_spatial_reference_in):

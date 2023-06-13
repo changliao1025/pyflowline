@@ -171,8 +171,6 @@ def add_unique_vertex(aVertex_in, pVertex_in, dThreshold_in = 1.0E-6):
         pass
 
     return aVertex_in, iFlag_exist
-
-
 def find_list_in_list(aList_in, pList_in):
     c = copy.deepcopy(pList_in)
     c.sort()

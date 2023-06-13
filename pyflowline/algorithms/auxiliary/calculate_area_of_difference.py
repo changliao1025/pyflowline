@@ -4,9 +4,11 @@ from osgeo import ogr, osr
 import importlib
 
 from shapely.ops import polygonize
-from pyflowline.algorithms.auxiliary.gdal_functions import  calculate_angle_betwen_vertex_normal
-from pyflowline.algorithms.auxiliary.gdal_functions import calculate_polygon_area
+
 from pyflowline.algorithms.auxiliary.find_index_in_list import find_list_in_list 
+
+from pyflowline.external.pyearth.gis.gdal.gdal_functions import calculate_angle_betwen_vertex_normal
+from pyflowline.external.pyearth.gis.gdal.gdal_functions import calculate_polygon_area
 
 iFlag_cython = importlib.util.find_spec("cython") 
 if iFlag_cython is not None:

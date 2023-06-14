@@ -132,7 +132,6 @@ dmypy.json
 
 #unused for development testing
 retired
-unused
 core.*
 *.nc
 *.tif

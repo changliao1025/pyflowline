@@ -16,11 +16,11 @@ from pyflowline.classes.basin import pybasin
 from pyflowline.classes.flowline import pyflowline
 from pyflowline.classes.edge import pyedge
 from pyflowline.formats.read_mesh import read_mesh_json, read_mesh_json_w_topology
-from pyflowline.algorithms.auxiliary.gdal_functions import reproject_coordinates
-from pyflowline.algorithms.auxiliary.gdal_functions  import degree_to_meter
-from pyflowline.algorithms.auxiliary.gdal_functions  import meter_to_degree
-from pyflowline.algorithms.auxiliary.gdal_functions import retrieve_geotiff_metadata
-from pyflowline.algorithms.auxiliary.gdal_functions import read_mesh_boundary
+from pyflowline.external.pyearth.gis.gdal.gdal_functions import reproject_coordinates
+from pyflowline.external.pyearth.gis.gdal.gdal_functions  import degree_to_meter
+from pyflowline.external.pyearth.gis.gdal.gdal_functions  import meter_to_degree
+from pyflowline.external.pyearth.gis.gdal.gdal_functions import retrieve_geotiff_metadata
+from pyflowline.external.pyearth.gis.gdal.gdal_functions import read_mesh_boundary
 from pyflowline.mesh.hexagon.create_hexagon_mesh import create_hexagon_mesh
 from pyflowline.mesh.latlon.create_latlon_mesh import create_latlon_mesh
 from pyflowline.mesh.square.create_square_mesh import create_square_mesh
@@ -414,9 +414,9 @@ class flowlinecase(object):
         """
         print('Start mesh generation.')
         if iFlag_antarctic_in is None:
-            iFlag_antarctic=0
+            iFlag_antarctic = 0
         else:
-            iFlag_antarctic=1
+            iFlag_antarctic = iFlag_antarctic_in
 
         aCell_out = list()  
         if self.iFlag_create_mesh ==1:

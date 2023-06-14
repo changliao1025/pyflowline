@@ -1,6 +1,7 @@
 ### PyFlowline
 
 [![DOI](https://zenodo.org/badge/368338554.svg)](https://zenodo.org/badge/latestdoi/368338554)
+[![Downloads](https://static.pepy.tech/badge/pyflowline)](https://pepy.tech/project/pyflowline)
 
 PyFlowline: a mesh-independent river network generator for hydrologic models. 
 
@@ -11,6 +12,22 @@ This package generates the mesh cell-based conceptual river networks using the f
 1. `Flowline simplification`: PyFlowline checks the vector dataset and corrects undesired flowlines, such as braided rivers.
 2. `Mesh generation`: PyFlowline generates structured meshes (e.g., rectangle, hexagon) or imports user-provided unstructured meshes into the PyFlowline-compatible GEOJSON format.
 3. `Topological relationship reconstruction`: PyFlowline reconstructs the topological relationship using the mesh and flowline intersections.
+
+
+### Dependency
+
+PyFlowline depends on the following packages
+
+1. `numpy`
+2. `gdal`
+3. `netCDF4`
+4. `shapely`
+
+PyFlowline also have three optional dependency packages
+
+1. `cython` for performance 
+2. `matplotlin` for visualization
+3. `cartopy` for visulization
 
 ### Quickstart
 

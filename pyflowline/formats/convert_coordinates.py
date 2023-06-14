@@ -8,7 +8,7 @@ from pyflowline.classes.latlon import pylatlon
 from pyflowline.classes.mpas import pympas
 from pyflowline.classes.tin import pytin
 
-from pyflowline.algorithms.auxiliary.gdal_functions import reproject_coordinates
+from pyflowline.external.pyearth.gis.gdal.gdal_functions import reproject_coordinates
 
 def convert_gcs_coordinates_to_cell(iMesh_type_in, \
     dLongitude_center_in, \

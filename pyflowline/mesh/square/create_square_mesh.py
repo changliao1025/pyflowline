@@ -9,7 +9,8 @@ import numpy as np
 from shapely.wkt import loads
 from pyflowline.classes.square import pysquare
 from pyflowline.formats.convert_coordinates import convert_gcs_coordinates_to_cell
-from pyflowline.algorithms.auxiliary.gdal_functions import  reproject_coordinates_batch
+
+from pyflowline.external.pyearth.gis.gdal.gdal_functions import  reproject_coordinates_batch
 
 def create_square_mesh(dX_left_in, dY_bot_in, dResolution_meter_in, ncolumn_in, nrow_in, pPolygon_in,
     sFilename_output_in, sFilename_spatial_reference_in):   

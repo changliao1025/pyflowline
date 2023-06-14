@@ -27,15 +27,26 @@ bibliography: paper.bib
 
 # Summary
 
-River networks are crucial in hydrologic and Earth system models. Accurately representing river networks in spatially-distributed hydrologic models requires considering the model's spatial discretization and computational mesh. However, current methods of generating river networks for hydrologic models do not typically support unstructured meshes. Unstructured meshes offer numerous advantages over traditional, structured meshes. To overcome this limitation, we developed PyFlowline, a Python package that generates mesh-independent river networks. With PyFlowline, hydrologic modelers can generate conceptual river networks and their topological relationships for both structured and unstructured meshes.
+River networks are crucial in hydrologic and Earth system models. Accurately representing river networks in hydrologic models requires considering the model's spatial resolution and computational mesh. However, current river network representation methods often have several limitations (1)  vector-based; (2) they perform poorly at coarse resolution (3) they do not support unstructured meshes. To overcome these limitations, we developed PyFlowline, a Python package that generates mesh-independent river networks. With PyFlowline, hydrologic modelers can generate conceptual river networks at various spatial resolutions for both structured and unstructured computational meshes. The generated river network datasets can be used by hydrologic models across scales.
 
 # Statement of need
 
-Generating a mesh cell-based conceptual river network for a given vector-based river network and arbitrary mesh geometry is a major challenge in hydrologic model configuration. Existing methods are typically limited to structured rectangular meshes such as 30m x 30m cartesian grids for high-resolution watershed-scale modeling or 0.5 degree x 0.5 degree geographic grids for global climate modeling. Structured meshes have fixed cartesian or geographic grid-cell sizes, which can be limiting for coupled land-river-ocean continuum simulations, which are often based on unstructured meshes [@Engwirda:2021]. However, unstructured meshes offer a flexible structure with variable grid-cell sizes and shapes. This flexibility makes them ideal for adapting to complex geometry such as river channels and coastlines.Thus, unstructured meshes are increasingly being adopted in hydrologic modeling.
 
-Although unstructured meshes offer flexibility, the additional effort required to generate a computational river network that aligns with the mesh topology limits their adoption. A mesh-independent river network representation method that supports both unstructured and structured mesh-based hydrologic models could address this limitation. PyFlowline is a Python package that provides a framework for generating river networks for hydrologic models, meeting the identified need. Using an object-oriented programming approach, PyFlowline represents river network elements and mesh cell relationships. It relies on open-source Python libraries like GDAL and Cython for data input/output and spatial data operations.
+For hydrologic modelers, river networks are a key input for hydrologic models. 
+While some hydrologic models accept vector-based river networks [@Schwenk:2021], others only accept mesh cell-based, which requires a generation method from the vector-based river network. 
+Currently, generating a mesh cell-based river network from a given vector-based river network and arbitrary computational mesh is a major challenge.
+Existing methods are typically limited to structured rectangular meshes, such as 30m x 30m cartesian grids for high-resolution watershed-scale modeling or 0.5 degree x 0.5 degree geographic grids for global climate modeling. 
 
-The computational geometry algorithms used in PyFlowline are designed and implemented using a unified spherical framework, making it suitable for regional and global-scale simulations. Moreover, PyFlowline is mesh-independent, supporting both structured and unstructured meshes. It can quickly adopt other mesh types, such as triangulated irregular networks (TIN) or discrete global grid systems (DGGs). PyFlowline is a core component of the HexWatershed model, a mesh-independent flow direction model. Several scientific studies focused on coupled Earth system models [@Feng:2022; @Liao:2022] have utilized PyFlowline. A workshop tutorial has also been provided online and in person to support its implementation
+Structured mesh-based methods use fixed cartesian or geographic cell sizes, which have several limitations: (1) they perform poorly at coarse resolution (>1km), and (2) they cannot be seamlessly coupled with other unstructured mesh-based hydrologic models such as oceanic models [@Engwirda:2021]. In contrast, unstructured meshes offer a flexible structure with variable grid-cell sizes and shapes. This flexibility makes them ideal for adapting to complex geometry such as river channels and coastlines. Besides, unstructured meshes provide the flexibility to couple different hydrologic models under a unified framework.
+Thus, unstructured meshes are increasingly being adopted in hydrologic modeling.
+
+Although unstructured meshes offer these flexibilities, additional efforts are required to generate conceptual river networks that capture real-world river networks across different spatial scales.
+
+A mesh-independent river network representation method that preserves topological relationships across scales could address this limitation. 
+PyFlowline is a Python package that provides a framework for generating river networks for hydrologic models, meeting the identified need. Using an object-oriented programming approach, PyFlowline represents river network elements and mesh cell relationships. It relies on open-source Python libraries like GDAL and Cython for data input/output and spatial data operations.
+
+The computational geometry algorithms used in PyFlowline are designed and implemented using a unified spherical framework, making it suitable for regional and global-scale simulations. PyFlowline uses topological relationships to capture the river networks so they are preserved even at coarse spatial resolutions.
+Moreover, PyFlowline is mesh-independent, supporting both structured and unstructured meshes. It can quickly adopt other mesh types, such as triangulated irregular networks (TIN) or discrete global grid systems (DGGs). PyFlowline is a core component of the HexWatershed model, a mesh-independent flow direction model. Several scientific studies focused on coupled Earth system models [@Feng:2022; @Liao:2022] have utilized PyFlowline. A workshop tutorial has also been provided online and in person to support its implementation.
 
 
 # Model features
@@ -52,8 +63,21 @@ PyFlowline provides several key features, including
 
 # State of the field
 
-PyFlowline is the only modeling software that can generate river networks on unstructured meshes. Model documentation is hosted at https://pyflowline.readthedocs.io/en/latest/, including a case study for the Susquehanna River Basin in the Mid-Atlantic region of the United States.
+Existing river network representation methods often fall into these three categories:
 
+1. Vector-based, hydrologic models use this method cannot couple river and land because there is no one-to-one mapping [@Schwenk:2021];
+2. High-resolution DEM-based, only supports structured rectangle grids (e.g., 30m x 30m ) at high spatial resolutions [@Esri:2011];
+3. Upscaling-based, only supports structured geographic grids (e.g., 0.5 degree x 0.5 degree) at coarse resolutions [@Wu:2012]. This method often cannot provide global coverage including Greenland and Antarctic.
+
+PyFlowline is the only modeling software that provides these unique features:
+
+1. It can generate river networks on unstructured meshes; 
+2. It uses topological relationships to capture river networkd precisely; 
+3. It can be applied at both high and coarse resolutions; 
+4. It can provide global coverage including Greenland and the Antarctic.
+
+
+Model documentation is hosted at https://pyflowline.readthedocs.io/en/latest/, including a case study for the Susquehanna River Basin in the Mid-Atlantic region of the United States.
 
 # Acknowledgment
 

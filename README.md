@@ -23,7 +23,7 @@ PyFlowline depends on the following packages
 3. `netCDF4`
 4. `shapely`
 
-PyFlowline also have three optional dependency packages
+PyFlowline also has three optional dependency packages
 
 1. `cython` for performance 
 2. `matplotlin` for visualization
@@ -47,6 +47,8 @@ This work was supported by the Earth System Model Development program areas of t
 
 ### License
 
+BSD 3-Clause License
+
 Copyright © 2022, Battelle Memorial Institute
 
 1. Battelle Memorial Institute (hereinafter Battelle) hereby grants permission to any person or entity lawfully obtaining a copy of this software and associated documentation files (hereinafter “the Software”) to redistribute and use the Software in source and binary forms, with or without modification. Such person or entity may use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software and may permit others to do so, subject to the following conditions:
@@ -63,7 +65,7 @@ Copyright © 2022, Battelle Memorial Institute
 
 Several publications describe the algorithms used in `PyFlowline` in detail. If you make use of `PyFlowline` in your work, please consider including a reference to the following:
 
-* Liao. C. Cooper, M (2022) Pyflowline: a mesh independent river network generator for hydrologic models. Zenodo.
+* Liao. C. Cooper, M (2022) Pyflowline: a mesh-independent river network generator for hydrologic models. Zenodo.
 https://doi.org/10.5281/zenodo.6407299
 
 * Liao, C., Zhou, T., Xu, D., Cooper, M. G., Engwirda, D., Li, H.-Y., & Leung, L. R. (2023). Topological relationship-based flow direction modeling: Mesh-independent river networks representation. Journal of Advances in Modeling Earth Systems, 15, e2022MS003089. https://doi.org/10.1029/2022MS003089

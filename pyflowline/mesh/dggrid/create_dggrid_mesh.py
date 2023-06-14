@@ -6,15 +6,16 @@ from shutil import copy2
 import subprocess
 import datetime
 
+from pyflowline.external.pyearth.system.define_global_variables import *
 
 pDate = datetime.datetime.today()
 sDate_default = "{:04d}".format(pDate.year) + "{:02d}".format(pDate.month) + "{:02d}".format(pDate.day)
 
 
-def create_dggrid_case( iCase_index, \
-    iResolution_index ,\
-        sGrid_type,\
-            sDate_in = None, \
+def create_dggrid_mesh( iCase_index, 
+    iResolution_index ,
+        sGrid_type,
+            sDate_in = None, 
         sFilename_crop_shapefile_in =None ):
 
     sCase = "{:03d}".format( iCase_index )

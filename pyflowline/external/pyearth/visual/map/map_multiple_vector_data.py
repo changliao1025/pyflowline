@@ -200,7 +200,7 @@ def map_multiple_vector_data(aFiletype_in,
     aValue_all = list()
     for i in range(nFile):
         aValue = list()
-        sFilename_in = aFilename_in[i]
+        sFilename = aFilename_in[i]
         
         iFlag_thickness = aFlag_thickness[i]
         if iFlag_thickness ==1 :

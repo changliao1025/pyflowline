@@ -66,10 +66,11 @@ def intersect_flowline_with_flowline( sFilename_flowline_a_in, sFilename_flowlin
         #pFeature_mesh= pLayer_mesh.GetFeature(i)
         pGeometry_flowline_a = pFeature_flowline_a.GetGeometryRef() 
         npoint = pFeature_flowline_a.GetPointCount()
-        aCoords = list()
+        aCoords_gcs = list()
         for i in range(0, npoint):                   
             pt = pFeature_flowline_a.GetPoint(i)
-            aCoords.append( [ pt[0], pt[1]])               
+            aCoords_gcs.append( [ pt[0], pt[1]])         
+
         aCoords_gcs= np.array(aCoords_gcs)       
 
         if (iFlag_transform ==1): #projections are different

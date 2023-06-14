@@ -65,7 +65,7 @@ PyFlowline provides several key features, including
 
 Existing river network representation methods often fall into these three categories:
 
-1. Vector-based, hydrologic models use this method cannot couple river and land because there is no one-to-one mapping [@Schwenk:2021];
+1. Vector-based, hydrologic models that use this method cannot couple river and land because there is no one-to-one mapping [@Schwenk:2021];
 2. High-resolution DEM-based, only supports structured rectangle grids (e.g., 30m x 30m ) at high spatial resolutions [@Esri:2011];
 3. Upscaling-based, only supports structured geographic grids (e.g., 0.5 degree x 0.5 degree) at coarse resolutions [@Wu:2012]. This method often cannot provide global coverage including Greenland and Antarctic.
 

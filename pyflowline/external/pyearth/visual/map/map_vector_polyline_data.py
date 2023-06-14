@@ -1,19 +1,18 @@
 import os
 import numpy as np
+from osgeo import  osr, gdal, ogr
+
 import matplotlib.pyplot as plt
 from matplotlib import cm
-import cartopy.crs as ccrs
-import cartopy.mpl.ticker as ticker
 import matplotlib as mpl
 import matplotlib.ticker as mticker
-from osgeo import  osr, gdal, ogr
-from pyearth.toolbox.data.cgpercentiles import cgpercentiles
-from cartopy.mpl.gridliner import LONGITUDE_FORMATTER, LATITUDE_FORMATTER
-from shapely.wkt import loads
 import matplotlib.path as mpath
+from shapely.wkt import loads
+import cartopy.crs as ccrs
+import cartopy.mpl.ticker as ticker
+from cartopy.mpl.gridliner import LONGITUDE_FORMATTER, LATITUDE_FORMATTER
 
-from pyearth.gis.spatialref.retrieve_shapefile_spatial_reference import retrieve_shapefile_spatial_reference
-from pyearth.toolbox.math.stat.remap import remap
+from pyflowline.external.pyearth.toolbox.math.stat.remap import remap
 
 class OOMFormatter(mpl.ticker.ScalarFormatter):
     def __init__(self, order=0, fformat="%1.1e", offset=True, mathText=True):
@@ -30,6 +29,7 @@ class OOMFormatter(mpl.ticker.ScalarFormatter):
 def map_vector_polyline_data(sFilename_in,
                              sFilename_output_in,
                              iFlag_color_in = None,
+                             iFlag_label_in = None,
                              iFlag_thickness_in =None,
                              sField_thickness_in=None,       
                              sField_color_in=None,                     
@@ -170,8 +170,8 @@ def map_vector_polyline_data(sFilename_in,
     ax = fig.add_axes([0.1, 0.15, 0.75, 0.8] , projection=pProjection_map ) #request.crs
     ax.set_global()
 
-    n_colors = pLayer.GetFeatureCount()
-    colours = cm.rainbow(np.linspace(0, 1, n_colors))
+    nColor = pLayer.GetFeatureCount()
+    aColor = cm.rainbow(np.linspace(0, 1, nColor))
 
     if iFlag_thickness ==1:
         aValue =list()
@@ -217,25 +217,19 @@ def map_vector_polyline_data(sFilename_in,
                 iThickness = 1.0
 
             if iFlag_color ==1:
-                iColor_index = (dValue-dValue_min ) /(dValue_max - dValue_min )
-                rgba = cmap(iColor_index)
+                if nColor < 10:
+                    rgba = aColor[lID]
+                else:
+                    iColor_index = (dValue-dValue_min ) /(dValue_max - dValue_min )
+                    rgba = cmap(iColor_index)
+                    
             else:
                 rgba='black'
 
-               
-                
-            if sColormap_in is not None:
-                line, = ax.plot(x, y, color=rgba,linewidth=iThickness, transform=ccrs.PlateCarree())
-            else:
-                if n_colors < 10:
-                    line, = ax.plot(x, y, color= colours[lID],linewidth=iThickness, transform=ccrs.PlateCarree())
-                else:
-                    line, = ax.plot(x, y, color=rgba,linewidth=iThickness, transform=ccrs.PlateCarree())
-
+            
+            line, = ax.plot(x, y, color=rgba, linewidth=iThickness, transform=ccrs.PlateCarree())
            
             lID = lID + 1
-
-
 
     if aExtent_in is None:
         marginx  = (dLon_max - dLon_min) / 20
@@ -267,18 +261,17 @@ def map_vector_polyline_data(sFilename_in,
             ax.text(0.03, dLocation, sText,
                     verticalalignment='top', horizontalalignment='left',
                     transform=ax.transAxes,
-                    color='black', fontsize=10 )
+                    color='black', 
+                    fontsize=10 )
 
             pass
 
-    if iFlag_title is None:
+    
+    if iFlag_title==1:
         ax.set_title( sTitle )
     else:
-        if iFlag_title==1:
-            ax.set_title( sTitle )
-        else:
-            pass
-        ax.set_title(sTitle)
+        pass
+
 
     pDataset = pLayer = pFeature  = None   
     sDirname = os.path.dirname(sFilename_output_in)

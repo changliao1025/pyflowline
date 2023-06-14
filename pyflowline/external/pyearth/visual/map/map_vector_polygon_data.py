@@ -30,7 +30,7 @@ class OOMFormatter(mpl.ticker.ScalarFormatter):
         if self._useMathText:
             self.format = r'$\mathdefault{%s}$' % self.format
 
-def map_vector_polygon_data( sFilename_in, 
+def map_vector_polygon_data(sFilename_in, 
                             iFlag_color_in = None,
                             iFlag_colorbar_in = None,
                             sVariable_in = None,
@@ -121,7 +121,7 @@ def map_vector_polygon_data( sFilename_in,
         sColormap =  'rainbow'
 
     if sTitle_in is not None:
-        sTitle = sTitle_in
+        sTitle = sTitle_in.capitalize()
         iFlag_title =1
     else:
         iFlag_title=0
@@ -192,7 +192,7 @@ def map_vector_polygon_data( sFilename_in,
             dValue_min = np.min(aValue)
             pass
         
-        #print(sVariable,dValue_min, dValue_max )
+        
         if dValue_max == dValue_min:
             iFlag_same_value = 1
             return
@@ -227,17 +227,30 @@ def map_vector_polygon_data( sFilename_in,
         else:
             sColor='black'
 
-        if sGeometry_type =='POLYGON':
-            dummy0 = loads( pGeometry_in.ExportToWkt() )
-            aCoords_gcs = dummy0.exterior.coords
-            aCoords_gcs= np.array(aCoords_gcs)
-            polygon = mpatches.Polygon(aCoords_gcs[:,0:2], closed=True, linewidth=0.25, 
-                    alpha=0.8, edgecolor = sColor,facecolor=sColor, 
-                        transform=ccrs.PlateCarree() )
-            
-            ax.add_patch(polygon)               
-        else:
-            pass    
+        if iFlag_color ==1:
+            if sGeometry_type =='POLYGON':
+                dummy0 = loads( pGeometry_in.ExportToWkt() )
+                aCoords_gcs = dummy0.exterior.coords
+                aCoords_gcs= np.array(aCoords_gcs)
+                polygon = mpatches.Polygon(aCoords_gcs[:,0:2], closed=True, linewidth=0.25, 
+                        alpha=0.8, edgecolor = sColor, 
+                        facecolor = sColor, 
+                            transform=ccrs.PlateCarree() )
+
+                ax.add_patch(polygon)               
+            else:
+                pass    
+        else:            
+            if sGeometry_type =='POLYGON':
+                dummy0 = loads( pGeometry_in.ExportToWkt() )
+                aCoords_gcs = dummy0.exterior.coords
+                aCoords_gcs= np.array(aCoords_gcs)
+                polygon = mpatches.Polygon(aCoords_gcs[:,0:2], closed=True, linewidth=0.25, 
+                        alpha=0.8, edgecolor = sColor, 
+                        facecolor = 'none', 
+                            transform=ccrs.PlateCarree() )
+
+                ax.add_patch(polygon) 
     
     if aExtent_in is None:
         marginx  = (dLon_max - dLon_min) / 20

@@ -85,6 +85,11 @@ def map_multiple_vector_data(aFiletype_in,
     else:
         aFlag_thickness = aFlag_thickness_in
 
+    if aFlag_color_in is None:
+        aFlag_color= np.zeros(nFile, dtype=np.int16)
+    else:
+        aFlag_color = aFlag_color_in
+
     #get the extent first
     sFilename_in = aFilename_in[0]
 
@@ -214,29 +219,31 @@ def map_multiple_vector_data(aFiletype_in,
     iThickness_max = 2.5
     iThickness_min = 0.3
     for i in range(nFile):
-        sFilename = aFilename_in[i]
-       
+        sFilename = aFilename_in[i]       
         iFlag_thickness = aFlag_thickness[i]
+        iFlag_colar = aFlag_color[i]
         pDataset = pDriver.Open(sFilename, gdal.GA_ReadOnly)
         pLayer = pDataset.GetLayer(0)
 
-        if iFlag_thickness ==1 :  
-            sVariable = aVariable_in[i]
-            aValue = np.array(aValue_all[i])
-            if iFlag_data_min == 1  and iFlag_data_max ==1: #both are provided
-                aValue = np.clip(aValue, dData_min, dData_max)
-                dValue_max = dData_max # np.max(aValue)
-                dValue_min = dData_min # np.min(aValue)
-            else:
+        nColor = pLayer.GetFeatureCount()
+        aColor = cm.rainbow(np.linspace(0, 1, nColor))
+        lID = 0       
+        for pFeature in pLayer:
+            pGeometry_in = pFeature.GetGeometryRef()
+            sGeometry_type = pGeometry_in.GetGeometryName()
 
-                aValue = aValue[aValue != dMissing_value]
-                dValue_max = np.max(aValue)
-                dValue_min = np.min(aValue)
-                pass
-
-            for pFeature in pLayer:
-                pGeometry_in = pFeature.GetGeometryRef()
-                sGeometry_type = pGeometry_in.GetGeometryName()
+            if iFlag_thickness ==1 :  
+                sVariable = aVariable_in[i]
+                aValue = np.array(aValue_all[i])
+                if iFlag_data_min == 1  and iFlag_data_max ==1: #both are provided
+                    aValue = np.clip(aValue, dData_min, dData_max)
+                    dValue_max = dData_max 
+                    dValue_min = dData_min 
+                else:
+                    aValue = aValue[aValue != dMissing_value]
+                    dValue_max = np.max(aValue)
+                    dValue_min = np.min(aValue)
+                    pass
                 dValue = float(pFeature.GetField(sVariable))
 
                 if dValue != dMissing_value:
@@ -246,63 +253,63 @@ def map_multiple_vector_data(aFiletype_in,
                     if dValue < dValue_min:
                         dValue = dValue_min
 
-                iColor_index = int( (dValue - dValue_min) / (dValue_max - dValue_min) * 255 )
-                iThickness = remap( dValue, dValue_min, dValue_max, iThickness_min, iThickness_max )
+                iThickness = remap( dValue, dValue_min, dValue_max, iThickness_min, iThickness_max )    
+            else:
+                iThickness = 1.0
+            
+            if iFlag_colar ==1:
+                if nColor < 10:
+                    sColor = aColor[lID]
+                else:
+                    sVariable = aVariable_in[i]
+                    aValue = np.array(aValue_all[i])
+                    if iFlag_data_min == 1  and iFlag_data_max ==1: #both are provided
+                        aValue = np.clip(aValue, dData_min, dData_max)
+                        dValue_max = dData_max 
+                        dValue_min = dData_min 
+                    else:
+                        aValue = aValue[aValue != dMissing_value]
+                        dValue_max = np.max(aValue)
+                        dValue_min = np.min(aValue)
+                        pass
+                    dValue = float(pFeature.GetField(sVariable))
+
+                    if dValue != dMissing_value:
+                        if dValue > dValue_max:
+                            dValue = dValue_max
+
+                        if dValue < dValue_min:
+                            dValue = dValue_min
+                            
+                    iColor_index = int( (dValue - dValue_min) / (dValue_max - dValue_min) * 255 )
+                    sColor = cmap(iColor_index) 
+            else:   
+                sColor = 'black'     
 
                 #pick color from colormap
-                cmiColor_index = cmap(iColor_index)     
-                if sGeometry_type =='POLYGON':
+                    
+            if sGeometry_type =='POLYGON':
+                dummy0 = loads( pGeometry_in.ExportToWkt() )
+                aCoords_gcs = dummy0.exterior.coords
+                aCoords_gcs= np.array(aCoords_gcs)
+                polygon = mpatches.Polygon(aCoords_gcs[:,0:2], closed=True, linewidth=0.25, \
+                    alpha=0.8, edgecolor = sColor,facecolor= 'none', \
+                        transform=ccrs.PlateCarree() )
+                ax.add_patch(polygon)               
+            else: 
+                if sGeometry_type =='LINESTRING':
                     dummy0 = loads( pGeometry_in.ExportToWkt() )
-                    aCoords_gcs = dummy0.exterior.coords
+                    aCoords_gcs = dummy0.coords
                     aCoords_gcs= np.array(aCoords_gcs)
-                    polygon = mpatches.Polygon(aCoords_gcs[:,0:2], closed=True, linewidth=0.25, \
-                        alpha=0.8, edgecolor = cmiColor_index,facecolor=cmiColor_index, \
-                            transform=ccrs.PlateCarree() )
-                    ax.add_patch(polygon)               
-                else: 
-                    if sGeometry_type =='LINESTRING':
-                        dummy0 = loads( pGeometry_in.ExportToWkt() )
-                        aCoords_gcs = dummy0.coords
-                        aCoords_gcs= np.array(aCoords_gcs)
-                        aCoords_gcs = aCoords_gcs[:,0:2]
-                        nvertex = len(aCoords_gcs)     
-                        codes = np.full(nvertex, mpath.Path.LINETO, dtype=int )
-                        codes[0] = mpath.Path.MOVETO
-                        path = mpath.Path(aCoords_gcs, codes)
-                        x, y = zip(*path.vertices)
-                        line, = ax.plot(x, y, color= 'black',linewidth=iThickness, transform=ccrs.PlateCarree())
+                    aCoords_gcs = aCoords_gcs[:,0:2]
+                    nvertex = len(aCoords_gcs)     
+                    codes = np.full(nvertex, mpath.Path.LINETO, dtype=int )
+                    codes[0] = mpath.Path.MOVETO
+                    path = mpath.Path(aCoords_gcs, codes)
+                    x, y = zip(*path.vertices)
+                    line, = ax.plot(x, y, color= sColor, linewidth=iThickness, transform=ccrs.PlateCarree())
 
-
-
-        else:
-            for pFeature in pLayer:
-                pGeometry_in = pFeature.GetGeometryRef()
-                sGeometry_type = pGeometry_in.GetGeometryName()
-
- 
-                if sGeometry_type =='POLYGON':
-                    dummy0 = loads( pGeometry_in.ExportToWkt() )
-                    aCoords_gcs = dummy0.exterior.coords
-                    aCoords_gcs= np.array(aCoords_gcs)
-                    polygon = mpatches.Polygon(aCoords_gcs[:,0:2], closed=True, linewidth=0.25, \
-                        alpha=0.8, edgecolor = 'b',facecolor='b', \
-                            transform=ccrs.PlateCarree() )
-                    ax.add_patch(polygon)      
-
-                else:
-                    if sGeometry_type =='LINESTRING':
-                        dummy0 = loads( pGeometry_in.ExportToWkt() )
-                        aCoords_gcs = dummy0.coords
-                        aCoords_gcs= np.array(aCoords_gcs)
-                        aCoords_gcs = aCoords_gcs[:,0:2]
-                        nvertex = len(aCoords_gcs)     
-                        codes = np.full(nvertex, mpath.Path.LINETO, dtype=int )
-                        codes[0] = mpath.Path.MOVETO
-                        path = mpath.Path(aCoords_gcs, codes)
-                        x, y = zip(*path.vertices)
-                        line, = ax.plot(x, y, color= 'black', transform=ccrs.PlateCarree())
-
-     
+            lID = lID + 1
     
     if aExtent_in is None:
         marginx  = (dLon_max - dLon_min) / 20
@@ -310,6 +317,7 @@ def map_multiple_vector_data(aFiletype_in,
         aExtent = [dLon_min - marginx , dLon_max + marginx , dLat_min -marginy , dLat_max + marginy]
     else:
         aExtent = aExtent_in
+
     ax.set_global() 
     ax.set_extent( aExtent )      
     ax.coastlines(color='black', linewidth=1)
@@ -327,10 +335,9 @@ def map_multiple_vector_data(aFiletype_in,
 
             pass
 
-    ax_cb= fig.add_axes([0.75, 0.15, 0.02, 0.6])
-
 
     if iFlag_colorbar ==1:
+        ax_cb= fig.add_axes([0.75, 0.15, 0.02, 0.6])
         if iFlag_scientific_notation_colorbar==1:
             formatter = OOMFormatter(fformat= "%1.1e")       
             cb = mpl.colorbar.ColorbarBase(ax_cb, orientation='vertical', 

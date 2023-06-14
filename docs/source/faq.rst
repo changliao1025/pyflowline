@@ -20,6 +20,7 @@ Frequently Asked Questions
    Anaconda:
 
    `export PROJ_LIB=/people/user/.conda/envs/hexwatershed/share/proj`
+   
    `export PROJ_LIB=$HOME/opt/anaconda3/envs/pyflowline/share/proj`
 
    Miniconda:

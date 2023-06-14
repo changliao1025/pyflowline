@@ -46,7 +46,7 @@ A mesh-independent river network representation method that preserves topologica
 PyFlowline is a Python package that provides a framework for generating river networks for hydrologic models, meeting the identified need. Using an object-oriented programming approach, PyFlowline represents river network elements and mesh cell relationships. It relies on open-source Python libraries like GDAL and Cython for data input/output and spatial data operations.
 
 The computational geometry algorithms used in PyFlowline are designed and implemented using a unified spherical framework, making it suitable for regional and global-scale simulations. PyFlowline uses topological relationships to capture the river networks so they are preserved even at coarse spatial resolutions.
-Moreover, PyFlowline is mesh-independent, supporting both structured and unstructured meshes. It can quickly adopt other mesh types, such as triangulated irregular networks (TIN) or discrete global grid systems (DGGs). PyFlowline is a core component of the HexWatershed model, a mesh-independent flow direction model. Several scientific studies focused on coupled Earth system models [@Feng:2022; @Liao:2022] have utilized PyFlowline. A workshop tutorial has also been provided online and in person to support its implementation.
+Moreover, PyFlowline is mesh-independent, supporting both structured and unstructured meshes. It can quickly adopt other mesh types, such as triangulated irregular networks (TIN) or discrete global grid systems (DGGs) [@Sahr:2011]. PyFlowline is a core component of the HexWatershed model, a mesh-independent flow direction model. Several scientific studies focused on coupled Earth system models [@Feng:2022; @Liao:2022] have utilized PyFlowline. A workshop tutorial has also been provided online and in person to support its implementation.
 
 
 # Model features
@@ -59,7 +59,7 @@ PyFlowline provides several key features, including
 
 1. Support for both structured and unstructured meshes, with JSON as the default file I/O format. For geospatial datasets such as vector river networks, GEOJSON is used.
 2. Regional and global-scale processing capabilities through the use of fast Cython- and (global-only) AABB tree-based algorithms.
-3. Built-in visualization functions based on the Python Matplotlib package, making it easy to visualize and analyze the PyFlowline model outputs.
+3. Built-in visualization functions based on the Python Matplotlib package [@LiaoPyearth:2022], making it easy to visualize and analyze the PyFlowline model outputs.
 
 # State of the field
 

@@ -27,9 +27,11 @@ bibliography: paper.bib
 
 # Summary
 
-River networks are crucial in hydrologic and Earth system models. Accurately representing river networks in spatially-distributed hydrologic models requires considering the model's spatial discretization and computational mesh. However, current methods of generating river networks for hydrologic models do not typically support unstructured meshes. Unstructured meshes offer numerous advantages over traditional, structured meshes. To overcome this limitation, we developed PyFlowline, a Python package that generates mesh-independent river networks. With PyFlowline, hydrologic modelers can generate conceptual river networks and their topological relationships for both structured and unstructured meshes.
+River networks are crucial in hydrologic and Earth system models. Accurately representing river networks in spatially-distributed hydrologic models requires considering the model's spatial discretization and computational mesh. However, current methods of generating river networks for hydrologic models are either vector-based or do not typically support unstructured meshes. Unstructured meshes offer numerous advantages over traditional, structured meshes. To overcome this limitation, we developed PyFlowline, a Python package that generates mesh-independent river networks. With PyFlowline, hydrologic modelers can generate conceptual river networks and their topological relationships for both structured and unstructured meshes.
 
 # Statement of need
+
+[@Schwenk:2021]
 
 Generating a mesh cell-based conceptual river network for a given vector-based river network and arbitrary mesh geometry is a major challenge in hydrologic model configuration. Existing methods are typically limited to structured rectangular meshes such as 30m x 30m cartesian grids for high-resolution watershed-scale modeling or 0.5 degree x 0.5 degree geographic grids for global climate modeling. Structured meshes have fixed cartesian or geographic grid-cell sizes, which can be limiting for coupled land-river-ocean continuum simulations, which are often based on unstructured meshes [@Engwirda:2021]. However, unstructured meshes offer a flexible structure with variable grid-cell sizes and shapes. This flexibility makes them ideal for adapting to complex geometry such as river channels and coastlines.Thus, unstructured meshes are increasingly being adopted in hydrologic modeling.
 

@@ -54,3 +54,20 @@ The following dependency packages will be installed during the process.
 * `shapely`
 
 
+=============
+Visualization
+=============
+
+PyFlowline only provides experimental support for visualization through the optional `matplotlib` and `cartopy` packages.
+
+You need to manually speicify these packages during the installation process
+
+    conda install -c conda-forge pyflowline matplotlib cartopy
+
+"""
+
+or install manually after the installation of PyFlowline:
+
+    conda install -c conda-forge matplotlib cartopy
+
+

@@ -134,10 +134,12 @@ def convert_dggrid_mesh_to_pyflowline_mesh(sFilename_dggrid_mesh, sFilename_mesh
         dummy0 = loads( pGeometry_mesh.ExportToWkt() )
         aCoords_gcs = dummy0.exterior.coords
         aCoords_gcs= np.array(aCoords_gcs)  
-        dLongitude_center = np.mean(aCoords_gcs[:,0])
-        dLatitude_center = np.mean(aCoords_gcs[:,1])     
+
+        dLongitude_center = np.mean(aCoords_gcs[:-1,0])
+        dLatitude_center = np.mean(aCoords_gcs[:-1,1])   
+
         lCellID = int(pFeature_mesh.GetField("name") )
-        pdggrid = convert_gcs_coordinates_to_cell(5, dLongitude_center, dLatitude_center, aCoords_gcs, iFlag_simplify_in=1)  
+        pdggrid = convert_gcs_coordinates_to_cell(5, dLongitude_center, dLatitude_center, aCoords_gcs)  
         dArea = pdggrid.calculate_cell_area()
         pdggrid.calculate_edge_length()
         pdggrid.dLength_flowline = pdggrid.dLength #Default

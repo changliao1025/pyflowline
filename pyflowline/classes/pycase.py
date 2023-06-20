@@ -17,6 +17,7 @@ from pyflowline.classes.mpas import pympas
 from pyflowline.classes.hexagon import pyhexagon
 from pyflowline.classes.latlon import pylatlon
 from pyflowline.classes.square import pysquare
+from pyflowline.classes.dggrid import pydggrid
 from pyflowline.classes.vertex import pyvertex
 from pyflowline.classes.basin import pybasin
 from pyflowline.classes.flowline import pyflowline
@@ -60,6 +61,8 @@ class CaseClassEncoder(JSONEncoder):
         if isinstance(obj, pylatlon):
             return obj.lCellID
         if isinstance(obj, pympas):
+            return obj.lCellID
+        if isinstance(obj, pydggrid):
             return obj.lCellID
         if isinstance(obj, pybasin):
             return obj.lBasinID

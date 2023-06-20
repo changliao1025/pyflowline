@@ -63,7 +63,7 @@ def read_mesh_json(iMesh_type_in, sFilename_mesh_in):
 
 def read_mesh_json_w_topology(iMesh_type_in, sFilename_mesh_in):
     """
-    convert a shpefile to json format.
+    
     This function should be used for stream flowline only.
     """
     iReturn_code = 1

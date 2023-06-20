@@ -340,6 +340,9 @@ def create_mpas_mesh(iFlag_global_in,
                 if lNeighbor in aCellID:
                     nNeighbor_new = nNeighbor_new + 1 
                     aNeighbor_new.append(lNeighbor)
+                    
+                if nNeighbor_new == pCell.nVertex:
+                    break
 
             pCell.nNeighbor_land= len(aNeighbor_new)
             pCell.aNeighbor_land = aNeighbor_new

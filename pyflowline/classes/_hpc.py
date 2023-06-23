@@ -83,11 +83,16 @@ def _create_hpc_job(self, sSlurm_in=None):
     ofs.write(sLine)
     sLine = 'module load gcc/8.1.0' + '\n'
     ofs.write(sLine)
+    
+    if self.iFlag_dggrid ==1:
+        sLine = 'module load gdal/2.3.1' + '\n'
+        ofs.write(sLine)
+
     sLine = 'module load anaconda3/2019.03' + '\n'
     ofs.write(sLine)
     sLine = 'source /share/apps/anaconda3/2019.03/etc/profile.d/conda.sh' + '\n'
     ofs.write(sLine)    
-    sLine = 'conda activate pyflowline' + '\n'
+    sLine = 'conda activate hexwatershed' + '\n'
     ofs.write(sLine)
     sLine = 'cd $SLURM_SUBMIT_DIR\n'
     ofs.write(sLine)

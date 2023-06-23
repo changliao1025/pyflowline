@@ -1,6 +1,41 @@
 import os
 import json
 
+
+
+def convert_mesh_to_kml(sFilename_geojson_in, sFilename_kml_out):
+    """
+    Convert the mesh to a kml file
+    """
+    import simplekml
+    with open(sFilename_geojson_in) as f:
+        data = json.load(f)
+        kml = simplekml.Kml()
+        for feature in data['features']:
+            geom = feature['geometry']
+            geom_type = geom['type']
+            lCellID = feature['properties']['lCellID']
+            sCellID = str(lCellID)
+
+            if geom_type == 'Polygon':
+                kml.newpolygon(name=sCellID,
+                               description='cell',
+                               outerboundaryis=geom['coordinates'][0])
+            elif geom_type == 'LineString':
+                kml.newlinestring(name=sCellID,
+                                  description='flowline',
+                                  coords=geom['coordinates'])
+            elif geom_type == 'Point':
+                kml.newpoint(name=sCellID,
+                             description='point',
+                             coords=[geom['coordinates']])
+            else:
+                print("ERROR: unknown type:", geom_type)
+        kml.save(sFilename_kml_out)
+
+    return
+
+
 def export_mesh_info_to_json(aCell_in, aFlowline_in, aCellID_outlet_iin, sFilename_json_in):
     """
     Export the mesh information into a json file

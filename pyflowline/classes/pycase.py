@@ -718,6 +718,13 @@ class flowlinecase(object):
             iMesh_type = self.iMesh_type
             aCell_out = read_mesh_json_w_topology(iMesh_type, self.sFilename_mesh)
             pass
+
+        #convert the mesh into the kml format so it can be visualized in google earth and google map
+
+        iFlag_kml = 1
+        if iFlag_kml ==1:
+            convert_mesh_to_kml(self.sFilename_mesh, self.sFilename_mesh_kml)
+
         print('Finish mesh generation.')
         return aCell_out
 

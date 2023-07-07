@@ -455,12 +455,12 @@ def read_mesh_boundary(sFilename_boundary_in):
         pGeometry_mesh = pFeature_mesh.GetGeometryRef()                     
         pGeometrytype_boundary = pGeometry_mesh.GetGeometryName()
         if(pGeometrytype_boundary == 'POLYGON'):       
-            pBoundary_out = pGeometry_mesh  
+            pBoundary_ogr = pGeometry_mesh  
         else:
             if(pGeometrytype_boundary == 'MULTIPOLYGON'):    
                 nLine = pGeometry_mesh.GetGeometryCount()
                 for i in range(nLine):
-                    pBoundary = pGeometry_mesh.GetGeometryRef(i)
+                    pBoundary_ogr = pGeometry_mesh.GetGeometryRef(i)
                
                 pass
             else:
@@ -468,8 +468,9 @@ def read_mesh_boundary(sFilename_boundary_in):
             pass   
             
             
-    pBoundary_out = loads( pBoundary.ExportToWkt() )
-    return pBoundary_out
+    pBoundary_wkt = pBoundary_ogr.ExportToWkt()
+    pBoundary_shp = loads( pBoundary_ogr.ExportToWkt() )
+    return pBoundary_wkt, pBoundary_shp
     
 
    

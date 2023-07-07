@@ -60,7 +60,7 @@ def pyflowline_read_model_configuration_file(sFilename_configuration_in,
     if sMesh_type_in is not None:
         sMesh_type = sMesh_type_in
     else:
-        sMesh_type = aConfig['sModel']
+        sMesh_type = aConfig['sMesh_type']
         pass
         
     if sModel_in is not None:

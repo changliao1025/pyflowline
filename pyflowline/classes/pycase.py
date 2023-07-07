@@ -8,7 +8,7 @@ import importlib
 import subprocess
 from shutil import copy2
 import numpy as np
-from osgeo import ogr, osr
+from osgeo import ogr, osr, gdal
 from shapely.wkt import loads
 
 from pyflowline.external.pyearth.system.define_global_variables import *
@@ -34,7 +34,7 @@ from pyflowline.mesh.square.create_square_mesh import create_square_mesh
 from pyflowline.mesh.mpas.create_mpas_mesh import create_mpas_mesh
 from pyflowline.mesh.dggrid.create_dggrid_mesh import create_dggrid_mesh
 from pyflowline.mesh.tin.create_tin_mesh import create_tin_mesh
-
+gdal.UseExceptions()   
 pDate = datetime.datetime.today()
 sDate_default = "{:04d}".format(pDate.year) + "{:02d}".format(pDate.month) + "{:02d}".format(pDate.day)
 
@@ -624,10 +624,10 @@ class flowlinecase(object):
                                 if iFlag_mesh_boundary ==1:
                                     #create a polygon based on
                                     #read boundary
-                                    pBoundary = read_mesh_boundary(self.sFilename_mesh_boundary)
+                                    pBoundary_wkt, pBoundary_shp = read_mesh_boundary(self.sFilename_mesh_boundary)
 
                                     aMpas = create_mpas_mesh(iFlag_global, iFlag_use_mesh_dem, iFlag_save_mesh,
-                                                             sFilename_mesh_netcdf,  sFilename_mesh, iFlag_antarctic_in=iFlag_antarctic_in, pBoundary_in = pBoundary)
+                                                             sFilename_mesh_netcdf,  sFilename_mesh, iFlag_antarctic_in=iFlag_antarctic_in, pBoundary_in = pBoundary_wkt)
                                     pass
                                 else:
                                     pRing = ogr.Geometry(ogr.wkbLinearRing)

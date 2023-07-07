@@ -68,6 +68,8 @@ class pylatlon(pycell):
     nNeighbor=-1
     nNeighbor_land=-1
     nNeighbor_ocean=-1
+    nNeighbor_land_virtual = -1
+    aNeighbor_land_virtual = None
     aNeighbor=None #the global ID of all neighbors
     aNeighbor_land=None #the global ID of all neighbors
     aNeighbor_ocean=None #the global ID of all neighbors

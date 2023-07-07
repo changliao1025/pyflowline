@@ -6,11 +6,13 @@
 import os
 import numpy as np
 from osgeo import ogr, osr
-from shapely.wkt import loads
-from pyflowline.classes.latlon import pylatlon
 from pyflowline.formats.convert_coordinates import convert_gcs_coordinates_to_cell
-
-def create_latlon_mesh(dLongitude_left_in, dLatitude_bot_in, dResolution_degree_in, ncolumn_in, nrow_in, pPolygon_in, sFilename_output_in):
+def create_latlon_mesh(dLongitude_left_in, 
+                       dLatitude_bot_in, 
+                       dResolution_degree_in, 
+                       ncolumn_in, nrow_in, 
+                       sFilename_output_in,
+                       pBoundary_in):
     """
     _summary_
 
@@ -25,6 +27,9 @@ def create_latlon_mesh(dLongitude_left_in, dLatitude_bot_in, dResolution_degree_
     Returns:
         _type_: _description_
     """
+    #for the reason that a geometry object will be crash if the associated dataset is closed, we must pass wkt string
+    #https://gdal.org/api/python_gotchas.html
+    pBoundary = ogr.CreateGeometryFromWkt(pBoundary_in)
        
     
     if os.path.exists(sFilename_output_in): 
@@ -97,10 +102,15 @@ def create_latlon_mesh(dLongitude_left_in, dLatitude_bot_in, dResolution_degree_
             aCoords[4,1] = y1
             
 
-            pCenter = ogr.Geometry(ogr.wkbPoint)
-            pCenter.AddPoint(dLongitude_center, dLatitude_center)
-            pCenter1 = loads( pCenter.ExportToWkt() )
-            iFlag = pCenter1.within(pPolygon_in)
+            iFlag == False
+            if pPolygon.Within(pBoundary):
+                iFlag = True
+            else:
+                #then check intersection
+                if pPolygon.Intersects(pBoundary):
+                    iFlag = True
+                else:
+                    pass
 
             if ( iFlag == True ):
 
@@ -108,14 +118,7 @@ def create_latlon_mesh(dLongitude_left_in, dLatitude_bot_in, dResolution_degree_
                 pLatlon = convert_gcs_coordinates_to_cell(3, dLongitude_center, dLatitude_center, dummy1)
                 pLatlon.lCellID = lCellID
                 dArea = pLatlon.calculate_cell_area()
-                pLatlon.calculate_edge_length()
-                
-                pFeature.SetGeometry(pPolygon)
-                pFeature.SetField("id", lCellID)
-                pFeature.SetField("lon", dLongitude_center )
-                pFeature.SetField("lat", dLatitude_center )
-                pFeature.SetField("area", dArea )
-                pLayer.CreateFeature(pFeature)
+                pLatlon.calculate_edge_length()      
 
                 lCellID_center = lCellID
 
@@ -153,6 +156,15 @@ def create_latlon_mesh(dLongitude_left_in, dLatitude_bot_in, dResolution_degree_
                 pLatlon.aNeighbor_land= aNeighbor
                 pLatlon.nNeighbor_land= pLatlon.nNeighbor            
                 aLatlon.append(pLatlon)
+
+                #save feature
+                pFeature.SetGeometry(pPolygon)
+                pFeature.SetField("id", lCellID)
+                pFeature.SetField("lon", dLongitude_center )
+                pFeature.SetField("lat", dLatitude_center )
+                pFeature.SetField("area", dArea )
+                pLayer.CreateFeature(pFeature)
+
                 lCellID = lCellID + 1
 
                 pass

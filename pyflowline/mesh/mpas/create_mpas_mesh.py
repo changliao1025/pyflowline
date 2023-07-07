@@ -3,8 +3,7 @@ import math
 import importlib
 import numpy as np
 from osgeo import ogr, osr, gdal
-from netCDF4 import Dataset
-from shapely.wkt import loads
+import netCDF4 as nc
 from pyflowline.formats.convert_attributes import convert_gcs_attributes_to_cell
 gdal.UseExceptions()  
 iFlag_cython = importlib.util.find_spec("cython") 
@@ -59,7 +58,7 @@ def create_mpas_mesh(iFlag_global_in,
 
     
 
-    pDatasets_in = Dataset(sFilename_mesh_netcdf_in)
+    pDatasets_in = nc.Dataset(sFilename_mesh_netcdf_in)
 
     netcdf_format = pDatasets_in.file_format
     pDriver_geojson = ogr.GetDriverByName('GeoJSON')     

@@ -26,6 +26,13 @@ from pyflowline.external.pyearth.gis.gdal.gdal_functions  import degree_to_meter
 from pyflowline.external.pyearth.gis.gdal.gdal_functions  import meter_to_degree
 from pyflowline.external.pyearth.gis.gdal.gdal_functions import retrieve_geotiff_metadata
 from pyflowline.external.pyearth.gis.gdal.gdal_functions import read_mesh_boundary
+
+iFlag_kml = importlib.util.find_spec("simplekml") 
+if iFlag_kml is not None:
+    from pyflowline.external.pyearth.gis.kml.convert_geojson_to_kml import convert_geojson_to_kml
+else:
+    pass
+
 from pyflowline.mesh.hexagon.create_hexagon_mesh import create_hexagon_mesh
 from pyflowline.mesh.latlon.create_latlon_mesh import create_latlon_mesh
 from pyflowline.mesh.square.create_square_mesh import create_square_mesh
@@ -125,6 +132,7 @@ class flowlinecase(object):
     sFilename_mesh=''
     sFilename_mesh_info=''
     sFilename_mesh_netcdf=''
+    sFilename_mesh_kml=''
 
     aBasin = list()
     aFlowline_simplified=list()
@@ -409,6 +417,7 @@ class flowlinecase(object):
         #model generated files
         self.sFilename_mesh = os.path.join(str(Path(self.sWorkspace_output)  ) , sMesh_type + ".geojson" )
         self.sFilename_mesh_info= os.path.join(str(Path(self.sWorkspace_output)  ) , sMesh_type + "_mesh_info.json"  )
+        sFilename_mesh_kml = os.path.join(str(Path(self.sWorkspace_output)  ) , sMesh_type + ".kml" )
 
         return
 
@@ -697,9 +706,9 @@ class flowlinecase(object):
 
         #convert the mesh into the kml format so it can be visualized in google earth and google map
 
-        iFlag_kml = 1
-        if iFlag_kml ==1:
-            convert_mesh_to_kml(self.sFilename_mesh, self.sFilename_mesh_kml)
+        
+        if iFlag_kml is not None:
+            convert_geojson_to_kml(self.sFilename_mesh, self.sFilename_mesh_kml)
 
         print('Finish mesh generation.')
         return aCell_out

@@ -61,6 +61,6 @@ setup(
     install_requires=REQUIRED,
     classifiers=CLASSIFY,
     extras_require={
-        'visualization': ['cython', 'matplotlib', 'cartopy>=0.21.0']
+        'visualization': ['cython', 'matplotlib', 'cartopy>=0.21.0','simplekml']
     }
 )

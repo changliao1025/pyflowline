@@ -2,34 +2,48 @@ import os
 import json
 #dependency packages
 import numpy as np
-
-from pyflowline.external.pyearth.toolbox.reader.text_reader_string import text_reader_string
-
 from pyflowline.external.pyearth.visual.map.map_vector_polygon_data import map_vector_polygon_data
 from pyflowline.external.pyearth.visual.map.map_vector_polyline_data import map_vector_polyline_data
 from pyflowline.external.pyearth.visual.map.map_multiple_vector_data import map_multiple_vector_data
 
 #plot function
-def plot(self, sFilename_output_in=None,iFlag_title = None, sVariable_in=None, aExtent_in = None):
-    if sVariable_in == 'mesh':
-        self._plot_mesh(sFilename_output_in=sFilename_output_in, aExtent_in = aExtent_in)
+def plot(self, 
+        iFlag_type_in = None,
+         iFlag_title = None, 
+        sFilename_output_in=None,
+        sVariable_in=None, 
+        aExtent_in = None,
+        pProjection_map_in = None):
+    if iFlag_type_in == 1: #polygon based 
+        if sVariable_in == 'mesh':
+            self._plot_mesh(sFilename_output_in=sFilename_output_in, 
+                            aExtent_in = aExtent_in, 
+                            pProjection_map_in = pProjection_map_in)
     else:
-        if sVariable_in == 'overlap':
-            self._plot_mesh_with_flowline( sFilename_output_in=sFilename_output_in, iFlag_title= iFlag_title, aExtent_in=aExtent_in)
-        else:
-            for pBasin in self.aBasin:
-                pBasin.basin_plot(self.iCase_index,
-                                  self.iMesh_type,
-                                  self.sMesh_type,
-                                  sFilename_output_in=sFilename_output_in,                                 
-                                  sVariable_in= sVariable_in,
-                                  aExtent_in=aExtent_in)
+        if iFlag_type_in == 2: #polyline based, only flowline
+            #this one is similar to the basin_plot, may be added later
             pass
+        else:
+            if iFlag_type_in == 3: #mixed based
+                if sVariable_in == 'overlap':
+                    self._plot_mesh_with_flowline( sFilename_output_in=sFilename_output_in, 
+                                                  iFlag_title= iFlag_title, 
+                                                  aExtent_in=aExtent_in, 
+                                                  pProjection_map_in = pProjection_map_in)
+                else:
+                    for pBasin in self.aBasin:
+                        pBasin.basin_plot(self.iCase_index,
+                                          self.iMesh_type,
+                                          self.sMesh_type,
+                                          sFilename_output_in=sFilename_output_in,                                 
+                                          sVariable_in= sVariable_in,
+                                          aExtent_in=aExtent_in,
+                                           pProjection_map_in = pProjection_map_in)
 
-    return
+                pass
+            else:
+                pass
 
-#this function is used to plot the study area
-def _plot_study_area(self, sFilename_boundary_in = None, sFilename_slope_in = None, sFilename_nhd_in = None):
     return
 
 def _plot_mesh(self, sFilename_output_in=None, aExtent_in=None, pProjection_map_in = None):
@@ -39,9 +53,7 @@ def _plot_mesh(self, sFilename_output_in=None, aExtent_in=None, pProjection_map_
 
     map_vector_polygon_data(sFilename_in, sFilename_output_in=sFilename_output_in, sTitle_in= sMesh_type)
 
-
     return
-
 
 #plot both polygon and polyline
 def _plot_mesh_with_flowline(self, 
@@ -65,11 +77,6 @@ def _plot_mesh_with_flowline(self,
                              sFilename_output_in=sFilename_output_in, 
                              sTitle_in= 'Mesh with flowline',
                              aFlag_color_in=[0, 1])
-    return
-
-#this is a reserved function
-def _compare_with_raster_dem_method(self, sFilename_dem_flowline, sFilename_in, aExtent_in=None, pProjection_map_in = None):
-
     return
 
 def basin_plot(self,
@@ -146,7 +153,14 @@ def basin_plot(self,
 
     return
 
+#this function is used to plot the study area
+def _plot_study_area(self, sFilename_boundary_in = None, sFilename_slope_in = None, sFilename_nhd_in = None):
+    return
 
+#this is a reserved function
+def _compare_with_raster_dem_method(self, sFilename_dem_flowline, sFilename_in, aExtent_in=None, pProjection_map_in = None):
+
+    return
 
 #this is a reserved function
 def _plot_area_of_difference(self, iCase_index, iMesh_type, sMesh_type, sFilename_figure_in, aExtent_in = None, pProjection_map_in = None):

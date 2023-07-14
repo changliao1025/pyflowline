@@ -296,7 +296,7 @@ def map_vector_polygon_data(sFilename_in,
 
     gl.xlabel_style = {'size': 10, 'color': 'k', 'rotation':0, 'ha':'right'}
     gl.ylabel_style = {'size': 10, 'color': 'k', 'rotation':90,'weight': 'normal'}
-    sDirname = os.path.dirname(sFilename_output_in)
+    
 
     if iFlag_title==1:
         ax.set_title( sTitle )
@@ -307,6 +307,7 @@ def map_vector_polygon_data(sFilename_in,
     if sFilename_output_in is None:
         plt.show()
     else:
+        sDirname = os.path.dirname(sFilename_output_in)
         sFilename = os.path.basename(sFilename_output_in)
         sFilename_out = os.path.join(sDirname, sFilename)
         sExtension = os.path.splitext(sFilename)[1]

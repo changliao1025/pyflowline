@@ -28,6 +28,7 @@ def map_vector_polyline_data(sFilename_in,
                              iFlag_color_in = None,
                              iFlag_label_in = None,
                              iFlag_thickness_in =None,
+                             iFlag_title_in = None,
                              sField_thickness_in=None,
                              sField_color_in=None,
                              iFlag_scientific_notation_colorbar_in=None,
@@ -275,6 +276,7 @@ def map_vector_polyline_data(sFilename_in,
     if sFilename_output_in is None:
         plt.show()
     else:
+        sDirname = os.path.dirname(sFilename_output_in)
         sFilename = os.path.basename(sFilename_output_in)
         sFilename_out = os.path.join(sDirname, sFilename)
         sExtension = os.path.splitext(sFilename)[1]

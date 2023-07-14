@@ -52,6 +52,8 @@ def map_multiple_vector_data(aFiletype_in,
     by default, the program will plot all the polygons in the file
     in the furture, the program will support to plot only a subset of polygons
 
+    Because of the overlay effect, it is ideal to plot them in the following order: polygon->polyling->point
+
     Args:
         iFiletype_in (_type_): _description_
         sFilename_in (_type_): _description_
@@ -68,6 +70,20 @@ def map_multiple_vector_data(aFiletype_in,
         aLegend_in (_type_, optional): _description_. Defaults to None.
     """
 
+    #check vector type first
+    if aFiletype_in is None:
+        print('Error: please specify the vector type')
+        return
+    else:
+        #point: 1, polyline: 2, polygon: 3      
+        arr = np.array(aFiletype_in)      
+        # Check if the array is descending or has the same values
+        is_descending = np.all(np.diff(arr) <= 0)        
+        if is_descending == True:
+            pass
+        else:
+            print('Error: the vector type is not correct')
+            return
 
     pDriver = ogr.GetDriverByName('GeoJSON')
 
@@ -157,6 +173,9 @@ def map_multiple_vector_data(aFiletype_in,
     iSize_y= 8
     fig.set_figwidth( iSize_x )
     fig.set_figheight( iSize_y )
+
+
+    #we require that the first polygon file defines the extent
 
     pLayer = pDataset.GetLayer(0)
     pSrs = osr.SpatialReference()
@@ -304,6 +323,15 @@ def map_multiple_vector_data(aFiletype_in,
                     path = mpath.Path(aCoords_gcs, codes)
                     x, y = zip(*path.vertices)
                     line, = ax.plot(x, y, color= sColor, linewidth=iThickness, transform=ccrs.Geodetic())
+                else:
+                    if sGeometry_type =='POINT':
+                        dummy0 = loads( pGeometry_in.ExportToWkt() )
+                        aCoords_gcs = dummy0.coords
+                        aCoords_gcs= np.array(aCoords_gcs)
+                        aCoords_gcs = aCoords_gcs[:,0:2]
+                        ax.plot(aCoords_gcs[0], aCoords_gcs[1], 'o', color= sColor, markersize=2, transform=ccrs.Geodetic())
+                    else:
+                        pass
 
             lID = lID + 1
 
@@ -359,7 +387,7 @@ def map_multiple_vector_data(aFiletype_in,
 
     gl.xlabel_style = {'size': 10, 'color': 'k', 'rotation':0, 'ha':'right'}
     gl.ylabel_style = {'size': 10, 'color': 'k', 'rotation':90,'weight': 'normal'}
-    sDirname = os.path.dirname(sFilename_output_in)
+    
 
 
     if iFlag_title==1:
@@ -371,6 +399,7 @@ def map_multiple_vector_data(aFiletype_in,
     if sFilename_output_in is None:
         plt.show()
     else:
+        sDirname = os.path.dirname(sFilename_output_in)
         sFilename = os.path.basename(sFilename_output_in)
         sFilename_out = os.path.join(sDirname, sFilename)
         sExtension = os.path.splitext(sFilename)[1]

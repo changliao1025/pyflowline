@@ -415,9 +415,12 @@ class flowlinecase(object):
 
 
         #model generated files
+        
         self.sFilename_mesh = os.path.join(str(Path(self.sWorkspace_output)  ) , sMesh_type + ".geojson" )
         self.sFilename_mesh_info= os.path.join(str(Path(self.sWorkspace_output)  ) , sMesh_type + "_mesh_info.json"  )
-        sFilename_mesh_kml = os.path.join(str(Path(self.sWorkspace_output)  ) , sMesh_type + ".kml" )
+        self.sFilename_mesh_kml = os.path.join(str(Path(self.sWorkspace_output)  ) , sMesh_type + ".kml" ) #for google service
+
+        
 
         return
 
@@ -470,7 +473,7 @@ class flowlinecase(object):
             dResolution_meter = self.dResolution_meter
             sFilename_dem = self.sFilename_dem
             sFilename_spatial_reference = self.sFilename_spatial_reference
-            sFilename_mesh = self.sFilename_mesh
+            sFilename_mesh = self.sFilename_mesh 
             if iMesh_type !=4: #mpas
                 spatial_reference_target = osr.SpatialReference()
                 spatial_reference_target.ImportFromEPSG(4326)

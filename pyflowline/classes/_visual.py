@@ -66,7 +66,7 @@ def plot(self,
 
 def _plot_mesh(self, sFilename_output_in=None, aExtent_in=None, pProjection_map_in = None):
 
-    sFilename_in = self.sFilename_mesh
+    sFilename_in = self.sFilename_mesh 
     sMesh_type = self.sMesh_type
 
     map_vector_polygon_data(sFilename_in,
@@ -141,8 +141,7 @@ def basin_plot(self,
                 iFlag_color = 0
             else:
                 if sVariable_in == 'flowline_simplified':
-                    sFilename_out = self.sFilename_flowline_simplified
-                    sFilename_json = os.path.join(sWorkspace_output_basin, sFilename_out)
+                    sFilename_json = self.sFilename_flowline_simplified                    
                     sTitle = 'Simplified flowline'
                     iFlag_color = 1
                     if aExtent_in is None:
@@ -151,8 +150,7 @@ def basin_plot(self,
                         iFlag_label=0
                 else:
                     if sVariable_in == 'flowline_conceptual':
-                        sFilename_out = self.sFilename_flowline_conceptual
-                        sFilename_json = os.path.join(sWorkspace_output_basin, sFilename_out)
+                        sFilename_json = self.sFilename_flowline_conceptual                        
                         sTitle = 'Conceptual flowline'
                         iFlag_color = 1
                         if aExtent_in is None:
@@ -161,8 +159,7 @@ def basin_plot(self,
                             iFlag_label=0
                     else:
                         if sVariable_in == 'aof':
-                            sFilename_out = 'area_of_difference.geojson'
-                            sFilename_json = os.path.join(sWorkspace_output_basin, sFilename_out)
+                            sFilename_json = self.sFilename_area_of_difference                            
                             sTitle = 'Conceptual flowline'
                             iFlag_label = 1
                             self.plot_area_of_difference(iCase_index,
@@ -203,8 +200,7 @@ def _compare_with_raster_dem_method(self, sFilename_dem_flowline, sFilename_in, 
 #this is a reserved function
 def _plot_area_of_difference(self, iCase_index, iMesh_type, sMesh_type, sFilename_figure_in, aExtent_in = None, pProjection_map_in = None):
 
-    sFilename_json = self.sFilename_area_of_difference
-    sFilename_json = os.path.join(self.sWorkspace_output_basin, sFilename_json)
+    sFilename_json = self.sFilename_area_of_difference    
 
     sFilename_in = self.sFilename_mesh
     sFilename_out = sFilename_figure_in

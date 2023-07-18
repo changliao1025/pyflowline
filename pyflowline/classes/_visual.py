@@ -8,8 +8,8 @@ from pyflowline.external.pyearth.visual.map.map_multiple_vector_data import map_
 def plot(self,
          iFlag_type_in = None,
          iFlag_title_in = None,
-         sFilename_output_in=None,
-         sVariable_in=None,
+         sFilename_output_in = None,
+         sVariable_in = None,
          aExtent_in = None,
          pProjection_map_in = None):
     """_summary_
@@ -22,6 +22,15 @@ def plot(self,
         aExtent_in (_type_, optional): _description_. Defaults to None.
         pProjection_map_in (_type_, optional): _description_. Defaults to None.
     """
+
+    if iFlag_type_in is None:
+        iFlag_type_in = 2
+
+    if iFlag_title_in is None:
+        iFlag_title_in = 1
+
+    if sVariable_in is None:
+        sVariable_in = 'flowline_conceptual'
     
 
     if iFlag_type_in == 1: #point based, such as dam

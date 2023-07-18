@@ -5,7 +5,17 @@
 
 PyFlowline: a mesh-independent river network generator for hydrologic models. 
 
-PyFlowline is mesh independent, meaning you can apply it to both structured (e.g., traditional rectangle mesh, latitude-longitude, hexagon) and unstructured mesh systems (e.g., Triangulated Irregular Network (TIN) mesh and Model for Prediction Across Scales (MPAS) mesh).
+PyFlowline is mesh independent, meaning you can apply it to both structured 
+
+1. traditional rectangle mesh 
+2. latitude-longitude 
+3. hexagon
+4. dggs ([dggrid](https://github.com/sahrk/DGGRID))
+
+and unstructured mesh systems 
+
+1. Model for Prediction Across Scales mesh ([MPAS](https://github.com/MPAS-Dev))
+2. Triangulated Irregular Network (TIN) mesh
 
 This package generates the mesh cell-based conceptual river networks using the following steps:
 

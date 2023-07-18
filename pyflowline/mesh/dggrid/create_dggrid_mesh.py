@@ -227,11 +227,8 @@ def create_dggrid_mesh(iFlag_global,
                          iFlag_antarctic_in=None,
                          sFilename_boundary_in = None ):
 
-    #use dggrid table to determine the resolution index
-    
-
-    sFilename_cell = sWorkspace_output + slash + 'cells'
-    
+    #use dggrid table to determine the resolution index   
+    sFilename_cell = sWorkspace_output + slash + 'cells'    
     if sGrid_type_in is not None:
         sGrid_type = sGrid_type_in
     else:

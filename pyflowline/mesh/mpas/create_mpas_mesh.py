@@ -2,11 +2,10 @@ import os
 import math
 import importlib
 import numpy as np
-from osgeo import ogr, osr
-from netCDF4 import Dataset
-from shapely.wkt import loads
+from osgeo import ogr, osr, gdal
+import netCDF4 as nc
 from pyflowline.formats.convert_attributes import convert_gcs_attributes_to_cell
-
+gdal.UseExceptions()  
 iFlag_cython = importlib.util.find_spec("cython") 
 if iFlag_cython is not None:
     from pyflowline.algorithms.cython.kernel import convert_360_to_180
@@ -15,8 +14,7 @@ else:
 
 def create_mpas_mesh(iFlag_global_in, 
     iFlag_use_mesh_dem, 
-    iFlag_save_mesh_in, 
-    
+    iFlag_save_mesh_in,     
     sFilename_mesh_netcdf_in, 
     sFilename_output_in,
     iFlag_antarctic_in=None,
@@ -44,7 +42,10 @@ def create_mpas_mesh(iFlag_global_in,
     if pBoundary_in is None:
         pBoundary = None
     else:
-        pBoundary = pBoundary_in
+        #for the reason that a geometry object will be crash if the associated dataset is closed, we must pass wkt string
+        #https://gdal.org/api/python_gotchas.html
+        pBoundary = ogr.CreateGeometryFromWkt(pBoundary_in)
+        #pBoundary = pBoundary_in #only works for shapely geometry object
        
     if (os.path.exists(sFilename_mesh_netcdf_in)):
         pass
@@ -55,9 +56,9 @@ def create_mpas_mesh(iFlag_global_in,
     if os.path.exists(sFilename_output_in):  
         os.remove(sFilename_output_in)
 
-    iFlag_remove_ice = 0
+    
 
-    pDatasets_in = Dataset(sFilename_mesh_netcdf_in)
+    pDatasets_in = nc.Dataset(sFilename_mesh_netcdf_in)
 
     netcdf_format = pDatasets_in.file_format
     pDriver_geojson = ogr.GetDriverByName('GeoJSON')     
@@ -84,7 +85,7 @@ def create_mpas_mesh(iFlag_global_in,
         pLayerDefn = pLayer.GetLayerDefn()
         pFeature = ogr.Feature(pLayerDefn)        
 
-    #write new netcdf
+    #read new netcdf
     for sKey, aValue in pDatasets_in.variables.items():      
         #we need to filter out unused grids based on mpas specs
         if sKey == 'latCell':
@@ -197,11 +198,11 @@ def create_mpas_mesh(iFlag_global_in,
     aBed_elevation_profile = bed_elevation_profile0[:]  #elevation    
     ncell = len(aIndexToCellID) 
     aMpas = list()
-    for i in range(ncell):
-        #center
+
+    #add a mpas cell into a list
+    def add_cell_into_list(aList, i, lCellID, dArea,dElevation_mean,dElevation_profile0, aCoords  ):
         dLat = convert_360_to_180 (aLatitudeCell[i])
         dLon = convert_360_to_180 (aLongitudeCell[i])
-
         #vertex
         aCellOnCellIndex = np.array(aCellsOnCell[i,:])
         aEdgesOnCellIndex = np.array(aEdgesOnCell[i,:])
@@ -213,141 +214,269 @@ def create_mpas_mesh(iFlag_global_in,
         dummy2 = np.where(aCellOnCellIndex > 0)
         aNeighborIndex= (aCellOnCellIndex[dummy2]).astype(int)
         aVertexIndexOnEdge = np.array(aVertexOnEdge0[aEdgeIndex-1,:]).astype((int))
-        aLonVertex = aLongitudeVertex[aVertexIndex-1]
-        aLatVertex = aLatitudeVertex[aVertexIndex-1]
-        nVertex = len(aLonVertex)
-
-        if iFlag_antarctic == 1:
-            #if it is antarctic, we dont need the boundary
-            if dLat < -60:
-                iFlag = True
-            else:  
-                iFlag = False
-            pass
+    
+        pmpas = convert_gcs_attributes_to_cell(4, dLon, dLat, aCoords, aVertexIndex, aEdgeIndex, aVertexIndexOnEdge)               
+        pmpas.dArea = dArea
+        pmpas.calculate_edge_length()
+        pmpas.dLength_flowline = pmpas.dLength_edge #Default
+        pmpas.lCellID = lCellID
+        pmpas.dElevation_mean  = dElevation_mean
+        pmpas.dElevation_profile0 = dElevation_profile0
+        #now setup the neighbor information
+        pmpas.aNeighbor=aNeighborIndex
+        pmpas.nNeighbor=len(aNeighborIndex)
+        if pmpas.nNeighbor != pmpas.nVertex:
+            #this cell is next to the ocean boundary
+            pmpas.nNeighbor_land = pmpas.nNeighbor 
+            pmpas.nNeighbor_ocean = pmpas.nVertex - pmpas.nNeighbor
+            pmpas.aNeighbor_land=aNeighborIndex
+            pmpas.nNeighbor_land=len(aNeighborIndex)
+            print(lCellID)
+            print('Warning: nNeighbor != nVertex')
         else:
-            #we will check vertex insteaf of center
+            pmpas.nNeighbor_land = pmpas.nNeighbor 
+            pmpas.nNeighbor_ocean = 0
+            pmpas.aNeighbor_land = aNeighborIndex        
+            pmpas.nNeighbor_land=len(aNeighborIndex)
+
+        aDistance=list()
+        for i in range(pmpas.nNeighbor):
+            #find shared edge
+            lEdgeID= aEdgeIndex[i]              
+            lIndex = lEdgeID-1
+            dDistance = aDcEdge[lIndex]
+            aDistance.append(dDistance)
+            pass
+
+        pmpas.aNeighbor_distance = aDistance
+        aList.append(pmpas)
+        return aList
+
+    if iFlag_antarctic == 1:
+        iFlag_remove_ice = 0
+        #if it is antarctic, we dont need the boundary
+        if dLat < -60:
+            iFlag = True
+        else:  
             iFlag = False
-            for j in range(nVertex):
-                x1 = convert_360_to_180(aLonVertex[j])
-                y1 = aLatVertex[j]                
-                pVertex = ogr.Geometry(ogr.wkbPoint)
-                pVertex.AddPoint(x1, y1)
-                pVertex1 = loads( pVertex.ExportToWkt() )   
-                iFlag = pVertex1.within(pBoundary)
-                if iFlag == True:
-                    break
-                else:
-                    continue
-                
-            pass 
+        pass
 
-
-        if ( iFlag == True ):
-            #get cell edge
-            lCellID = int(aIndexToCellID[i])
-            dElevation_mean = float(aBed_elevation[i])
-            dElevation_profile0 = float(aBed_elevation_profile[i,0])
-            dThickness_ice = float( aIce_thickness[i] )
-            dArea = float(aCellArea[i])
-            if iFlag_remove_ice == 1:
-                if dThickness_ice > 0 :
-                    continue
-                else:
-                    pass
-            else:
-                pass
-            
+    else:
+        iFlag_remove_ice = 1
+        for i in range(ncell):
+            #center
+            dLat = convert_360_to_180 (aLatitudeCell[i])
+            dLon = convert_360_to_180 (aLongitudeCell[i])
+            #vertex
+            aVertexOnCellIndex = np.array(aVertexOnCell[i,:])
+            dummy0 = np.where(aVertexOnCellIndex > 0)
+            aVertexIndex = aVertexOnCellIndex[dummy0]
+            aLonVertex = aLongitudeVertex[aVertexIndex-1]
+            aLatVertex = aLatitudeVertex[aVertexIndex-1]
+            nVertex = len(aLonVertex)
+            #first check if it is within the boundary
+            iFlag = False
             ring = ogr.Geometry(ogr.wkbLinearRing)
             aCoords = np.full((nVertex,2), -9999.0, dtype=float)
-            
             for j in range(nVertex):
                 x1 = convert_360_to_180(aLonVertex[j])
-                y1 = aLatVertex[j]      
+                y1 = aLatVertex[j] 
                 ring.AddPoint(x1, y1)
                 aCoords[j,0] = x1
                 aCoords[j,1] = y1
                 pass
+            
+            x1 = convert_360_to_180(aLonVertex[0])
+            y1 = aLatVertex[0]
+            ring.AddPoint(x1, y1) #double check            
+            pPolygon = ogr.Geometry(ogr.wkbPolygon)
+            pPolygon.AddGeometry(ring)
+            #check within first
+            iFlag == False
+            if pPolygon.Within(pBoundary):
+                iFlag = True
+            else:
+                #then check intersection
+                if pPolygon.Intersects(pBoundary):
+                    iFlag = True
+                else:
+                    pass
 
-            if iFlag_save_mesh_in ==1:
-                x1 = convert_360_to_180(aLonVertex[0])
-                y1 = aLatVertex[0]
-                ring.AddPoint(x1, y1) #double check            
-                pPolygon = ogr.Geometry(ogr.wkbPolygon)
-                pPolygon.AddGeometry(ring)
-                pFeature.SetGeometry(pPolygon)
-                pFeature.SetField("id", int(lCellID) )
-                pFeature.SetField("lon", dLon )
-                pFeature.SetField("lat", dLat )
-                pFeature.SetField("area", dArea )
-                if iFlag_use_mesh_dem == 1:
-                    pFeature.SetField("elev", dElevation_mean )
-                    pFeature.SetField("elev0", dElevation_profile0 )
-                pLayer.CreateFeature(pFeature)
+            if ( iFlag == True ):
+                lCellID = int(aIndexToCellID[i])
+                dElevation_mean = float(aBed_elevation[i])
+                dElevation_profile0 = float(aBed_elevation_profile[i,0])
+                dThickness_ice = float( aIce_thickness[i] )
+                dArea = float(aCellArea[i])
 
-            pmpas = convert_gcs_attributes_to_cell(4, dLon, dLat, aCoords, aVertexIndex, aEdgeIndex, aVertexIndexOnEdge)               
-            pmpas.dArea = dArea
-            pmpas.calculate_edge_length()
-            pmpas.dLength_flowline = pmpas.dLength_edge #Default
-            pmpas.lCellID = lCellID
-            pmpas.dElevation_mean  = dElevation_mean
-            pmpas.dElevation_profile0 = dElevation_profile0
-            pmpas.aNeighbor=aNeighborIndex
-            pmpas.nNeighbor=len(aNeighborIndex)
-            pmpas.aNeighbor_land=aNeighborIndex
-            pmpas.nNeighbor_land=len(aNeighborIndex)
-            aDistance=list()
-            for i in range(pmpas.nNeighbor):
-                lNeighborID = pmpas.aNeighbor[i]
-                #find shared edge
-                lEdgeID= aEdgeIndex[i]                    
-                #lIndex = aIndexToEdgeID[lEdgeID-1]
-                lIndex = lEdgeID-1
-                dDistance = aDcEdge[lIndex]
-                aDistance.append(dDistance)
-                pass
-            pmpas.aNeighbor_distance = aDistance
-            aMpas.append(pmpas)
-            #get vertex
-        else:
-            #if dLat< -54:
-            #    print(dLon, dLat)
-            #else:
-            #    pass
-            pass
-        pass
+                #then check if it is ice free
+                if iFlag_remove_ice == 1:
+                    if dThickness_ice > 0 :
+                        continue
+                    else:
+                        pass
+                else:
+                    pass           
+                #call fuction to add the cell
+                aMpas = add_cell_into_list(aMpas, i, lCellID, dArea, dElevation_mean, dElevation_profile0, aCoords )
+                
+                #save mesh cell
+                if iFlag_save_mesh_in ==1:                
+                    pFeature.SetGeometry(pPolygon)
+                    pFeature.SetField("id", int(lCellID) )
+                    pFeature.SetField("lon", dLon )
+                    pFeature.SetField("lat", dLat )
+                    pFeature.SetField("area", dArea )
+                    if iFlag_use_mesh_dem == 1:
+                        pFeature.SetField("elev", dElevation_mean )
+                        pFeature.SetField("elev0", dElevation_profile0 )
+
+                    pLayer.CreateFeature(pFeature)
+
 
     #for maps we need to clean some cell because they were not actually in the domain
+    #besides, we need to add some smal holes back
+    #to do this, we need two steps.
 
     if iFlag_global_in == 1:
         aMpas_out = aMpas
     else:
+        aMpas_middle = list()
         aMpas_out = list()
         ncell = len(aMpas)
+        #generate the list of cell ID
         aCellID  = list()
         for i in range(ncell):
             pCell = aMpas[i]
             lCellID = pCell.lCellID
             aCellID.append(lCellID)
 
+        #first update neighbor information because some cell should have vitual land neighbor (not present in the mesh)
         for i in range(ncell):
             pCell = aMpas[i]
-            aNeighbor = pCell.aNeighbor
-            nNeighbor = pCell.nNeighbor
-            aNeighbor_new = list()
-            nNeighbor_new = 0 
-            for j in range(nNeighbor):
-                lNeighbor = int(aNeighbor[j])
+            aNeighbor_land = pCell.aNeighbor_land
+            nNeighbor_land = pCell.nNeighbor
+            aNeighbor_land_update = list()
+            aNeighbor_land_virtual = list()
+            nNeighbor_land_update = 0 
+            for j in range(nNeighbor_land):
+                lNeighbor = int(aNeighbor_land[j])
                 if lNeighbor in aCellID:
-                    nNeighbor_new = nNeighbor_new + 1 
-                    aNeighbor_new.append(lNeighbor)
+                    nNeighbor_land_update = nNeighbor_land_update + 1 
+                    aNeighbor_land_update.append(lNeighbor)
+                else:
+                    aNeighbor_land_virtual.append(lNeighbor)
                     
-                if nNeighbor_new == pCell.nVertex:
-                    break
 
-            pCell.nNeighbor_land= len(aNeighbor_new)
-            pCell.aNeighbor_land = aNeighbor_new
-            pCell.nNeighbor_ocean = pCell.nVertex - pCell.nNeighbor_land
+            pCell.aNeighbor_land = aNeighbor_land_update
+            pCell.nNeighbor_land= len(aNeighbor_land_update)   
+            pCell.aNeighbor_land_virtual = aNeighbor_land_virtual   
+            pCell.nNeighbor_land_virtual = len(aNeighbor_land_virtual)
+            aMpas_middle.append(pCell)
+
+        #now add back small holes   
+        for i in range(ncell):
+            pCell = aMpas_middle[i]  
+              
+            if pCell.nNeighbor_land_virtual ==1:   
+                lNeighbor_hole = pCell.aNeighbor_land_virtual[0]
+                j = lNeighbor_hole-1
+                dLat = convert_360_to_180 (aLatitudeCell[j])
+                dLon = convert_360_to_180 (aLongitudeCell[j])
+
+                #vertex
+                aVertexOnCellIndex = np.array(aVertexOnCell[j,:])
+                dummy0 = np.where(aVertexOnCellIndex > 0)
+                aVertexIndex = aVertexOnCellIndex[dummy0]
+                aLonVertex = aLongitudeVertex[aVertexIndex-1]
+                aLatVertex = aLatitudeVertex[aVertexIndex-1]
+                nVertex = len(aLonVertex)
+
+                #first check if it is within the boundary
+    
+                ring = ogr.Geometry(ogr.wkbLinearRing)
+                aCoords = np.full((nVertex,2), -9999.0, dtype=float)
+                for k in range(nVertex):
+                    x1 = convert_360_to_180(aLonVertex[k])
+                    y1 = aLatVertex[k] 
+                    ring.AddPoint(x1, y1)
+                    aCoords[k,0] = x1
+                    aCoords[k,1] = y1
+                    pass
+
+                lCellID = int(aIndexToCellID[j])
+                dElevation_mean = float(aBed_elevation[j])
+                dElevation_profile0 = float(aBed_elevation_profile[j,0])
+                dArea = float(aCellArea[j])
+
+                if lCellID not in aCellID:
+                    aMpas_middle = add_cell_into_list(aMpas_middle, j, lCellID, dArea, dElevation_mean, dElevation_profile0, aCoords )
+                    aCellID.append(lCellID)
+
+                    #now we need to update the neightboring information as well
+                    pCell.aNeighbor_land.append(lCellID)
+                    pCell.nNeighbor_land = pCell.nNeighbor_land + 1
+
+                    pCell.aNeighbor_land_virtual = None
+                    pCell.nNeighbor_land_virtual = 0
+
+                    #save mesh cell
+                    x1 = convert_360_to_180(aLonVertex[0])
+                    y1 = aLatVertex[0]
+                    ring.AddPoint(x1, y1) #double check            
+                    pPolygon = ogr.Geometry(ogr.wkbPolygon)
+                    pPolygon.AddGeometry(ring)
+                    if iFlag_save_mesh_in ==1:                
+                        pFeature.SetGeometry(pPolygon)
+                        pFeature.SetField("id", int(lCellID) )
+                        pFeature.SetField("lon", dLon )
+                        pFeature.SetField("lat", dLat )
+                        pFeature.SetField("area", dArea )
+                        if iFlag_use_mesh_dem == 1:
+                            pFeature.SetField("elev", dElevation_mean )
+                            pFeature.SetField("elev0", dElevation_profile0 )
+
+                        pLayer.CreateFeature(pFeature)
+
+                else:
+                    #this hole was added already, but we need to update the neighbor information
+                    pCell.aNeighbor_land.append(lCellID)
+                    pCell.nNeighbor_land = pCell.nNeighbor_land + 1
+                    pCell.aNeighbor_land_virtual = None
+                    pCell.nNeighbor_land_virtual = 0
+
+                    pass
+
+        #now update again because some cell has more than one virutal land neighbor, but now none of them is virtual
+        #this fix will move virtual land neighbor back to land neighbor
+        #the ocean neighbor will remain unchanged
+        ncell = len(aMpas_middle)
+        for i in range(ncell):
+            pCell = aMpas_middle[i]
+            aNeighbor_land = pCell.aNeighbor_land           
+            aNeighbor_land_virtual_update = list()
+            aNeighbor_land_virtual = pCell.aNeighbor_land_virtual
+            nNeighbor_land_virtual = pCell.nNeighbor_land_virtual
+            nNeighbor_land_update = nNeighbor_land 
+            for j in range(nNeighbor_land_virtual):
+                lNeighbor = int(aNeighbor_land_virtual[j])
+                if lNeighbor in aCellID:
+                    #this cell is actually not virtual anymore
+                    nNeighbor_land_update = nNeighbor_land_update + 1 
+                    aNeighbor_land.append(lNeighbor)
+                else:
+                    aNeighbor_land_virtual_update.append(lNeighbor)
+                    
+                
+
+            pCell.aNeighbor_land = aNeighbor_land
+            pCell.nNeighbor_land= len(aNeighbor_land)   
+            pCell.aNeighbor_land_virtual = aNeighbor_land_virtual_update   
+            pCell.nNeighbor_land_virtual = len(aNeighbor_land_virtual_update)
             aMpas_out.append(pCell)
+
+
+        
 
 
     return aMpas_out

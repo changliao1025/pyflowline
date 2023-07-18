@@ -5,13 +5,15 @@ from shapely.geometry import Point, LineString
 from pyflowline.classes.edge import pyedge
 from pyflowline.classes.link import pycelllink
 
-def export_flowline_to_geojson( aFlowline_in, \
-    sFilename_json_in, \
-    iFlag_projected_in= None, \
-    pSpatial_reference_in=None, \
-    aAttribute_field=None,\
-    aAttribute_data=None,\
+def export_flowline_to_geojson( aFlowline_in, 
+    sFilename_json_in, 
+    iFlag_projected_in= None, 
+    pSpatial_reference_in=None, 
+    aAttribute_field=None,
+    aAttribute_data=None,
     aAttribute_dtype=None):
+    
+    
     """
     convert a shpefile to json format.
     This function should be used for stream flowline only.

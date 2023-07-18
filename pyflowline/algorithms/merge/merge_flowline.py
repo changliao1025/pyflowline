@@ -8,7 +8,9 @@ if iFlag_cython is not None:
     from pyflowline.algorithms.cython.kernel import find_vertex_in_list
 else:
     from pyflowline.algorithms.auxiliary.find_vertex_in_list import find_vertex_in_list
+
 lID = 0
+
 def merge_flowline(aFlowline_in, aVertex_in, \
     pVertex_outlet_in, \
         aIndex_headwater_in,\

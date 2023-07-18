@@ -8,10 +8,10 @@ from pyflowline.classes.latlon import pylatlon
 from pyflowline.classes.mpas import pympas
 from pyflowline.classes.tin import pytin
     
-def convert_gcs_attributes_to_cell(iMesh_type_in, dLongitude_center_in, dLatitude_center_in, \
-        aCoordinates_gcs_in, \
-        aVertexID_in, \
-        aEdgeID_in, \
+def convert_gcs_attributes_to_cell(iMesh_type_in, dLongitude_center_in, dLatitude_center_in, 
+        aCoordinates_gcs_in, 
+        aVertexID_in, 
+        aEdgeID_in, 
         aVertexIndexOnEdge_in):  
         
     npoint = len(aVertexID_in)     
@@ -70,10 +70,10 @@ def convert_gcs_attributes_to_cell(iMesh_type_in, dLongitude_center_in, dLatitud
                         return None
                     
   
-def convert_pcs_attributes_to_cell(iMesh_type_in, \
-    aCoordinates_pcs_in, \
-    aVertexID_in, \
-    aEdgeID_in,\
+def convert_pcs_attributes_to_cell(iMesh_type_in, 
+    aCoordinates_pcs_in, 
+    aVertexID_in, 
+    aEdgeID_in,
     aVertexIndexOnEdge_in):  
 
     npoint = len(aVertexID_in)     

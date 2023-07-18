@@ -68,11 +68,14 @@ class pympas(pycell):
     aVertexID=None
     pVertex_center = None
     aFlowline=None    
-    nNeighbor=-1
+    nNeighbor=-1 
     nNeighbor_land=-1
+    nNeighbor_land_virtual = -1
+    aNeighbor_land_virtual = None
     nNeighbor_ocean=-1
-    aNeighbor=None #the global ID of all neighbors
+    aNeighbor=None #the global ID of all neighbors, execluding null
     aNeighbor_land=None #the global ID of all neighbors
+    
     aNeighbor_ocean=None #the global ID of all neighbors
     aNeighbor_distance = None
 
@@ -96,8 +99,10 @@ class pympas(pycell):
             self.aVertex = aVertex #the first one and last one are the same
             self.nEdge = len(aEdge)
             self.nVertex = len(aVertex) 
+            #initialize the neighbor but without the actual neighbor information
             self.nNeighbor = -1
             self.nNeighbor_land = -1
+            self.nNeighbor_land_virtual = -1
             self.nNeighbor_ocean = -1
             self.iFlag_coast = 0      
             self.dLongitude_center_degree = dLon

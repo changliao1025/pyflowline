@@ -292,7 +292,7 @@ def create_mpas_mesh(iFlag_global_in,
             pPolygon = ogr.Geometry(ogr.wkbPolygon)
             pPolygon.AddGeometry(ring)
             #check within first
-            iFlag == False
+            iFlag = False
             if pPolygon.Within(pBoundary):
                 iFlag = True
             else:

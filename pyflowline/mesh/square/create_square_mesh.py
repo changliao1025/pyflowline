@@ -134,7 +134,7 @@ def create_square_mesh(dX_left_in, dY_bot_in,
             dLongitude_center = np.mean(aCoords[0:4,0])
             dLatitude_center = np.mean(aCoords[0:4,1])     
 
-            iFlag == False
+            iFlag = False
             if pPolygon.Within(pBoundary):
                 iFlag = True
             else:

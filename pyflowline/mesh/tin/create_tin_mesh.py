@@ -133,7 +133,7 @@ pBoundary_in):
             dLongitude_center = np.mean(aCoords[0:3,0])
             dLatitude_center = np.mean(aCoords[0:3,1])     
 
-            iFlag == False
+            iFlag = False
             if pPolygon.Within(pBoundary):
                 iFlag = True
             else:

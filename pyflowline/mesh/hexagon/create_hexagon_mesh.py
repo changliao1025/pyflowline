@@ -180,7 +180,7 @@ def create_hexagon_mesh(iFlag_rotation_in,
                 dLongitude_center = np.mean(aCoords[0:6,0])
                 dLatitude_center = np.mean(aCoords[0:6,1])                
 
-                iFlag == False
+                iFlag = False
                 if pPolygon.Within(pBoundary):
                     iFlag = True
                 else:

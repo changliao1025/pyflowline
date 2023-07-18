@@ -102,7 +102,7 @@ def create_latlon_mesh(dLongitude_left_in,
             aCoords[4,1] = y1
             
 
-            iFlag == False
+            iFlag = False
             if pPolygon.Within(pBoundary):
                 iFlag = True
             else:

@@ -153,7 +153,7 @@ def animate_vector_polygon_data(
     )
     cmap_reversed = cmap.reversed()
 
-    with open(sFilename_domain_json_in) as json_file:
+    with open(sFilename_mesh_in) as json_file:
         aCell_new = json.load(json_file)
         ncell_new = len(aCell_new)
 

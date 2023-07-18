@@ -255,11 +255,66 @@ def create_mpas_mesh(iFlag_global_in,
     if iFlag_antarctic == 1:
         iFlag_remove_ice = 0
         #if it is antarctic, we dont need the boundary
-        if dLat < -60:
-            iFlag = True
-        else:  
+        for i in range(ncell):
+            #center
+            dLat = convert_360_to_180 (aLatitudeCell[i])
+            dLon = convert_360_to_180 (aLongitudeCell[i])
+            aVertexOnCellIndex = np.array(aVertexOnCell[i,:])
+            dummy0 = np.where(aVertexOnCellIndex > 0)
+            aVertexIndex = aVertexOnCellIndex[dummy0]
+            aLonVertex = aLongitudeVertex[aVertexIndex-1]
+            aLatVertex = aLatitudeVertex[aVertexIndex-1]
+            nVertex = len(aLonVertex)
+            #first check if it is within the boundary
             iFlag = False
-        pass
+            ring = ogr.Geometry(ogr.wkbLinearRing)
+            aCoords = np.full((nVertex,2), -9999.0, dtype=float)
+            for j in range(nVertex):
+                x1 = convert_360_to_180(aLonVertex[j])
+                y1 = aLatVertex[j] 
+                ring.AddPoint(x1, y1)
+                aCoords[j,0] = x1
+                aCoords[j,1] = y1
+                pass
+            if dLat < -60:
+                iFlag = True
+            else:  
+                iFlag = False
+                pass
+
+            if ( iFlag == True ):
+                lCellID = int(aIndexToCellID[i])
+                dElevation_mean = float(aBed_elevation[i])
+                dElevation_profile0 = float(aBed_elevation_profile[i,0])
+                dThickness_ice = float( aIce_thickness[i] )
+                dArea = float(aCellArea[i])
+
+                #then check if it is ice free
+                if iFlag_remove_ice == 1:
+                    if dThickness_ice > 0 :
+                        continue
+                    else:
+                        pass
+                else:
+                    pass      
+
+                #call fuction to add the cell
+                aMpas = add_cell_into_list(aMpas, i, lCellID, dArea, dElevation_mean, dElevation_profile0, aCoords )
+                
+                #save mesh cell
+                if iFlag_save_mesh_in ==1:                
+                    pFeature.SetGeometry(pPolygon)
+                    pFeature.SetField("id", int(lCellID) )
+                    pFeature.SetField("lon", dLon )
+                    pFeature.SetField("lat", dLat )
+                    pFeature.SetField("area", dArea )
+                    if iFlag_use_mesh_dem == 1:
+                        pFeature.SetField("elev", dElevation_mean )
+                        pFeature.SetField("elev0", dElevation_profile0 )
+
+                    pLayer.CreateFeature(pFeature)
+            
+            
 
     else:
         iFlag_remove_ice = 1

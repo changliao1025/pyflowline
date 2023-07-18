@@ -68,8 +68,8 @@ def _plot_mesh(self, sFilename_output_in=None, aExtent_in=None, pProjection_map_
     sMesh_type = self.sMesh_type
 
     map_vector_polygon_data(sFilename_in,
-                            sFilename_output_in=sFilename_output_in,
-                            sTitle_in= sMesh_type,
+                            sFilename_output_in = sFilename_output_in,
+                            sTitle_in = sMesh_type,
                             aExtent_in = aExtent_in,
                             pProjection_map_in = pProjection_map_in)
 

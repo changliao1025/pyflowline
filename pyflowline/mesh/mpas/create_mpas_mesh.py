@@ -276,6 +276,13 @@ def create_mpas_mesh(iFlag_global_in,
                 aCoords[j,0] = x1
                 aCoords[j,1] = y1
                 pass
+
+            x1 = convert_360_to_180(aLonVertex[0])
+            y1 = aLatVertex[0]
+            ring.AddPoint(x1, y1) #double check            
+            pPolygon = ogr.Geometry(ogr.wkbPolygon)
+            pPolygon.AddGeometry(ring)
+
             if dLat < -60:
                 iFlag = True
             else:  

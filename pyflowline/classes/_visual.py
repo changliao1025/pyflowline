@@ -1,7 +1,5 @@
 import os
-import json
 #dependency packages
-import numpy as np
 from pyflowline.external.pyearth.visual.map.map_vector_polygon_data import map_vector_polygon_data
 from pyflowline.external.pyearth.visual.map.map_vector_polyline_data import map_vector_polyline_data
 from pyflowline.external.pyearth.visual.map.map_multiple_vector_data import map_multiple_vector_data

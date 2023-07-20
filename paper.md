@@ -31,7 +31,6 @@ River networks are crucial in hydrologic and Earth system models. Accurately rep
 
 # Statement of need
 
-
 For hydrologic modelers, river networks are a key input for hydrologic models. 
 While some hydrologic models accept vector-based river networks [@Schwenk:2021], others only accept mesh cell-based, which requires a generation method from the vector-based river network. 
 Currently, generating a mesh cell-based river network from a given vector-based river network and arbitrary computational mesh is a major challenge.
@@ -59,7 +58,7 @@ PyFlowline provides several key features, including
 
 1. Support for both structured and unstructured meshes, with JSON as the default file I/O format. For geospatial datasets such as vector river networks, GEOJSON is used.
 2. Regional and global-scale processing capabilities through the use of fast Cython- and (global-only) AABB tree-based algorithms.
-3. Built-in visualization functions based on the Python Matplotlib package [@LiaoPyearth:2022], making it easy to visualize and analyze the PyFlowline model outputs.
+3. Built-in visualization functions (experimental) based on the Python Matplotlib package [@LiaoPyearth:2022], making it easy to visualize and analyze the PyFlowline model outputs.
 
 # State of the field
 
@@ -67,14 +66,14 @@ Existing river network representation methods often fall into these three catego
 
 1. Vector-based, hydrologic models that use this method cannot couple river and land because there is no one-to-one mapping [@Schwenk:2021];
 2. High-resolution DEM-based, only supports structured rectangle grids (e.g., 30m x 30m ) at high spatial resolutions [@Esri:2011];
-3. Upscaling-based, only supports structured geographic grids (e.g., 0.5 degree x 0.5 degree) at coarse resolutions [@Wu:2012]. This method often cannot provide global coverage including Greenland and Antarctic.
+3. Upscaling-based, only supports structured geographic grids (e.g., 0.5 degree x 0.5 degree) at coarse resolutions [@Wu:2012]. This method often cannot provide global coverage, including Greenland and the Antarctic.
 
 PyFlowline is the only modeling software that provides these unique features:
 
 1. It can generate river networks on unstructured meshes; 
-2. It uses topological relationships to capture river networkd precisely; 
+2. It uses topological relationships to capture river networks precisely; 
 3. It can be applied at both high and coarse resolutions; 
-4. It can provide global coverage including Greenland and the Antarctic.
+4. It can provide global coverage, including Greenland and the Antarctic.
 
 Model documentation is hosted at https://pyflowline.readthedocs.io/en/latest/, including a case study for the Susquehanna River Basin in the Mid-Atlantic region of the United States.
 

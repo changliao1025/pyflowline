@@ -24,13 +24,19 @@ def plot(self,
     """
 
     if iFlag_type_in is None:
-        iFlag_type_in = 2
+        iFlag_type_in = 2 #polyline based, only flowline
 
     if iFlag_title_in is None:
         iFlag_title_in = 1
 
     if sVariable_in is None:
         sVariable_in = 'flowline_conceptual'
+    else:
+        if sVariable_in == 'mesh': 
+            iFlag_type_in = 3
+        else:
+            if sVariable_in == 'overlap':
+                iFlag_type_in = 4
     
 
     if iFlag_type_in == 1: #point based, such as dam
@@ -87,26 +93,29 @@ def _plot_mesh(self, sFilename_output_in=None, aExtent_in=None, pProjection_map_
 #plot both polygon and polyline
 def _plot_mesh_with_flowline(self,
                              sFilename_output_in=None,
-                             iFlag_title=None,
+                             iFlag_title_in=None,
                              aExtent_in=None,
                              pProjection_map_in = None):
 
     aFiletype_in = list()
     aFilename_in = list()
+    aFlag_color = list()
     aFilename_in.append(self.sFilename_mesh)
-    aFiletype_in.append(1)
+    aFiletype_in.append(3)
+    aFlag_color.append(0)
 
     for pBasin in self.aBasin:
         aFiletype_in.append(2)
         dummy = pBasin.sFilename_flowline_conceptual
         sFilename_json = os.path.join(pBasin.sWorkspace_output_basin, dummy)
         aFilename_in.append(sFilename_json)
+        aFlag_color.append(1)
 
     map_multiple_vector_data(aFiletype_in,
                              aFilename_in,
                              sFilename_output_in=sFilename_output_in,
                              sTitle_in= 'Mesh with flowline',
-                             aFlag_color_in=[0, 1],
+                             aFlag_color_in=aFlag_color,
                              aExtent_in = aExtent_in,
                              pProjection_map_in = pProjection_map_in)
     return
@@ -176,6 +185,7 @@ def basin_plot(self,
                                                          aExtent_in = aExtent_in)
                             return
                         else:
+                            print('Unsupported variable: ', sVariable_in, ' in basin_plot.')
                             pass
                 pass
     else:
@@ -184,7 +194,7 @@ def basin_plot(self,
 
 
     map_vector_polyline_data(sFilename_json,
-                             sFilename_output_in,
+                             sFilename_output_in= sFilename_output_in,
                              iFlag_title_in=iFlag_title_in,
                              iFlag_thickness_in=0  ,
                              sTitle_in=sTitle,

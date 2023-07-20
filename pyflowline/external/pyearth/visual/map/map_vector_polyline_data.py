@@ -24,7 +24,7 @@ class OOMFormatter(mpl.ticker.ScalarFormatter):
             self.format = r'$ mathdefault{%s}$' % self.format
 
 def map_vector_polyline_data(sFilename_in,
-                             sFilename_output_in,
+                             sFilename_output_in= None,
                              iFlag_color_in = None,
                              iFlag_label_in = None,
                              iFlag_thickness_in =None,

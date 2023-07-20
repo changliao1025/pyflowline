@@ -38,6 +38,7 @@ PyFlowline also has three optional dependency packages
 1. `cython` for performance 
 2. `matplotlin` for visualization
 3. `cartopy` for visulization
+4. `simplekml` for Google Earth KML support
 
 ### Quickstart
 
@@ -54,6 +55,8 @@ We provide several examples in the `examples` folder to demonstrate the model ca
 ### Acknowledgment
 
 This work was supported by the Earth System Model Development program areas of the U.S. Department of Energy, Office of Science, Office of Biological and Environmental Research as part of the multi-program, collaborative Integrated Coastal Modeling (ICoM) project and the Interdisciplinary Research for Arctic Coastal Environments (InteRFACE) project.
+
+This research was supported as part of the Next Generation Ecosystem Experiments-Tropics, funded by the U.S. Department of Energy, Office of Science, Office of Biological and Environmental Research at Pacific Northwest National Laboratory. The study was also partly supported by U.S. Department of Energy Office of Science Biological and Environmental Research through the Earth and Environmental System Modeling program as part of the Energy Exascale Earth System Model (E3SM) project.
 
 ### License
 

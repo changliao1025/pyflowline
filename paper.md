@@ -76,7 +76,6 @@ PyFlowline is the only modeling software that provides these unique features:
 3. It can be applied at both high and coarse resolutions; 
 4. It can provide global coverage including Greenland and the Antarctic.
 
-
 Model documentation is hosted at https://pyflowline.readthedocs.io/en/latest/, including a case study for the Susquehanna River Basin in the Mid-Atlantic region of the United States.
 
 # Acknowledgment
@@ -87,10 +86,11 @@ The model described in this repository was supported by the following:
 
 * the Earth System Model Development and Regional and Global Model Analysis program areas of the U.S. Department of Energy, Office of Science, Biological and Environmental Research program as part of the multi-program, collaborative Interdisciplinary Research for Arctic Coastal Environments (InteRFACE) project.
 
+* the Next Generation Ecosystem Experiments-Tropics project, funded by the U.S. Department of Energy, Office of Science, Office of Biological and Environmental Research at Pacific Northwest National Laboratory. 
+
 A portion of this research was performed using PNNL Research Computing at Pacific Northwest National Laboratory. 
 
 PNNL is operated for DOE by Battelle Memorial Institute under contract DE-AC05-76RL01830.
-
 
 # References
 

@@ -380,6 +380,10 @@ def create_mpas_mesh(iFlag_global_in,
                 else:
                     pass           
                 #call fuction to add the cell
+                if lCellID == 155420:
+                    print('debug')
+                    pass
+                
                 aMpas = add_cell_into_list(aMpas, i, lCellID, dArea, dElevation_mean, dElevation_profile0, aCoords )
                 
                 #save mesh cell
@@ -399,6 +403,8 @@ def create_mpas_mesh(iFlag_global_in,
     #for maps we need to clean some cell because they were not actually in the domain
     #besides, we need to add some smal holes back
     #to do this, we need two steps.
+
+    #debug 155420
 
     if iFlag_global_in == 1:
         aMpas_out = aMpas
@@ -470,8 +476,9 @@ def create_mpas_mesh(iFlag_global_in,
                 dElevation_mean = float(aBed_elevation[j])
                 dElevation_profile0 = float(aBed_elevation_profile[j,0])
                 dArea = float(aCellArea[j])
-
-                if lCellID not in aCellID:
+                           
+                if lCellID not in aCellID:                   
+                    
                     aMpas_middle = add_cell_into_list(aMpas_middle, j, lCellID, dArea, dElevation_mean, dElevation_profile0, aCoords )
                     aCellID.append(lCellID)
 
@@ -514,25 +521,35 @@ def create_mpas_mesh(iFlag_global_in,
         #the ocean neighbor will remain unchanged
         ncell = len(aMpas_middle)
         for i in range(ncell):
-            pCell = aMpas_middle[i]
-            aNeighbor_land = pCell.aNeighbor_land           
-            aNeighbor_land_virtual_update = list()
+            pCell = aMpas_middle[i]          
+
+            aNeighbor_land_update = list()   
+            aNeighbor_land = pCell.aNeighbor_land                    
+            nNeighbor_land = pCell.nNeighbor_land
+
+            aNeighbor_land_virtual_update = list()      
             aNeighbor_land_virtual = pCell.aNeighbor_land_virtual
             nNeighbor_land_virtual = pCell.nNeighbor_land_virtual
-            nNeighbor_land_update = nNeighbor_land 
+
+            for j in range(nNeighbor_land):
+                lNeighbor = int(aNeighbor_land[j])
+                if lNeighbor in aCellID:
+                    aNeighbor_land_update.append(lNeighbor)
+                    pass
+                else:
+                    pass
+
+
             for j in range(nNeighbor_land_virtual):
                 lNeighbor = int(aNeighbor_land_virtual[j])
                 if lNeighbor in aCellID:
-                    #this cell is actually not virtual anymore
-                    nNeighbor_land_update = nNeighbor_land_update + 1 
-                    aNeighbor_land.append(lNeighbor)
+                    #this cell is actually not virtual anymore                    
+                    aNeighbor_land_update.append(lNeighbor)
                 else:
                     aNeighbor_land_virtual_update.append(lNeighbor)
-                    
-                
-
-            pCell.aNeighbor_land = aNeighbor_land
-            pCell.nNeighbor_land= len(aNeighbor_land)   
+                           
+            pCell.aNeighbor_land = aNeighbor_land_update
+            pCell.nNeighbor_land= len(aNeighbor_land_update)   
             pCell.aNeighbor_land_virtual = aNeighbor_land_virtual_update   
             pCell.nNeighbor_land_virtual = len(aNeighbor_land_virtual_update)
             aMpas_out.append(pCell)

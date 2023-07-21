@@ -27,7 +27,7 @@ else:
 #setup case information
 #===================================
 iCase_index = 1
-iFlag_visualization = 1
+iFlag_visualization = 0
 sMesh = 'mpas'
 sDate='20230701'
 
@@ -40,7 +40,7 @@ oPyflowline.aBasin[0].dLongitude_outlet_degree=-76.009300
 
 oPyflowline.setup()
 if iFlag_visualization ==1:
-    #oPyflowline.plot(sVariable_in = 'flowline_filter', sFilename_output_in = 'filter_flowline.png'  )
+    oPyflowline.plot(sVariable_in = 'flowline_filter', sFilename_output_in = 'filter_flowline.png'  )
     pass
 
 oPyflowline.flowline_simplification()
@@ -53,6 +53,7 @@ if iFlag_visualization == 1:
     oPyflowline.plot( sVariable_in='flowline_simplified' , sFilename_output_in = 'flowline_simplified_zoom.png', aExtent_in =aExtent_meander ) 
 
     pass
+
 aCell = oPyflowline.mesh_generation()
 
 if iFlag_visualization == 1:

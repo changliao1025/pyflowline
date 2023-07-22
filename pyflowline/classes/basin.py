@@ -124,7 +124,7 @@ class pybasin(object):
     aConfluence_basin_conceptual= None
 
     #json
-    sFilename_hexwatershed_json=''
+    sFilename_watershed_json=''
     sFilename_stream_edge_json =''
 
     #geojson for hexwatershed compatibility
@@ -135,6 +135,9 @@ class pybasin(object):
     sFilename_distance_to_outlet = ''
     sFilename_stream_segment=''
     sFilename_stream_edge=''
+
+    sFilename_variable_polygon=''
+    sFilename_variable_polyline=''
 
     
     iFlag_visual = importlib.util.find_spec("cartopy") 
@@ -242,7 +245,7 @@ class pybasin(object):
             pass
 
         #json
-        self.sFilename_hexwatershed_json = os.path.join(str(self.sWorkspace_output_basin ), "watershed.json" )
+        self.sFilename_watershed_json = os.path.join(str(self.sWorkspace_output_basin ), "watershed.json" )
         self.sFilename_stream_edge_json = os.path.join(str(self.sWorkspace_output_basin ), 'stream_edge.json')
         self.sFilename_basin_info = os.path.join(str(self.sWorkspace_output_basin ), 'basin_info.json')
         self.sFilename_flowline_conceptual_info = os.path.join(str(self.sWorkspace_output_basin ), 'flowline_conceptual_info.json')
@@ -268,6 +271,8 @@ class pybasin(object):
         self.sFilename_distance_to_outlet = os.path.join(str(self.sWorkspace_output_basin ), "distance_to_outlet.geojson" )
         self.sFilename_stream_edge = os.path.join(str(self.sWorkspace_output_basin ), "stream_edge.geojson" )
         self.sFilename_stream_segment = os.path.join(str(self.sWorkspace_output_basin ), "stream_segment.geojson" )
+        self.sFilename_variable_polygon = os.path.join(str(self.sWorkspace_output_basin ), "variable_polygon.geojson" )
+        self.sFilename_variable_polyline = os.path.join(str(self.sWorkspace_output_basin ), "variable_polyline.geojson" )
         
         return
         

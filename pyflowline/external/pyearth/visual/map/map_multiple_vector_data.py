@@ -31,6 +31,7 @@ def map_multiple_vector_data(aFiletype_in,
                              iFlag_colorbar_in=None,
                              aFlag_thickness_in=None,
                              aFlag_color_in=None,
+                             aFlag_fill_in = None,
                              aVariable_in = None,
                              sFilename_output_in=None,
                              iFlag_scientific_notation_colorbar_in=None,
@@ -98,6 +99,11 @@ def map_multiple_vector_data(aFiletype_in,
         aFlag_color= np.zeros(nFile, dtype=np.int16)
     else:
         aFlag_color = aFlag_color_in
+
+    if aFlag_fill_in is None:
+        aFlag_fill= np.zeros(nFile, dtype=np.int16)
+    else:
+        aFlag_fill = aFlag_fill_in
 
     #get the extent first
     sFilename_in = aFilename_in[0]
@@ -217,6 +223,7 @@ def map_multiple_vector_data(aFiletype_in,
         sFilename = aFilename_in[i]
 
         iFlag_thickness = aFlag_thickness[i]
+        iFlag_color = aFlag_color[i]
         if iFlag_thickness ==1 :
             sVariable = aVariable_in[i]
             pDataset = pDriver.Open(sFilename, gdal.GA_ReadOnly)
@@ -227,6 +234,18 @@ def map_multiple_vector_data(aFiletype_in,
                 sGeometry_type = pGeometry_in.GetGeometryName()
                 dValue = float(pFeature.GetField(sVariable))
                 aValue.append(dValue)
+        else:
+            if iFlag_color  == 1:
+                sVariable = aVariable_in[i]
+                pDataset = pDriver.Open(sFilename, gdal.GA_ReadOnly)
+                pLayer = pDataset.GetLayer(0)
+
+                for pFeature in pLayer:
+                    pGeometry_in = pFeature.GetGeometryRef()
+                    sGeometry_type = pGeometry_in.GetGeometryName()
+                    dValue = float(pFeature.GetField(sVariable))
+                    aValue.append(dValue)
+
 
         aValue_all.append(aValue)
 
@@ -236,7 +255,8 @@ def map_multiple_vector_data(aFiletype_in,
     for i in range(nFile):
         sFilename = aFilename_in[i]
         iFlag_thickness = aFlag_thickness[i]
-        iFlag_colar = aFlag_color[i]
+        iFlag_color = aFlag_color[i]
+        iFlag_fill = aFlag_fill[i]
         pDataset = pDriver.Open(sFilename, gdal.GA_ReadOnly)
         pLayer = pDataset.GetLayer(0)
 
@@ -272,7 +292,7 @@ def map_multiple_vector_data(aFiletype_in,
             else:
                 iThickness = 1.0
 
-            if iFlag_colar ==1:
+            if iFlag_color ==1:
                 if nColor < 10:
                     sColor = aColor[lID]
                 else:
@@ -303,14 +323,12 @@ def map_multiple_vector_data(aFiletype_in,
 
                 #pick color from colormap
 
-            if sGeometry_type =='POLYGON':
+            if sGeometry_type =='POINT':
                 dummy0 = loads( pGeometry_in.ExportToWkt() )
-                aCoords_gcs = dummy0.exterior.coords
+                aCoords_gcs = dummy0.coords
                 aCoords_gcs= np.array(aCoords_gcs)
-                polygon = mpatches.Polygon(aCoords_gcs[:,0:2], closed=True, linewidth=0.25, \
-                                           alpha=0.8, edgecolor = sColor,facecolor= 'none', \
-                                           transform=ccrs.Geodetic() )
-                ax.add_patch(polygon)
+                aCoords_gcs = aCoords_gcs[:,0:2]
+                ax.plot(aCoords_gcs[0], aCoords_gcs[1], 'o', color= sColor, markersize=2, transform=ccrs.Geodetic())                
             else:
                 if sGeometry_type =='LINESTRING':
                     dummy0 = loads( pGeometry_in.ExportToWkt() )
@@ -324,12 +342,19 @@ def map_multiple_vector_data(aFiletype_in,
                     x, y = zip(*path.vertices)
                     line, = ax.plot(x, y, color= sColor, linewidth=iThickness, transform=ccrs.Geodetic())
                 else:
-                    if sGeometry_type =='POINT':
+                    if sGeometry_type == 'POLYGON': 
                         dummy0 = loads( pGeometry_in.ExportToWkt() )
-                        aCoords_gcs = dummy0.coords
-                        aCoords_gcs= np.array(aCoords_gcs)
-                        aCoords_gcs = aCoords_gcs[:,0:2]
-                        ax.plot(aCoords_gcs[0], aCoords_gcs[1], 'o', color= sColor, markersize=2, transform=ccrs.Geodetic())
+                        aCoords_gcs = dummy0.exterior.coords
+                        aCoords_gcs = np.array(aCoords_gcs)
+                        if iFlag_fill == 1:
+                            polygon = mpatches.Polygon(aCoords_gcs[:,0:2], closed=True, linewidth=0.25, 
+                                           alpha=0.8, edgecolor = sColor,facecolor= sColor, 
+                                           transform=ccrs.Geodetic() )
+                        else:
+                            polygon = mpatches.Polygon(aCoords_gcs[:,0:2], closed=True, linewidth=0.25, 
+                                           alpha=0.8, edgecolor = sColor,facecolor='none', 
+                                           transform=ccrs.Geodetic() )
+                        ax.add_patch(polygon)
                     else:
                         pass
 

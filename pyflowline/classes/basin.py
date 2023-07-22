@@ -123,6 +123,11 @@ class pybasin(object):
     aConfluence_basin_simplified= None
     aConfluence_basin_conceptual= None
 
+
+    #
+    sFilename_mesh = ''
+    iMesh_type = 0
+    sMesh_type = ''
     #json
     sFilename_watershed_json=''
     sFilename_stream_edge_json =''
@@ -142,8 +147,11 @@ class pybasin(object):
     
     iFlag_visual = importlib.util.find_spec("cartopy") 
     if iFlag_visual is not None:
-        from ._visual import basin_plot
-        from ._visual import _plot_area_of_difference 
+        from ._visual_basin import basin_plot
+        from ._visual_basin import _plot_polyline_variable
+        from ._visual_basin import _plot_polygon_variable
+
+        from ._visual_basin import _plot_area_of_difference 
     else:
         pass
 
@@ -229,6 +237,34 @@ class pybasin(object):
             self.sFilename_flowline_topo = aParameter['sFilename_flowline_topo']
         else:
             self.sFilename_flowline_topo = ''
+
+        if 'sMesh_type' in aParameter:
+            self.sMesh_type =  aParameter['sMesh_type']
+        else:
+            self.sMesh_type = 'hexagon'
+
+
+
+        sMesh_type = self.sMesh_type
+        if sMesh_type =='hexagon': #hexagon
+            self.iMesh_type = 1
+        else:
+            if sMesh_type =='square': #square
+                self.iMesh_type = 2
+            else:
+                if sMesh_type =='latlon': #latlon
+                    self.iMesh_type = 3
+                else:
+                    if sMesh_type =='mpas': #mpas
+                        self.iMesh_type = 4
+                    else:
+                        if sMesh_type =='dggrid':
+                            self.iMesh_type = 5
+                        else:
+                            if sMesh_type =='tin': #
+                                self.iMesh_type = 6
+                            else:
+                                print('Unsupported mesh type?')
 
         self.sBasinID  = "{:08d}".format(self.lBasinID)
 

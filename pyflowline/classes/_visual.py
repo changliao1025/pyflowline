@@ -124,42 +124,6 @@ def _plot_mesh_with_flowline(self,
                              pProjection_map_in = pProjection_map_in)
     return
 
-def _plot_mesh_with_flow_direction(self,
-                                   iFigwidth_in=None,
-                                   iFigheight_in=None,
-                                   sMesh_type_in = None,
-                                   sFilename_mesh_in = None,
-                                   sFilename_output_in = None,
-                                   aExtent_in = None,
-                                   pProjection_map_in = None):
-    if sMesh_type_in is None:
-        sMesh_type = self.sMesh_type
-    else:
-        sMesh_type = sMesh_type_in
-
-    if sFilename_mesh_in is None:
-        sFilename_mesh = self.sFilename_mesh
-    else:
-        sFilename_mesh = sFilename_mesh_in
-
-    if sFilename_output_in is None:
-        sFilename_output = os.path.join(str(Path(self.sWorkspace_output_hexwatershed)  ) , sMesh_type + "_mesh_w_flow_direction.png" )
-    else:
-        sFilename_output = sFilename_output_in
-
-    sFilename = self.sFilename_flow_direction #this can be either domain wide or subbasin level
-
-    aFiletype_in = [3, 2]
-
-    aFilename_in = [sFilename_mesh, sFilename]
-    map_multiple_vector_data(aFiletype_in,
-                             aFilename_in,
-                             sFilename_output_in=sFilename_output_in,
-                             sTitle_in= 'Mesh with flowline',
-                             aFlag_color_in=[0, 1])
-    return
-
-
 #this function is used to plot the study area
 def _plot_study_area(self, sFilename_boundary_in = None, sFilename_slope_in = None, sFilename_nhd_in = None):
     return

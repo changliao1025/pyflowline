@@ -176,8 +176,6 @@ def _plot_polyline_variable(self,
                              aExtent_in = aExtent_in,
                              pProjection_map_in = pProjection_map_in)
     
-    
-
 def _plot_polygon_variable(self,
                              sVariable_in,
                              iFigwidth_in=None,
@@ -280,6 +278,63 @@ def _plot_polygon_variable(self,
 
     return
 
+def _plot_mesh_with_flowline(self,
+                             sFilename_output_in=None,
+                             iFlag_title_in=None,
+                             aExtent_in=None,
+                             pProjection_map_in = None):
+
+    aFiletype_in = list()
+    aFilename_in = list()
+    aFlag_color = list()
+    aFilename_in.append(self.sFilename_mesh)
+    aFiletype_in.append(3)
+    aFlag_color.append(0)
+
+    
+    dummy = self.sFilename_flowline_conceptual
+    sFilename_json = os.path.join(self.sWorkspace_output_basin, dummy)
+    aFilename_in.append(sFilename_json)
+    aFlag_color.append(1)
+
+    map_multiple_vector_data(aFiletype_in,
+                             aFilename_in,
+                             sFilename_output_in=sFilename_output_in,
+                             sTitle_in= 'Mesh with flowline',
+                             aFlag_color_in=aFlag_color,
+                             aExtent_in = aExtent_in,
+                             pProjection_map_in = pProjection_map_in)
+    return
+
+def _plot_mesh_with_flow_direction(self,
+                                   iFigwidth_in=None,
+                                   iFigheight_in=None,
+                                   sMesh_type_in = None,
+                                   sFilename_mesh_in = None,
+                                   sFilename_output_in = None,
+                                   aExtent_in = None,
+                                   pProjection_map_in = None):
+    if sMesh_type_in is None:
+        sMesh_type = self.sMesh_type
+    else:
+        sMesh_type = sMesh_type_in
+
+    if sFilename_mesh_in is None:
+        sFilename_mesh = self.sFilename_mesh
+    else:
+        sFilename_mesh = sFilename_mesh_in
+
+    sFilename = self.sFilename_flow_direction #this can be either domain wide or subbasin level
+
+    aFiletype_in = [3, 2]
+
+    aFilename_in = [sFilename_mesh, sFilename]
+    map_multiple_vector_data(aFiletype_in,
+                             aFilename_in,
+                             sFilename_output_in=sFilename_output_in,
+                             sTitle_in= 'Mesh with flowline',
+                             aFlag_color_in=[0, 1])
+    return
 
 #this is a reserved function
 def _plot_area_of_difference(self, iMesh_type, sMesh_type, sFilename_figure_in, aExtent_in = None, pProjection_map_in = None):

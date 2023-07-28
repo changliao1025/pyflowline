@@ -30,7 +30,13 @@ pBoundary_in):
     pDataset = pDriver_geojson.CreateDataSource(sFilename_output_in)
     pLayer = pDataset.CreateLayer('cell', pSpatial_reference_gcs, ogr.wkbPolygon)
     # Add one attribute
-    pLayer.CreateField(ogr.FieldDefn('id', ogr.OFTInteger64)) #long type for high resolution    
+    pLayer.CreateField(ogr.FieldDefn('cellid', ogr.OFTInteger64)) #long type for high resolution  
+    pLayer.CreateField(ogr.FieldDefn('longitude', ogr.OFTReal)) #long type for high resolution
+    pLayer.CreateField(ogr.FieldDefn('latitude', ogr.OFTReal)) #long type for high resolution
+    pArea_field = ogr.FieldDefn('area', ogr.OFTReal)
+    pArea_field.SetWidth(20)
+    pArea_field.SetPrecision(2)
+    pLayer.CreateField(pArea_field)  
     pLayerDefn = pLayer.GetLayerDefn()
     pFeature = ogr.Feature(pLayerDefn)
     xleft = dX_left_in
@@ -53,10 +59,8 @@ pBoundary_in):
     #   |           |
     #(x1,y1)-----(x4,y4)
     #...............
-    for column in range(0, ncolumn_in):
-  
-        for row in range(0, nrow_in):
-            
+    for column in range(0, ncolumn_in):  
+        for row in range(0, nrow_in):            
 
             if column % 2 == 0 :
                 if row % 2 == 0:
@@ -153,9 +157,9 @@ pBoundary_in):
                 aTin.append(pTIN)
 
                 pFeature.SetGeometry(pPolygon)
-                pFeature.SetField("id", lCellID)
-                pFeature.SetField("lon", dLongitude_center )
-                pFeature.SetField("lat", dLatitude_center )
+                pFeature.SetField("cellid", lCellID)
+                pFeature.SetField("longitude", dLongitude_center )
+                pFeature.SetField("latitude", dLatitude_center )
                 pFeature.SetField("area", dArea )
                 pLayer.CreateFeature(pFeature)
                           

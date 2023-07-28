@@ -69,16 +69,16 @@ def create_mpas_mesh(iFlag_global_in,
         pDataset = pDriver_geojson.CreateDataSource(sFilename_output_in)
         pLayer = pDataset.CreateLayer('cell', pSpatial_reference_gcs, ogr.wkbPolygon)
         # Add one attribute
-        pLayer.CreateField(ogr.FieldDefn('id', ogr.OFTInteger64)) #long type for high resolution
-        pLayer.CreateField(ogr.FieldDefn('lon', ogr.OFTReal)) #long type for high resolution
-        pLayer.CreateField(ogr.FieldDefn('lat', ogr.OFTReal)) #long type for high resolution
+        pLayer.CreateField(ogr.FieldDefn('cellid', ogr.OFTInteger64)) #long type for high resolution
+        pLayer.CreateField(ogr.FieldDefn('longitude', ogr.OFTReal)) #long type for high resolution
+        pLayer.CreateField(ogr.FieldDefn('latitude', ogr.OFTReal)) #long type for high resolution
         pArea_field = ogr.FieldDefn('area', ogr.OFTReal)
         pArea_field.SetWidth(20)
         pArea_field.SetPrecision(2)
         pLayer.CreateField(pArea_field)
         if iFlag_use_mesh_dem == 1:
-            pLayer.CreateField(ogr.FieldDefn('elev', ogr.OFTReal)) #float type for high resolution
-            pLayer.CreateField(ogr.FieldDefn('elev0', ogr.OFTReal)) #float type for high resolution
+            pLayer.CreateField(ogr.FieldDefn('elevation_mean', ogr.OFTReal)) #float type for high resolution
+            pLayer.CreateField(ogr.FieldDefn('elevation_profile0', ogr.OFTReal)) #float type for high resolution
         else:
             pass
     
@@ -311,13 +311,13 @@ def create_mpas_mesh(iFlag_global_in,
                 #save mesh cell
                 if iFlag_save_mesh_in ==1:                
                     pFeature.SetGeometry(pPolygon)
-                    pFeature.SetField("id", int(lCellID) )
-                    pFeature.SetField("lon", dLon )
-                    pFeature.SetField("lat", dLat )
+                    pFeature.SetField("cellid", int(lCellID) )
+                    pFeature.SetField("longitude", dLon )
+                    pFeature.SetField("latitude", dLat )
                     pFeature.SetField("area", dArea )
                     if iFlag_use_mesh_dem == 1:
-                        pFeature.SetField("elev", dElevation_mean )
-                        pFeature.SetField("elev0", dElevation_profile0 )
+                        pFeature.SetField("elevation_mean", dElevation_mean )
+                        pFeature.SetField("elevation_profile0", dElevation_profile0 )
 
                     pLayer.CreateFeature(pFeature)
             
@@ -389,13 +389,13 @@ def create_mpas_mesh(iFlag_global_in,
                 #save mesh cell
                 if iFlag_save_mesh_in ==1:                
                     pFeature.SetGeometry(pPolygon)
-                    pFeature.SetField("id", int(lCellID) )
-                    pFeature.SetField("lon", dLon )
-                    pFeature.SetField("lat", dLat )
+                    pFeature.SetField("cellid", int(lCellID) )
+                    pFeature.SetField("longitude", dLon )
+                    pFeature.SetField("latitude", dLat )
                     pFeature.SetField("area", dArea )
                     if iFlag_use_mesh_dem == 1:
-                        pFeature.SetField("elev", dElevation_mean )
-                        pFeature.SetField("elev0", dElevation_profile0 )
+                        pFeature.SetField("elevation_mean", dElevation_mean )
+                        pFeature.SetField("elevation_profile0", dElevation_profile0 )
 
                     pLayer.CreateFeature(pFeature)
 
@@ -497,13 +497,13 @@ def create_mpas_mesh(iFlag_global_in,
                     pPolygon.AddGeometry(ring)
                     if iFlag_save_mesh_in ==1:                
                         pFeature.SetGeometry(pPolygon)
-                        pFeature.SetField("id", int(lCellID) )
-                        pFeature.SetField("lon", dLon )
-                        pFeature.SetField("lat", dLat )
+                        pFeature.SetField("cellid", int(lCellID) )
+                        pFeature.SetField("longitude", dLon )
+                        pFeature.SetField("latitude", dLat )
                         pFeature.SetField("area", dArea )
                         if iFlag_use_mesh_dem == 1:
-                            pFeature.SetField("elev", dElevation_mean )
-                            pFeature.SetField("elev0", dElevation_profile0 )
+                            pFeature.SetField("elevation_mean", dElevation_mean )
+                            pFeature.SetField("elevation_profile0", dElevation_profile0 )
 
                         pLayer.CreateFeature(pFeature)
 

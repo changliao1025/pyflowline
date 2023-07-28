@@ -27,7 +27,7 @@ def read_mesh_json(iMesh_type_in, sFilename_mesh_in):
     for n in range(ldefn.GetFieldCount()):
         fdefn = ldefn.GetFieldDefn(n)
         schema.append(fdefn.name)
-    if 'iseg' in schema:
+    if 'segment' in schema:
         iFlag_segment = 1
     else:
         iFlag_segment = 0   
@@ -38,13 +38,13 @@ def read_mesh_json(iMesh_type_in, sFilename_mesh_in):
         dummy0 = loads( pGeometry_mesh.ExportToWkt() )
         aCoords_gcs = dummy0.exterior.coords
         aCoords_gcs= np.array(aCoords_gcs)       
-        lCellID = pFeature_mesh.GetField("id")
-        dLon = pFeature_mesh.GetField("lon")
-        dLat = pFeature_mesh.GetField("lat")        
+        lCellID = pFeature_mesh.GetField("cellid")
+        dLon = pFeature_mesh.GetField("longitude")
+        dLat = pFeature_mesh.GetField("latitude")        
         dArea = pFeature_mesh.GetField("area")
         if iMesh_type_in == 4:
-            dElevation_mean = pFeature_mesh.GetField("elev")
-            dElevation_profile0 = pFeature_mesh.GetField("elev0")
+            dElevation_mean = pFeature_mesh.GetField("elevation_mean")
+            dElevation_profile0 = pFeature_mesh.GetField("elevation_profile0")
     
         pGeometrytype_mesh = pGeometry_mesh.GetGeometryName()
         if(pGeometrytype_mesh == 'POLYGON'):            
@@ -84,7 +84,7 @@ def read_mesh_json_w_topology(iMesh_type_in, sFilename_mesh_in):
     for n in range(ldefn.GetFieldCount()):
         fdefn = ldefn.GetFieldDefn(n)
         schema.append(fdefn.name)
-    if 'iseg' in schema:
+    if 'segment' in schema:
         iFlag_segment = 1
     else:
         iFlag_segment = 0   
@@ -95,13 +95,13 @@ def read_mesh_json_w_topology(iMesh_type_in, sFilename_mesh_in):
         dummy0 = loads( pGeometry_mesh.ExportToWkt() )
         aCoords_gcs = dummy0.exterior.coords
         aCoords_gcs= np.array(aCoords_gcs)       
-        lCellID = pFeature_mesh.GetField("id")
-        dLon = pFeature_mesh.GetField("lon")
-        dLat = pFeature_mesh.GetField("lat")        
+        lCellID = pFeature_mesh.GetField("cellid")
+        dLon = pFeature_mesh.GetField("longitude")
+        dLat = pFeature_mesh.GetField("latitude")        
         dArea = pFeature_mesh.GetField("area")
         if iMesh_type_in == 4:
-            dElevation_mean = pFeature_mesh.GetField("elev")
-            dElevation_profile0 = pFeature_mesh.GetField("elev0")
+            dElevation_mean = pFeature_mesh.GetField("elevation_mean")
+            dElevation_profile0 = pFeature_mesh.GetField("elevation_profile0")
     
         pGeometrytype_mesh = pGeometry_mesh.GetGeometryName()
         if(pGeometrytype_mesh == 'POLYGON'):            

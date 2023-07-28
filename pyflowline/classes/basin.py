@@ -552,15 +552,22 @@ class pybasin(object):
         ptimer.stop()
         if self.iFlag_debug ==1:
             sFilename_out = self.sFilename_flowline_segment_index_before_intersect            
-            export_flowline_to_geojson(  aFlowline_basin_simplified, sFilename_out, \
-                aAttribute_data=[aStream_segment], aAttribute_field=['iseg'], aAttribute_dtype=['int'])
+            export_flowline_to_geojson(  aFlowline_basin_simplified, 
+                                       sFilename_out, 
+                aAttribute_data=[aStream_segment], 
+                aAttribute_field=['segment'], 
+                aAttribute_dtype=['int'])
+            
         #build stream order 
         ptimer.start()
         aFlowline_basin_simplified, aStream_order = define_stream_order(aFlowline_basin_simplified)
         ptimer.stop()
         sFilename_out = self.sFilename_flowline_simplified        
-        export_flowline_to_geojson(  aFlowline_basin_simplified, sFilename_out, \
-                aAttribute_data=[aStream_segment, aStream_order], aAttribute_field=['iseg','iord'], aAttribute_dtype=['int','int'])
+        export_flowline_to_geojson(  aFlowline_basin_simplified, 
+                                   sFilename_out, 
+                aAttribute_data=[aStream_segment, aStream_order], 
+                aAttribute_field=['segment','order'], 
+                aAttribute_dtype=['int','int'])
         
         if self.iFlag_break_by_distance==1:
             ptimer.start()
@@ -681,7 +688,7 @@ class pybasin(object):
         export_flowline_to_geojson(  aFlowline_basin_conceptual, 
                                    sFilename_out, 
             aAttribute_data=[aStream_segment, aStream_order], 
-            aAttribute_field=['iseg','iord'], 
+            aAttribute_field=['segment','order'], 
             aAttribute_dtype=['int','int'])
 
         self.aFlowline_basin_conceptual = aFlowline_basin_conceptual     

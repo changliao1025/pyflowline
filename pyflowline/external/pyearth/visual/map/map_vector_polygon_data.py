@@ -63,6 +63,13 @@ def map_vector_polygon_data(sFilename_in,
 
     pDriver = ogr.GetDriverByName('GeoJSON')
 
+    #check if the file exists
+    if os.path.isfile(sFilename_in):
+        pass
+    else:
+        print('The file does not exist: ', sFilename_in)
+        return
+
     pDataset = pDriver.Open(sFilename_in, gdal.GA_ReadOnly)
     pLayer = pDataset.GetLayer(0)
 

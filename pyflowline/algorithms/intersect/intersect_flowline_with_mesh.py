@@ -46,9 +46,9 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh_in, sFilename_flo
 
     pLayerOut = pDataset_out.CreateLayer('flowline', pSpatial_reference_flowline, ogr.wkbMultiLineString)
     # Add one attribute
-    pLayerOut.CreateField(ogr.FieldDefn('id', ogr.OFTInteger64)) #long type for high resolution
-    pLayerOut.CreateField(ogr.FieldDefn('iseg', ogr.OFTInteger)) #long type for high resolution
-    pLayerOut.CreateField(ogr.FieldDefn('iord', ogr.OFTInteger)) #long type for high resolution
+    pLayerOut.CreateField(ogr.FieldDefn('lineid', ogr.OFTInteger64)) #long type for high resolution
+    pLayerOut.CreateField(ogr.FieldDefn('segment', ogr.OFTInteger)) #long type for high resolution
+    pLayerOut.CreateField(ogr.FieldDefn('order', ogr.OFTInteger)) #long type for high resolution
     pLayerDefn = pLayerOut.GetLayerDefn()
     pFeatureOut = ogr.Feature(pLayerDefn)       
     lID_flowline = 0          
@@ -59,9 +59,9 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh_in, sFilename_flo
         aCoords_gcs = dummy0.exterior.coords
         aCoords_gcs= np.array(aCoords_gcs)       
 
-        lCellID = pFeature_mesh.GetField("id")
-        dLon = pFeature_mesh.GetField("lon")
-        dLat = pFeature_mesh.GetField("lat")        
+        lCellID = pFeature_mesh.GetField("cellid")
+        dLon = pFeature_mesh.GetField("longitude")
+        dLat = pFeature_mesh.GetField("latitude")        
         dArea = pFeature_mesh.GetField("area")
         if (iFlag_transform ==1): 
             pGeometry_mesh.Transform(transform)
@@ -82,8 +82,8 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh_in, sFilename_flo
             for j in range (nfeature_flowline):
                 pFeature_flowline = pLayer_flowline.GetFeature(j)
                 pGeometry_flowline = pFeature_flowline.GetGeometryRef()
-                iStream_segment = pFeature_flowline.GetField("iseg")
-                iStream_order = pFeature_flowline.GetField("iord")
+                iStream_segment = pFeature_flowline.GetField("segment")
+                iStream_order = pFeature_flowline.GetField("order")
                 if (pGeometry_flowline.IsValid()):
                     pass
                 else:
@@ -96,9 +96,9 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh_in, sFilename_flo
                     pGeometrytype_intersect = pGeometry_intersect.GetGeometryName()
                     if pGeometrytype_intersect == 'LINESTRING':
                         pFeatureOut.SetGeometry(pGeometry_intersect)
-                        pFeatureOut.SetField("id", lID_flowline)         
-                        pFeatureOut.SetField("iseg", iStream_segment)    
-                        pFeatureOut.SetField("iord", iStream_order)           
+                        pFeatureOut.SetField("lineid", lID_flowline)         
+                        pFeatureOut.SetField("segment", iStream_segment)    
+                        pFeatureOut.SetField("order", iStream_order)           
                         pLayerOut.CreateFeature(pFeatureOut)    
                  
                         aCoords = list()
@@ -122,9 +122,9 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh_in, sFilename_flo
                             for i in range(nLine):
                                 Line = pGeometry_intersect.GetGeometryRef(i) 
                                 pFeatureOut.SetGeometry(Line)
-                                pFeatureOut.SetField("id", lID_flowline)         
-                                pFeatureOut.SetField("iseg", iStream_segment)    
-                                pFeatureOut.SetField("iord", iStream_order)           
+                                pFeatureOut.SetField("lineid", lID_flowline)         
+                                pFeatureOut.SetField("segment", iStream_segment)    
+                                pFeatureOut.SetField("order", iStream_order)           
                                 pLayerOut.CreateFeature(pFeatureOut)    
                                 aCoords = list()
                                 for i in range(0, Line.GetPointCount()): 

@@ -68,7 +68,11 @@ def map_vector_polyline_data(sFilename_in,
         pProjection_map_in (_type_, optional): _description_. Defaults to None.
     """
 
-
+    if os.path.isfile(sFilename_in):
+        pass
+    else:
+        print('The file does not exist: ', sFilename_in)
+        return
 
     sFilename_out= sFilename_output_in
     if iDPI_in is not None:

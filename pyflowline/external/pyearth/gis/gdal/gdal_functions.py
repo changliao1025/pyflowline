@@ -470,12 +470,14 @@ def read_mesh_boundary(sFilename_boundary_in):
     
 
 def get_geometry_coords(geometry):
-    if geometry.GetGeometryType() == ogr.wkbPolygon:
-        return get_polygon_exterior_coords(geometry)
-    elif geometry.GetGeometryType() == ogr.wkbLineString:
-        return get_linestring_coords(geometry)
-    elif geometry.GetGeometryType() == ogr.wkbPoint:
+    
+    sGeometry_type = geometry.GetGeometryName()
+    if sGeometry_type =='POINT':
         return get_point_coords(geometry)
+    elif sGeometry_type == 'LINESTRING':
+        return get_linestring_coords(geometry)
+    elif sGeometry_type =='POLYGON':
+        return get_polygon_exterior_coords(geometry)
     else:
         raise ValueError("Unsupported geometry type.")
 

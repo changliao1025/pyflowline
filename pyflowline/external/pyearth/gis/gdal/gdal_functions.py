@@ -3,10 +3,8 @@ from math import cos, sin, sqrt, acos
 import numpy as np
 import osgeo
 from osgeo import ogr, osr, gdal
-from shapely.wkt import loads
+#from shapely.wkt import loads
 #most of these functions are copied from the pyearth package
-
-
 
 import importlib
 iFlag_cython = importlib.util.find_spec("cython") 
@@ -71,8 +69,6 @@ def calculate_angle_betwen_vertex(x1, y1, x2, y2, x3, y3):
     angle3deg = angle_between_vectors_degrees(a3vec, c3vec)
     return  angle3deg
     
-
-
 def angle_between_vectors_degrees(u, v):
     """Return the angle between two vectors in any dimension space,
     in degrees.
@@ -469,8 +465,35 @@ def read_mesh_boundary(sFilename_boundary_in):
             
             
     pBoundary_wkt = pBoundary_ogr.ExportToWkt()
-    pBoundary_shp = loads( pBoundary_ogr.ExportToWkt() )
-    return pBoundary_wkt, pBoundary_shp
+   
+    return pBoundary_wkt
     
 
-   
+def get_geometry_coords(geometry):
+    if geometry.GetGeometryType() == ogr.wkbPolygon:
+        return get_polygon_exterior_coords(geometry)
+    elif geometry.GetGeometryType() == ogr.wkbLineString:
+        return get_linestring_coords(geometry)
+    elif geometry.GetGeometryType() == ogr.wkbPoint:
+        return get_point_coords(geometry)
+    else:
+        raise ValueError("Unsupported geometry type.")
+
+def get_polygon_exterior_coords(polygon_geometry):
+    exterior_coords = []
+    ring = polygon_geometry.GetGeometryRef(0)  # Get the exterior ring
+    for i in range(ring.GetPointCount()):
+        point = ring.GetPoint(i)
+        exterior_coords.append((point[0], point[1]))
+    return np.array(exterior_coords)
+
+def get_linestring_coords(linestring_geometry):
+    coords = []
+    for i in range(linestring_geometry.GetPointCount()):
+        point = linestring_geometry.GetPoint(i)
+        coords.append((point[0], point[1]))
+    return np.array(coords)
+
+def get_point_coords(point_geometry):
+    point = point_geometry.GetPoint()
+    return np.array([(point[0], point[1])])

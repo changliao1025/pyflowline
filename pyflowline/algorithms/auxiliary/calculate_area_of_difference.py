@@ -3,10 +3,7 @@ import numpy as np
 from osgeo import ogr, osr
 import importlib
 
-from shapely.ops import polygonize
-
 from pyflowline.algorithms.auxiliary.find_index_in_list import find_list_in_list 
-
 from pyflowline.external.pyearth.gis.gdal.gdal_functions import calculate_angle_betwen_vertex_normal
 from pyflowline.external.pyearth.gis.gdal.gdal_functions import calculate_polygon_area
 
@@ -16,6 +13,13 @@ if iFlag_cython is not None:
 else:
     from pyflowline.algorithms.auxiliary.find_vertex_in_list import find_vertex_in_list
 
+iFlag_shapely = importlib.util.find_spec("shapely") 
+if iFlag_shapely is not None:    
+    from shapely.ops import polygonize
+else:
+    print('shapely is required for this function')
+    pass
+    
 
 def calculate_area_of_difference_raw(sFilename_a, sFilename_b):
     #not yet supported

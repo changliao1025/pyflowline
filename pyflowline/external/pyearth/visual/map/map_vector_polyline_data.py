@@ -1,7 +1,7 @@
 import os
 import numpy as np
 from osgeo import  osr, gdal, ogr
-from shapely.wkt import loads
+#from shapely.wkt import loads
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import matplotlib as mpl
@@ -10,7 +10,7 @@ import matplotlib.path as mpath
 import cartopy.crs as ccrs
 from cartopy.mpl.gridliner import LONGITUDE_FORMATTER, LATITUDE_FORMATTER
 from pyflowline.external.pyearth.toolbox.math.stat.remap import remap
-
+from pyflowline.external.pyearth.gis.gdal.gdal_functions import get_geometry_coords
 class OOMFormatter(mpl.ticker.ScalarFormatter):
     def __init__(self, order=0, fformat="%1.1e", offset=True, mathText=True):
         self.oom = order
@@ -150,9 +150,10 @@ def map_vector_polyline_data(sFilename_in,
         sGeometry_type = pGeometry_in.GetGeometryName()
 
         if sGeometry_type =='LINESTRING':
-            dummy0 = loads( pGeometry_in.ExportToWkt() )
-            aCoords_gcs = dummy0.coords
-            aCoords_gcs= np.array(aCoords_gcs)
+            #dummy0 = loads( pGeometry_in.ExportToWkt() )
+            #aCoords_gcs = dummy0.coords
+            #aCoords_gcs= np.array(aCoords_gcs)
+            aCoords_gcs = get_geometry_coords(pGeometry_in)
             aCoords_gcs = aCoords_gcs[:,0:2]
 
             dLon_max = np.max( [dLon_max, np.max(aCoords_gcs[:,0])] )
@@ -197,12 +198,12 @@ def map_vector_polyline_data(sFilename_in,
             dValue = pFeature.GetField(sField_thickness)
 
         if sGeometry_type =='LINESTRING':
-            dummy0 = loads( pGeometry_in.ExportToWkt() )
-            aCoords_gcs = dummy0.coords
-            aCoords_gcs= np.array(aCoords_gcs)
+            #dummy0 = loads( pGeometry_in.ExportToWkt() )
+            #aCoords_gcs = dummy0.coords
+            #aCoords_gcs= np.array(aCoords_gcs)
+            aCoords_gcs = get_geometry_coords(pGeometry_in)
             aCoords_gcs = aCoords_gcs[:,0:2]
             nvertex = len(aCoords_gcs)
-
             if nvertex == 2 :
                 dLon_label = 0.5 * (aCoords_gcs[0][0] + aCoords_gcs[1][0] )
                 dLat_label = 0.5 * (aCoords_gcs[0][1] + aCoords_gcs[1][1] )

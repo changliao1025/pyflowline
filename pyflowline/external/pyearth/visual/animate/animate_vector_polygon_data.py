@@ -1,22 +1,16 @@
 import os
 import json
 import numpy as np
-
 import cartopy.crs as ccrs
-import cartopy.mpl.ticker as ticker
 import matplotlib as mpl
-from shapely.wkt import loads
+#from shapely.wkt import loads
 from osgeo import osr, gdal, ogr
-
-
 import matplotlib.pyplot as plt
-import matplotlib.path as mpath
-import matplotlib.ticker as mticker
 import matplotlib.patches as mpatches
 import matplotlib.cm as cm
 from matplotlib import animation
-from pyearth.toolbox.data.cgpercentiles import cgpercentiles
 from cartopy.mpl.gridliner import LONGITUDE_FORMATTER, LATITUDE_FORMATTER
+from pyflowline.external.pyearth.gis.gdal.gdal_functions import get_geometry_coords
 
 pProjection = ccrs.PlateCarree()  # for latlon data only
 
@@ -83,9 +77,10 @@ def animate_vector_polygon_data(
         sGeometry_type = pGeometry_in.GetGeometryName()
 
         if sGeometry_type == "POLYGON":
-            dummy0 = loads(pGeometry_in.ExportToWkt())
-            aCoords_gcs = dummy0.exterior.coords
-            aCoords_gcs = np.array(aCoords_gcs)
+            #dummy0 = loads(pGeometry_in.ExportToWkt())
+            #aCoords_gcs = dummy0.exterior.coords
+            #aCoords_gcs = np.array(aCoords_gcs)
+            aCoords_gcs = get_geometry_coords(pGeometry_in)
 
             dLon_max = np.max([dLon_max, np.max(aCoords_gcs[:, 0])])
             dLon_min = np.min([dLon_min, np.min(aCoords_gcs[:, 0])])

@@ -1,13 +1,15 @@
 import os
 import numpy as np
 from osgeo import  osr, gdal, ogr
-from shapely.wkt import loads
+#from shapely.wkt import loads
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import matplotlib.cm as cm
 import cartopy.crs as ccrs
 from cartopy.mpl.gridliner import LONGITUDE_FORMATTER, LATITUDE_FORMATTER
+
+from pyflowline.external.pyearth.gis.gdal.gdal_functions import get_geometry_coords
 
 class OOMFormatter(mpl.ticker.ScalarFormatter):
     def __init__(self, order=0, fformat="%1.1e", offset=True, mathText=True):
@@ -89,6 +91,9 @@ def map_vector_polygon_data(sFilename_in,
     else:
         iFlag_colorbar = 0
 
+    if iFlag_colorbar == 1: #if colorbar is used, then the color is used
+        iFlag_color = 1
+
     if dMissing_value_in is not None:
         dMissing_value = dMissing_value_in
     else:
@@ -162,34 +167,40 @@ def map_vector_polygon_data(sFilename_in,
     dLat_max = -90
     dLon_min = 180
     dLon_max = -180
-    aValue = list() #this one need to be fixed
+    
     for pFeature in pLayer:
         pGeometry_in = pFeature.GetGeometryRef()
         sGeometry_type = pGeometry_in.GetGeometryName()
 
         if sGeometry_type =='POLYGON':
-            dummy0 = loads( pGeometry_in.ExportToWkt() )
-            aCoords_gcs = dummy0.exterior.coords
-            aCoords_gcs= np.array(aCoords_gcs)
-
+            #dummy0 = loads( pGeometry_in.ExportToWkt() )            
+            #aCoords_gcs = dummy0.exterior.coords
+            #aCoords_gcs= np.array(aCoords_gcs)
+            aCoords_gcs = get_geometry_coords(pGeometry_in)
             dLon_max = np.max( [dLon_max, np.max(aCoords_gcs[:,0])] )
             dLon_min = np.min( [dLon_min, np.min(aCoords_gcs[:,0])] )
             dLat_max = np.max( [dLat_max, np.max(aCoords_gcs[:,1])] )
             dLat_min = np.min( [dLat_min, np.min(aCoords_gcs[:,1])] )
 
     if iFlag_color == 1:
+        aValue = list() #this one need to be fixed
+        for pFeature in pLayer:    
+            pGeometry_in = pFeature.GetGeometryRef()
+            sGeometry_type = pGeometry_in.GetGeometryName()
+            if sGeometry_type =='POLYGON':                
+                dummy = float(pFeature.GetField(sVariable))
+                aValue.append(dummy)
+
         aValue = np.array(aValue)
         if iFlag_data_min == 1  and iFlag_data_max ==1: #both are provided
             aValue = np.clip(aValue, dData_min, dData_max)
             dValue_max = dData_max # np.max(aValue)
             dValue_min = dData_min # np.min(aValue)
         else:
-
             aValue = aValue[aValue != dMissing_value]
             dValue_max = np.max(aValue)
             dValue_min = np.min(aValue)
             pass
-
 
         if dValue_max == dValue_min:
             iFlag_same_value = 1
@@ -226,10 +237,13 @@ def map_vector_polygon_data(sFilename_in,
             sColor='black'
 
         if iFlag_color ==1:
-            if sGeometry_type =='POLYGON':
-                dummy0 = loads( pGeometry_in.ExportToWkt() )
-                aCoords_gcs = dummy0.exterior.coords
-                aCoords_gcs= np.array(aCoords_gcs)
+            if sGeometry_type =='POLYGON':                
+                #old way that has a dependency on shapely
+                #dummy0 = loads( pGeometry_in.ExportToWkt() )
+                #aCoords_gcs = dummy0.exterior.coords
+                #aCoords_gcs= np.array(aCoords_gcs)
+                #new method that use gdal directly
+                aCoords_gcs = get_geometry_coords(pGeometry_in)
                 polygon = mpatches.Polygon(aCoords_gcs[:,0:2], closed=True, linewidth=0.25,
                                            alpha=0.8, edgecolor = sColor,
                                            facecolor = sColor,
@@ -240,9 +254,10 @@ def map_vector_polygon_data(sFilename_in,
                 pass
         else:
             if sGeometry_type =='POLYGON':
-                dummy0 = loads( pGeometry_in.ExportToWkt() )
-                aCoords_gcs = dummy0.exterior.coords
-                aCoords_gcs= np.array(aCoords_gcs)
+                #dummy0 = loads( pGeometry_in.ExportToWkt() )
+                #aCoords_gcs = dummy0.exterior.coords
+                #aCoords_gcs= np.array(aCoords_gcs)
+                aCoords_gcs = get_geometry_coords(pGeometry_in)
                 polygon = mpatches.Polygon(aCoords_gcs[:,0:2],
                                            closed=True,
                                            linewidth=0.25,

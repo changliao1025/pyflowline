@@ -31,7 +31,6 @@ PyFlowline depends on the following packages
 1. `numpy`
 2. `gdal`
 3. `netCDF4`
-4. `shapely`
 
 PyFlowline also has three optional dependency packages
 

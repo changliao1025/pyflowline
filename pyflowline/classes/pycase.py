@@ -540,7 +540,7 @@ class flowlinecase(object):
 
                 if iFlag_mesh_boundary ==1:
                     #create a polygon based on real boundary
-                    pBoundary_wkt, pBoundary_shp = read_mesh_boundary(self.sFilename_mesh_boundary)
+                    pBoundary_wkt = read_mesh_boundary(self.sFilename_mesh_boundary)
 
                     aHexagon = create_hexagon_mesh(iFlag_rotation, dX_lowerleft, dY_lowerleft, dResolution_meter, ncolumn, nrow, 
                                                    sFilename_mesh, sFilename_spatial_reference, pBoundary_wkt)
@@ -566,7 +566,7 @@ class flowlinecase(object):
                     nrow= int( (dY_upperleft - dY_lowerleft) / dResolution_meter )
                     if iFlag_mesh_boundary ==1:
                         #create a polygon based on real boundary
-                        pBoundary_wkt, pBoundary_shp = read_mesh_boundary(self.sFilename_mesh_boundary)
+                        pBoundary_wkt = read_mesh_boundary(self.sFilename_mesh_boundary)
 
                         aSquare = create_square_mesh(dX_lowerleft, dY_lowerleft, dResolution_meter, ncolumn, nrow, 
                                                      sFilename_mesh, sFilename_spatial_reference, pBoundary_wkt)
@@ -593,7 +593,7 @@ class flowlinecase(object):
 
                         if iFlag_mesh_boundary ==1:
                             #create a polygon based on real boundary
-                            pBoundary_wkt, pBoundary_shp = read_mesh_boundary(self.sFilename_mesh_boundary)
+                            pBoundary_wkt = read_mesh_boundary(self.sFilename_mesh_boundary)
                             aLatlon = create_latlon_mesh(dLongitude_left, dLatitude_bot, dResolution_degree, ncolumn, nrow, 
                                                          sFilename_mesh, pBoundary_wkt)
                             pass
@@ -634,7 +634,7 @@ class flowlinecase(object):
                                 if iFlag_mesh_boundary ==1:
                                     #create a polygon based on
                                     #read boundary
-                                    pBoundary_wkt, pBoundary_shp = read_mesh_boundary(self.sFilename_mesh_boundary)
+                                    pBoundary_wkt = read_mesh_boundary(self.sFilename_mesh_boundary)
 
                                     aMpas = create_mpas_mesh(iFlag_global, iFlag_use_mesh_dem, iFlag_save_mesh,
                                                              sFilename_mesh_netcdf,  sFilename_mesh, iFlag_antarctic_in=iFlag_antarctic_in, pBoundary_in = pBoundary_wkt)

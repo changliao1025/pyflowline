@@ -51,8 +51,6 @@ The following dependency packages will be installed during the process.
 * `numpy`
 * `gdal`
 * `netCDF4`
-* `shapely`
-
 
 =============
 Visualization

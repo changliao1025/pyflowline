@@ -1,18 +1,17 @@
 import os
 import numpy as np
 from osgeo import  osr, gdal, ogr
-from shapely.wkt import loads
+#from shapely.wkt import loads
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import matplotlib.path as mpath
 import matplotlib.cm as cm
 import cartopy.crs as ccrs
-import cartopy.mpl.ticker as ticker
 from cartopy.mpl.gridliner import LONGITUDE_FORMATTER, LATITUDE_FORMATTER
 
 from pyflowline.external.pyearth.toolbox.math.stat.remap import remap
-
+from pyflowline.external.pyearth.gis.gdal.gdal_functions import get_geometry_coords
 
 class OOMFormatter(mpl.ticker.ScalarFormatter):
     def __init__(self, order=0, fformat="%1.1e", offset=True, mathText=True):
@@ -195,9 +194,10 @@ def map_multiple_vector_data(aFiletype_in,
         pGeometry_in = pFeature.GetGeometryRef()
         sGeometry_type = pGeometry_in.GetGeometryName()
         if sGeometry_type =='POLYGON':
-            dummy0 = loads( pGeometry_in.ExportToWkt() )
-            aCoords_gcs = dummy0.exterior.coords
-            aCoords_gcs= np.array(aCoords_gcs)
+            #dummy0 = loads( pGeometry_in.ExportToWkt() )
+            #aCoords_gcs = dummy0.exterior.coords
+            #aCoords_gcs= np.array(aCoords_gcs)
+            aCoords_gcs = get_geometry_coords(pGeometry_in)
 
             dLon_max = np.max( [dLon_max, np.max(aCoords_gcs[:,0])] )
             dLon_min = np.min( [dLon_min, np.min(aCoords_gcs[:,0])] )
@@ -324,16 +324,18 @@ def map_multiple_vector_data(aFiletype_in,
                 #pick color from colormap
 
             if sGeometry_type =='POINT':
-                dummy0 = loads( pGeometry_in.ExportToWkt() )
-                aCoords_gcs = dummy0.coords
-                aCoords_gcs= np.array(aCoords_gcs)
+                #dummy0 = loads( pGeometry_in.ExportToWkt() )
+                #aCoords_gcs = dummy0.coords
+                #aCoords_gcs= np.array(aCoords_gcs)
+                aCoords_gcs = get_geometry_coords(pGeometry_in)
                 aCoords_gcs = aCoords_gcs[:,0:2]
                 ax.plot(aCoords_gcs[0], aCoords_gcs[1], 'o', color= sColor, markersize=2, transform=ccrs.Geodetic())                
             else:
                 if sGeometry_type =='LINESTRING':
-                    dummy0 = loads( pGeometry_in.ExportToWkt() )
-                    aCoords_gcs = dummy0.coords
-                    aCoords_gcs= np.array(aCoords_gcs)
+                    #dummy0 = loads( pGeometry_in.ExportToWkt() )
+                    #aCoords_gcs = dummy0.coords
+                    #aCoords_gcs= np.array(aCoords_gcs)
+                    aCoords_gcs = get_geometry_coords(pGeometry_in)
                     aCoords_gcs = aCoords_gcs[:,0:2]
                     nvertex = len(aCoords_gcs)
                     codes = np.full(nvertex, mpath.Path.LINETO, dtype=int )
@@ -343,9 +345,10 @@ def map_multiple_vector_data(aFiletype_in,
                     line, = ax.plot(x, y, color= sColor, linewidth=iThickness, transform=ccrs.Geodetic())
                 else:
                     if sGeometry_type == 'POLYGON': 
-                        dummy0 = loads( pGeometry_in.ExportToWkt() )
-                        aCoords_gcs = dummy0.exterior.coords
-                        aCoords_gcs = np.array(aCoords_gcs)
+                        #dummy0 = loads( pGeometry_in.ExportToWkt() )
+                        #aCoords_gcs = dummy0.exterior.coords
+                        #aCoords_gcs = np.array(aCoords_gcs)
+                        aCoords_gcs = get_geometry_coords(pGeometry_in)
                         if iFlag_fill == 1:
                             polygon = mpatches.Polygon(aCoords_gcs[:,0:2], closed=True, linewidth=0.25, 
                                            alpha=0.8, edgecolor = sColor,facecolor= sColor, 

@@ -1,16 +1,17 @@
 
-import sys, os, stat
+import os, stat
 import numpy as np
 from pathlib import Path
 import subprocess
 import datetime
 from shutil import copy2
 from osgeo import osr, ogr, gdal
-from shapely.wkt import loads
+#from shapely.wkt import loads
 from pyflowline.formats.convert_coordinates import convert_gcs_coordinates_to_cell
 
 from pyflowline.external.pyearth.system.define_global_variables import *
 from pyflowline.formats.convert_attributes import convert_gcs_attributes_to_cell
+from pyflowline.external.pyearth.gis.gdal.gdal_functions import get_geometry_coords
 
 pDate = datetime.datetime.today()
 sDate_default = "{:04d}".format(pDate.year) + "{:02d}".format(pDate.month) + "{:02d}".format(pDate.day)
@@ -131,10 +132,10 @@ def convert_dggrid_mesh_to_pyflowline_mesh(sFilename_dggrid_mesh, sFilename_mesh
     #we also need to spatial reference
     for pFeature_mesh in pLayer_mesh:
         pGeometry_mesh = pFeature_mesh.GetGeometryRef()        
-        dummy0 = loads( pGeometry_mesh.ExportToWkt() )
-        aCoords_gcs = dummy0.exterior.coords
-        aCoords_gcs= np.array(aCoords_gcs)  
-
+        #dummy0 = loads( pGeometry_mesh.ExportToWkt() )
+        #aCoords_gcs = dummy0.exterior.coords
+        #aCoords_gcs= np.array(aCoords_gcs)  
+        aCoords_gcs = get_geometry_coords(pGeometry_mesh)   
         dLongitude_center = np.mean(aCoords_gcs[:-1,0])
         dLatitude_center = np.mean(aCoords_gcs[:-1,1])   
 

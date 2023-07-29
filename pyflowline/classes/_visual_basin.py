@@ -32,8 +32,7 @@ def basin_plot(self,
     else:
         sFilename_mesh = sFilename_mesh_in
     
-    sField_thickness = ''
-    iFlag_thickness = 0
+
     if iFlag_type_in ==1:
         #point based
         pass
@@ -190,6 +189,7 @@ def _plot_polygon_variable(self,
                              dData_max_in = None,
                              sFilename_output_in=None,
                              aExtent_in = None,
+                             aLegend_in = None,
                              pProjection_map_in = None):
     """_summary_
 
@@ -275,10 +275,13 @@ def _plot_polygon_variable(self,
         pass
     
     map_vector_polygon_data(sFilename,
+                            iFlag_color_in = 1,
                              iFlag_colorbar_in = 1,
                              sFilename_output_in=sFilename_output_in,
+                             sVariable_in= sVariable,
                              sTitle_in= sTitle,
                              aExtent_in = aExtent_in,
+                             aLegend_in = aLegend_in,
                              pProjection_map_in = pProjection_map_in)
 
 

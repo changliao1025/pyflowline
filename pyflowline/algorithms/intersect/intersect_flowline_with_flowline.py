@@ -1,9 +1,8 @@
 import os
 import numpy as np
 from osgeo import ogr, osr
-from shapely.wkt import loads
+#from shapely.wkt import loads
 from pyflowline.classes.vertex import pyvertex
-
 
 import importlib
 iFlag_cython = importlib.util.find_spec("cython") 
@@ -22,7 +21,7 @@ def intersect_flowline_with_flowline( sFilename_flowline_a_in, sFilename_flowlin
     if os.path.exists(sFilename_output_in): 
         os.remove(sFilename_output_in)
     
-    pDriver_geojson = ogr.GetDriverByName( "GeoJSON")
+    pDriver_geojson = ogr.GetDriverByName("GeoJSON")
     pDataset_flowline_a = pDriver_geojson.Open(sFilename_flowline_a_in, 0)
     pDataset_flowline_b = pDriver_geojson.Open(sFilename_flowline_b_in, 0)   
     pLayer_flowline_a = pDataset_flowline_a.GetLayer(0)
@@ -50,9 +49,9 @@ def intersect_flowline_with_flowline( sFilename_flowline_a_in, sFilename_flowlin
 
     pDataset_out = pDriver_geojson.CreateDataSource(sFilename_output_in)
 
-    pLayerOut = pDataset_out.CreateLayer('flowline', pSpatial_reference_b, ogr.wkbMultiPoint)
+    pLayerOut = pDataset_out.CreateLayer('intersect', pSpatial_reference_b, ogr.wkbMultiPoint)
     # Add one attribute
-    pLayerOut.CreateField(ogr.FieldDefn('id', ogr.OFTInteger64)) #long type for high resolution
+    pLayerOut.CreateField(ogr.FieldDefn('pointid', ogr.OFTInteger64)) #long type for high resolution
     
     pLayerDefn = pLayerOut.GetLayerDefn()
     pFeatureOut = ogr.Feature(pLayerDefn)    
@@ -126,7 +125,7 @@ def intersect_flowline_with_flowline( sFilename_flowline_a_in, sFilename_flowlin
                             else:                       
                                 aVertex_intersect.append(pVertex)
                                 pFeatureOut.SetGeometry(point)
-                                pFeatureOut.SetField("id", lVertexID)         
+                                pFeatureOut.SetField("pointid", lVertexID)         
                                 pLayerOut.CreateFeature(pFeatureOut)    
                                 lVertexID = lVertexID + 1
 
@@ -143,7 +142,7 @@ def intersect_flowline_with_flowline( sFilename_flowline_a_in, sFilename_flowlin
                         else:                
                             aVertex_intersect.append(pVertex)
                             pFeatureOut.SetGeometry(pGeometry_intersect)
-                            pFeatureOut.SetField("id", lVertexID)         
+                            pFeatureOut.SetField("pointid", lVertexID)         
                             pLayerOut.CreateFeature(pFeatureOut)    
                             lVertexID = lVertexID + 1                                        
                     

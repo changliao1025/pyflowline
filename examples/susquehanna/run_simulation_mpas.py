@@ -52,7 +52,6 @@ if iFlag_visualization == 1:
      
     aExtent_meander = [-76.5,-76.2, 41.6,41.9] 
     #oPyflowline.plot( sVariable_in='flowline_simplified' , sFilename_output_in = 'flowline_simplified.png' ) 
-
     #oPyflowline.plot( sVariable_in='flowline_simplified' , sFilename_output_in = 'flowline_simplified_zoom.png', aExtent_in =aExtent_meander ) 
 
     pass

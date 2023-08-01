@@ -117,7 +117,7 @@ def map_multiple_vector_data(aFiletype_in,
     if iDPI_in is not None:
         iDPI = iDPI_in
     else:
-        iDPI = 300
+        iDPI = 600
 
     if dMissing_value_in is not None:
         dMissing_value = dMissing_value_in
@@ -290,7 +290,7 @@ def map_multiple_vector_data(aFiletype_in,
 
                 iThickness = remap( dValue, dValue_min, dValue_max, iThickness_min, iThickness_max )
             else:
-                iThickness = 1.0
+                iThickness = 0.25
 
             if iFlag_color ==1:
                 if nColor < 10:

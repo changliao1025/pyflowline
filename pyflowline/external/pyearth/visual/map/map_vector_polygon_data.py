@@ -29,6 +29,7 @@ def map_vector_polygon_data(sFilename_in,
                             sVariable_in = None,
                             sFilename_output_in=None,
                             iFlag_scientific_notation_colorbar_in=None,
+                            iFont_size_in = None,
                             sColormap_in = None,
                             sTitle_in = None,
                             iDPI_in = None,
@@ -93,6 +94,11 @@ def map_vector_polygon_data(sFilename_in,
 
     if iFlag_colorbar == 1: #if colorbar is used, then the color is used
         iFlag_color = 1
+    
+    if iFont_size_in is not None:
+        iFont_size = iFont_size_in
+    else:
+        iFont_size = 12
 
     if dMissing_value_in is not None:
         dMissing_value = dMissing_value_in
@@ -268,8 +274,8 @@ def map_vector_polygon_data(sFilename_in,
                 ax.add_patch(polygon)
 
     if aExtent_in is None:
-        marginx  = (dLon_max - dLon_min) / 20
-        marginy  = (dLat_max - dLat_min) / 20
+        marginx  = (dLon_max - dLon_min) / 50
+        marginy  = (dLat_max - dLat_min) / 50
         aExtent = [dLon_min - marginx , dLon_max + marginx , dLat_min -marginy , dLat_max + marginy]
     else:
         aExtent = aExtent_in
@@ -279,13 +285,15 @@ def map_vector_polygon_data(sFilename_in,
     ax.set_title(sTitle)
     if aLegend_in is not None:
         nlegend = len(aLegend_in)
+        dLocation0 = 0.96
         for i in range(nlegend):
             sText = aLegend_in[i]
-            dLocation = 0.06 + i * 0.04
-            ax.text(0.03, dLocation, sText, \
-                    verticalalignment='top', horizontalalignment='left',\
-                    transform=ax.transAxes, \
-                    color='black', fontsize=6)
+            #dLocation = 0.06 + i * 0.04
+            dLocation = dLocation0 - i * 0.06
+            ax.text(0.03, dLocation, sText, 
+                    verticalalignment='top', horizontalalignment='left',
+                    transform=ax.transAxes, 
+                    color='black', fontsize=iFont_size)
 
             pass
 
@@ -299,15 +307,16 @@ def map_vector_polygon_data(sFilename_in,
                                            norm=mpl.colors.Normalize(dValue_min, dValue_max),  # vmax and vmin
                                            extend=sExtend, format=formatter)
         else:
-            formatter = OOMFormatter(fformat= "%1.1f")
+            formatter = OOMFormatter(fformat= "%1.2f")
             cb = mpl.colorbar.ColorbarBase(ax_cb, orientation='vertical',
                                            cmap=cmap,
                                            norm=mpl.colors.Normalize(dValue_min, dValue_max),  # vmax and vmin
                                            extend=sExtend, format=formatter)
 
         cb.ax.get_yaxis().set_ticks_position('right')
-        cb.ax.get_yaxis().labelpad = 10
-        cb.ax.set_ylabel(sUnit, rotation=270)
+        cb.ax.get_yaxis().labelpad = 5
+        cb.ax.set_ylabel(sUnit, rotation=90)
+        cb.ax.get_yaxis().set_label_position('left')
         cb.ax.tick_params(labelsize=6)
 
     gl = ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True,

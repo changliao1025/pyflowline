@@ -28,7 +28,7 @@ def map_vector_polyline_data(sFilename_in,
                              iFlag_color_in = None,
                              iFlag_label_in = None,
                              iFlag_thickness_in =None,
-                             iFlag_title_in = None,
+                             iFont_size_in = None,
                              sField_thickness_in=None,
                              sField_color_in=None,
                              iFlag_scientific_notation_colorbar_in=None,
@@ -94,6 +94,11 @@ def map_vector_polyline_data(sFilename_in,
         iFlag_thickness = iFlag_thickness_in
     else:
         iFlag_thickness = 0
+
+    if iFont_size_in is not None:
+        iFont_size = iFont_size_in
+    else:
+        iFont_size = 12
 
     if sField_thickness_in is not None:
         sField_thickness = sField_thickness_in
@@ -170,8 +175,10 @@ def map_vector_polyline_data(sFilename_in,
 
 
     fig = plt.figure( dpi=300)
-    fig.set_figwidth( 4 )
-    fig.set_figheight( 4 )
+    iSize_x= 8
+    iSize_y= 8
+    fig.set_figwidth( iSize_x )
+    fig.set_figheight( iSize_y )
     ax = fig.add_axes([0.1, 0.15, 0.75, 0.8] , projection=pProjection_map ) #request.crs
     ax.set_global()
 
@@ -188,7 +195,7 @@ def map_vector_polyline_data(sFilename_in,
         aValue = np.array(aValue)
         dValue_max = np.max(aValue)
         dValue_min = np.min(aValue)
-        iThickness_max = 2.5
+        iThickness_max = 2.0
         iThickness_min = 0.3
 
     for pFeature in pLayer:
@@ -236,15 +243,14 @@ def map_vector_polyline_data(sFilename_in,
             lID = lID + 1
 
     if aExtent_in is None:
-        marginx  = (dLon_max - dLon_min) / 20
-        marginy  = (dLat_max - dLat_min) / 20
+        marginx  = (dLon_max - dLon_min) / 50
+        marginy  = (dLat_max - dLat_min) / 50
         aExtent = [dLon_min - marginx , dLon_max + marginx , dLat_min - marginy , dLat_max + marginy]
     else:
         aExtent = aExtent_in
 
     ax.set_extent(aExtent)
     ax.coastlines(color='black', linewidth=1)
-
   
     if aLegend_in is not None:
         nlegend = len(aLegend_in)
@@ -256,7 +262,7 @@ def map_vector_polyline_data(sFilename_in,
                     verticalalignment='top', horizontalalignment='left',
                     transform=ax.transAxes,
                     color='black',
-                    fontsize=10 )
+                    fontsize=iFont_size )
 
             pass
 

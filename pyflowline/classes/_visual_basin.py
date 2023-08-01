@@ -5,13 +5,26 @@ from pyflowline.external.pyearth.visual.map.map_vector_polygon_data import map_v
 from pyflowline.external.pyearth.visual.map.map_vector_polyline_data import map_vector_polyline_data
 from pyflowline.external.pyearth.visual.map.map_multiple_vector_data import map_multiple_vector_data
 
+def replace_last_occurrence(sFilename_path_in, sSubstring_in, sSubstring_out):
+    last_occurrence_index = sFilename_path_in.rfind(sSubstring_in)
+    if last_occurrence_index == -1:
+        # Substring not found, return the original string
+        return sFilename_path_in
+    else:
+        return sFilename_path_in[:last_occurrence_index] + sSubstring_out + sFilename_path_in[last_occurrence_index+len(sSubstring_in):]
+
+
 
 def basin_plot(self,
                iFlag_type_in,
                sMesh_type,
                sFilename_output_in=None,
                sFilename_mesh_in = None,
+               iFont_size_in = None,
                iFlag_title_in=None,
+               iFlag_scientific_notation_colorbar_in=None,
+               dData_min_in = None,
+                             dData_max_in = None,
                sVariable_in=None,
                aExtent_in = None,
                 aLegend_in = None,
@@ -39,6 +52,8 @@ def basin_plot(self,
     else:
         if iFlag_type_in == 2: #polyline based
             self._plot_polyline_variable(sVariable_in,
+                                         iFlag_title_in=iFlag_title_in,
+                                           iFont_size_in=iFont_size_in,
                                                sFilename_output_in=sFilename_output_in,
                                                aExtent_in = aExtent_in,
                                                aLegend_in = aLegend_in,
@@ -48,6 +63,11 @@ def basin_plot(self,
             if iFlag_type_in == 3:#polygon based
 
                 self._plot_polygon_variable( sVariable_in,                 
+                                            iFlag_title_in= iFlag_title_in,
+                                            iFont_size_in=iFont_size_in,
+                                            iFlag_scientific_notation_colorbar_in=iFlag_scientific_notation_colorbar_in,
+                                            dData_min_in = dData_min_in,
+                                            dData_max_in = dData_max_in,
                                                sFilename_output_in=sFilename_output_in,
                                                aExtent_in = aExtent_in,
                                                 aLegend_in = aLegend_in,
@@ -69,11 +89,16 @@ def basin_plot(self,
                     else:
                         if sVariable_in == "flow_direction_with_observation":
                             sFilename0 = self.sFilename_flow_direction #this can be either domain wide or subbasin level
-                            sFilename1 = ''
+                            #should use the pyflowline simplified flowline
+                            sFilename_dummy = self.sFilename_flowline_simplified
+                            #now replace the folder string 
+
+                            sFilename1 = replace_last_occurrence(sFilename_dummy, 'hexwatershed', 'pyflowline')
+
                             aFiletype_in = [3, 2, 2]
                             aFilename_in = [sFilename_mesh, sFilename0, sFilename1]
                             map_multiple_vector_data(aFiletype_in,
-                                             aFilename_in,
+                                             aFilename_in,                                            
                                              sFilename_output_in=sFilename_output_in,
                                              sTitle_in= 'Mesh with flowline and observation',
                                              aFlag_color_in = [0, 0, 0],
@@ -94,12 +119,14 @@ def _plot_polyline_variable(self,
                              iFlag_title_in=None,
                              iFigwidth_in=None,
                              iFigheight_in=None,
+                             iFont_size_in=None,
                              dData_min_in = None,
                              dData_max_in = None,
                              sFilename_output_in=None,
                              aExtent_in = None,
                              aLegend_in = None,
                              pProjection_map_in = None):
+    
     
 
 
@@ -167,15 +194,24 @@ def _plot_polyline_variable(self,
         #default
         print('A variable is needed.')
         return
+    
+    if iFlag_title_in is not None:        
+        if iFlag_title_in == 0:
+            sTitle=''
+        else:
+            pass
+    else:        
+        sTitle=''
+        pass
                
     
     map_vector_polyline_data(sFilename_json,
-                             sFilename_output_in= sFilename_output_in,
-                             iFlag_title_in=iFlag_title_in,
+                             sFilename_output_in= sFilename_output_in,                             
                              iFlag_thickness_in= iFlag_thickness  ,
                              sTitle_in=sTitle,
                              iFlag_color_in= iFlag_color,
                              iFlag_label_in=iFlag_label,
+                              iFont_size_in=iFont_size_in,
                              sField_thickness_in = sField_thickness,
                              aExtent_in = aExtent_in,
                              aLegend_in = aLegend_in,
@@ -185,10 +221,13 @@ def _plot_polygon_variable(self,
                              sVariable_in,
                              iFigwidth_in=None,
                              iFigheight_in=None,
+                            iFlag_title_in=None,
+                            iFont_size_in=None,
+                            iFlag_scientific_notation_colorbar_in = None,
                              dData_min_in = None,
                              dData_max_in = None,
                              sFilename_output_in=None,
-                             aExtent_in = None,
+                              aExtent_in = None,
                              aLegend_in = None,
                              pProjection_map_in = None):
     """_summary_
@@ -219,7 +258,7 @@ def _plot_polygon_variable(self,
             if sVariable_in == 'drainage_area':
                 sVariable='drainage_area'
                 sTitle = 'Drainage area'
-                sUnit = r'Unit: $m^{2}$'
+                sUnit = r'Units: $m^{2}$'
                 dData_min = dData_min_in
                 dData_max = dData_max_in
                 sFilename = self.sFilename_variable_polygon
@@ -251,7 +290,7 @@ def _plot_polygon_variable(self,
             if sVariable_in == 'drainage_area':
                 sVariable='drainage_area'
                 sTitle = 'Drainage area'
-                sUnit = r'Unit: $m^{2}$'
+                sUnit = r'Units: $m^{2}$'
                 dData_min = dData_min_in
                 dData_max = dData_max_in
                 sFilename = self.sFilename_variable_polygon
@@ -274,12 +313,23 @@ def _plot_polygon_variable(self,
                     sFilename = self.sFilename_variable_polygon
         pass
     
+    if iFlag_title_in is not None:        
+        if iFlag_title_in == 0:
+            sTitle=''
+        else:
+            pass
+    else:        
+        sTitle=''
+        pass
+
     map_vector_polygon_data(sFilename,
                             iFlag_color_in = 1,
                              iFlag_colorbar_in = 1,
+                             iFlag_scientific_notation_colorbar_in = iFlag_scientific_notation_colorbar_in,
                              sFilename_output_in=sFilename_output_in,
                              sVariable_in= sVariable,
                              sTitle_in= sTitle,
+                             sUnit_in= sUnit,
                              aExtent_in = aExtent_in,
                              aLegend_in = aLegend_in,
                              pProjection_map_in = pProjection_map_in)

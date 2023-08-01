@@ -179,6 +179,17 @@ def meter_to_degree(dResolution_meter_in, dLatitude_mean_in):
 
     return dResolution_degree
 
+def get_utm_spatial_reference(dLongitude_in):
+    if -180 <= dLongitude_in <= 180:
+        zone = int((dLongitude_in + 180) / 6) + 1
+        hemisphere = 'N' if dLongitude_in >= 0 else 'S'
+        epsg_code = 32600 + zone if hemisphere == 'N' else 32700 + zone
+        utm_sr = osr.SpatialReference()
+        utm_sr.ImportFromEPSG(epsg_code)
+        return utm_sr
+    else:
+        raise ValueError("Longitude must be in the range [-180, 180].")
+
 def reproject_coordinates(x_in, y_in, spatial_reference_source, spatial_reference_target=None):
     """[Reproject coordinates from one reference to another. By default to WGS84.]
 
@@ -439,7 +450,7 @@ def read_mesh_boundary(sFilename_boundary_in):
         iReturn_code = 0
         return iReturn_code
 
-    aCell_out=list()
+    
     pDriver_json = ogr.GetDriverByName('GeoJSON')    
     pDataset_mesh = pDriver_json.Open(sFilename_boundary_in, gdal.GA_ReadOnly)
     pLayer_mesh = pDataset_mesh.GetLayer(0)
@@ -465,8 +476,10 @@ def read_mesh_boundary(sFilename_boundary_in):
             
             
     pBoundary_wkt = pBoundary_ogr.ExportToWkt()
+    aExtent = pBoundary_ogr.GetEnvelope()
+    min_x, max_x, min_y, max_y = aExtent
    
-    return pBoundary_wkt
+    return pBoundary_wkt, aExtent
     
 
 def get_geometry_coords(geometry):

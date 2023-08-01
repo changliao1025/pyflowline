@@ -8,11 +8,11 @@ Overview
 
 PyFlowline is a mesh-independent river network generator for hydrologic models.
 
-Traditionally, the river network is represented by the vector-based river network. These vector-based river networks usually cannot be directly used by hydrologic models, which use the mesh as the spatial discretization. 
+River networks are landscape features typically represented using vector layers. However, most hydrologic models rely on regular grids to discretize the spatial domain and cannot directly ingest vector features into the model. As a result, hydrologic models usually implement a so-called stream-burning process to convert the vector-based river network into a mesh-based river network. 
 
-In most cases, the vector-based river network datasets are used in a so-called stream-burning process to convert the vector-based river network to the mesh-based river network. However, all the existing stream-burning methods only support the structured meshes and there are also some other limitations.
+However, all the existing stream-burning methods only support the structured meshes and there are also some other limitations. For example, existing stream-burning methods always treat the vector river networks as a binary mask and cannot descrive the topology near river confluences and meanders. 
 
-To close this gap, PyFlowline was developed using a mesh-independent approach. At its core, PyFlowline uses the intersection between the vector river network and mesh to reconstruct the conceptual river network. It also addresses several limitations of the existing stream-burning methods.
+PyFlowline solves this issue by using a mesh-independent approach that intersects the vector river network and mesh to reconstruct the conceptual river network.
 
 ***********
 Development

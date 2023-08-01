@@ -3,6 +3,30 @@ Glossary
 ########
 
 
+*****************
+Structured mesh
+*****************
+
+In PyFlowline, structured mesh refers to meshes that have a repeating pattern or structure.
+
+The following meshes are considered as structured:
+
+1. Projected raster meshes (e.g. 100m by 100m)
+2. GCS-based rectangle meshes  (e.g. 0.5 degree by 0.5 degree)
+3. Hexagon meshes (e.g. 100m by edge)
+4. DGGS meshes (e.g., DGGrid meshes)
+
+*****************
+Unstructured mesh
+*****************
+
+In PyFlowline, unstructured mesh refers to meshes that don't have a repeating pattern or structure and the cell size varies from cell to cell.
+
+The following meshes are considered as unstructured:
+
+1. Model for Prediction Across Scales (MPAS) meshes
+2. Triangulated irregular network (TIN) meshes
+
 ************
 Great circle
 ************

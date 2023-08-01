@@ -26,6 +26,7 @@ from pyflowline.external.pyearth.gis.gdal.gdal_functions  import degree_to_meter
 from pyflowline.external.pyearth.gis.gdal.gdal_functions  import meter_to_degree
 from pyflowline.external.pyearth.gis.gdal.gdal_functions import retrieve_geotiff_metadata
 from pyflowline.external.pyearth.gis.gdal.gdal_functions import read_mesh_boundary
+from pyflowline.external.pyearth.gis.gdal.gdal_functions import get_utm_spatial_reference
 
 iFlag_kml = importlib.util.find_spec("simplekml") 
 if iFlag_kml is not None:
@@ -386,9 +387,9 @@ class flowlinecase(object):
                 print("The MPAS mesh file does not exist!")
                 exit()
         else:
-            if not os.path.isfile(self.sFilename_dem ):
+            if not os.path.isfile(self.sFilename_dem ): #why DEM is required?
                 print("The DEM file does not exist!")
-                exit()
+                #exit()
 
         self.aBasin = list()
 
@@ -419,8 +420,6 @@ class flowlinecase(object):
         self.sFilename_mesh = os.path.join(str(Path(self.sWorkspace_output)  ) , sMesh_type + ".geojson" )
         self.sFilename_mesh_info= os.path.join(str(Path(self.sWorkspace_output)  ) , sMesh_type + "_mesh_info.json"  )
         self.sFilename_mesh_kml = os.path.join(str(Path(self.sWorkspace_output)  ) , sMesh_type + ".kml" ) #for google service
-
-        
 
         return
 
@@ -474,52 +473,140 @@ class flowlinecase(object):
             sFilename_dem = self.sFilename_dem
             sFilename_spatial_reference = self.sFilename_spatial_reference
             sFilename_mesh = self.sFilename_mesh 
-            if iMesh_type !=4: #mpas
-                spatial_reference_target = osr.SpatialReference()
-                spatial_reference_target.ImportFromEPSG(4326)
 
-                dPixelWidth, dOriginX, dOriginY, nrow, ncolumn, pSpatialRef_dem, pProjection, pGeotransform\
-                    = retrieve_geotiff_metadata(sFilename_dem)
+            if iFlag_mesh_boundary ==1:
+                #create a polygon based on real boundary
+                pBoundary_wkt, aExtent = read_mesh_boundary(self.sFilename_mesh_boundary)           
 
-                #lower left
-                dX_lowerleft  = dOriginX
-                dY_lowerleft = dOriginY - (nrow+1) * dPixelWidth
-                dLongitude_left0,  dLatitude_bot0= reproject_coordinates(dX_lowerleft, dY_lowerleft,pSpatialRef_dem,    spatial_reference_target)
+                if iMesh_type != 4: #mpas
+                    spatial_reference_target = osr.SpatialReference()
+                    spatial_reference_target.ImportFromEPSG(4326)
 
-                #upper right
-                dX_upperright = dOriginX + (ncolumn +1) * dPixelWidth
-                dY_upperright = dOriginY
-                dLongitude_right0, dLatitude_top0= reproject_coordinates(dX_upperright, dY_upperright,pSpatialRef_dem,  spatial_reference_target)
+                    #check whether DEM exists
+                    if os.path.isfile(sFilename_dem):
+                        dPixelWidth, dOriginX, dOriginY, nrow, ncolumn, pSpatialRef_dem, pProjection, pGeotransform\
+                            = retrieve_geotiff_metadata(sFilename_dem)
 
-                #lower right
-                dX_lowerright = dOriginX + (ncolumn +1) * dPixelWidth
-                dY_lowerright = dOriginY - (nrow+1) * dPixelWidth
+                        #lower left
+                        dX_lowerleft  = dOriginX
+                        dY_lowerleft = dOriginY - (nrow+1) * dPixelWidth
+                        dLongitude_left0,  dLatitude_bot0= reproject_coordinates(dX_lowerleft, dY_lowerleft,pSpatialRef_dem,    spatial_reference_target)
 
-                dLongitude_right1,  dLatitude_bot1= reproject_coordinates(dX_lowerright, dY_lowerright,pSpatialRef_dem,    spatial_reference_target)
+                        #upper right
+                        dX_upperright = dOriginX + (ncolumn +1) * dPixelWidth
+                        dY_upperright = dOriginY
+                        dLongitude_right0, dLatitude_top0= reproject_coordinates(dX_upperright, dY_upperright,pSpatialRef_dem,  spatial_reference_target)
 
-                #uppler left
-                dX_upperleft   = dOriginX
-                dY_upperleft   =  dOriginY
-                dLongitude_left1, dLatitude_top1= reproject_coordinates(dX_upperleft, dY_upperleft,pSpatialRef_dem,  spatial_reference_target)
+                        #lower right
+                        dX_lowerright = dOriginX + (ncolumn +1) * dPixelWidth
+                        dY_lowerright = dOriginY - (nrow+1) * dPixelWidth
 
-                dLatitude_top = np.max([dLatitude_top0, dLatitude_top1])
-                dLatitude_bot = np.min([dLatitude_bot0, dLatitude_bot1])
+                        dLongitude_right1,  dLatitude_bot1= reproject_coordinates(dX_lowerright, dY_lowerright,pSpatialRef_dem,    spatial_reference_target)
 
-                dLongitude_left = np.min([dLongitude_left0, dLongitude_left1])
-                dLongitude_right = np.max([dLongitude_right0, dLongitude_right1])
+                        #uppler left
+                        dX_upperleft   = dOriginX
+                        dY_upperleft   =  dOriginY
+                        dLongitude_left1, dLatitude_top1= reproject_coordinates(dX_upperleft, dY_upperleft, pSpatialRef_dem,  spatial_reference_target)
 
-                dLatitude_mean = 0.5 * (dLatitude_top + dLatitude_bot)
-                #pass
+                        dLatitude_top = np.max([dLatitude_top0, dLatitude_top1])
+                        dLatitude_bot = np.min([dLatitude_bot0, dLatitude_bot1])
 
-                if dResolution_meter < 0:
-                    #not used
-                    pass
+                        dLongitude_left = np.min([dLongitude_left0, dLongitude_left1])
+                        dLongitude_right = np.max([dLongitude_right0, dLongitude_right1])
+
+                        dLatitude_mean = 0.5 * (dLatitude_top + dLatitude_bot)
+                        #pass
+
+                        if dResolution_meter is None:
+                            #not used
+                            pass
+                        else:
+                            dResolution_degree = meter_to_degree(dResolution_meter, dLatitude_mean)
+
+                        dX_lowerleft = dOriginX
+                        dY_upperleft = dOriginY
+                    else: #use the spatial extent and utm zone to obatin the mesh boundary
+                        dLongitude_left, dLongitude_right,dLatitude_bot,  dLatitude_top = aExtent
+                        dLatitude_mean = 0.5 * (dLatitude_top + dLatitude_bot)
+                        dLongitude_mean = 0.5 * (dLongitude_left + dLongitude_right)
+
+                        if iMesh_type == 3: #latlon
+
+                            pass
+                        else:
+                            if dResolution_meter is None:
+                                #not used
+                                pass
+                            else:
+                                dResolution_degree = meter_to_degree(dResolution_meter, dLatitude_mean)
+                            pass
+
+                        pUTM = get_utm_spatial_reference(dLongitude_mean)
+                        
+                        #calculate the lower left and upper right in utm projection
+                        dX_lowerleft, dY_lowerleft = reproject_coordinates(dLongitude_left, dLatitude_bot, spatial_reference_target,  pUTM)
+                        
+                        dX_lowerright, dY_lowerright = reproject_coordinates(dLongitude_right, dLatitude_bot, spatial_reference_target,  pUTM)
+
+                        dX_upperright, dY_upperright = reproject_coordinates(dLongitude_right, dLatitude_top, spatial_reference_target,  pUTM)
+
+                        dX_upperleft, dY_upperright = reproject_coordinates(dLongitude_left, dLatitude_top, spatial_reference_target,  pUTM)
+                        
                 else:
-                    dResolution_degree = meter_to_degree(dResolution_meter, dLatitude_mean)
 
-                dX_lowerleft = dOriginX
-                dY_upperleft = dOriginY
+                    pass
             else:
+                #if the boundary is not specified, a DEM file is required
+                if iMesh_type != 4: #mpas
+                    spatial_reference_target = osr.SpatialReference()
+                    spatial_reference_target.ImportFromEPSG(4326)
+
+                    #check whether DEM exists
+                    if os.path.isfile(sFilename_dem):
+                        dPixelWidth, dOriginX, dOriginY, nrow, ncolumn, pSpatialRef_dem, pProjection, pGeotransform\
+                            = retrieve_geotiff_metadata(sFilename_dem)
+
+                        #lower left
+                        dX_lowerleft  = dOriginX
+                        dY_lowerleft = dOriginY - (nrow+1) * dPixelWidth
+                        dLongitude_left0,  dLatitude_bot0= reproject_coordinates(dX_lowerleft, dY_lowerleft,pSpatialRef_dem,    spatial_reference_target)
+
+                        #upper right
+                        dX_upperright = dOriginX + (ncolumn +1) * dPixelWidth
+                        dY_upperright = dOriginY
+                        dLongitude_right0, dLatitude_top0= reproject_coordinates(dX_upperright, dY_upperright,pSpatialRef_dem,  spatial_reference_target)
+
+                        #lower right
+                        dX_lowerright = dOriginX + (ncolumn +1) * dPixelWidth
+                        dY_lowerright = dOriginY - (nrow+1) * dPixelWidth
+
+                        dLongitude_right1,  dLatitude_bot1= reproject_coordinates(dX_lowerright, dY_lowerright,pSpatialRef_dem,    spatial_reference_target)
+
+                        #uppler left
+                        dX_upperleft   = dOriginX
+                        dY_upperleft   =  dOriginY
+                        dLongitude_left1, dLatitude_top1= reproject_coordinates(dX_upperleft, dY_upperleft, pSpatialRef_dem,  spatial_reference_target)
+
+                        dLatitude_top = np.max([dLatitude_top0, dLatitude_top1])
+                        dLatitude_bot = np.min([dLatitude_bot0, dLatitude_bot1])
+
+                        dLongitude_left = np.min([dLongitude_left0, dLongitude_left1])
+                        dLongitude_right = np.max([dLongitude_right0, dLongitude_right1])
+
+                        dLatitude_mean = 0.5 * (dLatitude_top + dLatitude_bot)
+                        #pass
+
+                        if dResolution_meter < 0:
+                            #not used
+                            pass
+                        else:
+                            dResolution_degree = meter_to_degree(dResolution_meter, dLatitude_mean)
+
+                        dX_lowerleft = dOriginX
+                        dY_upperleft = dOriginY
+                    else:
+                        print("Error: DEM file does not exist: " + sFilename_dem)
+                        return
                 pass
 
             if iMesh_type ==1: #hexagon
@@ -540,7 +627,7 @@ class flowlinecase(object):
 
                 if iFlag_mesh_boundary ==1:
                     #create a polygon based on real boundary
-                    pBoundary_wkt = read_mesh_boundary(self.sFilename_mesh_boundary)
+                    pBoundary_wkt, aExtent = read_mesh_boundary(self.sFilename_mesh_boundary)
 
                     aHexagon = create_hexagon_mesh(iFlag_rotation, dX_lowerleft, dY_lowerleft, dResolution_meter, ncolumn, nrow, 
                                                    sFilename_mesh, sFilename_spatial_reference, pBoundary_wkt)
@@ -566,7 +653,7 @@ class flowlinecase(object):
                     nrow= int( (dY_upperleft - dY_lowerleft) / dResolution_meter )
                     if iFlag_mesh_boundary ==1:
                         #create a polygon based on real boundary
-                        pBoundary_wkt = read_mesh_boundary(self.sFilename_mesh_boundary)
+                        pBoundary_wkt , aExtent= read_mesh_boundary(self.sFilename_mesh_boundary)
 
                         aSquare = create_square_mesh(dX_lowerleft, dY_lowerleft, dResolution_meter, ncolumn, nrow, 
                                                      sFilename_mesh, sFilename_spatial_reference, pBoundary_wkt)
@@ -593,7 +680,8 @@ class flowlinecase(object):
 
                         if iFlag_mesh_boundary ==1:
                             #create a polygon based on real boundary
-                            pBoundary_wkt = read_mesh_boundary(self.sFilename_mesh_boundary)
+                            #already produced
+                            pBoundary_wkt , aExtent= read_mesh_boundary(self.sFilename_mesh_boundary)
                             aLatlon = create_latlon_mesh(dLongitude_left, dLatitude_bot, dResolution_degree, ncolumn, nrow, 
                                                          sFilename_mesh, pBoundary_wkt)
                             pass
@@ -634,7 +722,7 @@ class flowlinecase(object):
                                 if iFlag_mesh_boundary ==1:
                                     #create a polygon based on
                                     #read boundary
-                                    pBoundary_wkt = read_mesh_boundary(self.sFilename_mesh_boundary)
+                                    pBoundary_wkt, aExtent = read_mesh_boundary(self.sFilename_mesh_boundary)
 
                                     aMpas = create_mpas_mesh(iFlag_global, iFlag_use_mesh_dem, iFlag_save_mesh,
                                                              sFilename_mesh_netcdf,  sFilename_mesh, iFlag_antarctic_in=iFlag_antarctic_in, pBoundary_in = pBoundary_wkt)

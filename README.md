@@ -5,9 +5,13 @@
 
 PyFlowline: a mesh-independent river network generator for hydrologic models. 
 
+### Quickstart
+
+Please refer to the [quickstart documentation](https://pyflowline.readthedocs.io/en/latest/quickstart.html) for details on how to get started using the PyFlowline package.
+
 PyFlowline is mesh independent, meaning you can apply it to both structured 
 
-1. traditional rectangle mesh 
+1. traditional rectangle projected mesh 
 2. latitude-longitude 
 3. hexagon
 4. dggs ([dggrid](https://github.com/sahrk/DGGRID))
@@ -23,7 +27,6 @@ This package generates the mesh cell-based conceptual river networks using the f
 2. `Mesh generation`: PyFlowline generates structured meshes (e.g., rectangle, hexagon) or imports user-provided unstructured meshes into the PyFlowline-compatible GEOJSON format.
 3. `Topological relationship reconstruction`: PyFlowline reconstructs the topological relationship using the mesh and flowline intersections.
 
-
 ### Dependency
 
 PyFlowline depends on the following packages
@@ -31,18 +34,13 @@ PyFlowline depends on the following packages
 1. `numpy`
 2. `gdal`
 3. `netCDF4`
-4. `shapely`
 
 PyFlowline also has three optional dependency packages
 
 1. `cython` for performance 
-2. `matplotlin` for visualization
+2. `matplotlib` for visualization
 3. `cartopy` for visulization
 4. `simplekml` for Google Earth KML support
-
-### Quickstart
-
-Please refer to the [quickstart documentation](https://pyflowline.readthedocs.io/en/latest/quickstart.html) for details on how to get started using the PyFlowline package.
 
 ### Installation
 

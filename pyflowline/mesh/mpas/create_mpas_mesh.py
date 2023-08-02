@@ -69,16 +69,16 @@ def create_mpas_mesh(iFlag_global_in,
         pDataset = pDriver_geojson.CreateDataSource(sFilename_output_in)
         pLayer = pDataset.CreateLayer('cell', pSpatial_reference_gcs, ogr.wkbPolygon)
         # Add one attribute
-        pLayer.CreateField(ogr.FieldDefn('id', ogr.OFTInteger64)) #long type for high resolution
-        pLayer.CreateField(ogr.FieldDefn('lon', ogr.OFTReal)) #long type for high resolution
-        pLayer.CreateField(ogr.FieldDefn('lat', ogr.OFTReal)) #long type for high resolution
+        pLayer.CreateField(ogr.FieldDefn('cellid', ogr.OFTInteger64)) #long type for high resolution
+        pLayer.CreateField(ogr.FieldDefn('longitude', ogr.OFTReal)) #long type for high resolution
+        pLayer.CreateField(ogr.FieldDefn('latitude', ogr.OFTReal)) #long type for high resolution
         pArea_field = ogr.FieldDefn('area', ogr.OFTReal)
         pArea_field.SetWidth(20)
         pArea_field.SetPrecision(2)
         pLayer.CreateField(pArea_field)
         if iFlag_use_mesh_dem == 1:
-            pLayer.CreateField(ogr.FieldDefn('elev', ogr.OFTReal)) #float type for high resolution
-            pLayer.CreateField(ogr.FieldDefn('elev0', ogr.OFTReal)) #float type for high resolution
+            pLayer.CreateField(ogr.FieldDefn('elevation_mean', ogr.OFTReal)) #float type for high resolution
+            pLayer.CreateField(ogr.FieldDefn('elevation_profile0', ogr.OFTReal)) #float type for high resolution
         else:
             pass
     
@@ -311,13 +311,13 @@ def create_mpas_mesh(iFlag_global_in,
                 #save mesh cell
                 if iFlag_save_mesh_in ==1:                
                     pFeature.SetGeometry(pPolygon)
-                    pFeature.SetField("id", int(lCellID) )
-                    pFeature.SetField("lon", dLon )
-                    pFeature.SetField("lat", dLat )
+                    pFeature.SetField("cellid", int(lCellID) )
+                    pFeature.SetField("longitude", dLon )
+                    pFeature.SetField("latitude", dLat )
                     pFeature.SetField("area", dArea )
                     if iFlag_use_mesh_dem == 1:
-                        pFeature.SetField("elev", dElevation_mean )
-                        pFeature.SetField("elev0", dElevation_profile0 )
+                        pFeature.SetField("elevation_mean", dElevation_mean )
+                        pFeature.SetField("elevation_profile0", dElevation_profile0 )
 
                     pLayer.CreateFeature(pFeature)
             
@@ -380,18 +380,22 @@ def create_mpas_mesh(iFlag_global_in,
                 else:
                     pass           
                 #call fuction to add the cell
+                if lCellID == 155420:
+                    print('debug')
+                    pass
+                
                 aMpas = add_cell_into_list(aMpas, i, lCellID, dArea, dElevation_mean, dElevation_profile0, aCoords )
                 
                 #save mesh cell
                 if iFlag_save_mesh_in ==1:                
                     pFeature.SetGeometry(pPolygon)
-                    pFeature.SetField("id", int(lCellID) )
-                    pFeature.SetField("lon", dLon )
-                    pFeature.SetField("lat", dLat )
+                    pFeature.SetField("cellid", int(lCellID) )
+                    pFeature.SetField("longitude", dLon )
+                    pFeature.SetField("latitude", dLat )
                     pFeature.SetField("area", dArea )
                     if iFlag_use_mesh_dem == 1:
-                        pFeature.SetField("elev", dElevation_mean )
-                        pFeature.SetField("elev0", dElevation_profile0 )
+                        pFeature.SetField("elevation_mean", dElevation_mean )
+                        pFeature.SetField("elevation_profile0", dElevation_profile0 )
 
                     pLayer.CreateFeature(pFeature)
 
@@ -399,6 +403,8 @@ def create_mpas_mesh(iFlag_global_in,
     #for maps we need to clean some cell because they were not actually in the domain
     #besides, we need to add some smal holes back
     #to do this, we need two steps.
+
+    #debug 155420
 
     if iFlag_global_in == 1:
         aMpas_out = aMpas
@@ -470,8 +476,9 @@ def create_mpas_mesh(iFlag_global_in,
                 dElevation_mean = float(aBed_elevation[j])
                 dElevation_profile0 = float(aBed_elevation_profile[j,0])
                 dArea = float(aCellArea[j])
-
-                if lCellID not in aCellID:
+                           
+                if lCellID not in aCellID:                   
+                    
                     aMpas_middle = add_cell_into_list(aMpas_middle, j, lCellID, dArea, dElevation_mean, dElevation_profile0, aCoords )
                     aCellID.append(lCellID)
 
@@ -490,13 +497,13 @@ def create_mpas_mesh(iFlag_global_in,
                     pPolygon.AddGeometry(ring)
                     if iFlag_save_mesh_in ==1:                
                         pFeature.SetGeometry(pPolygon)
-                        pFeature.SetField("id", int(lCellID) )
-                        pFeature.SetField("lon", dLon )
-                        pFeature.SetField("lat", dLat )
+                        pFeature.SetField("cellid", int(lCellID) )
+                        pFeature.SetField("longitude", dLon )
+                        pFeature.SetField("latitude", dLat )
                         pFeature.SetField("area", dArea )
                         if iFlag_use_mesh_dem == 1:
-                            pFeature.SetField("elev", dElevation_mean )
-                            pFeature.SetField("elev0", dElevation_profile0 )
+                            pFeature.SetField("elevation_mean", dElevation_mean )
+                            pFeature.SetField("elevation_profile0", dElevation_profile0 )
 
                         pLayer.CreateFeature(pFeature)
 
@@ -514,25 +521,35 @@ def create_mpas_mesh(iFlag_global_in,
         #the ocean neighbor will remain unchanged
         ncell = len(aMpas_middle)
         for i in range(ncell):
-            pCell = aMpas_middle[i]
-            aNeighbor_land = pCell.aNeighbor_land           
-            aNeighbor_land_virtual_update = list()
+            pCell = aMpas_middle[i]          
+
+            aNeighbor_land_update = list()   
+            aNeighbor_land = pCell.aNeighbor_land                    
+            nNeighbor_land = pCell.nNeighbor_land
+
+            aNeighbor_land_virtual_update = list()      
             aNeighbor_land_virtual = pCell.aNeighbor_land_virtual
             nNeighbor_land_virtual = pCell.nNeighbor_land_virtual
-            nNeighbor_land_update = nNeighbor_land 
+
+            for j in range(nNeighbor_land):
+                lNeighbor = int(aNeighbor_land[j])
+                if lNeighbor in aCellID:
+                    aNeighbor_land_update.append(lNeighbor)
+                    pass
+                else:
+                    pass
+
+
             for j in range(nNeighbor_land_virtual):
                 lNeighbor = int(aNeighbor_land_virtual[j])
                 if lNeighbor in aCellID:
-                    #this cell is actually not virtual anymore
-                    nNeighbor_land_update = nNeighbor_land_update + 1 
-                    aNeighbor_land.append(lNeighbor)
+                    #this cell is actually not virtual anymore                    
+                    aNeighbor_land_update.append(lNeighbor)
                 else:
                     aNeighbor_land_virtual_update.append(lNeighbor)
-                    
-                
-
-            pCell.aNeighbor_land = aNeighbor_land
-            pCell.nNeighbor_land= len(aNeighbor_land)   
+                           
+            pCell.aNeighbor_land = aNeighbor_land_update
+            pCell.nNeighbor_land= len(aNeighbor_land_update)   
             pCell.aNeighbor_land_virtual = aNeighbor_land_virtual_update   
             pCell.nNeighbor_land_virtual = len(aNeighbor_land_virtual_update)
             aMpas_out.append(pCell)

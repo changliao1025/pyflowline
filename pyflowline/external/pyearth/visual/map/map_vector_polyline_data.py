@@ -1,7 +1,7 @@
 import os
 import numpy as np
 from osgeo import  osr, gdal, ogr
-from shapely.wkt import loads
+#from shapely.wkt import loads
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import matplotlib as mpl
@@ -10,7 +10,7 @@ import matplotlib.path as mpath
 import cartopy.crs as ccrs
 from cartopy.mpl.gridliner import LONGITUDE_FORMATTER, LATITUDE_FORMATTER
 from pyflowline.external.pyearth.toolbox.math.stat.remap import remap
-
+from pyflowline.external.pyearth.gis.gdal.gdal_functions import get_geometry_coords
 class OOMFormatter(mpl.ticker.ScalarFormatter):
     def __init__(self, order=0, fformat="%1.1e", offset=True, mathText=True):
         self.oom = order
@@ -28,7 +28,7 @@ def map_vector_polyline_data(sFilename_in,
                              iFlag_color_in = None,
                              iFlag_label_in = None,
                              iFlag_thickness_in =None,
-                             iFlag_title_in = None,
+                             iFont_size_in = None,
                              sField_thickness_in=None,
                              sField_color_in=None,
                              iFlag_scientific_notation_colorbar_in=None,
@@ -68,7 +68,11 @@ def map_vector_polyline_data(sFilename_in,
         pProjection_map_in (_type_, optional): _description_. Defaults to None.
     """
 
-
+    if os.path.isfile(sFilename_in):
+        pass
+    else:
+        print('The file does not exist: ', sFilename_in)
+        return
 
     sFilename_out= sFilename_output_in
     if iDPI_in is not None:
@@ -90,6 +94,11 @@ def map_vector_polyline_data(sFilename_in,
         iFlag_thickness = iFlag_thickness_in
     else:
         iFlag_thickness = 0
+
+    if iFont_size_in is not None:
+        iFont_size = iFont_size_in
+    else:
+        iFont_size = 12
 
     if sField_thickness_in is not None:
         sField_thickness = sField_thickness_in
@@ -146,9 +155,10 @@ def map_vector_polyline_data(sFilename_in,
         sGeometry_type = pGeometry_in.GetGeometryName()
 
         if sGeometry_type =='LINESTRING':
-            dummy0 = loads( pGeometry_in.ExportToWkt() )
-            aCoords_gcs = dummy0.coords
-            aCoords_gcs= np.array(aCoords_gcs)
+            #dummy0 = loads( pGeometry_in.ExportToWkt() )
+            #aCoords_gcs = dummy0.coords
+            #aCoords_gcs= np.array(aCoords_gcs)
+            aCoords_gcs = get_geometry_coords(pGeometry_in)
             aCoords_gcs = aCoords_gcs[:,0:2]
 
             dLon_max = np.max( [dLon_max, np.max(aCoords_gcs[:,0])] )
@@ -165,8 +175,10 @@ def map_vector_polyline_data(sFilename_in,
 
 
     fig = plt.figure( dpi=300)
-    fig.set_figwidth( 4 )
-    fig.set_figheight( 4 )
+    iSize_x= 8
+    iSize_y= 8
+    fig.set_figwidth( iSize_x )
+    fig.set_figheight( iSize_y )
     ax = fig.add_axes([0.1, 0.15, 0.75, 0.8] , projection=pProjection_map ) #request.crs
     ax.set_global()
 
@@ -183,7 +195,7 @@ def map_vector_polyline_data(sFilename_in,
         aValue = np.array(aValue)
         dValue_max = np.max(aValue)
         dValue_min = np.min(aValue)
-        iThickness_max = 2.5
+        iThickness_max = 2.0
         iThickness_min = 0.3
 
     for pFeature in pLayer:
@@ -193,12 +205,12 @@ def map_vector_polyline_data(sFilename_in,
             dValue = pFeature.GetField(sField_thickness)
 
         if sGeometry_type =='LINESTRING':
-            dummy0 = loads( pGeometry_in.ExportToWkt() )
-            aCoords_gcs = dummy0.coords
-            aCoords_gcs= np.array(aCoords_gcs)
+            #dummy0 = loads( pGeometry_in.ExportToWkt() )
+            #aCoords_gcs = dummy0.coords
+            #aCoords_gcs= np.array(aCoords_gcs)
+            aCoords_gcs = get_geometry_coords(pGeometry_in)
             aCoords_gcs = aCoords_gcs[:,0:2]
             nvertex = len(aCoords_gcs)
-
             if nvertex == 2 :
                 dLon_label = 0.5 * (aCoords_gcs[0][0] + aCoords_gcs[1][0] )
                 dLat_label = 0.5 * (aCoords_gcs[0][1] + aCoords_gcs[1][1] )
@@ -231,15 +243,14 @@ def map_vector_polyline_data(sFilename_in,
             lID = lID + 1
 
     if aExtent_in is None:
-        marginx  = (dLon_max - dLon_min) / 20
-        marginy  = (dLat_max - dLat_min) / 20
+        marginx  = (dLon_max - dLon_min) / 50
+        marginy  = (dLat_max - dLat_min) / 50
         aExtent = [dLon_min - marginx , dLon_max + marginx , dLat_min - marginy , dLat_max + marginy]
     else:
         aExtent = aExtent_in
 
     ax.set_extent(aExtent)
     ax.coastlines(color='black', linewidth=1)
-
   
     if aLegend_in is not None:
         nlegend = len(aLegend_in)
@@ -251,7 +262,7 @@ def map_vector_polyline_data(sFilename_in,
                     verticalalignment='top', horizontalalignment='left',
                     transform=ax.transAxes,
                     color='black',
-                    fontsize=10 )
+                    fontsize=iFont_size )
 
             pass
 

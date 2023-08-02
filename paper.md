@@ -34,7 +34,7 @@ River networks are crucial in hydrologic and Earth system models. Accurately rep
 For hydrologic modelers, river networks are a key input for hydrologic models. 
 While some hydrologic models accept vector-based river networks [@Schwenk:2021], others only accept mesh cell-based, which requires a generation method from the vector-based river network. 
 Currently, generating a mesh cell-based river network from a given vector-based river network and arbitrary computational mesh is a major challenge.
-Existing methods are typically limited to structured rectangular meshes, such as 30m x 30m cartesian grids for high-resolution watershed-scale modeling or 0.5 degree x 0.5 degree geographic grids for global climate modeling. 
+Existing methods are typically limited to structured rectangular meshes, such as 30m x 30m cartesian grids for high-resolution watershed-scale modeling or 0.5 degree x 0.5 degree geographic grids for global climate modeling. In PyFlowline, we define structured meshes (e.g., lat-lon, raster files with projections, and hexagon) as those with fixed cell sizes and shapes and unstructured meshes as those with variable cell sizes and shapes.
 
 Structured mesh-based methods use fixed cartesian or geographic cell sizes, which have several limitations: (1) they perform poorly at coarse resolution (>1km), and (2) they cannot be seamlessly coupled with other unstructured mesh-based hydrologic models such as oceanic models [@Engwirda:2021]. In contrast, unstructured meshes offer a flexible structure with variable grid-cell sizes and shapes. This flexibility makes them ideal for adapting to complex geometry such as river channels and coastlines. Besides, unstructured meshes provide the flexibility to couple different hydrologic models under a unified framework.
 Thus, unstructured meshes are increasingly being adopted in hydrologic modeling.
@@ -45,14 +45,14 @@ A mesh-independent river network representation method that preserves topologica
 PyFlowline is a Python package that provides a framework for generating river networks for hydrologic models, meeting the identified need. Using an object-oriented programming approach, PyFlowline represents river network elements and mesh cell relationships. It relies on open-source Python libraries like GDAL and Cython for data input/output and spatial data operations.
 
 The computational geometry algorithms used in PyFlowline are designed and implemented using a unified spherical framework, making it suitable for regional and global-scale simulations. PyFlowline uses topological relationships to capture the river networks so they are preserved even at coarse spatial resolutions.
-Moreover, PyFlowline is mesh-independent, supporting both structured and unstructured meshes. It can quickly adopt other mesh types, such as triangulated irregular networks (TIN) or discrete global grid systems (DGGs) [@Sahr:2011]. PyFlowline is a core component of the HexWatershed model, a mesh-independent flow direction model. Several scientific studies focused on coupled Earth system models [@Feng:2022; @Liao:2022] have utilized PyFlowline. A workshop tutorial has also been provided online and in person to support its implementation.
+Moreover, PyFlowline is mesh-independent, supporting both structured and unstructured meshes. It can quickly adopt other mesh types, such as triangulated irregular networks (TIN) or discrete global grid systems (DGGs) [@Sahr:2011]. PyFlowline is a core component of the HexWatershed model, a mesh-independent flow direction model. Several scientific studies focused on coupled Earth system models [@Feng:2022; @Liao:2023] have utilized PyFlowline. A workshop tutorial has also been provided online and in person to support its implementation.
 
 
 # Model features
 
 PyFlowline uses Python's OOP architecture to describe river networks using three essential elements: segments, reaches, and confluences. When applicable, river networks are processed as objects throughout the package.
 
-![The data model. \label{fig:oop}](https://github.com/changliao1025/pyflowline/blob/main/docs/figures/basic_element.png?raw=true)
+![The data model. A vertex class object represents a point on the Earth surface. It have three coordiantes. An edge class object represents a directed line between two points. Besides, it has a length attribute. A flowline class object represents a list of connected lines. \label{fig:oop}](https://github.com/changliao1025/pyflowline/blob/main/docs/figures/basic_element.png?raw=true)
 
 PyFlowline provides several key features, including
 

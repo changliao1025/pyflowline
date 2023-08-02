@@ -48,10 +48,10 @@ File I/O
 Inputs
 ==============================
 
-
-PyFlowline uses two configuration files to manage all the input information. Within this configuration file, it stores major model input parameters and paths to input files. 
+PyFlowline uses two configuration files to manage all the input information, within which major model input parameters and paths are specified. 
 
 These two configuration files have a parent-child relationship:
+
 1. The parent configuration file stores parameters for the whole domain, and
 2. The child configuration file stores parameters for every single watershed.
 

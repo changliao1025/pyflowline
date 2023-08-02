@@ -169,11 +169,11 @@ def read_flowline_geojson(sFilename_geojson_in):
     for n in range(ldefn.GetFieldCount()):
         fdefn = ldefn.GetFieldDefn(n)
         schema.append(fdefn.name)
-    if 'iseg' in schema:
+    if 'segment' in schema:
         iFlag_segment = 1
     else:
         iFlag_segment = 0    
-    if 'id' in schema:
+    if 'lineid' in schema:
         iFlag_id = 1
     else:
         iFlag_id = 0
@@ -189,12 +189,12 @@ def read_flowline_geojson(sFilename_geojson_in):
         pGeometry_in = pFeature_geojson.GetGeometryRef()
         sGeometry_type = pGeometry_in.GetGeometryName()
         if iFlag_segment ==1:
-            iStream_segment = pFeature_geojson.GetField("iseg")
+            iStream_segment = pFeature_geojson.GetField("segment")
         else:
             iStream_segment = -1
         
         if iFlag_id ==1:
-            lFlowlineID = pFeature_geojson.GetField("id")
+            lFlowlineID = pFeature_geojson.GetField("lineid")
         else:
             lFlowlineID = -1
 

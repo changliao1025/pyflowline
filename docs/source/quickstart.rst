@@ -2,6 +2,10 @@
 Quickstart
 #####################
 
+Installing and running PyFlowline requires some basic knowledge of the Python ecosystem.
+
+Besides, configuring a PyFlowline simulation requires some knowledge of Geographic Information System (GIS) and computational hydrology.
+
 Users can run a PyFlowline simulation in the following steps:
 
 1. Create a new Python environment using Conda, and activate the new environment.

@@ -31,6 +31,16 @@ Option A
 In this option, you will use conda to install the released PyFlowline package, but not necessarily the latest version.
 Conda will automatically install all the dependency packages.
 
+Before you install the package, it is highly recommended that you start from a new conda environment using the following command:
+
+    conda create -n pyflowline_test
+
+After activating the environment with:
+
+    conda activate pyflowline_test
+
+You can then install it with:
+
     conda install -c conda-forge pyflowline
 
 
@@ -51,6 +61,19 @@ The following dependency packages will be installed during the process.
 * `numpy`
 * `gdal`
 * `netCDF4`
-* `shapely`
+
+=============
+Visualization
+=============
+
+PyFlowline only provides experimental support for visualization through the optional `matplotlib` and `cartopy` packages.
+
+You need to manually speicify these packages during the installation process
+
+    conda install -c conda-forge pyflowline matplotlib cartopy
+
+or install manually after the installation of PyFlowline:
+
+    conda install -c conda-forge matplotlib cartopy
 
 

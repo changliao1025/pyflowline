@@ -3,10 +3,8 @@ from math import cos, sin, sqrt, acos
 import numpy as np
 import osgeo
 from osgeo import ogr, osr, gdal
-from shapely.wkt import loads
+#from shapely.wkt import loads
 #most of these functions are copied from the pyearth package
-
-
 
 import importlib
 iFlag_cython = importlib.util.find_spec("cython") 
@@ -71,8 +69,6 @@ def calculate_angle_betwen_vertex(x1, y1, x2, y2, x3, y3):
     angle3deg = angle_between_vectors_degrees(a3vec, c3vec)
     return  angle3deg
     
-
-
 def angle_between_vectors_degrees(u, v):
     """Return the angle between two vectors in any dimension space,
     in degrees.
@@ -182,6 +178,17 @@ def meter_to_degree(dResolution_meter_in, dLatitude_mean_in):
     dResolution_degree= dResolution_meter_in/(2*np.pi * dRadius2) * 360.0
 
     return dResolution_degree
+
+def get_utm_spatial_reference(dLongitude_in):
+    if -180 <= dLongitude_in <= 180:
+        zone = int((dLongitude_in + 180) / 6) + 1
+        hemisphere = 'N' if dLongitude_in >= 0 else 'S'
+        epsg_code = 32600 + zone if hemisphere == 'N' else 32700 + zone
+        utm_sr = osr.SpatialReference()
+        utm_sr.ImportFromEPSG(epsg_code)
+        return utm_sr
+    else:
+        raise ValueError("Longitude must be in the range [-180, 180].")
 
 def reproject_coordinates(x_in, y_in, spatial_reference_source, spatial_reference_target=None):
     """[Reproject coordinates from one reference to another. By default to WGS84.]
@@ -443,7 +450,7 @@ def read_mesh_boundary(sFilename_boundary_in):
         iReturn_code = 0
         return iReturn_code
 
-    aCell_out=list()
+    
     pDriver_json = ogr.GetDriverByName('GeoJSON')    
     pDataset_mesh = pDriver_json.Open(sFilename_boundary_in, gdal.GA_ReadOnly)
     pLayer_mesh = pDataset_mesh.GetLayer(0)
@@ -455,12 +462,12 @@ def read_mesh_boundary(sFilename_boundary_in):
         pGeometry_mesh = pFeature_mesh.GetGeometryRef()                     
         pGeometrytype_boundary = pGeometry_mesh.GetGeometryName()
         if(pGeometrytype_boundary == 'POLYGON'):       
-            pBoundary_out = pGeometry_mesh  
+            pBoundary_ogr = pGeometry_mesh  
         else:
             if(pGeometrytype_boundary == 'MULTIPOLYGON'):    
                 nLine = pGeometry_mesh.GetGeometryCount()
                 for i in range(nLine):
-                    pBoundary = pGeometry_mesh.GetGeometryRef(i)
+                    pBoundary_ogr = pGeometry_mesh.GetGeometryRef(i)
                
                 pass
             else:
@@ -468,8 +475,40 @@ def read_mesh_boundary(sFilename_boundary_in):
             pass   
             
             
-    pBoundary_out = loads( pBoundary.ExportToWkt() )
-    return pBoundary_out
+    pBoundary_wkt = pBoundary_ogr.ExportToWkt()
+    aExtent = pBoundary_ogr.GetEnvelope()
+    min_x, max_x, min_y, max_y = aExtent
+   
+    return pBoundary_wkt, aExtent
     
 
-   
+def get_geometry_coords(geometry):
+    
+    sGeometry_type = geometry.GetGeometryName()
+    if sGeometry_type =='POINT':
+        return get_point_coords(geometry)
+    elif sGeometry_type == 'LINESTRING':
+        return get_linestring_coords(geometry)
+    elif sGeometry_type =='POLYGON':
+        return get_polygon_exterior_coords(geometry)
+    else:
+        raise ValueError("Unsupported geometry type.")
+
+def get_polygon_exterior_coords(polygon_geometry):
+    exterior_coords = []
+    ring = polygon_geometry.GetGeometryRef(0)  # Get the exterior ring
+    for i in range(ring.GetPointCount()):
+        point = ring.GetPoint(i)
+        exterior_coords.append((point[0], point[1]))
+    return np.array(exterior_coords)
+
+def get_linestring_coords(linestring_geometry):
+    coords = []
+    for i in range(linestring_geometry.GetPointCount()):
+        point = linestring_geometry.GetPoint(i)
+        coords.append((point[0], point[1]))
+    return np.array(coords)
+
+def get_point_coords(point_geometry):
+    point = point_geometry.GetPoint()
+    return np.array([(point[0], point[1])])

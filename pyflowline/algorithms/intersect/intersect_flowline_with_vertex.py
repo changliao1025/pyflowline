@@ -1,9 +1,8 @@
 
 
 import os
-import numpy as np
 from osgeo import ogr, osr
-from shapely.wkt import loads
+#from shapely.wkt import loads
 
 def intersect_flowline_with_vertex( sFilename_flowline_in, sFilename_vertex_in, sFilename_output_in):
 
@@ -41,9 +40,9 @@ def intersect_flowline_with_vertex( sFilename_flowline_in, sFilename_vertex_in, 
 
     pDataset_out = pDriver_geojson.CreateDataSource(sFilename_output_in)
 
-    pLayerOut = pDataset_out.CreateLayer('flowline', pSpatial_reference_b, ogr.wkbMultiPoint)
+    pLayerOut = pDataset_out.CreateLayer('intersect', pSpatial_reference_b, ogr.wkbMultiPoint)
     # Add one attribute
-    pLayerOut.CreateField(ogr.FieldDefn('id', ogr.OFTInteger64)) #long type for high resolution
+    pLayerOut.CreateField(ogr.FieldDefn('pointid', ogr.OFTInteger64)) #long type for high resolution
     
     pLayerDefn = pLayerOut.GetLayerDefn()
     pFeatureOut = ogr.Feature(pLayerDefn)    

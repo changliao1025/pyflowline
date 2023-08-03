@@ -6,11 +6,13 @@
 import os
 import numpy as np
 from osgeo import ogr, osr
-from shapely.wkt import loads
-from pyflowline.classes.latlon import pylatlon
 from pyflowline.formats.convert_coordinates import convert_gcs_coordinates_to_cell
-
-def create_latlon_mesh(dLongitude_left_in, dLatitude_bot_in, dResolution_degree_in, ncolumn_in, nrow_in, pPolygon_in, sFilename_output_in):
+def create_latlon_mesh(dLongitude_left_in, 
+                       dLatitude_bot_in, 
+                       dResolution_degree_in, 
+                       ncolumn_in, nrow_in, 
+                       sFilename_output_in,
+                       pBoundary_in):
     """
     _summary_
 
@@ -25,7 +27,9 @@ def create_latlon_mesh(dLongitude_left_in, dLatitude_bot_in, dResolution_degree_
     Returns:
         _type_: _description_
     """
-       
+    #for the reason that a geometry object will be crash if the associated dataset is closed, we must pass wkt string
+    #https://gdal.org/api/python_gotchas.html
+    pBoundary = ogr.CreateGeometryFromWkt(pBoundary_in)   
     
     if os.path.exists(sFilename_output_in): 
         os.remove(sFilename_output_in)
@@ -38,9 +42,9 @@ def create_latlon_mesh(dLongitude_left_in, dLatitude_bot_in, dResolution_degree_
     pSpatial_reference_gcs.SetAxisMappingStrategy(osr.OAMS_TRADITIONAL_GIS_ORDER)
     pLayer = pDataset.CreateLayer('cell', pSpatial_reference_gcs, ogr.wkbPolygon)
     # Add one attribute
-    pLayer.CreateField(ogr.FieldDefn('id', ogr.OFTInteger64)) #long type for high resolution
-    pLayer.CreateField(ogr.FieldDefn('lon', ogr.OFTReal)) #long type for high resolution
-    pLayer.CreateField(ogr.FieldDefn('lat', ogr.OFTReal)) #long type for high resolution
+    pLayer.CreateField(ogr.FieldDefn('cellid', ogr.OFTInteger64)) #long type for high resolution
+    pLayer.CreateField(ogr.FieldDefn('longitude', ogr.OFTReal)) #long type for high resolution
+    pLayer.CreateField(ogr.FieldDefn('latitude', ogr.OFTReal)) #long type for high resolution
     pArea_field = ogr.FieldDefn('area', ogr.OFTReal)
     pArea_field.SetWidth(20)
     pArea_field.SetPrecision(2)
@@ -94,29 +98,24 @@ def create_latlon_mesh(dLongitude_left_in, dLatitude_bot_in, dResolution_degree_
             aCoords[3,0] = x4
             aCoords[3,1] = y4
             aCoords[4,0] = x1
-            aCoords[4,1] = y1
-            
+            aCoords[4,1] = y1            
 
-            pCenter = ogr.Geometry(ogr.wkbPoint)
-            pCenter.AddPoint(dLongitude_center, dLatitude_center)
-            pCenter1 = loads( pCenter.ExportToWkt() )
-            iFlag = pCenter1.within(pPolygon_in)
+            iFlag = False
+            if pPolygon.Within(pBoundary):
+                iFlag = True
+            else:
+                #then check intersection
+                if pPolygon.Intersects(pBoundary):
+                    iFlag = True
+                else:
+                    pass
 
             if ( iFlag == True ):
-
                 dummy1= np.array(aCoords)           
                 pLatlon = convert_gcs_coordinates_to_cell(3, dLongitude_center, dLatitude_center, dummy1)
                 pLatlon.lCellID = lCellID
                 dArea = pLatlon.calculate_cell_area()
-                pLatlon.calculate_edge_length()
-                
-                pFeature.SetGeometry(pPolygon)
-                pFeature.SetField("id", lCellID)
-                pFeature.SetField("lon", dLongitude_center )
-                pFeature.SetField("lat", dLatitude_center )
-                pFeature.SetField("area", dArea )
-                pLayer.CreateFeature(pFeature)
-
+                pLatlon.calculate_edge_length()      
                 lCellID_center = lCellID
 
                 aNeighbor = list()
@@ -153,6 +152,15 @@ def create_latlon_mesh(dLongitude_left_in, dLatitude_bot_in, dResolution_degree_
                 pLatlon.aNeighbor_land= aNeighbor
                 pLatlon.nNeighbor_land= pLatlon.nNeighbor            
                 aLatlon.append(pLatlon)
+
+                #save feature
+                pFeature.SetGeometry(pPolygon)
+                pFeature.SetField("cellid", lCellID)
+                pFeature.SetField("longitude", dLongitude_center )
+                pFeature.SetField("latitude", dLatitude_center )
+                pFeature.SetField("area", dArea )
+                pLayer.CreateFeature(pFeature)
+
                 lCellID = lCellID + 1
 
                 pass
@@ -166,6 +174,7 @@ def create_latlon_mesh(dLongitude_left_in, dLatitude_bot_in, dResolution_degree_
         pCell = aLatlon[i]
         lCellID = pCell.lCellID
         aCellID.append(lCellID)
+        
     for i in range(ncell):
         pCell = aLatlon[i]
         aNeighbor = pCell.aNeighbor
@@ -177,6 +186,10 @@ def create_latlon_mesh(dLongitude_left_in, dLatitude_bot_in, dResolution_degree_
             if lNeighbor in aCellID:
                 nNeighbor_new = nNeighbor_new + 1 
                 aNeighbor_new.append(lNeighbor)
+
+        #for latlon, there is no ocean concept
+        pCell.nNeighbor= len(aNeighbor_new)
+        pCell.aNeighbor = aNeighbor
         pCell.nNeighbor_land= len(aNeighbor_new)
         pCell.aNeighbor_land = aNeighbor_new
         pCell.nNeighbor_ocean = pCell.nVertex - pCell.nNeighbor_land

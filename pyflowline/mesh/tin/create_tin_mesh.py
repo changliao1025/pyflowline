@@ -1,20 +1,19 @@
-import os, sys
-
+import os
 import numpy as np
-
 from osgeo import ogr, osr
-from shapely.wkt import loads
-from pyflowline.classes.tin import pytin
-
-from pyflowline.formats.convert_coordinates import convert_pcs_coordinates_to_cell
 from pyflowline.formats.convert_coordinates import convert_gcs_coordinates_to_cell
-from pyflowline.algorithms.auxiliary.find_index_in_list import check_if_duplicates
-from pyflowline.algorithms.auxiliary.gdal_functions import reproject_coordinates_batch
+from pyflowline.external.pyearth.gis.gdal.gdal_functions import reproject_coordinates_batch
 
-def create_tin_mesh(dX_left_in, dY_bot_in, dResolution_meter_in, ncolumn_in, nrow_in, pPolygon_in,
-sFilename_output_in, sFilename_spatial_reference_in):
+def create_tin_mesh(dX_left_in, dY_bot_in, 
+                    dResolution_meter_in, 
+                    ncolumn_in, nrow_in, 
+sFilename_output_in, 
+sFilename_spatial_reference_in, 
+pBoundary_in):
      
-    
+    #for the reason that a geometry object will be crash if the associated dataset is closed, we must pass wkt string
+    #https://gdal.org/api/python_gotchas.html
+    pBoundary = ogr.CreateGeometryFromWkt(pBoundary_in)
     if os.path.exists(sFilename_output_in): 
         #delete it if it exists
         os.remove(sFilename_output_in)
@@ -31,7 +30,13 @@ sFilename_output_in, sFilename_spatial_reference_in):
     pDataset = pDriver_geojson.CreateDataSource(sFilename_output_in)
     pLayer = pDataset.CreateLayer('cell', pSpatial_reference_gcs, ogr.wkbPolygon)
     # Add one attribute
-    pLayer.CreateField(ogr.FieldDefn('id', ogr.OFTInteger64)) #long type for high resolution    
+    pLayer.CreateField(ogr.FieldDefn('cellid', ogr.OFTInteger64)) #long type for high resolution  
+    pLayer.CreateField(ogr.FieldDefn('longitude', ogr.OFTReal)) #long type for high resolution
+    pLayer.CreateField(ogr.FieldDefn('latitude', ogr.OFTReal)) #long type for high resolution
+    pArea_field = ogr.FieldDefn('area', ogr.OFTReal)
+    pArea_field.SetWidth(20)
+    pArea_field.SetPrecision(2)
+    pLayer.CreateField(pArea_field)  
     pLayerDefn = pLayer.GetLayerDefn()
     pFeature = ogr.Feature(pLayerDefn)
     xleft = dX_left_in
@@ -54,10 +59,8 @@ sFilename_output_in, sFilename_spatial_reference_in):
     #   |           |
     #(x1,y1)-----(x4,y4)
     #...............
-    for column in range(0, ncolumn_in):
-  
-        for row in range(0, nrow_in):
-            
+    for column in range(0, ncolumn_in):  
+        for row in range(0, nrow_in):            
 
             if column % 2 == 0 :
                 if row % 2 == 0:
@@ -133,10 +136,17 @@ sFilename_output_in, sFilename_spatial_reference_in):
             dummy1= np.array(aCoords)
             dLongitude_center = np.mean(aCoords[0:3,0])
             dLatitude_center = np.mean(aCoords[0:3,1])     
-            pCenter = ogr.Geometry(ogr.wkbPoint)
-            pCenter.AddPoint(dLongitude_center, dLatitude_center)
-            pCenter1 = loads( pCenter.ExportToWkt() )
-            iFlag = pCenter1.within(pPolygon_in)
+
+            iFlag = False
+            if pPolygon.Within(pBoundary):
+                iFlag = True
+            else:
+                #then check intersection
+                if pPolygon.Intersects(pBoundary):
+                    iFlag = True
+                else:
+                    pass
+
             if ( iFlag == True ):         
            
                 pTIN = convert_gcs_coordinates_to_cell(5, dLongitude_center, dLatitude_center, dummy1)
@@ -144,15 +154,16 @@ sFilename_output_in, sFilename_spatial_reference_in):
                 dArea = pTIN.calculate_cell_area()
                 pTIN.dArea = dArea
                 pTIN.calculate_edge_length() 
-                
+                aTin.append(pTIN)
+
                 pFeature.SetGeometry(pPolygon)
-                pFeature.SetField("id", lCellID)
-                pFeature.SetField("lon", dLongitude_center )
-                pFeature.SetField("lat", dLatitude_center )
+                pFeature.SetField("cellid", lCellID)
+                pFeature.SetField("longitude", dLongitude_center )
+                pFeature.SetField("latitude", dLatitude_center )
                 pFeature.SetField("area", dArea )
                 pLayer.CreateFeature(pFeature)
                           
-                aTin.append(pTIN)
+                
                 lCellID = lCellID + 1   
 
             pass

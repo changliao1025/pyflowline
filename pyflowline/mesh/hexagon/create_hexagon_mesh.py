@@ -6,20 +6,19 @@
 import os
 import numpy as np
 from osgeo import ogr, osr
-from shapely.wkt import loads
-from pyflowline.classes.hexagon import pyhexagon
 from pyflowline.formats.convert_coordinates import convert_gcs_coordinates_to_cell
 from pyflowline.algorithms.auxiliary.find_index_in_list import check_if_duplicates
-from pyflowline.algorithms.auxiliary.gdal_functions import reproject_coordinates_batch
+from pyflowline.external.pyearth.gis.gdal.gdal_functions import reproject_coordinates_batch
 
 def create_hexagon_mesh(iFlag_rotation_in, 
-        dX_left_in, dY_bot_in, 
+        dX_left_in, 
+        dY_bot_in, 
         dResolution_meter_in, 
         ncolumn_in, 
-        nrow_in,
-        pPolygon_in, 
+        nrow_in, 
         sFilename_output_in, 
-        sFilename_spatial_reference_in):
+        sFilename_spatial_reference_in,
+        pBoundary_in):
     """
     _summary_
 
@@ -36,6 +35,11 @@ def create_hexagon_mesh(iFlag_rotation_in,
     Returns:
         _type_: _description_
     """
+
+    
+    #for the reason that a geometry object will be crash if the associated dataset is closed, we must pass wkt string
+    #https://gdal.org/api/python_gotchas.html
+    pBoundary = ogr.CreateGeometryFromWkt(pBoundary_in)
     
     if os.path.exists(sFilename_output_in): 
         os.remove(sFilename_output_in)
@@ -57,9 +61,9 @@ def create_hexagon_mesh(iFlag_rotation_in,
     pSpatial_reference_gcs.SetAxisMappingStrategy(osr.OAMS_TRADITIONAL_GIS_ORDER)
     pLayer = pDataset.CreateLayer('cell', pSpatial_reference_gcs, ogr.wkbPolygon)
     # Add one attribute
-    pLayer.CreateField(ogr.FieldDefn('id', ogr.OFTInteger64)) #long type for high resolution
-    pLayer.CreateField(ogr.FieldDefn('lon', ogr.OFTReal)) #long type for high resolution
-    pLayer.CreateField(ogr.FieldDefn('lat', ogr.OFTReal)) #long type for high resolution
+    pLayer.CreateField(ogr.FieldDefn('cellid', ogr.OFTInteger64)) #long type for high resolution
+    pLayer.CreateField(ogr.FieldDefn('longitude', ogr.OFTReal)) #long type for high resolution
+    pLayer.CreateField(ogr.FieldDefn('latitude', ogr.OFTReal)) #long type for high resolution
     pArea_field = ogr.FieldDefn('area', ogr.OFTReal)
     pArea_field.SetWidth(20)
     pArea_field.SetPrecision(2)
@@ -174,18 +178,20 @@ def create_hexagon_mesh(iFlag_rotation_in,
            
                 dummy1= np.array(aCoords)
                 dLongitude_center = np.mean(aCoords[0:6,0])
-                dLatitude_center = np.mean(aCoords[0:6,1])
-                pCenter = ogr.Geometry(ogr.wkbPoint)
-                pCenter.AddPoint(dLongitude_center, dLatitude_center)
-                pCenter1 = loads( pCenter.ExportToWkt() )
-                iFlag = pCenter1.within(pPolygon_in)
+                dLatitude_center = np.mean(aCoords[0:6,1])                
+
+                iFlag = False
+                if pPolygon.Within(pBoundary):
+                    iFlag = True
+                else:
+                    #then check intersection
+                    if pPolygon.Intersects(pBoundary):
+                        iFlag = True
+                    else:
+                        pass
+
                 if ( iFlag == True ):
-                    pFeature.SetGeometry(pPolygon)
-                    pFeature.SetField("id", lCellID) 
-                    pFeature.SetField("lon", dLongitude_center )
-                    pFeature.SetField("lat", dLatitude_center )
-                    pFeature.SetField("area", dArea )
-                    pLayer.CreateFeature(pFeature)
+                    
 
                     pHexagon = convert_gcs_coordinates_to_cell(1, dLongitude_center, dLatitude_center, dummy1)
                     pHexagon.lCellID = lCellID
@@ -249,6 +255,15 @@ def create_hexagon_mesh(iFlag_rotation_in,
                     pHexagon.aNeighbor_land= aNeighbor
                     pHexagon.nNeighbor_land= pHexagon.nNeighbor
                     aHexagon.append(pHexagon)
+
+                    #save feature
+                    pFeature.SetGeometry(pPolygon)
+                    pFeature.SetField("cellid", lCellID) 
+                    pFeature.SetField("longitude", dLongitude_center )
+                    pFeature.SetField("latitude", dLatitude_center )
+                    pFeature.SetField("area", dArea )
+                    pLayer.CreateFeature(pFeature)
+
                     lCellID= lCellID + 1    
                     pass
                 else:
@@ -347,10 +362,15 @@ def create_hexagon_mesh(iFlag_rotation_in,
                 dummy1= np.array(aCoords)
                 dLongitude_center = np.mean(aCoords[0:6,0])
                 dLatitude_center = np.mean(aCoords[0:6,1])     
-                pCenter = ogr.Geometry(ogr.wkbPoint)
-                pCenter.AddPoint(dLongitude_center, dLatitude_center)
-                pCenter1 = loads( pCenter.ExportToWkt() )
-                iFlag = pCenter1.within(pPolygon_in)
+                iFlag == False
+                if pPolygon.Within(pBoundary):
+                    iFlag = True
+                else:
+                    #then check intersection
+                    if pPolygon.Intersects(pBoundary):
+                        iFlag = True
+                    else:
+                        pass
                 if ( iFlag == True ):  
                     
                     pHexagon = convert_gcs_coordinates_to_cell(1, dLongitude_center, dLatitude_center, dummy1)
@@ -359,14 +379,6 @@ def create_hexagon_mesh(iFlag_rotation_in,
                     pHexagon.dArea = dArea
                     pHexagon.calculate_edge_length() 
                     
-
-                    pFeature.SetGeometry(pPolygon)
-                    pFeature.SetField("id", lCellID)
-                    pFeature.SetField("lon", dLongitude_center )
-                    pFeature.SetField("lat", dLatitude_center )
-                    pFeature.SetField("area", dArea )
-                    pLayer.CreateFeature(pFeature)
-
                     lCellID_center = lCellID                
                     aNeighbor=list()
                     if iRow > 1:#0
@@ -386,7 +398,6 @@ def create_hexagon_mesh(iFlag_rotation_in,
                             if iRow != 1:
                                 lCellID1 = nrow_in * (iColumn-2) + iRow -1
                                 aNeighbor.append(lCellID1)
-
 
                     if iRow < nrow_in:#3
                         lCellID3 = lCellID_center + 1
@@ -415,6 +426,13 @@ def create_hexagon_mesh(iFlag_rotation_in,
                     pHexagon.nNeighbor_land= pHexagon.nNeighbor
                     aHexagon.append(pHexagon)
 
+                    pFeature.SetGeometry(pPolygon)
+                    pFeature.SetField("cellid", lCellID)
+                    pFeature.SetField("longitude", dLongitude_center )
+                    pFeature.SetField("latitude", dLatitude_center )
+                    pFeature.SetField("area", dArea )
+                    pLayer.CreateFeature(pFeature)
+
                     lCellID= lCellID +1
 
                     pass
@@ -434,6 +452,7 @@ def create_hexagon_mesh(iFlag_rotation_in,
         pCell = aHexagon[i]
         lCellID = pCell.lCellID
         aCellID.append(lCellID)
+        
     for i in range(ncell):
         pCell = aHexagon[i]
         aNeighbor = pCell.aNeighbor
@@ -445,6 +464,9 @@ def create_hexagon_mesh(iFlag_rotation_in,
             if lNeighbor in aCellID:
                 nNeighbor_new = nNeighbor_new + 1 
                 aNeighbor_new.append(lNeighbor)
+        
+        pCell.nNeighbor= len(aNeighbor_new)
+        pCell.aNeighbor = aNeighbor        
         pCell.nNeighbor_land= len(aNeighbor_new)
         pCell.aNeighbor_land = aNeighbor_new
         pCell.nNeighbor_ocean = pCell.nVertex - pCell.nNeighbor_land

@@ -49,7 +49,13 @@ class pytin(pycell):
     aFlowline=None
     lCellID  = -1
     aNeighbor=None #the global ID of all neighbors
+    nNeighbor_land_virtual = -1
+    aNeighbor_land_virtual = None
     nNeighbor=-1
+
+    aNeighbor_distance = None
+  
+
     def __init__(self, aEdge,aVertex, dLon, dLat):       
         nEdge = len(aEdge)
         if nEdge !=3:

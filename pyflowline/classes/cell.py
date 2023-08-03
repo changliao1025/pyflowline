@@ -12,7 +12,8 @@ class celltype(enum.Enum):
     square = 2
     latlon = 3
     mpas = 4
-    tin = 5
+    dggrid = 5
+    tin = 6
 
 class pycell(metaclass=ABCMeta):
     

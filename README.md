@@ -1,10 +1,25 @@
 ### PyFlowline
 
 [![DOI](https://zenodo.org/badge/368338554.svg)](https://zenodo.org/badge/latestdoi/368338554)
+[![Downloads](https://static.pepy.tech/badge/pyflowline)](https://pepy.tech/project/pyflowline)
 
 PyFlowline: a mesh-independent river network generator for hydrologic models. 
 
-PyFlowline is mesh independent, meaning you can apply it to both structured (e.g., traditional rectangle mesh, latitude-longitude, hexagon) and unstructured mesh systems (e.g., Triangulated Irregular Network (TIN) mesh and Model for Prediction Across Scales (MPAS) mesh).
+### Quickstart
+
+Please refer to the [quickstart documentation](https://pyflowline.readthedocs.io/en/latest/quickstart.html) for details on how to get started using the PyFlowline package.
+
+PyFlowline is mesh independent, meaning you can apply it to both structured 
+
+1. traditional rectangle projected mesh 
+2. latitude-longitude 
+3. hexagon
+4. dggs ([dggrid](https://github.com/sahrk/DGGRID))
+
+and unstructured mesh systems 
+
+1. Model for Prediction Across Scales mesh ([MPAS](https://github.com/MPAS-Dev))
+2. Triangulated Irregular Network (TIN) mesh
 
 This package generates the mesh cell-based conceptual river networks using the following steps:
 
@@ -12,9 +27,20 @@ This package generates the mesh cell-based conceptual river networks using the f
 2. `Mesh generation`: PyFlowline generates structured meshes (e.g., rectangle, hexagon) or imports user-provided unstructured meshes into the PyFlowline-compatible GEOJSON format.
 3. `Topological relationship reconstruction`: PyFlowline reconstructs the topological relationship using the mesh and flowline intersections.
 
-### Quickstart
+### Dependency
 
-Please refer to the [quickstart documentation](https://pyflowline.readthedocs.io/en/latest/quickstart.html) for details on how to get started using the PyFlowline package.
+PyFlowline depends on the following packages
+
+1. `numpy`
+2. `gdal`
+3. `netCDF4`
+
+PyFlowline also has three optional dependency packages
+
+1. `cython` for performance 
+2. `matplotlib` for visualization
+3. `cartopy` for visulization
+4. `simplekml` for Google Earth KML support
 
 ### Installation
 
@@ -28,7 +54,13 @@ We provide several examples in the `examples` folder to demonstrate the model ca
 
 This work was supported by the Earth System Model Development program areas of the U.S. Department of Energy, Office of Science, Office of Biological and Environmental Research as part of the multi-program, collaborative Integrated Coastal Modeling (ICoM) project and the Interdisciplinary Research for Arctic Coastal Environments (InteRFACE) project.
 
+This research was supported as part of the Next Generation Ecosystem Experiments-Tropics, funded by the U.S. Department of Energy, Office of Science, Office of Biological and Environmental Research at Pacific Northwest National Laboratory. The study was also partly supported by U.S. Department of Energy Office of Science Biological and Environmental Research through the Earth and Environmental System Modeling program as part of the Energy Exascale Earth System Model (E3SM) project.
+
+This research was supported by the Next Generation Ecosystem Experiments-Tropics project, funded by the U.S. Department of Energy, Office of Science, Office of Biological and Environmental Research at Pacific Northwest National Laboratory. 
+
 ### License
+
+BSD 3-Clause License
 
 Copyright © 2022, Battelle Memorial Institute
 
@@ -46,7 +78,7 @@ Copyright © 2022, Battelle Memorial Institute
 
 Several publications describe the algorithms used in `PyFlowline` in detail. If you make use of `PyFlowline` in your work, please consider including a reference to the following:
 
-* Liao. C. Cooper, M (2022) Pyflowline: a mesh independent river network generator for hydrologic models. Zenodo.
+* Liao. C. Cooper, M (2022) Pyflowline: a mesh-independent river network generator for hydrologic models. Zenodo.
 https://doi.org/10.5281/zenodo.6407299
 
 * Liao, C., Zhou, T., Xu, D., Cooper, M. G., Engwirda, D., Li, H.-Y., & Leung, L. R. (2023). Topological relationship-based flow direction modeling: Mesh-independent river networks representation. Journal of Advances in Modeling Earth Systems, 15, e2022MS003089. https://doi.org/10.1029/2022MS003089

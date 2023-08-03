@@ -6,7 +6,7 @@ from pyflowline.classes.vertex import pyvertex
 from pyflowline.classes.edge import pyedge
 from pyflowline.classes.cell import pycell
 from pyflowline.classes.flowline import pyflowline
-from pyflowline.algorithms.auxiliary.gdal_functions import calculate_polygon_area
+from pyflowline.external.pyearth.gis.gdal.gdal_functions import calculate_polygon_area
 
 class LatlonClassEncoder(JSONEncoder):
     def default(self, obj):
@@ -68,10 +68,14 @@ class pylatlon(pycell):
     nNeighbor=-1
     nNeighbor_land=-1
     nNeighbor_ocean=-1
+    nNeighbor_land_virtual = -1
+    aNeighbor_land_virtual = None
     aNeighbor=None #the global ID of all neighbors
     aNeighbor_land=None #the global ID of all neighbors
     aNeighbor_ocean=None #the global ID of all neighbors
+    
     aNeighbor_distance = None
+   
 
     def __init__(self, dLon, dLat, aEdge, aVertex):
         """

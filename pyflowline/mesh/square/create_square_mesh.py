@@ -6,13 +6,15 @@
 import os
 from osgeo import ogr, osr
 import numpy as np
-from shapely.wkt import loads
-from pyflowline.classes.square import pysquare
 from pyflowline.formats.convert_coordinates import convert_gcs_coordinates_to_cell
-from pyflowline.algorithms.auxiliary.gdal_functions import  reproject_coordinates_batch
+from pyflowline.external.pyearth.gis.gdal.gdal_functions import  reproject_coordinates_batch
 
-def create_square_mesh(dX_left_in, dY_bot_in, dResolution_meter_in, ncolumn_in, nrow_in, pPolygon_in,
-    sFilename_output_in, sFilename_spatial_reference_in):   
+def create_square_mesh(dX_left_in, dY_bot_in,
+                        dResolution_meter_in,
+                        ncolumn_in, nrow_in,
+    sFilename_output_in, 
+    sFilename_spatial_reference_in, 
+    pBoundary_in):   
     """
     _summary_
 
@@ -28,7 +30,9 @@ def create_square_mesh(dX_left_in, dY_bot_in, dResolution_meter_in, ncolumn_in, 
     Returns:
         _type_: _description_
     """
-
+    #for the reason that a geometry object will be crash if the associated dataset is closed, we must pass wkt string
+    #https://gdal.org/api/python_gotchas.html
+    pBoundary = ogr.CreateGeometryFromWkt(pBoundary_in)
 
     if os.path.exists(sFilename_output_in): 
         os.remove(sFilename_output_in)
@@ -44,9 +48,9 @@ def create_square_mesh(dX_left_in, dY_bot_in, dResolution_meter_in, ncolumn_in, 
     pSpatial_reference_gcs.SetAxisMappingStrategy(osr.OAMS_TRADITIONAL_GIS_ORDER)
     pLayer = pDataset.CreateLayer('cell', pSpatial_reference_gcs, ogr.wkbPolygon)
     # Add one attribute
-    pLayer.CreateField(ogr.FieldDefn('id', ogr.OFTInteger64)) #long type for high resolution
-    pLayer.CreateField(ogr.FieldDefn('lon', ogr.OFTReal)) #long type for high resolution
-    pLayer.CreateField(ogr.FieldDefn('lat', ogr.OFTReal)) #long type for high resolution
+    pLayer.CreateField(ogr.FieldDefn('cellid', ogr.OFTInteger64)) #long type for high resolution
+    pLayer.CreateField(ogr.FieldDefn('longitude', ogr.OFTReal)) #long type for high resolution
+    pLayer.CreateField(ogr.FieldDefn('latitude', ogr.OFTReal)) #long type for high resolution
     pArea_field = ogr.FieldDefn('area', ogr.OFTReal)
     pArea_field.SetWidth(20)
     pArea_field.SetPrecision(2)
@@ -130,22 +134,23 @@ def create_square_mesh(dX_left_in, dY_bot_in, dResolution_meter_in, ncolumn_in, 
             dLongitude_center = np.mean(aCoords[0:4,0])
             dLatitude_center = np.mean(aCoords[0:4,1])     
 
-            pCenter = ogr.Geometry(ogr.wkbPoint)
-            pCenter.AddPoint(dLongitude_center, dLatitude_center)
-            pCenter1 = loads( pCenter.ExportToWkt() )
-            iFlag = pCenter1.within(pPolygon_in)
+            iFlag = False
+            if pPolygon.Within(pBoundary):
+                iFlag = True
+            else:
+                #then check intersection
+                if pPolygon.Intersects(pBoundary):
+                    iFlag = True
+                else:
+                    pass
+
             if ( iFlag == True ):
                 pSquare = convert_gcs_coordinates_to_cell(2, dLongitude_center, dLatitude_center, dummy1)
                 pSquare.lCellID = lCellID
                 dArea = pSquare.calculate_cell_area()
                 pSquare.calculate_edge_length()
 
-                pFeature.SetGeometry(pPolygon)
-                pFeature.SetField("id", lCellID)
-                pFeature.SetField("lon", dLongitude_center )
-                pFeature.SetField("lat", dLatitude_center )
-                pFeature.SetField("area", dArea )
-                pLayer.CreateFeature(pFeature)
+                
 
                 #build topoloy
                 aNeighbor=list()
@@ -185,6 +190,15 @@ def create_square_mesh(dX_left_in, dY_bot_in, dResolution_meter_in, ncolumn_in, 
                 pSquare.aNeighbor_land= aNeighbor
                 pSquare.nNeighbor_land= pSquare.nNeighbor
                 aSquare.append(pSquare)
+
+                #save feature
+                pFeature.SetGeometry(pPolygon)
+                pFeature.SetField("cellid", lCellID)
+                pFeature.SetField("longitude", dLongitude_center )
+                pFeature.SetField("latitude", dLatitude_center )
+                pFeature.SetField("area", dArea )
+                pLayer.CreateFeature(pFeature)
+
                 lCellID = lCellID + 1
 
                 pass
@@ -198,6 +212,7 @@ def create_square_mesh(dX_left_in, dY_bot_in, dResolution_meter_in, ncolumn_in, 
         pCell = aSquare[i]
         lCellID = pCell.lCellID
         aCellID.append(lCellID)
+        
     for i in range(ncell):
         pCell = aSquare[i]
         aNeighbor = pCell.aNeighbor
@@ -209,6 +224,9 @@ def create_square_mesh(dX_left_in, dY_bot_in, dResolution_meter_in, ncolumn_in, 
             if lNeighbor in aCellID:
                 nNeighbor_new = nNeighbor_new + 1 
                 aNeighbor_new.append(lNeighbor)
+        
+        pCell.nNeighbor= len(aNeighbor_new)
+        pCell.aNeighbor = aNeighbor
         pCell.nNeighbor_land= len(aNeighbor_new)
         pCell.aNeighbor_land = aNeighbor_new
         pCell.nNeighbor_ocean = pCell.nVertex - pCell.nNeighbor_land

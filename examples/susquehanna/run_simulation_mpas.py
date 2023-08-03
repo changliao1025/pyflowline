@@ -27,9 +27,10 @@ else:
 #setup case information
 #===================================
 iCase_index = 1
+iFlag_simulation = 0
+iFlag_visualization = 1
 sMesh = 'mpas'
-sDate='20230101'
-
+sDate='20230701'
 
 oPyflowline = pyflowline_read_model_configuration_file(sFilename_configuration_in, 
     iCase_index_in=iCase_index, sDate_in=sDate)
@@ -38,15 +39,37 @@ oPyflowline = pyflowline_read_model_configuration_file(sFilename_configuration_i
 oPyflowline.aBasin[0].dLatitude_outlet_degree=39.462000
 oPyflowline.aBasin[0].dLongitude_outlet_degree=-76.009300
 
-oPyflowline.setup()
+#oPyflowline.setup()
+if iFlag_visualization ==1:
+    #oPyflowline.plot(sVariable_in = 'flowline_filter', sFilename_output_in = 'filter_flowline.png'  )
+    pass
 
+if iFlag_simulation == 1:
+    #oPyflowline.flowline_simplification()
+    pass
 
-#oPyflowline.flowline_simplification()
-#oPyflowline.plot( sVariable_in = 'flowline_simplified' )
+if iFlag_visualization == 1:
+     
+    aExtent_meander = [-76.5,-76.2, 41.6,41.9] 
+    #oPyflowline.plot( sVariable_in='flowline_simplified' , sFilename_output_in = 'flowline_simplified.png' ) 
+    #oPyflowline.plot( sVariable_in='flowline_simplified' , sFilename_output_in = 'flowline_simplified_zoom.png', aExtent_in =aExtent_meander ) 
 
+    pass
 
-aCell = oPyflowline.mesh_generation()
-oPyflowline.reconstruct_topological_relationship(aCell)
+if iFlag_simulation == 1:
+    aCell = oPyflowline.mesh_generation()
+
+if iFlag_visualization == 1:
+    oPyflowline.plot( sVariable_in='mesh', sFilename_output_in = 'mesh.png' ) 
+    pass
+
+if iFlag_simulation == 1:
+    oPyflowline.reconstruct_topological_relationship(aCell)
+
+if iFlag_visualization == 1:
+    oPyflowline.plot(  sVariable_in='overlap', sFilename_output_in = 'mesh_w_flowline.png',)
+    pass
+
 oPyflowline.export()
 
 print('Finished')

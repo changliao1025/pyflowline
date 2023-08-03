@@ -9,7 +9,7 @@ iFlag_cython = importlib.util.find_spec("cython")
 if iFlag_cython is not None:
     from pyflowline.algorithms.cython.kernel import calculate_angle_betwen_vertex
 else:
-    from pyflowline.algorithms.auxiliary.gdal_functions import  calculate_angle_betwen_vertex
+    from pyflowline.external.pyearth.gis.gdal.gdal_functions import  calculate_angle_betwen_vertex
 
 class ConfluenceClassEncoder(JSONEncoder):
     """Confluence Class Encoder

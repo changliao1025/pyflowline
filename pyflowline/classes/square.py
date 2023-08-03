@@ -72,6 +72,7 @@ class pysquare(pycell):
     aNeighbor_land=None #the global ID of all neighbors
     aNeighbor_ocean=None #the global ID of all neighbors
     aNeighbor_distance = None
+   
 
     def __init__(self, dLon, dLat, aEdge, aVertex):    
         """

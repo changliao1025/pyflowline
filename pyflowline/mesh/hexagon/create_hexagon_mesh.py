@@ -452,6 +452,7 @@ def create_hexagon_mesh(iFlag_rotation_in,
         pCell = aHexagon[i]
         lCellID = pCell.lCellID
         aCellID.append(lCellID)
+        
     for i in range(ncell):
         pCell = aHexagon[i]
         aNeighbor = pCell.aNeighbor
@@ -463,6 +464,9 @@ def create_hexagon_mesh(iFlag_rotation_in,
             if lNeighbor in aCellID:
                 nNeighbor_new = nNeighbor_new + 1 
                 aNeighbor_new.append(lNeighbor)
+        
+        pCell.nNeighbor= len(aNeighbor_new)
+        pCell.aNeighbor = aNeighbor        
         pCell.nNeighbor_land= len(aNeighbor_new)
         pCell.aNeighbor_land = aNeighbor_new
         pCell.nNeighbor_ocean = pCell.nVertex - pCell.nNeighbor_land

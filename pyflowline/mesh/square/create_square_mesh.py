@@ -224,6 +224,9 @@ def create_square_mesh(dX_left_in, dY_bot_in,
             if lNeighbor in aCellID:
                 nNeighbor_new = nNeighbor_new + 1 
                 aNeighbor_new.append(lNeighbor)
+        
+        pCell.nNeighbor= len(aNeighbor_new)
+        pCell.aNeighbor = aNeighbor
         pCell.nNeighbor_land= len(aNeighbor_new)
         pCell.aNeighbor_land = aNeighbor_new
         pCell.nNeighbor_ocean = pCell.nVertex - pCell.nNeighbor_land

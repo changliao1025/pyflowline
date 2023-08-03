@@ -29,8 +29,7 @@ def create_latlon_mesh(dLongitude_left_in,
     """
     #for the reason that a geometry object will be crash if the associated dataset is closed, we must pass wkt string
     #https://gdal.org/api/python_gotchas.html
-    pBoundary = ogr.CreateGeometryFromWkt(pBoundary_in)
-       
+    pBoundary = ogr.CreateGeometryFromWkt(pBoundary_in)   
     
     if os.path.exists(sFilename_output_in): 
         os.remove(sFilename_output_in)
@@ -99,8 +98,7 @@ def create_latlon_mesh(dLongitude_left_in,
             aCoords[3,0] = x4
             aCoords[3,1] = y4
             aCoords[4,0] = x1
-            aCoords[4,1] = y1
-            
+            aCoords[4,1] = y1            
 
             iFlag = False
             if pPolygon.Within(pBoundary):
@@ -113,13 +111,11 @@ def create_latlon_mesh(dLongitude_left_in,
                     pass
 
             if ( iFlag == True ):
-
                 dummy1= np.array(aCoords)           
                 pLatlon = convert_gcs_coordinates_to_cell(3, dLongitude_center, dLatitude_center, dummy1)
                 pLatlon.lCellID = lCellID
                 dArea = pLatlon.calculate_cell_area()
                 pLatlon.calculate_edge_length()      
-
                 lCellID_center = lCellID
 
                 aNeighbor = list()
@@ -178,6 +174,7 @@ def create_latlon_mesh(dLongitude_left_in,
         pCell = aLatlon[i]
         lCellID = pCell.lCellID
         aCellID.append(lCellID)
+        
     for i in range(ncell):
         pCell = aLatlon[i]
         aNeighbor = pCell.aNeighbor
@@ -189,6 +186,10 @@ def create_latlon_mesh(dLongitude_left_in,
             if lNeighbor in aCellID:
                 nNeighbor_new = nNeighbor_new + 1 
                 aNeighbor_new.append(lNeighbor)
+
+        #for latlon, there is no ocean concept
+        pCell.nNeighbor= len(aNeighbor_new)
+        pCell.aNeighbor = aNeighbor
         pCell.nNeighbor_land= len(aNeighbor_new)
         pCell.aNeighbor_land = aNeighbor_new
         pCell.nNeighbor_ocean = pCell.nVertex - pCell.nNeighbor_land

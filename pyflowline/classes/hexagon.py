@@ -66,14 +66,15 @@ class pyhexagon(pycell):
     aFlowline=None   
     nNeighbor=-1
     nNeighbor_land=-1
-    nNeighbor_ocean=-1
+    nNeighbor_ocean=-1 #cell that actually on ocean
     nNeighbor_land_virtual = -1
-    aNeighbor_land_virtual = None
-    aNeighbor=None #the global ID of all neighbors
+    aNeighbor_land_virtual = None #cell that on land but not considered as neighbor
+    aNeighbor=None #the global ID of all neighbors, including both virtual and real land neighbors
     aNeighbor_land=None #the global ID of all neighbors
     aNeighbor_ocean=None #the global ID of all neighbors
+    
     aNeighbor_distance = None
-
+   
     def __init__(self, dLon, dLat, aEdge, aVertex):
         """
         Initilize a hexagon cell object

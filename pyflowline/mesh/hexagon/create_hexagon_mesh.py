@@ -75,22 +75,34 @@ def create_hexagon_mesh(iFlag_rotation_in,
     dArea = np.power(dResolution_meter_in,2.0)
     #hexagon edge
     dLength_edge = np.sqrt(  2.0 * dArea / (3.0* np.sqrt(3.0))  )
+    dLength_half_edge = 0.5 * dLength_edge
     #geojson
     aHexagon=list()
     #.........
-    #(x2,y2)-----(x3,y3)
+    #change the order because mpas uses counter-clock wise to store the vertices
+    #we will also start from the lower-left corner, and then go to the right and then go up
+    #so the final index will be like this
+    #3 4
+    #1 2
+    #lCellID = 1
+    #.........
+    #(x4,y4)-----(x3,y3)
     #   |           |
-    #(x1,y1)-----(x4,y4)
+    #(x1,y1)-----(x2,y2)
     #...............
   
-    lCellID = 1
-    if iFlag_rotation_in ==0:
-        dX_shift = 0.5 * dLength_edge * np.sqrt(3.0)
-        dY_shift = 0.5 * dLength_edge
+    #lCellID = 1
+
+
+    if iFlag_rotation_in == 0:
+        dX_shift = dLength_half_edge * np.sqrt(3.0)
+        dY_shift = dLength_half_edge
         dX_spacing = dLength_edge * np.sqrt(3.0)
         dY_spacing = dLength_edge * 1.5
         for iRow in range(1, nrow_in+1):
             for iColumn in range(1, ncolumn_in+1):
+                #using global id to identify the cell
+                lCellID = (iRow-1) * ncolumn_in + iColumn
                 if iRow % 2 == 1 : #odd
                 #define a polygon here
                     x1 = xleft + (iColumn-1) * dX_spacing
@@ -190,9 +202,7 @@ def create_hexagon_mesh(iFlag_rotation_in,
                     else:
                         pass
 
-                if ( iFlag == True ):
-                    
-
+                if ( iFlag == True ):         
                     pHexagon = convert_gcs_coordinates_to_cell(1, dLongitude_center, dLatitude_center, dummy1)
                     pHexagon.lCellID = lCellID
                     dArea = pHexagon.calculate_cell_area()
@@ -452,7 +462,7 @@ def create_hexagon_mesh(iFlag_rotation_in,
         pCell = aHexagon[i]
         lCellID = pCell.lCellID
         aCellID.append(lCellID)
-        
+
     for i in range(ncell):
         pCell = aHexagon[i]
         aNeighbor = pCell.aNeighbor
@@ -466,7 +476,7 @@ def create_hexagon_mesh(iFlag_rotation_in,
                 aNeighbor_new.append(lNeighbor)
         
         pCell.nNeighbor= len(aNeighbor_new)
-        pCell.aNeighbor = aNeighbor        
+        pCell.aNeighbor = aNeighbor_new     
         pCell.nNeighbor_land= len(aNeighbor_new)
         pCell.aNeighbor_land = aNeighbor_new
         pCell.nNeighbor_ocean = pCell.nVertex - pCell.nNeighbor_land

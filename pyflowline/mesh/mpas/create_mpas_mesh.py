@@ -175,8 +175,7 @@ def create_mpas_mesh(iFlag_global_in,
         if sKey == 'bed_elevation_profile':
             bed_elevation_profile0 = aValue 
         else:
-            pass
-        
+            pass        
 
     aLatitudeVertex = latVertex0[:] / math.pi * 180
     aLongitudeVertex = lonVertex0[:] / math.pi * 180    
@@ -377,10 +376,7 @@ def create_mpas_mesh(iFlag_global_in,
                         pass
                 else:
                     pass           
-                #call fuction to add the cell
-                if lCellID == 155420:
-                    print('debug')
-                    pass
+                #call fuction to add the cell               
                 
                 aMpas = add_cell_into_list(aMpas, i, lCellID, dArea, dElevation_mean, dElevation_profile0, aCoords )
                 
@@ -477,13 +473,18 @@ def create_mpas_mesh(iFlag_global_in,
                     aCoords[k,1] = y1
                     pass
 
+                x1 = convert_360_to_180(aLonVertex[0])
+                y1 = aLatVertex[0]
+                ring.AddPoint(x1, y1) #double check            
+                pPolygon = ogr.Geometry(ogr.wkbPolygon)
+                pPolygon.AddGeometry(ring)
+
                 lCellID = int(aIndexToCellID[j])
                 dElevation_mean = float(aBed_elevation[j])
                 dElevation_profile0 = float(aBed_elevation_profile[j,0])
                 dArea = float(aCellArea[j])
                            
-                if lCellID not in aCellID:                   
-                    
+                if lCellID not in aCellID:   
                     aMpas_middle = add_cell_into_list(aMpas_middle, j, lCellID, dArea, dElevation_mean, dElevation_profile0, aCoords )
                     aCellID.append(lCellID)
 
@@ -495,11 +496,7 @@ def create_mpas_mesh(iFlag_global_in,
                     pCell.nNeighbor_land_virtual = 0
 
                     #save mesh cell
-                    x1 = convert_360_to_180(aLonVertex[0])
-                    y1 = aLatVertex[0]
-                    ring.AddPoint(x1, y1) #double check            
-                    pPolygon = ogr.Geometry(ogr.wkbPolygon)
-                    pPolygon.AddGeometry(ring)
+                    
                     if iFlag_save_mesh_in ==1:                
                         pFeature.SetGeometry(pPolygon)
                         pFeature.SetField("cellid", int(lCellID) )

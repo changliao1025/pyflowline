@@ -137,3 +137,6 @@ core.*
 *.nc
 *.tif
 *.tiff
+
+# mac file system
+.DS_Store

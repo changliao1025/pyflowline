@@ -55,27 +55,36 @@ def create_latlon_mesh(dLongitude_left_in,
     xspacing= dResolution_degree_in
     ybottom = dLatitude_bot_in
     yspacing = dResolution_degree_in
-    lCellID = 1
+
+    #change the order because mpas uses counter-clock wise to store the vertices
+    #we will also start from the lower-left corner, and then go to the right and then go up
+    #so the final index will be like this
+    #3 4
+    #1 2
+    #lCellID = 1
     #.........
-    #(x2,y2)-----(x3,y3)
+    #(x4,y4)-----(x3,y3)
     #   |           |
-    #(x1,y1)-----(x4,y4)
+    #(x1,y1)-----(x2,y2)
     #...............
     aLatlon = list()
-    for iColumn in range(1, ncolumn_in+1):
-        for iRow in range(1, nrow_in+1):
+    for iRow in range(1, nrow_in+1):
+        for iColumn in range(1, ncolumn_in+1):        
+            #global cell id for the mesh
+            lCellID = (iRow-1) * ncolumn_in + iColumn
+
             #define a polygon here
             x1 = xleft + ((iColumn-1) * xspacing)
             y1 = ybottom + ((iRow-1) * yspacing)
 
-            x2 = xleft + ((iColumn-1) * xspacing)
-            y2 = ybottom + ((iRow ) * yspacing)
+            x2 = xleft + ((iColumn ) * xspacing)
+            y2 = ybottom + ((iRow-1) * yspacing)     
 
             x3 = xleft + ((iColumn ) * xspacing)
             y3 = ybottom + ((iRow ) * yspacing)
 
-            x4 = xleft + ((iColumn ) * xspacing)
-            y4 = ybottom + ((iRow-1) * yspacing)           
+            x4 = xleft + ((iColumn-1) * xspacing)
+            y4 = ybottom + ((iRow ) * yspacing)         
 
             ring = ogr.Geometry(ogr.wkbLinearRing)
             ring.AddPoint(x1, y1)
@@ -116,36 +125,52 @@ def create_latlon_mesh(dLongitude_left_in,
                 pLatlon.lCellID = lCellID
                 dArea = pLatlon.calculate_cell_area()
                 pLatlon.calculate_edge_length()      
-                lCellID_center = lCellID
+                #lCellID_center = lCellID
 
                 aNeighbor = list()
+
+                #counter-clock wise direction to add the neighbor
                 if iRow > 1:#under
-                    lCellID0 = lCellID_center - 1
-                    aNeighbor.append(lCellID0)
+                    iRow_dummy = iRow - 1
                     if iColumn > 1:
-                        lCellID2 = lCellID0 - nrow_in
+                        iColumn_dummy = iColumn - 1
+                        lCellID2 = (iRow_dummy-1) * ncolumn_in + iColumn_dummy #lCellID0 - nrow_in
                         aNeighbor.append(lCellID2)
 
-                if iColumn> 1:#left
-                    lCellID1 = nrow_in * (iColumn-2) + iRow 
-                    aNeighbor.append(lCellID1)  
-                    if iRow < nrow_in:
-                        lCellID4 = lCellID1 + 1
-                        aNeighbor.append(lCellID4)      
-
-                if iRow < nrow_in:#top
-                    lCellID3 = lCellID_center + 1
-                    aNeighbor.append(lCellID3)
-                    if iColumn < ncolumn_in:
-                        lCellID6 = lCellID3 + nrow_in
-                        aNeighbor.append(lCellID6) 
+                    lCellID0 =  (iRow_dummy-1) * ncolumn_in + iColumn
+                    aNeighbor.append(lCellID0)                    
 
                 if iColumn  < ncolumn_in  : #right
-                    lCellID5 = nrow_in * iColumn + iRow 
-                    aNeighbor.append(lCellID5)
+                    iColumn_dummy = iColumn + 1
                     if iRow > 1:
-                        lCellID7 = lCellID5 -1
+                        iRow_dummy = iRow - 1
+                        lCellID7 = (iRow_dummy-1) * ncolumn_in + iColumn_dummy# lCellID5 -1
                         aNeighbor.append(lCellID7) 
+
+                    lCellID5 = (iRow-1) * ncolumn_in + iColumn_dummy #nrow_in * iColumn + iRow 
+                    aNeighbor.append(lCellID5)                       
+
+                if iRow < nrow_in:#top
+                    iRow_dummy = iRow + 1
+                    if iColumn < ncolumn_in:
+                        iColumn_dummy = iColumn + 1
+                        lCellID6 = (iRow_dummy-1) * ncolumn_in + iColumn_dummy #lCellID3 + nrow_in
+                        aNeighbor.append(lCellID6) 
+
+                    lCellID3 = (iRow_dummy-1) * ncolumn_in + iColumn #lCellID_center + 1
+                    aNeighbor.append(lCellID3)         
+                
+
+                if iColumn> 1:#left
+                    iColumn_dummy = iColumn - 1
+                    if iRow < nrow_in:
+                        iRow_dummy = iRow + 1
+                        lCellID4 = (iRow_dummy-1) * ncolumn_in + iColumn_dummy #lCellID1 + 1
+                        aNeighbor.append(lCellID4)   
+
+                    lCellID1 = (iRow-1) * ncolumn_in + iColumn_dummy #nrow_in * (iColumn-2) + iRow 
+                    aNeighbor.append(lCellID1)  
+                    
 
                 pLatlon.aNeighbor = aNeighbor
                 pLatlon.nNeighbor = len(aNeighbor)
@@ -161,7 +186,7 @@ def create_latlon_mesh(dLongitude_left_in,
                 pFeature.SetField("area", dArea )
                 pLayer.CreateFeature(pFeature)
 
-                lCellID = lCellID + 1
+                
 
                 pass
         
@@ -189,7 +214,7 @@ def create_latlon_mesh(dLongitude_left_in,
 
         #for latlon, there is no ocean concept
         pCell.nNeighbor= len(aNeighbor_new)
-        pCell.aNeighbor = aNeighbor
+        pCell.aNeighbor = aNeighbor_new
         pCell.nNeighbor_land= len(aNeighbor_new)
         pCell.aNeighbor_land = aNeighbor_new
         pCell.nNeighbor_ocean = pCell.nVertex - pCell.nNeighbor_land

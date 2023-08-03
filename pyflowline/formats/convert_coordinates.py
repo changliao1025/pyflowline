@@ -19,17 +19,21 @@ else:
     from pyflowline.external.pyearth.gis.gdal.gdal_functions import  calculate_angle_betwen_vertex
     from pyflowline.external.pyearth.gis.gdal.gdal_functions import calculate_distance_to_plane
 
-def convert_gcs_coordinates_to_cell(iMesh_type_in, 
-    dLongitude_center_in, 
-    dLatitude_center_in, 
-        aCoordinates_gcs_in,
-        iFlag_simplify_in=None):
+def convert_gcs_coordinates_to_cell(iMesh_type_in,     
+                                    dLongitude_center_in,     
+                                    dLatitude_center_in,         
+                                    aCoordinates_gcs_in,        
+                                    iFlag_simplify_in=None):
+    
+    
+   
 
     if iFlag_simplify_in is None:
         iFlag_simplify_in = 0
     else:
         iFlag_simplify_in = iFlag_simplify_in
 
+    #the closed polygon has a duplicate point (start and end are the same)
     npoint = len(aCoordinates_gcs_in)    
     aVertex=list()              
     aEdge=list()    
@@ -90,8 +94,7 @@ def convert_gcs_coordinates_to_cell(iMesh_type_in,
     aEdge.append(pEdge)
     
 
-    if iMesh_type_in ==1: #hexagon
-        
+    if iMesh_type_in ==1: #hexagon       
 
         pHexagon = pyhexagon( dLongitude_center_in, dLatitude_center_in, aEdge, aVertex)
         return pHexagon

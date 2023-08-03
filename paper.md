@@ -32,11 +32,11 @@ River networks are crucial in hydrologic and Earth system models. Accurately rep
 # Statement of need
 
 For hydrologic modelers, river networks are a key input for hydrologic models. 
-While some hydrologic models accept vector-based river networks [@Schwenk:2021], others only accept mesh cell-based, which requires a generation method from the vector-based river network. 
+While some hydrologic models accept vector-based river networks [@mizukami_2016_GMD; @Schwenk:2021], others only accept mesh cell-based representations, or require a generation method from a vector-based river network. 
 Currently, generating a mesh cell-based river network from a given vector-based river network and arbitrary computational mesh is a major challenge.
 Existing methods are typically limited to structured rectangular meshes, such as 30m x 30m cartesian grids for high-resolution watershed-scale modeling or 0.5 degree x 0.5 degree geographic grids for global climate modeling. In PyFlowline, we define structured meshes (e.g., lat-lon, raster files with projections, and hexagon) as those with fixed cell sizes and shapes and unstructured meshes as those with variable cell sizes and shapes.
 
-Structured mesh-based methods use fixed cartesian or geographic cell sizes, which have several limitations: (1) they perform poorly at coarse resolution (>1km), and (2) they cannot be seamlessly coupled with other unstructured mesh-based hydrologic models such as oceanic models [@Engwirda:2021]. In contrast, unstructured meshes offer a flexible structure with variable grid-cell sizes and shapes. This flexibility makes them ideal for adapting to complex geometry such as river channels and coastlines. Besides, unstructured meshes provide the flexibility to couple different hydrologic models under a unified framework.
+Structured mesh-based methods use fixed cartesian or geographic cell sizes, which have several limitations: (1) they cannot resolve fine-scale river networks at coarse cell resolutions (>1km), and (2) they cannot be seamlessly coupled with other unstructured mesh-based hydrologic models such as oceanic models [@Engwirda:2021]. In contrast, unstructured meshes offer a flexible structure with variable grid-cell sizes and shapes. This flexibility makes them ideal for adapting to complex geometry such as river channels and coastlines. Besides, unstructured meshes provide the flexibility to couple different hydrologic models under a unified framework.
 Thus, unstructured meshes are increasingly being adopted in hydrologic modeling.
 
 Although unstructured meshes offer these flexibilities, additional efforts are required to generate conceptual river networks that capture real-world river networks across different spatial scales.
@@ -62,11 +62,11 @@ PyFlowline provides several key features, including
 
 # State of the field
 
-Existing river network representation methods often fall into these three categories:
+Existing river network representation methods often fall into three categories, each with associated strengths and weaknesses:
 
-1. Vector-based, hydrologic models that use this method cannot couple river and land because there is no one-to-one mapping [@Schwenk:2021];
-2. High-resolution DEM-based, only supports structured rectangle grids (e.g., 30m x 30m ) at high spatial resolutions [@Esri:2011];
-3. Upscaling-based, only supports structured geographic grids (e.g., 0.5 degree x 0.5 degree) at coarse resolutions [@Wu:2012]. This method often cannot provide global coverage, including Greenland and the Antarctic.
+1. Vector-based. Hydrologic models that use this method can represent fine-scale river networks, but cannot couple river and land without one-to-one mapping between river segments and land model cells [@Schwenk:2021];
+2. High-resolution DEM-based. Flow networks derived from structured rectangle-grid DEMs are widely available, but resolving fine-scale river networks requires grids with very high spatial resolution (e.g., 30m x 30m or finer) [@Esri:2011];
+3. Upscaling-based methods address the scale mismatch between coarse-resolution grids and fine-scale river networks, but only support structured geographic grids (e.g., 0.5 degree x 0.5 degree) at coarse resolutions [@Wu:2012]. This method often cannot provide global coverage, including Greenland and the Antarctic.
 
 PyFlowline is the only modeling software that provides these unique features:
 

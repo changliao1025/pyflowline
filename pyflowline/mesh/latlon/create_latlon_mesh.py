@@ -86,28 +86,21 @@ def create_latlon_mesh(dLongitude_left_in,
             x4 = xleft + ((iColumn-1) * xspacing)
             y4 = ybottom + ((iRow ) * yspacing)         
 
+            coordinates = [(x1, y1), (x2, y2), (x3, y3), (x4, y4), (x1, y1)]
+
             ring = ogr.Geometry(ogr.wkbLinearRing)
-            ring.AddPoint(x1, y1)
-            ring.AddPoint(x2, y2)
-            ring.AddPoint(x3, y3)
-            ring.AddPoint(x4, y4)
-            ring.AddPoint(x1, y1)
+            for x, y in coordinates:
+                ring.AddPoint(x, y)
+
             pPolygon = ogr.Geometry(ogr.wkbPolygon)
             pPolygon.AddGeometry(ring)
 
             dLongitude_center = (x1 + x2 + x3 + x4)/4.0
             dLatitude_center = (y1 + y2 + y3 + y4)/4.0
             aCoords = np.full((5,2), -9999.0, dtype=float)
-            aCoords[0,0] = x1
-            aCoords[0,1] = y1
-            aCoords[1,0] = x2
-            aCoords[1,1] = y2
-            aCoords[2,0] = x3
-            aCoords[2,1] = y3
-            aCoords[3,0] = x4
-            aCoords[3,1] = y4
-            aCoords[4,0] = x1
-            aCoords[4,1] = y1            
+            for i, (x, y) in enumerate(coordinates):
+                aCoords[i, 0] = x
+                aCoords[i, 1] = y         
 
             iFlag = False
             if pPolygon.Within(pBoundary):

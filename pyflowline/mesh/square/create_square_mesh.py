@@ -154,49 +154,26 @@ def create_square_mesh(dX_left_in, dY_bot_in,
             x4 = xleft + ((iColumn-1) * xspacing)
             y4 = ybottom + ((iRow ) * yspacing)  
 
-            x = list()
-            x.append(x1)
-            x.append(x2)
-            x.append(x3)
-            x.append(x4)
-          
-            y = list()
-            y.append(y1)
-            y.append(y2)
-            y.append(y3)
-            y.append(y4)
+            x = [x1, x2, x3, x4]
+            y = [y1, y2, y3, y4]
            
             x_new , y_new = reproject_coordinates_batch(x, y, pSpatial_reference)
-            x1=x_new[0]
-            x2=x_new[1]
-            x3=x_new[2]
-            x4=x_new[3]
-          
-            y1=y_new[0]
-            y2=y_new[1]
-            y3=y_new[2]
-            y4=y_new[3]        
-    
+            x1, x2, x3, x4 = x_new
+            y1, y2, y3, y4 = y_new       
+            coordinates = [(x1, y1), (x2, y2), (x3, y3), (x4, y4), (x1, y1)]
+
+
             ring = ogr.Geometry(ogr.wkbLinearRing)
-            ring.AddPoint(x1, y1)
-            ring.AddPoint(x2, y2)
-            ring.AddPoint(x3, y3)
-            ring.AddPoint(x4, y4)
-            ring.AddPoint(x1, y1)
+            for x, y in coordinates:
+                ring.AddPoint(x, y)
+
             pPolygon = ogr.Geometry(ogr.wkbPolygon)
             pPolygon.AddGeometry(ring)
 
             aCoords = np.full((5,2), -9999.0, dtype=float)
-            aCoords[0,0] = x1
-            aCoords[0,1] = y1
-            aCoords[1,0] = x2
-            aCoords[1,1] = y2
-            aCoords[2,0] = x3
-            aCoords[2,1] = y3
-            aCoords[3,0] = x4
-            aCoords[3,1] = y4
-            aCoords[4,0] = x1
-            aCoords[4,1] = y1
+            for i, (x, y) in enumerate(coordinates):
+                aCoords[i, 0] = x
+                aCoords[i, 1] = y
 
             dummy1= np.array(aCoords)
             dLongitude_center = np.mean(aCoords[0:4,0])
@@ -222,8 +199,6 @@ def create_square_mesh(dX_left_in, dY_bot_in,
                 pFeature.SetField("latitude", dLatitude_center )
                 pFeature.SetField("area", dArea )
                 pLayer.CreateFeature(pFeature)
-
-                lCellID = lCellID + 1
 
                 pass
 

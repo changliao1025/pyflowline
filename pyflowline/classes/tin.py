@@ -52,6 +52,10 @@ class pytin(pycell):
     nNeighbor_land_virtual = -1
     aNeighbor_land_virtual = None
     nNeighbor=-1
+
+    aNeighbor_distance = None
+  
+
     def __init__(self, aEdge,aVertex, dLon, dLat):       
         nEdge = len(aEdge)
         if nEdge !=3:

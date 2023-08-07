@@ -645,6 +645,7 @@ class flowlinecase(object):
 
                     aHexagon = create_hexagon_mesh(iFlag_rotation, dX_lowerleft, dY_lowerleft, dResolution_meter, ncolumn, nrow,
                                                    sFilename_mesh, sFilename_spatial_reference, pBoundary_wkt)
+                    pass
 
                 return aHexagon
             else:
@@ -670,7 +671,9 @@ class flowlinecase(object):
                         pBoundary_wkt = pBoundary.ExportToWkt() 
                         aSquare = create_square_mesh(dX_lowerleft, dY_lowerleft, dResolution_meter, ncolumn, nrow, 
                                                      sFilename_mesh, sFilename_spatial_reference, pBoundary_wkt)
-                        return aSquare
+                        pass
+                    
+                    return aSquare
                 else:
                     if iMesh_type ==3: #latlon
                         dResolution_meter = degree_to_meter(dLatitude_mean, dResolution_degree)
@@ -701,8 +704,6 @@ class flowlinecase(object):
                             pass
 
                         return aLatlon
-
-
 
                     else:
                         if iMesh_type == 4: #mpas
@@ -741,6 +742,8 @@ class flowlinecase(object):
                                     #new method using polygon object
                                     aMpas = create_mpas_mesh(iFlag_global, iFlag_use_mesh_dem, iFlag_save_mesh, 
                                                              sFilename_mesh_netcdf, sFilename_mesh, iFlag_antarctic_in= iFlag_antarctic_in, pBoundary_in = pBoundary_wkt  )
+                                    pass
+
                             return aMpas
                         else:
                             if iMesh_type == 5: #dggrid
@@ -760,6 +763,7 @@ class flowlinecase(object):
                                                                      sWorkspace_output,
                                                                      iFlag_antarctic_in=iFlag_antarctic_in,
                                                                      sFilename_boundary_in = self.sFilename_mesh_boundary)
+                                                                     
                                     pass
                                 else:                                       
                                     aDggrid = create_dggrid_mesh(iFlag_global,
@@ -767,6 +771,7 @@ class flowlinecase(object):
                                                                      dResolution_meter,
                                                                      sFilename_mesh,
                                                                      sWorkspace_output)
+                                    pass
 
 
                                 return aDggrid

@@ -13,6 +13,20 @@ def convert_gcs_attributes_to_cell(iMesh_type_in, dLongitude_center_in, dLatitud
         aVertexID_in, 
         aEdgeID_in, 
         aVertexIndexOnEdge_in):  
+    """_summary_
+
+    Args:
+        iMesh_type_in (_type_): _description_
+        dLongitude_center_in (_type_): _description_
+        dLatitude_center_in (_type_): _description_
+        aCoordinates_gcs_in (_type_): _description_
+        aVertexID_in (_type_): _description_
+        aEdgeID_in (_type_): _description_
+        aVertexIndexOnEdge_in (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
         
     npoint = len(aVertexID_in)     
     aVertex=list()        

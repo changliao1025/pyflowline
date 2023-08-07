@@ -175,8 +175,7 @@ def create_mpas_mesh(iFlag_global_in,
         if sKey == 'bed_elevation_profile':
             bed_elevation_profile0 = aValue 
         else:
-            pass
-        
+            pass        
 
     aLatitudeVertex = latVertex0[:] / math.pi * 180
     aLongitudeVertex = lonVertex0[:] / math.pi * 180    
@@ -225,15 +224,14 @@ def create_mpas_mesh(iFlag_global_in,
         #now setup the neighbor information
         pmpas.aNeighbor=aNeighborIndex
         pmpas.nNeighbor=len(aNeighborIndex)
-        if pmpas.nNeighbor != pmpas.nVertex:
-            #this cell is next to the ocean boundary
+        if pmpas.nNeighbor != pmpas.nVertex:  #this cell is next to the ocean boundary            
             pmpas.nNeighbor_land = pmpas.nNeighbor 
             pmpas.nNeighbor_ocean = pmpas.nVertex - pmpas.nNeighbor
             pmpas.aNeighbor_land=aNeighborIndex
             pmpas.nNeighbor_land=len(aNeighborIndex)
             print(lCellID)
             print('Warning: nNeighbor != nVertex')
-        else:
+        else: #this cell is not at the the land-ocean mask coastal line
             pmpas.nNeighbor_land = pmpas.nNeighbor 
             pmpas.nNeighbor_ocean = 0
             pmpas.aNeighbor_land = aNeighborIndex        
@@ -242,13 +240,14 @@ def create_mpas_mesh(iFlag_global_in,
         aDistance=list()
         for i in range(pmpas.nNeighbor):
             #find shared edge
-            lEdgeID= aEdgeIndex[i]              
+            lEdgeID= aEdgeIndex[i]
             lIndex = lEdgeID-1
             dDistance = aDcEdge[lIndex]
             aDistance.append(dDistance)
             pass
 
-        pmpas.aNeighbor_distance = aDistance
+        #this contains all the original mpas neighbor distance
+        pmpas.aNeighbor_distance = aDistance 
         aList.append(pmpas)
         return aList
 
@@ -303,7 +302,7 @@ def create_mpas_mesh(iFlag_global_in,
                     else:
                         pass
                 else:
-                    pass      
+                    pass
 
                 #call fuction to add the cell
                 aMpas = add_cell_into_list(aMpas, i, lCellID, dArea, dElevation_mean, dElevation_profile0, aCoords )
@@ -321,8 +320,6 @@ def create_mpas_mesh(iFlag_global_in,
 
                     pLayer.CreateFeature(pFeature)
             
-            
-
     else:
         iFlag_remove_ice = 1
         for i in range(ncell):
@@ -379,10 +376,7 @@ def create_mpas_mesh(iFlag_global_in,
                         pass
                 else:
                     pass           
-                #call fuction to add the cell
-                if lCellID == 155420:
-                    print('debug')
-                    pass
+                #call fuction to add the cell               
                 
                 aMpas = add_cell_into_list(aMpas, i, lCellID, dArea, dElevation_mean, dElevation_profile0, aCoords )
                 
@@ -412,7 +406,7 @@ def create_mpas_mesh(iFlag_global_in,
         aMpas_middle = list()
         aMpas_out = list()
         ncell = len(aMpas)
-        #generate the list of cell ID
+        #generate the list of cell ID that are already certain
         aCellID  = list()
         for i in range(ncell):
             pCell = aMpas[i]
@@ -420,33 +414,40 @@ def create_mpas_mesh(iFlag_global_in,
             aCellID.append(lCellID)
 
         #first update neighbor information because some cell should have vitual land neighbor (not present in the mesh)
+        #this operation does not increase the number of cells, but it update the neighbor information
+        #specifically, it divided the land neighbor into two parts: land and virtual land
         for i in range(ncell):
             pCell = aMpas[i]
-            aNeighbor_land = pCell.aNeighbor_land
+            aNeighbor_land = pCell.aNeighbor_land   #including both holes and maps land cutoff by boundary
             nNeighbor_land = pCell.nNeighbor
             aNeighbor_land_update = list()
             aNeighbor_land_virtual = list()
             nNeighbor_land_update = 0 
-            for j in range(nNeighbor_land):
+            for j in range(nNeighbor_land): #loop all land neighbors
                 lNeighbor = int(aNeighbor_land[j])
                 if lNeighbor in aCellID:
                     nNeighbor_land_update = nNeighbor_land_update + 1 
                     aNeighbor_land_update.append(lNeighbor)
                 else:
+                    #a hole or boundary mpas land cell
                     aNeighbor_land_virtual.append(lNeighbor)
                     
-
             pCell.aNeighbor_land = aNeighbor_land_update
             pCell.nNeighbor_land= len(aNeighbor_land_update)   
             pCell.aNeighbor_land_virtual = aNeighbor_land_virtual   
             pCell.nNeighbor_land_virtual = len(aNeighbor_land_virtual)
             aMpas_middle.append(pCell)
 
-        #now add back small holes   
+            #distance remains unchanged since we just have missing cells.
+
+        #now add back small holes 
+        #this operation will increase the number of cells  
+        #it will also update the neighbor information for some cells, 
+        #not all cells will be updated (because some cells have 2+ virtual land neighbors)
         for i in range(ncell):
             pCell = aMpas_middle[i]  
               
-            if pCell.nNeighbor_land_virtual ==1:   
+            if pCell.nNeighbor_land_virtual ==1:  #only one virtual land means it is likely next to a hole 
                 lNeighbor_hole = pCell.aNeighbor_land_virtual[0]
                 j = lNeighbor_hole-1
                 dLat = convert_360_to_180 (aLatitudeCell[j])
@@ -472,13 +473,18 @@ def create_mpas_mesh(iFlag_global_in,
                     aCoords[k,1] = y1
                     pass
 
+                x1 = convert_360_to_180(aLonVertex[0])
+                y1 = aLatVertex[0]
+                ring.AddPoint(x1, y1) #double check            
+                pPolygon = ogr.Geometry(ogr.wkbPolygon)
+                pPolygon.AddGeometry(ring)
+
                 lCellID = int(aIndexToCellID[j])
                 dElevation_mean = float(aBed_elevation[j])
                 dElevation_profile0 = float(aBed_elevation_profile[j,0])
                 dArea = float(aCellArea[j])
                            
-                if lCellID not in aCellID:                   
-                    
+                if lCellID not in aCellID:   
                     aMpas_middle = add_cell_into_list(aMpas_middle, j, lCellID, dArea, dElevation_mean, dElevation_profile0, aCoords )
                     aCellID.append(lCellID)
 
@@ -490,11 +496,7 @@ def create_mpas_mesh(iFlag_global_in,
                     pCell.nNeighbor_land_virtual = 0
 
                     #save mesh cell
-                    x1 = convert_360_to_180(aLonVertex[0])
-                    y1 = aLatVertex[0]
-                    ring.AddPoint(x1, y1) #double check            
-                    pPolygon = ogr.Geometry(ogr.wkbPolygon)
-                    pPolygon.AddGeometry(ring)
+                    
                     if iFlag_save_mesh_in ==1:                
                         pFeature.SetGeometry(pPolygon)
                         pFeature.SetField("cellid", int(lCellID) )
@@ -516,7 +518,9 @@ def create_mpas_mesh(iFlag_global_in,
 
                     pass
 
-        #now update again because some cell has more than one virutal land neighbor, but now none of them is virtual
+                #how about distance? still unchanged, but the orders are changed
+
+        #now update again because some cell has more than one virutal land neighbor, but now none of them is virtual anymore
         #this fix will move virtual land neighbor back to land neighbor
         #the ocean neighbor will remain unchanged
         ncell = len(aMpas_middle)
@@ -531,15 +535,21 @@ def create_mpas_mesh(iFlag_global_in,
             aNeighbor_land_virtual = pCell.aNeighbor_land_virtual
             nNeighbor_land_virtual = pCell.nNeighbor_land_virtual
 
+            aNeighbor_distance = pCell.aNeighbor_distance
+            aNeighbor_distance_update = list()
+
             for j in range(nNeighbor_land):
                 lNeighbor = int(aNeighbor_land[j])
+                dDistance = aNeighbor_distance[j]
                 if lNeighbor in aCellID:
                     aNeighbor_land_update.append(lNeighbor)
+                    aNeighbor_distance_update.append(dDistance)
                     pass
                 else:
+                    #this is a land cell in mpas, but it may be clipped by boundary
                     pass
 
-
+            #for book keeping only        
             for j in range(nNeighbor_land_virtual):
                 lNeighbor = int(aNeighbor_land_virtual[j])
                 if lNeighbor in aCellID:
@@ -550,8 +560,10 @@ def create_mpas_mesh(iFlag_global_in,
                            
             pCell.aNeighbor_land = aNeighbor_land_update
             pCell.nNeighbor_land= len(aNeighbor_land_update)   
-            pCell.aNeighbor_land_virtual = aNeighbor_land_virtual_update   
+            pCell.aNeighbor_land_virtual = aNeighbor_land_virtual_update   #for book keeping only
             pCell.nNeighbor_land_virtual = len(aNeighbor_land_virtual_update)
+
+            pCell.aNeighbor_distance = aNeighbor_distance_update
             aMpas_out.append(pCell)
 
 

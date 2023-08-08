@@ -16,12 +16,13 @@ def replace_last_occurrence(sFilename_path_in, sSubstring_in, sSubstring_out):
 
 
 def basin_plot(self,
-               iFlag_type_in,
+               iFlag_type_in,               
                sMesh_type,
                sFilename_output_in=None,
                sFilename_mesh_in = None,
                iFont_size_in = None,
                iFlag_title_in=None,
+               iFlag_colorbar_in=None,
                iFlag_scientific_notation_colorbar_in=None,
                dData_min_in = None,
                              dData_max_in = None,
@@ -65,6 +66,7 @@ def basin_plot(self,
                 self._plot_polygon_variable( sVariable_in,                 
                                             iFlag_title_in= iFlag_title_in,
                                             iFont_size_in=iFont_size_in,
+                                            iFlag_colorbar_in=iFlag_colorbar_in,
                                             iFlag_scientific_notation_colorbar_in=iFlag_scientific_notation_colorbar_in,
                                             dData_min_in = dData_min_in,
                                             dData_max_in = dData_max_in,
@@ -221,6 +223,7 @@ def _plot_polygon_variable(self,
                              sVariable_in,
                              iFigwidth_in=None,
                              iFigheight_in=None,
+                             iFlag_colorbar_in=None,
                             iFlag_title_in=None,
                             iFont_size_in=None,
                             iFlag_scientific_notation_colorbar_in = None,
@@ -250,6 +253,7 @@ def _plot_polygon_variable(self,
             sVariable='elevation' #Elevation_profile'
             sTitle = 'Surface elevation'
             sUnit = 'Unit: m'
+            sColormap ='terrain'
             dData_min = dData_min_in
             dData_max = dData_max_in
             sFilename = self.sFilename_elevation
@@ -274,6 +278,7 @@ def _plot_polygon_variable(self,
                     sVariable='slope'
                     sTitle = 'Surface slope'
                     sUnit = 'Unit: percent'
+                    sColormap='plasma'
                     dData_min = 0.0
                     dData_max = dData_max_in
                     sFilename = self.sFilename_variable_polygon
@@ -283,6 +288,7 @@ def _plot_polygon_variable(self,
             sVariable='elevation'
             sTitle = 'Surface elevation'
             sUnit = r'Unit: m'
+            sColormap ='terrain'
             dData_min = dData_min_in
             dData_max = dData_max_in
             sFilename = self.sFilename_variable_polygon
@@ -308,6 +314,7 @@ def _plot_polygon_variable(self,
                     sVariable='slope'
                     sTitle = 'Surface slope'
                     sUnit = r'Unit: percent'
+                    sColormap='plasma'
                     dData_min = dData_min_in
                     dData_max = dData_max_in
                     sFilename = self.sFilename_variable_polygon
@@ -324,12 +331,14 @@ def _plot_polygon_variable(self,
 
     map_vector_polygon_data(sFilename,
                             iFlag_color_in = 1,
-                             iFlag_colorbar_in = 1,
+                             iFlag_colorbar_in = iFlag_colorbar_in,
+                             iFont_size_in = iFont_size_in,
                              iFlag_scientific_notation_colorbar_in = iFlag_scientific_notation_colorbar_in,
                              sFilename_output_in=sFilename_output_in,
                              sVariable_in= sVariable,
                              sTitle_in= sTitle,
                              sUnit_in= sUnit,
+                             sColormap_in = sColormap,
                              aExtent_in = aExtent_in,
                              aLegend_in = aLegend_in,
                              pProjection_map_in = pProjection_map_in)

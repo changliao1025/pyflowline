@@ -157,7 +157,7 @@ def create_square_mesh(dX_left_in, dY_bot_in,
             x = [x1, x2, x3, x4]
             y = [y1, y2, y3, y4]
            
-            x_new , y_new = reproject_coordinates_batch(x, y, pSpatial_reference)
+            x_new , y_new = reproject_coordinates_batch(x, y, pSpatial_reference, pSpatial_reference_gcs)
             x1, x2, x3, x4 = x_new
             y1, y2, y3, y4 = y_new       
             coordinates = [(x1, y1), (x2, y2), (x3, y3), (x4, y4), (x1, y1)]
@@ -188,7 +188,8 @@ def create_square_mesh(dX_left_in, dY_bot_in,
                     iFlag = True
                 else:
                     pass
-
+                
+                
             if ( iFlag == True ):
                 aSquare, dArea = add_cell_into_list(aSquare, lCellID, iRow, iColumn, dLongitude_center,dLatitude_center, dummy1 ) 
         
@@ -353,6 +354,9 @@ def create_square_mesh(dX_left_in, dY_bot_in,
     for pSquare in aSquare_out:
         aNeighbor = pSquare.aNeighbor
         pSquare.aNeighbor_distance=list()
+        if pSquare.lCellID == 41:
+            print('debug')
+
         for lCellID1 in aNeighbor:
             for pSquare1 in aSquare_out:
                 if pSquare1.lCellID == lCellID1:

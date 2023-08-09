@@ -25,7 +25,7 @@ def basin_plot(self,
                iFlag_colorbar_in=None,
                iFlag_scientific_notation_colorbar_in=None,
                dData_min_in = None,
-                             dData_max_in = None,
+               dData_max_in = None,
                sVariable_in=None,
                aExtent_in = None,
                 aLegend_in = None,
@@ -94,16 +94,22 @@ def basin_plot(self,
                             #should use the pyflowline simplified flowline
                             sFilename_dummy = self.sFilename_flowline_simplified
                             #now replace the folder string 
-
                             sFilename1 = replace_last_occurrence(sFilename_dummy, 'hexwatershed', 'pyflowline')
+                            sFilename_dummy = self.sFilename_flowline_conceptual
+                            #now replace the folder string 
+                            sFilename2 = replace_last_occurrence(sFilename_dummy, 'hexwatershed', 'pyflowline')
 
-                            aFiletype_in = [3, 2, 2]
-                            aFilename_in = [sFilename_mesh, sFilename0, sFilename1]
+                            aFiletype_in = [2, 2, 2]
+                            aFilename_in = [sFilename0, sFilename1, sFilename2]
                             map_multiple_vector_data(aFiletype_in,
-                                             aFilename_in,                                            
+                                             aFilename_in,                           
+                                             iFont_size_in=iFont_size_in,                 
                                              sFilename_output_in=sFilename_output_in,
-                                             sTitle_in= 'Mesh with flowline and observation',
-                                             aFlag_color_in = [0, 0, 0],
+                                             #sTitle_in= 'Flow direction with observation',
+                                             aFlag_thickness_in=  [1, 0, 0],
+                                             aVariable_in= ['drainage_area', '', 'segment'],
+                                               aLegend_in = aLegend_in,
+                                             aFlag_color_in = [0, 0, 1],
                                              aFlag_fill_in  = [0, 0, 0])
                         else:
                             print('Unsupported variable: ', sVariable_in, ' in basin_plot.')
@@ -265,6 +271,7 @@ def _plot_polygon_variable(self,
                 sUnit = r'Units: $m^{2}$'
                 dData_min = dData_min_in
                 dData_max = dData_max_in
+                sColormap ='Spectral_r'
                 sFilename = self.sFilename_variable_polygon
             else:
                 if sVariable_in == 'travel_distance':
@@ -273,12 +280,13 @@ def _plot_polygon_variable(self,
                     sUnit = r'Unit: m'
                     dData_min = 0.0
                     dData_max = dData_max_in
+                    sColormap ='Spectral_r'
                     sFilename = self.sFilename_variable_polygon
                 else:
                     sVariable='slope'
                     sTitle = 'Surface slope'
                     sUnit = 'Unit: percent'
-                    sColormap='plasma'
+                    sColormap='Spectral_r'
                     dData_min = 0.0
                     dData_max = dData_max_in
                     sFilename = self.sFilename_variable_polygon
@@ -299,6 +307,7 @@ def _plot_polygon_variable(self,
                 sUnit = r'Units: $m^{2}$'
                 dData_min = dData_min_in
                 dData_max = dData_max_in
+                sColormap ='Spectral_r'
                 sFilename = self.sFilename_variable_polygon
 
             else:
@@ -308,13 +317,14 @@ def _plot_polygon_variable(self,
                     sUnit = r'Unit: m'
                     dData_min = 0.0
                     dData_max = dData_max_in
+                    sColormap ='Spectral_r'
                     iFlag_subbasin = 1
                     sFilename = self.sFilename_variable_polygon
                 else:
                     sVariable='slope'
                     sTitle = 'Surface slope'
                     sUnit = r'Unit: percent'
-                    sColormap='plasma'
+                    sColormap='Spectral_r'
                     dData_min = dData_min_in
                     dData_max = dData_max_in
                     sFilename = self.sFilename_variable_polygon
@@ -334,6 +344,8 @@ def _plot_polygon_variable(self,
                              iFlag_colorbar_in = iFlag_colorbar_in,
                              iFont_size_in = iFont_size_in,
                              iFlag_scientific_notation_colorbar_in = iFlag_scientific_notation_colorbar_in,
+                             dData_max_in = dData_max,
+                             dData_min_in = dData_min,
                              sFilename_output_in=sFilename_output_in,
                              sVariable_in= sVariable,
                              sTitle_in= sTitle,

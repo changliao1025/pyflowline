@@ -100,6 +100,20 @@ def map_vector_polyline_data(sFilename_in,
     else:
         iFont_size = 12
 
+    if dData_min_in is not None:
+        iFlag_data_min = 1
+        dData_min = dData_min_in
+    else:
+        iFlag_data_min = 0
+        pass
+
+    if dData_max_in is not None:
+        iFlag_data_max = 1
+        dData_max = dData_max_in
+    else:
+        iFlag_data_max = 0
+        pass
+
     if sField_thickness_in is not None:
         sField_thickness = sField_thickness_in
     else:

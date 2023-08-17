@@ -751,7 +751,19 @@ class flowlinecase(object):
                                 dLatitude_bot    = self.dLatitude_bot
                                 dLongitude_left  = self.dLongitude_left
                                 dLongitude_right = self.dLongitude_right                                
-                                sWorkspace_output = self.sWorkspace_output + slash + 'dggrid'
+                                
+
+                                if self.iFlag_standalone == 1:
+                                    sWorkspace_output = self.sWorkspace_output + slash + 'dggrid'
+                                    pass
+                                else:
+                                    sWorkspace_output = self.sWorkspace_output + slash + '..'+ slash + 'dggrid'
+                                    
+                                    sWorkspace_output = os.path.abspath(sWorkspace_output)
+                                    pass
+
+                                if not os.path.exists(sWorkspace_output):
+                                    os.makedirs(sWorkspace_output)
                                 
                                 if iFlag_mesh_boundary ==1:
                                         #create a polygon based on
@@ -800,12 +812,7 @@ class flowlinecase(object):
             aCell_out = read_mesh_json_w_topology(iMesh_type, self.sFilename_mesh)
             pass
 
-        #convert the mesh into the kml format so it can be visualized in google earth and google map
-
         
-        if iFlag_kml is not None:
-            convert_geojson_to_kml(self.sFilename_mesh, self.sFilename_mesh_kml)
-
         print('Finish mesh generation.')
         return aCell_out
 
@@ -936,14 +943,13 @@ class flowlinecase(object):
         
         if self.iFlag_dggrid == 1:
             #create dggrid output folder
-            sWorkspace_output = self.sWorkspace_output + slash + 'dggrid'
+            if self.iFlag_standalone == 1:
+                sWorkspace_output = self.sWorkspace_output + slash + 'dggrid'
+            else:
+                sWorkspace_output = self.sWorkspace_output + slash + '..'+ slash + 'dggrid'
+                sWorkspace_output = os.path.abspath(sWorkspace_output)
 
-            #if (os.path.exists(sWorkspace_output)):
-            #    sCommand = 'rm -rf '  + sWorkspace_output
-            #    print(sCommand)
-            #    p = subprocess.Popen(sCommand, shell= True)
-            #    p.wait()
-
+         
             Path(sWorkspace_output).mkdir(parents=True, exist_ok=True)
             #then copy the binary file to the folder
             #copy execulate
@@ -989,6 +995,11 @@ class flowlinecase(object):
         Export the model outputs
         """
         self.export_mesh_info_to_json()
+        #convert the mesh into the kml format so it can be visualized in google earth and google map
+        #shoule move this to the export function
+        if iFlag_kml is not None:
+            convert_geojson_to_kml(self.sFilename_mesh, self.sFilename_mesh_kml)
+
         if self.iFlag_flowline ==1:
             for pBasin in self.aBasin:
                 pBasin.export()
@@ -1117,7 +1128,7 @@ class flowlinecase(object):
             else:
                 #use current output path
                 sName = 'configuration_basin.json'
-                sFilename_output  =  os.path.join( self.sWorkspace_output  , sName)
+                sFilename_output  =  os.path.join( self.sWorkspace_output, sName)
 
             #all basins
             with open(sFilename_output, 'w', encoding='utf-8') as f:

@@ -118,7 +118,7 @@ def map_multiple_vector_data(aFiletype_in,
     if iDPI_in is not None:
         iDPI = iDPI_in
     else:
-        iDPI = 600
+        iDPI = 300
 
     if dMissing_value_in is not None:
         dMissing_value = dMissing_value_in
@@ -452,5 +452,7 @@ def map_multiple_vector_data(aFiletype_in,
                 plt.savefig(sFilename_out, bbox_inches='tight')
             else:
                 plt.savefig(sFilename_out, bbox_inches='tight', format ='ps')
-                plt.close('all')
-                plt.clf()
+    
+    #clean cache
+    plt.close('all')
+    plt.clf()

@@ -188,7 +188,7 @@ def map_vector_polyline_data(sFilename_in,
                                             globe=None)
 
 
-    fig = plt.figure( dpi=300)
+    fig = plt.figure( dpi = iDPI  )
     iSize_x= 8
     iSize_y= 8
     fig.set_figwidth( iSize_x )
@@ -312,5 +312,6 @@ def map_vector_polyline_data(sFilename_in,
                 plt.savefig(sFilename_out, bbox_inches='tight')
             else:
                 plt.savefig(sFilename_out, bbox_inches='tight', format ='ps')
-                plt.close('all')
-                plt.clf()
+    #clean
+    plt.close('all')
+    plt.clf()

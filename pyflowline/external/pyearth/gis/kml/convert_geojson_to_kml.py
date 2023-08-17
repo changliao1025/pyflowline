@@ -15,13 +15,18 @@ def convert_geojson_to_kml(sFilename_geojson, sFilename_kml):
     while feature:
         # Get the geometry of the feature
         geometry = feature.GetGeometryRef()
-
+        sGeometry_type = geometry.GetGeometryName()   
         # Convert the geometry to WKT
         wkt = geometry.ExportToWkt()
-
-        # Create a KML placemark and add it to the KML object
-        polygon = kml.newpolygon()
-        polygon.geometry = simplekml.Geometry(wkt=wkt)
+        if(sGeometry_type == 'POLYGON'):
+            # Create a KML placemark and add it to the KML object
+            polygon = kml.newpolygon()
+            polygon.geometry = simplekml.Geometry(wkt=wkt)
+        else:
+            if (sGeometry_type == 'LINESTRING'):
+                # Create a KML placemark and add it to the KML object
+                linestring = kml.newlinestring()
+                linestring.geometry = simplekml.Geometry(wkt=wkt)
 
         # Move to the next feature
         feature = layer.GetNextFeature()

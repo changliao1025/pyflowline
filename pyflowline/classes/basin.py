@@ -42,7 +42,11 @@ if iFlag_cython is not None:
 else:
     from pyflowline.algorithms.auxiliary.find_vertex_in_list import find_vertex_in_list
 
-
+iFlag_kml = importlib.util.find_spec("simplekml") 
+if iFlag_kml is not None:
+    from pyflowline.external.pyearth.gis.kml.convert_geojson_to_kml import convert_geojson_to_kml
+else:
+    pass
 sys.setrecursionlimit(10000)
 
 class BasinClassEncoder(JSONEncoder):
@@ -310,6 +314,8 @@ class pybasin(object):
         self.sFilename_variable_polygon = os.path.join(str(self.sWorkspace_output_basin ), "variable_polygon.geojson" )
         self.sFilename_variable_polyline = os.path.join(str(self.sWorkspace_output_basin ), "variable_polyline.geojson" )
         
+        #kml
+        self.sFilename_flowline_conceptual_kml = os.path.join(str(self.sWorkspace_output_basin ),'flowline_conceptual.kml')
         return
         
     def flowline_simplification(self):
@@ -552,10 +558,10 @@ class pybasin(object):
         ptimer.stop()
         if self.iFlag_debug ==1:
             sFilename_out = self.sFilename_flowline_segment_index_before_intersect            
-            export_flowline_to_geojson(  aFlowline_basin_simplified, 
+            export_flowline_to_geojson(aFlowline_basin_simplified, 
                                        sFilename_out, 
                 aAttribute_data=[aStream_segment], 
-                aAttribute_field=['segment'], 
+                aAttribute_field=['iStream_segment'], 
                 aAttribute_dtype=['int'])
             
         #build stream order 
@@ -563,10 +569,10 @@ class pybasin(object):
         aFlowline_basin_simplified, aStream_order = define_stream_order(aFlowline_basin_simplified)
         ptimer.stop()
         sFilename_out = self.sFilename_flowline_simplified        
-        export_flowline_to_geojson(  aFlowline_basin_simplified, 
+        export_flowline_to_geojson(aFlowline_basin_simplified, 
                                    sFilename_out, 
                 aAttribute_data=[aStream_segment, aStream_order], 
-                aAttribute_field=['segment','order'], 
+                aAttribute_field=['iStream_segment','iStream_order'], 
                 aAttribute_dtype=['int','int'])
         
         if self.iFlag_break_by_distance==1:
@@ -648,7 +654,7 @@ class pybasin(object):
             sFilename_out = 'flowline_edge_correct_flowline_direction.geojson'
             sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
             export_flowline_to_geojson( aFlowline_basin_conceptual,  sFilename_out)
-        aFlowline_basin_conceptual = remove_flowline_loop(  aFlowline_basin_conceptual )  
+        aFlowline_basin_conceptual = remove_flowline_loop(aFlowline_basin_conceptual )  
         if self.iFlag_debug ==1:
             sFilename_out = 'flowline_edge_remove_flowline_loop.geojson'
             sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
@@ -688,7 +694,7 @@ class pybasin(object):
         export_flowline_to_geojson(  aFlowline_basin_conceptual, 
                                    sFilename_out, 
             aAttribute_data=[aStream_segment, aStream_order], 
-            aAttribute_field=['segment','order'], 
+            aAttribute_field=['iStream_segment','iStream_order'], 
             aAttribute_dtype=['int','int'])
 
         self.aFlowline_basin_conceptual = aFlowline_basin_conceptual     
@@ -783,7 +789,16 @@ class pybasin(object):
         """
         self.export_basin_info_to_json()
         self.export_flowline_info_to_json()
-        self.export_confluence_info_to_json()        
+        self.export_confluence_info_to_json()   
+
+        if iFlag_kml is not None:
+            #only convert final conceptual flowline to kml
+            sFilename_conceptual = self.sFilename_flowline_conceptual
+            sFilename_conceptual_kml = self.sFilename_flowline_conceptual_kml
+            
+            convert_geojson_to_kml(sFilename_conceptual, sFilename_conceptual_kml)
+
+
         return
 
     def export_flowline(self, aFlowline_in, sFilename_json_in,iFlag_projected_in = None,  pSpatial_reference_in = None):
@@ -796,8 +811,8 @@ class pybasin(object):
             iFlag_projected_in (int, optional): Flag if re-projection is needed. Defaults to None.
             pSpatial_reference_in (object, optional): The spatial reference if re-projection is needed. Defaults to None.
         """
-        export_flowline_to_geojson(aFlowline_in, sFilename_json_in,\
-            iFlag_projected_in= iFlag_projected_in, \
+        export_flowline_to_geojson(aFlowline_in, sFilename_json_in,
+            iFlag_projected_in= iFlag_projected_in, 
             pSpatial_reference_in = pSpatial_reference_in)
             
         return

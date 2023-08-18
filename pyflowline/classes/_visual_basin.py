@@ -107,7 +107,7 @@ def basin_plot(self,
                                              sFilename_output_in=sFilename_output_in,
                                              #sTitle_in= 'Flow direction with observation',
                                              aFlag_thickness_in=  [1, 0, 0],
-                                             aVariable_in= ['drainage_area', '', 'segment'],
+                                             aVariable_in= ['drainage_area', '', 'stream_segment'],
                                                aLegend_in = aLegend_in,
                                              aFlag_color_in = [0, 0, 1],
                                              aFlag_fill_in  = [0, 0, 0])

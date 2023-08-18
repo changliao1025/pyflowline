@@ -46,9 +46,9 @@ def export_vertex_to_geojson(aVertex_in,
     pDataset_json = pDriver.CreateDataSource(sFilename_json_in)
     pLayer_json = pDataset_json.CreateLayer('vertex', pSpatial_reference_in, ogr.wkbPoint)
     # Add one attribute
-    pLayer_json.CreateField(ogr.FieldDefn('id', ogr.OFTInteger64)) #long type for high resolution
+    pLayer_json.CreateField(ogr.FieldDefn('pointid', ogr.OFTInteger64)) #long type for high resolution
     if iFlag_attribute ==1:        
-        pLayer_json.CreateField(ogr.FieldDefn('con', ogr.OFTInteger64)) #long type for high resolution
+        pLayer_json.CreateField(ogr.FieldDefn('connectivity', ogr.OFTInteger64)) #long type for high resolution
         pass
 
     pLayerDefn = pLayer_json.GetLayerDefn()
@@ -65,9 +65,9 @@ def export_vertex_to_geojson(aVertex_in,
 
         pGeometry_out = ogr.CreateGeometryFromWkb(dummy1.wkb)
         pFeature_out.SetGeometry(pGeometry_out)   
-        pFeature_out.SetField("id", lID)
+        pFeature_out.SetField("pointid", lID)
         if iFlag_attribute ==1:
-            pFeature_out.SetField("con", int(aAttribute[i]) )
+            pFeature_out.SetField("connectivity", int(aAttribute[i]) )
                 
         pLayer_json.CreateFeature(pFeature_out)        
         lID =  lID + 1

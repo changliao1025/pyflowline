@@ -125,7 +125,7 @@ def _plot_mesh_with_flowline(self,
         sFilename_json = os.path.join(pBasin.sWorkspace_output_basin, dummy)
         aFilename_in.append(sFilename_json)
         aFlag_color.append(1)
-        aVariable_in.append('segment')
+        aVariable_in.append('stream_segment')
 
     map_multiple_vector_data(aFiletype_in,
                              aFilename_in,

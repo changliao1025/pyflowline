@@ -16,6 +16,34 @@ from pyflowline.external.pyearth.gis.gdal.gdal_functions import get_geometry_coo
 pDate = datetime.datetime.today()
 sDate_default = "{:04d}".format(pDate.year) + "{:02d}".format(pDate.month) + "{:02d}".format(pDate.day)
 
+#setup common resolution
+aISEA3H = [4320.490,
+           2539.690,
+           1480.02, 
+           855.419,
+           494.959,
+           285.6520,
+           165.058, 
+           95.2636, 
+           55.0226, 
+           31.7596, 
+           18.341,
+             10.5871, 
+             6.11367, 
+             3.52911]
+
+aISEA4H = [3764.92,
+           1913.88,
+           961.978,
+           481.7710,
+           241.0470,
+           120.56, 
+           60.2893, 
+           30.147, 
+           15.0741, 
+           7.53719, 
+           3.76863]
+
 def generate_bash_script(sWorkspace_output):
     sName  = 'dggrid.ini'
     sFilename_configuration  =  os.path.join(sWorkspace_output,  sName )
@@ -73,24 +101,34 @@ def find_number_range(number, aArray):
             return i  # Return the index of the range where the number falls
     return -1  
 
-def dggrid_search_resolution_index(sGrid_type, dResolution):
-    if sGrid_type == 'ISEA3H':
+
+def dggrid_find_index_by_resolution(sDggrid_type, dResolution):
+    if sDggrid_type == 'ISEA3H':
         #unit km
-        aResolution = [ 3.52911, 6.11367, 10.58710, 18.34100, 31.75960, 55.02260, 95.26360, 165.05800]
-        aIndex = np.arange(14, 6, -1)
-        index = find_number_range(dResolution * 0.001, aResolution)
-        iResolution_index = aIndex[index]
+        index = find_number_range(dResolution * 0.001, aISEA3H)
+        iResolution_index = index+1
         pass
     else:
-        if sGrid_type == 'ISEA4H':
-            aResolution = [ 3.76863, 7.53719, 15.07410, 30.14700, 60.28930, 120.56000]
-            aIndex = np.arange(12, 5, -1)
-            index = find_number_range(dResolution * 0.001, aResolution)
-            iResolution_index = aIndex[index]
+        if sDggrid_type == 'ISEA4H':
+            index = find_number_range(dResolution * 0.001, aISEA4H)
+            iResolution_index = index + 1
             pass
         pass
 
     return iResolution_index
+
+def dggrid_find_resolution_by_index(sDggrid_type, iResolution_index):
+    if sDggrid_type == 'ISEA3H':
+       
+        dResolution = aISEA3H[iResolution_index-1 ] * 1000
+        pass
+    else:
+        if sDggrid_type == 'ISEA4H':
+            dResolution = aISEA4H[iResolution_index-1 ] * 1000
+            pass
+        pass
+
+    return dResolution
 
 def convert_dggrid_mesh_to_pyflowline_mesh(sFilename_dggrid_mesh, sFilename_mesh_pyflowline):
     
@@ -221,21 +259,29 @@ def convert_dggrid_mesh_to_pyflowline_mesh(sFilename_dggrid_mesh, sFilename_mesh
 
 def create_dggrid_mesh(iFlag_global,
                          iFlag_save_mesh,
-                         dResolution ,
                          sFilename_mesh,
                          sWorkspace_output, #for dggrid
-                         sGrid_type_in= None,
+                         iResolution_index_in = None,
+                         sDggrid_type_in= None,
                          iFlag_antarctic_in=None,
                          sFilename_boundary_in = None ):
 
     #use dggrid table to determine the resolution index   
     sFilename_cell = sWorkspace_output + slash + 'cells'    
-    if sGrid_type_in is not None:
-        sGrid_type = sGrid_type_in
-    else:
-        sGrid_type = 'ISEA3H' #default
 
-    iResolution_index = dggrid_search_resolution_index(sGrid_type, dResolution)   
+    if iResolution_index_in is not None:
+        iResolution_index = iResolution_index_in
+    else:
+        iResolution_index = 10
+
+    if sDggrid_type_in is not None:
+        sDggrid_type = sDggrid_type_in
+    else:
+        sDggrid_type = 'ISEA3H' #default
+
+    dResolution= dggrid_find_resolution_by_index(sDggrid_type, iResolution_index)  
+    print('Resolution is: ', dResolution)
+    #  
     sResolution = "{:0d}".format( iResolution_index )
 
     if sFilename_boundary_in is not None:
@@ -255,7 +301,7 @@ def create_dggrid_mesh(iFlag_global,
         ofs = open(sFilename_config, 'w')
         sLine = 'dggrid_operation GENERATE_GRID' + '\n'
         ofs.write(sLine)
-        sLine = 'dggs_type ' + sGrid_type.upper() + '\n'
+        sLine = 'dggs_type ' + sDggrid_type.upper() + '\n'
         ofs.write(sLine)
         sLine = 'dggs_res_spec ' + sResolution + '\n'
         ofs.write(sLine)
@@ -308,13 +354,13 @@ if __name__ == '__main__':
 
     sFilename_boundary = '/qfs/people/liao313/data/dggrid/conus/vector/conus_simple.shp'
     iCase_index = 1
-    sGrid_type='isea3h'
+    sDggrid_type='isea3h'
     for i  in np.arange(1, 15):
         sWalltime =  "{:02d}".format( iCase_index )
         iResolution_index = i
         create_dggrid_mesh( iCase_index, \
                             iResolution_index ,  \
-                            sGrid_type,
+                            sDggrid_type,
 
                        sFilename_boundary_in=  sFilename_boundary)
 

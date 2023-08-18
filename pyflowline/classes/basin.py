@@ -561,7 +561,7 @@ class pybasin(object):
             export_flowline_to_geojson(aFlowline_basin_simplified, 
                                        sFilename_out, 
                 aAttribute_data=[aStream_segment], 
-                aAttribute_field=['iStream_segment'], 
+                aAttribute_field=['stream_segment'], 
                 aAttribute_dtype=['int'])
             
         #build stream order 
@@ -572,7 +572,7 @@ class pybasin(object):
         export_flowline_to_geojson(aFlowline_basin_simplified, 
                                    sFilename_out, 
                 aAttribute_data=[aStream_segment, aStream_order], 
-                aAttribute_field=['iStream_segment','iStream_order'], 
+                aAttribute_field=['stream_segment','stream_order'], 
                 aAttribute_dtype=['int','int'])
         
         if self.iFlag_break_by_distance==1:
@@ -694,7 +694,7 @@ class pybasin(object):
         export_flowline_to_geojson(  aFlowline_basin_conceptual, 
                                    sFilename_out, 
             aAttribute_data=[aStream_segment, aStream_order], 
-            aAttribute_field=['iStream_segment','iStream_order'], 
+            aAttribute_field=['stream_segment','stream_order'], 
             aAttribute_dtype=['int','int'])
 
         self.aFlowline_basin_conceptual = aFlowline_basin_conceptual     

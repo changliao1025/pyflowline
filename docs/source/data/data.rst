@@ -80,6 +80,7 @@ An example parent JSON file is provided below:
         "iFlag_global": 0,
         "iFlag_multiple_outlet": 0,
         "iFlag_rotation": 0, 
+        "iFlag_mesh_boundary": 0,
         "iCase_index": 1,
         "iMesh_type": 1,    
         "dLongitude_left": -79,

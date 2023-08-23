@@ -974,6 +974,25 @@ class flowlinecase(object):
             pass
         return
 
+    def change_model_parameter(self, sVariable_in, dValue, iFlag_basin_in = None):
+        if iFlag_basin_in is None:
+            if hasattr(self, sVariable_in):
+                setattr(self, sVariable_in, dValue)
+                return True
+            else:
+                print("This model parameter is unknown, please check the full parameter list in the documentation: " + sVariable_in)
+                return False
+        else:
+            #this mean the variable is in the basin object
+            for pBasin in self.aBasin:
+                if hasattr(pBasin, sVariable_in):
+                    setattr(pBasin, sVariable_in, dValue)
+                    return True
+                else:
+                    print("This model parameter is unknown, please check the full parameter list in the documentation: " + sVariable_in)
+                    return False
+
+    
     def run(self):
         """
         Run the flowlinecase simulation
@@ -1065,6 +1084,13 @@ class flowlinecase(object):
                                ensure_ascii=True, \
                                cls=CaseClassEncoder)
         return sJson
+
+    def print(self):
+        """
+        Print the flowline case object
+        """
+        print(self.tojson())
+        return
 
     def export_config_to_json(self, sFilename_output_in = None):
         """

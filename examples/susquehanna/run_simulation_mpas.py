@@ -35,7 +35,22 @@ sDate='20230701'
 oPyflowline = pyflowline_read_model_configuration_file(sFilename_configuration_in, 
     iCase_index_in=iCase_index, sDate_in=sDate)
 
+#take a look at the model parameters
 
+oPyflowline.print()
+
+#now we can change the following model parameters
+#there are two ways to change the model parameters
+#use a function or assign a value directly
+
+oPyflowline.change_model_parameter(sVariable_in='sWorkspace_output', sValue_in=sWorkspace_output)
+
+#if you need to change a parameter for a basin instead of the whole model domain, use the iFlag_basin_in option, this will change all the basins
+oPyflowline.change_model_parameter(sVariable_in='dLatitude_outlet_degree', sValue_in=39.462000, iFlag_basin_in=1)
+oPyflowline.change_model_parameter(sVariable_in='dLongitude_outlet_degree', sValue_in=-76.009300, iFlag_basin_in=1)
+
+
+#the second way is to assign a value directly
 oPyflowline.aBasin[0].dLatitude_outlet_degree=39.462000
 oPyflowline.aBasin[0].dLongitude_outlet_degree=-76.009300
 

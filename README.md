@@ -3,20 +3,20 @@
 [![DOI](https://zenodo.org/badge/368338554.svg)](https://zenodo.org/badge/latestdoi/368338554)
 [![Downloads](https://static.pepy.tech/badge/pyflowline)](https://pepy.tech/project/pyflowline)
 
-PyFlowline: a mesh-independent river network generator for hydrologic models. 
+PyFlowline: a mesh-independent river network generator for hydrologic models.  
 
 ### Quickstart
 
 Please refer to the [quickstart documentation](https://pyflowline.readthedocs.io/en/latest/quickstart.html) for details on how to get started using the PyFlowline package.
 
-PyFlowline is mesh independent, meaning you can apply it to both structured 
+PyFlowline is mesh independent, meaning you can apply it to both structured  
 
-1. traditional rectangle projected mesh 
-2. latitude-longitude 
+1. traditional rectangle projected mesh  
+2. latitude-longitude  
 3. hexagon
 4. dggs ([dggrid](https://github.com/sahrk/DGGRID))
 
-and unstructured mesh systems 
+and unstructured mesh systems  
 
 1. Model for Prediction Across Scales mesh ([MPAS](https://github.com/MPAS-Dev))
 2. Triangulated Irregular Network (TIN) mesh
@@ -56,7 +56,7 @@ This work was supported by the Earth System Model Development program areas of t
 
 This research was supported as part of the Next Generation Ecosystem Experiments-Tropics, funded by the U.S. Department of Energy, Office of Science, Office of Biological and Environmental Research at Pacific Northwest National Laboratory. The study was also partly supported by U.S. Department of Energy Office of Science Biological and Environmental Research through the Earth and Environmental System Modeling program as part of the Energy Exascale Earth System Model (E3SM) project.
 
-This research was supported by the Next Generation Ecosystem Experiments-Tropics project, funded by the U.S. Department of Energy, Office of Science, Office of Biological and Environmental Research at Pacific Northwest National Laboratory. 
+This research was supported by the Next Generation Ecosystem Experiments-Tropics project, funded by the U.S. Department of Energy, Office of Science, Office of Biological and Environmental Research at Pacific Northwest National Laboratory.  
 
 ### License
 

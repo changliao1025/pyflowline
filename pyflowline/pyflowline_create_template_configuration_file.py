@@ -7,7 +7,7 @@ from pyflowline.classes.pycase import flowlinecase
 from pyflowline.classes.basin import pybasin
 
 def pyflowline_create_basin_template_configuration_file(sFilename_basins_json, nBasin, sWorkspace_input_in, sWorkspace_output_in):
-    """generate baisn configureation
+    """generate basin configuration
 
     Args:
         sFilename_basins_json (str): the filename

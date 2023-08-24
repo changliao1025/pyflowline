@@ -27,7 +27,7 @@ def read_mesh_json(iMesh_type_in, sFilename_mesh_in):
     for n in range(ldefn.GetFieldCount()):
         fdefn = ldefn.GetFieldDefn(n)
         schema.append(fdefn.name)
-    if 'segment' in schema:
+    if 'stream_segment' in schema:
         iFlag_segment = 1
     else:
         iFlag_segment = 0   
@@ -85,7 +85,7 @@ def read_mesh_json_w_topology(iMesh_type_in, sFilename_mesh_in):
     for n in range(ldefn.GetFieldCount()):
         fdefn = ldefn.GetFieldDefn(n)
         schema.append(fdefn.name)
-    if 'segment' in schema:
+    if 'stream_segment' in schema:
         iFlag_segment = 1
     else:
         iFlag_segment = 0   

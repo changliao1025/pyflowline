@@ -59,7 +59,7 @@ def export_flowline_to_geojson( aFlowline_in,
 
     pLayer_json = pDataset_json.CreateLayer('flowline', pSpatial_reference_in, ogr.wkbLineString)
     # Add one attribute
-    pLayer_json.CreateField(ogr.FieldDefn('id', ogr.OFTInteger64)) #long type for high resolution
+    pLayer_json.CreateField(ogr.FieldDefn('lineid', ogr.OFTInteger64)) #long type for high resolution
 
     #add the other fields
     if iFlag_attribute ==1:
@@ -94,8 +94,8 @@ def export_flowline_to_geojson( aFlowline_in,
         pGeometry_out = ogr.CreateGeometryFromWkb(dummy1.wkb)
         pFeature_out.SetGeometry(pGeometry_out)
    
-        pFeature_out.SetField("id", lID)
-        if iFlag_attribute ==1:
+        pFeature_out.SetField("lineid", lID)
+        if iFlag_attribute == 1:
             for k in range(nAttribute1):
                 sField = aAttribute_field[k]
                 dtype = aAttribute_dtype[k]

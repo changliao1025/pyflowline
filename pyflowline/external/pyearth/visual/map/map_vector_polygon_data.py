@@ -349,5 +349,7 @@ def map_vector_polygon_data(sFilename_in,
                 plt.savefig(sFilename_out, bbox_inches='tight')
             else:
                 plt.savefig(sFilename_out, bbox_inches='tight', format ='ps')
-                plt.close('all')
-                plt.clf()
+                
+    #clean cache
+    plt.close('all')
+    plt.clf()

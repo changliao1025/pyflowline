@@ -11,10 +11,10 @@ else:
 
 lID = 0
 
-def merge_flowline(aFlowline_in, aVertex_in, \
-    pVertex_outlet_in, \
-        aIndex_headwater_in,\
-            aIndex_middle_in, \
+def merge_flowline(aFlowline_in, aVertex_in, 
+    pVertex_outlet_in, 
+        aIndex_headwater_in,
+            aIndex_middle_in, 
                 aIndex_confluence_in ):
 
     nVertex=len(aVertex_in)

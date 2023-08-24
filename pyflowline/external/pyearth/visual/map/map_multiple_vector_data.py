@@ -34,6 +34,7 @@ def map_multiple_vector_data(aFiletype_in,
                              aVariable_in = None,
                              sFilename_output_in=None,
                              iFlag_scientific_notation_colorbar_in=None,
+                             iFont_size_in=None,
                              sColormap_in = None,
                              sTitle_in = None,
                              iDPI_in = None,
@@ -117,7 +118,7 @@ def map_multiple_vector_data(aFiletype_in,
     if iDPI_in is not None:
         iDPI = iDPI_in
     else:
-        iDPI = 600
+        iDPI = 300
 
     if dMissing_value_in is not None:
         dMissing_value = dMissing_value_in
@@ -154,6 +155,11 @@ def map_multiple_vector_data(aFiletype_in,
     else:
         iFlag_title=0
         sTitle =  ''
+    
+    if iFont_size_in is not None:
+        iFont_size = iFont_size_in
+    else:
+        iFont_size = 12
 
     if sExtend_in is not None:
         sExtend = sExtend_in
@@ -203,7 +209,13 @@ def map_multiple_vector_data(aFiletype_in,
             dLon_min = np.min( [dLon_min, np.min(aCoords_gcs[:,0])] )
             dLat_max = np.max( [dLat_max, np.max(aCoords_gcs[:,1])] )
             dLat_min = np.min( [dLat_min, np.min(aCoords_gcs[:,1])] )
-
+        else:
+            if sGeometry_type =='LINESTRING':
+                aCoords_gcs = get_geometry_coords(pGeometry_in)
+                dLon_max = np.max( [dLon_max, np.max(aCoords_gcs[:,0])] )
+                dLon_min = np.min( [dLon_min, np.min(aCoords_gcs[:,0])] )
+                dLat_max = np.max( [dLat_max, np.max(aCoords_gcs[:,1])] )
+                dLat_min = np.min( [dLat_min, np.min(aCoords_gcs[:,1])] )
 
     if pProjection_map_in is not None:
         pProjection_map = pProjection_map_in
@@ -364,8 +376,8 @@ def map_multiple_vector_data(aFiletype_in,
             lID = lID + 1
 
     if aExtent_in is None:
-        marginx  = (dLon_max - dLon_min) / 20
-        marginy  = (dLat_max - dLat_min) / 20
+        marginx  = (dLon_max - dLon_min) / 50
+        marginy  = (dLat_max - dLat_min) / 50
         aExtent = [dLon_min - marginx , dLon_max + marginx , dLat_min -marginy , dLat_max + marginy]
     else:
         aExtent = aExtent_in
@@ -377,13 +389,15 @@ def map_multiple_vector_data(aFiletype_in,
 
     if aLegend_in is not None:
         nlegend = len(aLegend_in)
+        dLocation0 = 0.96
         for i in range(nlegend):
             sText = aLegend_in[i]
-            dLocation = 0.06 + i * 0.04
+            #dLocation = 0.06 + i * 0.04
+            dLocation = dLocation0 - i * 0.06
             ax.text(0.03, dLocation, sText,
                     verticalalignment='top', horizontalalignment='left',
                     transform=ax.transAxes,
-                    color='black', fontsize=6)
+                    color='black', fontsize=iFont_size)
 
             pass
 
@@ -438,5 +452,7 @@ def map_multiple_vector_data(aFiletype_in,
                 plt.savefig(sFilename_out, bbox_inches='tight')
             else:
                 plt.savefig(sFilename_out, bbox_inches='tight', format ='ps')
-                plt.close('all')
-                plt.clf()
+    
+    #clean cache
+    plt.close('all')
+    plt.clf()

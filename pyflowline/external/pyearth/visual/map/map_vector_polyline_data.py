@@ -100,6 +100,20 @@ def map_vector_polyline_data(sFilename_in,
     else:
         iFont_size = 12
 
+    if dData_min_in is not None:
+        iFlag_data_min = 1
+        dData_min = dData_min_in
+    else:
+        iFlag_data_min = 0
+        pass
+
+    if dData_max_in is not None:
+        iFlag_data_max = 1
+        dData_max = dData_max_in
+    else:
+        iFlag_data_max = 0
+        pass
+
     if sField_thickness_in is not None:
         sField_thickness = sField_thickness_in
     else:
@@ -174,7 +188,7 @@ def map_vector_polyline_data(sFilename_in,
                                             globe=None)
 
 
-    fig = plt.figure( dpi=300)
+    fig = plt.figure( dpi = iDPI  )
     iSize_x= 8
     iSize_y= 8
     fig.set_figwidth( iSize_x )
@@ -298,5 +312,6 @@ def map_vector_polyline_data(sFilename_in,
                 plt.savefig(sFilename_out, bbox_inches='tight')
             else:
                 plt.savefig(sFilename_out, bbox_inches='tight', format ='ps')
-                plt.close('all')
-                plt.clf()
+    #clean
+    plt.close('all')
+    plt.clf()

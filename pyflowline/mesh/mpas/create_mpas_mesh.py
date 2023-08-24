@@ -536,14 +536,14 @@ def create_mpas_mesh(iFlag_global_in,
             nNeighbor_land_virtual = pCell.nNeighbor_land_virtual
 
             aNeighbor_distance = pCell.aNeighbor_distance
-            aNeighbor_distance_update = list()
+            #aNeighbor_distance_update = list()
 
             for j in range(nNeighbor_land):
                 lNeighbor = int(aNeighbor_land[j])
                 dDistance = aNeighbor_distance[j]
                 if lNeighbor in aCellID:
                     aNeighbor_land_update.append(lNeighbor)
-                    aNeighbor_distance_update.append(dDistance)
+                    #aNeighbor_distance_update.append(dDistance)
                     pass
                 else:
                     #this is a land cell in mpas, but it may be clipped by boundary
@@ -563,7 +563,7 @@ def create_mpas_mesh(iFlag_global_in,
             pCell.aNeighbor_land_virtual = aNeighbor_land_virtual_update   #for book keeping only
             pCell.nNeighbor_land_virtual = len(aNeighbor_land_virtual_update)
 
-            pCell.aNeighbor_distance = aNeighbor_distance_update
+            #pCell.aNeighbor_distance = aNeighbor_distance_update
             aMpas_out.append(pCell)
 
 

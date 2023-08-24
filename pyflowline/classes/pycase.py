@@ -102,6 +102,7 @@ class flowlinecase(object):
     iFlag_intersect = 1
     iFlag_rotation=0
     iFlag_break_by_distance = 0  #if the distance between two vertice are far,
+    iResolution_index = 10
     iFlag_dggrid = 0
     nOutlet = 1 #by default , there shoule ne only one ouelet
     dResolution_degree=0.0
@@ -121,6 +122,7 @@ class flowlinecase(object):
     sRegion=''
     sModel=''
     sMesh_type ='hexagon'
+    sDggrid_type = 'ISEA3H'
 
     sCase=''
     sDate=''
@@ -239,6 +241,16 @@ class flowlinecase(object):
             self.iFlag_dggrid = int(aConfig_in['iFlag_dggrid'])
         else:
             self.iFlag_dggrid=0
+
+        if 'iResolution_index' in aConfig_in:
+            self.iResolution_index = int(aConfig_in['iResolution_index'])
+        else:
+            self.iResolution_index=10
+        
+        if 'sDggrid_type' in aConfig_in:
+            self.sDggrid_type = aConfig_in['sDggrid_type']
+        else:
+            self.sDggrid_type='ISEA3H'
 
         if 'nOutlet' in aConfig_in:
             self.nOutlet = int(aConfig_in['nOutlet'])
@@ -751,17 +763,30 @@ class flowlinecase(object):
                                 dLatitude_bot    = self.dLatitude_bot
                                 dLongitude_left  = self.dLongitude_left
                                 dLongitude_right = self.dLongitude_right                                
-                                sWorkspace_output = self.sWorkspace_output + slash + 'dggrid'
+                                
+
+                                if self.iFlag_standalone == 1:
+                                    sWorkspace_output = self.sWorkspace_output + slash + 'dggrid'
+                                    pass
+                                else:
+                                    sWorkspace_output = self.sWorkspace_output + slash + '..'+ slash + 'dggrid'
+                                    
+                                    sWorkspace_output = os.path.abspath(sWorkspace_output)
+                                    pass
+
+                                if not os.path.exists(sWorkspace_output):
+                                    os.makedirs(sWorkspace_output)
                                 
                                 if iFlag_mesh_boundary ==1:
                                         #create a polygon based on
 
                                     aDggrid = create_dggrid_mesh(iFlag_global,
                                                                      iFlag_save_mesh,
-                                                                     dResolution_meter,
                                                                      sFilename_mesh,
                                                                      sWorkspace_output,
+                                                                     iResolution_index_in= self.iResolution_index,
                                                                      iFlag_antarctic_in=iFlag_antarctic_in,
+                                                                     sDggrid_type_in = self.sDggrid_type,
                                                                      sFilename_boundary_in = self.sFilename_mesh_boundary)
                                                                      
                                     pass
@@ -770,7 +795,9 @@ class flowlinecase(object):
                                                                      iFlag_save_mesh,
                                                                      dResolution_meter,
                                                                      sFilename_mesh,
-                                                                     sWorkspace_output)
+                                                                     sWorkspace_output,
+                                                                      iResolution_index_in= self.iResolution_index,
+                                                                          sDggrid_type_in = self.sDggrid_type)
                                     pass
 
 
@@ -795,17 +822,12 @@ class flowlinecase(object):
                                     print('Unsupported mesh type?')
                                 return
         else:
-            #read mesh?
+            #read mesh? this function is not completed
             iMesh_type = self.iMesh_type
             aCell_out = read_mesh_json_w_topology(iMesh_type, self.sFilename_mesh)
             pass
 
-        #convert the mesh into the kml format so it can be visualized in google earth and google map
-
         
-        if iFlag_kml is not None:
-            convert_geojson_to_kml(self.sFilename_mesh, self.sFilename_mesh_kml)
-
         print('Finish mesh generation.')
         return aCell_out
 
@@ -936,14 +958,13 @@ class flowlinecase(object):
         
         if self.iFlag_dggrid == 1:
             #create dggrid output folder
-            sWorkspace_output = self.sWorkspace_output + slash + 'dggrid'
+            if self.iFlag_standalone == 1:
+                sWorkspace_output = self.sWorkspace_output + slash + 'dggrid'
+            else:
+                sWorkspace_output = self.sWorkspace_output + slash + '..'+ slash + 'dggrid'
+                sWorkspace_output = os.path.abspath(sWorkspace_output)
 
-            #if (os.path.exists(sWorkspace_output)):
-            #    sCommand = 'rm -rf '  + sWorkspace_output
-            #    print(sCommand)
-            #    p = subprocess.Popen(sCommand, shell= True)
-            #    p.wait()
-
+         
             Path(sWorkspace_output).mkdir(parents=True, exist_ok=True)
             #then copy the binary file to the folder
             #copy execulate
@@ -953,6 +974,25 @@ class flowlinecase(object):
             pass
         return
 
+    def change_model_parameter(self, sVariable_in, dValue, iFlag_basin_in = None):
+        if iFlag_basin_in is None:
+            if hasattr(self, sVariable_in):
+                setattr(self, sVariable_in, dValue)
+                return True
+            else:
+                print("This model parameter is unknown, please check the full parameter list in the documentation: " + sVariable_in)
+                return False
+        else:
+            #this mean the variable is in the basin object
+            for pBasin in self.aBasin:
+                if hasattr(pBasin, sVariable_in):
+                    setattr(pBasin, sVariable_in, dValue)
+                    return True
+                else:
+                    print("This model parameter is unknown, please check the full parameter list in the documentation: " + sVariable_in)
+                    return False
+
+    
     def run(self):
         """
         Run the flowlinecase simulation
@@ -989,6 +1029,11 @@ class flowlinecase(object):
         Export the model outputs
         """
         self.export_mesh_info_to_json()
+        #convert the mesh into the kml format so it can be visualized in google earth and google map
+        #shoule move this to the export function
+        if iFlag_kml is not None:
+            convert_geojson_to_kml(self.sFilename_mesh, self.sFilename_mesh_kml)
+
         if self.iFlag_flowline ==1:
             for pBasin in self.aBasin:
                 pBasin.export()
@@ -1039,6 +1084,13 @@ class flowlinecase(object):
                                ensure_ascii=True, \
                                cls=CaseClassEncoder)
         return sJson
+
+    def print(self):
+        """
+        Print the flowline case object
+        """
+        print(self.tojson())
+        return
 
     def export_config_to_json(self, sFilename_output_in = None):
         """
@@ -1117,7 +1169,7 @@ class flowlinecase(object):
             else:
                 #use current output path
                 sName = 'configuration_basin.json'
-                sFilename_output  =  os.path.join( self.sWorkspace_output  , sName)
+                sFilename_output  =  os.path.join( self.sWorkspace_output, sName)
 
             #all basins
             with open(sFilename_output, 'w', encoding='utf-8') as f:

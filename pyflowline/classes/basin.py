@@ -89,6 +89,8 @@ class pybasin(object):
     lCellID_outlet=-1
     iFlag_debug = 0
     iFlag_disconnected =0
+    iFlag_remove_small_river = 0
+    iFlag_remove_low_order_river = 0
     iFlag_dam=0
 
     iFlag_break_by_distance = 0
@@ -182,6 +184,16 @@ class pybasin(object):
             self.iFlag_disconnected             = int(aParameter['iFlag_disconnected'])
         else:
             self.iFlag_disconnected   = 0
+
+        if 'iFlag_remove_small_river' in aParameter:            
+            self.iFlag_remove_small_river             = int(aParameter['iFlag_remove_small_river'])
+        else:
+            self.iFlag_remove_small_river   = 0
+
+        if 'iFlag_remove_low_order_river' in aParameter:
+            self.iFlag_remove_low_order_river = int(aParameter['iFlag_remove_low_order_river'])
+        else:
+            self.iFlag_remove_low_order_river = 0
         
         if 'iFlag_dam' in aParameter:            
             self.iFlag_dam             = int(aParameter['iFlag_dam'])
@@ -512,29 +524,34 @@ class pybasin(object):
             sFilename_out = 'flowline_loop_before_intersect.geojson'
             sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
             export_flowline_to_geojson( aFlowline_basin_simplified, sFilename_out)
-        #using loop to remove small river, here we use 5 steps
-        ptimer.start()
-        for i in range(3):
-            sStep = "{:02d}".format(i+1)
-            aFlowline_basin_simplified = remove_small_river(aFlowline_basin_simplified, self.dThreshold_small_river)
-            if self.iFlag_debug ==1:
-                sFilename_out = 'flowline_large_'+ sStep +'_before_intersect.geojson'
-                sFilename_out =os.path.join(sWorkspace_output_basin, sFilename_out)
-                export_flowline_to_geojson( aFlowline_basin_simplified,  sFilename_out)
-            aVertex, lIndex_outlet, aIndex_headwater,aIndex_middle, aIndex_confluence, aConnectivity, pVertex_outlet = find_flowline_confluence(aFlowline_basin_simplified,  pVertex_outlet)
-            if self.iFlag_debug ==1:
-                sFilename_out = 'flowline_vertex_with_confluence_'+ sStep +'_before_intersect.geojson'
-                sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
-                export_vertex_to_geojson( aVertex,  sFilename_out, aAttribute_data=aConnectivity)
-            aFlowline_basin_simplified = merge_flowline( aFlowline_basin_simplified,aVertex, pVertex_outlet, aIndex_headwater,aIndex_middle, aIndex_confluence  )  
-            if self.iFlag_debug ==1:
-                sFilename_out = 'flowline_merge_'+ sStep +'_before_intersect.geojson'
-                sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
-                export_flowline_to_geojson( aFlowline_basin_simplified,  sFilename_out)
-            if len(aFlowline_basin_simplified) == 1:
-                break
-        ptimer.stop()
-        sys.stdout.flush()
+        
+        
+        #using loop to remove small river, here we use 3 steps
+
+        if self.iFlag_remove_small_river ==1:
+            ptimer.start()
+            for i in range(3):
+                sStep = "{:02d}".format(i+1)
+                dThreshold = self.dThreshold_small_river * (3-i)
+                aFlowline_basin_simplified = remove_small_river(aFlowline_basin_simplified,dThreshold )
+                if self.iFlag_debug ==1:
+                    sFilename_out = 'flowline_large_'+ sStep +'_before_intersect.geojson'
+                    sFilename_out =os.path.join(sWorkspace_output_basin, sFilename_out)
+                    export_flowline_to_geojson( aFlowline_basin_simplified,  sFilename_out)
+                aVertex, lIndex_outlet, aIndex_headwater,aIndex_middle, aIndex_confluence, aConnectivity, pVertex_outlet = find_flowline_confluence(aFlowline_basin_simplified,  pVertex_outlet)
+                if self.iFlag_debug ==1:
+                    sFilename_out = 'flowline_vertex_with_confluence_'+ sStep +'_before_intersect.geojson'
+                    sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
+                    export_vertex_to_geojson( aVertex,  sFilename_out, aAttribute_data=aConnectivity)
+                aFlowline_basin_simplified = merge_flowline( aFlowline_basin_simplified,aVertex, pVertex_outlet, aIndex_headwater,aIndex_middle, aIndex_confluence  )  
+                if self.iFlag_debug ==1:
+                    sFilename_out = 'flowline_merge_'+ sStep +'_before_intersect.geojson'
+                    sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
+                    export_flowline_to_geojson( aFlowline_basin_simplified,  sFilename_out)
+                if len(aFlowline_basin_simplified) == 1:
+                    break
+            ptimer.stop()
+            sys.stdout.flush()
         
         #the final vertex info
         aVertex, lIndex_outlet, aIndex_headwater,aIndex_middle, aIndex_confluence, aConnectivity, pVertex_outlet = find_flowline_confluence(aFlowline_basin_simplified,  pVertex_outlet)

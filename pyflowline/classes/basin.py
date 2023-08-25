@@ -530,26 +530,32 @@ class pybasin(object):
 
         if self.iFlag_remove_small_river ==1:
             ptimer.start()
-            for i in range(3):
+            for i in np.arange(0, 3, 1):
                 sStep = "{:02d}".format(i+1)
-                dThreshold = self.dThreshold_small_river * (3-i)
-                aFlowline_basin_simplified = remove_small_river(aFlowline_basin_simplified,dThreshold )
+                dThreshold = self.dThreshold_small_river 
+                print(sStep, dThreshold)
+                aFlowline_basin_simplified = remove_small_river(aFlowline_basin_simplified, dThreshold )
                 if self.iFlag_debug ==1:
                     sFilename_out = 'flowline_large_'+ sStep +'_before_intersect.geojson'
                     sFilename_out =os.path.join(sWorkspace_output_basin, sFilename_out)
                     export_flowline_to_geojson( aFlowline_basin_simplified,  sFilename_out)
+                    print(len(aFlowline_basin_simplified))
+
                 aVertex, lIndex_outlet, aIndex_headwater,aIndex_middle, aIndex_confluence, aConnectivity, pVertex_outlet = find_flowline_confluence(aFlowline_basin_simplified,  pVertex_outlet)
                 if self.iFlag_debug ==1:
                     sFilename_out = 'flowline_vertex_with_confluence_'+ sStep +'_before_intersect.geojson'
                     sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
                     export_vertex_to_geojson( aVertex,  sFilename_out, aAttribute_data=aConnectivity)
+
                 aFlowline_basin_simplified = merge_flowline( aFlowline_basin_simplified,aVertex, pVertex_outlet, aIndex_headwater,aIndex_middle, aIndex_confluence  )  
                 if self.iFlag_debug ==1:
                     sFilename_out = 'flowline_merge_'+ sStep +'_before_intersect.geojson'
                     sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
                     export_flowline_to_geojson( aFlowline_basin_simplified,  sFilename_out)
+                    
                 if len(aFlowline_basin_simplified) == 1:
                     break
+                
             ptimer.stop()
             sys.stdout.flush()
         

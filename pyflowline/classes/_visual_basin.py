@@ -105,10 +105,10 @@ def basin_plot(self,
                                              aFilename_in,                           
                                              iFont_size_in=iFont_size_in,                 
                                              sFilename_output_in=sFilename_output_in,
-                                             #sTitle_in= 'Flow direction with observation',
+                                             sTitle_in= 'Flow direction with observation',
                                              aFlag_thickness_in=  [1, 0, 0],
                                              aVariable_in= ['drainage_area', '', 'stream_segment'],
-                                               aLegend_in = aLegend_in,
+                                             aLegend_in = aLegend_in,
                                              aFlag_color_in = [0, 0, 1],
                                              aFlag_fill_in  = [0, 0, 0])
                         else:
@@ -292,43 +292,53 @@ def _plot_polygon_variable(self,
                     sFilename = self.sFilename_variable_polygon
         
     else:
-        if sVariable_in == 'elevation':
-            sVariable='elevation'
-            sTitle = 'Surface elevation'
-            sUnit = r'Unit: m'
+        if sVariable_in == 'area':
+            sVariable='area'
+            sTitle = 'Area'
+            sUnit = r'Units: $m^{2}$'
             sColormap ='terrain'
             dData_min = dData_min_in
             dData_max = dData_max_in
             sFilename = self.sFilename_variable_polygon
+            pass
         else:
-            if sVariable_in == 'drainage_area':
-                sVariable='drainage_area'
-                sTitle = 'Drainage area'
-                sUnit = r'Units: $m^{2}$'
+            if sVariable_in == 'elevation':
+                sVariable='elevation'
+                sTitle = 'Surface elevation'
+                sUnit = r'Unit: m'
+                sColormap ='terrain'
                 dData_min = dData_min_in
                 dData_max = dData_max_in
-                sColormap ='Spectral_r'
                 sFilename = self.sFilename_variable_polygon
-
             else:
-                if sVariable_in == 'travel_distance':
-                    sVariable='travel_distance'
-                    sTitle = 'Travel distance'
-                    sUnit = r'Unit: m'
-                    dData_min = 0.0
-                    dData_max = dData_max_in
-                    sColormap ='Spectral_r'
-                    iFlag_subbasin = 1
-                    sFilename = self.sFilename_variable_polygon
-                else:
-                    sVariable='slope'
-                    sTitle = 'Surface slope'
-                    sUnit = r'Unit: percent'
-                    sColormap='Spectral_r'
+                if sVariable_in == 'drainage_area':
+                    sVariable='drainage_area'
+                    sTitle = 'Drainage area'
+                    sUnit = r'Units: $m^{2}$'
                     dData_min = dData_min_in
                     dData_max = dData_max_in
+                    sColormap ='Spectral_r'
                     sFilename = self.sFilename_variable_polygon
-        pass
+
+                else:
+                    if sVariable_in == 'travel_distance':
+                        sVariable='travel_distance'
+                        sTitle = 'Travel distance'
+                        sUnit = r'Unit: m'
+                        dData_min = 0.0
+                        dData_max = dData_max_in
+                        sColormap ='Spectral_r'
+                        iFlag_subbasin = 1
+                        sFilename = self.sFilename_variable_polygon
+                    else:
+                        sVariable='slope'
+                        sTitle = 'Surface slope'
+                        sUnit = r'Unit: percent'
+                        sColormap='Spectral_r'
+                        dData_min = dData_min_in
+                        dData_max = dData_max_in
+                        sFilename = self.sFilename_variable_polygon
+            pass
     
     if iFlag_title_in is not None:        
         if iFlag_title_in == 0:

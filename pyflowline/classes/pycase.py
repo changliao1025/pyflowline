@@ -39,6 +39,7 @@ from pyflowline.mesh.latlon.create_latlon_mesh import create_latlon_mesh
 from pyflowline.mesh.square.create_square_mesh import create_square_mesh
 from pyflowline.mesh.mpas.create_mpas_mesh import create_mpas_mesh
 from pyflowline.mesh.dggrid.create_dggrid_mesh import create_dggrid_mesh
+from pyflowline.mesh.dggrid.create_dggrid_mesh import dggrid_find_resolution_by_index
 from pyflowline.mesh.tin.create_tin_mesh import create_tin_mesh
 gdal.UseExceptions()   
 pDate = datetime.datetime.today()
@@ -271,6 +272,8 @@ class flowlinecase(object):
         else:
             print('Please specify resolution.')
 
+        
+
         if 'dThreshold_break_by_distance' in aConfig_in:
             self.dThreshold_break_by_distance = float(aConfig_in['dThreshold_break_by_distance'])
 
@@ -383,6 +386,10 @@ class flowlinecase(object):
                             else:
                                 print('Unsupported mesh type?')
 
+        if self.iMesh_type == 5:
+            #update resolution
+            self.dResolution_meter = dggrid_find_resolution_by_index(self.sDggrid_type, self.iResolution_index)
+            
         #the model can be run as part of hexwatershed or standalone
         if self.iFlag_standalone == 1:
             #in standalone case, will add case information and update output path
@@ -779,6 +786,7 @@ class flowlinecase(object):
                                 
                                 if iFlag_mesh_boundary ==1:
                                         #create a polygon based on
+                                    
 
                                     aDggrid = create_dggrid_mesh(iFlag_global,
                                                                      iFlag_save_mesh,
@@ -788,6 +796,8 @@ class flowlinecase(object):
                                                                      iFlag_antarctic_in=iFlag_antarctic_in,
                                                                      sDggrid_type_in = self.sDggrid_type,
                                                                      sFilename_boundary_in = self.sFilename_mesh_boundary)
+                                    
+                                    
                                                                      
                                     pass
                                 else:                                       
@@ -798,6 +808,7 @@ class flowlinecase(object):
                                                                      sWorkspace_output,
                                                                       iResolution_index_in= self.iResolution_index,
                                                                           sDggrid_type_in = self.sDggrid_type)
+                                    
                                     pass
 
 

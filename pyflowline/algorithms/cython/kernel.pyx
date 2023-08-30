@@ -2,6 +2,8 @@ import numpy as np
 cimport cython
 from libcpp.vector cimport vector
 from libc.math cimport sin, cos, asin,acos, sqrt, abs
+from pyflowline.external.tinyr.tinyr.tinyr import RTree
+
 """ Low-level function for pyflowline
 """
 # Authors: Chang Liao
@@ -71,25 +73,58 @@ cpdef  find_vertex_in_list(list aVertex_in, pVertex_in, double dThreshold_in = 1
     cdef int lIndex= -1
     cdef int nVertex
     cdef double dDistance
+    cdef double x, y, left, right, bottom, top
     nVertex= len(aVertex_in)
 
     if nVertex > 0 :
-
+        index_vertex = RTree( max_cap=5, min_cap=2)
         for i in range(nVertex):
-            pVertex = aVertex_in[i]
+            x = aVertex_in[i].dLongitude_degree
+            y = aVertex_in[i].dLatitude_degree   
+            left =   x - 1E-5
+            right =  x + 1E-5
+            bottom = y - 1E-5
+            top =    y + 1E-5
+            pBound= (left, bottom, right, top)
+            index_vertex.insert(i, pBound) 
+
+        #now the new vertex
+        x=pVertex_in.dLongitude_degree
+        y=pVertex_in.dLatitude_degree   
+        left =   x - 1E-5
+        right =  x + 1E-5
+        bottom = y - 1E-5
+        top =    y + 1E-5
+        pBound= (left, bottom, right, top)
+        aIntersect = list(index_vertex.search(pBound))
+
+        for k in aIntersect:
+            pVertex = aVertex_in[k]
             dDistance = pVertex.calculate_distance(pVertex_in)
             #if pVertex == pVertex_in:
             if dDistance < dThreshold_in:
                 iFlag_exist = 1      
-                lIndex = i 
+                lIndex = k
                 break                
             else:
                 pass
-
-        pass        
-        
-    else:
         pass
+      
+
+    #if nVertex > 0 :
+    #    for i in range(nVertex):
+    #        pVertex = aVertex_in[i]
+    #        dDistance = pVertex.calculate_distance(pVertex_in)
+    #        #if pVertex == pVertex_in:
+    #        if dDistance < dThreshold_in:
+    #            iFlag_exist = 1      
+    #            lIndex = i 
+    #            break                
+    #        else:
+    #            pass
+    #    pass                
+    #else:
+    #    pass
     
     return iFlag_exist, lIndex
 
@@ -100,30 +135,70 @@ cpdef find_vertex_on_edge(list aVertex_in, pEdge_in):
     cdef int nVertex, npoint
     cdef vector[int] aIndex ,aIndex_order
     cdef vector[double] aDistance 
+    cdef double x, y, left, right, bottom, top
   
     nVertex= len(aVertex_in)
     npoint = 0    
     if nVertex > 0 :
-        for i in range( nVertex):
-            pVertex = aVertex_in[i]
+        index_vertex = tinyr.RTree(max_cap=5, min_cap=2)
+        for i in range(nVertex):
+            lID = i 
+            x = aVertex_in[i].dLongitude_degree
+            y = aVertex_in[i].dLatitude_degree   
+            left = x - 1E-5
+            right= x + 1E-5
+            bottom= y -1E-5
+            top=    y + 1E-5
+            pBound= (left, bottom, right, top)
+            index_vertex.insert(lID, pBound)  # 
+            pass
+        #now the new vertex
+        pVertex_start = pEdge_in.pVertex_start
+        pVertex_end = pEdge_in.pVertex_end
+        x1=pVertex_start.dLongitude_degree
+        y1=pVertex_start.dLatitude_degree   
+        x2=pVertex_end.dLongitude_degree
+        y2=pVertex_end.dLatitude_degree
+        left   = np.min([x1, x2])
+        right  = np.max([x1, x2])
+        bottom = np.min([y1, y2])
+        top    = np.max([y1, y2])
+        pBound= (left, bottom, right, top)
+        aIntersect = list(index_vertex.search(pBound))
+        for k in aIntersect:
+            pVertex = aVertex_in[k]
             iFlag_overlap, dDistance, diff = pEdge_in.check_vertex_on_edge(pVertex)
             if iFlag_overlap == 1:                
-                iFlag_exist = 1                   
-                aDistance.push_back(dDistance)
-                aIndex.push_back(i)
+                iFlag_exist = 1                      
+                aDistance.append(dDistance)
+                aIndex.append(k) 
                 npoint = npoint + 1          
             else:                
                 if  diff < 1.0:
-                    iFlag_overlap = pEdge_in.check_vertex_on_edge(pVertex) 
+                    iFlag_overlap = pEdge_in.check_vertex_on_edge(pVertex)
                 pass
 
-        #re-order 
-        if iFlag_exist == 1 :
-            x = np.array(aDistance)
-            b = np.argsort(x)
-            c = np.array(aIndex)
-            d= c[b]
-            aIndex_order = list(d)    
+        #old method
+        #for i in range( nVertex):
+        #    pVertex = aVertex_in[i]
+        #    iFlag_overlap, dDistance, diff = pEdge_in.check_vertex_on_edge(pVertex)
+        #    if iFlag_overlap == 1:                
+        #        iFlag_exist = 1                   
+        #        aDistance.push_back(dDistance)
+        #        aIndex.push_back(i)
+        #        npoint = npoint + 1          
+        #    else:                
+        #        if  diff < 1.0:
+        #            iFlag_overlap = pEdge_in.check_vertex_on_edge(pVertex) 
+        #        pass
+#
+        ##re-order 
+        #if iFlag_exist == 1 :
+        #    x = np.array(aDistance)
+        #    b = np.argsort(x)
+        #    c = np.array(aIndex)
+        #    d= c[b]
+        #    aIndex_order = list(d)    
 
     else:
         pass

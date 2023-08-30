@@ -229,8 +229,8 @@ class pyedge(object):
                  pVertex_start.dLongitude_degree, pVertex_start.dLatitude_degree,\
                  pVertex_in.dLongitude_degree, pVertex_in.dLatitude_degree,\
                  pVertex_end.dLongitude_degree,pVertex_end.dLatitude_degree)
-            lons = [pVertex_start.dLongitude_degree,pVertex_in.dLongitude_degree,pVertex_end.dLongitude_degree]
-            lats = [pVertex_start.dLatitude_degree, pVertex_in.dLatitude_degree, pVertex_end.dLatitude_degree]
+            #lons = [pVertex_start.dLongitude_degree,pVertex_in.dLongitude_degree,pVertex_end.dLongitude_degree]
+            #lats = [pVertex_start.dLatitude_degree, pVertex_in.dLatitude_degree, pVertex_end.dLatitude_degree]
             #dArea = calculate_polygon_area(lons, lats)
 
             if  angle3deg > 178 and d3 < 1.0: #care
@@ -240,7 +240,7 @@ class pyedge(object):
                 iFlag = 0
             
         else:
-                iFlag = 0 
+            iFlag = 0 
 
         return iFlag, dDistance, dDistance_plane
     

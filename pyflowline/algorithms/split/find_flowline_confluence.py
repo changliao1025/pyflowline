@@ -14,6 +14,7 @@ else:
     from pyflowline.algorithms.auxiliary.find_vertex_in_list import find_vertex_in_list
 
 def find_flowline_confluence(aFlowline_in, pVertex_outlet_in):    
+
     nFlowline = len(aFlowline_in) 
     aVertex=list()
     aIndex_headwater=list()
@@ -56,7 +57,6 @@ def find_flowline_confluence(aFlowline_in, pVertex_outlet_in):
         pVertex_start = pFlowline.pVertex_start
         pVertex_end = pFlowline.pVertex_end
         
-
         iFlag_exist, lIndex =  find_vertex_in_list(aVertex, pVertex_end)  
         if lIndex != lIndex_outlet:
 

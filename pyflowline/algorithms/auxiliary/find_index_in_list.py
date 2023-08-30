@@ -6,8 +6,10 @@ import importlib
 iFlag_cython = importlib.util.find_spec("cython") 
 if iFlag_cython is not None:
     from pyflowline.algorithms.cython.kernel import find_vertex_in_list
+    from pyflowline.external.tinyr.tinyr.tinyr import RTree
+    iFlag_use_rtree = 1
 else:
-
+    iFlag_use_rtree =0
     from pyflowline.algorithms.auxiliary.find_vertex_in_list import find_vertex_in_list
 
 
@@ -19,27 +21,69 @@ def find_vertex_on_edge(aVertex_in, pEdge_in):
     nVertex= len(aVertex_in)
     npoint = 0    
     if nVertex > 0 :
-        for i in np.arange( nVertex):
-            pVertex = aVertex_in[i]
-            iFlag_overlap, dDistance, diff = pEdge_in.check_vertex_on_edge(pVertex)
-            if iFlag_overlap == 1:                
-                iFlag_exist = 1                      
-                aDistance.append(dDistance)
-                aIndex.append(i) 
-                npoint = npoint + 1          
-            else:                
-                if  diff < 1.0:
-                    iFlag_overlap = pEdge_in.check_vertex_on_edge(pVertex)
-                   
+        if iFlag_use_rtree == 1:
+            index_vertex = RTree(max_cap=5, min_cap=2)
+            for i in range(nVertex):
+                lID = i 
+                x = aVertex_in[i].dLongitude_degree
+                y = aVertex_in[i].dLatitude_degree   
+                left= x - 1E-5
+                right= x + 1E-5
+                bottom= y-1E-5
+                top=    y+1E-5
+                pBound= (left, bottom, right, top)
+                index_vertex.insert(lID, pBound)  # 
                 pass
+            #now the new vertex
+            pVertex_start = pEdge_in.pVertex_start
+            pVertex_end = pEdge_in.pVertex_end
+            x1=pVertex_start.dLongitude_degree
+            y1=pVertex_start.dLatitude_degree   
+            x2=pVertex_end.dLongitude_degree
+            y2=pVertex_end.dLatitude_degree
+            left   = np.min([x1, x2])
+            right  = np.max([x1, x2])
+            bottom = np.min([y1, y2])
+            top    = np.max([y1, y2])
+            pBound= (left, bottom, right, top)
+            aIntersect = list(index_vertex.search(pBound))
+            for k in aIntersect:
+                pVertex = aVertex_in[k]
+                iFlag_overlap, dDistance, diff = pEdge_in.check_vertex_on_edge(pVertex)
+                if iFlag_overlap == 1:                
+                    iFlag_exist = 1                      
+                    aDistance.append(dDistance)
+                    aIndex.append(k) 
+                    npoint = npoint + 1          
+                else:                
+                    if  diff < 1.0:
+                        iFlag_overlap = pEdge_in.check_vertex_on_edge(pVertex)
 
-        #re-order 
-        if iFlag_exist == 1 :
-            x = np.array(aDistance)
-            b = np.argsort(x)
-            c = np.array(aIndex)
-            d= c[b]
-            aIndex_order = list(d)        
+                    pass
+
+
+        else:
+            for i in np.arange( nVertex):
+                pVertex = aVertex_in[i]
+                iFlag_overlap, dDistance, diff = pEdge_in.check_vertex_on_edge(pVertex)
+                if iFlag_overlap == 1:                
+                    iFlag_exist = 1                      
+                    aDistance.append(dDistance)
+                    aIndex.append(i) 
+                    npoint = npoint + 1          
+                else:                
+                    if  diff < 1.0:
+                        iFlag_overlap = pEdge_in.check_vertex_on_edge(pVertex)
+
+                    pass
+
+            #re-order 
+            if iFlag_exist == 1 :
+                x = np.array(aDistance)
+                b = np.argsort(x)
+                c = np.array(aIndex)
+                d= c[b]
+                aIndex_order = list(d)        
     else:
         pass
     
@@ -171,6 +215,7 @@ def add_unique_vertex(aVertex_in, pVertex_in, dThreshold_in = 1.0E-6):
         pass
 
     return aVertex_in, iFlag_exist
+
 def find_list_in_list(aList_in, pList_in):
     c = copy.deepcopy(pList_in)
     c.sort()

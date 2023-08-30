@@ -140,7 +140,7 @@ cpdef find_vertex_on_edge(list aVertex_in, pEdge_in):
     nVertex= len(aVertex_in)
     npoint = 0    
     if nVertex > 0 :
-        index_vertex = tinyr.RTree(max_cap=5, min_cap=2)
+        index_vertex = RTree(max_cap=5, min_cap=2)
         for i in range(nVertex):
             lID = i 
             x = aVertex_in[i].dLongitude_degree
@@ -170,8 +170,8 @@ cpdef find_vertex_on_edge(list aVertex_in, pEdge_in):
             iFlag_overlap, dDistance, diff = pEdge_in.check_vertex_on_edge(pVertex)
             if iFlag_overlap == 1:                
                 iFlag_exist = 1                      
-                aDistance.append(dDistance)
-                aIndex.append(k) 
+                aDistance.push_back(dDistance)
+                aIndex.push_back(i)
                 npoint = npoint + 1          
             else:                
                 if  diff < 1.0:
@@ -192,18 +192,18 @@ cpdef find_vertex_on_edge(list aVertex_in, pEdge_in):
         #            iFlag_overlap = pEdge_in.check_vertex_on_edge(pVertex) 
         #        pass
 #
-        ##re-order 
-        #if iFlag_exist == 1 :
-        #    x = np.array(aDistance)
-        #    b = np.argsort(x)
-        #    c = np.array(aIndex)
-        #    d= c[b]
-        #    aIndex_order = list(d)    
+        #re-order 
+        if iFlag_exist == 1 :
+            x = np.array(aDistance)
+            b = np.argsort(x)
+            c = np.array(aIndex)
+            d= c[b]
+            aIndex_order = list(d)    
 
     else:
         pass
     
-    return iFlag_exist, npoint , aIndex_order
+    return iFlag_exist, npoint, aIndex_order
 
 @cython.boundscheck(False)  # deactivate bnds checking
 cpdef add_unique_vertex(list aVertex_in, pVertex_in, double dThreshold_in = 1.0E-6):

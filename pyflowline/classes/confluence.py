@@ -59,7 +59,7 @@ class pyconfluence():
         try:     
             self.pVertex_confluence      = pVertex_center       
             self.aFlowline_upstream      = aFlowline_upstream_in  
-            self.pFlowline_downstream      = pFlowline_downstream_in  
+            self.pFlowline_downstream    = pFlowline_downstream_in  
             
         except:
             print('Initialization of confluence failed!')

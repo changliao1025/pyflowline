@@ -1,5 +1,13 @@
 import numpy as np
 def remove_flowline_loop(aFlowline_in):
+    """_summary_
+
+    Args:
+        aFlowline_in (_type_): _description_
+
+    Returns:
+        List: List of flowline, ordered from outlet to headwater
+    """
     aFlowline_out=list()
     nFlowline = len(aFlowline_in)
     def find_paralle_stream( pVertex_start_in):        

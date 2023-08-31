@@ -1,7 +1,7 @@
 
 import numpy as np
 
-from pyflowline.algorithms.auxiliary.check_head_water import check_head_water
+#from pyflowline.algorithms.auxiliary.check_head_water import check_head_water
 
 
 import importlib
@@ -14,6 +14,15 @@ else:
     from pyflowline.algorithms.auxiliary.find_vertex_in_list import find_vertex_in_list
 
 def find_flowline_confluence(aFlowline_in, pVertex_outlet_in):    
+    """_summary_
+
+    Args:
+        aFlowline_in (_type_): _description_
+        pVertex_outlet_in (_type_): _description_
+
+    Returns:
+        List: _description_
+    """
 
     nFlowline = len(aFlowline_in) 
     aVertex=list()
@@ -21,6 +30,9 @@ def find_flowline_confluence(aFlowline_in, pVertex_outlet_in):
     aIndex_confluence=list()
     aIndex_middle =list()
     lIndex_outlet = -1
+
+    #add all the flowline start and end vertex into a host list
+    #because the flowlines are order from outlet to headwater, there is no order in vertex list
     for i in range(0, nFlowline):      
         pFlowline = aFlowline_in[i]
         pVertex_start = pFlowline.pVertex_start
@@ -60,7 +72,8 @@ def find_flowline_confluence(aFlowline_in, pVertex_outlet_in):
         iFlag_exist, lIndex =  find_vertex_in_list(aVertex, pVertex_end)  
         if lIndex != lIndex_outlet:
 
-            if check_head_water(aFlowline_in, pVertex_start)==1:
+            #if check_head_water(aFlowline_in, pVertex_start)==1:
+            if pFlowline.iStream_order == 1:
                 iFlag_exist, lIndex =  find_vertex_in_list(aVertex, pVertex_start)            
                 aConnectivity[lIndex] = 1
                 iFlag_exist, lIndex =  find_vertex_in_list(aVertex, pVertex_end)            

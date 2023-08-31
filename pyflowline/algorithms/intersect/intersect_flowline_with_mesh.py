@@ -11,7 +11,7 @@ from pyflowline.external.pyearth.gis.gdal.gdal_functions import get_geometry_coo
 
 iFlag_cython = importlib.util.find_spec("cython") 
 if iFlag_cython is not None:
-    from pyflowline.external.tinyr import tinyr
+    from pyflowline.external.tinyr.tinyr.tinyr import RTree
     iFlag_use_rtree = 1
 else:
     iFlag_use_rtree =0
@@ -65,7 +65,7 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh_in, sFilename_flo
     if iFlag_use_rtree ==1: #use the rtree to speed up 
         #index_flowline = rtree.index.Index()
         interleaved = True
-        index_flowline = tinyr.RTree(interleaved=interleaved, max_cap=5, min_cap=2)
+        index_flowline = RTree(interleaved=interleaved, max_cap=5, min_cap=2)
         for i in range(nfeature_flowline):
             lID = i 
             pFeature_flowline = pLayer_flowline.GetFeature(i)
@@ -110,6 +110,8 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh_in, sFilename_flo
                         iFlag_intersected = 1
                         pGeometry_intersect = pGeometry_flowline.Intersection(pGeometry_mesh)                     
                         pGeometrytype_intersect = pGeometry_intersect.GetGeometryName()
+                        iStream_segment = pFeature_flowline.GetField("stream_segment")
+                        iStream_order = pFeature_flowline.GetField("stream_order")
                         if pGeometrytype_intersect == 'LINESTRING':
                             pFeatureOut.SetGeometry(pGeometry_intersect)
                             pFeatureOut.SetField("lineid", lID_flowline)         

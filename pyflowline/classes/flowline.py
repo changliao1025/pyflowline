@@ -51,7 +51,7 @@ class pyflowline(object):
     dSinuosity=0.0
 
     iStream_segment=-1
-    iStream_order =-1
+    iStream_order = -1
 
     nEdge=0
     nVertex=0
@@ -61,6 +61,10 @@ class pyflowline(object):
     aFlowlineID_start_end = None
     aFlowlineID_end_start = None
     aFlowlineID_end_end = None
+
+    #for stream topology
+    lFlowline_downstream = None #only store the index, not the actual objects
+    aFlowline_upstream = None #only store the index, not the actual objects
     
     def __init__(self, aEdge):
         """

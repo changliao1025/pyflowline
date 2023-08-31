@@ -13,10 +13,23 @@ lID = 0
 
 def merge_flowline(aFlowline_in, 
                    aVertex_in, 
-    pVertex_outlet_in, 
-        aIndex_headwater_in,
-            aIndex_middle_in, 
-                aIndex_confluence_in ):
+                    pVertex_outlet_in, 
+                    aIndex_headwater_in,
+                    aIndex_middle_in, 
+                    aIndex_confluence_in ):
+    """Merge the flowline feature to its simplist format
+
+    Args:
+        aFlowline_in (_type_): _description_
+        aVertex_in (_type_): _description_
+        pVertex_outlet_in (_type_): _description_
+        aIndex_headwater_in (_type_): _description_
+        aIndex_middle_in (_type_): _description_
+        aIndex_confluence_in (_type_): _description_
+
+    Returns:
+        List: The flowline are strictly ordered from outlet to headwater
+    """
 
     nVertex=len(aVertex_in)
     nFlowline = len(aFlowline_in)
@@ -50,20 +63,25 @@ def merge_flowline(aFlowline_in,
                 pVertex_end = pFlowline2.pVertex_end
                 if pVertex_end == pVertex_current:
                     pFlowline = pFlowline.merge_upstream(pFlowline2)
-                    pVertex_current = pVertex_start
-                    
+                    pVertex_current = pVertex_start                    
                     break
                 else:
                     pass
 
-        pFlowline.iStream_segment = iSegment              
-        pFlowline.lIndex = lID
-        aFlowline_out.append(pFlowline)        
-        lID = lID + 1        
+               
         #go to next 
         if find_vertex_in_list(aVertex_headwater.tolist(), pVertex_current)[0] ==1: 
+            pFlowline.iStream_segment = iSegment      
+            pFlowline.iStream_order = 1           
+            pFlowline.lIndex = lID
+            aFlowline_out.append(pFlowline)        
+            lID = lID + 1 
             return
         else:
+            pFlowline.iStream_segment = iSegment              
+            pFlowline.lIndex = lID
+            aFlowline_out.append(pFlowline)        
+            lID = lID + 1 
             #confluence
             if find_vertex_in_list(aVertex_confluence.tolist(), pVertex_current)[0] ==1: 
                 for k in range(0, nFlowline):                      

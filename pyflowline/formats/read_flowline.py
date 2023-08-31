@@ -173,6 +173,10 @@ def read_flowline_geojson(sFilename_geojson_in):
         iFlag_segment = 1
     else:
         iFlag_segment = 0    
+    if 'stream_order' in schema:
+        iFlag_order = 1
+    else:
+        iFlag_order = 0    
     if 'lineid' in schema:
         iFlag_id = 1
     else:
@@ -192,6 +196,11 @@ def read_flowline_geojson(sFilename_geojson_in):
             iStream_segment = pFeature_geojson.GetField("stream_segment")
         else:
             iStream_segment = -1
+
+        if iFlag_order ==1:
+            iStream_order = pFeature_geojson.GetField("stream_order")
+        else:
+            iStream_order = -1
         
         if iFlag_id ==1:
             lFlowlineID = pFeature_geojson.GetField("lineid")
@@ -231,6 +240,7 @@ def read_flowline_geojson(sFilename_geojson_in):
                 pLine = convert_gcs_coordinates_to_flowline(dummy1)
                 pLine.lIndex = lID
                 pLine.iStream_segment = iStream_segment
+                pLine.iStream_order = iStream_order
                 pLine.lFlowlineID = lFlowlineID
                 pLine.lNHDPlusID = lNHDPlusID
                 aFlowline.append(pLine)

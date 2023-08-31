@@ -4,6 +4,16 @@ import numpy as np
 from pyflowline.algorithms.auxiliary.check_head_water import check_head_water
 lID=0
 def correct_flowline_direction(aFlowline_in, pVertex_outlet_in):    
+    """_summary_ This function should expect the flowline may not be ordered, so the stream order info is not available.
+
+    Args:
+        aFlowline_in (_type_): _description_
+        pVertex_outlet_in (_type_): _description_
+
+    Returns:
+        _type_: List of flowline, ordered from outlet to headwater
+    """
+    
     aFlowline_out= list()     
     #we have to go reversely    
     aFlag_process=None

@@ -30,8 +30,9 @@ from pyflowline.algorithms.loop.remove_flowline_loop import remove_flowline_loop
 from pyflowline.algorithms.simplification.remove_small_river import remove_small_river
 from pyflowline.algorithms.simplification.remove_returning_flowline import remove_returning_flowline
 from pyflowline.algorithms.simplification.remove_duplicate_flowline import remove_duplicate_flowline
-from pyflowline.algorithms.index.define_stream_order import define_stream_order
 from pyflowline.algorithms.index.define_stream_segment_index import define_stream_segment_index
+from pyflowline.algorithms.index.define_stream_topology import define_stream_topology
+from pyflowline.algorithms.index.define_stream_order import define_stream_order, update_head_water_stream_order
 from pyflowline.algorithms.intersect.intersect_flowline_with_mesh import intersect_flowline_with_mesh
 from pyflowline.algorithms.intersect.intersect_flowline_with_flowline import intersect_flowline_with_flowline
 from pyflowline.algorithms.auxiliary.calculate_area_of_difference import calculate_area_of_difference_simplified
@@ -501,11 +502,12 @@ class pybasin(object):
         point['dLatitude_degree'] = self.dLatitude_outlet_degree
         pVertex_outlet=pyvertex(point)
 
-        print('Basin ',  self.sBasinID, 'started correction flow direction')
         
         try:
+            print('Basin ',  self.sBasinID, 'started correction flow direction')
             ptimer.start()
-            nFlowline_before = len(aFlowline_basin_simplified)        
+            nFlowline_before = len(aFlowline_basin_simplified)  
+            #this flowline is ordered from downstream to upstream      
             aFlowline_basin_simplified = correct_flowline_direction(aFlowline_basin_simplified,  pVertex_outlet )
             nFlowline_after = len(aFlowline_basin_simplified)
             ptimer.stop()
@@ -532,6 +534,12 @@ class pybasin(object):
             export_flowline_to_geojson( aFlowline_basin_simplified, sFilename_out)
         
         
+        #at this stage, the stream order information is not available, but could be easily rebuild for speed up the small river removal algorithm
+        print('Basin ',  self.sBasinID, 'started update stream order initial')
+        ptimer.start()
+        aFlowline_basin_simplified = update_head_water_stream_order(aFlowline_basin_simplified )
+        ptimer.stop()
+
         #using loop to remove small river, here we use 3 steps
         if self.iFlag_remove_small_river ==1:
             for i in np.arange(0, 3, 1):
@@ -547,6 +555,9 @@ class pybasin(object):
                     export_flowline_to_geojson( aFlowline_basin_simplified,  sFilename_out)
                     #print(len(aFlowline_basin_simplified))
 
+                #update stream order    
+                aFlowline_basin_simplified = update_head_water_stream_order(aFlowline_basin_simplified )
+
                 aVertex, lIndex_outlet, aIndex_headwater,aIndex_middle, aIndex_confluence, aConnectivity, pVertex_outlet = find_flowline_confluence(aFlowline_basin_simplified,  pVertex_outlet)
                 if self.iFlag_debug ==1:
                     sFilename_out = 'flowline_vertex_with_confluence_'+ sStep +'_before_intersect.geojson'
@@ -558,13 +569,27 @@ class pybasin(object):
                     sFilename_out = 'flowline_merge_'+ sStep +'_before_intersect.geojson'
                     sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
                     export_flowline_to_geojson( aFlowline_basin_simplified,  sFilename_out)
+
+                aFlowline_basin_simplified = update_head_water_stream_order(aFlowline_basin_simplified )
                     
                 ptimer.stop()
                 if len(aFlowline_basin_simplified) == 1:
-                    break
-                
+                    break               
                 
             sys.stdout.flush()
+        else: #if we dont remove small river, we still need to merge the flowline
+            aVertex, lIndex_outlet, aIndex_headwater,aIndex_middle, aIndex_confluence, aConnectivity, pVertex_outlet = find_flowline_confluence(aFlowline_basin_simplified,  pVertex_outlet)
+            if self.iFlag_debug ==1:
+                sFilename_out = 'flowline_vertex_with_confluence_before_intersect.geojson'
+                sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
+                export_vertex_to_geojson( aVertex,  sFilename_out, aAttribute_data=aConnectivity)
+            aFlowline_basin_simplified = merge_flowline( aFlowline_basin_simplified, aVertex, pVertex_outlet, aIndex_headwater,aIndex_middle, aIndex_confluence  )  
+            if self.iFlag_debug ==1:
+                sFilename_out = 'flowline_merge_before_intersect.geojson'
+                sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
+                export_flowline_to_geojson( aFlowline_basin_simplified,  sFilename_out)
+            aFlowline_basin_simplified = update_head_water_stream_order(aFlowline_basin_simplified )
+            pass
         
         #the final vertex info
         print('Basin ',  self.sBasinID, 'find flowline confluence')
@@ -575,18 +600,10 @@ class pybasin(object):
         sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
         export_vertex_to_geojson( aVertex,  sFilename_out, aAttribute_data=aConnectivity)
         
-
-        aVertex = np.array(aVertex)
-        aIndex_confluence = np.array(aIndex_confluence)
-        if aIndex_confluence.size > 0:        
-            print('Basin ',  self.sBasinID, 'started confluence definition')
-            ptimer.start()
-            aVertex_confluence = aVertex[aIndex_confluence]
-            self.aConfluence_basin_simplified = self.build_confluence(aFlowline_basin_simplified, aVertex_confluence) 
-            ptimer.stop()
+        #starting here, the self object can be updated because no more edit (add/remove) will be made to the flowline
+        #but attributes will be updated
         
-
-        #build segment index
+        #build segment index, they are reversed
         print('Basin ',  self.sBasinID, 'started stream segment definition')
         ptimer.start()
         aFlowline_basin_simplified, aStream_segment = define_stream_segment_index(aFlowline_basin_simplified)
@@ -598,11 +615,26 @@ class pybasin(object):
                 aAttribute_data=[aStream_segment], 
                 aAttribute_field=['stream_segment'], 
                 aAttribute_dtype=['int'])
+
+        aVertex = np.array(aVertex)
+        aIndex_confluence = np.array(aIndex_confluence)
+        if aIndex_confluence.size > 0:        
+            print('Basin ',  self.sBasinID, 'started confluence definition')
+            ptimer.start()
+            aVertex_confluence = aVertex[aIndex_confluence]
+            aConfluence_basin_simplified = self.build_confluence(aFlowline_basin_simplified, aVertex_confluence) 
+            ptimer.stop()
+
+        #change added a new function to build stream topology
+        print('Basin ',  self.sBasinID, 'started stream topology definition')
+        ptimer.start()
+        aFlowline_basin_simplified = define_stream_topology(aFlowline_basin_simplified, aConfluence_basin_simplified)
+        ptimer.stop()
             
         #build stream order 
         print('Basin ',  self.sBasinID, 'started stream order definition')
         ptimer.start()
-        aFlowline_basin_simplified, aStream_order = define_stream_order(aFlowline_basin_simplified)
+        aFlowline_basin_simplified, aStream_order = define_stream_order(aFlowline_basin_simplified, aConfluence_basin_simplified)
         ptimer.stop()
         sFilename_out = self.sFilename_flowline_simplified        
         export_flowline_to_geojson(aFlowline_basin_simplified, 
@@ -620,6 +652,7 @@ class pybasin(object):
             sFilename_out = self.sFilename_flowline_split
             export_flowline_to_geojson(  aFlowline_basin_simplified_split, sFilename_out  )
 
+        self.aConfluence_basin_simplified = aConfluence_basin_simplified
         self.aFlowline_basin_simplified= aFlowline_basin_simplified
         print('Finish flowline simplification:',  self.sBasinID)
         sys.stdout.flush()
@@ -696,6 +729,8 @@ class pybasin(object):
             sFilename_out = 'flowline_edge_remove_flowline_loop.geojson'
             sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
             export_flowline_to_geojson( aFlowline_basin_conceptual,  sFilename_out)
+
+        aFlowline_basin_conceptual = update_head_water_stream_order(aFlowline_basin_conceptual )
   
         aVertex, lIndex_outlet, aIndex_headwater,aIndex_middle, aIndex_confluence, aConnectivity, pVertex_outlet\
             = find_flowline_confluence(aFlowline_basin_conceptual,  pVertex_outlet)
@@ -705,22 +740,32 @@ class pybasin(object):
             export_vertex_to_geojson( aVertex,  sFilename_out, aAttribute_data=aConnectivity)
         
         #segment based
-        aFlowline_basin_conceptual = merge_flowline( aFlowline_basin_conceptual,aVertex, pVertex_outlet, aIndex_headwater,aIndex_middle, aIndex_confluence  )                          
+        aFlowline_basin_conceptual = merge_flowline( aFlowline_basin_conceptual,aVertex, pVertex_outlet, aIndex_headwater,aIndex_middle, aIndex_confluence  )     
+
+        aFlowline_basin_conceptual = update_head_water_stream_order(aFlowline_basin_conceptual )            
+
         aVertex, lIndex_outlet, aIndex_headwater,aIndex_middle, aIndex_confluence, aConnectivity, pVertex_outlet\
-            = find_flowline_confluence(aFlowline_basin_conceptual,  pVertex_outlet)        
+            = find_flowline_confluence(aFlowline_basin_conceptual,  pVertex_outlet)   
+             
         aFlowline_basin_conceptual, aStream_segment = define_stream_segment_index(aFlowline_basin_conceptual)
-        aFlowline_basin_conceptual, aStream_order = define_stream_order(aFlowline_basin_conceptual)
 
         #save confluence
         aVertex = np.array(aVertex)
         aIndex_confluence = np.array(aIndex_confluence)
         if aIndex_confluence.size > 0:        
             aVertex_confluence = aVertex[aIndex_confluence] 
-            self.aConfluence_basin_conceptual = self.build_confluence(aFlowline_basin_conceptual, aVertex_confluence) 
+            aConfluence_basin_conceptual = self.build_confluence(aFlowline_basin_conceptual, aVertex_confluence) 
         else:
             #there is no confluence
             pass
-          
+
+        #change added a new function to build stream topology
+        print('Basin ',  self.sBasinID, 'started stream topology definition')
+        ptimer.start()
+        aFlowline_basin_conceptual = define_stream_topology(aFlowline_basin_conceptual, aConfluence_basin_conceptual)
+        ptimer.stop()
+
+        aFlowline_basin_conceptual, aStream_order = define_stream_order(aFlowline_basin_conceptual, aConfluence_basin_conceptual)
 
         #edge based
         aFlowline_basin_edge, aEdge = split_flowline_to_edge(aFlowline_basin_conceptual)
@@ -734,6 +779,7 @@ class pybasin(object):
             aAttribute_field=['stream_segment','stream_order'], 
             aAttribute_dtype=['int','int'])
 
+        self.aConfluence_basin_conceptual = aConfluence_basin_conceptual
         self.aFlowline_basin_conceptual = aFlowline_basin_conceptual     
         
         self.lCellID_outlet = lCellID_outlet

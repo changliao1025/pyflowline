@@ -34,6 +34,14 @@ if iFlag_kml is not None:
 else:
     pass
 
+iFlag_cython = importlib.util.find_spec("cython") 
+if iFlag_cython is not None:
+    from pyflowline.external.tinyr.tinyr.tinyr import RTree
+    iFlag_use_rtree = 1
+else:
+    iFlag_use_rtree =0
+    pass
+
 from pyflowline.mesh.hexagon.create_hexagon_mesh import create_hexagon_mesh
 from pyflowline.mesh.latlon.create_latlon_mesh import create_latlon_mesh
 from pyflowline.mesh.square.create_square_mesh import create_square_mesh
@@ -832,17 +840,14 @@ class flowlinecase(object):
 
                                     print('Unsupported mesh type?')
                                 return
-        else:
-            #read mesh? this function is not completed
-            iMesh_type = self.iMesh_type
-            aCell_out = read_mesh_json_w_topology(iMesh_type, self.sFilename_mesh)
+        else:            
             pass
 
         
         print('Finish mesh generation.')
         return aCell_out
 
-    def reconstruct_topological_relationship(self, aCell_raw):
+    def reconstruct_topological_relationship(self):
         """
         The topological relationship reconstruction operation
 
@@ -859,8 +864,7 @@ class flowlinecase(object):
             sWorkspace_output = self.sWorkspace_output
             nOutlet = self.nOutlet
             sFilename_mesh=self.sFilename_mesh
-            self.aCell, pSpatial_reference_mesh = read_mesh_json(iMesh_type, sFilename_mesh)
-            self.aCell = self.merge_cell_info(aCell_raw)
+            #self.aCell = aCell_raw should ready in the second step
             aFlowline_conceptual = list()   #store all the flowline
             aCellID_outlet = list()
             aBasin = list()
@@ -910,13 +914,28 @@ class flowlinecase(object):
                             print(pVertex_end.tojson())
                             pass
 
+            #update length using rtree
+            if iFlag_use_rtree == 1:
+                interleaved = True
+                index_mesh = RTree(interleaved=interleaved, max_cap=5, min_cap=2)
+                for i in range(len(self.aCell)):
+                    lID = i 
+                    pBound = self.aCell[i].pBound                
+                    #pBound= (left, bottom, right, top)
+                    index_mesh.insert(lID, pBound)  #  
 
-
-                #update length?
-            for pCell in self.aCell:
                 for pCell2 in aCell_intersect:
-                    if pCell2.lCellID == pCell.lCellID:
-                        pCell.dLength_flowline = pCell2.dLength_flowline
+                    pBound = pCell2.pBound
+                    aIntersect = list(index_mesh.search(pBound))
+                    for k in aIntersect:
+                        pCell = self.aCell[k]
+                        if pCell2.lCellID == pCell.lCellID:
+                            pCell.dLength_flowline = pCell2.dLength_flowline
+            else:
+                for pCell in self.aCell:
+                    for pCell2 in aCell_intersect:
+                        if pCell2.lCellID == pCell.lCellID:
+                            pCell.dLength_flowline = pCell2.dLength_flowline
 
             self.aFlowline_conceptual = aFlowline_conceptual
             self.aCellID_outlet = aCellID_outlet
@@ -932,6 +951,7 @@ class flowlinecase(object):
 
         Args:
             aCell_raw (list [pycell]): The original cell information that contains neighbor definition
+            This information is defined in the mesh generation function, so mesh generation must be run.
 
         Returns:
             list [pycell]: The updated list of cell objects.
@@ -1013,17 +1033,28 @@ class flowlinecase(object):
         """
         aCell_out = None
         if self.iFlag_flowline == 1:
-            self.flowline_simplification()
-            aCell = self.mesh_generation()
-            if self.iFlag_intersect ==1:
-                aCell_out, a, b = self.reconstruct_topological_relationship(aCell)
-            else:
-                pass
+            self.flowline_simplification()       
         else:
-            #only mesh generator
-            aCell = self.mesh_generation(iFlag_antarctic_in= self.iFlag_antarctic)
-            self.aCell = aCell
-            aCell_out = aCell
+            pass            
+
+        if self.iFlag_create_mesh:
+            self.aCell = self.mesh_generation(iFlag_antarctic_in= self.iFlag_antarctic)
+            aCell_out = self.aCell
+            pass
+        else:
+            #may be read mesh           
+            iMesh_type = self.iMesh_type
+            #there must be some auxiliary file associated with the mesh file
+            self.aCell = read_mesh_json_w_topology(iMesh_type, self.sFilename_mesh)             
+            aCell_out = self.aCell
+            pass
+
+        if self.iFlag_intersect == 1:
+            self.aCell, a, b = self.reconstruct_topological_relationship()
+            aCell_out = self.aCell
+            pass
+        else:
+            pass
 
         return aCell_out
 

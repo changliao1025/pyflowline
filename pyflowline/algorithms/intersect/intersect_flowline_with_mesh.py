@@ -60,7 +60,7 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh_in, sFilename_flo
     pLayerDefn = pLayerOut.GetLayerDefn()
     pFeatureOut = ogr.Feature(pLayerDefn)   
 
-    lID_flowline = 0          
+    lFlowlineID = 0          
     aFlowline_intersect_all=list() 
     if iFlag_use_rtree ==1: #use the rtree to speed up 
         #index_flowline = rtree.index.Index()
@@ -114,7 +114,7 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh_in, sFilename_flo
                         iStream_order = pFeature_flowline.GetField("stream_order")
                         if pGeometrytype_intersect == 'LINESTRING':
                             pFeatureOut.SetGeometry(pGeometry_intersect)
-                            pFeatureOut.SetField("lineid", lID_flowline)         
+                            pFeatureOut.SetField("lineid", lFlowlineID)         
                             pFeatureOut.SetField("stream_segment", iStream_segment)    
                             pFeatureOut.SetField("stream_order", iStream_order)           
                             pLayerOut.CreateFeature(pFeatureOut)    
@@ -125,14 +125,14 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh_in, sFilename_flo
                                 aCoords.append( [ pt[0], pt[1]]) 
 
                             dummy1= np.array(aCoords)
-                            pLine = convert_gcs_coordinates_to_flowline(dummy1)
-                            pLine.calculate_length()
-                            pLine.lIndex = lID_flowline
-                            pLine.iStream_segment = iStream_segment
-                            pLine.iStream_order = iStream_order
-                            aFlowline_intersect.append(pLine)
-                            aFlowline_intersect_all.append(pLine)
-                            lID_flowline = lID_flowline + 1
+                            pFlowline = convert_gcs_coordinates_to_flowline(dummy1)
+                            pFlowline.calculate_length()
+                            pFlowline.lFlowlineIndex = lFlowlineID
+                            pFlowline.iStream_segment = iStream_segment
+                            pFlowline.iStream_order = iStream_order
+                            aFlowline_intersect.append(pFlowline)
+                            aFlowline_intersect_all.append(pFlowline)
+                            lFlowlineID = lFlowlineID + 1
 
                         else:
                             if(pGeometrytype_intersect == 'MULTILINESTRING'):
@@ -140,7 +140,7 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh_in, sFilename_flo
                                 for i in range(nLine):
                                     Line = pGeometry_intersect.GetGeometryRef(i) 
                                     pFeatureOut.SetGeometry(Line)
-                                    pFeatureOut.SetField("lineid", lID_flowline)         
+                                    pFeatureOut.SetField("lineid", lFlowlineID)         
                                     pFeatureOut.SetField("stream_segment", iStream_segment)    
                                     pFeatureOut.SetField("stream_order", iStream_order)           
                                     pLayerOut.CreateFeature(pFeatureOut)    
@@ -150,14 +150,14 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh_in, sFilename_flo
                                         aCoords.append( [ pt[0], pt[1]]) 
 
                                     dummy1= np.array(aCoords)
-                                    pLine = convert_gcs_coordinates_to_flowline(dummy1)
-                                    pLine.calculate_length()
-                                    pLine.lIndex = lID_flowline
-                                    pLine.iStream_segment = iStream_segment
-                                    pLine.iStream_order = iStream_order
-                                    aFlowline_intersect.append(pLine)
-                                    aFlowline_intersect_all.append(pLine)
-                                    lID_flowline = lID_flowline + 1
+                                    pFlowline = convert_gcs_coordinates_to_flowline(dummy1)
+                                    pFlowline.calculate_length()
+                                    pFlowline.lFlowlineIndex = lFlowlineID
+                                    pFlowline.iStream_segment = iStream_segment
+                                    pFlowline.iStream_order = iStream_order
+                                    aFlowline_intersect.append(pFlowline)
+                                    aFlowline_intersect_all.append(pFlowline)
+                                    lFlowlineID = lFlowlineID + 1
                                 pass
                             else:
                                 pass                            
@@ -230,7 +230,7 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh_in, sFilename_flo
                         pGeometrytype_intersect = pGeometry_intersect.GetGeometryName()
                         if pGeometrytype_intersect == 'LINESTRING':
                             pFeatureOut.SetGeometry(pGeometry_intersect)
-                            pFeatureOut.SetField("lineid", lID_flowline)         
+                            pFeatureOut.SetField("lineid", lFlowlineID)         
                             pFeatureOut.SetField("stream_segment", iStream_segment)    
                             pFeatureOut.SetField("stream_order", iStream_order)           
                             pLayerOut.CreateFeature(pFeatureOut)    
@@ -241,14 +241,14 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh_in, sFilename_flo
                                 aCoords.append( [ pt[0], pt[1]]) 
 
                             dummy1= np.array(aCoords)
-                            pLine = convert_gcs_coordinates_to_flowline(dummy1)
-                            pLine.calculate_length()
-                            pLine.lIndex = lID_flowline
-                            pLine.iStream_segment = iStream_segment
-                            pLine.iStream_order = iStream_order
-                            aFlowline_intersect.append(pLine)
-                            aFlowline_intersect_all.append(pLine)
-                            lID_flowline = lID_flowline + 1
+                            pFlowline = convert_gcs_coordinates_to_flowline(dummy1)
+                            pFlowline.calculate_length()
+                            pFlowline.lFlowlineIndex = lFlowlineID
+                            pFlowline.iStream_segment = iStream_segment
+                            pFlowline.iStream_order = iStream_order
+                            aFlowline_intersect.append(pFlowline)
+                            aFlowline_intersect_all.append(pFlowline)
+                            lFlowlineID = lFlowlineID + 1
 
                         else:
                             if(pGeometrytype_intersect == 'MULTILINESTRING'):
@@ -256,7 +256,7 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh_in, sFilename_flo
                                 for i in range(nLine):
                                     Line = pGeometry_intersect.GetGeometryRef(i) 
                                     pFeatureOut.SetGeometry(Line)
-                                    pFeatureOut.SetField("lineid", lID_flowline)         
+                                    pFeatureOut.SetField("lineid", lFlowlineID)         
                                     pFeatureOut.SetField("stream_segment", iStream_segment)    
                                     pFeatureOut.SetField("stream_order", iStream_order)           
                                     pLayerOut.CreateFeature(pFeatureOut)    
@@ -266,14 +266,14 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh_in, sFilename_flo
                                         aCoords.append( [ pt[0], pt[1]]) 
 
                                     dummy1= np.array(aCoords)
-                                    pLine = convert_gcs_coordinates_to_flowline(dummy1)
-                                    pLine.calculate_length()
-                                    pLine.lIndex = lID_flowline
-                                    pLine.iStream_segment = iStream_segment
-                                    pLine.iStream_order = iStream_order
-                                    aFlowline_intersect.append(pLine)
-                                    aFlowline_intersect_all.append(pLine)
-                                    lID_flowline = lID_flowline + 1
+                                    pFlowline = convert_gcs_coordinates_to_flowline(dummy1)
+                                    pFlowline.calculate_length()
+                                    pFlowline.lFlowlineIndex = lFlowlineID
+                                    pFlowline.iStream_segment = iStream_segment
+                                    pFlowline.iStream_order = iStream_order
+                                    aFlowline_intersect.append(pFlowline)
+                                    aFlowline_intersect_all.append(pFlowline)
+                                    lFlowlineID = lFlowlineID + 1
                                 pass
                             else:
                                 pass                            

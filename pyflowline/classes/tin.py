@@ -18,7 +18,7 @@ class TINClassEncoder(JSONEncoder):
         if isinstance(obj, list):
             pass  
         if isinstance(obj, pyvertex):
-            return json.loads(obj.tojson()) #lVertexID
+            return json.loads(obj.tojson()) 
         if isinstance(obj, pyedge):
             return obj.lEdgeID        
         if isinstance(obj, pyflowline):

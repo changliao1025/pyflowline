@@ -56,7 +56,7 @@ def find_vertex_on_edge(aVertex_in, pEdge_in):
                     aIndex.append(k) 
                     npoint = npoint + 1          
                 else:                
-                    if  diff < 1.0:
+                    if diff < 1.0:
                         iFlag_overlap = pEdge_in.check_vertex_on_edge(pVertex)
 
                     pass

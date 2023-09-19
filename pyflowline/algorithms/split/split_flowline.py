@@ -47,7 +47,9 @@ def split_flowline(aFlowline_in, aVertex_in, iFlag_intersect = None, iFlag_use_i
             iFlag_exist, lIndex = find_vertex_in_list( aVertex_in,  pVertex)
             if iFlag_exist == 1:                
                 iPart = iPart + 1
-                aVertex.append(pVertex)            
+                aVertex.append(pVertex)   
+                pass
+
             if iFlag_intersect is not None:
                 if iFlag_use_id is not None:
                     aDistance = list()
@@ -78,6 +80,7 @@ def split_flowline(aFlowline_in, aVertex_in, iFlag_intersect = None, iFlag_use_i
                             pVertex_dummy = aVertex_in[ aIndex_order[k]  ] 
                             aVertex.append(pVertex_dummy)
                             aVertex_all.append(pVertex_dummy)
+                            pass
 
                 else:
                     iFlag_exist, npoint, aIndex = find_vertex_on_edge( aVertex_in, pEdge)
@@ -88,7 +91,9 @@ def split_flowline(aFlowline_in, aVertex_in, iFlag_intersect = None, iFlag_use_i
                             iPart = iPart + 1
                             aVertex.append(pVertex_dummy)
                             aVertex_all.append(pVertex_dummy)
+                            pass
                         pass
+
         #the last ending vertex
         pVertex = pFlowline.pVertex_end
         aVertex_all.append(pVertex)
@@ -116,6 +121,8 @@ def split_flowline(aFlowline_in, aVertex_in, iFlag_intersect = None, iFlag_use_i
                         iFlag_exist, lIndex = find_vertex_in_list( aVertex_all,  pVertex)
                         if iFlag_exist ==1:
                             aVertex_index.append(lIndex)
+                            pass
+
                     #find duplicate
                     for k in range(nLine):
                         t = aVertex_index[k]
@@ -128,6 +135,7 @@ def split_flowline(aFlowline_in, aVertex_in, iFlag_intersect = None, iFlag_use_i
                                 pEdge = pyedge(pVertex0, pVertex1)
                                 aEdge.append(pEdge)
                                 pass
+
                             pFlowline1 = pyflowline(aEdge)
                             pFlowline1.iStream_order = iStream_order
                             pFlowline1.iFlag_dam = iFlag_dam

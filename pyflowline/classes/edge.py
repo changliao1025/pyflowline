@@ -25,7 +25,7 @@ class EdgeClassEncoder(JSONEncoder):
         if isinstance(obj, list):
             pass  
         if isinstance(obj, pyvertex):
-            return json.loads(obj.tojson()) #lVertexID
+            return json.loads(obj.tojson()) 
           
             
         return JSONEncoder.default(self, obj)
@@ -42,7 +42,7 @@ class pyedge(object):
 
 
     lEdgeID=-1
-    lIndex=-1
+    lEdgeIndex=-1
     pVertex_start = None
     pVertex_end = None
     dLength=0.0    

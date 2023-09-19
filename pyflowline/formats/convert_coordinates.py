@@ -178,6 +178,15 @@ def convert_pcs_coordinates_to_cell(iMesh_type_in, aCoordinates_pcs_in, pSpatial
 
 
 def convert_gcs_coordinates_to_flowline(aCoordinates_in):
+    """convert coordinates to flowline, but we cannot setup index and id yet
+
+    Args:
+        aCoordinates_in (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
+    
     npoint = len(aCoordinates_in)
     
     aVertex=list()
@@ -199,8 +208,8 @@ def convert_gcs_coordinates_to_flowline(aCoordinates_in):
             pEdge = pyedge( aVertex[j], aVertex[j+1] )
             aEdge.append(pEdge)
     
-    pLine = pyflowline( aEdge)    
-    return pLine
+    pFlowline = pyflowline( aEdge)    
+    return pFlowline
 
 def convert_pcs_coordinates_to_flowline(aCoordinates_in, pSpatial_reference_in):
     npoint = len(aCoordinates_in)
@@ -223,6 +232,6 @@ def convert_pcs_coordinates_to_flowline(aCoordinates_in, pSpatial_reference_in):
         pEdge = pyedge( aVertex[j], aVertex[j+1] )
         aEdge.append(pEdge)
     
-    pLine = pyflowline( aEdge)
+    pFlowline = pyflowline( aEdge)
     
-    return pLine
+    return pFlowline

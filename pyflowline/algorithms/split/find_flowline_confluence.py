@@ -6,6 +6,8 @@ import numpy as np
 
 import importlib
 iFlag_cython = importlib.util.find_spec("cython") 
+
+from pyflowline.algorithms.split.find_flowline_vertex import find_flowline_vertex
 if iFlag_cython is not None:
     from pyflowline.algorithms.cython.kernel import add_unique_vertex
     from pyflowline.algorithms.cython.kernel import find_vertex_in_list
@@ -33,13 +35,15 @@ def find_flowline_confluence(aFlowline_in, pVertex_outlet_in):
 
     #add all the flowline start and end vertex into a host list
     #because the flowlines are order from outlet to headwater, there is no order in vertex list
-    for i in range(0, nFlowline):      
-        pFlowline = aFlowline_in[i]
-        pVertex_start = pFlowline.pVertex_start
-        pVertex_end = pFlowline.pVertex_end
-        aVertex, dummy = add_unique_vertex(aVertex, pVertex_start)
-        aVertex, dummy = add_unique_vertex(aVertex, pVertex_end)
-        pass
+    #for i in range(0, nFlowline):      
+    #    pFlowline = aFlowline_in[i]
+    #    pVertex_start = pFlowline.pVertex_start
+    #    pVertex_end = pFlowline.pVertex_end
+    #    aVertex, dummy = add_unique_vertex(aVertex, pVertex_start)
+    #    aVertex, dummy = add_unique_vertex(aVertex, pVertex_end)
+    #    pass
+
+    aVertex = find_flowline_vertex(aFlowline_in)
 
     nVertex=len(aVertex)
     aConnectivity  = np.full(  nVertex , 0, dtype=int )

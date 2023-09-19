@@ -73,13 +73,13 @@ def merge_flowline(aFlowline_in,
         if find_vertex_in_list(aVertex_headwater.tolist(), pVertex_current)[0] ==1: 
             pFlowline.iStream_segment = iSegment      
             pFlowline.iStream_order = 1           
-            pFlowline.lIndex = lID
+            pFlowline.lFlowlineIndex = lID
             aFlowline_out.append(pFlowline)        
             lID = lID + 1 
             return
         else:
             pFlowline.iStream_segment = iSegment              
-            pFlowline.lIndex = lID
+            pFlowline.lFlowlineIndex = lID
             aFlowline_out.append(pFlowline)        
             lID = lID + 1 
             #confluence

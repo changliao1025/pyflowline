@@ -66,7 +66,7 @@ class BasinClassEncoder(JSONEncoder):
         if isinstance(obj, list):
             pass  
         if isinstance(obj, pyvertex):
-            return json.loads(obj.tojson()) #lVertexID
+            return json.loads(obj.tojson()) 
         if isinstance(obj, pyedge):
             return obj.lEdgeID        
         if isinstance(obj, pyflowline):
@@ -259,8 +259,6 @@ class pybasin(object):
             self.sMesh_type =  aParameter['sMesh_type']
         else:
             self.sMesh_type = 'hexagon'
-
-
 
         sMesh_type = self.sMesh_type
         if sMesh_type =='hexagon': #hexagon
@@ -469,6 +467,9 @@ class pybasin(object):
         #calculate length
         self.aFlowline_basin_filtered = aFlowline_basin_filtered
         self.dLength_flowline_filtered = self.calculate_flowline_length(aFlowline_basin_filtered)
+
+        #assign vertex id
+        
 
         #simplification started
         print('Basin ',  self.sBasinID, 'find flowline vertex')

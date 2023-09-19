@@ -33,12 +33,13 @@ def find_vertex_in_list(aVertex_in, pVertex_in, dThreshold_in=1.0E-6):
             lID = i 
             x=aVertex_in[i].dLongitude_degree
             y=aVertex_in[i].dLatitude_degree   
-            left= x - 1E-5
-            right= x + 1E-5
-            bottom= y-1E-5
-            top=    y+1E-5
-            pBound= (left, bottom, right, top)
+            left   = x - 1E-5
+            right  = x + 1E-5
+            bottom = y - 1E-5
+            top    = y + 1E-5
+            pBound = (left, bottom, right, top)
             index_vertex.insert(lID, pBound)  # 
+            pass
 
         #now the new vertex
         x=pVertex_in.dLongitude_degree
@@ -52,9 +53,9 @@ def find_vertex_in_list(aVertex_in, pVertex_in, dThreshold_in=1.0E-6):
 
         for k in aIntersect:
             pVertex = aVertex_in[k]
-            dDistance = pVertex.calculate_distance(pVertex_in)
-            #if pVertex == pVertex_in:
-            if dDistance < dThreshold_in:
+            #dDistance = pVertex.calculate_distance(pVertex_in)
+            if pVertex == pVertex_in: #if dDistance < dThreshold_in:
+            
                 iFlag_exist = 1      
                 lIndex = k
                 break                
@@ -66,9 +67,9 @@ def find_vertex_in_list(aVertex_in, pVertex_in, dThreshold_in=1.0E-6):
         if nVertex > 0 :
             for i in np.arange( nVertex):
                 pVertex = aVertex_in[i]
-                dDistance = pVertex.calculate_distance(pVertex_in)
-                #if pVertex == pVertex_in:
-                if dDistance < dThreshold_in:
+                #dDistance = pVertex.calculate_distance(pVertex_in)
+                if pVertex == pVertex_in: #if dDistance < dThreshold_in:
+                
                     iFlag_exist = 1      
                     lIndex = i 
                     break                

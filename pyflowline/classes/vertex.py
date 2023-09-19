@@ -31,8 +31,7 @@ class pyvertex(object):
  
     
   
-    lIndex=-1 
-    """this index will be used for array - class variable"""
+    lVerterIndex=-1 #this index will be used for array - class variable    
     lVertexID=-1
     lFlowlineID = -1  #we use this id only for intersect
     dX_meter=-9999
@@ -61,7 +60,7 @@ class pyvertex(object):
         if 'z' in aParameter:            
             self.dZ_meter             = float(aParameter['z'])
         
-        #longitude and latitude are always required     
+        #dLongitude and dLatitude are always required     
         try:     
             self.dLongitude_degree      = float(aParameter['dLongitude_degree'])      
             """dLongitude_degree - object variable"""           
@@ -101,6 +100,24 @@ class pyvertex(object):
         pNvector = pynvector(point)
         return pNvector
     
+    def __hash__(self, precision=6):
+
+        #design a hash function that uses both dLongitude and dLatitude
+
+        # Scale the dLatitude and dLongitude to a suitable range
+        dLongitude = self.dLongitude_degree
+        dLatitude = self.dLatitude_degree
+
+        scale_factor = 10 ** precision
+        scaled_latitude = int((dLatitude + 90)* scale_factor)
+        scaled_longitude = int((dLongitude + 180)* scale_factor)
+
+        # Combine the scaled values into a single hash code
+        hash_code = (scaled_latitude << 32) | scaled_longitude
+        
+
+        return hash_code
+    
     def __eq__(self, other):
         """
         Check whether two vertices are equivalent
@@ -111,14 +128,23 @@ class pyvertex(object):
         Returns:
             int: 1 if equivalent, 0 if not
         """
-        iFlag = -1
-        dThreshold_in = 1.0E-6        
-        c = self.calculate_distance(other)
-        if( c <= dThreshold_in ): #be careful
-            #print(self.dLongitude_degree ,self.dLatitude_degree , other.dLongitude_degree, other.dLatitude_degree)
-            iFlag = 1
+        iFlag = False
+        #dThreshold_in = 1.0E-6        
+        if isinstance(other, pyvertex):
+            #c = self.calculate_distance(other)
+            #if( c <= dThreshold_in ): #be careful
+            #    #print(self.dLongitude_degree ,self.dLatitude_degree , 
+            #    #other.dLongitude_degree, other.dLatitude_degree)
+            #    iFlag = True
+            #else:
+            #    iFlag = False    
+            if (self.dLongitude_degree == other.dLongitude_degree) and \
+                (self.dLatitude_degree == other.dLatitude_degree):
+                iFlag = True
+            else:
+                iFlag = False
         else:
-            iFlag = 0       
+            iFlag = False 
 
         return iFlag
 

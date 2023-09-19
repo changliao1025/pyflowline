@@ -35,7 +35,7 @@ def remove_flowline_loop(aFlowline_in):
         ndownstream , aDownstream, aStream_order = find_paralle_stream( pVertex_start)
         if ndownstream == 1:
             if aFlag[i] !=1:
-                pFlowline.lIndex = lID
+                pFlowline.lFlowlineIndex = lID
                 aFlowline_out.append(pFlowline)
                 lID = lID + 1
                 aFlag[i]=1
@@ -48,7 +48,7 @@ def remove_flowline_loop(aFlowline_in):
                 lIndex = aDownstream[ sort_index[0] ]
                 pFlowline_down =  aFlowline_in[lIndex]          
                 if aFlag[ lIndex ]  !=1:
-                    pFlowline_down.lIndex = lID
+                    pFlowline_down.lFlowlineIndex = lID
                     aFlowline_out.append(pFlowline_down)
                     lID = lID + 1
                     aFlag[lIndex]=1

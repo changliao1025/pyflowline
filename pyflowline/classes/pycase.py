@@ -1008,7 +1008,15 @@ class flowlinecase(object):
     def change_model_parameter(self, sVariable_in, dValue, iFlag_basin_in = None):
         if iFlag_basin_in is None:
             if hasattr(self, sVariable_in):
-                setattr(self, sVariable_in, dValue)
+                #get default data type                
+                sType_default = type(getattr(self, sVariable_in))
+                #get the data type of the input value
+                sType_input = type(dValue)
+                if sType_default == sType_input:      
+                    setattr(self, sVariable_in, dValue)
+                    pass   
+                else:
+                    print('Incorrect data type for the input value: ' + sVariable_in)
                 return True
             else:
                 print("This model parameter is unknown, please check the full parameter list in the documentation: " + sVariable_in)
@@ -1017,8 +1025,14 @@ class flowlinecase(object):
             #this mean the variable is in the basin object
             for pBasin in self.aBasin:
                 if hasattr(pBasin, sVariable_in):
-                    setattr(pBasin, sVariable_in, dValue)
-                    return True
+                    #get default data type
+                    sType_default = type(getattr(pBasin, sVariable_in))
+                    sType_input = type(dValue)
+                    if sType_default == sType_input:      
+                        setattr(pBasin, sVariable_in, dValue)
+                    else:
+                        print('Incorrect data type for the input value: ' + sVariable_in)                       
+                        return False
                 else:
                     print("This model parameter is unknown, please check the full parameter list in the documentation: " + sVariable_in)
                     return False

@@ -100,7 +100,7 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh_in, sFilename_flo
 
                 left, right, bottom, top= pGeometry_mesh.GetEnvelope()   
                 pBound= (left, bottom, right, top)
-                #aIntersect = list(index_flowline.intersection(pBound))
+     
                 aIntersect = list(index_flowline.search(pBound))
                 for k in aIntersect:
                     pFeature_flowline = pLayer_flowline.GetFeature(k)

@@ -102,7 +102,8 @@ def basin_plot(self,
                             aFiletype_in = [2, 2, 2]
                             aFilename_in = [sFilename0, sFilename1, sFilename2]
                             map_multiple_vector_data(aFiletype_in,
-                                             aFilename_in,                           
+                                             aFilename_in,  
+                                             iFlag_title_in=iFlag_title_in,                         
                                              iFont_size_in=iFont_size_in,                 
                                              sFilename_output_in=sFilename_output_in,
                                              sTitle_in= 'Flow direction with observation',

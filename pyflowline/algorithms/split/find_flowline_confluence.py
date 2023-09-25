@@ -1,11 +1,13 @@
 
 import numpy as np
 
-from pyflowline.algorithms.auxiliary.check_head_water import check_head_water
+#from pyflowline.algorithms.auxiliary.check_head_water import check_head_water
 
 
 import importlib
 iFlag_cython = importlib.util.find_spec("cython") 
+
+from pyflowline.algorithms.split.find_flowline_vertex import find_flowline_vertex
 if iFlag_cython is not None:
     from pyflowline.algorithms.cython.kernel import add_unique_vertex
     from pyflowline.algorithms.cython.kernel import find_vertex_in_list
@@ -14,19 +16,34 @@ else:
     from pyflowline.algorithms.auxiliary.find_vertex_in_list import find_vertex_in_list
 
 def find_flowline_confluence(aFlowline_in, pVertex_outlet_in):    
+    """_summary_
+
+    Args:
+        aFlowline_in (_type_): _description_
+        pVertex_outlet_in (_type_): _description_
+
+    Returns:
+        List: _description_
+    """
+
     nFlowline = len(aFlowline_in) 
     aVertex=list()
     aIndex_headwater=list()
     aIndex_confluence=list()
     aIndex_middle =list()
     lIndex_outlet = -1
-    for i in range(0, nFlowline):      
-        pFlowline = aFlowline_in[i]
-        pVertex_start = pFlowline.pVertex_start
-        pVertex_end = pFlowline.pVertex_end
-        aVertex, dummy = add_unique_vertex(aVertex, pVertex_start)
-        aVertex, dummy = add_unique_vertex(aVertex, pVertex_end)
-        pass
+
+    #add all the flowline start and end vertex into a host list
+    #because the flowlines are order from outlet to headwater, there is no order in vertex list
+    #for i in range(0, nFlowline):      
+    #    pFlowline = aFlowline_in[i]
+    #    pVertex_start = pFlowline.pVertex_start
+    #    pVertex_end = pFlowline.pVertex_end
+    #    aVertex, dummy = add_unique_vertex(aVertex, pVertex_start)
+    #    aVertex, dummy = add_unique_vertex(aVertex, pVertex_end)
+    #    pass
+
+    aVertex = find_flowline_vertex(aFlowline_in)
 
     nVertex=len(aVertex)
     aConnectivity  = np.full(  nVertex , 0, dtype=int )
@@ -56,11 +73,11 @@ def find_flowline_confluence(aFlowline_in, pVertex_outlet_in):
         pVertex_start = pFlowline.pVertex_start
         pVertex_end = pFlowline.pVertex_end
         
-
         iFlag_exist, lIndex =  find_vertex_in_list(aVertex, pVertex_end)  
         if lIndex != lIndex_outlet:
 
-            if check_head_water(aFlowline_in, pVertex_start)==1:
+            #if check_head_water(aFlowline_in, pVertex_start)==1:
+            if pFlowline.iStream_order == 1:
                 iFlag_exist, lIndex =  find_vertex_in_list(aVertex, pVertex_start)            
                 aConnectivity[lIndex] = 1
                 iFlag_exist, lIndex =  find_vertex_in_list(aVertex, pVertex_end)            

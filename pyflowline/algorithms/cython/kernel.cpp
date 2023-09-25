@@ -994,7 +994,7 @@ struct __pyx_opt_args_6kernel_add_unique_vertex;
 struct __pyx_ctuple_double__and_double__and_double;
 typedef struct __pyx_ctuple_double__and_double__and_double __pyx_ctuple_double__and_double__and_double;
 
-/* "kernel.pyx":59
+/* "kernel.pyx":61
  * 
  * @cython.boundscheck(False)  # deactivate bnds checking
  * cpdef  find_vertex_in_list(list aVertex_in, pVertex_in, double dThreshold_in = 1.0E-6):             # <<<<<<<<<<<<<<
@@ -1006,7 +1006,7 @@ struct __pyx_opt_args_6kernel_find_vertex_in_list {
   double dThreshold_in;
 };
 
-/* "kernel.pyx":134
+/* "kernel.pyx":209
  * 
  * @cython.boundscheck(False)  # deactivate bnds checking
  * cpdef add_unique_vertex(list aVertex_in, pVertex_in, double dThreshold_in = 1.0E-6):             # <<<<<<<<<<<<<<
@@ -1018,7 +1018,7 @@ struct __pyx_opt_args_6kernel_add_unique_vertex {
   double dThreshold_in;
 };
 
-/* "kernel.pyx":181
+/* "kernel.pyx":256
  * 
  * @cython.boundscheck(False)  # deactivate bnds checking
  * cpdef (double, double, double) longlat_to_3d(dLongitude_degree_in, dLatitude_degree_in):             # <<<<<<<<<<<<<<
@@ -1117,105 +1117,6 @@ static int __Pyx_ParseOptionalKeywords(PyObject *kwds, PyObject **argnames[],\
     PyObject *kwds2, PyObject *values[], Py_ssize_t num_pos_args,\
     const char* function_name);
 
-/* GetItemInt.proto */
-#define __Pyx_GetItemInt(o, i, type, is_signed, to_py_func, is_list, wraparound, boundscheck)\
-    (__Pyx_fits_Py_ssize_t(i, type, is_signed) ?\
-    __Pyx_GetItemInt_Fast(o, (Py_ssize_t)i, is_list, wraparound, boundscheck) :\
-    (is_list ? (PyErr_SetString(PyExc_IndexError, "list index out of range"), (PyObject*)NULL) :\
-               __Pyx_GetItemInt_Generic(o, to_py_func(i))))
-#define __Pyx_GetItemInt_List(o, i, type, is_signed, to_py_func, is_list, wraparound, boundscheck)\
-    (__Pyx_fits_Py_ssize_t(i, type, is_signed) ?\
-    __Pyx_GetItemInt_List_Fast(o, (Py_ssize_t)i, wraparound, boundscheck) :\
-    (PyErr_SetString(PyExc_IndexError, "list index out of range"), (PyObject*)NULL))
-static CYTHON_INLINE PyObject *__Pyx_GetItemInt_List_Fast(PyObject *o, Py_ssize_t i,
-                                                              int wraparound, int boundscheck);
-#define __Pyx_GetItemInt_Tuple(o, i, type, is_signed, to_py_func, is_list, wraparound, boundscheck)\
-    (__Pyx_fits_Py_ssize_t(i, type, is_signed) ?\
-    __Pyx_GetItemInt_Tuple_Fast(o, (Py_ssize_t)i, wraparound, boundscheck) :\
-    (PyErr_SetString(PyExc_IndexError, "tuple index out of range"), (PyObject*)NULL))
-static CYTHON_INLINE PyObject *__Pyx_GetItemInt_Tuple_Fast(PyObject *o, Py_ssize_t i,
-                                                              int wraparound, int boundscheck);
-static PyObject *__Pyx_GetItemInt_Generic(PyObject *o, PyObject* j);
-static CYTHON_INLINE PyObject *__Pyx_GetItemInt_Fast(PyObject *o, Py_ssize_t i,
-                                                     int is_list, int wraparound, int boundscheck);
-
-/* PyCFunctionFastCall.proto */
-#if CYTHON_FAST_PYCCALL
-static CYTHON_INLINE PyObject *__Pyx_PyCFunction_FastCall(PyObject *func, PyObject **args, Py_ssize_t nargs);
-#else
-#define __Pyx_PyCFunction_FastCall(func, args, nargs)  (assert(0), NULL)
-#endif
-
-/* PyFunctionFastCall.proto */
-#if CYTHON_FAST_PYCALL
-#define __Pyx_PyFunction_FastCall(func, args, nargs)\
-    __Pyx_PyFunction_FastCallDict((func), (args), (nargs), NULL)
-#if 1 || PY_VERSION_HEX < 0x030600B1
-static PyObject *__Pyx_PyFunction_FastCallDict(PyObject *func, PyObject **args, Py_ssize_t nargs, PyObject *kwargs);
-#else
-#define __Pyx_PyFunction_FastCallDict(func, args, nargs, kwargs) _PyFunction_FastCallDict(func, args, nargs, kwargs)
-#endif
-#define __Pyx_BUILD_ASSERT_EXPR(cond)\
-    (sizeof(char [1 - 2*!(cond)]) - 1)
-#ifndef Py_MEMBER_SIZE
-#define Py_MEMBER_SIZE(type, member) sizeof(((type *)0)->member)
-#endif
-#if CYTHON_FAST_PYCALL
-  static size_t __pyx_pyframe_localsplus_offset = 0;
-  #include "frameobject.h"
-#if PY_VERSION_HEX >= 0x030b00a6
-  #ifndef Py_BUILD_CORE
-    #define Py_BUILD_CORE 1
-  #endif
-  #include "internal/pycore_frame.h"
-#endif
-  #define __Pxy_PyFrame_Initialize_Offsets()\
-    ((void)__Pyx_BUILD_ASSERT_EXPR(sizeof(PyFrameObject) == offsetof(PyFrameObject, f_localsplus) + Py_MEMBER_SIZE(PyFrameObject, f_localsplus)),\
-     (void)(__pyx_pyframe_localsplus_offset = ((size_t)PyFrame_Type.tp_basicsize) - Py_MEMBER_SIZE(PyFrameObject, f_localsplus)))
-  #define __Pyx_PyFrame_GetLocalsplus(frame)\
-    (assert(__pyx_pyframe_localsplus_offset), (PyObject **)(((char *)(frame)) + __pyx_pyframe_localsplus_offset))
-#endif // CYTHON_FAST_PYCALL
-#endif
-
-/* PyObjectCall.proto */
-#if CYTHON_COMPILING_IN_CPYTHON
-static CYTHON_INLINE PyObject* __Pyx_PyObject_Call(PyObject *func, PyObject *arg, PyObject *kw);
-#else
-#define __Pyx_PyObject_Call(func, arg, kw) PyObject_Call(func, arg, kw)
-#endif
-
-/* PyObjectCall2Args.proto */
-static CYTHON_UNUSED PyObject* __Pyx_PyObject_Call2Args(PyObject* function, PyObject* arg1, PyObject* arg2);
-
-/* PyObjectCallMethO.proto */
-#if CYTHON_COMPILING_IN_CPYTHON
-static CYTHON_INLINE PyObject* __Pyx_PyObject_CallMethO(PyObject *func, PyObject *arg);
-#endif
-
-/* PyObjectCallOneArg.proto */
-static CYTHON_INLINE PyObject* __Pyx_PyObject_CallOneArg(PyObject *func, PyObject *arg);
-
-/* ArgTypeTest.proto */
-#define __Pyx_ArgTypeTest(obj, type, none_allowed, name, exact)\
-    ((likely((Py_TYPE(obj) == type) | (none_allowed && (obj == Py_None)))) ? 1 :\
-        __Pyx__ArgTypeTest(obj, type, name, exact))
-static int __Pyx__ArgTypeTest(PyObject *obj, PyTypeObject *type, const char *name, int exact);
-
-/* RaiseTooManyValuesToUnpack.proto */
-static CYTHON_INLINE void __Pyx_RaiseTooManyValuesError(Py_ssize_t expected);
-
-/* RaiseNeedMoreValuesToUnpack.proto */
-static CYTHON_INLINE void __Pyx_RaiseNeedMoreValuesError(Py_ssize_t index);
-
-/* IterFinish.proto */
-static CYTHON_INLINE int __Pyx_IterFinish(void);
-
-/* UnpackItemEndCheck.proto */
-static int __Pyx_IternextUnpackEndCheck(PyObject *retval, Py_ssize_t expected);
-
-/* PyIntCompare.proto */
-static CYTHON_INLINE PyObject* __Pyx_PyInt_EqObjC(PyObject *op1, PyObject *op2, long intval, long inplace);
-
 /* PyDictVersioning.proto */
 #if CYTHON_USE_DICT_VERSIONS && CYTHON_USE_TYPE_SLOTS
 #define __PYX_DICT_VERSION_INIT  ((PY_UINT64_T) -1)
@@ -1263,12 +1164,111 @@ static PyObject *__Pyx__GetModuleGlobalName(PyObject *name, PY_UINT64_T *dict_ve
 static CYTHON_INLINE PyObject *__Pyx__GetModuleGlobalName(PyObject *name);
 #endif
 
+/* PyObjectCall.proto */
+#if CYTHON_COMPILING_IN_CPYTHON
+static CYTHON_INLINE PyObject* __Pyx_PyObject_Call(PyObject *func, PyObject *arg, PyObject *kw);
+#else
+#define __Pyx_PyObject_Call(func, arg, kw) PyObject_Call(func, arg, kw)
+#endif
+
+/* GetItemInt.proto */
+#define __Pyx_GetItemInt(o, i, type, is_signed, to_py_func, is_list, wraparound, boundscheck)\
+    (__Pyx_fits_Py_ssize_t(i, type, is_signed) ?\
+    __Pyx_GetItemInt_Fast(o, (Py_ssize_t)i, is_list, wraparound, boundscheck) :\
+    (is_list ? (PyErr_SetString(PyExc_IndexError, "list index out of range"), (PyObject*)NULL) :\
+               __Pyx_GetItemInt_Generic(o, to_py_func(i))))
+#define __Pyx_GetItemInt_List(o, i, type, is_signed, to_py_func, is_list, wraparound, boundscheck)\
+    (__Pyx_fits_Py_ssize_t(i, type, is_signed) ?\
+    __Pyx_GetItemInt_List_Fast(o, (Py_ssize_t)i, wraparound, boundscheck) :\
+    (PyErr_SetString(PyExc_IndexError, "list index out of range"), (PyObject*)NULL))
+static CYTHON_INLINE PyObject *__Pyx_GetItemInt_List_Fast(PyObject *o, Py_ssize_t i,
+                                                              int wraparound, int boundscheck);
+#define __Pyx_GetItemInt_Tuple(o, i, type, is_signed, to_py_func, is_list, wraparound, boundscheck)\
+    (__Pyx_fits_Py_ssize_t(i, type, is_signed) ?\
+    __Pyx_GetItemInt_Tuple_Fast(o, (Py_ssize_t)i, wraparound, boundscheck) :\
+    (PyErr_SetString(PyExc_IndexError, "tuple index out of range"), (PyObject*)NULL))
+static CYTHON_INLINE PyObject *__Pyx_GetItemInt_Tuple_Fast(PyObject *o, Py_ssize_t i,
+                                                              int wraparound, int boundscheck);
+static PyObject *__Pyx_GetItemInt_Generic(PyObject *o, PyObject* j);
+static CYTHON_INLINE PyObject *__Pyx_GetItemInt_Fast(PyObject *o, Py_ssize_t i,
+                                                     int is_list, int wraparound, int boundscheck);
+
+/* PyFunctionFastCall.proto */
+#if CYTHON_FAST_PYCALL
+#define __Pyx_PyFunction_FastCall(func, args, nargs)\
+    __Pyx_PyFunction_FastCallDict((func), (args), (nargs), NULL)
+#if 1 || PY_VERSION_HEX < 0x030600B1
+static PyObject *__Pyx_PyFunction_FastCallDict(PyObject *func, PyObject **args, Py_ssize_t nargs, PyObject *kwargs);
+#else
+#define __Pyx_PyFunction_FastCallDict(func, args, nargs, kwargs) _PyFunction_FastCallDict(func, args, nargs, kwargs)
+#endif
+#define __Pyx_BUILD_ASSERT_EXPR(cond)\
+    (sizeof(char [1 - 2*!(cond)]) - 1)
+#ifndef Py_MEMBER_SIZE
+#define Py_MEMBER_SIZE(type, member) sizeof(((type *)0)->member)
+#endif
+#if CYTHON_FAST_PYCALL
+  static size_t __pyx_pyframe_localsplus_offset = 0;
+  #include "frameobject.h"
+#if PY_VERSION_HEX >= 0x030b00a6
+  #ifndef Py_BUILD_CORE
+    #define Py_BUILD_CORE 1
+  #endif
+  #include "internal/pycore_frame.h"
+#endif
+  #define __Pxy_PyFrame_Initialize_Offsets()\
+    ((void)__Pyx_BUILD_ASSERT_EXPR(sizeof(PyFrameObject) == offsetof(PyFrameObject, f_localsplus) + Py_MEMBER_SIZE(PyFrameObject, f_localsplus)),\
+     (void)(__pyx_pyframe_localsplus_offset = ((size_t)PyFrame_Type.tp_basicsize) - Py_MEMBER_SIZE(PyFrameObject, f_localsplus)))
+  #define __Pyx_PyFrame_GetLocalsplus(frame)\
+    (assert(__pyx_pyframe_localsplus_offset), (PyObject **)(((char *)(frame)) + __pyx_pyframe_localsplus_offset))
+#endif // CYTHON_FAST_PYCALL
+#endif
+
+/* PyCFunctionFastCall.proto */
+#if CYTHON_FAST_PYCCALL
+static CYTHON_INLINE PyObject *__Pyx_PyCFunction_FastCall(PyObject *func, PyObject **args, Py_ssize_t nargs);
+#else
+#define __Pyx_PyCFunction_FastCall(func, args, nargs)  (assert(0), NULL)
+#endif
+
+/* PyObjectCall2Args.proto */
+static CYTHON_UNUSED PyObject* __Pyx_PyObject_Call2Args(PyObject* function, PyObject* arg1, PyObject* arg2);
+
+/* PyObjectCallMethO.proto */
+#if CYTHON_COMPILING_IN_CPYTHON
+static CYTHON_INLINE PyObject* __Pyx_PyObject_CallMethO(PyObject *func, PyObject *arg);
+#endif
+
+/* PyObjectCallOneArg.proto */
+static CYTHON_INLINE PyObject* __Pyx_PyObject_CallOneArg(PyObject *func, PyObject *arg);
+
 /* ObjectGetItem.proto */
 #if CYTHON_USE_TYPE_SLOTS
 static CYTHON_INLINE PyObject *__Pyx_PyObject_GetItem(PyObject *obj, PyObject* key);
 #else
 #define __Pyx_PyObject_GetItem(obj, key)  PyObject_GetItem(obj, key)
 #endif
+
+/* ArgTypeTest.proto */
+#define __Pyx_ArgTypeTest(obj, type, none_allowed, name, exact)\
+    ((likely((Py_TYPE(obj) == type) | (none_allowed && (obj == Py_None)))) ? 1 :\
+        __Pyx__ArgTypeTest(obj, type, name, exact))
+static int __Pyx__ArgTypeTest(PyObject *obj, PyTypeObject *type, const char *name, int exact);
+
+/* RaiseTooManyValuesToUnpack.proto */
+static CYTHON_INLINE void __Pyx_RaiseTooManyValuesError(Py_ssize_t expected);
+
+/* RaiseNeedMoreValuesToUnpack.proto */
+static CYTHON_INLINE void __Pyx_RaiseNeedMoreValuesError(Py_ssize_t index);
+
+/* IterFinish.proto */
+static CYTHON_INLINE int __Pyx_IterFinish(void);
+
+/* UnpackItemEndCheck.proto */
+static int __Pyx_IternextUnpackEndCheck(PyObject *retval, Py_ssize_t expected);
+
+/* PyIntCompare.proto */
+static CYTHON_INLINE PyObject* __Pyx_PyInt_EqObjC(PyObject *op1, PyObject *op2, long intval, long inplace);
 
 /* ListAppend.proto */
 #if CYTHON_USE_PYLIST_INTERNALS && CYTHON_ASSUME_SAFE_MACROS
@@ -1366,6 +1366,9 @@ static CYTHON_INLINE int __Pyx_ListComp_Append(PyObject* list, PyObject* x) {
 
 /* Import.proto */
 static PyObject *__Pyx_Import(PyObject *name, PyObject *from_list, int level);
+
+/* ImportFrom.proto */
+static PyObject* __Pyx_ImportFrom(PyObject* module, PyObject* name);
 
 /* CLineInTraceback.proto */
 #ifdef CYTHON_CLINE_IN_TRACEBACK
@@ -1512,18 +1515,29 @@ static const char __pyx_k_y1[] = "y1";
 static const char __pyx_k_y2[] = "y2";
 static const char __pyx_k_z1[] = "z1";
 static const char __pyx_k_z2[] = "z2";
+static const char __pyx_k_max[] = "max";
+static const char __pyx_k_min[] = "min";
 static const char __pyx_k_main[] = "__main__";
 static const char __pyx_k_name[] = "__name__";
 static const char __pyx_k_test[] = "__test__";
+static const char __pyx_k_RTree[] = "RTree";
 static const char __pyx_k_array[] = "array";
 static const char __pyx_k_numpy[] = "numpy";
 static const char __pyx_k_range[] = "range";
 static const char __pyx_k_import[] = "__import__";
+static const char __pyx_k_insert[] = "insert";
+static const char __pyx_k_search[] = "search";
 static const char __pyx_k_argsort[] = "argsort";
+static const char __pyx_k_max_cap[] = "max_cap";
+static const char __pyx_k_min_cap[] = "min_cap";
 static const char __pyx_k_pEdge_in[] = "pEdge_in";
 static const char __pyx_k_aVertex_in[] = "aVertex_in";
 static const char __pyx_k_pVertex_in[] = "pVertex_in";
+static const char __pyx_k_pVertex_end[] = "pVertex_end";
 static const char __pyx_k_dThreshold_in[] = "dThreshold_in";
+static const char __pyx_k_pVertex_start[] = "pVertex_start";
+static const char __pyx_k_dLatitude_degree[] = "dLatitude_degree";
+static const char __pyx_k_dLongitude_degree[] = "dLongitude_degree";
 static const char __pyx_k_calculate_distance[] = "calculate_distance";
 static const char __pyx_k_cline_in_traceback[] = "cline_in_traceback";
 static const char __pyx_k_dLatitude_degree_in[] = "dLatitude_degree_in";
@@ -1535,29 +1549,42 @@ static const char __pyx_k_dLongitude_degree_in[] = "dLongitude_degree_in";
 static const char __pyx_k_dLongitude_degree1_in[] = "dLongitude_degree1_in";
 static const char __pyx_k_dLongitude_degree2_in[] = "dLongitude_degree2_in";
 static const char __pyx_k_dLongitude_degree3_in[] = "dLongitude_degree3_in";
+static const char __pyx_k_pyflowline_external_tinyr_tinyr[] = "pyflowline.external.tinyr.tinyr.tinyr";
+static PyObject *__pyx_n_s_RTree;
 static PyObject *__pyx_n_s_aVertex_in;
 static PyObject *__pyx_n_s_argsort;
 static PyObject *__pyx_n_s_array;
 static PyObject *__pyx_n_s_calculate_distance;
 static PyObject *__pyx_n_s_check_vertex_on_edge;
 static PyObject *__pyx_n_s_cline_in_traceback;
+static PyObject *__pyx_n_s_dLatitude_degree;
 static PyObject *__pyx_n_s_dLatitude_degree1_in;
 static PyObject *__pyx_n_s_dLatitude_degree2_in;
 static PyObject *__pyx_n_s_dLatitude_degree3_in;
 static PyObject *__pyx_n_s_dLatitude_degree_in;
+static PyObject *__pyx_n_s_dLongitude_degree;
 static PyObject *__pyx_n_s_dLongitude_degree1_in;
 static PyObject *__pyx_n_s_dLongitude_degree2_in;
 static PyObject *__pyx_n_s_dLongitude_degree3_in;
 static PyObject *__pyx_n_s_dLongitude_degree_in;
 static PyObject *__pyx_n_s_dThreshold_in;
 static PyObject *__pyx_n_s_import;
+static PyObject *__pyx_n_s_insert;
 static PyObject *__pyx_n_s_main;
+static PyObject *__pyx_n_s_max;
+static PyObject *__pyx_n_s_max_cap;
+static PyObject *__pyx_n_s_min;
+static PyObject *__pyx_n_s_min_cap;
 static PyObject *__pyx_n_s_name;
 static PyObject *__pyx_n_s_np;
 static PyObject *__pyx_n_s_numpy;
 static PyObject *__pyx_n_s_pEdge_in;
+static PyObject *__pyx_n_s_pVertex_end;
 static PyObject *__pyx_n_s_pVertex_in;
+static PyObject *__pyx_n_s_pVertex_start;
+static PyObject *__pyx_n_s_pyflowline_external_tinyr_tinyr;
 static PyObject *__pyx_n_s_range;
+static PyObject *__pyx_n_s_search;
 static PyObject *__pyx_n_s_test;
 static PyObject *__pyx_n_s_x1;
 static PyObject *__pyx_n_s_x2;
@@ -1577,9 +1604,11 @@ static PyObject *__pyx_pf_6kernel_16calculate_distance_to_plane(CYTHON_UNUSED Py
 static PyObject *__pyx_float_1_0;
 static PyObject *__pyx_float_180_0;
 static PyObject *__pyx_int_1;
+static PyObject *__pyx_int_2;
+static PyObject *__pyx_int_5;
 /* Late includes */
 
-/* "kernel.pyx":15
+/* "kernel.pyx":17
  * 
  * @cython.boundscheck(False)  # deactivate bnds checking
  * cpdef  calculate_distance_based_on_lon_lat(double dLongitude_degree1_in, double dLatitude_degree1_in, double dLongitude_degree2_in, double dLatitude_degree2_in):             # <<<<<<<<<<<<<<
@@ -1606,7 +1635,7 @@ static PyObject *__pyx_f_6kernel_calculate_distance_based_on_lon_lat(double __py
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("calculate_distance_based_on_lon_lat", 0);
 
-  /* "kernel.pyx":28
+  /* "kernel.pyx":30
  *     # Radius of earth in kilometers. Use 3956 for miles
  * 
  *     dLongitude_radian1_in = dLongitude_degree1_in /180.0 * pi             # <<<<<<<<<<<<<<
@@ -1615,7 +1644,7 @@ static PyObject *__pyx_f_6kernel_calculate_distance_based_on_lon_lat(double __py
  */
   __pyx_v_dLongitude_radian1_in = ((__pyx_v_dLongitude_degree1_in / 180.0) * __pyx_v_6kernel_pi);
 
-  /* "kernel.pyx":29
+  /* "kernel.pyx":31
  * 
  *     dLongitude_radian1_in = dLongitude_degree1_in /180.0 * pi
  *     dLatitude_radian1_in = dLatitude_degree1_in /180.0 * pi             # <<<<<<<<<<<<<<
@@ -1624,7 +1653,7 @@ static PyObject *__pyx_f_6kernel_calculate_distance_based_on_lon_lat(double __py
  */
   __pyx_v_dLatitude_radian1_in = ((__pyx_v_dLatitude_degree1_in / 180.0) * __pyx_v_6kernel_pi);
 
-  /* "kernel.pyx":30
+  /* "kernel.pyx":32
  *     dLongitude_radian1_in = dLongitude_degree1_in /180.0 * pi
  *     dLatitude_radian1_in = dLatitude_degree1_in /180.0 * pi
  *     dLongitude_radian2_in = dLongitude_degree2_in /180.0 * pi             # <<<<<<<<<<<<<<
@@ -1633,7 +1662,7 @@ static PyObject *__pyx_f_6kernel_calculate_distance_based_on_lon_lat(double __py
  */
   __pyx_v_dLongitude_radian2_in = ((__pyx_v_dLongitude_degree2_in / 180.0) * __pyx_v_6kernel_pi);
 
-  /* "kernel.pyx":31
+  /* "kernel.pyx":33
  *     dLatitude_radian1_in = dLatitude_degree1_in /180.0 * pi
  *     dLongitude_radian2_in = dLongitude_degree2_in /180.0 * pi
  *     dLatitude_radian2_in = dLatitude_degree2_in /180.0 * pi             # <<<<<<<<<<<<<<
@@ -1642,7 +1671,7 @@ static PyObject *__pyx_f_6kernel_calculate_distance_based_on_lon_lat(double __py
  */
   __pyx_v_dLatitude_radian2_in = ((__pyx_v_dLatitude_degree2_in / 180.0) * __pyx_v_6kernel_pi);
 
-  /* "kernel.pyx":34
+  /* "kernel.pyx":36
  * 
  *     # haversine formula
  *     dLongtitude_diff = dLongitude_radian2_in - dLongitude_radian1_in             # <<<<<<<<<<<<<<
@@ -1651,7 +1680,7 @@ static PyObject *__pyx_f_6kernel_calculate_distance_based_on_lon_lat(double __py
  */
   __pyx_v_dLongtitude_diff = (__pyx_v_dLongitude_radian2_in - __pyx_v_dLongitude_radian1_in);
 
-  /* "kernel.pyx":35
+  /* "kernel.pyx":37
  *     # haversine formula
  *     dLongtitude_diff = dLongitude_radian2_in - dLongitude_radian1_in
  *     dLatitude_diff = dLatitude_radian2_in - dLatitude_radian1_in             # <<<<<<<<<<<<<<
@@ -1660,7 +1689,7 @@ static PyObject *__pyx_f_6kernel_calculate_distance_based_on_lon_lat(double __py
  */
   __pyx_v_dLatitude_diff = (__pyx_v_dLatitude_radian2_in - __pyx_v_dLatitude_radian1_in);
 
-  /* "kernel.pyx":36
+  /* "kernel.pyx":38
  *     dLongtitude_diff = dLongitude_radian2_in - dLongitude_radian1_in
  *     dLatitude_diff = dLatitude_radian2_in - dLatitude_radian1_in
  *     a = sin(dLatitude_diff/2)*sin(dLatitude_diff/2) + cos(dLatitude_radian1_in) * cos(dLatitude_radian2_in) * sin(dLongtitude_diff/2)*sin(dLongtitude_diff/2)             # <<<<<<<<<<<<<<
@@ -1669,7 +1698,7 @@ static PyObject *__pyx_f_6kernel_calculate_distance_based_on_lon_lat(double __py
  */
   __pyx_v_a = ((sin((__pyx_v_dLatitude_diff / 2.0)) * sin((__pyx_v_dLatitude_diff / 2.0))) + (((cos(__pyx_v_dLatitude_radian1_in) * cos(__pyx_v_dLatitude_radian2_in)) * sin((__pyx_v_dLongtitude_diff / 2.0))) * sin((__pyx_v_dLongtitude_diff / 2.0))));
 
-  /* "kernel.pyx":37
+  /* "kernel.pyx":39
  *     dLatitude_diff = dLatitude_radian2_in - dLatitude_radian1_in
  *     a = sin(dLatitude_diff/2)*sin(dLatitude_diff/2) + cos(dLatitude_radian1_in) * cos(dLatitude_radian2_in) * sin(dLongtitude_diff/2)*sin(dLongtitude_diff/2)
  *     b = 2 * asin(sqrt(a))             # <<<<<<<<<<<<<<
@@ -1678,7 +1707,7 @@ static PyObject *__pyx_f_6kernel_calculate_distance_based_on_lon_lat(double __py
  */
   __pyx_v_b = (2.0 * asin(sqrt(__pyx_v_a)));
 
-  /* "kernel.pyx":38
+  /* "kernel.pyx":40
  *     a = sin(dLatitude_diff/2)*sin(dLatitude_diff/2) + cos(dLatitude_radian1_in) * cos(dLatitude_radian2_in) * sin(dLongtitude_diff/2)*sin(dLongtitude_diff/2)
  *     b = 2 * asin(sqrt(a))
  *     c = b * dRadius             # <<<<<<<<<<<<<<
@@ -1687,7 +1716,7 @@ static PyObject *__pyx_f_6kernel_calculate_distance_based_on_lon_lat(double __py
  */
   __pyx_v_c = (__pyx_v_b * __pyx_v_6kernel_dRadius);
 
-  /* "kernel.pyx":39
+  /* "kernel.pyx":41
  *     b = 2 * asin(sqrt(a))
  *     c = b * dRadius
  *     return c             # <<<<<<<<<<<<<<
@@ -1695,13 +1724,13 @@ static PyObject *__pyx_f_6kernel_calculate_distance_based_on_lon_lat(double __py
  * @cython.boundscheck(False)  # deactivate bnds checking
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_c); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 39, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_c); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 41, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "kernel.pyx":15
+  /* "kernel.pyx":17
  * 
  * @cython.boundscheck(False)  # deactivate bnds checking
  * cpdef  calculate_distance_based_on_lon_lat(double dLongitude_degree1_in, double dLatitude_degree1_in, double dLongitude_degree2_in, double dLatitude_degree2_in):             # <<<<<<<<<<<<<<
@@ -1761,23 +1790,23 @@ static PyObject *__pyx_pw_6kernel_1calculate_distance_based_on_lon_lat(PyObject 
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_dLatitude_degree1_in)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calculate_distance_based_on_lon_lat", 1, 4, 4, 1); __PYX_ERR(0, 15, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calculate_distance_based_on_lon_lat", 1, 4, 4, 1); __PYX_ERR(0, 17, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_dLongitude_degree2_in)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calculate_distance_based_on_lon_lat", 1, 4, 4, 2); __PYX_ERR(0, 15, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calculate_distance_based_on_lon_lat", 1, 4, 4, 2); __PYX_ERR(0, 17, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_dLatitude_degree2_in)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calculate_distance_based_on_lon_lat", 1, 4, 4, 3); __PYX_ERR(0, 15, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calculate_distance_based_on_lon_lat", 1, 4, 4, 3); __PYX_ERR(0, 17, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "calculate_distance_based_on_lon_lat") < 0)) __PYX_ERR(0, 15, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "calculate_distance_based_on_lon_lat") < 0)) __PYX_ERR(0, 17, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 4) {
       goto __pyx_L5_argtuple_error;
@@ -1787,14 +1816,14 @@ static PyObject *__pyx_pw_6kernel_1calculate_distance_based_on_lon_lat(PyObject 
       values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
       values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
     }
-    __pyx_v_dLongitude_degree1_in = __pyx_PyFloat_AsDouble(values[0]); if (unlikely((__pyx_v_dLongitude_degree1_in == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 15, __pyx_L3_error)
-    __pyx_v_dLatitude_degree1_in = __pyx_PyFloat_AsDouble(values[1]); if (unlikely((__pyx_v_dLatitude_degree1_in == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 15, __pyx_L3_error)
-    __pyx_v_dLongitude_degree2_in = __pyx_PyFloat_AsDouble(values[2]); if (unlikely((__pyx_v_dLongitude_degree2_in == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 15, __pyx_L3_error)
-    __pyx_v_dLatitude_degree2_in = __pyx_PyFloat_AsDouble(values[3]); if (unlikely((__pyx_v_dLatitude_degree2_in == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 15, __pyx_L3_error)
+    __pyx_v_dLongitude_degree1_in = __pyx_PyFloat_AsDouble(values[0]); if (unlikely((__pyx_v_dLongitude_degree1_in == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 17, __pyx_L3_error)
+    __pyx_v_dLatitude_degree1_in = __pyx_PyFloat_AsDouble(values[1]); if (unlikely((__pyx_v_dLatitude_degree1_in == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 17, __pyx_L3_error)
+    __pyx_v_dLongitude_degree2_in = __pyx_PyFloat_AsDouble(values[2]); if (unlikely((__pyx_v_dLongitude_degree2_in == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 17, __pyx_L3_error)
+    __pyx_v_dLatitude_degree2_in = __pyx_PyFloat_AsDouble(values[3]); if (unlikely((__pyx_v_dLatitude_degree2_in == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 17, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("calculate_distance_based_on_lon_lat", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 15, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("calculate_distance_based_on_lon_lat", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 17, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("kernel.calculate_distance_based_on_lon_lat", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -1816,7 +1845,7 @@ static PyObject *__pyx_pf_6kernel_calculate_distance_based_on_lon_lat(CYTHON_UNU
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("calculate_distance_based_on_lon_lat", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __pyx_f_6kernel_calculate_distance_based_on_lon_lat(__pyx_v_dLongitude_degree1_in, __pyx_v_dLatitude_degree1_in, __pyx_v_dLongitude_degree2_in, __pyx_v_dLatitude_degree2_in, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 15, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_6kernel_calculate_distance_based_on_lon_lat(__pyx_v_dLongitude_degree1_in, __pyx_v_dLatitude_degree1_in, __pyx_v_dLongitude_degree2_in, __pyx_v_dLatitude_degree2_in, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 17, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -1833,7 +1862,7 @@ static PyObject *__pyx_pf_6kernel_calculate_distance_based_on_lon_lat(CYTHON_UNU
   return __pyx_r;
 }
 
-/* "kernel.pyx":42
+/* "kernel.pyx":44
  * 
  * @cython.boundscheck(False)  # deactivate bnds checking
  * cpdef  convert_360_to_180(double dLongitude_in):             # <<<<<<<<<<<<<<
@@ -1853,7 +1882,7 @@ static PyObject *__pyx_f_6kernel_convert_360_to_180(double __pyx_v_dLongitude_in
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("convert_360_to_180", 0);
 
-  /* "kernel.pyx":54
+  /* "kernel.pyx":56
  *     cdef int a
  *     cdef double dLongitude_out
  *     a = int(dLongitude_in /180.0)             # <<<<<<<<<<<<<<
@@ -1862,7 +1891,7 @@ static PyObject *__pyx_f_6kernel_convert_360_to_180(double __pyx_v_dLongitude_in
  */
   __pyx_v_a = ((int)(__pyx_v_dLongitude_in / 180.0));
 
-  /* "kernel.pyx":55
+  /* "kernel.pyx":57
  *     cdef double dLongitude_out
  *     a = int(dLongitude_in /180.0)
  *     dLongitude_out = dLongitude_in - a * 360.0             # <<<<<<<<<<<<<<
@@ -1871,7 +1900,7 @@ static PyObject *__pyx_f_6kernel_convert_360_to_180(double __pyx_v_dLongitude_in
  */
   __pyx_v_dLongitude_out = (__pyx_v_dLongitude_in - (__pyx_v_a * 360.0));
 
-  /* "kernel.pyx":56
+  /* "kernel.pyx":58
  *     a = int(dLongitude_in /180.0)
  *     dLongitude_out = dLongitude_in - a * 360.0
  *     return dLongitude_out             # <<<<<<<<<<<<<<
@@ -1879,13 +1908,13 @@ static PyObject *__pyx_f_6kernel_convert_360_to_180(double __pyx_v_dLongitude_in
  * @cython.boundscheck(False)  # deactivate bnds checking
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_dLongitude_out); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 56, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_dLongitude_out); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 58, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "kernel.pyx":42
+  /* "kernel.pyx":44
  * 
  * @cython.boundscheck(False)  # deactivate bnds checking
  * cpdef  convert_360_to_180(double dLongitude_in):             # <<<<<<<<<<<<<<
@@ -1916,7 +1945,7 @@ static PyObject *__pyx_pw_6kernel_3convert_360_to_180(PyObject *__pyx_self, PyOb
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("convert_360_to_180 (wrapper)", 0);
   assert(__pyx_arg_dLongitude_in); {
-    __pyx_v_dLongitude_in = __pyx_PyFloat_AsDouble(__pyx_arg_dLongitude_in); if (unlikely((__pyx_v_dLongitude_in == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 42, __pyx_L3_error)
+    __pyx_v_dLongitude_in = __pyx_PyFloat_AsDouble(__pyx_arg_dLongitude_in); if (unlikely((__pyx_v_dLongitude_in == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 44, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -1940,7 +1969,7 @@ static PyObject *__pyx_pf_6kernel_2convert_360_to_180(CYTHON_UNUSED PyObject *__
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("convert_360_to_180", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __pyx_f_6kernel_convert_360_to_180(__pyx_v_dLongitude_in, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 42, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_6kernel_convert_360_to_180(__pyx_v_dLongitude_in, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 44, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -1957,7 +1986,7 @@ static PyObject *__pyx_pf_6kernel_2convert_360_to_180(CYTHON_UNUSED PyObject *__
   return __pyx_r;
 }
 
-/* "kernel.pyx":59
+/* "kernel.pyx":61
  * 
  * @cython.boundscheck(False)  # deactivate bnds checking
  * cpdef  find_vertex_in_list(list aVertex_in, pVertex_in, double dThreshold_in = 1.0E-6):             # <<<<<<<<<<<<<<
@@ -1973,18 +2002,31 @@ static PyObject *__pyx_f_6kernel_find_vertex_in_list(PyObject *__pyx_v_aVertex_i
   int __pyx_v_lIndex;
   int __pyx_v_nVertex;
   double __pyx_v_dDistance;
+  double __pyx_v_x;
+  double __pyx_v_y;
+  double __pyx_v_left;
+  double __pyx_v_right;
+  double __pyx_v_bottom;
+  double __pyx_v_top;
+  PyObject *__pyx_v_index_vertex = NULL;
+  PyObject *__pyx_v_pBound = NULL;
+  PyObject *__pyx_v_aIntersect = NULL;
+  PyObject *__pyx_v_k = NULL;
   PyObject *__pyx_v_pVertex = NULL;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   Py_ssize_t __pyx_t_1;
   int __pyx_t_2;
-  int __pyx_t_3;
-  int __pyx_t_4;
-  int __pyx_t_5;
-  PyObject *__pyx_t_6 = NULL;
-  PyObject *__pyx_t_7 = NULL;
-  PyObject *__pyx_t_8 = NULL;
+  PyObject *__pyx_t_3 = NULL;
+  PyObject *__pyx_t_4 = NULL;
+  PyObject *__pyx_t_5 = NULL;
+  int __pyx_t_6;
+  int __pyx_t_7;
+  int __pyx_t_8;
   double __pyx_t_9;
+  PyObject *__pyx_t_10 = NULL;
+  PyObject *__pyx_t_11 = NULL;
+  int __pyx_t_12;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
@@ -1995,7 +2037,7 @@ static PyObject *__pyx_f_6kernel_find_vertex_in_list(PyObject *__pyx_v_aVertex_i
     }
   }
 
-  /* "kernel.pyx":70
+  /* "kernel.pyx":72
  *     """
  *     cdef int i
  *     cdef int iFlag_exist = 0             # <<<<<<<<<<<<<<
@@ -2004,7 +2046,7 @@ static PyObject *__pyx_f_6kernel_find_vertex_in_list(PyObject *__pyx_v_aVertex_i
  */
   __pyx_v_iFlag_exist = 0;
 
-  /* "kernel.pyx":71
+  /* "kernel.pyx":73
  *     cdef int i
  *     cdef int iFlag_exist = 0
  *     cdef int lIndex= -1             # <<<<<<<<<<<<<<
@@ -2013,190 +2055,520 @@ static PyObject *__pyx_f_6kernel_find_vertex_in_list(PyObject *__pyx_v_aVertex_i
  */
   __pyx_v_lIndex = -1;
 
-  /* "kernel.pyx":74
- *     cdef int nVertex
+  /* "kernel.pyx":77
  *     cdef double dDistance
+ *     cdef double x, y, left, right, bottom, top
  *     nVertex= len(aVertex_in)             # <<<<<<<<<<<<<<
  * 
  *     if nVertex > 0 :
  */
   if (unlikely(__pyx_v_aVertex_in == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "object of type 'NoneType' has no len()");
-    __PYX_ERR(0, 74, __pyx_L1_error)
+    __PYX_ERR(0, 77, __pyx_L1_error)
   }
-  __pyx_t_1 = PyList_GET_SIZE(__pyx_v_aVertex_in); if (unlikely(__pyx_t_1 == ((Py_ssize_t)-1))) __PYX_ERR(0, 74, __pyx_L1_error)
+  __pyx_t_1 = PyList_GET_SIZE(__pyx_v_aVertex_in); if (unlikely(__pyx_t_1 == ((Py_ssize_t)-1))) __PYX_ERR(0, 77, __pyx_L1_error)
   __pyx_v_nVertex = __pyx_t_1;
 
-  /* "kernel.pyx":76
+  /* "kernel.pyx":79
  *     nVertex= len(aVertex_in)
  * 
  *     if nVertex > 0 :             # <<<<<<<<<<<<<<
- * 
+ *         index_vertex = RTree( max_cap=5, min_cap=2)
  *         for i in range(nVertex):
  */
   __pyx_t_2 = ((__pyx_v_nVertex > 0) != 0);
   if (__pyx_t_2) {
 
-    /* "kernel.pyx":78
- *     if nVertex > 0 :
+    /* "kernel.pyx":80
  * 
+ *     if nVertex > 0 :
+ *         index_vertex = RTree( max_cap=5, min_cap=2)             # <<<<<<<<<<<<<<
+ *         for i in range(nVertex):
+ *             x = aVertex_in[i].dLongitude_degree
+ */
+    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_RTree); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 80, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __pyx_t_4 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 80, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_4);
+    if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_max_cap, __pyx_int_5) < 0) __PYX_ERR(0, 80, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_min_cap, __pyx_int_2) < 0) __PYX_ERR(0, 80, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_empty_tuple, __pyx_t_4); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 80, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_5);
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+    __pyx_v_index_vertex = __pyx_t_5;
+    __pyx_t_5 = 0;
+
+    /* "kernel.pyx":81
+ *     if nVertex > 0 :
+ *         index_vertex = RTree( max_cap=5, min_cap=2)
  *         for i in range(nVertex):             # <<<<<<<<<<<<<<
- *             pVertex = aVertex_in[i]
+ *             x = aVertex_in[i].dLongitude_degree
+ *             y = aVertex_in[i].dLatitude_degree
+ */
+    __pyx_t_6 = __pyx_v_nVertex;
+    __pyx_t_7 = __pyx_t_6;
+    for (__pyx_t_8 = 0; __pyx_t_8 < __pyx_t_7; __pyx_t_8+=1) {
+      __pyx_v_i = __pyx_t_8;
+
+      /* "kernel.pyx":82
+ *         index_vertex = RTree( max_cap=5, min_cap=2)
+ *         for i in range(nVertex):
+ *             x = aVertex_in[i].dLongitude_degree             # <<<<<<<<<<<<<<
+ *             y = aVertex_in[i].dLatitude_degree
+ *             left =   x - 1E-5
+ */
+      if (unlikely(__pyx_v_aVertex_in == Py_None)) {
+        PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
+        __PYX_ERR(0, 82, __pyx_L1_error)
+      }
+      __pyx_t_5 = __Pyx_GetItemInt_List(__pyx_v_aVertex_in, __pyx_v_i, int, 1, __Pyx_PyInt_From_int, 1, 1, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 82, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_5);
+      __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_dLongitude_degree); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 82, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_4);
+      __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+      __pyx_t_9 = __pyx_PyFloat_AsDouble(__pyx_t_4); if (unlikely((__pyx_t_9 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 82, __pyx_L1_error)
+      __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+      __pyx_v_x = __pyx_t_9;
+
+      /* "kernel.pyx":83
+ *         for i in range(nVertex):
+ *             x = aVertex_in[i].dLongitude_degree
+ *             y = aVertex_in[i].dLatitude_degree             # <<<<<<<<<<<<<<
+ *             left =   x - 1E-5
+ *             right =  x + 1E-5
+ */
+      if (unlikely(__pyx_v_aVertex_in == Py_None)) {
+        PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
+        __PYX_ERR(0, 83, __pyx_L1_error)
+      }
+      __pyx_t_4 = __Pyx_GetItemInt_List(__pyx_v_aVertex_in, __pyx_v_i, int, 1, __Pyx_PyInt_From_int, 1, 1, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 83, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_4);
+      __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_dLatitude_degree); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 83, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_5);
+      __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+      __pyx_t_9 = __pyx_PyFloat_AsDouble(__pyx_t_5); if (unlikely((__pyx_t_9 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 83, __pyx_L1_error)
+      __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+      __pyx_v_y = __pyx_t_9;
+
+      /* "kernel.pyx":84
+ *             x = aVertex_in[i].dLongitude_degree
+ *             y = aVertex_in[i].dLatitude_degree
+ *             left =   x - 1E-5             # <<<<<<<<<<<<<<
+ *             right =  x + 1E-5
+ *             bottom = y - 1E-5
+ */
+      __pyx_v_left = (__pyx_v_x - 1E-5);
+
+      /* "kernel.pyx":85
+ *             y = aVertex_in[i].dLatitude_degree
+ *             left =   x - 1E-5
+ *             right =  x + 1E-5             # <<<<<<<<<<<<<<
+ *             bottom = y - 1E-5
+ *             top =    y + 1E-5
+ */
+      __pyx_v_right = (__pyx_v_x + 1E-5);
+
+      /* "kernel.pyx":86
+ *             left =   x - 1E-5
+ *             right =  x + 1E-5
+ *             bottom = y - 1E-5             # <<<<<<<<<<<<<<
+ *             top =    y + 1E-5
+ *             pBound= (left, bottom, right, top)
+ */
+      __pyx_v_bottom = (__pyx_v_y - 1E-5);
+
+      /* "kernel.pyx":87
+ *             right =  x + 1E-5
+ *             bottom = y - 1E-5
+ *             top =    y + 1E-5             # <<<<<<<<<<<<<<
+ *             pBound= (left, bottom, right, top)
+ *             index_vertex.insert(i, pBound)
+ */
+      __pyx_v_top = (__pyx_v_y + 1E-5);
+
+      /* "kernel.pyx":88
+ *             bottom = y - 1E-5
+ *             top =    y + 1E-5
+ *             pBound= (left, bottom, right, top)             # <<<<<<<<<<<<<<
+ *             index_vertex.insert(i, pBound)
+ * 
+ */
+      __pyx_t_5 = PyFloat_FromDouble(__pyx_v_left); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 88, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_5);
+      __pyx_t_4 = PyFloat_FromDouble(__pyx_v_bottom); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 88, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_4);
+      __pyx_t_3 = PyFloat_FromDouble(__pyx_v_right); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 88, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_3);
+      __pyx_t_10 = PyFloat_FromDouble(__pyx_v_top); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 88, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_10);
+      __pyx_t_11 = PyTuple_New(4); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 88, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_11);
+      __Pyx_GIVEREF(__pyx_t_5);
+      PyTuple_SET_ITEM(__pyx_t_11, 0, __pyx_t_5);
+      __Pyx_GIVEREF(__pyx_t_4);
+      PyTuple_SET_ITEM(__pyx_t_11, 1, __pyx_t_4);
+      __Pyx_GIVEREF(__pyx_t_3);
+      PyTuple_SET_ITEM(__pyx_t_11, 2, __pyx_t_3);
+      __Pyx_GIVEREF(__pyx_t_10);
+      PyTuple_SET_ITEM(__pyx_t_11, 3, __pyx_t_10);
+      __pyx_t_5 = 0;
+      __pyx_t_4 = 0;
+      __pyx_t_3 = 0;
+      __pyx_t_10 = 0;
+      __Pyx_XDECREF_SET(__pyx_v_pBound, __pyx_t_11);
+      __pyx_t_11 = 0;
+
+      /* "kernel.pyx":89
+ *             top =    y + 1E-5
+ *             pBound= (left, bottom, right, top)
+ *             index_vertex.insert(i, pBound)             # <<<<<<<<<<<<<<
+ * 
+ *         #now the new vertex
+ */
+      __pyx_t_10 = __Pyx_PyObject_GetAttrStr(__pyx_v_index_vertex, __pyx_n_s_insert); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 89, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_10);
+      __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_i); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 89, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_3);
+      __pyx_t_4 = NULL;
+      __pyx_t_12 = 0;
+      if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_10))) {
+        __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_10);
+        if (likely(__pyx_t_4)) {
+          PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_10);
+          __Pyx_INCREF(__pyx_t_4);
+          __Pyx_INCREF(function);
+          __Pyx_DECREF_SET(__pyx_t_10, function);
+          __pyx_t_12 = 1;
+        }
+      }
+      #if CYTHON_FAST_PYCALL
+      if (PyFunction_Check(__pyx_t_10)) {
+        PyObject *__pyx_temp[3] = {__pyx_t_4, __pyx_t_3, __pyx_v_pBound};
+        __pyx_t_11 = __Pyx_PyFunction_FastCall(__pyx_t_10, __pyx_temp+1-__pyx_t_12, 2+__pyx_t_12); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 89, __pyx_L1_error)
+        __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
+        __Pyx_GOTREF(__pyx_t_11);
+        __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+      } else
+      #endif
+      #if CYTHON_FAST_PYCCALL
+      if (__Pyx_PyFastCFunction_Check(__pyx_t_10)) {
+        PyObject *__pyx_temp[3] = {__pyx_t_4, __pyx_t_3, __pyx_v_pBound};
+        __pyx_t_11 = __Pyx_PyCFunction_FastCall(__pyx_t_10, __pyx_temp+1-__pyx_t_12, 2+__pyx_t_12); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 89, __pyx_L1_error)
+        __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
+        __Pyx_GOTREF(__pyx_t_11);
+        __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+      } else
+      #endif
+      {
+        __pyx_t_5 = PyTuple_New(2+__pyx_t_12); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 89, __pyx_L1_error)
+        __Pyx_GOTREF(__pyx_t_5);
+        if (__pyx_t_4) {
+          __Pyx_GIVEREF(__pyx_t_4); PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_4); __pyx_t_4 = NULL;
+        }
+        __Pyx_GIVEREF(__pyx_t_3);
+        PyTuple_SET_ITEM(__pyx_t_5, 0+__pyx_t_12, __pyx_t_3);
+        __Pyx_INCREF(__pyx_v_pBound);
+        __Pyx_GIVEREF(__pyx_v_pBound);
+        PyTuple_SET_ITEM(__pyx_t_5, 1+__pyx_t_12, __pyx_v_pBound);
+        __pyx_t_3 = 0;
+        __pyx_t_11 = __Pyx_PyObject_Call(__pyx_t_10, __pyx_t_5, NULL); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 89, __pyx_L1_error)
+        __Pyx_GOTREF(__pyx_t_11);
+        __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+      }
+      __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
+      __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
+    }
+
+    /* "kernel.pyx":92
+ * 
+ *         #now the new vertex
+ *         x=pVertex_in.dLongitude_degree             # <<<<<<<<<<<<<<
+ *         y=pVertex_in.dLatitude_degree
+ *         left =   x - 1E-5
+ */
+    __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_v_pVertex_in, __pyx_n_s_dLongitude_degree); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 92, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_11);
+    __pyx_t_9 = __pyx_PyFloat_AsDouble(__pyx_t_11); if (unlikely((__pyx_t_9 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 92, __pyx_L1_error)
+    __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
+    __pyx_v_x = __pyx_t_9;
+
+    /* "kernel.pyx":93
+ *         #now the new vertex
+ *         x=pVertex_in.dLongitude_degree
+ *         y=pVertex_in.dLatitude_degree             # <<<<<<<<<<<<<<
+ *         left =   x - 1E-5
+ *         right =  x + 1E-5
+ */
+    __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_v_pVertex_in, __pyx_n_s_dLatitude_degree); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 93, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_11);
+    __pyx_t_9 = __pyx_PyFloat_AsDouble(__pyx_t_11); if (unlikely((__pyx_t_9 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 93, __pyx_L1_error)
+    __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
+    __pyx_v_y = __pyx_t_9;
+
+    /* "kernel.pyx":94
+ *         x=pVertex_in.dLongitude_degree
+ *         y=pVertex_in.dLatitude_degree
+ *         left =   x - 1E-5             # <<<<<<<<<<<<<<
+ *         right =  x + 1E-5
+ *         bottom = y - 1E-5
+ */
+    __pyx_v_left = (__pyx_v_x - 1E-5);
+
+    /* "kernel.pyx":95
+ *         y=pVertex_in.dLatitude_degree
+ *         left =   x - 1E-5
+ *         right =  x + 1E-5             # <<<<<<<<<<<<<<
+ *         bottom = y - 1E-5
+ *         top =    y + 1E-5
+ */
+    __pyx_v_right = (__pyx_v_x + 1E-5);
+
+    /* "kernel.pyx":96
+ *         left =   x - 1E-5
+ *         right =  x + 1E-5
+ *         bottom = y - 1E-5             # <<<<<<<<<<<<<<
+ *         top =    y + 1E-5
+ *         pBound= (left, bottom, right, top)
+ */
+    __pyx_v_bottom = (__pyx_v_y - 1E-5);
+
+    /* "kernel.pyx":97
+ *         right =  x + 1E-5
+ *         bottom = y - 1E-5
+ *         top =    y + 1E-5             # <<<<<<<<<<<<<<
+ *         pBound= (left, bottom, right, top)
+ *         aIntersect = list(index_vertex.search(pBound))
+ */
+    __pyx_v_top = (__pyx_v_y + 1E-5);
+
+    /* "kernel.pyx":98
+ *         bottom = y - 1E-5
+ *         top =    y + 1E-5
+ *         pBound= (left, bottom, right, top)             # <<<<<<<<<<<<<<
+ *         aIntersect = list(index_vertex.search(pBound))
+ * 
+ */
+    __pyx_t_11 = PyFloat_FromDouble(__pyx_v_left); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 98, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_11);
+    __pyx_t_10 = PyFloat_FromDouble(__pyx_v_bottom); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 98, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_10);
+    __pyx_t_5 = PyFloat_FromDouble(__pyx_v_right); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 98, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_5);
+    __pyx_t_3 = PyFloat_FromDouble(__pyx_v_top); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 98, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __pyx_t_4 = PyTuple_New(4); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 98, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_4);
+    __Pyx_GIVEREF(__pyx_t_11);
+    PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_11);
+    __Pyx_GIVEREF(__pyx_t_10);
+    PyTuple_SET_ITEM(__pyx_t_4, 1, __pyx_t_10);
+    __Pyx_GIVEREF(__pyx_t_5);
+    PyTuple_SET_ITEM(__pyx_t_4, 2, __pyx_t_5);
+    __Pyx_GIVEREF(__pyx_t_3);
+    PyTuple_SET_ITEM(__pyx_t_4, 3, __pyx_t_3);
+    __pyx_t_11 = 0;
+    __pyx_t_10 = 0;
+    __pyx_t_5 = 0;
+    __pyx_t_3 = 0;
+    __Pyx_XDECREF_SET(__pyx_v_pBound, __pyx_t_4);
+    __pyx_t_4 = 0;
+
+    /* "kernel.pyx":99
+ *         top =    y + 1E-5
+ *         pBound= (left, bottom, right, top)
+ *         aIntersect = list(index_vertex.search(pBound))             # <<<<<<<<<<<<<<
+ * 
+ *         for k in aIntersect:
+ */
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_index_vertex, __pyx_n_s_search); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 99, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __pyx_t_5 = NULL;
+    if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_3))) {
+      __pyx_t_5 = PyMethod_GET_SELF(__pyx_t_3);
+      if (likely(__pyx_t_5)) {
+        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
+        __Pyx_INCREF(__pyx_t_5);
+        __Pyx_INCREF(function);
+        __Pyx_DECREF_SET(__pyx_t_3, function);
+      }
+    }
+    __pyx_t_4 = (__pyx_t_5) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_5, __pyx_v_pBound) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_pBound);
+    __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
+    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 99, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_4);
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __pyx_t_3 = PySequence_List(__pyx_t_4); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 99, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+    __pyx_v_aIntersect = ((PyObject*)__pyx_t_3);
+    __pyx_t_3 = 0;
+
+    /* "kernel.pyx":101
+ *         aIntersect = list(index_vertex.search(pBound))
+ * 
+ *         for k in aIntersect:             # <<<<<<<<<<<<<<
+ *             pVertex = aVertex_in[k]
  *             dDistance = pVertex.calculate_distance(pVertex_in)
  */
-    __pyx_t_3 = __pyx_v_nVertex;
-    __pyx_t_4 = __pyx_t_3;
-    for (__pyx_t_5 = 0; __pyx_t_5 < __pyx_t_4; __pyx_t_5+=1) {
-      __pyx_v_i = __pyx_t_5;
+    __pyx_t_3 = __pyx_v_aIntersect; __Pyx_INCREF(__pyx_t_3); __pyx_t_1 = 0;
+    for (;;) {
+      if (__pyx_t_1 >= PyList_GET_SIZE(__pyx_t_3)) break;
+      #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
+      __pyx_t_4 = PyList_GET_ITEM(__pyx_t_3, __pyx_t_1); __Pyx_INCREF(__pyx_t_4); __pyx_t_1++; if (unlikely(0 < 0)) __PYX_ERR(0, 101, __pyx_L1_error)
+      #else
+      __pyx_t_4 = PySequence_ITEM(__pyx_t_3, __pyx_t_1); __pyx_t_1++; if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 101, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_4);
+      #endif
+      __Pyx_XDECREF_SET(__pyx_v_k, __pyx_t_4);
+      __pyx_t_4 = 0;
 
-      /* "kernel.pyx":79
+      /* "kernel.pyx":102
  * 
- *         for i in range(nVertex):
- *             pVertex = aVertex_in[i]             # <<<<<<<<<<<<<<
+ *         for k in aIntersect:
+ *             pVertex = aVertex_in[k]             # <<<<<<<<<<<<<<
  *             dDistance = pVertex.calculate_distance(pVertex_in)
  *             #if pVertex == pVertex_in:
  */
       if (unlikely(__pyx_v_aVertex_in == Py_None)) {
         PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-        __PYX_ERR(0, 79, __pyx_L1_error)
+        __PYX_ERR(0, 102, __pyx_L1_error)
       }
-      __pyx_t_6 = __Pyx_GetItemInt_List(__pyx_v_aVertex_in, __pyx_v_i, int, 1, __Pyx_PyInt_From_int, 1, 1, 0); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 79, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_6);
-      __Pyx_XDECREF_SET(__pyx_v_pVertex, __pyx_t_6);
-      __pyx_t_6 = 0;
+      __pyx_t_4 = __Pyx_PyObject_GetItem(__pyx_v_aVertex_in, __pyx_v_k); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 102, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_4);
+      __Pyx_XDECREF_SET(__pyx_v_pVertex, __pyx_t_4);
+      __pyx_t_4 = 0;
 
-      /* "kernel.pyx":80
- *         for i in range(nVertex):
- *             pVertex = aVertex_in[i]
+      /* "kernel.pyx":103
+ *         for k in aIntersect:
+ *             pVertex = aVertex_in[k]
  *             dDistance = pVertex.calculate_distance(pVertex_in)             # <<<<<<<<<<<<<<
  *             #if pVertex == pVertex_in:
  *             if dDistance < dThreshold_in:
  */
-      __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_pVertex, __pyx_n_s_calculate_distance); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 80, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_7);
-      __pyx_t_8 = NULL;
-      if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_7))) {
-        __pyx_t_8 = PyMethod_GET_SELF(__pyx_t_7);
-        if (likely(__pyx_t_8)) {
-          PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_7);
-          __Pyx_INCREF(__pyx_t_8);
+      __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_pVertex, __pyx_n_s_calculate_distance); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 103, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_5);
+      __pyx_t_10 = NULL;
+      if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_5))) {
+        __pyx_t_10 = PyMethod_GET_SELF(__pyx_t_5);
+        if (likely(__pyx_t_10)) {
+          PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_5);
+          __Pyx_INCREF(__pyx_t_10);
           __Pyx_INCREF(function);
-          __Pyx_DECREF_SET(__pyx_t_7, function);
+          __Pyx_DECREF_SET(__pyx_t_5, function);
         }
       }
-      __pyx_t_6 = (__pyx_t_8) ? __Pyx_PyObject_Call2Args(__pyx_t_7, __pyx_t_8, __pyx_v_pVertex_in) : __Pyx_PyObject_CallOneArg(__pyx_t_7, __pyx_v_pVertex_in);
-      __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
-      if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 80, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_6);
-      __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-      __pyx_t_9 = __pyx_PyFloat_AsDouble(__pyx_t_6); if (unlikely((__pyx_t_9 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 80, __pyx_L1_error)
-      __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+      __pyx_t_4 = (__pyx_t_10) ? __Pyx_PyObject_Call2Args(__pyx_t_5, __pyx_t_10, __pyx_v_pVertex_in) : __Pyx_PyObject_CallOneArg(__pyx_t_5, __pyx_v_pVertex_in);
+      __Pyx_XDECREF(__pyx_t_10); __pyx_t_10 = 0;
+      if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 103, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_4);
+      __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+      __pyx_t_9 = __pyx_PyFloat_AsDouble(__pyx_t_4); if (unlikely((__pyx_t_9 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 103, __pyx_L1_error)
+      __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
       __pyx_v_dDistance = __pyx_t_9;
 
-      /* "kernel.pyx":82
+      /* "kernel.pyx":105
  *             dDistance = pVertex.calculate_distance(pVertex_in)
  *             #if pVertex == pVertex_in:
  *             if dDistance < dThreshold_in:             # <<<<<<<<<<<<<<
  *                 iFlag_exist = 1
- *                 lIndex = i
+ *                 lIndex = k
  */
       __pyx_t_2 = ((__pyx_v_dDistance < __pyx_v_dThreshold_in) != 0);
       if (__pyx_t_2) {
 
-        /* "kernel.pyx":83
+        /* "kernel.pyx":106
  *             #if pVertex == pVertex_in:
  *             if dDistance < dThreshold_in:
  *                 iFlag_exist = 1             # <<<<<<<<<<<<<<
- *                 lIndex = i
+ *                 lIndex = k
  *                 break
  */
         __pyx_v_iFlag_exist = 1;
 
-        /* "kernel.pyx":84
+        /* "kernel.pyx":107
  *             if dDistance < dThreshold_in:
  *                 iFlag_exist = 1
- *                 lIndex = i             # <<<<<<<<<<<<<<
+ *                 lIndex = k             # <<<<<<<<<<<<<<
  *                 break
  *             else:
  */
-        __pyx_v_lIndex = __pyx_v_i;
+        __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_v_k); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 107, __pyx_L1_error)
+        __pyx_v_lIndex = __pyx_t_6;
 
-        /* "kernel.pyx":85
+        /* "kernel.pyx":108
  *                 iFlag_exist = 1
- *                 lIndex = i
+ *                 lIndex = k
  *                 break             # <<<<<<<<<<<<<<
  *             else:
  *                 pass
  */
-        goto __pyx_L5_break;
+        goto __pyx_L7_break;
 
-        /* "kernel.pyx":82
+        /* "kernel.pyx":105
  *             dDistance = pVertex.calculate_distance(pVertex_in)
  *             #if pVertex == pVertex_in:
  *             if dDistance < dThreshold_in:             # <<<<<<<<<<<<<<
  *                 iFlag_exist = 1
- *                 lIndex = i
+ *                 lIndex = k
  */
       }
 
-      /* "kernel.pyx":87
+      /* "kernel.pyx":110
  *                 break
  *             else:
  *                 pass             # <<<<<<<<<<<<<<
- * 
  *         pass
+ * 
  */
       /*else*/ {
       }
-    }
-    __pyx_L5_break:;
 
-    /* "kernel.pyx":76
+      /* "kernel.pyx":101
+ *         aIntersect = list(index_vertex.search(pBound))
+ * 
+ *         for k in aIntersect:             # <<<<<<<<<<<<<<
+ *             pVertex = aVertex_in[k]
+ *             dDistance = pVertex.calculate_distance(pVertex_in)
+ */
+    }
+    __pyx_L7_break:;
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+
+    /* "kernel.pyx":79
  *     nVertex= len(aVertex_in)
  * 
  *     if nVertex > 0 :             # <<<<<<<<<<<<<<
- * 
+ *         index_vertex = RTree( max_cap=5, min_cap=2)
  *         for i in range(nVertex):
  */
-    goto __pyx_L3;
   }
 
-  /* "kernel.pyx":92
- * 
- *     else:
- *         pass             # <<<<<<<<<<<<<<
- * 
- *     return iFlag_exist, lIndex
- */
-  /*else*/ {
-  }
-  __pyx_L3:;
-
-  /* "kernel.pyx":94
- *         pass
+  /* "kernel.pyx":129
+ *     #    pass
  * 
  *     return iFlag_exist, lIndex             # <<<<<<<<<<<<<<
  * 
  * @cython.boundscheck(False)  # deactivate bnds checking
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_6 = __Pyx_PyInt_From_int(__pyx_v_iFlag_exist); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 94, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_6);
-  __pyx_t_7 = __Pyx_PyInt_From_int(__pyx_v_lIndex); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 94, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_7);
-  __pyx_t_8 = PyTuple_New(2); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 94, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_8);
-  __Pyx_GIVEREF(__pyx_t_6);
-  PyTuple_SET_ITEM(__pyx_t_8, 0, __pyx_t_6);
-  __Pyx_GIVEREF(__pyx_t_7);
-  PyTuple_SET_ITEM(__pyx_t_8, 1, __pyx_t_7);
-  __pyx_t_6 = 0;
-  __pyx_t_7 = 0;
-  __pyx_r = __pyx_t_8;
-  __pyx_t_8 = 0;
+  __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_iFlag_exist); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 129, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_lIndex); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 129, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __pyx_t_5 = PyTuple_New(2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 129, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  __Pyx_GIVEREF(__pyx_t_3);
+  PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_3);
+  __Pyx_GIVEREF(__pyx_t_4);
+  PyTuple_SET_ITEM(__pyx_t_5, 1, __pyx_t_4);
+  __pyx_t_3 = 0;
+  __pyx_t_4 = 0;
+  __pyx_r = __pyx_t_5;
+  __pyx_t_5 = 0;
   goto __pyx_L0;
 
-  /* "kernel.pyx":59
+  /* "kernel.pyx":61
  * 
  * @cython.boundscheck(False)  # deactivate bnds checking
  * cpdef  find_vertex_in_list(list aVertex_in, pVertex_in, double dThreshold_in = 1.0E-6):             # <<<<<<<<<<<<<<
@@ -2206,12 +2578,18 @@ static PyObject *__pyx_f_6kernel_find_vertex_in_list(PyObject *__pyx_v_aVertex_i
 
   /* function exit code */
   __pyx_L1_error:;
-  __Pyx_XDECREF(__pyx_t_6);
-  __Pyx_XDECREF(__pyx_t_7);
-  __Pyx_XDECREF(__pyx_t_8);
+  __Pyx_XDECREF(__pyx_t_3);
+  __Pyx_XDECREF(__pyx_t_4);
+  __Pyx_XDECREF(__pyx_t_5);
+  __Pyx_XDECREF(__pyx_t_10);
+  __Pyx_XDECREF(__pyx_t_11);
   __Pyx_AddTraceback("kernel.find_vertex_in_list", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = 0;
   __pyx_L0:;
+  __Pyx_XDECREF(__pyx_v_index_vertex);
+  __Pyx_XDECREF(__pyx_v_pBound);
+  __Pyx_XDECREF(__pyx_v_aIntersect);
+  __Pyx_XDECREF(__pyx_v_k);
   __Pyx_XDECREF(__pyx_v_pVertex);
   __Pyx_XGIVEREF(__pyx_r);
   __Pyx_RefNannyFinishContext();
@@ -2256,7 +2634,7 @@ static PyObject *__pyx_pw_6kernel_5find_vertex_in_list(PyObject *__pyx_self, PyO
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_pVertex_in)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("find_vertex_in_list", 0, 2, 3, 1); __PYX_ERR(0, 59, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("find_vertex_in_list", 0, 2, 3, 1); __PYX_ERR(0, 61, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
@@ -2266,7 +2644,7 @@ static PyObject *__pyx_pw_6kernel_5find_vertex_in_list(PyObject *__pyx_self, PyO
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "find_vertex_in_list") < 0)) __PYX_ERR(0, 59, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "find_vertex_in_list") < 0)) __PYX_ERR(0, 61, __pyx_L3_error)
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
@@ -2281,20 +2659,20 @@ static PyObject *__pyx_pw_6kernel_5find_vertex_in_list(PyObject *__pyx_self, PyO
     __pyx_v_aVertex_in = ((PyObject*)values[0]);
     __pyx_v_pVertex_in = values[1];
     if (values[2]) {
-      __pyx_v_dThreshold_in = __pyx_PyFloat_AsDouble(values[2]); if (unlikely((__pyx_v_dThreshold_in == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 59, __pyx_L3_error)
+      __pyx_v_dThreshold_in = __pyx_PyFloat_AsDouble(values[2]); if (unlikely((__pyx_v_dThreshold_in == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 61, __pyx_L3_error)
     } else {
       __pyx_v_dThreshold_in = ((double)1.0E-6);
     }
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("find_vertex_in_list", 0, 2, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 59, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("find_vertex_in_list", 0, 2, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 61, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("kernel.find_vertex_in_list", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_aVertex_in), (&PyList_Type), 1, "aVertex_in", 1))) __PYX_ERR(0, 59, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_aVertex_in), (&PyList_Type), 1, "aVertex_in", 1))) __PYX_ERR(0, 61, __pyx_L1_error)
   __pyx_r = __pyx_pf_6kernel_4find_vertex_in_list(__pyx_self, __pyx_v_aVertex_in, __pyx_v_pVertex_in, __pyx_v_dThreshold_in);
 
   /* function exit code */
@@ -2318,7 +2696,7 @@ static PyObject *__pyx_pf_6kernel_4find_vertex_in_list(CYTHON_UNUSED PyObject *_
   __Pyx_XDECREF(__pyx_r);
   __pyx_t_2.__pyx_n = 1;
   __pyx_t_2.dThreshold_in = __pyx_v_dThreshold_in;
-  __pyx_t_1 = __pyx_f_6kernel_find_vertex_in_list(__pyx_v_aVertex_in, __pyx_v_pVertex_in, 0, &__pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 59, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_6kernel_find_vertex_in_list(__pyx_v_aVertex_in, __pyx_v_pVertex_in, 0, &__pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 61, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -2335,7 +2713,7 @@ static PyObject *__pyx_pf_6kernel_4find_vertex_in_list(CYTHON_UNUSED PyObject *_
   return __pyx_r;
 }
 
-/* "kernel.pyx":97
+/* "kernel.pyx":132
  * 
  * @cython.boundscheck(False)  # deactivate bnds checking
  * cpdef find_vertex_on_edge(list aVertex_in, pEdge_in):             # <<<<<<<<<<<<<<
@@ -2351,12 +2729,28 @@ static PyObject *__pyx_f_6kernel_find_vertex_on_edge(PyObject *__pyx_v_aVertex_i
   std::vector<int>  __pyx_v_aIndex;
   std::vector<int>  __pyx_v_aIndex_order;
   std::vector<double>  __pyx_v_aDistance;
+  double __pyx_v_x;
+  double __pyx_v_y;
+  double __pyx_v_left;
+  double __pyx_v_right;
+  double __pyx_v_bottom;
+  double __pyx_v_top;
+  PyObject *__pyx_v_index_vertex = NULL;
   int __pyx_v_i;
+  int __pyx_v_lID;
+  PyObject *__pyx_v_pBound = NULL;
+  PyObject *__pyx_v_pVertex_start = NULL;
+  PyObject *__pyx_v_pVertex_end = NULL;
+  PyObject *__pyx_v_x1 = NULL;
+  PyObject *__pyx_v_y1 = NULL;
+  PyObject *__pyx_v_x2 = NULL;
+  PyObject *__pyx_v_y2 = NULL;
+  PyObject *__pyx_v_aIntersect = NULL;
+  PyObject *__pyx_v_k = NULL;
   PyObject *__pyx_v_pVertex = NULL;
   PyObject *__pyx_v_iFlag_overlap = NULL;
   PyObject *__pyx_v_dDistance = NULL;
   PyObject *__pyx_v_diff = NULL;
-  PyObject *__pyx_v_x = NULL;
   PyObject *__pyx_v_b = NULL;
   PyObject *__pyx_v_c = NULL;
   PyObject *__pyx_v_d = NULL;
@@ -2364,23 +2758,25 @@ static PyObject *__pyx_f_6kernel_find_vertex_on_edge(PyObject *__pyx_v_aVertex_i
   __Pyx_RefNannyDeclarations
   Py_ssize_t __pyx_t_1;
   int __pyx_t_2;
-  int __pyx_t_3;
-  int __pyx_t_4;
-  int __pyx_t_5;
-  PyObject *__pyx_t_6 = NULL;
-  PyObject *__pyx_t_7 = NULL;
-  PyObject *__pyx_t_8 = NULL;
-  PyObject *__pyx_t_9 = NULL;
+  PyObject *__pyx_t_3 = NULL;
+  PyObject *__pyx_t_4 = NULL;
+  PyObject *__pyx_t_5 = NULL;
+  int __pyx_t_6;
+  int __pyx_t_7;
+  int __pyx_t_8;
+  double __pyx_t_9;
   PyObject *__pyx_t_10 = NULL;
-  PyObject *(*__pyx_t_11)(PyObject *);
-  double __pyx_t_12;
-  std::vector<int>  __pyx_t_13;
+  PyObject *__pyx_t_11 = NULL;
+  int __pyx_t_12;
+  PyObject *__pyx_t_13 = NULL;
+  PyObject *(*__pyx_t_14)(PyObject *);
+  std::vector<int>  __pyx_t_15;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("find_vertex_on_edge", 0);
 
-  /* "kernel.pyx":99
+  /* "kernel.pyx":134
  * cpdef find_vertex_on_edge(list aVertex_in, pEdge_in):
  *     #
  *     cdef int iFlag_exist = 0             # <<<<<<<<<<<<<<
@@ -2389,8 +2785,8 @@ static PyObject *__pyx_f_6kernel_find_vertex_on_edge(PyObject *__pyx_v_aVertex_i
  */
   __pyx_v_iFlag_exist = 0;
 
-  /* "kernel.pyx":104
- *     cdef vector[double] aDistance
+  /* "kernel.pyx":140
+ *     cdef double x, y, left, right, bottom, top
  * 
  *     nVertex= len(aVertex_in)             # <<<<<<<<<<<<<<
  *     npoint = 0
@@ -2398,156 +2794,667 @@ static PyObject *__pyx_f_6kernel_find_vertex_on_edge(PyObject *__pyx_v_aVertex_i
  */
   if (unlikely(__pyx_v_aVertex_in == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "object of type 'NoneType' has no len()");
-    __PYX_ERR(0, 104, __pyx_L1_error)
+    __PYX_ERR(0, 140, __pyx_L1_error)
   }
-  __pyx_t_1 = PyList_GET_SIZE(__pyx_v_aVertex_in); if (unlikely(__pyx_t_1 == ((Py_ssize_t)-1))) __PYX_ERR(0, 104, __pyx_L1_error)
+  __pyx_t_1 = PyList_GET_SIZE(__pyx_v_aVertex_in); if (unlikely(__pyx_t_1 == ((Py_ssize_t)-1))) __PYX_ERR(0, 140, __pyx_L1_error)
   __pyx_v_nVertex = __pyx_t_1;
 
-  /* "kernel.pyx":105
+  /* "kernel.pyx":141
  * 
  *     nVertex= len(aVertex_in)
  *     npoint = 0             # <<<<<<<<<<<<<<
  *     if nVertex > 0 :
- *         for i in range( nVertex):
+ *         index_vertex = RTree(max_cap=5, min_cap=2)
  */
   __pyx_v_npoint = 0;
 
-  /* "kernel.pyx":106
+  /* "kernel.pyx":142
  *     nVertex= len(aVertex_in)
  *     npoint = 0
  *     if nVertex > 0 :             # <<<<<<<<<<<<<<
- *         for i in range( nVertex):
- *             pVertex = aVertex_in[i]
+ *         index_vertex = RTree(max_cap=5, min_cap=2)
+ *         for i in range(nVertex):
  */
   __pyx_t_2 = ((__pyx_v_nVertex > 0) != 0);
   if (__pyx_t_2) {
 
-    /* "kernel.pyx":107
+    /* "kernel.pyx":143
  *     npoint = 0
  *     if nVertex > 0 :
- *         for i in range( nVertex):             # <<<<<<<<<<<<<<
- *             pVertex = aVertex_in[i]
+ *         index_vertex = RTree(max_cap=5, min_cap=2)             # <<<<<<<<<<<<<<
+ *         for i in range(nVertex):
+ *             lID = i
+ */
+    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_RTree); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 143, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __pyx_t_4 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 143, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_4);
+    if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_max_cap, __pyx_int_5) < 0) __PYX_ERR(0, 143, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_min_cap, __pyx_int_2) < 0) __PYX_ERR(0, 143, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_empty_tuple, __pyx_t_4); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 143, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_5);
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+    __pyx_v_index_vertex = __pyx_t_5;
+    __pyx_t_5 = 0;
+
+    /* "kernel.pyx":144
+ *     if nVertex > 0 :
+ *         index_vertex = RTree(max_cap=5, min_cap=2)
+ *         for i in range(nVertex):             # <<<<<<<<<<<<<<
+ *             lID = i
+ *             x = aVertex_in[i].dLongitude_degree
+ */
+    __pyx_t_6 = __pyx_v_nVertex;
+    __pyx_t_7 = __pyx_t_6;
+    for (__pyx_t_8 = 0; __pyx_t_8 < __pyx_t_7; __pyx_t_8+=1) {
+      __pyx_v_i = __pyx_t_8;
+
+      /* "kernel.pyx":145
+ *         index_vertex = RTree(max_cap=5, min_cap=2)
+ *         for i in range(nVertex):
+ *             lID = i             # <<<<<<<<<<<<<<
+ *             x = aVertex_in[i].dLongitude_degree
+ *             y = aVertex_in[i].dLatitude_degree
+ */
+      __pyx_v_lID = __pyx_v_i;
+
+      /* "kernel.pyx":146
+ *         for i in range(nVertex):
+ *             lID = i
+ *             x = aVertex_in[i].dLongitude_degree             # <<<<<<<<<<<<<<
+ *             y = aVertex_in[i].dLatitude_degree
+ *             left = x - 1E-5
+ */
+      if (unlikely(__pyx_v_aVertex_in == Py_None)) {
+        PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
+        __PYX_ERR(0, 146, __pyx_L1_error)
+      }
+      __pyx_t_5 = __Pyx_GetItemInt_List(__pyx_v_aVertex_in, __pyx_v_i, int, 1, __Pyx_PyInt_From_int, 1, 1, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 146, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_5);
+      __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_dLongitude_degree); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 146, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_4);
+      __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+      __pyx_t_9 = __pyx_PyFloat_AsDouble(__pyx_t_4); if (unlikely((__pyx_t_9 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 146, __pyx_L1_error)
+      __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+      __pyx_v_x = __pyx_t_9;
+
+      /* "kernel.pyx":147
+ *             lID = i
+ *             x = aVertex_in[i].dLongitude_degree
+ *             y = aVertex_in[i].dLatitude_degree             # <<<<<<<<<<<<<<
+ *             left = x - 1E-5
+ *             right= x + 1E-5
+ */
+      if (unlikely(__pyx_v_aVertex_in == Py_None)) {
+        PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
+        __PYX_ERR(0, 147, __pyx_L1_error)
+      }
+      __pyx_t_4 = __Pyx_GetItemInt_List(__pyx_v_aVertex_in, __pyx_v_i, int, 1, __Pyx_PyInt_From_int, 1, 1, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 147, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_4);
+      __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_dLatitude_degree); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 147, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_5);
+      __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+      __pyx_t_9 = __pyx_PyFloat_AsDouble(__pyx_t_5); if (unlikely((__pyx_t_9 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 147, __pyx_L1_error)
+      __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+      __pyx_v_y = __pyx_t_9;
+
+      /* "kernel.pyx":148
+ *             x = aVertex_in[i].dLongitude_degree
+ *             y = aVertex_in[i].dLatitude_degree
+ *             left = x - 1E-5             # <<<<<<<<<<<<<<
+ *             right= x + 1E-5
+ *             bottom= y -1E-5
+ */
+      __pyx_v_left = (__pyx_v_x - 1E-5);
+
+      /* "kernel.pyx":149
+ *             y = aVertex_in[i].dLatitude_degree
+ *             left = x - 1E-5
+ *             right= x + 1E-5             # <<<<<<<<<<<<<<
+ *             bottom= y -1E-5
+ *             top=    y + 1E-5
+ */
+      __pyx_v_right = (__pyx_v_x + 1E-5);
+
+      /* "kernel.pyx":150
+ *             left = x - 1E-5
+ *             right= x + 1E-5
+ *             bottom= y -1E-5             # <<<<<<<<<<<<<<
+ *             top=    y + 1E-5
+ *             pBound= (left, bottom, right, top)
+ */
+      __pyx_v_bottom = (__pyx_v_y - 1E-5);
+
+      /* "kernel.pyx":151
+ *             right= x + 1E-5
+ *             bottom= y -1E-5
+ *             top=    y + 1E-5             # <<<<<<<<<<<<<<
+ *             pBound= (left, bottom, right, top)
+ *             index_vertex.insert(lID, pBound)  #
+ */
+      __pyx_v_top = (__pyx_v_y + 1E-5);
+
+      /* "kernel.pyx":152
+ *             bottom= y -1E-5
+ *             top=    y + 1E-5
+ *             pBound= (left, bottom, right, top)             # <<<<<<<<<<<<<<
+ *             index_vertex.insert(lID, pBound)  #
+ *             pass
+ */
+      __pyx_t_5 = PyFloat_FromDouble(__pyx_v_left); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 152, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_5);
+      __pyx_t_4 = PyFloat_FromDouble(__pyx_v_bottom); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 152, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_4);
+      __pyx_t_3 = PyFloat_FromDouble(__pyx_v_right); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 152, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_3);
+      __pyx_t_10 = PyFloat_FromDouble(__pyx_v_top); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 152, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_10);
+      __pyx_t_11 = PyTuple_New(4); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 152, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_11);
+      __Pyx_GIVEREF(__pyx_t_5);
+      PyTuple_SET_ITEM(__pyx_t_11, 0, __pyx_t_5);
+      __Pyx_GIVEREF(__pyx_t_4);
+      PyTuple_SET_ITEM(__pyx_t_11, 1, __pyx_t_4);
+      __Pyx_GIVEREF(__pyx_t_3);
+      PyTuple_SET_ITEM(__pyx_t_11, 2, __pyx_t_3);
+      __Pyx_GIVEREF(__pyx_t_10);
+      PyTuple_SET_ITEM(__pyx_t_11, 3, __pyx_t_10);
+      __pyx_t_5 = 0;
+      __pyx_t_4 = 0;
+      __pyx_t_3 = 0;
+      __pyx_t_10 = 0;
+      __Pyx_XDECREF_SET(__pyx_v_pBound, __pyx_t_11);
+      __pyx_t_11 = 0;
+
+      /* "kernel.pyx":153
+ *             top=    y + 1E-5
+ *             pBound= (left, bottom, right, top)
+ *             index_vertex.insert(lID, pBound)  #             # <<<<<<<<<<<<<<
+ *             pass
+ *         #now the new vertex
+ */
+      __pyx_t_10 = __Pyx_PyObject_GetAttrStr(__pyx_v_index_vertex, __pyx_n_s_insert); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 153, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_10);
+      __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_lID); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 153, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_3);
+      __pyx_t_4 = NULL;
+      __pyx_t_12 = 0;
+      if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_10))) {
+        __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_10);
+        if (likely(__pyx_t_4)) {
+          PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_10);
+          __Pyx_INCREF(__pyx_t_4);
+          __Pyx_INCREF(function);
+          __Pyx_DECREF_SET(__pyx_t_10, function);
+          __pyx_t_12 = 1;
+        }
+      }
+      #if CYTHON_FAST_PYCALL
+      if (PyFunction_Check(__pyx_t_10)) {
+        PyObject *__pyx_temp[3] = {__pyx_t_4, __pyx_t_3, __pyx_v_pBound};
+        __pyx_t_11 = __Pyx_PyFunction_FastCall(__pyx_t_10, __pyx_temp+1-__pyx_t_12, 2+__pyx_t_12); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 153, __pyx_L1_error)
+        __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
+        __Pyx_GOTREF(__pyx_t_11);
+        __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+      } else
+      #endif
+      #if CYTHON_FAST_PYCCALL
+      if (__Pyx_PyFastCFunction_Check(__pyx_t_10)) {
+        PyObject *__pyx_temp[3] = {__pyx_t_4, __pyx_t_3, __pyx_v_pBound};
+        __pyx_t_11 = __Pyx_PyCFunction_FastCall(__pyx_t_10, __pyx_temp+1-__pyx_t_12, 2+__pyx_t_12); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 153, __pyx_L1_error)
+        __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
+        __Pyx_GOTREF(__pyx_t_11);
+        __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+      } else
+      #endif
+      {
+        __pyx_t_5 = PyTuple_New(2+__pyx_t_12); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 153, __pyx_L1_error)
+        __Pyx_GOTREF(__pyx_t_5);
+        if (__pyx_t_4) {
+          __Pyx_GIVEREF(__pyx_t_4); PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_4); __pyx_t_4 = NULL;
+        }
+        __Pyx_GIVEREF(__pyx_t_3);
+        PyTuple_SET_ITEM(__pyx_t_5, 0+__pyx_t_12, __pyx_t_3);
+        __Pyx_INCREF(__pyx_v_pBound);
+        __Pyx_GIVEREF(__pyx_v_pBound);
+        PyTuple_SET_ITEM(__pyx_t_5, 1+__pyx_t_12, __pyx_v_pBound);
+        __pyx_t_3 = 0;
+        __pyx_t_11 = __Pyx_PyObject_Call(__pyx_t_10, __pyx_t_5, NULL); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 153, __pyx_L1_error)
+        __Pyx_GOTREF(__pyx_t_11);
+        __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+      }
+      __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
+      __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
+    }
+
+    /* "kernel.pyx":156
+ *             pass
+ *         #now the new vertex
+ *         pVertex_start = pEdge_in.pVertex_start             # <<<<<<<<<<<<<<
+ *         pVertex_end = pEdge_in.pVertex_end
+ *         x1=pVertex_start.dLongitude_degree
+ */
+    __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_v_pEdge_in, __pyx_n_s_pVertex_start); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 156, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_11);
+    __pyx_v_pVertex_start = __pyx_t_11;
+    __pyx_t_11 = 0;
+
+    /* "kernel.pyx":157
+ *         #now the new vertex
+ *         pVertex_start = pEdge_in.pVertex_start
+ *         pVertex_end = pEdge_in.pVertex_end             # <<<<<<<<<<<<<<
+ *         x1=pVertex_start.dLongitude_degree
+ *         y1=pVertex_start.dLatitude_degree
+ */
+    __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_v_pEdge_in, __pyx_n_s_pVertex_end); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 157, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_11);
+    __pyx_v_pVertex_end = __pyx_t_11;
+    __pyx_t_11 = 0;
+
+    /* "kernel.pyx":158
+ *         pVertex_start = pEdge_in.pVertex_start
+ *         pVertex_end = pEdge_in.pVertex_end
+ *         x1=pVertex_start.dLongitude_degree             # <<<<<<<<<<<<<<
+ *         y1=pVertex_start.dLatitude_degree
+ *         x2=pVertex_end.dLongitude_degree
+ */
+    __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_v_pVertex_start, __pyx_n_s_dLongitude_degree); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 158, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_11);
+    __pyx_v_x1 = __pyx_t_11;
+    __pyx_t_11 = 0;
+
+    /* "kernel.pyx":159
+ *         pVertex_end = pEdge_in.pVertex_end
+ *         x1=pVertex_start.dLongitude_degree
+ *         y1=pVertex_start.dLatitude_degree             # <<<<<<<<<<<<<<
+ *         x2=pVertex_end.dLongitude_degree
+ *         y2=pVertex_end.dLatitude_degree
+ */
+    __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_v_pVertex_start, __pyx_n_s_dLatitude_degree); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 159, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_11);
+    __pyx_v_y1 = __pyx_t_11;
+    __pyx_t_11 = 0;
+
+    /* "kernel.pyx":160
+ *         x1=pVertex_start.dLongitude_degree
+ *         y1=pVertex_start.dLatitude_degree
+ *         x2=pVertex_end.dLongitude_degree             # <<<<<<<<<<<<<<
+ *         y2=pVertex_end.dLatitude_degree
+ *         left   = np.min([x1, x2])
+ */
+    __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_v_pVertex_end, __pyx_n_s_dLongitude_degree); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 160, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_11);
+    __pyx_v_x2 = __pyx_t_11;
+    __pyx_t_11 = 0;
+
+    /* "kernel.pyx":161
+ *         y1=pVertex_start.dLatitude_degree
+ *         x2=pVertex_end.dLongitude_degree
+ *         y2=pVertex_end.dLatitude_degree             # <<<<<<<<<<<<<<
+ *         left   = np.min([x1, x2])
+ *         right  = np.max([x1, x2])
+ */
+    __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_v_pVertex_end, __pyx_n_s_dLatitude_degree); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 161, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_11);
+    __pyx_v_y2 = __pyx_t_11;
+    __pyx_t_11 = 0;
+
+    /* "kernel.pyx":162
+ *         x2=pVertex_end.dLongitude_degree
+ *         y2=pVertex_end.dLatitude_degree
+ *         left   = np.min([x1, x2])             # <<<<<<<<<<<<<<
+ *         right  = np.max([x1, x2])
+ *         bottom = np.min([y1, y2])
+ */
+    __Pyx_GetModuleGlobalName(__pyx_t_10, __pyx_n_s_np); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 162, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_10);
+    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_10, __pyx_n_s_min); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 162, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_5);
+    __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
+    __pyx_t_10 = PyList_New(2); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 162, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_10);
+    __Pyx_INCREF(__pyx_v_x1);
+    __Pyx_GIVEREF(__pyx_v_x1);
+    PyList_SET_ITEM(__pyx_t_10, 0, __pyx_v_x1);
+    __Pyx_INCREF(__pyx_v_x2);
+    __Pyx_GIVEREF(__pyx_v_x2);
+    PyList_SET_ITEM(__pyx_t_10, 1, __pyx_v_x2);
+    __pyx_t_3 = NULL;
+    if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_5))) {
+      __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_5);
+      if (likely(__pyx_t_3)) {
+        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_5);
+        __Pyx_INCREF(__pyx_t_3);
+        __Pyx_INCREF(function);
+        __Pyx_DECREF_SET(__pyx_t_5, function);
+      }
+    }
+    __pyx_t_11 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_5, __pyx_t_3, __pyx_t_10) : __Pyx_PyObject_CallOneArg(__pyx_t_5, __pyx_t_10);
+    __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
+    if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 162, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_11);
+    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+    __pyx_t_9 = __pyx_PyFloat_AsDouble(__pyx_t_11); if (unlikely((__pyx_t_9 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 162, __pyx_L1_error)
+    __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
+    __pyx_v_left = __pyx_t_9;
+
+    /* "kernel.pyx":163
+ *         y2=pVertex_end.dLatitude_degree
+ *         left   = np.min([x1, x2])
+ *         right  = np.max([x1, x2])             # <<<<<<<<<<<<<<
+ *         bottom = np.min([y1, y2])
+ *         top    = np.max([y1, y2])
+ */
+    __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_np); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 163, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_5);
+    __pyx_t_10 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_max); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 163, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_10);
+    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+    __pyx_t_5 = PyList_New(2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 163, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_5);
+    __Pyx_INCREF(__pyx_v_x1);
+    __Pyx_GIVEREF(__pyx_v_x1);
+    PyList_SET_ITEM(__pyx_t_5, 0, __pyx_v_x1);
+    __Pyx_INCREF(__pyx_v_x2);
+    __Pyx_GIVEREF(__pyx_v_x2);
+    PyList_SET_ITEM(__pyx_t_5, 1, __pyx_v_x2);
+    __pyx_t_3 = NULL;
+    if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_10))) {
+      __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_10);
+      if (likely(__pyx_t_3)) {
+        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_10);
+        __Pyx_INCREF(__pyx_t_3);
+        __Pyx_INCREF(function);
+        __Pyx_DECREF_SET(__pyx_t_10, function);
+      }
+    }
+    __pyx_t_11 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_10, __pyx_t_3, __pyx_t_5) : __Pyx_PyObject_CallOneArg(__pyx_t_10, __pyx_t_5);
+    __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+    if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 163, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_11);
+    __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
+    __pyx_t_9 = __pyx_PyFloat_AsDouble(__pyx_t_11); if (unlikely((__pyx_t_9 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 163, __pyx_L1_error)
+    __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
+    __pyx_v_right = __pyx_t_9;
+
+    /* "kernel.pyx":164
+ *         left   = np.min([x1, x2])
+ *         right  = np.max([x1, x2])
+ *         bottom = np.min([y1, y2])             # <<<<<<<<<<<<<<
+ *         top    = np.max([y1, y2])
+ *         pBound= (left, bottom, right, top)
+ */
+    __Pyx_GetModuleGlobalName(__pyx_t_10, __pyx_n_s_np); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 164, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_10);
+    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_10, __pyx_n_s_min); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 164, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_5);
+    __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
+    __pyx_t_10 = PyList_New(2); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 164, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_10);
+    __Pyx_INCREF(__pyx_v_y1);
+    __Pyx_GIVEREF(__pyx_v_y1);
+    PyList_SET_ITEM(__pyx_t_10, 0, __pyx_v_y1);
+    __Pyx_INCREF(__pyx_v_y2);
+    __Pyx_GIVEREF(__pyx_v_y2);
+    PyList_SET_ITEM(__pyx_t_10, 1, __pyx_v_y2);
+    __pyx_t_3 = NULL;
+    if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_5))) {
+      __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_5);
+      if (likely(__pyx_t_3)) {
+        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_5);
+        __Pyx_INCREF(__pyx_t_3);
+        __Pyx_INCREF(function);
+        __Pyx_DECREF_SET(__pyx_t_5, function);
+      }
+    }
+    __pyx_t_11 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_5, __pyx_t_3, __pyx_t_10) : __Pyx_PyObject_CallOneArg(__pyx_t_5, __pyx_t_10);
+    __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
+    if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 164, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_11);
+    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+    __pyx_t_9 = __pyx_PyFloat_AsDouble(__pyx_t_11); if (unlikely((__pyx_t_9 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 164, __pyx_L1_error)
+    __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
+    __pyx_v_bottom = __pyx_t_9;
+
+    /* "kernel.pyx":165
+ *         right  = np.max([x1, x2])
+ *         bottom = np.min([y1, y2])
+ *         top    = np.max([y1, y2])             # <<<<<<<<<<<<<<
+ *         pBound= (left, bottom, right, top)
+ *         aIntersect = list(index_vertex.search(pBound))
+ */
+    __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_np); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 165, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_5);
+    __pyx_t_10 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_max); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 165, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_10);
+    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+    __pyx_t_5 = PyList_New(2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 165, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_5);
+    __Pyx_INCREF(__pyx_v_y1);
+    __Pyx_GIVEREF(__pyx_v_y1);
+    PyList_SET_ITEM(__pyx_t_5, 0, __pyx_v_y1);
+    __Pyx_INCREF(__pyx_v_y2);
+    __Pyx_GIVEREF(__pyx_v_y2);
+    PyList_SET_ITEM(__pyx_t_5, 1, __pyx_v_y2);
+    __pyx_t_3 = NULL;
+    if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_10))) {
+      __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_10);
+      if (likely(__pyx_t_3)) {
+        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_10);
+        __Pyx_INCREF(__pyx_t_3);
+        __Pyx_INCREF(function);
+        __Pyx_DECREF_SET(__pyx_t_10, function);
+      }
+    }
+    __pyx_t_11 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_10, __pyx_t_3, __pyx_t_5) : __Pyx_PyObject_CallOneArg(__pyx_t_10, __pyx_t_5);
+    __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+    if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 165, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_11);
+    __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
+    __pyx_t_9 = __pyx_PyFloat_AsDouble(__pyx_t_11); if (unlikely((__pyx_t_9 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 165, __pyx_L1_error)
+    __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
+    __pyx_v_top = __pyx_t_9;
+
+    /* "kernel.pyx":166
+ *         bottom = np.min([y1, y2])
+ *         top    = np.max([y1, y2])
+ *         pBound= (left, bottom, right, top)             # <<<<<<<<<<<<<<
+ *         aIntersect = list(index_vertex.search(pBound))
+ *         for k in aIntersect:
+ */
+    __pyx_t_11 = PyFloat_FromDouble(__pyx_v_left); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 166, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_11);
+    __pyx_t_10 = PyFloat_FromDouble(__pyx_v_bottom); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 166, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_10);
+    __pyx_t_5 = PyFloat_FromDouble(__pyx_v_right); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 166, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_5);
+    __pyx_t_3 = PyFloat_FromDouble(__pyx_v_top); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 166, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __pyx_t_4 = PyTuple_New(4); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 166, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_4);
+    __Pyx_GIVEREF(__pyx_t_11);
+    PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_11);
+    __Pyx_GIVEREF(__pyx_t_10);
+    PyTuple_SET_ITEM(__pyx_t_4, 1, __pyx_t_10);
+    __Pyx_GIVEREF(__pyx_t_5);
+    PyTuple_SET_ITEM(__pyx_t_4, 2, __pyx_t_5);
+    __Pyx_GIVEREF(__pyx_t_3);
+    PyTuple_SET_ITEM(__pyx_t_4, 3, __pyx_t_3);
+    __pyx_t_11 = 0;
+    __pyx_t_10 = 0;
+    __pyx_t_5 = 0;
+    __pyx_t_3 = 0;
+    __Pyx_XDECREF_SET(__pyx_v_pBound, __pyx_t_4);
+    __pyx_t_4 = 0;
+
+    /* "kernel.pyx":167
+ *         top    = np.max([y1, y2])
+ *         pBound= (left, bottom, right, top)
+ *         aIntersect = list(index_vertex.search(pBound))             # <<<<<<<<<<<<<<
+ *         for k in aIntersect:
+ *             pVertex = aVertex_in[k]
+ */
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_index_vertex, __pyx_n_s_search); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 167, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __pyx_t_5 = NULL;
+    if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_3))) {
+      __pyx_t_5 = PyMethod_GET_SELF(__pyx_t_3);
+      if (likely(__pyx_t_5)) {
+        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
+        __Pyx_INCREF(__pyx_t_5);
+        __Pyx_INCREF(function);
+        __Pyx_DECREF_SET(__pyx_t_3, function);
+      }
+    }
+    __pyx_t_4 = (__pyx_t_5) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_5, __pyx_v_pBound) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_pBound);
+    __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
+    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 167, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_4);
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __pyx_t_3 = PySequence_List(__pyx_t_4); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 167, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+    __pyx_v_aIntersect = ((PyObject*)__pyx_t_3);
+    __pyx_t_3 = 0;
+
+    /* "kernel.pyx":168
+ *         pBound= (left, bottom, right, top)
+ *         aIntersect = list(index_vertex.search(pBound))
+ *         for k in aIntersect:             # <<<<<<<<<<<<<<
+ *             pVertex = aVertex_in[k]
  *             iFlag_overlap, dDistance, diff = pEdge_in.check_vertex_on_edge(pVertex)
  */
-    __pyx_t_3 = __pyx_v_nVertex;
-    __pyx_t_4 = __pyx_t_3;
-    for (__pyx_t_5 = 0; __pyx_t_5 < __pyx_t_4; __pyx_t_5+=1) {
-      __pyx_v_i = __pyx_t_5;
+    __pyx_t_3 = __pyx_v_aIntersect; __Pyx_INCREF(__pyx_t_3); __pyx_t_1 = 0;
+    for (;;) {
+      if (__pyx_t_1 >= PyList_GET_SIZE(__pyx_t_3)) break;
+      #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
+      __pyx_t_4 = PyList_GET_ITEM(__pyx_t_3, __pyx_t_1); __Pyx_INCREF(__pyx_t_4); __pyx_t_1++; if (unlikely(0 < 0)) __PYX_ERR(0, 168, __pyx_L1_error)
+      #else
+      __pyx_t_4 = PySequence_ITEM(__pyx_t_3, __pyx_t_1); __pyx_t_1++; if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 168, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_4);
+      #endif
+      __Pyx_XDECREF_SET(__pyx_v_k, __pyx_t_4);
+      __pyx_t_4 = 0;
 
-      /* "kernel.pyx":108
- *     if nVertex > 0 :
- *         for i in range( nVertex):
- *             pVertex = aVertex_in[i]             # <<<<<<<<<<<<<<
+      /* "kernel.pyx":169
+ *         aIntersect = list(index_vertex.search(pBound))
+ *         for k in aIntersect:
+ *             pVertex = aVertex_in[k]             # <<<<<<<<<<<<<<
  *             iFlag_overlap, dDistance, diff = pEdge_in.check_vertex_on_edge(pVertex)
  *             if iFlag_overlap == 1:
  */
       if (unlikely(__pyx_v_aVertex_in == Py_None)) {
         PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-        __PYX_ERR(0, 108, __pyx_L1_error)
+        __PYX_ERR(0, 169, __pyx_L1_error)
       }
-      __pyx_t_6 = __Pyx_GetItemInt_List(__pyx_v_aVertex_in, __pyx_v_i, int, 1, __Pyx_PyInt_From_int, 1, 1, 0); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 108, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_6);
-      __Pyx_XDECREF_SET(__pyx_v_pVertex, __pyx_t_6);
-      __pyx_t_6 = 0;
+      __pyx_t_4 = __Pyx_PyObject_GetItem(__pyx_v_aVertex_in, __pyx_v_k); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 169, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_4);
+      __Pyx_XDECREF_SET(__pyx_v_pVertex, __pyx_t_4);
+      __pyx_t_4 = 0;
 
-      /* "kernel.pyx":109
- *         for i in range( nVertex):
- *             pVertex = aVertex_in[i]
+      /* "kernel.pyx":170
+ *         for k in aIntersect:
+ *             pVertex = aVertex_in[k]
  *             iFlag_overlap, dDistance, diff = pEdge_in.check_vertex_on_edge(pVertex)             # <<<<<<<<<<<<<<
  *             if iFlag_overlap == 1:
  *                 iFlag_exist = 1
  */
-      __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_pEdge_in, __pyx_n_s_check_vertex_on_edge); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 109, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_7);
-      __pyx_t_8 = NULL;
-      if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_7))) {
-        __pyx_t_8 = PyMethod_GET_SELF(__pyx_t_7);
-        if (likely(__pyx_t_8)) {
-          PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_7);
-          __Pyx_INCREF(__pyx_t_8);
+      __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_pEdge_in, __pyx_n_s_check_vertex_on_edge); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 170, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_5);
+      __pyx_t_10 = NULL;
+      if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_5))) {
+        __pyx_t_10 = PyMethod_GET_SELF(__pyx_t_5);
+        if (likely(__pyx_t_10)) {
+          PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_5);
+          __Pyx_INCREF(__pyx_t_10);
           __Pyx_INCREF(function);
-          __Pyx_DECREF_SET(__pyx_t_7, function);
+          __Pyx_DECREF_SET(__pyx_t_5, function);
         }
       }
-      __pyx_t_6 = (__pyx_t_8) ? __Pyx_PyObject_Call2Args(__pyx_t_7, __pyx_t_8, __pyx_v_pVertex) : __Pyx_PyObject_CallOneArg(__pyx_t_7, __pyx_v_pVertex);
-      __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
-      if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 109, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_6);
-      __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-      if ((likely(PyTuple_CheckExact(__pyx_t_6))) || (PyList_CheckExact(__pyx_t_6))) {
-        PyObject* sequence = __pyx_t_6;
+      __pyx_t_4 = (__pyx_t_10) ? __Pyx_PyObject_Call2Args(__pyx_t_5, __pyx_t_10, __pyx_v_pVertex) : __Pyx_PyObject_CallOneArg(__pyx_t_5, __pyx_v_pVertex);
+      __Pyx_XDECREF(__pyx_t_10); __pyx_t_10 = 0;
+      if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 170, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_4);
+      __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+      if ((likely(PyTuple_CheckExact(__pyx_t_4))) || (PyList_CheckExact(__pyx_t_4))) {
+        PyObject* sequence = __pyx_t_4;
         Py_ssize_t size = __Pyx_PySequence_SIZE(sequence);
         if (unlikely(size != 3)) {
           if (size > 3) __Pyx_RaiseTooManyValuesError(3);
           else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-          __PYX_ERR(0, 109, __pyx_L1_error)
+          __PYX_ERR(0, 170, __pyx_L1_error)
         }
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
         if (likely(PyTuple_CheckExact(sequence))) {
-          __pyx_t_7 = PyTuple_GET_ITEM(sequence, 0); 
-          __pyx_t_8 = PyTuple_GET_ITEM(sequence, 1); 
-          __pyx_t_9 = PyTuple_GET_ITEM(sequence, 2); 
+          __pyx_t_5 = PyTuple_GET_ITEM(sequence, 0); 
+          __pyx_t_10 = PyTuple_GET_ITEM(sequence, 1); 
+          __pyx_t_11 = PyTuple_GET_ITEM(sequence, 2); 
         } else {
-          __pyx_t_7 = PyList_GET_ITEM(sequence, 0); 
-          __pyx_t_8 = PyList_GET_ITEM(sequence, 1); 
-          __pyx_t_9 = PyList_GET_ITEM(sequence, 2); 
+          __pyx_t_5 = PyList_GET_ITEM(sequence, 0); 
+          __pyx_t_10 = PyList_GET_ITEM(sequence, 1); 
+          __pyx_t_11 = PyList_GET_ITEM(sequence, 2); 
         }
-        __Pyx_INCREF(__pyx_t_7);
-        __Pyx_INCREF(__pyx_t_8);
-        __Pyx_INCREF(__pyx_t_9);
+        __Pyx_INCREF(__pyx_t_5);
+        __Pyx_INCREF(__pyx_t_10);
+        __Pyx_INCREF(__pyx_t_11);
         #else
-        __pyx_t_7 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 109, __pyx_L1_error)
-        __Pyx_GOTREF(__pyx_t_7);
-        __pyx_t_8 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 109, __pyx_L1_error)
-        __Pyx_GOTREF(__pyx_t_8);
-        __pyx_t_9 = PySequence_ITEM(sequence, 2); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 109, __pyx_L1_error)
-        __Pyx_GOTREF(__pyx_t_9);
+        __pyx_t_5 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 170, __pyx_L1_error)
+        __Pyx_GOTREF(__pyx_t_5);
+        __pyx_t_10 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 170, __pyx_L1_error)
+        __Pyx_GOTREF(__pyx_t_10);
+        __pyx_t_11 = PySequence_ITEM(sequence, 2); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 170, __pyx_L1_error)
+        __Pyx_GOTREF(__pyx_t_11);
         #endif
-        __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+        __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
       } else {
         Py_ssize_t index = -1;
-        __pyx_t_10 = PyObject_GetIter(__pyx_t_6); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 109, __pyx_L1_error)
+        __pyx_t_13 = PyObject_GetIter(__pyx_t_4); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 170, __pyx_L1_error)
+        __Pyx_GOTREF(__pyx_t_13);
+        __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+        __pyx_t_14 = Py_TYPE(__pyx_t_13)->tp_iternext;
+        index = 0; __pyx_t_5 = __pyx_t_14(__pyx_t_13); if (unlikely(!__pyx_t_5)) goto __pyx_L8_unpacking_failed;
+        __Pyx_GOTREF(__pyx_t_5);
+        index = 1; __pyx_t_10 = __pyx_t_14(__pyx_t_13); if (unlikely(!__pyx_t_10)) goto __pyx_L8_unpacking_failed;
         __Pyx_GOTREF(__pyx_t_10);
-        __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-        __pyx_t_11 = Py_TYPE(__pyx_t_10)->tp_iternext;
-        index = 0; __pyx_t_7 = __pyx_t_11(__pyx_t_10); if (unlikely(!__pyx_t_7)) goto __pyx_L6_unpacking_failed;
-        __Pyx_GOTREF(__pyx_t_7);
-        index = 1; __pyx_t_8 = __pyx_t_11(__pyx_t_10); if (unlikely(!__pyx_t_8)) goto __pyx_L6_unpacking_failed;
-        __Pyx_GOTREF(__pyx_t_8);
-        index = 2; __pyx_t_9 = __pyx_t_11(__pyx_t_10); if (unlikely(!__pyx_t_9)) goto __pyx_L6_unpacking_failed;
-        __Pyx_GOTREF(__pyx_t_9);
-        if (__Pyx_IternextUnpackEndCheck(__pyx_t_11(__pyx_t_10), 3) < 0) __PYX_ERR(0, 109, __pyx_L1_error)
-        __pyx_t_11 = NULL;
-        __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
-        goto __pyx_L7_unpacking_done;
-        __pyx_L6_unpacking_failed:;
-        __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
-        __pyx_t_11 = NULL;
+        index = 2; __pyx_t_11 = __pyx_t_14(__pyx_t_13); if (unlikely(!__pyx_t_11)) goto __pyx_L8_unpacking_failed;
+        __Pyx_GOTREF(__pyx_t_11);
+        if (__Pyx_IternextUnpackEndCheck(__pyx_t_14(__pyx_t_13), 3) < 0) __PYX_ERR(0, 170, __pyx_L1_error)
+        __pyx_t_14 = NULL;
+        __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
+        goto __pyx_L9_unpacking_done;
+        __pyx_L8_unpacking_failed:;
+        __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
+        __pyx_t_14 = NULL;
         if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-        __PYX_ERR(0, 109, __pyx_L1_error)
-        __pyx_L7_unpacking_done:;
+        __PYX_ERR(0, 170, __pyx_L1_error)
+        __pyx_L9_unpacking_done:;
       }
-      __Pyx_XDECREF_SET(__pyx_v_iFlag_overlap, __pyx_t_7);
-      __pyx_t_7 = 0;
-      __Pyx_XDECREF_SET(__pyx_v_dDistance, __pyx_t_8);
-      __pyx_t_8 = 0;
-      __Pyx_XDECREF_SET(__pyx_v_diff, __pyx_t_9);
-      __pyx_t_9 = 0;
+      __Pyx_XDECREF_SET(__pyx_v_iFlag_overlap, __pyx_t_5);
+      __pyx_t_5 = 0;
+      __Pyx_XDECREF_SET(__pyx_v_dDistance, __pyx_t_10);
+      __pyx_t_10 = 0;
+      __Pyx_XDECREF_SET(__pyx_v_diff, __pyx_t_11);
+      __pyx_t_11 = 0;
 
-      /* "kernel.pyx":110
- *             pVertex = aVertex_in[i]
+      /* "kernel.pyx":171
+ *             pVertex = aVertex_in[k]
  *             iFlag_overlap, dDistance, diff = pEdge_in.check_vertex_on_edge(pVertex)
  *             if iFlag_overlap == 1:             # <<<<<<<<<<<<<<
  *                 iFlag_exist = 1
  *                 aDistance.push_back(dDistance)
  */
-      __pyx_t_6 = __Pyx_PyInt_EqObjC(__pyx_v_iFlag_overlap, __pyx_int_1, 1, 0); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 110, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_6);
-      __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_6); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 110, __pyx_L1_error)
-      __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+      __pyx_t_4 = __Pyx_PyInt_EqObjC(__pyx_v_iFlag_overlap, __pyx_int_1, 1, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 171, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_4);
+      __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 171, __pyx_L1_error)
+      __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
       if (__pyx_t_2) {
 
-        /* "kernel.pyx":111
+        /* "kernel.pyx":172
  *             iFlag_overlap, dDistance, diff = pEdge_in.check_vertex_on_edge(pVertex)
  *             if iFlag_overlap == 1:
  *                 iFlag_exist = 1             # <<<<<<<<<<<<<<
@@ -2556,22 +3463,22 @@ static PyObject *__pyx_f_6kernel_find_vertex_on_edge(PyObject *__pyx_v_aVertex_i
  */
         __pyx_v_iFlag_exist = 1;
 
-        /* "kernel.pyx":112
+        /* "kernel.pyx":173
  *             if iFlag_overlap == 1:
  *                 iFlag_exist = 1
  *                 aDistance.push_back(dDistance)             # <<<<<<<<<<<<<<
  *                 aIndex.push_back(i)
  *                 npoint = npoint + 1
  */
-        __pyx_t_12 = __pyx_PyFloat_AsDouble(__pyx_v_dDistance); if (unlikely((__pyx_t_12 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 112, __pyx_L1_error)
+        __pyx_t_9 = __pyx_PyFloat_AsDouble(__pyx_v_dDistance); if (unlikely((__pyx_t_9 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 173, __pyx_L1_error)
         try {
-          __pyx_v_aDistance.push_back(__pyx_t_12);
+          __pyx_v_aDistance.push_back(__pyx_t_9);
         } catch(...) {
           __Pyx_CppExn2PyErr();
-          __PYX_ERR(0, 112, __pyx_L1_error)
+          __PYX_ERR(0, 173, __pyx_L1_error)
         }
 
-        /* "kernel.pyx":113
+        /* "kernel.pyx":174
  *                 iFlag_exist = 1
  *                 aDistance.push_back(dDistance)
  *                 aIndex.push_back(i)             # <<<<<<<<<<<<<<
@@ -2582,10 +3489,10 @@ static PyObject *__pyx_f_6kernel_find_vertex_on_edge(PyObject *__pyx_v_aVertex_i
           __pyx_v_aIndex.push_back(__pyx_v_i);
         } catch(...) {
           __Pyx_CppExn2PyErr();
-          __PYX_ERR(0, 113, __pyx_L1_error)
+          __PYX_ERR(0, 174, __pyx_L1_error)
         }
 
-        /* "kernel.pyx":114
+        /* "kernel.pyx":175
  *                 aDistance.push_back(dDistance)
  *                 aIndex.push_back(i)
  *                 npoint = npoint + 1             # <<<<<<<<<<<<<<
@@ -2594,17 +3501,17 @@ static PyObject *__pyx_f_6kernel_find_vertex_on_edge(PyObject *__pyx_v_aVertex_i
  */
         __pyx_v_npoint = (__pyx_v_npoint + 1);
 
-        /* "kernel.pyx":110
- *             pVertex = aVertex_in[i]
+        /* "kernel.pyx":171
+ *             pVertex = aVertex_in[k]
  *             iFlag_overlap, dDistance, diff = pEdge_in.check_vertex_on_edge(pVertex)
  *             if iFlag_overlap == 1:             # <<<<<<<<<<<<<<
  *                 iFlag_exist = 1
  *                 aDistance.push_back(dDistance)
  */
-        goto __pyx_L8;
+        goto __pyx_L10;
       }
 
-      /* "kernel.pyx":116
+      /* "kernel.pyx":177
  *                 npoint = npoint + 1
  *             else:
  *                 if  diff < 1.0:             # <<<<<<<<<<<<<<
@@ -2612,39 +3519,39 @@ static PyObject *__pyx_f_6kernel_find_vertex_on_edge(PyObject *__pyx_v_aVertex_i
  *                 pass
  */
       /*else*/ {
-        __pyx_t_6 = PyObject_RichCompare(__pyx_v_diff, __pyx_float_1_0, Py_LT); __Pyx_XGOTREF(__pyx_t_6); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 116, __pyx_L1_error)
-        __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_6); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 116, __pyx_L1_error)
-        __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+        __pyx_t_4 = PyObject_RichCompare(__pyx_v_diff, __pyx_float_1_0, Py_LT); __Pyx_XGOTREF(__pyx_t_4); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 177, __pyx_L1_error)
+        __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 177, __pyx_L1_error)
+        __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
         if (__pyx_t_2) {
 
-          /* "kernel.pyx":117
+          /* "kernel.pyx":178
  *             else:
  *                 if  diff < 1.0:
  *                     iFlag_overlap = pEdge_in.check_vertex_on_edge(pVertex)             # <<<<<<<<<<<<<<
  *                 pass
  * 
  */
-          __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_v_pEdge_in, __pyx_n_s_check_vertex_on_edge); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 117, __pyx_L1_error)
-          __Pyx_GOTREF(__pyx_t_9);
-          __pyx_t_8 = NULL;
-          if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_9))) {
-            __pyx_t_8 = PyMethod_GET_SELF(__pyx_t_9);
-            if (likely(__pyx_t_8)) {
-              PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_9);
-              __Pyx_INCREF(__pyx_t_8);
+          __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_v_pEdge_in, __pyx_n_s_check_vertex_on_edge); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 178, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_11);
+          __pyx_t_10 = NULL;
+          if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_11))) {
+            __pyx_t_10 = PyMethod_GET_SELF(__pyx_t_11);
+            if (likely(__pyx_t_10)) {
+              PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_11);
+              __Pyx_INCREF(__pyx_t_10);
               __Pyx_INCREF(function);
-              __Pyx_DECREF_SET(__pyx_t_9, function);
+              __Pyx_DECREF_SET(__pyx_t_11, function);
             }
           }
-          __pyx_t_6 = (__pyx_t_8) ? __Pyx_PyObject_Call2Args(__pyx_t_9, __pyx_t_8, __pyx_v_pVertex) : __Pyx_PyObject_CallOneArg(__pyx_t_9, __pyx_v_pVertex);
-          __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
-          if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 117, __pyx_L1_error)
-          __Pyx_GOTREF(__pyx_t_6);
-          __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-          __Pyx_DECREF_SET(__pyx_v_iFlag_overlap, __pyx_t_6);
-          __pyx_t_6 = 0;
+          __pyx_t_4 = (__pyx_t_10) ? __Pyx_PyObject_Call2Args(__pyx_t_11, __pyx_t_10, __pyx_v_pVertex) : __Pyx_PyObject_CallOneArg(__pyx_t_11, __pyx_v_pVertex);
+          __Pyx_XDECREF(__pyx_t_10); __pyx_t_10 = 0;
+          if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 178, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_4);
+          __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
+          __Pyx_DECREF_SET(__pyx_v_iFlag_overlap, __pyx_t_4);
+          __pyx_t_4 = 0;
 
-          /* "kernel.pyx":116
+          /* "kernel.pyx":177
  *                 npoint = npoint + 1
  *             else:
  *                 if  diff < 1.0:             # <<<<<<<<<<<<<<
@@ -2653,11 +3560,20 @@ static PyObject *__pyx_f_6kernel_find_vertex_on_edge(PyObject *__pyx_v_aVertex_i
  */
         }
       }
-      __pyx_L8:;
-    }
+      __pyx_L10:;
 
-    /* "kernel.pyx":121
- * 
+      /* "kernel.pyx":168
+ *         pBound= (left, bottom, right, top)
+ *         aIntersect = list(index_vertex.search(pBound))
+ *         for k in aIntersect:             # <<<<<<<<<<<<<<
+ *             pVertex = aVertex_in[k]
+ *             iFlag_overlap, dDistance, diff = pEdge_in.check_vertex_on_edge(pVertex)
+ */
+    }
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+
+    /* "kernel.pyx":196
+ * #
  *         #re-order
  *         if iFlag_exist == 1 :             # <<<<<<<<<<<<<<
  *             x = np.array(aDistance)
@@ -2666,129 +3582,133 @@ static PyObject *__pyx_f_6kernel_find_vertex_on_edge(PyObject *__pyx_v_aVertex_i
     __pyx_t_2 = ((__pyx_v_iFlag_exist == 1) != 0);
     if (__pyx_t_2) {
 
-      /* "kernel.pyx":122
+      /* "kernel.pyx":197
  *         #re-order
  *         if iFlag_exist == 1 :
  *             x = np.array(aDistance)             # <<<<<<<<<<<<<<
  *             b = np.argsort(x)
  *             c = np.array(aIndex)
  */
-      __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_np); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 122, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_9);
-      __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_t_9, __pyx_n_s_array); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 122, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_8);
-      __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-      __pyx_t_9 = __pyx_convert_vector_to_py_double(__pyx_v_aDistance); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 122, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_9);
-      __pyx_t_7 = NULL;
-      if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_8))) {
-        __pyx_t_7 = PyMethod_GET_SELF(__pyx_t_8);
-        if (likely(__pyx_t_7)) {
-          PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_8);
-          __Pyx_INCREF(__pyx_t_7);
+      __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_np); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 197, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_4);
+      __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_array); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 197, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_11);
+      __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+      __pyx_t_4 = __pyx_convert_vector_to_py_double(__pyx_v_aDistance); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 197, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_4);
+      __pyx_t_10 = NULL;
+      if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_11))) {
+        __pyx_t_10 = PyMethod_GET_SELF(__pyx_t_11);
+        if (likely(__pyx_t_10)) {
+          PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_11);
+          __Pyx_INCREF(__pyx_t_10);
           __Pyx_INCREF(function);
-          __Pyx_DECREF_SET(__pyx_t_8, function);
+          __Pyx_DECREF_SET(__pyx_t_11, function);
         }
       }
-      __pyx_t_6 = (__pyx_t_7) ? __Pyx_PyObject_Call2Args(__pyx_t_8, __pyx_t_7, __pyx_t_9) : __Pyx_PyObject_CallOneArg(__pyx_t_8, __pyx_t_9);
-      __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
-      __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-      if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 122, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_6);
-      __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-      __pyx_v_x = __pyx_t_6;
-      __pyx_t_6 = 0;
+      __pyx_t_3 = (__pyx_t_10) ? __Pyx_PyObject_Call2Args(__pyx_t_11, __pyx_t_10, __pyx_t_4) : __Pyx_PyObject_CallOneArg(__pyx_t_11, __pyx_t_4);
+      __Pyx_XDECREF(__pyx_t_10); __pyx_t_10 = 0;
+      __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+      if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 197, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_3);
+      __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
+      __pyx_t_9 = __pyx_PyFloat_AsDouble(__pyx_t_3); if (unlikely((__pyx_t_9 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 197, __pyx_L1_error)
+      __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+      __pyx_v_x = __pyx_t_9;
 
-      /* "kernel.pyx":123
+      /* "kernel.pyx":198
  *         if iFlag_exist == 1 :
  *             x = np.array(aDistance)
  *             b = np.argsort(x)             # <<<<<<<<<<<<<<
  *             c = np.array(aIndex)
  *             d= c[b]
  */
-      __Pyx_GetModuleGlobalName(__pyx_t_8, __pyx_n_s_np); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 123, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_8);
-      __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_t_8, __pyx_n_s_argsort); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 123, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_9);
-      __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-      __pyx_t_8 = NULL;
-      if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_9))) {
-        __pyx_t_8 = PyMethod_GET_SELF(__pyx_t_9);
-        if (likely(__pyx_t_8)) {
-          PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_9);
-          __Pyx_INCREF(__pyx_t_8);
+      __Pyx_GetModuleGlobalName(__pyx_t_11, __pyx_n_s_np); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 198, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_11);
+      __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_11, __pyx_n_s_argsort); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 198, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_4);
+      __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
+      __pyx_t_11 = PyFloat_FromDouble(__pyx_v_x); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 198, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_11);
+      __pyx_t_10 = NULL;
+      if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_4))) {
+        __pyx_t_10 = PyMethod_GET_SELF(__pyx_t_4);
+        if (likely(__pyx_t_10)) {
+          PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_4);
+          __Pyx_INCREF(__pyx_t_10);
           __Pyx_INCREF(function);
-          __Pyx_DECREF_SET(__pyx_t_9, function);
+          __Pyx_DECREF_SET(__pyx_t_4, function);
         }
       }
-      __pyx_t_6 = (__pyx_t_8) ? __Pyx_PyObject_Call2Args(__pyx_t_9, __pyx_t_8, __pyx_v_x) : __Pyx_PyObject_CallOneArg(__pyx_t_9, __pyx_v_x);
-      __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
-      if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 123, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_6);
-      __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-      __pyx_v_b = __pyx_t_6;
-      __pyx_t_6 = 0;
+      __pyx_t_3 = (__pyx_t_10) ? __Pyx_PyObject_Call2Args(__pyx_t_4, __pyx_t_10, __pyx_t_11) : __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_11);
+      __Pyx_XDECREF(__pyx_t_10); __pyx_t_10 = 0;
+      __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
+      if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 198, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_3);
+      __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+      __pyx_v_b = __pyx_t_3;
+      __pyx_t_3 = 0;
 
-      /* "kernel.pyx":124
+      /* "kernel.pyx":199
  *             x = np.array(aDistance)
  *             b = np.argsort(x)
  *             c = np.array(aIndex)             # <<<<<<<<<<<<<<
  *             d= c[b]
  *             aIndex_order = list(d)
  */
-      __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_np); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 124, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_9);
-      __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_t_9, __pyx_n_s_array); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 124, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_8);
-      __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-      __pyx_t_9 = __pyx_convert_vector_to_py_int(__pyx_v_aIndex); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 124, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_9);
-      __pyx_t_7 = NULL;
-      if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_8))) {
-        __pyx_t_7 = PyMethod_GET_SELF(__pyx_t_8);
-        if (likely(__pyx_t_7)) {
-          PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_8);
-          __Pyx_INCREF(__pyx_t_7);
+      __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_np); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 199, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_4);
+      __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_array); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 199, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_11);
+      __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+      __pyx_t_4 = __pyx_convert_vector_to_py_int(__pyx_v_aIndex); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 199, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_4);
+      __pyx_t_10 = NULL;
+      if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_11))) {
+        __pyx_t_10 = PyMethod_GET_SELF(__pyx_t_11);
+        if (likely(__pyx_t_10)) {
+          PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_11);
+          __Pyx_INCREF(__pyx_t_10);
           __Pyx_INCREF(function);
-          __Pyx_DECREF_SET(__pyx_t_8, function);
+          __Pyx_DECREF_SET(__pyx_t_11, function);
         }
       }
-      __pyx_t_6 = (__pyx_t_7) ? __Pyx_PyObject_Call2Args(__pyx_t_8, __pyx_t_7, __pyx_t_9) : __Pyx_PyObject_CallOneArg(__pyx_t_8, __pyx_t_9);
-      __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
-      __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-      if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 124, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_6);
-      __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-      __pyx_v_c = __pyx_t_6;
-      __pyx_t_6 = 0;
+      __pyx_t_3 = (__pyx_t_10) ? __Pyx_PyObject_Call2Args(__pyx_t_11, __pyx_t_10, __pyx_t_4) : __Pyx_PyObject_CallOneArg(__pyx_t_11, __pyx_t_4);
+      __Pyx_XDECREF(__pyx_t_10); __pyx_t_10 = 0;
+      __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+      if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 199, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_3);
+      __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
+      __pyx_v_c = __pyx_t_3;
+      __pyx_t_3 = 0;
 
-      /* "kernel.pyx":125
+      /* "kernel.pyx":200
  *             b = np.argsort(x)
  *             c = np.array(aIndex)
  *             d= c[b]             # <<<<<<<<<<<<<<
  *             aIndex_order = list(d)
  * 
  */
-      __pyx_t_6 = __Pyx_PyObject_GetItem(__pyx_v_c, __pyx_v_b); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 125, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_6);
-      __pyx_v_d = __pyx_t_6;
-      __pyx_t_6 = 0;
+      __pyx_t_3 = __Pyx_PyObject_GetItem(__pyx_v_c, __pyx_v_b); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 200, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_3);
+      __pyx_v_d = __pyx_t_3;
+      __pyx_t_3 = 0;
 
-      /* "kernel.pyx":126
+      /* "kernel.pyx":201
  *             c = np.array(aIndex)
  *             d= c[b]
  *             aIndex_order = list(d)             # <<<<<<<<<<<<<<
  * 
  *     else:
  */
-      __pyx_t_6 = PySequence_List(__pyx_v_d); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 126, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_6);
-      __pyx_t_13 = __pyx_convert_vector_from_py_int(__pyx_t_6); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 126, __pyx_L1_error)
-      __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-      __pyx_v_aIndex_order = __pyx_t_13;
+      __pyx_t_3 = PySequence_List(__pyx_v_d); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 201, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_3);
+      __pyx_t_15 = __pyx_convert_vector_from_py_int(__pyx_t_3); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 201, __pyx_L1_error)
+      __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+      __pyx_v_aIndex_order = __pyx_t_15;
 
-      /* "kernel.pyx":121
- * 
+      /* "kernel.pyx":196
+ * #
  *         #re-order
  *         if iFlag_exist == 1 :             # <<<<<<<<<<<<<<
  *             x = np.array(aDistance)
@@ -2796,57 +3716,57 @@ static PyObject *__pyx_f_6kernel_find_vertex_on_edge(PyObject *__pyx_v_aVertex_i
  */
     }
 
-    /* "kernel.pyx":106
+    /* "kernel.pyx":142
  *     nVertex= len(aVertex_in)
  *     npoint = 0
  *     if nVertex > 0 :             # <<<<<<<<<<<<<<
- *         for i in range( nVertex):
- *             pVertex = aVertex_in[i]
+ *         index_vertex = RTree(max_cap=5, min_cap=2)
+ *         for i in range(nVertex):
  */
     goto __pyx_L3;
   }
 
-  /* "kernel.pyx":129
+  /* "kernel.pyx":204
  * 
  *     else:
  *         pass             # <<<<<<<<<<<<<<
  * 
- *     return iFlag_exist, npoint , aIndex_order
+ *     return iFlag_exist, npoint, aIndex_order
  */
   /*else*/ {
   }
   __pyx_L3:;
 
-  /* "kernel.pyx":131
+  /* "kernel.pyx":206
  *         pass
  * 
- *     return iFlag_exist, npoint , aIndex_order             # <<<<<<<<<<<<<<
+ *     return iFlag_exist, npoint, aIndex_order             # <<<<<<<<<<<<<<
  * 
  * @cython.boundscheck(False)  # deactivate bnds checking
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_6 = __Pyx_PyInt_From_int(__pyx_v_iFlag_exist); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 131, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_6);
-  __pyx_t_8 = __Pyx_PyInt_From_int(__pyx_v_npoint); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 131, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_8);
-  __pyx_t_9 = __pyx_convert_vector_to_py_int(__pyx_v_aIndex_order); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 131, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_9);
-  __pyx_t_7 = PyTuple_New(3); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 131, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_7);
-  __Pyx_GIVEREF(__pyx_t_6);
-  PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_6);
-  __Pyx_GIVEREF(__pyx_t_8);
-  PyTuple_SET_ITEM(__pyx_t_7, 1, __pyx_t_8);
-  __Pyx_GIVEREF(__pyx_t_9);
-  PyTuple_SET_ITEM(__pyx_t_7, 2, __pyx_t_9);
-  __pyx_t_6 = 0;
-  __pyx_t_8 = 0;
-  __pyx_t_9 = 0;
-  __pyx_r = __pyx_t_7;
-  __pyx_t_7 = 0;
+  __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_iFlag_exist); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 206, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __pyx_t_11 = __Pyx_PyInt_From_int(__pyx_v_npoint); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 206, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_11);
+  __pyx_t_4 = __pyx_convert_vector_to_py_int(__pyx_v_aIndex_order); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 206, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __pyx_t_10 = PyTuple_New(3); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 206, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_10);
+  __Pyx_GIVEREF(__pyx_t_3);
+  PyTuple_SET_ITEM(__pyx_t_10, 0, __pyx_t_3);
+  __Pyx_GIVEREF(__pyx_t_11);
+  PyTuple_SET_ITEM(__pyx_t_10, 1, __pyx_t_11);
+  __Pyx_GIVEREF(__pyx_t_4);
+  PyTuple_SET_ITEM(__pyx_t_10, 2, __pyx_t_4);
+  __pyx_t_3 = 0;
+  __pyx_t_11 = 0;
+  __pyx_t_4 = 0;
+  __pyx_r = __pyx_t_10;
+  __pyx_t_10 = 0;
   goto __pyx_L0;
 
-  /* "kernel.pyx":97
+  /* "kernel.pyx":132
  * 
  * @cython.boundscheck(False)  # deactivate bnds checking
  * cpdef find_vertex_on_edge(list aVertex_in, pEdge_in):             # <<<<<<<<<<<<<<
@@ -2856,19 +3776,29 @@ static PyObject *__pyx_f_6kernel_find_vertex_on_edge(PyObject *__pyx_v_aVertex_i
 
   /* function exit code */
   __pyx_L1_error:;
-  __Pyx_XDECREF(__pyx_t_6);
-  __Pyx_XDECREF(__pyx_t_7);
-  __Pyx_XDECREF(__pyx_t_8);
-  __Pyx_XDECREF(__pyx_t_9);
+  __Pyx_XDECREF(__pyx_t_3);
+  __Pyx_XDECREF(__pyx_t_4);
+  __Pyx_XDECREF(__pyx_t_5);
   __Pyx_XDECREF(__pyx_t_10);
+  __Pyx_XDECREF(__pyx_t_11);
+  __Pyx_XDECREF(__pyx_t_13);
   __Pyx_AddTraceback("kernel.find_vertex_on_edge", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = 0;
   __pyx_L0:;
+  __Pyx_XDECREF(__pyx_v_index_vertex);
+  __Pyx_XDECREF(__pyx_v_pBound);
+  __Pyx_XDECREF(__pyx_v_pVertex_start);
+  __Pyx_XDECREF(__pyx_v_pVertex_end);
+  __Pyx_XDECREF(__pyx_v_x1);
+  __Pyx_XDECREF(__pyx_v_y1);
+  __Pyx_XDECREF(__pyx_v_x2);
+  __Pyx_XDECREF(__pyx_v_y2);
+  __Pyx_XDECREF(__pyx_v_aIntersect);
+  __Pyx_XDECREF(__pyx_v_k);
   __Pyx_XDECREF(__pyx_v_pVertex);
   __Pyx_XDECREF(__pyx_v_iFlag_overlap);
   __Pyx_XDECREF(__pyx_v_dDistance);
   __Pyx_XDECREF(__pyx_v_diff);
-  __Pyx_XDECREF(__pyx_v_x);
   __Pyx_XDECREF(__pyx_v_b);
   __Pyx_XDECREF(__pyx_v_c);
   __Pyx_XDECREF(__pyx_v_d);
@@ -2911,11 +3841,11 @@ static PyObject *__pyx_pw_6kernel_7find_vertex_on_edge(PyObject *__pyx_self, PyO
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_pEdge_in)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("find_vertex_on_edge", 1, 2, 2, 1); __PYX_ERR(0, 97, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("find_vertex_on_edge", 1, 2, 2, 1); __PYX_ERR(0, 132, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "find_vertex_on_edge") < 0)) __PYX_ERR(0, 97, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "find_vertex_on_edge") < 0)) __PYX_ERR(0, 132, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
       goto __pyx_L5_argtuple_error;
@@ -2928,13 +3858,13 @@ static PyObject *__pyx_pw_6kernel_7find_vertex_on_edge(PyObject *__pyx_self, PyO
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("find_vertex_on_edge", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 97, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("find_vertex_on_edge", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 132, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("kernel.find_vertex_on_edge", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_aVertex_in), (&PyList_Type), 1, "aVertex_in", 1))) __PYX_ERR(0, 97, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_aVertex_in), (&PyList_Type), 1, "aVertex_in", 1))) __PYX_ERR(0, 132, __pyx_L1_error)
   __pyx_r = __pyx_pf_6kernel_6find_vertex_on_edge(__pyx_self, __pyx_v_aVertex_in, __pyx_v_pEdge_in);
 
   /* function exit code */
@@ -2955,7 +3885,7 @@ static PyObject *__pyx_pf_6kernel_6find_vertex_on_edge(CYTHON_UNUSED PyObject *_
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("find_vertex_on_edge", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __pyx_f_6kernel_find_vertex_on_edge(__pyx_v_aVertex_in, __pyx_v_pEdge_in, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 97, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_6kernel_find_vertex_on_edge(__pyx_v_aVertex_in, __pyx_v_pEdge_in, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 132, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -2972,7 +3902,7 @@ static PyObject *__pyx_pf_6kernel_6find_vertex_on_edge(CYTHON_UNUSED PyObject *_
   return __pyx_r;
 }
 
-/* "kernel.pyx":134
+/* "kernel.pyx":209
  * 
  * @cython.boundscheck(False)  # deactivate bnds checking
  * cpdef add_unique_vertex(list aVertex_in, pVertex_in, double dThreshold_in = 1.0E-6):             # <<<<<<<<<<<<<<
@@ -3009,7 +3939,7 @@ static PyObject *__pyx_f_6kernel_add_unique_vertex(PyObject *__pyx_v_aVertex_in,
     }
   }
 
-  /* "kernel.pyx":147
+  /* "kernel.pyx":222
  *     cdef int nVertex
  *     cdef int dummy
  *     iFlag_exist = 0             # <<<<<<<<<<<<<<
@@ -3018,7 +3948,7 @@ static PyObject *__pyx_f_6kernel_add_unique_vertex(PyObject *__pyx_v_aVertex_in,
  */
   __pyx_v_iFlag_exist = 0;
 
-  /* "kernel.pyx":148
+  /* "kernel.pyx":223
  *     cdef int dummy
  *     iFlag_exist = 0
  *     nVertex = len(aVertex_in)             # <<<<<<<<<<<<<<
@@ -3027,12 +3957,12 @@ static PyObject *__pyx_f_6kernel_add_unique_vertex(PyObject *__pyx_v_aVertex_in,
  */
   if (unlikely(__pyx_v_aVertex_in == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "object of type 'NoneType' has no len()");
-    __PYX_ERR(0, 148, __pyx_L1_error)
+    __PYX_ERR(0, 223, __pyx_L1_error)
   }
-  __pyx_t_1 = PyList_GET_SIZE(__pyx_v_aVertex_in); if (unlikely(__pyx_t_1 == ((Py_ssize_t)-1))) __PYX_ERR(0, 148, __pyx_L1_error)
+  __pyx_t_1 = PyList_GET_SIZE(__pyx_v_aVertex_in); if (unlikely(__pyx_t_1 == ((Py_ssize_t)-1))) __PYX_ERR(0, 223, __pyx_L1_error)
   __pyx_v_nVertex = __pyx_t_1;
 
-  /* "kernel.pyx":150
+  /* "kernel.pyx":225
  *     nVertex = len(aVertex_in)
  * 
  *     iFlag_exist, dummy =  find_vertex_in_list(aVertex_in, pVertex_in, dThreshold_in)             # <<<<<<<<<<<<<<
@@ -3041,7 +3971,7 @@ static PyObject *__pyx_f_6kernel_add_unique_vertex(PyObject *__pyx_v_aVertex_in,
  */
   __pyx_t_3.__pyx_n = 1;
   __pyx_t_3.dThreshold_in = __pyx_v_dThreshold_in;
-  __pyx_t_2 = __pyx_f_6kernel_find_vertex_in_list(__pyx_v_aVertex_in, __pyx_v_pVertex_in, 0, &__pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 150, __pyx_L1_error)
+  __pyx_t_2 = __pyx_f_6kernel_find_vertex_in_list(__pyx_v_aVertex_in, __pyx_v_pVertex_in, 0, &__pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 225, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   if ((likely(PyTuple_CheckExact(__pyx_t_2))) || (PyList_CheckExact(__pyx_t_2))) {
     PyObject* sequence = __pyx_t_2;
@@ -3049,7 +3979,7 @@ static PyObject *__pyx_f_6kernel_add_unique_vertex(PyObject *__pyx_v_aVertex_in,
     if (unlikely(size != 2)) {
       if (size > 2) __Pyx_RaiseTooManyValuesError(2);
       else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-      __PYX_ERR(0, 150, __pyx_L1_error)
+      __PYX_ERR(0, 225, __pyx_L1_error)
     }
     #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
     if (likely(PyTuple_CheckExact(sequence))) {
@@ -3062,15 +3992,15 @@ static PyObject *__pyx_f_6kernel_add_unique_vertex(PyObject *__pyx_v_aVertex_in,
     __Pyx_INCREF(__pyx_t_4);
     __Pyx_INCREF(__pyx_t_5);
     #else
-    __pyx_t_4 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 150, __pyx_L1_error)
+    __pyx_t_4 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 225, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_5 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 150, __pyx_L1_error)
+    __pyx_t_5 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 225, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     #endif
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   } else {
     Py_ssize_t index = -1;
-    __pyx_t_6 = PyObject_GetIter(__pyx_t_2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 150, __pyx_L1_error)
+    __pyx_t_6 = PyObject_GetIter(__pyx_t_2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 225, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __pyx_t_7 = Py_TYPE(__pyx_t_6)->tp_iternext;
@@ -3078,7 +4008,7 @@ static PyObject *__pyx_f_6kernel_add_unique_vertex(PyObject *__pyx_v_aVertex_in,
     __Pyx_GOTREF(__pyx_t_4);
     index = 1; __pyx_t_5 = __pyx_t_7(__pyx_t_6); if (unlikely(!__pyx_t_5)) goto __pyx_L3_unpacking_failed;
     __Pyx_GOTREF(__pyx_t_5);
-    if (__Pyx_IternextUnpackEndCheck(__pyx_t_7(__pyx_t_6), 2) < 0) __PYX_ERR(0, 150, __pyx_L1_error)
+    if (__Pyx_IternextUnpackEndCheck(__pyx_t_7(__pyx_t_6), 2) < 0) __PYX_ERR(0, 225, __pyx_L1_error)
     __pyx_t_7 = NULL;
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     goto __pyx_L4_unpacking_done;
@@ -3086,17 +4016,17 @@ static PyObject *__pyx_f_6kernel_add_unique_vertex(PyObject *__pyx_v_aVertex_in,
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     __pyx_t_7 = NULL;
     if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-    __PYX_ERR(0, 150, __pyx_L1_error)
+    __PYX_ERR(0, 225, __pyx_L1_error)
     __pyx_L4_unpacking_done:;
   }
-  __pyx_t_8 = __Pyx_PyInt_As_int(__pyx_t_4); if (unlikely((__pyx_t_8 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 150, __pyx_L1_error)
+  __pyx_t_8 = __Pyx_PyInt_As_int(__pyx_t_4); if (unlikely((__pyx_t_8 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 225, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_9 = __Pyx_PyInt_As_int(__pyx_t_5); if (unlikely((__pyx_t_9 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 150, __pyx_L1_error)
+  __pyx_t_9 = __Pyx_PyInt_As_int(__pyx_t_5); if (unlikely((__pyx_t_9 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 225, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   __pyx_v_iFlag_exist = __pyx_t_8;
   __pyx_v_dummy = __pyx_t_9;
 
-  /* "kernel.pyx":152
+  /* "kernel.pyx":227
  *     iFlag_exist, dummy =  find_vertex_in_list(aVertex_in, pVertex_in, dThreshold_in)
  * 
  *     if iFlag_exist == 1:             # <<<<<<<<<<<<<<
@@ -3108,7 +4038,7 @@ static PyObject *__pyx_f_6kernel_add_unique_vertex(PyObject *__pyx_v_aVertex_in,
     goto __pyx_L5;
   }
 
-  /* "kernel.pyx":155
+  /* "kernel.pyx":230
  *         pass
  *     else:
  *         aVertex_in.append(pVertex_in)             # <<<<<<<<<<<<<<
@@ -3118,13 +4048,13 @@ static PyObject *__pyx_f_6kernel_add_unique_vertex(PyObject *__pyx_v_aVertex_in,
   /*else*/ {
     if (unlikely(__pyx_v_aVertex_in == Py_None)) {
       PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "append");
-      __PYX_ERR(0, 155, __pyx_L1_error)
+      __PYX_ERR(0, 230, __pyx_L1_error)
     }
-    __pyx_t_11 = __Pyx_PyList_Append(__pyx_v_aVertex_in, __pyx_v_pVertex_in); if (unlikely(__pyx_t_11 == ((int)-1))) __PYX_ERR(0, 155, __pyx_L1_error)
+    __pyx_t_11 = __Pyx_PyList_Append(__pyx_v_aVertex_in, __pyx_v_pVertex_in); if (unlikely(__pyx_t_11 == ((int)-1))) __PYX_ERR(0, 230, __pyx_L1_error)
   }
   __pyx_L5:;
 
-  /* "kernel.pyx":158
+  /* "kernel.pyx":233
  *         pass
  * 
  *     return aVertex_in, iFlag_exist             # <<<<<<<<<<<<<<
@@ -3132,9 +4062,9 @@ static PyObject *__pyx_f_6kernel_add_unique_vertex(PyObject *__pyx_v_aVertex_in,
  * 
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_iFlag_exist); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 158, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_iFlag_exist); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 233, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_5 = PyTuple_New(2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 158, __pyx_L1_error)
+  __pyx_t_5 = PyTuple_New(2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 233, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_INCREF(__pyx_v_aVertex_in);
   __Pyx_GIVEREF(__pyx_v_aVertex_in);
@@ -3146,7 +4076,7 @@ static PyObject *__pyx_f_6kernel_add_unique_vertex(PyObject *__pyx_v_aVertex_in,
   __pyx_t_5 = 0;
   goto __pyx_L0;
 
-  /* "kernel.pyx":134
+  /* "kernel.pyx":209
  * 
  * @cython.boundscheck(False)  # deactivate bnds checking
  * cpdef add_unique_vertex(list aVertex_in, pVertex_in, double dThreshold_in = 1.0E-6):             # <<<<<<<<<<<<<<
@@ -3206,7 +4136,7 @@ static PyObject *__pyx_pw_6kernel_9add_unique_vertex(PyObject *__pyx_self, PyObj
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_pVertex_in)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("add_unique_vertex", 0, 2, 3, 1); __PYX_ERR(0, 134, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("add_unique_vertex", 0, 2, 3, 1); __PYX_ERR(0, 209, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
@@ -3216,7 +4146,7 @@ static PyObject *__pyx_pw_6kernel_9add_unique_vertex(PyObject *__pyx_self, PyObj
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "add_unique_vertex") < 0)) __PYX_ERR(0, 134, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "add_unique_vertex") < 0)) __PYX_ERR(0, 209, __pyx_L3_error)
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
@@ -3231,20 +4161,20 @@ static PyObject *__pyx_pw_6kernel_9add_unique_vertex(PyObject *__pyx_self, PyObj
     __pyx_v_aVertex_in = ((PyObject*)values[0]);
     __pyx_v_pVertex_in = values[1];
     if (values[2]) {
-      __pyx_v_dThreshold_in = __pyx_PyFloat_AsDouble(values[2]); if (unlikely((__pyx_v_dThreshold_in == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 134, __pyx_L3_error)
+      __pyx_v_dThreshold_in = __pyx_PyFloat_AsDouble(values[2]); if (unlikely((__pyx_v_dThreshold_in == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 209, __pyx_L3_error)
     } else {
       __pyx_v_dThreshold_in = ((double)1.0E-6);
     }
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("add_unique_vertex", 0, 2, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 134, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("add_unique_vertex", 0, 2, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 209, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("kernel.add_unique_vertex", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_aVertex_in), (&PyList_Type), 1, "aVertex_in", 1))) __PYX_ERR(0, 134, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_aVertex_in), (&PyList_Type), 1, "aVertex_in", 1))) __PYX_ERR(0, 209, __pyx_L1_error)
   __pyx_r = __pyx_pf_6kernel_8add_unique_vertex(__pyx_self, __pyx_v_aVertex_in, __pyx_v_pVertex_in, __pyx_v_dThreshold_in);
 
   /* function exit code */
@@ -3268,7 +4198,7 @@ static PyObject *__pyx_pf_6kernel_8add_unique_vertex(CYTHON_UNUSED PyObject *__p
   __Pyx_XDECREF(__pyx_r);
   __pyx_t_2.__pyx_n = 1;
   __pyx_t_2.dThreshold_in = __pyx_v_dThreshold_in;
-  __pyx_t_1 = __pyx_f_6kernel_add_unique_vertex(__pyx_v_aVertex_in, __pyx_v_pVertex_in, 0, &__pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 134, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_6kernel_add_unique_vertex(__pyx_v_aVertex_in, __pyx_v_pVertex_in, 0, &__pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 209, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -3285,7 +4215,7 @@ static PyObject *__pyx_pf_6kernel_8add_unique_vertex(CYTHON_UNUSED PyObject *__p
   return __pyx_r;
 }
 
-/* "kernel.pyx":163
+/* "kernel.pyx":238
  * @cython.boundscheck(False)  # deactivate bnds checking
  * #cdef angle_between_vectors_coordinates(double *u, double *v):
  * cpdef angle_between_vectors_coordinates(double x1, double y1, double z1, double x2, double y2, double z2):             # <<<<<<<<<<<<<<
@@ -3311,7 +4241,7 @@ static PyObject *__pyx_f_6kernel_angle_between_vectors_coordinates(double __pyx_
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("angle_between_vectors_coordinates", 0);
 
-  /* "kernel.pyx":168
+  /* "kernel.pyx":243
  *     """
  *     cdef double a, b, c, d, e, f
  *     a = x1*x2 + y1*y2 + z1*z2             # <<<<<<<<<<<<<<
@@ -3320,7 +4250,7 @@ static PyObject *__pyx_f_6kernel_angle_between_vectors_coordinates(double __pyx_
  */
   __pyx_v_a = (((__pyx_v_x1 * __pyx_v_x2) + (__pyx_v_y1 * __pyx_v_y2)) + (__pyx_v_z1 * __pyx_v_z2));
 
-  /* "kernel.pyx":169
+  /* "kernel.pyx":244
  *     cdef double a, b, c, d, e, f
  *     a = x1*x2 + y1*y2 + z1*z2
  *     b = sqrt( x1*x1 + y1*y1 + z1*z1   )             # <<<<<<<<<<<<<<
@@ -3329,7 +4259,7 @@ static PyObject *__pyx_f_6kernel_angle_between_vectors_coordinates(double __pyx_
  */
   __pyx_v_b = sqrt((((__pyx_v_x1 * __pyx_v_x1) + (__pyx_v_y1 * __pyx_v_y1)) + (__pyx_v_z1 * __pyx_v_z1)));
 
-  /* "kernel.pyx":170
+  /* "kernel.pyx":245
  *     a = x1*x2 + y1*y2 + z1*z2
  *     b = sqrt( x1*x1 + y1*y1 + z1*z1   )
  *     c = sqrt( x2*x2 + y2*y2 + z2*z2   )             # <<<<<<<<<<<<<<
@@ -3338,7 +4268,7 @@ static PyObject *__pyx_f_6kernel_angle_between_vectors_coordinates(double __pyx_
  */
   __pyx_v_c = sqrt((((__pyx_v_x2 * __pyx_v_x2) + (__pyx_v_y2 * __pyx_v_y2)) + (__pyx_v_z2 * __pyx_v_z2)));
 
-  /* "kernel.pyx":171
+  /* "kernel.pyx":246
  *     b = sqrt( x1*x1 + y1*y1 + z1*z1   )
  *     c = sqrt( x2*x2 + y2*y2 + z2*z2   )
  *     d = a / (b* c)             # <<<<<<<<<<<<<<
@@ -3348,11 +4278,11 @@ static PyObject *__pyx_f_6kernel_angle_between_vectors_coordinates(double __pyx_
   __pyx_t_1 = (__pyx_v_b * __pyx_v_c);
   if (unlikely(__pyx_t_1 == 0)) {
     PyErr_SetString(PyExc_ZeroDivisionError, "float division");
-    __PYX_ERR(0, 171, __pyx_L1_error)
+    __PYX_ERR(0, 246, __pyx_L1_error)
   }
   __pyx_v_d = (__pyx_v_a / __pyx_t_1);
 
-  /* "kernel.pyx":172
+  /* "kernel.pyx":247
  *     c = sqrt( x2*x2 + y2*y2 + z2*z2   )
  *     d = a / (b* c)
  *     if d > 1:             # <<<<<<<<<<<<<<
@@ -3362,7 +4292,7 @@ static PyObject *__pyx_f_6kernel_angle_between_vectors_coordinates(double __pyx_
   __pyx_t_2 = ((__pyx_v_d > 1.0) != 0);
   if (__pyx_t_2) {
 
-    /* "kernel.pyx":173
+    /* "kernel.pyx":248
  *     d = a / (b* c)
  *     if d > 1:
  *         d = 1             # <<<<<<<<<<<<<<
@@ -3371,7 +4301,7 @@ static PyObject *__pyx_f_6kernel_angle_between_vectors_coordinates(double __pyx_
  */
     __pyx_v_d = 1.0;
 
-    /* "kernel.pyx":172
+    /* "kernel.pyx":247
  *     c = sqrt( x2*x2 + y2*y2 + z2*z2   )
  *     d = a / (b* c)
  *     if d > 1:             # <<<<<<<<<<<<<<
@@ -3380,7 +4310,7 @@ static PyObject *__pyx_f_6kernel_angle_between_vectors_coordinates(double __pyx_
  */
   }
 
-  /* "kernel.pyx":174
+  /* "kernel.pyx":249
  *     if d > 1:
  *         d = 1
  *     if d < -1:             # <<<<<<<<<<<<<<
@@ -3390,7 +4320,7 @@ static PyObject *__pyx_f_6kernel_angle_between_vectors_coordinates(double __pyx_
   __pyx_t_2 = ((__pyx_v_d < -1.0) != 0);
   if (__pyx_t_2) {
 
-    /* "kernel.pyx":175
+    /* "kernel.pyx":250
  *         d = 1
  *     if d < -1:
  *         d = -1             # <<<<<<<<<<<<<<
@@ -3399,7 +4329,7 @@ static PyObject *__pyx_f_6kernel_angle_between_vectors_coordinates(double __pyx_
  */
     __pyx_v_d = -1.0;
 
-    /* "kernel.pyx":174
+    /* "kernel.pyx":249
  *     if d > 1:
  *         d = 1
  *     if d < -1:             # <<<<<<<<<<<<<<
@@ -3408,7 +4338,7 @@ static PyObject *__pyx_f_6kernel_angle_between_vectors_coordinates(double __pyx_
  */
   }
 
-  /* "kernel.pyx":176
+  /* "kernel.pyx":251
  *     if d < -1:
  *         d = -1
  *     e = acos(d)             # <<<<<<<<<<<<<<
@@ -3417,7 +4347,7 @@ static PyObject *__pyx_f_6kernel_angle_between_vectors_coordinates(double __pyx_
  */
   __pyx_v_e = acos(__pyx_v_d);
 
-  /* "kernel.pyx":177
+  /* "kernel.pyx":252
  *         d = -1
  *     e = acos(d)
  *     f = e / pi * 180.0             # <<<<<<<<<<<<<<
@@ -3426,11 +4356,11 @@ static PyObject *__pyx_f_6kernel_angle_between_vectors_coordinates(double __pyx_
  */
   if (unlikely(__pyx_v_6kernel_pi == 0)) {
     PyErr_SetString(PyExc_ZeroDivisionError, "float division");
-    __PYX_ERR(0, 177, __pyx_L1_error)
+    __PYX_ERR(0, 252, __pyx_L1_error)
   }
   __pyx_v_f = ((__pyx_v_e / __pyx_v_6kernel_pi) * 180.0);
 
-  /* "kernel.pyx":178
+  /* "kernel.pyx":253
  *     e = acos(d)
  *     f = e / pi * 180.0
  *     return f             # <<<<<<<<<<<<<<
@@ -3438,13 +4368,13 @@ static PyObject *__pyx_f_6kernel_angle_between_vectors_coordinates(double __pyx_
  * @cython.boundscheck(False)  # deactivate bnds checking
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_3 = PyFloat_FromDouble(__pyx_v_f); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 178, __pyx_L1_error)
+  __pyx_t_3 = PyFloat_FromDouble(__pyx_v_f); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 253, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_r = __pyx_t_3;
   __pyx_t_3 = 0;
   goto __pyx_L0;
 
-  /* "kernel.pyx":163
+  /* "kernel.pyx":238
  * @cython.boundscheck(False)  # deactivate bnds checking
  * #cdef angle_between_vectors_coordinates(double *u, double *v):
  * cpdef angle_between_vectors_coordinates(double x1, double y1, double z1, double x2, double y2, double z2):             # <<<<<<<<<<<<<<
@@ -3510,35 +4440,35 @@ static PyObject *__pyx_pw_6kernel_11angle_between_vectors_coordinates(PyObject *
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_y1)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("angle_between_vectors_coordinates", 1, 6, 6, 1); __PYX_ERR(0, 163, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("angle_between_vectors_coordinates", 1, 6, 6, 1); __PYX_ERR(0, 238, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_z1)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("angle_between_vectors_coordinates", 1, 6, 6, 2); __PYX_ERR(0, 163, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("angle_between_vectors_coordinates", 1, 6, 6, 2); __PYX_ERR(0, 238, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_x2)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("angle_between_vectors_coordinates", 1, 6, 6, 3); __PYX_ERR(0, 163, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("angle_between_vectors_coordinates", 1, 6, 6, 3); __PYX_ERR(0, 238, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  4:
         if (likely((values[4] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_y2)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("angle_between_vectors_coordinates", 1, 6, 6, 4); __PYX_ERR(0, 163, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("angle_between_vectors_coordinates", 1, 6, 6, 4); __PYX_ERR(0, 238, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  5:
         if (likely((values[5] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_z2)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("angle_between_vectors_coordinates", 1, 6, 6, 5); __PYX_ERR(0, 163, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("angle_between_vectors_coordinates", 1, 6, 6, 5); __PYX_ERR(0, 238, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "angle_between_vectors_coordinates") < 0)) __PYX_ERR(0, 163, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "angle_between_vectors_coordinates") < 0)) __PYX_ERR(0, 238, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 6) {
       goto __pyx_L5_argtuple_error;
@@ -3550,16 +4480,16 @@ static PyObject *__pyx_pw_6kernel_11angle_between_vectors_coordinates(PyObject *
       values[4] = PyTuple_GET_ITEM(__pyx_args, 4);
       values[5] = PyTuple_GET_ITEM(__pyx_args, 5);
     }
-    __pyx_v_x1 = __pyx_PyFloat_AsDouble(values[0]); if (unlikely((__pyx_v_x1 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 163, __pyx_L3_error)
-    __pyx_v_y1 = __pyx_PyFloat_AsDouble(values[1]); if (unlikely((__pyx_v_y1 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 163, __pyx_L3_error)
-    __pyx_v_z1 = __pyx_PyFloat_AsDouble(values[2]); if (unlikely((__pyx_v_z1 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 163, __pyx_L3_error)
-    __pyx_v_x2 = __pyx_PyFloat_AsDouble(values[3]); if (unlikely((__pyx_v_x2 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 163, __pyx_L3_error)
-    __pyx_v_y2 = __pyx_PyFloat_AsDouble(values[4]); if (unlikely((__pyx_v_y2 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 163, __pyx_L3_error)
-    __pyx_v_z2 = __pyx_PyFloat_AsDouble(values[5]); if (unlikely((__pyx_v_z2 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 163, __pyx_L3_error)
+    __pyx_v_x1 = __pyx_PyFloat_AsDouble(values[0]); if (unlikely((__pyx_v_x1 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 238, __pyx_L3_error)
+    __pyx_v_y1 = __pyx_PyFloat_AsDouble(values[1]); if (unlikely((__pyx_v_y1 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 238, __pyx_L3_error)
+    __pyx_v_z1 = __pyx_PyFloat_AsDouble(values[2]); if (unlikely((__pyx_v_z1 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 238, __pyx_L3_error)
+    __pyx_v_x2 = __pyx_PyFloat_AsDouble(values[3]); if (unlikely((__pyx_v_x2 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 238, __pyx_L3_error)
+    __pyx_v_y2 = __pyx_PyFloat_AsDouble(values[4]); if (unlikely((__pyx_v_y2 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 238, __pyx_L3_error)
+    __pyx_v_z2 = __pyx_PyFloat_AsDouble(values[5]); if (unlikely((__pyx_v_z2 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 238, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("angle_between_vectors_coordinates", 1, 6, 6, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 163, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("angle_between_vectors_coordinates", 1, 6, 6, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 238, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("kernel.angle_between_vectors_coordinates", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -3581,7 +4511,7 @@ static PyObject *__pyx_pf_6kernel_10angle_between_vectors_coordinates(CYTHON_UNU
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("angle_between_vectors_coordinates", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __pyx_f_6kernel_angle_between_vectors_coordinates(__pyx_v_x1, __pyx_v_y1, __pyx_v_z1, __pyx_v_x2, __pyx_v_y2, __pyx_v_z2, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 163, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_6kernel_angle_between_vectors_coordinates(__pyx_v_x1, __pyx_v_y1, __pyx_v_z1, __pyx_v_x2, __pyx_v_y2, __pyx_v_z2, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 238, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -3598,7 +4528,7 @@ static PyObject *__pyx_pf_6kernel_10angle_between_vectors_coordinates(CYTHON_UNU
   return __pyx_r;
 }
 
-/* "kernel.pyx":181
+/* "kernel.pyx":256
  * 
  * @cython.boundscheck(False)  # deactivate bnds checking
  * cpdef (double, double, double) longlat_to_3d(dLongitude_degree_in, dLatitude_degree_in):             # <<<<<<<<<<<<<<
@@ -3626,75 +4556,75 @@ static __pyx_ctuple_double__and_double__and_double __pyx_f_6kernel_longlat_to_3d
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("longlat_to_3d", 0);
 
-  /* "kernel.pyx":189
+  /* "kernel.pyx":264
  *     cdef double dLongitude_degree, dLatitude_degree
  * 
  *     dLongitude_radian =  dLongitude_degree_in / 180.0 * pi             # <<<<<<<<<<<<<<
  *     dLatitude_radian = dLatitude_degree_in / 180.0 * pi
  * 
  */
-  __pyx_t_1 = __Pyx_PyFloat_DivideObjC(__pyx_v_dLongitude_degree_in, __pyx_float_180_0, 180.0, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 189, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyFloat_DivideObjC(__pyx_v_dLongitude_degree_in, __pyx_float_180_0, 180.0, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 264, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = PyFloat_FromDouble(__pyx_v_6kernel_pi); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 189, __pyx_L1_error)
+  __pyx_t_2 = PyFloat_FromDouble(__pyx_v_6kernel_pi); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 264, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = PyNumber_Multiply(__pyx_t_1, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 189, __pyx_L1_error)
+  __pyx_t_3 = PyNumber_Multiply(__pyx_t_1, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 264, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_dLongitude_radian = __pyx_t_3;
   __pyx_t_3 = 0;
 
-  /* "kernel.pyx":190
+  /* "kernel.pyx":265
  * 
  *     dLongitude_radian =  dLongitude_degree_in / 180.0 * pi
  *     dLatitude_radian = dLatitude_degree_in / 180.0 * pi             # <<<<<<<<<<<<<<
  * 
  *     x = cos(dLatitude_radian) * cos(dLongitude_radian)
  */
-  __pyx_t_3 = __Pyx_PyFloat_DivideObjC(__pyx_v_dLatitude_degree_in, __pyx_float_180_0, 180.0, 0, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 190, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyFloat_DivideObjC(__pyx_v_dLatitude_degree_in, __pyx_float_180_0, 180.0, 0, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 265, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_2 = PyFloat_FromDouble(__pyx_v_6kernel_pi); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 190, __pyx_L1_error)
+  __pyx_t_2 = PyFloat_FromDouble(__pyx_v_6kernel_pi); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 265, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_1 = PyNumber_Multiply(__pyx_t_3, __pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 190, __pyx_L1_error)
+  __pyx_t_1 = PyNumber_Multiply(__pyx_t_3, __pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 265, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_dLatitude_radian = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "kernel.pyx":192
+  /* "kernel.pyx":267
  *     dLatitude_radian = dLatitude_degree_in / 180.0 * pi
  * 
  *     x = cos(dLatitude_radian) * cos(dLongitude_radian)             # <<<<<<<<<<<<<<
  *     y = cos(dLatitude_radian) * sin(dLongitude_radian)
  *     z = sin(dLatitude_radian)
  */
-  __pyx_t_4 = __pyx_PyFloat_AsDouble(__pyx_v_dLatitude_radian); if (unlikely((__pyx_t_4 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 192, __pyx_L1_error)
-  __pyx_t_5 = __pyx_PyFloat_AsDouble(__pyx_v_dLongitude_radian); if (unlikely((__pyx_t_5 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 192, __pyx_L1_error)
+  __pyx_t_4 = __pyx_PyFloat_AsDouble(__pyx_v_dLatitude_radian); if (unlikely((__pyx_t_4 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 267, __pyx_L1_error)
+  __pyx_t_5 = __pyx_PyFloat_AsDouble(__pyx_v_dLongitude_radian); if (unlikely((__pyx_t_5 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 267, __pyx_L1_error)
   __pyx_v_x = (cos(__pyx_t_4) * cos(__pyx_t_5));
 
-  /* "kernel.pyx":193
+  /* "kernel.pyx":268
  * 
  *     x = cos(dLatitude_radian) * cos(dLongitude_radian)
  *     y = cos(dLatitude_radian) * sin(dLongitude_radian)             # <<<<<<<<<<<<<<
  *     z = sin(dLatitude_radian)
  * 
  */
-  __pyx_t_5 = __pyx_PyFloat_AsDouble(__pyx_v_dLatitude_radian); if (unlikely((__pyx_t_5 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 193, __pyx_L1_error)
-  __pyx_t_4 = __pyx_PyFloat_AsDouble(__pyx_v_dLongitude_radian); if (unlikely((__pyx_t_4 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 193, __pyx_L1_error)
+  __pyx_t_5 = __pyx_PyFloat_AsDouble(__pyx_v_dLatitude_radian); if (unlikely((__pyx_t_5 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 268, __pyx_L1_error)
+  __pyx_t_4 = __pyx_PyFloat_AsDouble(__pyx_v_dLongitude_radian); if (unlikely((__pyx_t_4 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 268, __pyx_L1_error)
   __pyx_v_y = (cos(__pyx_t_5) * sin(__pyx_t_4));
 
-  /* "kernel.pyx":194
+  /* "kernel.pyx":269
  *     x = cos(dLatitude_radian) * cos(dLongitude_radian)
  *     y = cos(dLatitude_radian) * sin(dLongitude_radian)
  *     z = sin(dLatitude_radian)             # <<<<<<<<<<<<<<
  * 
  *     return x, y, z
  */
-  __pyx_t_4 = __pyx_PyFloat_AsDouble(__pyx_v_dLatitude_radian); if (unlikely((__pyx_t_4 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 194, __pyx_L1_error)
+  __pyx_t_4 = __pyx_PyFloat_AsDouble(__pyx_v_dLatitude_radian); if (unlikely((__pyx_t_4 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 269, __pyx_L1_error)
   __pyx_v_z = sin(__pyx_t_4);
 
-  /* "kernel.pyx":196
+  /* "kernel.pyx":271
  *     z = sin(dLatitude_radian)
  * 
  *     return x, y, z             # <<<<<<<<<<<<<<
@@ -3707,7 +4637,7 @@ static __pyx_ctuple_double__and_double__and_double __pyx_f_6kernel_longlat_to_3d
   __pyx_r = __pyx_t_6;
   goto __pyx_L0;
 
-  /* "kernel.pyx":181
+  /* "kernel.pyx":256
  * 
  * @cython.boundscheck(False)  # deactivate bnds checking
  * cpdef (double, double, double) longlat_to_3d(dLongitude_degree_in, dLatitude_degree_in):             # <<<<<<<<<<<<<<
@@ -3764,11 +4694,11 @@ static PyObject *__pyx_pw_6kernel_13longlat_to_3d(PyObject *__pyx_self, PyObject
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_dLatitude_degree_in)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("longlat_to_3d", 1, 2, 2, 1); __PYX_ERR(0, 181, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("longlat_to_3d", 1, 2, 2, 1); __PYX_ERR(0, 256, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "longlat_to_3d") < 0)) __PYX_ERR(0, 181, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "longlat_to_3d") < 0)) __PYX_ERR(0, 256, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
       goto __pyx_L5_argtuple_error;
@@ -3781,7 +4711,7 @@ static PyObject *__pyx_pw_6kernel_13longlat_to_3d(PyObject *__pyx_self, PyObject
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("longlat_to_3d", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 181, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("longlat_to_3d", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 256, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("kernel.longlat_to_3d", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -3803,7 +4733,7 @@ static PyObject *__pyx_pf_6kernel_12longlat_to_3d(CYTHON_UNUSED PyObject *__pyx_
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("longlat_to_3d", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __pyx_convert__to_py___pyx_ctuple_double__and_double__and_double(__pyx_f_6kernel_longlat_to_3d(__pyx_v_dLongitude_degree_in, __pyx_v_dLatitude_degree_in, 0)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 181, __pyx_L1_error)
+  __pyx_t_1 = __pyx_convert__to_py___pyx_ctuple_double__and_double__and_double(__pyx_f_6kernel_longlat_to_3d(__pyx_v_dLongitude_degree_in, __pyx_v_dLatitude_degree_in, 0)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 256, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -3820,7 +4750,7 @@ static PyObject *__pyx_pf_6kernel_12longlat_to_3d(CYTHON_UNUSED PyObject *__pyx_
   return __pyx_r;
 }
 
-/* "kernel.pyx":200
+/* "kernel.pyx":275
  * 
  * @cython.boundscheck(False)  # deactivate bnds checking
  * cpdef calculate_angle_betwen_vertex(dLongitude_degree1_in, dLatitude_degree1_in, dLongitude_degree2_in, dLatitude_degree2_in, dLongitude_degree3_in, dLatitude_degree3_in):             # <<<<<<<<<<<<<<
@@ -3858,7 +4788,7 @@ static PyObject *__pyx_f_6kernel_calculate_angle_betwen_vertex(PyObject *__pyx_v
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("calculate_angle_betwen_vertex", 0);
 
-  /* "kernel.pyx":211
+  /* "kernel.pyx":286
  * 
  *     # The points in 3D space
  *     x1, y1, z1 = longlat_to_3d(dLongitude_degree1_in, dLatitude_degree1_in)             # <<<<<<<<<<<<<<
@@ -3873,7 +4803,7 @@ static PyObject *__pyx_f_6kernel_calculate_angle_betwen_vertex(PyObject *__pyx_v
   __pyx_v_y1 = __pyx_t_3;
   __pyx_v_z1 = __pyx_t_4;
 
-  /* "kernel.pyx":212
+  /* "kernel.pyx":287
  *     # The points in 3D space
  *     x1, y1, z1 = longlat_to_3d(dLongitude_degree1_in, dLatitude_degree1_in)
  *     x2, y2, z2 = longlat_to_3d(dLongitude_degree2_in, dLatitude_degree2_in)             # <<<<<<<<<<<<<<
@@ -3888,7 +4818,7 @@ static PyObject *__pyx_f_6kernel_calculate_angle_betwen_vertex(PyObject *__pyx_v
   __pyx_v_y2 = __pyx_t_3;
   __pyx_v_z2 = __pyx_t_2;
 
-  /* "kernel.pyx":213
+  /* "kernel.pyx":288
  *     x1, y1, z1 = longlat_to_3d(dLongitude_degree1_in, dLatitude_degree1_in)
  *     x2, y2, z2 = longlat_to_3d(dLongitude_degree2_in, dLatitude_degree2_in)
  *     x3, y3, z3 = longlat_to_3d(dLongitude_degree3_in, dLatitude_degree3_in)             # <<<<<<<<<<<<<<
@@ -3903,7 +4833,7 @@ static PyObject *__pyx_f_6kernel_calculate_angle_betwen_vertex(PyObject *__pyx_v
   __pyx_v_y3 = __pyx_t_3;
   __pyx_v_z3 = __pyx_t_4;
 
-  /* "kernel.pyx":216
+  /* "kernel.pyx":291
  *     # Vectors in 3D space
  * 
  *     x4 = x1 - x2             # <<<<<<<<<<<<<<
@@ -3912,7 +4842,7 @@ static PyObject *__pyx_f_6kernel_calculate_angle_betwen_vertex(PyObject *__pyx_v
  */
   __pyx_v_x4 = (__pyx_v_x1 - __pyx_v_x2);
 
-  /* "kernel.pyx":217
+  /* "kernel.pyx":292
  * 
  *     x4 = x1 - x2
  *     y4 = y1 - y2             # <<<<<<<<<<<<<<
@@ -3921,7 +4851,7 @@ static PyObject *__pyx_f_6kernel_calculate_angle_betwen_vertex(PyObject *__pyx_v
  */
   __pyx_v_y4 = (__pyx_v_y1 - __pyx_v_y2);
 
-  /* "kernel.pyx":218
+  /* "kernel.pyx":293
  *     x4 = x1 - x2
  *     y4 = y1 - y2
  *     z4 = z1 - z2             # <<<<<<<<<<<<<<
@@ -3930,7 +4860,7 @@ static PyObject *__pyx_f_6kernel_calculate_angle_betwen_vertex(PyObject *__pyx_v
  */
   __pyx_v_z4 = (__pyx_v_z1 - __pyx_v_z2);
 
-  /* "kernel.pyx":220
+  /* "kernel.pyx":295
  *     z4 = z1 - z2
  *     #c3vec[i] = aCoordinate3[i] - aCoordinate2[i]
  *     x5 = x3 - x2             # <<<<<<<<<<<<<<
@@ -3939,7 +4869,7 @@ static PyObject *__pyx_f_6kernel_calculate_angle_betwen_vertex(PyObject *__pyx_v
  */
   __pyx_v_x5 = (__pyx_v_x3 - __pyx_v_x2);
 
-  /* "kernel.pyx":221
+  /* "kernel.pyx":296
  *     #c3vec[i] = aCoordinate3[i] - aCoordinate2[i]
  *     x5 = x3 - x2
  *     y5 = y3 - y2             # <<<<<<<<<<<<<<
@@ -3948,7 +4878,7 @@ static PyObject *__pyx_f_6kernel_calculate_angle_betwen_vertex(PyObject *__pyx_v
  */
   __pyx_v_y5 = (__pyx_v_y3 - __pyx_v_y2);
 
-  /* "kernel.pyx":222
+  /* "kernel.pyx":297
  *     x5 = x3 - x2
  *     y5 = y3 - y2
  *     z5 = z3 - z2             # <<<<<<<<<<<<<<
@@ -3957,20 +4887,20 @@ static PyObject *__pyx_f_6kernel_calculate_angle_betwen_vertex(PyObject *__pyx_v
  */
   __pyx_v_z5 = (__pyx_v_z3 - __pyx_v_z2);
 
-  /* "kernel.pyx":224
+  /* "kernel.pyx":299
  *     z5 = z3 - z2
  * 
  *     angle3deg = angle_between_vectors_coordinates( x4, y4, z4, x5, y5, z5)             # <<<<<<<<<<<<<<
  *     return  angle3deg
  * 
  */
-  __pyx_t_5 = __pyx_f_6kernel_angle_between_vectors_coordinates(__pyx_v_x4, __pyx_v_y4, __pyx_v_z4, __pyx_v_x5, __pyx_v_y5, __pyx_v_z5, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 224, __pyx_L1_error)
+  __pyx_t_5 = __pyx_f_6kernel_angle_between_vectors_coordinates(__pyx_v_x4, __pyx_v_y4, __pyx_v_z4, __pyx_v_x5, __pyx_v_y5, __pyx_v_z5, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 299, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_4 = __pyx_PyFloat_AsDouble(__pyx_t_5); if (unlikely((__pyx_t_4 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 224, __pyx_L1_error)
+  __pyx_t_4 = __pyx_PyFloat_AsDouble(__pyx_t_5); if (unlikely((__pyx_t_4 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 299, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   __pyx_v_angle3deg = __pyx_t_4;
 
-  /* "kernel.pyx":225
+  /* "kernel.pyx":300
  * 
  *     angle3deg = angle_between_vectors_coordinates( x4, y4, z4, x5, y5, z5)
  *     return  angle3deg             # <<<<<<<<<<<<<<
@@ -3978,13 +4908,13 @@ static PyObject *__pyx_f_6kernel_calculate_angle_betwen_vertex(PyObject *__pyx_v
  * @cython.boundscheck(False)  # deactivate bnds checking
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_5 = PyFloat_FromDouble(__pyx_v_angle3deg); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 225, __pyx_L1_error)
+  __pyx_t_5 = PyFloat_FromDouble(__pyx_v_angle3deg); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 300, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __pyx_r = __pyx_t_5;
   __pyx_t_5 = 0;
   goto __pyx_L0;
 
-  /* "kernel.pyx":200
+  /* "kernel.pyx":275
  * 
  * @cython.boundscheck(False)  # deactivate bnds checking
  * cpdef calculate_angle_betwen_vertex(dLongitude_degree1_in, dLatitude_degree1_in, dLongitude_degree2_in, dLatitude_degree2_in, dLongitude_degree3_in, dLatitude_degree3_in):             # <<<<<<<<<<<<<<
@@ -4049,35 +4979,35 @@ static PyObject *__pyx_pw_6kernel_15calculate_angle_betwen_vertex(PyObject *__py
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_dLatitude_degree1_in)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calculate_angle_betwen_vertex", 1, 6, 6, 1); __PYX_ERR(0, 200, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calculate_angle_betwen_vertex", 1, 6, 6, 1); __PYX_ERR(0, 275, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_dLongitude_degree2_in)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calculate_angle_betwen_vertex", 1, 6, 6, 2); __PYX_ERR(0, 200, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calculate_angle_betwen_vertex", 1, 6, 6, 2); __PYX_ERR(0, 275, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_dLatitude_degree2_in)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calculate_angle_betwen_vertex", 1, 6, 6, 3); __PYX_ERR(0, 200, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calculate_angle_betwen_vertex", 1, 6, 6, 3); __PYX_ERR(0, 275, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  4:
         if (likely((values[4] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_dLongitude_degree3_in)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calculate_angle_betwen_vertex", 1, 6, 6, 4); __PYX_ERR(0, 200, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calculate_angle_betwen_vertex", 1, 6, 6, 4); __PYX_ERR(0, 275, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  5:
         if (likely((values[5] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_dLatitude_degree3_in)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calculate_angle_betwen_vertex", 1, 6, 6, 5); __PYX_ERR(0, 200, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calculate_angle_betwen_vertex", 1, 6, 6, 5); __PYX_ERR(0, 275, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "calculate_angle_betwen_vertex") < 0)) __PYX_ERR(0, 200, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "calculate_angle_betwen_vertex") < 0)) __PYX_ERR(0, 275, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 6) {
       goto __pyx_L5_argtuple_error;
@@ -4098,7 +5028,7 @@ static PyObject *__pyx_pw_6kernel_15calculate_angle_betwen_vertex(PyObject *__py
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("calculate_angle_betwen_vertex", 1, 6, 6, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 200, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("calculate_angle_betwen_vertex", 1, 6, 6, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 275, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("kernel.calculate_angle_betwen_vertex", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -4120,7 +5050,7 @@ static PyObject *__pyx_pf_6kernel_14calculate_angle_betwen_vertex(CYTHON_UNUSED 
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("calculate_angle_betwen_vertex", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __pyx_f_6kernel_calculate_angle_betwen_vertex(__pyx_v_dLongitude_degree1_in, __pyx_v_dLatitude_degree1_in, __pyx_v_dLongitude_degree2_in, __pyx_v_dLatitude_degree2_in, __pyx_v_dLongitude_degree3_in, __pyx_v_dLatitude_degree3_in, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 200, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_6kernel_calculate_angle_betwen_vertex(__pyx_v_dLongitude_degree1_in, __pyx_v_dLatitude_degree1_in, __pyx_v_dLongitude_degree2_in, __pyx_v_dLatitude_degree2_in, __pyx_v_dLongitude_degree3_in, __pyx_v_dLatitude_degree3_in, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 275, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -4137,7 +5067,7 @@ static PyObject *__pyx_pf_6kernel_14calculate_angle_betwen_vertex(CYTHON_UNUSED 
   return __pyx_r;
 }
 
-/* "kernel.pyx":228
+/* "kernel.pyx":303
  * 
  * @cython.boundscheck(False)  # deactivate bnds checking
  * cpdef calculate_distance_to_plane(dLongitude_degree1_in, dLatitude_degree1_in, dLongitude_degree2_in, dLatitude_degree2_in, dLongitude_degree3_in, dLatitude_degree3_in):             # <<<<<<<<<<<<<<
@@ -4173,7 +5103,7 @@ static PyObject *__pyx_f_6kernel_calculate_distance_to_plane(PyObject *__pyx_v_d
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("calculate_distance_to_plane", 0);
 
-  /* "kernel.pyx":235
+  /* "kernel.pyx":310
  *     cdef b, c
  *     # The points in 3D space
  *     x1, y1, z1 = longlat_to_3d(dLongitude_degree1_in, dLatitude_degree1_in)             # <<<<<<<<<<<<<<
@@ -4188,7 +5118,7 @@ static PyObject *__pyx_f_6kernel_calculate_distance_to_plane(PyObject *__pyx_v_d
   __pyx_v_y1 = __pyx_t_3;
   __pyx_v_z1 = __pyx_t_4;
 
-  /* "kernel.pyx":236
+  /* "kernel.pyx":311
  *     # The points in 3D space
  *     x1, y1, z1 = longlat_to_3d(dLongitude_degree1_in, dLatitude_degree1_in)
  *     x2, y2, z2 = longlat_to_3d(dLongitude_degree2_in, dLatitude_degree2_in)             # <<<<<<<<<<<<<<
@@ -4203,7 +5133,7 @@ static PyObject *__pyx_f_6kernel_calculate_distance_to_plane(PyObject *__pyx_v_d
   __pyx_v_y2 = __pyx_t_3;
   __pyx_v_z2 = __pyx_t_2;
 
-  /* "kernel.pyx":237
+  /* "kernel.pyx":312
  *     x1, y1, z1 = longlat_to_3d(dLongitude_degree1_in, dLatitude_degree1_in)
  *     x2, y2, z2 = longlat_to_3d(dLongitude_degree2_in, dLatitude_degree2_in)
  *     x3, y3, z3 = longlat_to_3d(dLongitude_degree3_in, dLatitude_degree3_in)             # <<<<<<<<<<<<<<
@@ -4218,7 +5148,7 @@ static PyObject *__pyx_f_6kernel_calculate_distance_to_plane(PyObject *__pyx_v_d
   __pyx_v_y3 = __pyx_t_3;
   __pyx_v_z3 = __pyx_t_4;
 
-  /* "kernel.pyx":239
+  /* "kernel.pyx":314
  *     x3, y3, z3 = longlat_to_3d(dLongitude_degree3_in, dLatitude_degree3_in)
  *     #The formula is x+b*y+c*z=0
  *     c = (-x1*y3 + x3* y1)/( z1*y3 - z3*y1 )             # <<<<<<<<<<<<<<
@@ -4229,14 +5159,14 @@ static PyObject *__pyx_f_6kernel_calculate_distance_to_plane(PyObject *__pyx_v_d
   __pyx_t_3 = ((__pyx_v_z1 * __pyx_v_y3) - (__pyx_v_z3 * __pyx_v_y1));
   if (unlikely(__pyx_t_3 == 0)) {
     PyErr_SetString(PyExc_ZeroDivisionError, "float division");
-    __PYX_ERR(0, 239, __pyx_L1_error)
+    __PYX_ERR(0, 314, __pyx_L1_error)
   }
-  __pyx_t_5 = PyFloat_FromDouble((__pyx_t_4 / __pyx_t_3)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 239, __pyx_L1_error)
+  __pyx_t_5 = PyFloat_FromDouble((__pyx_t_4 / __pyx_t_3)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 314, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __pyx_v_c = __pyx_t_5;
   __pyx_t_5 = 0;
 
-  /* "kernel.pyx":240
+  /* "kernel.pyx":315
  *     #The formula is x+b*y+c*z=0
  *     c = (-x1*y3 + x3* y1)/( z1*y3 - z3*y1 )
  *     b = (-x1*z3 + x3 * z1 ) / (y1 * z3 - y3*z1)             # <<<<<<<<<<<<<<
@@ -4247,61 +5177,61 @@ static PyObject *__pyx_f_6kernel_calculate_distance_to_plane(PyObject *__pyx_v_d
   __pyx_t_4 = ((__pyx_v_y1 * __pyx_v_z3) - (__pyx_v_y3 * __pyx_v_z1));
   if (unlikely(__pyx_t_4 == 0)) {
     PyErr_SetString(PyExc_ZeroDivisionError, "float division");
-    __PYX_ERR(0, 240, __pyx_L1_error)
+    __PYX_ERR(0, 315, __pyx_L1_error)
   }
-  __pyx_t_5 = PyFloat_FromDouble((__pyx_t_3 / __pyx_t_4)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 240, __pyx_L1_error)
+  __pyx_t_5 = PyFloat_FromDouble((__pyx_t_3 / __pyx_t_4)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 315, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __pyx_v_b = __pyx_t_5;
   __pyx_t_5 = 0;
 
-  /* "kernel.pyx":241
+  /* "kernel.pyx":316
  *     c = (-x1*y3 + x3* y1)/( z1*y3 - z3*y1 )
  *     b = (-x1*z3 + x3 * z1 ) / (y1 * z3 - y3*z1)
  *     distance = abs(  x2 + b * y2 + c * z2 )             # <<<<<<<<<<<<<<
  *     return distance
  * 
  */
-  __pyx_t_5 = PyFloat_FromDouble(__pyx_v_x2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 241, __pyx_L1_error)
+  __pyx_t_5 = PyFloat_FromDouble(__pyx_v_x2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 316, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_6 = PyFloat_FromDouble(__pyx_v_y2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 241, __pyx_L1_error)
+  __pyx_t_6 = PyFloat_FromDouble(__pyx_v_y2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 316, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
-  __pyx_t_7 = PyNumber_Multiply(__pyx_v_b, __pyx_t_6); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 241, __pyx_L1_error)
+  __pyx_t_7 = PyNumber_Multiply(__pyx_v_b, __pyx_t_6); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 316, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  __pyx_t_6 = PyNumber_Add(__pyx_t_5, __pyx_t_7); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 241, __pyx_L1_error)
+  __pyx_t_6 = PyNumber_Add(__pyx_t_5, __pyx_t_7); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 316, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-  __pyx_t_7 = PyFloat_FromDouble(__pyx_v_z2); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 241, __pyx_L1_error)
+  __pyx_t_7 = PyFloat_FromDouble(__pyx_v_z2); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 316, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
-  __pyx_t_5 = PyNumber_Multiply(__pyx_v_c, __pyx_t_7); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 241, __pyx_L1_error)
+  __pyx_t_5 = PyNumber_Multiply(__pyx_v_c, __pyx_t_7); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 316, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-  __pyx_t_7 = PyNumber_Add(__pyx_t_6, __pyx_t_5); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 241, __pyx_L1_error)
+  __pyx_t_7 = PyNumber_Add(__pyx_t_6, __pyx_t_5); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 316, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __pyx_t_5 = __Pyx_PyNumber_Absolute(__pyx_t_7); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 241, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyNumber_Absolute(__pyx_t_7); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 316, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-  __pyx_t_4 = __pyx_PyFloat_AsDouble(__pyx_t_5); if (unlikely((__pyx_t_4 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 241, __pyx_L1_error)
+  __pyx_t_4 = __pyx_PyFloat_AsDouble(__pyx_t_5); if (unlikely((__pyx_t_4 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 316, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   __pyx_v_distance = __pyx_t_4;
 
-  /* "kernel.pyx":242
+  /* "kernel.pyx":317
  *     b = (-x1*z3 + x3 * z1 ) / (y1 * z3 - y3*z1)
  *     distance = abs(  x2 + b * y2 + c * z2 )
  *     return distance             # <<<<<<<<<<<<<<
  * 
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_5 = PyFloat_FromDouble(__pyx_v_distance); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 242, __pyx_L1_error)
+  __pyx_t_5 = PyFloat_FromDouble(__pyx_v_distance); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 317, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __pyx_r = __pyx_t_5;
   __pyx_t_5 = 0;
   goto __pyx_L0;
 
-  /* "kernel.pyx":228
+  /* "kernel.pyx":303
  * 
  * @cython.boundscheck(False)  # deactivate bnds checking
  * cpdef calculate_distance_to_plane(dLongitude_degree1_in, dLatitude_degree1_in, dLongitude_degree2_in, dLatitude_degree2_in, dLongitude_degree3_in, dLatitude_degree3_in):             # <<<<<<<<<<<<<<
@@ -4370,35 +5300,35 @@ static PyObject *__pyx_pw_6kernel_17calculate_distance_to_plane(PyObject *__pyx_
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_dLatitude_degree1_in)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calculate_distance_to_plane", 1, 6, 6, 1); __PYX_ERR(0, 228, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calculate_distance_to_plane", 1, 6, 6, 1); __PYX_ERR(0, 303, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_dLongitude_degree2_in)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calculate_distance_to_plane", 1, 6, 6, 2); __PYX_ERR(0, 228, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calculate_distance_to_plane", 1, 6, 6, 2); __PYX_ERR(0, 303, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_dLatitude_degree2_in)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calculate_distance_to_plane", 1, 6, 6, 3); __PYX_ERR(0, 228, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calculate_distance_to_plane", 1, 6, 6, 3); __PYX_ERR(0, 303, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  4:
         if (likely((values[4] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_dLongitude_degree3_in)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calculate_distance_to_plane", 1, 6, 6, 4); __PYX_ERR(0, 228, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calculate_distance_to_plane", 1, 6, 6, 4); __PYX_ERR(0, 303, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  5:
         if (likely((values[5] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_dLatitude_degree3_in)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calculate_distance_to_plane", 1, 6, 6, 5); __PYX_ERR(0, 228, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calculate_distance_to_plane", 1, 6, 6, 5); __PYX_ERR(0, 303, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "calculate_distance_to_plane") < 0)) __PYX_ERR(0, 228, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "calculate_distance_to_plane") < 0)) __PYX_ERR(0, 303, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 6) {
       goto __pyx_L5_argtuple_error;
@@ -4419,7 +5349,7 @@ static PyObject *__pyx_pw_6kernel_17calculate_distance_to_plane(PyObject *__pyx_
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("calculate_distance_to_plane", 1, 6, 6, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 228, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("calculate_distance_to_plane", 1, 6, 6, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 303, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("kernel.calculate_distance_to_plane", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -4441,7 +5371,7 @@ static PyObject *__pyx_pf_6kernel_16calculate_distance_to_plane(CYTHON_UNUSED Py
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("calculate_distance_to_plane", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __pyx_f_6kernel_calculate_distance_to_plane(__pyx_v_dLongitude_degree1_in, __pyx_v_dLatitude_degree1_in, __pyx_v_dLongitude_degree2_in, __pyx_v_dLatitude_degree2_in, __pyx_v_dLongitude_degree3_in, __pyx_v_dLatitude_degree3_in, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 228, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_6kernel_calculate_distance_to_plane(__pyx_v_dLongitude_degree1_in, __pyx_v_dLatitude_degree1_in, __pyx_v_dLongitude_degree2_in, __pyx_v_dLatitude_degree2_in, __pyx_v_dLongitude_degree3_in, __pyx_v_dLatitude_degree3_in, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 303, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -4757,29 +5687,41 @@ static struct PyModuleDef __pyx_moduledef = {
 #endif
 
 static __Pyx_StringTabEntry __pyx_string_tab[] = {
+  {&__pyx_n_s_RTree, __pyx_k_RTree, sizeof(__pyx_k_RTree), 0, 0, 1, 1},
   {&__pyx_n_s_aVertex_in, __pyx_k_aVertex_in, sizeof(__pyx_k_aVertex_in), 0, 0, 1, 1},
   {&__pyx_n_s_argsort, __pyx_k_argsort, sizeof(__pyx_k_argsort), 0, 0, 1, 1},
   {&__pyx_n_s_array, __pyx_k_array, sizeof(__pyx_k_array), 0, 0, 1, 1},
   {&__pyx_n_s_calculate_distance, __pyx_k_calculate_distance, sizeof(__pyx_k_calculate_distance), 0, 0, 1, 1},
   {&__pyx_n_s_check_vertex_on_edge, __pyx_k_check_vertex_on_edge, sizeof(__pyx_k_check_vertex_on_edge), 0, 0, 1, 1},
   {&__pyx_n_s_cline_in_traceback, __pyx_k_cline_in_traceback, sizeof(__pyx_k_cline_in_traceback), 0, 0, 1, 1},
+  {&__pyx_n_s_dLatitude_degree, __pyx_k_dLatitude_degree, sizeof(__pyx_k_dLatitude_degree), 0, 0, 1, 1},
   {&__pyx_n_s_dLatitude_degree1_in, __pyx_k_dLatitude_degree1_in, sizeof(__pyx_k_dLatitude_degree1_in), 0, 0, 1, 1},
   {&__pyx_n_s_dLatitude_degree2_in, __pyx_k_dLatitude_degree2_in, sizeof(__pyx_k_dLatitude_degree2_in), 0, 0, 1, 1},
   {&__pyx_n_s_dLatitude_degree3_in, __pyx_k_dLatitude_degree3_in, sizeof(__pyx_k_dLatitude_degree3_in), 0, 0, 1, 1},
   {&__pyx_n_s_dLatitude_degree_in, __pyx_k_dLatitude_degree_in, sizeof(__pyx_k_dLatitude_degree_in), 0, 0, 1, 1},
+  {&__pyx_n_s_dLongitude_degree, __pyx_k_dLongitude_degree, sizeof(__pyx_k_dLongitude_degree), 0, 0, 1, 1},
   {&__pyx_n_s_dLongitude_degree1_in, __pyx_k_dLongitude_degree1_in, sizeof(__pyx_k_dLongitude_degree1_in), 0, 0, 1, 1},
   {&__pyx_n_s_dLongitude_degree2_in, __pyx_k_dLongitude_degree2_in, sizeof(__pyx_k_dLongitude_degree2_in), 0, 0, 1, 1},
   {&__pyx_n_s_dLongitude_degree3_in, __pyx_k_dLongitude_degree3_in, sizeof(__pyx_k_dLongitude_degree3_in), 0, 0, 1, 1},
   {&__pyx_n_s_dLongitude_degree_in, __pyx_k_dLongitude_degree_in, sizeof(__pyx_k_dLongitude_degree_in), 0, 0, 1, 1},
   {&__pyx_n_s_dThreshold_in, __pyx_k_dThreshold_in, sizeof(__pyx_k_dThreshold_in), 0, 0, 1, 1},
   {&__pyx_n_s_import, __pyx_k_import, sizeof(__pyx_k_import), 0, 0, 1, 1},
+  {&__pyx_n_s_insert, __pyx_k_insert, sizeof(__pyx_k_insert), 0, 0, 1, 1},
   {&__pyx_n_s_main, __pyx_k_main, sizeof(__pyx_k_main), 0, 0, 1, 1},
+  {&__pyx_n_s_max, __pyx_k_max, sizeof(__pyx_k_max), 0, 0, 1, 1},
+  {&__pyx_n_s_max_cap, __pyx_k_max_cap, sizeof(__pyx_k_max_cap), 0, 0, 1, 1},
+  {&__pyx_n_s_min, __pyx_k_min, sizeof(__pyx_k_min), 0, 0, 1, 1},
+  {&__pyx_n_s_min_cap, __pyx_k_min_cap, sizeof(__pyx_k_min_cap), 0, 0, 1, 1},
   {&__pyx_n_s_name, __pyx_k_name, sizeof(__pyx_k_name), 0, 0, 1, 1},
   {&__pyx_n_s_np, __pyx_k_np, sizeof(__pyx_k_np), 0, 0, 1, 1},
   {&__pyx_n_s_numpy, __pyx_k_numpy, sizeof(__pyx_k_numpy), 0, 0, 1, 1},
   {&__pyx_n_s_pEdge_in, __pyx_k_pEdge_in, sizeof(__pyx_k_pEdge_in), 0, 0, 1, 1},
+  {&__pyx_n_s_pVertex_end, __pyx_k_pVertex_end, sizeof(__pyx_k_pVertex_end), 0, 0, 1, 1},
   {&__pyx_n_s_pVertex_in, __pyx_k_pVertex_in, sizeof(__pyx_k_pVertex_in), 0, 0, 1, 1},
+  {&__pyx_n_s_pVertex_start, __pyx_k_pVertex_start, sizeof(__pyx_k_pVertex_start), 0, 0, 1, 1},
+  {&__pyx_n_s_pyflowline_external_tinyr_tinyr, __pyx_k_pyflowline_external_tinyr_tinyr, sizeof(__pyx_k_pyflowline_external_tinyr_tinyr), 0, 0, 1, 1},
   {&__pyx_n_s_range, __pyx_k_range, sizeof(__pyx_k_range), 0, 0, 1, 1},
+  {&__pyx_n_s_search, __pyx_k_search, sizeof(__pyx_k_search), 0, 0, 1, 1},
   {&__pyx_n_s_test, __pyx_k_test, sizeof(__pyx_k_test), 0, 0, 1, 1},
   {&__pyx_n_s_x1, __pyx_k_x1, sizeof(__pyx_k_x1), 0, 0, 1, 1},
   {&__pyx_n_s_x2, __pyx_k_x2, sizeof(__pyx_k_x2), 0, 0, 1, 1},
@@ -4790,7 +5732,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {0, 0, 0, 0, 0, 0, 0}
 };
 static CYTHON_SMALL_CODE int __Pyx_InitCachedBuiltins(void) {
-  __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_range) __PYX_ERR(0, 78, __pyx_L1_error)
+  __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_range) __PYX_ERR(0, 81, __pyx_L1_error)
   return 0;
   __pyx_L1_error:;
   return -1;
@@ -4808,6 +5750,8 @@ static CYTHON_SMALL_CODE int __Pyx_InitGlobals(void) {
   __pyx_float_1_0 = PyFloat_FromDouble(1.0); if (unlikely(!__pyx_float_1_0)) __PYX_ERR(0, 1, __pyx_L1_error)
   __pyx_float_180_0 = PyFloat_FromDouble(180.0); if (unlikely(!__pyx_float_180_0)) __PYX_ERR(0, 1, __pyx_L1_error)
   __pyx_int_1 = PyInt_FromLong(1); if (unlikely(!__pyx_int_1)) __PYX_ERR(0, 1, __pyx_L1_error)
+  __pyx_int_2 = PyInt_FromLong(2); if (unlikely(!__pyx_int_2)) __PYX_ERR(0, 1, __pyx_L1_error)
+  __pyx_int_5 = PyInt_FromLong(5); if (unlikely(!__pyx_int_5)) __PYX_ERR(0, 1, __pyx_L1_error)
   return 0;
   __pyx_L1_error:;
   return -1;
@@ -4972,6 +5916,7 @@ static CYTHON_SMALL_CODE int __pyx_pymod_exec_kernel(PyObject *__pyx_pyinit_modu
 #endif
 {
   PyObject *__pyx_t_1 = NULL;
+  PyObject *__pyx_t_2 = NULL;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
@@ -5087,7 +6032,28 @@ if (!__Pyx_RefNanny) {
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_np, __pyx_t_1) < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "kernel.pyx":11
+  /* "kernel.pyx":5
+ * from libcpp.vector cimport vector
+ * from libc.math cimport sin, cos, asin,acos, sqrt, abs
+ * from pyflowline.external.tinyr.tinyr.tinyr import RTree             # <<<<<<<<<<<<<<
+ * 
+ * """ Low-level function for pyflowline
+ */
+  __pyx_t_1 = PyList_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 5, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_INCREF(__pyx_n_s_RTree);
+  __Pyx_GIVEREF(__pyx_n_s_RTree);
+  PyList_SET_ITEM(__pyx_t_1, 0, __pyx_n_s_RTree);
+  __pyx_t_2 = __Pyx_Import(__pyx_n_s_pyflowline_external_tinyr_tinyr, __pyx_t_1, -1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 5, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_1 = __Pyx_ImportFrom(__pyx_t_2, __pyx_n_s_RTree); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 5, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_RTree, __pyx_t_1) < 0) __PYX_ERR(0, 5, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+
+  /* "kernel.pyx":13
  * #constant
  * 
  * cdef double pi = 3.14159265358979323846264338327             # <<<<<<<<<<<<<<
@@ -5096,7 +6062,7 @@ if (!__Pyx_RefNanny) {
  */
   __pyx_v_6kernel_pi = 3.14159265358979323846264338327;
 
-  /* "kernel.pyx":12
+  /* "kernel.pyx":14
  * 
  * cdef double pi = 3.14159265358979323846264338327
  * cdef double dRadius = 6378137.0             # <<<<<<<<<<<<<<
@@ -5110,10 +6076,10 @@ if (!__Pyx_RefNanny) {
  * cimport cython
  * from libcpp.vector cimport vector
  */
-  __pyx_t_1 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_test, __pyx_t_1) < 0) __PYX_ERR(0, 1, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_2 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_test, __pyx_t_2) < 0) __PYX_ERR(0, 1, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
   /* "vector.from_py":45
  * 
@@ -5128,6 +6094,7 @@ if (!__Pyx_RefNanny) {
   goto __pyx_L0;
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_XDECREF(__pyx_t_2);
   if (__pyx_m) {
     if (__pyx_d) {
       __Pyx_AddTraceback("init kernel", __pyx_clineno, __pyx_lineno, __pyx_filename);
@@ -5335,6 +6302,87 @@ bad:
     return -1;
 }
 
+/* PyDictVersioning */
+#if CYTHON_USE_DICT_VERSIONS && CYTHON_USE_TYPE_SLOTS
+static CYTHON_INLINE PY_UINT64_T __Pyx_get_tp_dict_version(PyObject *obj) {
+    PyObject *dict = Py_TYPE(obj)->tp_dict;
+    return likely(dict) ? __PYX_GET_DICT_VERSION(dict) : 0;
+}
+static CYTHON_INLINE PY_UINT64_T __Pyx_get_object_dict_version(PyObject *obj) {
+    PyObject **dictptr = NULL;
+    Py_ssize_t offset = Py_TYPE(obj)->tp_dictoffset;
+    if (offset) {
+#if CYTHON_COMPILING_IN_CPYTHON
+        dictptr = (likely(offset > 0)) ? (PyObject **) ((char *)obj + offset) : _PyObject_GetDictPtr(obj);
+#else
+        dictptr = _PyObject_GetDictPtr(obj);
+#endif
+    }
+    return (dictptr && *dictptr) ? __PYX_GET_DICT_VERSION(*dictptr) : 0;
+}
+static CYTHON_INLINE int __Pyx_object_dict_version_matches(PyObject* obj, PY_UINT64_T tp_dict_version, PY_UINT64_T obj_dict_version) {
+    PyObject *dict = Py_TYPE(obj)->tp_dict;
+    if (unlikely(!dict) || unlikely(tp_dict_version != __PYX_GET_DICT_VERSION(dict)))
+        return 0;
+    return obj_dict_version == __Pyx_get_object_dict_version(obj);
+}
+#endif
+
+/* GetModuleGlobalName */
+#if CYTHON_USE_DICT_VERSIONS
+static PyObject *__Pyx__GetModuleGlobalName(PyObject *name, PY_UINT64_T *dict_version, PyObject **dict_cached_value)
+#else
+static CYTHON_INLINE PyObject *__Pyx__GetModuleGlobalName(PyObject *name)
+#endif
+{
+    PyObject *result;
+#if !CYTHON_AVOID_BORROWED_REFS
+#if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX >= 0x030500A1
+    result = _PyDict_GetItem_KnownHash(__pyx_d, name, ((PyASCIIObject *) name)->hash);
+    __PYX_UPDATE_DICT_CACHE(__pyx_d, result, *dict_cached_value, *dict_version)
+    if (likely(result)) {
+        return __Pyx_NewRef(result);
+    } else if (unlikely(PyErr_Occurred())) {
+        return NULL;
+    }
+#else
+    result = PyDict_GetItem(__pyx_d, name);
+    __PYX_UPDATE_DICT_CACHE(__pyx_d, result, *dict_cached_value, *dict_version)
+    if (likely(result)) {
+        return __Pyx_NewRef(result);
+    }
+#endif
+#else
+    result = PyObject_GetItem(__pyx_d, name);
+    __PYX_UPDATE_DICT_CACHE(__pyx_d, result, *dict_cached_value, *dict_version)
+    if (likely(result)) {
+        return __Pyx_NewRef(result);
+    }
+    PyErr_Clear();
+#endif
+    return __Pyx_GetBuiltinName(name);
+}
+
+/* PyObjectCall */
+#if CYTHON_COMPILING_IN_CPYTHON
+static CYTHON_INLINE PyObject* __Pyx_PyObject_Call(PyObject *func, PyObject *arg, PyObject *kw) {
+    PyObject *result;
+    ternaryfunc call = Py_TYPE(func)->tp_call;
+    if (unlikely(!call))
+        return PyObject_Call(func, arg, kw);
+    if (unlikely(Py_EnterRecursiveCall((char*)" while calling a Python object")))
+        return NULL;
+    result = (*call)(func, arg, kw);
+    Py_LeaveRecursiveCall();
+    if (unlikely(!result) && unlikely(!PyErr_Occurred())) {
+        PyErr_SetString(
+            PyExc_SystemError,
+            "NULL result without error in PyObject_Call");
+    }
+    return result;
+}
+#endif
+
 /* GetItemInt */
 static PyObject *__Pyx_GetItemInt_Generic(PyObject *o, PyObject* j) {
     PyObject *r;
@@ -5421,29 +6469,6 @@ static CYTHON_INLINE PyObject *__Pyx_GetItemInt_Fast(PyObject *o, Py_ssize_t i, 
 #endif
     return __Pyx_GetItemInt_Generic(o, PyInt_FromSsize_t(i));
 }
-
-/* PyCFunctionFastCall */
-#if CYTHON_FAST_PYCCALL
-static CYTHON_INLINE PyObject * __Pyx_PyCFunction_FastCall(PyObject *func_obj, PyObject **args, Py_ssize_t nargs) {
-    PyCFunctionObject *func = (PyCFunctionObject*)func_obj;
-    PyCFunction meth = PyCFunction_GET_FUNCTION(func);
-    PyObject *self = PyCFunction_GET_SELF(func);
-    int flags = PyCFunction_GET_FLAGS(func);
-    assert(PyCFunction_Check(func));
-    assert(METH_FASTCALL == (flags & ~(METH_CLASS | METH_STATIC | METH_COEXIST | METH_KEYWORDS | METH_STACKLESS)));
-    assert(nargs >= 0);
-    assert(nargs == 0 || args != NULL);
-    /* _PyCFunction_FastCallDict() must not be called with an exception set,
-       because it may clear it (directly or indirectly) and so the
-       caller loses its exception */
-    assert(!PyErr_Occurred());
-    if ((PY_VERSION_HEX < 0x030700A0) || unlikely(flags & METH_KEYWORDS)) {
-        return (*((__Pyx_PyCFunctionFastWithKeywords)(void*)meth)) (self, args, nargs, NULL);
-    } else {
-        return (*((__Pyx_PyCFunctionFast)(void*)meth)) (self, args, nargs);
-    }
-}
-#endif
 
 /* PyFunctionFastCall */
 #if CYTHON_FAST_PYCALL
@@ -5564,23 +6589,26 @@ done:
 #endif
 #endif
 
-/* PyObjectCall */
-#if CYTHON_COMPILING_IN_CPYTHON
-static CYTHON_INLINE PyObject* __Pyx_PyObject_Call(PyObject *func, PyObject *arg, PyObject *kw) {
-    PyObject *result;
-    ternaryfunc call = Py_TYPE(func)->tp_call;
-    if (unlikely(!call))
-        return PyObject_Call(func, arg, kw);
-    if (unlikely(Py_EnterRecursiveCall((char*)" while calling a Python object")))
-        return NULL;
-    result = (*call)(func, arg, kw);
-    Py_LeaveRecursiveCall();
-    if (unlikely(!result) && unlikely(!PyErr_Occurred())) {
-        PyErr_SetString(
-            PyExc_SystemError,
-            "NULL result without error in PyObject_Call");
+/* PyCFunctionFastCall */
+#if CYTHON_FAST_PYCCALL
+static CYTHON_INLINE PyObject * __Pyx_PyCFunction_FastCall(PyObject *func_obj, PyObject **args, Py_ssize_t nargs) {
+    PyCFunctionObject *func = (PyCFunctionObject*)func_obj;
+    PyCFunction meth = PyCFunction_GET_FUNCTION(func);
+    PyObject *self = PyCFunction_GET_SELF(func);
+    int flags = PyCFunction_GET_FLAGS(func);
+    assert(PyCFunction_Check(func));
+    assert(METH_FASTCALL == (flags & ~(METH_CLASS | METH_STATIC | METH_COEXIST | METH_KEYWORDS | METH_STACKLESS)));
+    assert(nargs >= 0);
+    assert(nargs == 0 || args != NULL);
+    /* _PyCFunction_FastCallDict() must not be called with an exception set,
+       because it may clear it (directly or indirectly) and so the
+       caller loses its exception */
+    assert(!PyErr_Occurred());
+    if ((PY_VERSION_HEX < 0x030700A0) || unlikely(flags & METH_KEYWORDS)) {
+        return (*((__Pyx_PyCFunctionFastWithKeywords)(void*)meth)) (self, args, nargs, NULL);
+    } else {
+        return (*((__Pyx_PyCFunctionFast)(void*)meth)) (self, args, nargs);
     }
-    return result;
 }
 #endif
 
@@ -5670,6 +6698,35 @@ static CYTHON_INLINE PyObject* __Pyx_PyObject_CallOneArg(PyObject *func, PyObjec
     result = __Pyx_PyObject_Call(func, args, NULL);
     Py_DECREF(args);
     return result;
+}
+#endif
+
+/* ObjectGetItem */
+#if CYTHON_USE_TYPE_SLOTS
+static PyObject *__Pyx_PyObject_GetIndex(PyObject *obj, PyObject* index) {
+    PyObject *runerr;
+    Py_ssize_t key_value;
+    PySequenceMethods *m = Py_TYPE(obj)->tp_as_sequence;
+    if (unlikely(!(m && m->sq_item))) {
+        PyErr_Format(PyExc_TypeError, "'%.200s' object is not subscriptable", Py_TYPE(obj)->tp_name);
+        return NULL;
+    }
+    key_value = __Pyx_PyIndex_AsSsize_t(index);
+    if (likely(key_value != -1 || !(runerr = PyErr_Occurred()))) {
+        return __Pyx_GetItemInt_Fast(obj, key_value, 0, 1, 1);
+    }
+    if (PyErr_GivenExceptionMatches(runerr, PyExc_OverflowError)) {
+        PyErr_Clear();
+        PyErr_Format(PyExc_IndexError, "cannot fit '%.200s' into an index-sized integer", Py_TYPE(index)->tp_name);
+    }
+    return NULL;
+}
+static PyObject *__Pyx_PyObject_GetItem(PyObject *obj, PyObject* key) {
+    PyMappingMethods *m = Py_TYPE(obj)->tp_as_mapping;
+    if (likely(m && m->mp_subscript)) {
+        return m->mp_subscript(obj, key);
+    }
+    return __Pyx_PyObject_GetIndex(obj, key);
 }
 #endif
 
@@ -5820,96 +6877,6 @@ static CYTHON_INLINE PyObject* __Pyx_PyInt_EqObjC(PyObject *op1, PyObject *op2, 
     return (
         PyObject_RichCompare(op1, op2, Py_EQ));
 }
-
-/* PyDictVersioning */
-#if CYTHON_USE_DICT_VERSIONS && CYTHON_USE_TYPE_SLOTS
-static CYTHON_INLINE PY_UINT64_T __Pyx_get_tp_dict_version(PyObject *obj) {
-    PyObject *dict = Py_TYPE(obj)->tp_dict;
-    return likely(dict) ? __PYX_GET_DICT_VERSION(dict) : 0;
-}
-static CYTHON_INLINE PY_UINT64_T __Pyx_get_object_dict_version(PyObject *obj) {
-    PyObject **dictptr = NULL;
-    Py_ssize_t offset = Py_TYPE(obj)->tp_dictoffset;
-    if (offset) {
-#if CYTHON_COMPILING_IN_CPYTHON
-        dictptr = (likely(offset > 0)) ? (PyObject **) ((char *)obj + offset) : _PyObject_GetDictPtr(obj);
-#else
-        dictptr = _PyObject_GetDictPtr(obj);
-#endif
-    }
-    return (dictptr && *dictptr) ? __PYX_GET_DICT_VERSION(*dictptr) : 0;
-}
-static CYTHON_INLINE int __Pyx_object_dict_version_matches(PyObject* obj, PY_UINT64_T tp_dict_version, PY_UINT64_T obj_dict_version) {
-    PyObject *dict = Py_TYPE(obj)->tp_dict;
-    if (unlikely(!dict) || unlikely(tp_dict_version != __PYX_GET_DICT_VERSION(dict)))
-        return 0;
-    return obj_dict_version == __Pyx_get_object_dict_version(obj);
-}
-#endif
-
-/* GetModuleGlobalName */
-#if CYTHON_USE_DICT_VERSIONS
-static PyObject *__Pyx__GetModuleGlobalName(PyObject *name, PY_UINT64_T *dict_version, PyObject **dict_cached_value)
-#else
-static CYTHON_INLINE PyObject *__Pyx__GetModuleGlobalName(PyObject *name)
-#endif
-{
-    PyObject *result;
-#if !CYTHON_AVOID_BORROWED_REFS
-#if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX >= 0x030500A1
-    result = _PyDict_GetItem_KnownHash(__pyx_d, name, ((PyASCIIObject *) name)->hash);
-    __PYX_UPDATE_DICT_CACHE(__pyx_d, result, *dict_cached_value, *dict_version)
-    if (likely(result)) {
-        return __Pyx_NewRef(result);
-    } else if (unlikely(PyErr_Occurred())) {
-        return NULL;
-    }
-#else
-    result = PyDict_GetItem(__pyx_d, name);
-    __PYX_UPDATE_DICT_CACHE(__pyx_d, result, *dict_cached_value, *dict_version)
-    if (likely(result)) {
-        return __Pyx_NewRef(result);
-    }
-#endif
-#else
-    result = PyObject_GetItem(__pyx_d, name);
-    __PYX_UPDATE_DICT_CACHE(__pyx_d, result, *dict_cached_value, *dict_version)
-    if (likely(result)) {
-        return __Pyx_NewRef(result);
-    }
-    PyErr_Clear();
-#endif
-    return __Pyx_GetBuiltinName(name);
-}
-
-/* ObjectGetItem */
-#if CYTHON_USE_TYPE_SLOTS
-static PyObject *__Pyx_PyObject_GetIndex(PyObject *obj, PyObject* index) {
-    PyObject *runerr;
-    Py_ssize_t key_value;
-    PySequenceMethods *m = Py_TYPE(obj)->tp_as_sequence;
-    if (unlikely(!(m && m->sq_item))) {
-        PyErr_Format(PyExc_TypeError, "'%.200s' object is not subscriptable", Py_TYPE(obj)->tp_name);
-        return NULL;
-    }
-    key_value = __Pyx_PyIndex_AsSsize_t(index);
-    if (likely(key_value != -1 || !(runerr = PyErr_Occurred()))) {
-        return __Pyx_GetItemInt_Fast(obj, key_value, 0, 1, 1);
-    }
-    if (PyErr_GivenExceptionMatches(runerr, PyExc_OverflowError)) {
-        PyErr_Clear();
-        PyErr_Format(PyExc_IndexError, "cannot fit '%.200s' into an index-sized integer", Py_TYPE(index)->tp_name);
-    }
-    return NULL;
-}
-static PyObject *__Pyx_PyObject_GetItem(PyObject *obj, PyObject* key) {
-    PyMappingMethods *m = Py_TYPE(obj)->tp_as_mapping;
-    if (likely(m && m->mp_subscript)) {
-        return m->mp_subscript(obj, key);
-    }
-    return __Pyx_PyObject_GetIndex(obj, key);
-}
-#endif
 
 /* PyFloatBinop */
 #if !CYTHON_COMPILING_IN_PYPY
@@ -6137,6 +7104,20 @@ bad:
     Py_XDECREF(empty_list);
     Py_XDECREF(empty_dict);
     return module;
+}
+
+/* ImportFrom */
+  static PyObject* __Pyx_ImportFrom(PyObject* module, PyObject* name) {
+    PyObject* value = __Pyx_PyObject_GetAttrStr(module, name);
+    if (unlikely(!value) && PyErr_ExceptionMatches(PyExc_AttributeError)) {
+        PyErr_Format(PyExc_ImportError,
+        #if PY_MAJOR_VERSION < 3
+            "cannot import name %.230s", PyString_AS_STRING(name));
+        #else
+            "cannot import name %S", name);
+        #endif
+    }
+    return value;
 }
 
 /* CLineInTraceback */

@@ -18,7 +18,7 @@ class DggridClassEncoder(JSONEncoder):
         if isinstance(obj, list):
             pass  
         if isinstance(obj, pyvertex):
-            return json.loads(obj.tojson()) #lVertexID
+            return json.loads(obj.tojson()) 
         if isinstance(obj, pyedge):
             return obj.lEdgeID        
         if isinstance(obj, pyflowline):
@@ -73,7 +73,8 @@ class pydggrid(pycell):
     aNeighbor_land=None #the global ID of all neighbors
     aNeighbor_ocean=None #the global ID of all neighbors
     aNeighbor_distance = None
-
+    pBound=None
+    
     def __init__(self, dLon, dLat, aEdge, aVertex):
         """
         Initilize a hexagon cell object
@@ -100,8 +101,22 @@ class pydggrid(pycell):
         self.iStream_order_burned=-1
         self.iStream_segment_burned=-1
         self.dElevation_mean=-9999.0
+        self.calculate_cell_bound() #bound for rtree 
         pass
-      
+
+    def calculate_cell_bound(self):
+        dLat_min = 90
+        dLat_max = -90
+        dLon_min = 180
+        dLon_max = -180
+        for i in range(self.nVertex):
+            dLon_max = np.max( [dLon_max, self.aVertex[i].dLongitude_degree] )
+            dLon_min = np.min( [dLon_min, self.aVertex[i].dLongitude_degree] )
+            dLat_max = np.max( [dLat_max, self.aVertex[i].dLatitude_degree] )
+            dLat_min = np.min( [dLat_min, self.aVertex[i].dLatitude_degree] )
+        
+        self.pBound = (dLon_min, dLat_min, dLon_max, dLat_max)
+        return self.pBound  
     
     def has_this_edge(self, pEdge_in):
         """

@@ -18,7 +18,7 @@ class FlowlineClassEncoder(JSONEncoder):
         if isinstance(obj, list):
             pass  
         if isinstance(obj, pyvertex):
-            return json.loads(obj.tojson()) #lVertexID
+            return json.loads(obj.tojson()) 
         if isinstance(obj, pyedge):
             return obj.lEdgeID         
             
@@ -35,7 +35,7 @@ class pyflowline(object):
     """
 
     lFlowlineID=-1
-    lIndex=-1
+    lFlowlineIndex=-1
     lIndex_upstream=-1
     lIndex_downstream=-1
 
@@ -51,7 +51,7 @@ class pyflowline(object):
     dSinuosity=0.0
 
     iStream_segment=-1
-    iStream_order =-1
+    iStream_order = -1
 
     nEdge=0
     nVertex=0
@@ -61,6 +61,10 @@ class pyflowline(object):
     aFlowlineID_start_end = None
     aFlowlineID_end_start = None
     aFlowlineID_end_end = None
+
+    #for stream topology
+    lFlowline_downstream = None #only store the index, not the actual objects
+    aFlowline_upstream = None #only store the index, not the actual objects
     
     def __init__(self, aEdge):
         """
@@ -325,10 +329,12 @@ class pyflowline(object):
         obj = self.__dict__.copy()
         for sKey in aSkip:
             obj.pop(sKey, None)
-        sJson = json.dumps(obj,  \
-            sort_keys=True, \
-                indent = 4, \
-                    ensure_ascii=True, \
+
+
+        sJson = json.dumps(obj,  
+            sort_keys=True, 
+                indent = 4, 
+                    ensure_ascii=True, 
                         cls=FlowlineClassEncoder)
         return sJson
         

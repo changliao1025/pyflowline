@@ -34,11 +34,20 @@ if iFlag_kml is not None:
 else:
     pass
 
+iFlag_cython = importlib.util.find_spec("cython") 
+if iFlag_cython is not None:
+    from pyflowline.external.tinyr.tinyr.tinyr import RTree
+    iFlag_use_rtree = 1
+else:
+    iFlag_use_rtree =0
+    pass
+
 from pyflowline.mesh.hexagon.create_hexagon_mesh import create_hexagon_mesh
 from pyflowline.mesh.latlon.create_latlon_mesh import create_latlon_mesh
 from pyflowline.mesh.square.create_square_mesh import create_square_mesh
 from pyflowline.mesh.mpas.create_mpas_mesh import create_mpas_mesh
 from pyflowline.mesh.dggrid.create_dggrid_mesh import create_dggrid_mesh
+from pyflowline.mesh.dggrid.create_dggrid_mesh import dggrid_find_resolution_by_index
 from pyflowline.mesh.tin.create_tin_mesh import create_tin_mesh
 gdal.UseExceptions()   
 pDate = datetime.datetime.today()
@@ -55,7 +64,7 @@ class CaseClassEncoder(JSONEncoder):
         if isinstance(obj, list):
             pass
         if isinstance(obj, pyvertex):
-            return json.loads(obj.tojson()) #lVertexID
+            return json.loads(obj.tojson()) 
         if isinstance(obj, pyedge):
             return obj.lEdgeID
         if isinstance(obj, pyflowline):
@@ -271,6 +280,8 @@ class flowlinecase(object):
         else:
             print('Please specify resolution.')
 
+        
+
         if 'dThreshold_break_by_distance' in aConfig_in:
             self.dThreshold_break_by_distance = float(aConfig_in['dThreshold_break_by_distance'])
 
@@ -383,6 +394,10 @@ class flowlinecase(object):
                             else:
                                 print('Unsupported mesh type?')
 
+        if self.iMesh_type == 5:
+            #update resolution
+            self.dResolution_meter = dggrid_find_resolution_by_index(self.sDggrid_type, self.iResolution_index)
+            
         #the model can be run as part of hexwatershed or standalone
         if self.iFlag_standalone == 1:
             #in standalone case, will add case information and update output path
@@ -779,6 +794,7 @@ class flowlinecase(object):
                                 
                                 if iFlag_mesh_boundary ==1:
                                         #create a polygon based on
+                                    
 
                                     aDggrid = create_dggrid_mesh(iFlag_global,
                                                                      iFlag_save_mesh,
@@ -788,6 +804,8 @@ class flowlinecase(object):
                                                                      iFlag_antarctic_in=iFlag_antarctic_in,
                                                                      sDggrid_type_in = self.sDggrid_type,
                                                                      sFilename_boundary_in = self.sFilename_mesh_boundary)
+                                    
+                                    
                                                                      
                                     pass
                                 else:                                       
@@ -798,6 +816,7 @@ class flowlinecase(object):
                                                                      sWorkspace_output,
                                                                       iResolution_index_in= self.iResolution_index,
                                                                           sDggrid_type_in = self.sDggrid_type)
+                                    
                                     pass
 
 
@@ -821,17 +840,14 @@ class flowlinecase(object):
 
                                     print('Unsupported mesh type?')
                                 return
-        else:
-            #read mesh? this function is not completed
-            iMesh_type = self.iMesh_type
-            aCell_out = read_mesh_json_w_topology(iMesh_type, self.sFilename_mesh)
+        else:            
             pass
 
         
         print('Finish mesh generation.')
         return aCell_out
 
-    def reconstruct_topological_relationship(self, aCell_raw):
+    def reconstruct_topological_relationship(self):
         """
         The topological relationship reconstruction operation
 
@@ -848,8 +864,7 @@ class flowlinecase(object):
             sWorkspace_output = self.sWorkspace_output
             nOutlet = self.nOutlet
             sFilename_mesh=self.sFilename_mesh
-            self.aCell, pSpatial_reference_mesh = read_mesh_json(iMesh_type, sFilename_mesh)
-            self.aCell = self.merge_cell_info(aCell_raw)
+            #self.aCell = aCell_raw should ready in the second step
             aFlowline_conceptual = list()   #store all the flowline
             aCellID_outlet = list()
             aBasin = list()
@@ -899,13 +914,28 @@ class flowlinecase(object):
                             print(pVertex_end.tojson())
                             pass
 
+            #update length using rtree
+            if iFlag_use_rtree == 1:
+                interleaved = True
+                index_mesh = RTree(interleaved=interleaved, max_cap=5, min_cap=2)
+                for i in range(len(self.aCell)):
+                    lID = i 
+                    pBound = self.aCell[i].pBound                
+                    #pBound= (left, bottom, right, top)
+                    index_mesh.insert(lID, pBound)  #  
 
-
-                #update length?
-            for pCell in self.aCell:
                 for pCell2 in aCell_intersect:
-                    if pCell2.lCellID == pCell.lCellID:
-                        pCell.dLength_flowline = pCell2.dLength_flowline
+                    pBound = pCell2.pBound
+                    aIntersect = list(index_mesh.search(pBound))
+                    for k in aIntersect:
+                        pCell = self.aCell[k]
+                        if pCell2.lCellID == pCell.lCellID:
+                            pCell.dLength_flowline = pCell2.dLength_flowline
+            else:
+                for pCell in self.aCell:
+                    for pCell2 in aCell_intersect:
+                        if pCell2.lCellID == pCell.lCellID:
+                            pCell.dLength_flowline = pCell2.dLength_flowline
 
             self.aFlowline_conceptual = aFlowline_conceptual
             self.aCellID_outlet = aCellID_outlet
@@ -921,6 +951,7 @@ class flowlinecase(object):
 
         Args:
             aCell_raw (list [pycell]): The original cell information that contains neighbor definition
+            This information is defined in the mesh generation function, so mesh generation must be run.
 
         Returns:
             list [pycell]: The updated list of cell objects.
@@ -977,7 +1008,15 @@ class flowlinecase(object):
     def change_model_parameter(self, sVariable_in, dValue, iFlag_basin_in = None):
         if iFlag_basin_in is None:
             if hasattr(self, sVariable_in):
-                setattr(self, sVariable_in, dValue)
+                #get default data type                
+                sType_default = type(getattr(self, sVariable_in))
+                #get the data type of the input value
+                sType_input = type(dValue)
+                if sType_default == sType_input:      
+                    setattr(self, sVariable_in, dValue)
+                    pass   
+                else:
+                    print('Incorrect data type for the input value: ' + sVariable_in)
                 return True
             else:
                 print("This model parameter is unknown, please check the full parameter list in the documentation: " + sVariable_in)
@@ -986,8 +1025,14 @@ class flowlinecase(object):
             #this mean the variable is in the basin object
             for pBasin in self.aBasin:
                 if hasattr(pBasin, sVariable_in):
-                    setattr(pBasin, sVariable_in, dValue)
-                    return True
+                    #get default data type
+                    sType_default = type(getattr(pBasin, sVariable_in))
+                    sType_input = type(dValue)
+                    if sType_default == sType_input:      
+                        setattr(pBasin, sVariable_in, dValue)
+                    else:
+                        print('Incorrect data type for the input value: ' + sVariable_in)                       
+                        return False
                 else:
                     print("This model parameter is unknown, please check the full parameter list in the documentation: " + sVariable_in)
                     return False
@@ -1002,17 +1047,28 @@ class flowlinecase(object):
         """
         aCell_out = None
         if self.iFlag_flowline == 1:
-            self.flowline_simplification()
-            aCell = self.mesh_generation()
-            if self.iFlag_intersect ==1:
-                aCell_out, a, b = self.reconstruct_topological_relationship(aCell)
-            else:
-                pass
+            self.flowline_simplification()       
         else:
-            #only mesh generator
-            aCell = self.mesh_generation(iFlag_antarctic_in= self.iFlag_antarctic)
-            self.aCell = aCell
-            aCell_out = aCell
+            pass            
+
+        if self.iFlag_create_mesh:
+            self.aCell = self.mesh_generation(iFlag_antarctic_in= self.iFlag_antarctic)
+            aCell_out = self.aCell
+            pass
+        else:
+            #may be read mesh           
+            iMesh_type = self.iMesh_type
+            #there must be some auxiliary file associated with the mesh file
+            self.aCell = read_mesh_json_w_topology(iMesh_type, self.sFilename_mesh)             
+            aCell_out = self.aCell
+            pass
+
+        if self.iFlag_intersect == 1:
+            self.aCell, a, b = self.reconstruct_topological_relationship()
+            aCell_out = self.aCell
+            pass
+        else:
+            pass
 
         return aCell_out
 

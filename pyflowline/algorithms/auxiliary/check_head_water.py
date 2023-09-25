@@ -1,5 +1,6 @@
 def check_head_water(aFlowline_in, pVertex_start_in):
     """[Check whether a vertex assoacited with a flowline is a headwater or not]
+    if the stream order info is avaialble, use the stream order info to check is easier and faster
 
     Args:
         aFlowline_in ([pyflowline]): [all the flowline]

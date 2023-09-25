@@ -33,7 +33,8 @@ class pycelllink(object):
         pycelllink: A link object
     """
 
-    lIndex=0
+    lLinkIndex=0
+    lLinkID=0
     pCell_start=None
     pCell_end=None
     pEdge_link = None

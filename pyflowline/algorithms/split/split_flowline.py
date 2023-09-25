@@ -8,13 +8,26 @@ iFlag_cython = importlib.util.find_spec("cython")
 if iFlag_cython is not None:
     from pyflowline.algorithms.cython.kernel import find_vertex_on_edge
     from pyflowline.algorithms.cython.kernel import find_vertex_in_list
+  
 else:
     from pyflowline.algorithms.auxiliary.find_index_in_list import find_vertex_on_edge    
     from pyflowline.algorithms.auxiliary.find_vertex_in_list import find_vertex_in_list
 
+
 def split_flowline(aFlowline_in, aVertex_in, iFlag_intersect = None, iFlag_use_id=None):
+    """
+    Split flowline based on the intersection with a list of vertex
+    Input:
+        aFlowline_in: list of flowline
+        aVertex_in: list of vertex
+        iFlag_intersect: 1: a vertex maybe on a line, but it is not a vertex of the line
+        iFlag_use_id: 1: 
+    Output:
+        aFlowline_out: list of flowline
+    """
     aFlowline_out = list()
     nFlowline = len(aFlowline_in)
+    
     for i in range(nFlowline):
         pFlowline = aFlowline_in[i]
         iStream_order = pFlowline.iStream_order
@@ -34,8 +47,9 @@ def split_flowline(aFlowline_in, aVertex_in, iFlag_intersect = None, iFlag_use_i
             iFlag_exist, lIndex = find_vertex_in_list( aVertex_in,  pVertex)
             if iFlag_exist == 1:                
                 iPart = iPart + 1
-                aVertex.append(pVertex)            
-                
+                aVertex.append(pVertex)   
+                pass
+
             if iFlag_intersect is not None:
                 if iFlag_use_id is not None:
                     aDistance = list()
@@ -66,6 +80,7 @@ def split_flowline(aFlowline_in, aVertex_in, iFlag_intersect = None, iFlag_use_i
                             pVertex_dummy = aVertex_in[ aIndex_order[k]  ] 
                             aVertex.append(pVertex_dummy)
                             aVertex_all.append(pVertex_dummy)
+                            pass
 
                 else:
                     iFlag_exist, npoint, aIndex = find_vertex_on_edge( aVertex_in, pEdge)
@@ -76,6 +91,7 @@ def split_flowline(aFlowline_in, aVertex_in, iFlag_intersect = None, iFlag_use_i
                             iPart = iPart + 1
                             aVertex.append(pVertex_dummy)
                             aVertex_all.append(pVertex_dummy)
+                            pass
                         pass
 
         #the last ending vertex
@@ -86,7 +102,6 @@ def split_flowline(aFlowline_in, aVertex_in, iFlag_intersect = None, iFlag_use_i
             iPart = iPart + 1
             aVertex.append(pVertex)
             pass
-
         if iPart == 0 :
             print('Something is wrong')
             pass
@@ -106,7 +121,8 @@ def split_flowline(aFlowline_in, aVertex_in, iFlag_intersect = None, iFlag_use_i
                         iFlag_exist, lIndex = find_vertex_in_list( aVertex_all,  pVertex)
                         if iFlag_exist ==1:
                             aVertex_index.append(lIndex)
-                    
+                            pass
+
                     #find duplicate
                     for k in range(nLine):
                         t = aVertex_index[k]

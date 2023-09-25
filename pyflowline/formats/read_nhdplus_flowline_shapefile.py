@@ -102,7 +102,7 @@ def extract_nhdplus_flowline_shapefile_by_attribute(sFilename_shapefile_in, aAtt
     else:
         iFlag_transform =0   
 
-    lID = 0
+    lFlowlineIndex = 0
     for pFeature_shapefile in pLayer_shapefile:        
         pGeometry_in = pFeature_shapefile.GetGeometryRef()
         sGeometry_type = pGeometry_in.GetGeometryName()       
@@ -114,8 +114,7 @@ def extract_nhdplus_flowline_shapefile_by_attribute(sFilename_shapefile_in, aAtt
             pass
         else:
             print('Geometry issue')
-        if lNHDPlusID in aAttribute_in:
-            
+        if lNHDPlusID in aAttribute_in:            
             if(sGeometry_type == 'MULTILINESTRING'):
                 nLine = pGeometry_in.GetGeometryCount()
                 for i in range(nLine):
@@ -125,10 +124,10 @@ def extract_nhdplus_flowline_shapefile_by_attribute(sFilename_shapefile_in, aAtt
                         pt = Line.GetPoint(i)
                         aCoords.append( [ pt[0], pt[1]])                      
                     dummy1= np.array(aCoords)
-                    pLine = convert_gcs_coordinates_to_flowline(dummy1)
-                    pLine.lIndex = lID                    
-                    aFlowline.append(pLine)
-                    lID = lID + 1
+                    pFlowline = convert_gcs_coordinates_to_flowline(dummy1)
+                    pFlowline.lFlowlineIndex = lFlowlineIndex                    
+                    aFlowline.append(pFlowline)
+                    lFlowlineIndex = lFlowlineIndex + 1
             else:
                 if sGeometry_type =='LINESTRING':
                     aCoords = list()
@@ -136,10 +135,10 @@ def extract_nhdplus_flowline_shapefile_by_attribute(sFilename_shapefile_in, aAtt
                         pt = pGeometry_in.GetPoint(i)
                         aCoords.append( [ pt[0], pt[1]])                  
                     dummy1= np.array(aCoords)
-                    pLine = convert_gcs_coordinates_to_flowline(dummy1)
-                    pLine.lIndex = lID                    
-                    aFlowline.append(pLine)
-                    lID = lID + 1
+                    pFlowline = convert_gcs_coordinates_to_flowline(dummy1)
+                    pFlowline.lFlowlineIndex = lFlowlineIndex                    
+                    aFlowline.append(pFlowline)
+                    lFlowlineIndex = lFlowlineIndex + 1
                 else:
                     print(sGeometry_type)
                     pass

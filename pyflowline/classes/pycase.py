@@ -306,7 +306,7 @@ class flowlinecase(object):
             if self.iFlag_mesh_boundary==1:
                 if not os.path.isfile(self.sFilename_mesh_boundary ):
                     print("The mesh boundary file does not exist, you should update this parameter before running the model!")
-                    #exit()
+                    exit()
                 pass
 
         if 'sFilename_spatial_reference' in aConfig_in:
@@ -321,7 +321,7 @@ class flowlinecase(object):
                 self.sFilename_dggrid = aConfig_in['sFilename_dggrid']
                 if not os.path.isfile(self.sFilename_dggrid ):
                     print("The dggrid binary file does not exist, you need to update this parameter before running the model!")
-                    #exit()
+                    exit()
                 pass
 
             else:
@@ -416,7 +416,7 @@ class flowlinecase(object):
         else:
             if not os.path.isfile(self.sFilename_dem ): #why DEM is required?
                 print("The DEM file does not exist!")
-                #exit()
+                exit()
 
         self.aBasin = list()
 
@@ -428,7 +428,8 @@ class flowlinecase(object):
                 else:
                     print('This basin configuration file does not exist: ', self.sFilename_basins )
                     print('Please update this parameter before running the model!')
-                    #exit()
+                    exit()
+                    
                 with open(self.sFilename_basins) as json_file:
                     dummy_data = json.load(json_file)
                     for i in range(self.nOutlet):
@@ -1014,8 +1015,7 @@ class flowlinecase(object):
                 #get the data type of the input value
                 sType_input = type(dValue)
                 if sType_default == sType_input:      
-                    setattr(self, sVariable_in, dValue)
-                    self.update_model()
+                    setattr(self, sVariable_in, dValue)                    
                     pass   
                 else:
                     print('Incorrect data type for the input value: ' + sVariable_in)
@@ -1042,27 +1042,7 @@ class flowlinecase(object):
                     print("This model parameter is unknown, please check the full parameter list in the documentation: " + sVariable_in)
                     return False
 
-    def update_model(self):
-        """This function should be called after the model parameter is changed
-        """
-        #update subbasin
-        if self.iFlag_flowline==1:            
-            if os.path.isfile(self.sFilename_basins):
-                pass
-            else:                
-                print("Error: the basin file does not exist: " + self.sFilename_basins)
-            
-            self.aBasin.clear()
-
-            with open(self.sFilename_basins) as json_file:
-                dummy_data = json.load(json_file)
-                for i in range(self.nOutlet):
-                    sBasin =  "{:08d}".format(i+1)
-                    dummy_basin = dummy_data[i]
-                    dummy_basin['sWorkspace_output_basin'] = str(Path(self.sWorkspace_output) / sBasin )
-                    pBasin = pybasin(dummy_basin)
-                    self.aBasin.append(pBasin)
-        
+ 
 
     def run(self):
         """

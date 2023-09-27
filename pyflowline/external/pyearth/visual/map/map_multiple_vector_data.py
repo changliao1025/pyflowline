@@ -9,7 +9,7 @@ import matplotlib.path as mpath
 import matplotlib.cm as cm
 import cartopy.crs as ccrs
 from cartopy.mpl.gridliner import LONGITUDE_FORMATTER, LATITUDE_FORMATTER
-
+from cartopy.io.img_tiles import OSM
 from pyflowline.external.pyearth.toolbox.math.stat.remap import remap
 from pyflowline.external.pyearth.gis.gdal.gdal_functions import get_geometry_coords
 
@@ -28,6 +28,7 @@ class OOMFormatter(mpl.ticker.ScalarFormatter):
 def map_multiple_vector_data(aFiletype_in,
                              aFilename_in,
                              iFlag_colorbar_in=None,
+                             iFlag_title_in=None,
                              aFlag_thickness_in=None,
                              aFlag_color_in=None,
                              aFlag_fill_in = None,
@@ -120,6 +121,22 @@ def map_multiple_vector_data(aFiletype_in,
     else:
         iDPI = 300
 
+    if iFlag_title_in is not None:
+        iFlag_title = iFlag_title_in
+        if iFlag_title == 1:
+            if sTitle_in is not None:
+                sTitle = sTitle_in
+            else:
+                sTitle =  ''     
+
+        else:
+            iFlag_title=0
+
+    else:
+        iFlag_title = 0
+        sTitle =  ''       
+            
+
     if dMissing_value_in is not None:
         dMissing_value = dMissing_value_in
     else:
@@ -149,12 +166,7 @@ def map_multiple_vector_data(aFiletype_in,
     else:
         sColormap =  'rainbow'
 
-    if sTitle_in is not None:
-        sTitle = sTitle_in
-        iFlag_title =1
-    else:
-        iFlag_title=0
-        sTitle =  ''
+   
     
     if iFont_size_in is not None:
         iFont_size = iFont_size_in
@@ -224,9 +236,24 @@ def map_multiple_vector_data(aFiletype_in,
                                             central_latitude = 0.50*(dLat_max+dLat_min),
                                             globe=None)
 
-    ax = fig.add_axes([0.08, 0.1, 0.62, 0.7], projection=pProjection_map )
+    ax = fig.add_axes([0.08, 0.1, 0.62, 0.7], projection= pProjection_map  ) #projection=ccrs.PlateCarree()
 
+    # Create an OSM image tile source
+    osm_tiles = OSM()
 
+    if aExtent_in is None:
+        marginx  = (dLon_max - dLon_min) / 50
+        marginy  = (dLat_max - dLat_min) / 50
+        aExtent = [dLon_min - marginx , dLon_max + marginx , dLat_min -marginy , dLat_max + marginy]
+    else:
+        aExtent = aExtent_in
+    
+    ax.set_global()
+    ax.set_extent( aExtent )
+    #Add the OSM image to the map
+    ax.add_image(osm_tiles, 9)   
+
+    
     #====================================
     #should we allow more than one scale for one variable?
     aValue_all = list()
@@ -375,17 +402,21 @@ def map_multiple_vector_data(aFiletype_in,
 
             lID = lID + 1
 
-    if aExtent_in is None:
-        marginx  = (dLon_max - dLon_min) / 50
-        marginy  = (dLat_max - dLat_min) / 50
-        aExtent = [dLon_min - marginx , dLon_max + marginx , dLat_min -marginy , dLat_max + marginy]
-    else:
-        aExtent = aExtent_in
+    
+    #reset extent
+    ax.set_extent( aExtent )     
 
-    ax.set_global()
-    ax.set_extent( aExtent )
     ax.coastlines(color='black', linewidth=1)
-    ax.set_title(sTitle)
+    if iFlag_title==1:
+        ax.set_title(sTitle)
+    iFlag_label = 0
+    if iFlag_label ==1:
+        sText = 'Manaus'
+        dLongitude_label = -60.016667
+        dLatitude_label  = -3.1
+        ax.text(dLongitude_label, dLatitude_label, sText, 
+                verticalalignment='center', horizontalalignment='center',                
+                color='black', fontsize=iFont_size,transform=ccrs.Geodetic())
 
     if aLegend_in is not None:
         nlegend = len(aLegend_in)

@@ -111,7 +111,9 @@ def basin_plot(self,
                                              aVariable_in= ['drainage_area', '', 'stream_segment'],
                                              aLegend_in = aLegend_in,
                                              aFlag_color_in = [0, 0, 1],
-                                             aFlag_fill_in  = [0, 0, 0])
+                                             aFlag_fill_in  = [0, 0, 0],
+                                                aExtent_in = aExtent_in,
+                                               pProjection_map_in = pProjection_map_in)
                         else:
                             print('Unsupported variable: ', sVariable_in, ' in basin_plot.')
                             return                    

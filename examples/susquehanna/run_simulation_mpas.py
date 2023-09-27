@@ -17,7 +17,7 @@ sWorkspace_output=  str(Path(sPath_data)  /  'output')
 #===================================
 #you need to update this file based on your own case study
 #===================================
-sFilename_configuration_in = realpath( sPath_parent +  '/examples/susquehanna/pyflowline_susquehanna_mpas.json' )
+sFilename_configuration_in = realpath( sPath_parent +  '/data/susquehanna/input/pyflowline_susquehanna_mpas.json' )
 if os.path.isfile(sFilename_configuration_in):
     pass
 else:

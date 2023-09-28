@@ -7,6 +7,7 @@ from os.path import realpath
 sPath_parent = str(Path(__file__).parents[2]) # data is located two dir's up
 
 sys.path.append(sPath_parent)
+from pyflowline.change_json_key_value import change_json_key_value
 from pyflowline.pyflowline_read_model_configuration_file import pyflowline_read_model_configuration_file
 
 sPath_data = realpath( sPath_parent +  '/data/susquehanna' )
@@ -31,6 +32,13 @@ iFlag_simulation = 0
 iFlag_visualization = 1
 sMesh = 'mpas'
 sDate='20230701'
+
+sFolder_data = os.path.join(sPath_parent, 'data')
+sFolder_data_susquehanna =  os.path.join(sFolder_data, 'susquehanna')
+sFolder_input = os.path.join(sFolder_data_susquehanna, 'input')
+sFilename_flowline = realpath( os.path.join(sFolder_input, 'flowline.geojson') )
+sFilename_basins =  realpath( os.path.join(sFolder_input , 'pyflowline_susquehanna_basins.json' ))
+change_json_key_value(sFilename_basins, 'sFilename_flowline_filter', sFilename_flowline, iFlag_basin_in=1)
 
 oPyflowline = pyflowline_read_model_configuration_file(sFilename_configuration_in, 
     iCase_index_in=iCase_index, sDate_in=sDate)

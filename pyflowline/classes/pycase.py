@@ -490,7 +490,7 @@ class flowlinecase(object):
         else:
             iFlag_antarctic = iFlag_antarctic_in
 
-        aCell_out = list()
+     
         if self.iFlag_create_mesh ==1:
             iFlag_global =  self.iFlag_global
             iMesh_type = self.iMesh_type
@@ -676,7 +676,7 @@ class flowlinecase(object):
                                                    sFilename_mesh, sFilename_spatial_reference, pBoundary_wkt)
                     pass
 
-                return aHexagon
+                self.aCell = aHexagon
             else:
                 if iMesh_type ==2: #sqaure
                     ncolumn= int( (dX_lowerright - dX_lowerleft) / dResolution_meter )
@@ -702,7 +702,7 @@ class flowlinecase(object):
                                                      sFilename_mesh, sFilename_spatial_reference, pBoundary_wkt)
                         pass
                     
-                    return aSquare
+                    self.aCell = aSquare
                 else:
                     if iMesh_type ==3: #latlon
                         dResolution_meter = degree_to_meter(dLatitude_mean, dResolution_degree)
@@ -731,8 +731,10 @@ class flowlinecase(object):
                                                          sFilename_mesh, pBoundary_wkt)
 
                             pass
+                    
+                        self.aCell = aLatlon
 
-                        return aLatlon
+                        
 
                     else:
                         if iMesh_type == 4: #mpas
@@ -773,7 +775,7 @@ class flowlinecase(object):
                                                              sFilename_mesh_netcdf, sFilename_mesh, iFlag_antarctic_in= iFlag_antarctic_in, pBoundary_in = pBoundary_wkt  )
                                     pass
 
-                            return aMpas
+                            self.aCell = aMpas
                         else:
                             if iMesh_type == 5: #dggrid
                                 dLatitude_top    = self.dLatitude_top
@@ -822,7 +824,7 @@ class flowlinecase(object):
                                     pass
 
 
-                                return aDggrid
+                                self.aCell = aDggrid
 
                             else:
                                 if iMesh_type == 6: #tin this one need to be updated because central location issue
@@ -837,7 +839,7 @@ class flowlinecase(object):
                                     ncolumn= int( (dX_lowerright - dX_lowerleft) / dX_shift )
                                     nrow= int( (dY_upperleft - dY_lowerleft) / dY_spacing )
                                     aTin = create_tin_mesh(dX_lowerleft, dY_lowerleft, dResolution_meter, ncolumn, nrow, sFilename_mesh, sFilename_spatial_reference)
-                                    return aTin
+                                    self.aCell = aTin
                                 else:
 
                                     print('Unsupported mesh type?')
@@ -847,7 +849,7 @@ class flowlinecase(object):
 
         
         print('Finish mesh generation.')
-        return aCell_out
+        return self.aCell
 
     def reconstruct_topological_relationship(self):
         """

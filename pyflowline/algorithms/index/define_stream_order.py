@@ -39,8 +39,13 @@ def define_stream_order(aFlowline_in, aConfluence_in):
     """
     nFlowline = len(aFlowline_in)
     nSegment = nFlowline
-    aFlowline_out = list()  
-    iMethod = 1       
+    aFlowline_out = list() 
+    if iFlag_use_rtree == 1: 
+        iMethod = 1       
+    else:
+        iMethod = 2
+        pass
+    
     if nFlowline == 0 :
         print ('data incomplete')
     else:       

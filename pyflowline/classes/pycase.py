@@ -240,6 +240,11 @@ class flowlinecase(object):
             self.iFlag_intersect = int(aConfig_in['iFlag_intersect'])
         else:
             self.iFlag_intersect=1
+        
+        if self.iFlag_flowline == 1:
+            pass
+        else:
+            self.iFlag_intersect=0
 
         if 'iFlag_break_by_distance' in aConfig_in:
             self.iFlag_break_by_distance = int(aConfig_in['iFlag_break_by_distance'])
@@ -441,6 +446,7 @@ class flowlinecase(object):
             else:
                 pass
         else:
+            
             pass
 
 
@@ -507,7 +513,7 @@ class flowlinecase(object):
                 #create a polygon based on real boundary
                 pBoundary_wkt, aExtent = read_mesh_boundary(self.sFilename_mesh_boundary)           
 
-                if iMesh_type != 4: #mpas
+                if iMesh_type != 4: #not mpas
                     spatial_reference_target = osr.SpatialReference()
                     spatial_reference_target.ImportFromEPSG(4326)
 
@@ -1043,8 +1049,6 @@ class flowlinecase(object):
                 else:
                     print("This model parameter is unknown, please check the full parameter list in the documentation: " + sVariable_in)
                     return False
-
- 
 
     def run(self):
         """

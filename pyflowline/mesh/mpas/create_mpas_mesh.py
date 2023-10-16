@@ -3,7 +3,6 @@ import math
 import importlib
 import numpy as np
 from osgeo import ogr, osr, gdal
-import netCDF4 as nc
 from pyflowline.formats.convert_attributes import convert_gcs_attributes_to_cell
 gdal.UseExceptions()  
 iFlag_cython = importlib.util.find_spec("cython") 
@@ -33,6 +32,7 @@ def create_mpas_mesh(iFlag_global_in,
     Returns:
         _type_: _description_
     """
+    import netCDF4 as nc
 
     if iFlag_antarctic_in is None:
         iFlag_antarctic=0

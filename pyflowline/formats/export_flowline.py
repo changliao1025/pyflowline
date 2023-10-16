@@ -1,7 +1,7 @@
 import os
 import json
 from osgeo import ogr, osr
-from shapely.geometry import Point, LineString
+#from shapely.geometry import Point, LineString
 from pyflowline.classes.edge import pyedge
 from pyflowline.classes.link import pycelllink
 
@@ -81,17 +81,21 @@ def export_flowline_to_geojson( aFlowline_in,
     for i in range(nFlowline):
         pFlowline = aFlowline_in[i]
         dummy =pFlowline.aVertex
-        aPoint=list()
+        #replace shapely with gdal function
+        #aPoint=list()
+        pLine = ogr.Geometry(ogr.wkbLineString)
         for j in dummy:
             if iFlag_projected_in ==1:
-                aPoint.append( Point( j.dx, j.dy ) )                
+                #aPoint.append( Point( j.dx, j.dy ) )                
+                pLine.AddPoint(j.dx, j.dy)
                 pass
             else:
-                aPoint.append( Point( j.dLongitude_degree, j.dLatitude_degree ) )
+                #aPoint.append( Point( j.dLongitude_degree, j.dLatitude_degree ) )
+                pLine.AddPoint(j.dLongitude_degree, j.dLatitude_degree)
                 pass
 
-        dummy1= LineString( aPoint )
-        pGeometry_out = ogr.CreateGeometryFromWkb(dummy1.wkb)
+        #dummy1= LineString( aPoint )
+        pGeometry_out = ogr.CreateGeometryFromWkb(pLine.ExportToWkb())
         pFeature_out.SetGeometry(pGeometry_out)
    
         pFeature_out.SetField("lineid", lID)

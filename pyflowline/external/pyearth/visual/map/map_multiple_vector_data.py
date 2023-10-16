@@ -35,7 +35,9 @@ def map_multiple_vector_data(aFiletype_in,
                              aVariable_in = None,
                              sFilename_output_in=None,
                              iFlag_scientific_notation_colorbar_in=None,
+                             iFlag_openstreetmap_in = None,
                              iFont_size_in=None,
+                             iFlag_openstreetmap_level_in = None,
                              sColormap_in = None,
                              sTitle_in = None,
                              iDPI_in = None,
@@ -239,7 +241,7 @@ def map_multiple_vector_data(aFiletype_in,
     ax = fig.add_axes([0.08, 0.1, 0.62, 0.7], projection= pProjection_map  ) #projection=ccrs.PlateCarree()
 
     # Create an OSM image tile source
-    osm_tiles = OSM()
+    
 
     if aExtent_in is None:
         marginx  = (dLon_max - dLon_min) / 50
@@ -250,8 +252,19 @@ def map_multiple_vector_data(aFiletype_in,
     
     ax.set_global()
     ax.set_extent( aExtent )
-    #Add the OSM image to the map
-    ax.add_image(osm_tiles, 9)   
+    if iFlag_openstreetmap_in is not None:
+        if iFlag_openstreetmap_level_in is not None:
+            iFlag_openstreetmap_level = iFlag_openstreetmap_level_in
+        else:
+            iFlag_openstreetmap_level = 9
+            pass
+
+        osm_tiles = OSM()
+        #Add the OSM image to the map
+        ax.add_image(osm_tiles, iFlag_openstreetmap_level)   
+        sLicense_info = "© OpenStreetMap contributors, CC-BY-SA"
+        ax.text(0.5, 0.05, sLicense_info, transform=ax.transAxes, ha='center', va='center', fontsize=10, color='gray', bbox=dict(facecolor='white', edgecolor='black', boxstyle='round,pad=0.3'))
+
 
     
     #====================================

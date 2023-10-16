@@ -1,6 +1,6 @@
 import os
 from osgeo import ogr, osr
-from shapely.geometry import Point
+#from shapely.geometry import Point
 
 def export_vertex_to_geojson(aVertex_in, 
         sFilename_json_in,
@@ -56,14 +56,18 @@ def export_vertex_to_geojson(aVertex_in,
     lID = 0
     for i in range(nVertex):       
         pVertex = aVertex_in[i]
+        pPoint = ogr.Geometry(ogr.wkbPoint)
         if iFlag_projected_in ==1:
-            dummy1= Point( pVertex.dx, pVertex.dy )
+            #dummy1= Point( pVertex.dx, pVertex.dy )
+            pPoint.AddPoint(pVertex.dx, pVertex.dy)
             pass
         else:
-            dummy1= Point( pVertex.dLongitude_degree, pVertex.dLatitude_degree ) 
+            #dummy1= Point( pVertex.dLongitude_degree, pVertex.dLatitude_degree ) 
+            pPoint.AddPoint(pVertex.dLongitude_degree, pVertex.dLatitude_degree)
             pass
 
-        pGeometry_out = ogr.CreateGeometryFromWkb(dummy1.wkb)
+
+        pGeometry_out = ogr.CreateGeometryFromWkb(pPoint.ExportToWkb())
         pFeature_out.SetGeometry(pGeometry_out)   
         pFeature_out.SetField("pointid", lID)
         if iFlag_attribute ==1:

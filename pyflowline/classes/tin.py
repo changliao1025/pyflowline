@@ -113,7 +113,7 @@ class pytin(pycell):
         return iFlag_found, pEdge_out
     
     def calculate_cell_area(self):           
-        self.dArea = 0.0
+        #self.dArea = 0.0
         return self.dArea
 
     def calculate_edge_length(self):        

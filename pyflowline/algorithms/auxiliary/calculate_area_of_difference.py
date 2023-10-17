@@ -13,12 +13,7 @@ if iFlag_cython is not None:
 else:
     from pyflowline.algorithms.auxiliary.find_vertex_in_list import find_vertex_in_list
 
-iFlag_shapely = importlib.util.find_spec("shapely") 
-if iFlag_shapely is not None:    
-    from shapely.ops import polygonize
-else:
-    print('shapely is required for this function')
-    pass
+
     
 
 def calculate_area_of_difference_raw(sFilename_a, sFilename_b):
@@ -26,6 +21,12 @@ def calculate_area_of_difference_raw(sFilename_a, sFilename_b):
     return
 
 def calculate_area_of_difference_simplified(aFlowline_in, aVertex_all_in, sFilename_output_in):   
+    iFlag_shapely = importlib.util.find_spec("shapely") 
+    if iFlag_shapely is not None:    
+        from shapely.ops import polygonize
+    else:
+        print('shapely is required for this function')
+    pass
     if os.path.exists(sFilename_output_in): 
         os.remove(sFilename_output_in)
         pass

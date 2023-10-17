@@ -23,13 +23,7 @@ def _create_hpc_job(self, sSlurm_in=None):
         +  'sMesh_type_in="'+ str(self.sMesh_type) +'"' \
         + ')'  +   '\n'   
     ofs_pyflowline.write(sLine)
-    #if self.iFlag_flowline==1:
-    #    sLine = 'oPyflowline.aBasin[0].dLatitude_outlet_degree=' \
-    #        +  "{:0f}".format(self.aBasin[0].dLatitude_outlet_degree)+ '\n'   
-    #    ofs_pyflowline.write(sLine)
-    #    sLine = 'oPyflowline.aBasin[0].dLongitude_outlet_degree=' \
-    #        + "{:0f}".format(self.aBasin[0].dLongitude_outlet_degree)+ '\n'   
-    #    ofs_pyflowline.write(sLine)        
+         
     sLine = 'oPyflowline.setup()' + '\n'   
     ofs_pyflowline.write(sLine)
     
@@ -38,9 +32,9 @@ def _create_hpc_job(self, sSlurm_in=None):
         ofs_pyflowline.write(sLine)     
     else:
         pass    
-    sLine = 'aCell = oPyflowline.mesh_generation()' + '\n'   
+    sLine = 'oPyflowline.mesh_generation()' + '\n'   
     ofs_pyflowline.write(sLine)      
-    sLine = 'oPyflowline.reconstruct_topological_relationship(aCell)' + '\n'   
+    sLine = 'oPyflowline.reconstruct_topological_relationship()' + '\n'   
     ofs_pyflowline.write(sLine)   
 
     sLine = 'oPyflowline.analyze()' + '\n'   

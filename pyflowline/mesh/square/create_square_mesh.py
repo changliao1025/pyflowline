@@ -136,6 +136,8 @@ def create_square_mesh(dX_left_in, dY_bot_in,
     #(x1,y1)-----(x2,y2)
     #...............
     aSquare = list()
+    aSquare_dict = dict()
+    lCellIndex = 0
     for iRow in range(1, nrow_in+1):    
         for iColumn in range(1, ncolumn_in+1):        
             #global cell id for the mesh
@@ -191,7 +193,7 @@ def create_square_mesh(dX_left_in, dY_bot_in,
                 
                 
             if ( iFlag == True ):
-                aSquare, dArea = add_cell_into_list(aSquare, lCellID, iRow, iColumn, dLongitude_center,dLatitude_center, dummy1 ) 
+                aSquare, dArea = add_cell_into_list(aSquare, lCellID, iRow, iColumn, dLongitude_center,dLatitude_center, aCoords ) 
         
                 #save feature
                 pFeature.SetGeometry(pPolygon)
@@ -201,12 +203,16 @@ def create_square_mesh(dX_left_in, dY_bot_in,
                 pFeature.SetField("area", dArea )
                 pLayer.CreateFeature(pFeature)
 
+                #add to dictionary
+                aSquare_dict[lCellID] = lCellIndex
+                lCellIndex = lCellIndex + 1
+
                 pass
 
     
+    iFlag_fill_hole = 0
     aSquare_out = list()
-    aSquare_middle = list()
- 
+    aSquare_middle = list() 
     ncell = len(aSquare)
     aCellID  = list()
     for i in range(ncell):
@@ -214,155 +220,170 @@ def create_square_mesh(dX_left_in, dY_bot_in,
         lCellID = pCell.lCellID
         aCellID.append(lCellID)
 
-    for i in range(ncell):
-        pCell = aSquare[i]
-        aNeighbor_land = pCell.aNeighbor_land   #including both holes and maps land cutoff by boundary
-        nNeighbor_land = pCell.nNeighbor
-        aNeighbor_land_update = list()
-        aNeighbor_land_virtual = list()
-        nNeighbor_land_update = 0 
-        for j in range(nNeighbor_land): #loop all land neighbors
-            lNeighbor = int(aNeighbor_land[j])
-            if lNeighbor in aCellID:
-                nNeighbor_land_update = nNeighbor_land_update + 1 
-                aNeighbor_land_update.append(lNeighbor)
-            else:
-                #a hole or boundary mpas land cell
-                aNeighbor_land_virtual.append(lNeighbor)
-                
-        pCell.nNeighbor= len(aNeighbor_land_update)
-        pCell.aNeighbor = aNeighbor_land_update        
-        pCell.aNeighbor_land = aNeighbor_land_update
-        pCell.nNeighbor_land= len(aNeighbor_land_update)   
-        pCell.aNeighbor_land_virtual = aNeighbor_land_virtual   
-        
-        pCell.nNeighbor_land_virtual = len(aNeighbor_land_virtual)
-        aSquare_middle.append(pCell)
+    if iFlag_fill_hole == 1:       
+        #find virtual land cells
+        for i in range(ncell):
+            pCell = aSquare[i]
+            aNeighbor_land = pCell.aNeighbor_land   #including both holes and maps land cutoff by boundary
+            nNeighbor_land = pCell.nNeighbor
+            aNeighbor_land_update = list()
+            aNeighbor_land_virtual = list()
+            nNeighbor_land_update = 0 
+            for j in range(nNeighbor_land): #loop all land neighbors
+                lNeighbor = int(aNeighbor_land[j])
+                if lNeighbor in aCellID:
+                    nNeighbor_land_update = nNeighbor_land_update + 1 
+                    aNeighbor_land_update.append(lNeighbor)
+                else:
+                    #a hole or boundary mpas land cell
+                    aNeighbor_land_virtual.append(lNeighbor)
 
-    #add hole back
-    for i in range(ncell):
-        pCell = aSquare_middle[i]  
-          
-        if pCell.nNeighbor_land_virtual ==1:  #only one virtual land means it is likely next to a hole 
-            lNeighbor_hole = pCell.aNeighbor_land_virtual[0]
-            #now find its row and column indices
-            #id start with 1 so we need to refind the row and column index
-            iRow, iColumn = index_to_row_col(lNeighbor_hole, ncolumn_in)          
-            lCellID = (iRow-1) * ncolumn_in + iColumn
-            if lCellID != lNeighbor_hole:
-                print("error")
-                return
-            
-            #now build the cell    
-            #define a polygon here
-            x1 = xleft + ((iColumn-1) * xspacing)
-            y1 = ybottom + ((iRow-1) * yspacing)
+            pCell.nNeighbor= len(aNeighbor_land_update)
+            pCell.aNeighbor = aNeighbor_land_update        
+            pCell.aNeighbor_land = aNeighbor_land_update
+            pCell.nNeighbor_land= len(aNeighbor_land_update)   
+            pCell.aNeighbor_land_virtual = aNeighbor_land_virtual   
 
-            x2 = xleft + ((iColumn ) * xspacing)
-            y2 = ybottom + ((iRow-1) * yspacing)     
+            pCell.nNeighbor_land_virtual = len(aNeighbor_land_virtual)
+            aSquare_middle.append(pCell)
 
-            x3 = xleft + ((iColumn ) * xspacing)
-            y3 = ybottom + ((iRow ) * yspacing)
+        #add hole back
+        for i in range(ncell):
+            pCell = aSquare_middle[i]                
+            if pCell.nNeighbor_land_virtual ==1:  #only one virtual land means it is likely next to a hole 
+                lNeighbor_hole = pCell.aNeighbor_land_virtual[0]
+                #now find its row and column indices
+                #id start with 1 so we need to refind the row and column index
+                iRow, iColumn = index_to_row_col(lNeighbor_hole, ncolumn_in)          
+                lCellID = (iRow-1) * ncolumn_in + iColumn
+                if lCellID != lNeighbor_hole:
+                    print("error")
+                    return
 
-            x4 = xleft + ((iColumn-1) * xspacing)
-            y4 = ybottom + ((iRow ) * yspacing)  
+                #now build the cell    
+                #define a polygon here
+                x1 = xleft + ((iColumn-1) * xspacing)
+                y1 = ybottom + ((iRow-1) * yspacing)
 
-            x = [x1, x2, x3, x4]
-            y = [y1, y2, y3, y4]
+                x2 = xleft + ((iColumn ) * xspacing)
+                y2 = ybottom + ((iRow-1) * yspacing)     
+
+                x3 = xleft + ((iColumn ) * xspacing)
+                y3 = ybottom + ((iRow ) * yspacing)
+
+                x4 = xleft + ((iColumn-1) * xspacing)
+                y4 = ybottom + ((iRow ) * yspacing)  
+
+                x = [x1, x2, x3, x4]
+                y = [y1, y2, y3, y4]
+
+                x_new , y_new = reproject_coordinates_batch(x, y, pSpatial_reference)
+                x1, x2, x3, x4 = x_new
+                y1, y2, y3, y4 = y_new       
+                coordinates = [(x1, y1), (x2, y2), (x3, y3), (x4, y4), (x1, y1)]        
+
+                ring = ogr.Geometry(ogr.wkbLinearRing)
+                for x, y in coordinates:
+                    ring.AddPoint(x, y)
+
+                pPolygon = ogr.Geometry(ogr.wkbPolygon)
+                pPolygon.AddGeometry(ring)
+
+                aCoords = np.full((5,2), -9999.0, dtype=float)
+                for i, (x, y) in enumerate(coordinates):
+                    aCoords[i, 0] = x
+                    aCoords[i, 1] = y
            
-            x_new , y_new = reproject_coordinates_batch(x, y, pSpatial_reference)
-            x1, x2, x3, x4 = x_new
-            y1, y2, y3, y4 = y_new       
-            coordinates = [(x1, y1), (x2, y2), (x3, y3), (x4, y4), (x1, y1)]        
+                dLongitude_center = np.mean(aCoords[0:4,0])
+                dLatitude_center = np.mean(aCoords[0:4,1])   
 
-            ring = ogr.Geometry(ogr.wkbLinearRing)
-            for x, y in coordinates:
-                ring.AddPoint(x, y)
+                if lCellID not in aCellID:    
+                    aSquare_middle, dArea = add_cell_into_list(aSquare_middle, lCellID, iRow, iColumn, dLongitude_center,dLatitude_center, aCoords )        
+                    aCellID.append(lCellID)
 
-            pPolygon = ogr.Geometry(ogr.wkbPolygon)
-            pPolygon.AddGeometry(ring)
+                    pFeature.SetGeometry(pPolygon)
+                    pFeature.SetField("cellid", int(lCellID) )
+                    pFeature.SetField("longitude", dLongitude_center )
+                    pFeature.SetField("latitude", dLatitude_center )
+                    pFeature.SetField("area", dArea )                
+                    pLayer.CreateFeature(pFeature)
 
-            aCoords = np.full((5,2), -9999.0, dtype=float)
-            for i, (x, y) in enumerate(coordinates):
-                aCoords[i, 0] = x
-                aCoords[i, 1] = y
+                else:
+                    #this hole was added already, but we need to update the neighbor information
+                    pCell.aNeighbor_land.append(lCellID)
+                    pCell.nNeighbor_land = pCell.nNeighbor_land + 1
+                    pCell.aNeighbor_land_virtual = None
+                    pCell.nNeighbor_land_virtual = 0
+                    pass
+
+        #update
+        ncell = len(aSquare_middle)
+        for i in range(ncell):
+            pCell = aSquare_middle[i]
+            aNeighbor_land_update = list()   
+            aNeighbor_land = pCell.aNeighbor_land                    
+            nNeighbor_land = pCell.nNeighbor_land
+            aNeighbor_land_virtual_update = list()      
+            aNeighbor_land_virtual = pCell.aNeighbor_land_virtual
+            nNeighbor_land_virtual = pCell.nNeighbor_land_virtual   
+            for j in range(nNeighbor_land):
+                lNeighbor = int(aNeighbor_land[j])
+                if lNeighbor in aCellID:
+                    aNeighbor_land_update.append(lNeighbor)
+                    pass
+                else:
+                    #this is a land cell in mpas, but it may be clipped by boundary
+                    pass
+
+            #for book keeping only        
+            for j in range(nNeighbor_land_virtual):
+                lNeighbor = int(aNeighbor_land_virtual[j])
+                if lNeighbor in aCellID:
+                    #this cell is actually not virtual anymore                    
+                    aNeighbor_land_update.append(lNeighbor)
+                else:
+                    aNeighbor_land_virtual_update.append(lNeighbor)
     
+            pCell.nNeighbor= len(aNeighbor_land_update)
+            pCell.aNeighbor = aNeighbor_land_update        
+            pCell.aNeighbor_land = aNeighbor_land_update
+            pCell.nNeighbor_land= len(aNeighbor_land_update)   
+            pCell.aNeighbor_land_virtual = aNeighbor_land_virtual_update   #for book keeping only
+            pCell.nNeighbor_land_virtual = len(aNeighbor_land_virtual_update)
+            aSquare_out.append(pCell)
+    else:
+        for i in range(ncell):
+            pCell = aSquare[i]
+            aNeighbor = pCell.aNeighbor
+            nNeighbor = pCell.nNeighbor
+            aNeighbor_land_update = list()
+            nNeighbor_new = 0 
+            for j in range(nNeighbor):
+                lNeighbor = int(aNeighbor[j])
+                if lNeighbor in aCellID:
+                    nNeighbor_new = nNeighbor_new + 1 
+                    aNeighbor_land_update.append(lNeighbor)
 
-            dummy1= np.array(aCoords)
-            dLongitude_center = np.mean(aCoords[0:4,0])
-            dLatitude_center = np.mean(aCoords[0:4,1])   
-            
-            if lCellID not in aCellID:    
-                aSquare_middle, dArea = add_cell_into_list(aSquare_middle, lCellID, iRow, iColumn, dLongitude_center,dLatitude_center, dummy1 )        
-                aCellID.append(lCellID)
+            #for latlon, there is no ocean concept
+            pCell.aNeighbor = aNeighbor_land_update
+            pCell.nNeighbor= len(aNeighbor_land_update)            
+            pCell.nNeighbor_land= len(aNeighbor_land_update)
+            pCell.aNeighbor_land = aNeighbor_land_update
+            pCell.nNeighbor_ocean = pCell.nVertex - pCell.nNeighbor_land
+            aSquare_out.append(pCell)
+        pass
 
-                pFeature.SetGeometry(pPolygon)
-                pFeature.SetField("cellid", int(lCellID) )
-                pFeature.SetField("longitude", dLongitude_center )
-                pFeature.SetField("latitude", dLatitude_center )
-                pFeature.SetField("area", dArea )                
-                pLayer.CreateFeature(pFeature)
-
-            else:
-                #this hole was added already, but we need to update the neighbor information
-                pCell.aNeighbor_land.append(lCellID)
-                pCell.nNeighbor_land = pCell.nNeighbor_land + 1
-                pCell.aNeighbor_land_virtual = None
-                pCell.nNeighbor_land_virtual = 0
-                pass
-
-    #update
-    ncell = len(aSquare_middle)
-    for i in range(ncell):
-        pCell = aSquare_middle[i]
-        aNeighbor_land_update = list()   
-        aNeighbor_land = pCell.aNeighbor_land                    
-        nNeighbor_land = pCell.nNeighbor_land
-        aNeighbor_land_virtual_update = list()      
-        aNeighbor_land_virtual = pCell.aNeighbor_land_virtual
-        nNeighbor_land_virtual = pCell.nNeighbor_land_virtual       
-        
-        for j in range(nNeighbor_land):
-            lNeighbor = int(aNeighbor_land[j])
-            
-            if lNeighbor in aCellID:
-                aNeighbor_land_update.append(lNeighbor)
-                
-                pass
-            else:
-                #this is a land cell in mpas, but it may be clipped by boundary
-                pass
-
-        #for book keeping only        
-        for j in range(nNeighbor_land_virtual):
-            lNeighbor = int(aNeighbor_land_virtual[j])
-            if lNeighbor in aCellID:
-                #this cell is actually not virtual anymore                    
-                aNeighbor_land_update.append(lNeighbor)
-            else:
-                aNeighbor_land_virtual_update.append(lNeighbor)
-   
-        pCell.nNeighbor= len(aNeighbor_land_update)
-        pCell.aNeighbor = aNeighbor_land_update        
-        pCell.aNeighbor_land = aNeighbor_land_update
-        pCell.nNeighbor_land= len(aNeighbor_land_update)   
-        pCell.aNeighbor_land_virtual = aNeighbor_land_virtual_update   #for book keeping only
-        pCell.nNeighbor_land_virtual = len(aNeighbor_land_virtual_update)
-        
-        aSquare_out.append(pCell)
-
+    #distance
     for pSquare in aSquare_out:
         aNeighbor = pSquare.aNeighbor
         pSquare.aNeighbor_distance=list()
-        if pSquare.lCellID == 41:
-            print('debug')
-
         for lCellID1 in aNeighbor:
-            for pSquare1 in aSquare_out:
-                if pSquare1.lCellID == lCellID1:
-                    dDistance = pSquare.pVertex_center.calculate_distance( pSquare1.pVertex_center )
-                    pSquare.aNeighbor_distance.append(dDistance)
-                    break
+            #use dictionary to get index
+            lCellID1 = int(lCellID1)            
+            lIndex = aSquare_dict[lCellID1]
+            pLatlon1 = aSquare_out[lIndex]                
+            dDistance = pSquare.pVertex_center.calculate_distance( pLatlon1.pVertex_center )
+            pSquare.aNeighbor_distance.append(dDistance)   
 
     pDataset = pLayer = pFeature  = None  
     return aSquare_out

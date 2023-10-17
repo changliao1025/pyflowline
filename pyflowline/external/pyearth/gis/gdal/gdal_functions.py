@@ -140,7 +140,7 @@ def retrieve_geotiff_metadata(sFilename_geotiff_in):
         dOriginY = pGeotransform[3]
         dPixelWidth = pGeotransform[1]
         pPixelHeight = pGeotransform[5]               
-        return dPixelWidth, dOriginX, dOriginY, nrow, ncolumn, pSpatial_reference, pProjection, pGeotransform
+        return dPixelWidth, pPixelHeight, dOriginX, dOriginY, nrow, ncolumn, pSpatial_reference, pProjection, pGeotransform
 
 def degree_to_meter(dLatitude_in, dResolution_degree_in):
     """[Conver a degree-based resolution to meter-based resolution]

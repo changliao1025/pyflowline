@@ -519,7 +519,7 @@ class flowlinecase(object):
 
                     #check whether DEM exists
                     if os.path.isfile(sFilename_dem):
-                        dPixelWidth, dOriginX, dOriginY, nrow, ncolumn, pSpatialRef_dem, pProjection, pGeotransform\
+                        dPixelWidth, pPixelHeight, dOriginX, dOriginY, nrow, ncolumn, pSpatialRef_dem, pProjection, pGeotransform\
                             = retrieve_geotiff_metadata(sFilename_dem)
 
                         #lower left
@@ -689,7 +689,7 @@ class flowlinecase(object):
                     nrow= int( (dY_upperleft - dY_lowerleft) / dResolution_meter )
                     if iFlag_mesh_boundary ==1:
                         #create a polygon based on real boundary
-                        pBoundary_wkt , aExtent= read_mesh_boundary(self.sFilename_mesh_boundary)
+                        pBoundary_wkt, aExtent= read_mesh_boundary(self.sFilename_mesh_boundary)
 
                         aSquare = create_square_mesh(dX_lowerleft, dY_lowerleft, dResolution_meter, ncolumn, nrow, 
                                                      sFilename_mesh, sFilename_spatial_reference, pBoundary_wkt)

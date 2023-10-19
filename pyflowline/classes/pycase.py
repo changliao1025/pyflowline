@@ -10,7 +10,7 @@ import numpy as np
 from osgeo import ogr, osr, gdal
 
 from pyflowline.external.pyearth.system.define_global_variables import *
-
+from pyflowline.classes.timer import pytimer
 from pyflowline.classes.mpas import pympas
 from pyflowline.classes.hexagon import pyhexagon
 from pyflowline.classes.latlon import pylatlon
@@ -1096,6 +1096,9 @@ class flowlinecase(object):
         """
         Export the model outputs
         """
+        print('Started export elevation')
+        ptimer = pytimer()
+        ptimer.start()
         self.export_mesh_info_to_json()
         #convert the mesh into the kml format so it can be visualized in google earth and google map
         #shoule move this to the export function
@@ -1107,6 +1110,7 @@ class flowlinecase(object):
                 pBasin.export()
 
         self.tojson()
+        ptimer.stop()
         return
 
     def export_mesh_info_to_json(self):
@@ -1114,10 +1118,9 @@ class flowlinecase(object):
         Export the mesh information to a json file
         """
 
-        aCell_all = self.aCell
+  
         sFilename_json = self.sFilename_mesh_info
-        ncell=len(aCell_all)
-        iFlag_flowline = self.iFlag_flowline
+        
         #if iFlag_flowline == 1: #if there is conceptual flowline
         #    pass
         #else:
@@ -1126,7 +1129,7 @@ class flowlinecase(object):
 
 
         with open(sFilename_json, 'w', encoding='utf-8') as f:
-            sJson = json.dumps([json.loads(ob.tojson()) for ob in aCell_all], indent = 4)
+            sJson = json.dumps([json.loads(ob.tojson()) for ob in self.aCell], indent = 4)
             f.write(sJson)
             f.close()
 

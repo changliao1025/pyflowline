@@ -210,17 +210,15 @@ def reproject_coordinates(x_in, y_in, spatial_reference_source, spatial_referenc
         pass
     
     if int(osgeo.__version__[0]) >= 3:
-    # GDAL 3 changes axis order: https://github.com/OSGeo/gdal/issues/1546
-                    
+    # GDAL 3 changes axis order: https://github.com/OSGeo/gdal/issues/1546                    
         spatial_reference_source.SetAxisMappingStrategy(osgeo.osr.OAMS_TRADITIONAL_GIS_ORDER)
         spatial_reference_target.SetAxisMappingStrategy(osgeo.osr.OAMS_TRADITIONAL_GIS_ORDER)
-
+        pass
     
-    pTransform = osr.CoordinateTransformation( spatial_reference_source, spatial_reference_target)
-   
+    pTransform = osr.CoordinateTransformation( spatial_reference_source, spatial_reference_target)   
     x_new,y_new, z = pTransform.TransformPoint( x_in,y_in)
     
-    return x_new,y_new
+    return x_new, y_new
 
 def reproject_coordinates_batch(aX_in, aY_in, spatial_reference_source, spatial_reference_target=None):
     """[Reproject coordinates from one reference to another in batch mode. By default to WGS84.]

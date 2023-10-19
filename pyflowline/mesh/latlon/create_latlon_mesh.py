@@ -55,7 +55,9 @@ def create_latlon_mesh(dLongitude_left_in,
     xspacing= dResolution_degree_in
     ybottom = dLatitude_bot_in
     yspacing = dResolution_degree_in
-
+    aLatlon = list()
+    aLatlon_dict = dict()
+    lCellIndex = 0
     def add_cell_into_list(aList, lCellID, iRow, iColumn, dLongitude_center, dLatitude_center, aCoords ):          
     
         pLatlon = convert_gcs_coordinates_to_cell(2, dLongitude_center, dLatitude_center, aCoords)
@@ -121,10 +123,7 @@ def create_latlon_mesh(dLongitude_left_in,
     #   |           |
     #(x1,y1)-----(x2,y2)
     #...............
-    aLatlon = list()
-    #create a dictionary for searching using unsorted map harsh table method
-    aLatlon_dict = dict()
-    lCellIndex = 0
+    
     for iRow in range(1, nrow_in+1):
         for iColumn in range(1, ncolumn_in+1):        
             #global cell id for the mesh
@@ -186,36 +185,25 @@ def create_latlon_mesh(dLongitude_left_in,
     pDataset = pLayer = pFeature  = None      
 
     #update neighbor, this will not change the dictionary index
-    iFlag_fill_hole = 1
+    iFlag_fill_hole = 0
     aLatlon_out = list()
-    ncell = len(aLatlon)
-    aCellID  = list()
-    for i in range(ncell):
-        pCell = aLatlon[i]
-        lCellID = pCell.lCellID
-        aCellID.append(lCellID)
         
     if iFlag_fill_hole == 1:
         #follow the map or hexagon method
         pass
     else:
-        for i in range(ncell):
-            pCell = aLatlon[i]
-            aNeighbor = pCell.aNeighbor
-            nNeighbor = pCell.nNeighbor
-            aNeighbor_land_update = list()
-            nNeighbor_new = 0 
-            for j in range(nNeighbor):
-                lNeighbor = int(aNeighbor[j])
-                if lNeighbor in aCellID:
-                    nNeighbor_new = nNeighbor_new + 1 
+        for pCell in aLatlon:       
+            aNeighbor = pCell.aNeighbor         
+            aNeighbor_land_update = list() 
+            for lNeighbor in aNeighbor:              
+                if lNeighbor in aLatlon_dict:           
                     aNeighbor_land_update.append(lNeighbor)
 
             #for latlon, there is no ocean concept
             pCell.aNeighbor = aNeighbor_land_update
-            pCell.nNeighbor= len(aNeighbor_land_update)            
-            pCell.nNeighbor_land= len(aNeighbor_land_update)
-            pCell.aNeighbor_land = aNeighbor_land_update
+            pCell.nNeighbor= len(aNeighbor_land_update)     
+            pCell.aNeighbor_land = aNeighbor_land_update       
+            pCell.nNeighbor_land= len(aNeighbor_land_update)            
             pCell.nNeighbor_ocean = pCell.nVertex - pCell.nNeighbor_land
             aLatlon_out.append(pCell)
 
@@ -224,8 +212,7 @@ def create_latlon_mesh(dLongitude_left_in,
         aNeighbor = pLatlon.aNeighbor
         pLatlon.aNeighbor_distance=list()        
         for lCellID1 in aNeighbor:
-            #use dictionary to get index
-            lCellID1 = int(lCellID1)            
+            #use dictionary to get index           
             lIndex = aLatlon_dict[lCellID1]
             pLatlon1 = aLatlon_out[lIndex]                
             dDistance = pLatlon.pVertex_center.calculate_distance( pLatlon1.pVertex_center )

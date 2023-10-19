@@ -285,7 +285,7 @@ class pybasin(object):
 
         if not os.path.isfile(self.sFilename_flowline_filter):
             print("The filtered flowline file does not exist!")
-            exit
+            pass
         if self.iFlag_dam==1:
             if not os.path.isfile(self.sFilename_flowline_raw):
                 print("The raw flowline file does not exist!")
@@ -484,6 +484,7 @@ class pybasin(object):
         try:
             print('Basin ', self.sBasinID, 'split flowline')
             ptimer.start()
+            sys.stdout.flush()
             nFlowline_before = len(aFlowline_basin_filtered)
             aFlowline_basin_simplified = split_flowline(aFlowline_basin_filtered, aVertex)
             nFlowline_after = len(aFlowline_basin_simplified)
@@ -553,6 +554,7 @@ class pybasin(object):
                 dThreshold = self.dThreshold_small_river           
                 print('Basin ',  self.sBasinID, 'started small river removal', sStep, dThreshold)
                 ptimer.start()
+                sys.stdout.flush()
                 aFlowline_basin_simplified = remove_small_river(aFlowline_basin_simplified, dThreshold )
                 if self.iFlag_debug ==1:
                     sFilename_out = 'flowline_large_'+ sStep +'_before_intersect.geojson'

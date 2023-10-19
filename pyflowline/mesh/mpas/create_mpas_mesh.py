@@ -197,6 +197,8 @@ def create_mpas_mesh(iFlag_global_in,
     aBed_elevation_profile = bed_elevation_profile0[:]  #elevation    
     ncell = len(aIndexToCellID) 
     aMpas = list()
+    aMpas_dict = dict()
+    lCellIndex=0
 
     #add a mpas cell into a list
     def add_cell_into_list(aList, i, lCellID, dArea,dElevation_mean,dElevation_profile0, aCoords  ):
@@ -306,7 +308,8 @@ def create_mpas_mesh(iFlag_global_in,
 
                 #call fuction to add the cell
                 aMpas = add_cell_into_list(aMpas, i, lCellID, dArea, dElevation_mean, dElevation_profile0, aCoords )
-                
+                aMpas_dict[lCellID] = lCellIndex
+                lCellIndex = lCellIndex + 1
                 #save mesh cell
                 if iFlag_save_mesh_in ==1:                
                     pFeature.SetGeometry(pPolygon)
@@ -379,9 +382,10 @@ def create_mpas_mesh(iFlag_global_in,
                 #call fuction to add the cell               
                 
                 aMpas = add_cell_into_list(aMpas, i, lCellID, dArea, dElevation_mean, dElevation_profile0, aCoords )
-                
+                aMpas_dict[lCellID] = lCellIndex
+                lCellIndex = lCellIndex + 1
                 #save mesh cell
-                if iFlag_save_mesh_in ==1:                
+                if iFlag_save_mesh_in == 1:                
                     pFeature.SetGeometry(pPolygon)
                     pFeature.SetField("cellid", int(lCellID) )
                     pFeature.SetField("longitude", dLon )
@@ -397,38 +401,25 @@ def create_mpas_mesh(iFlag_global_in,
     #for maps we need to clean some cell because they were not actually in the domain
     #besides, we need to add some smal holes back
     #to do this, we need two steps.
-
+    
 
     if iFlag_global_in == 1:
         aMpas_out = aMpas
     else:
-        iFlag_fill_hole = 1
-        aMpas_middle = list()
+        iFlag_fill_hole = 0        
         aMpas_out = list()
         ncell = len(aMpas)
-        #generate the list of cell ID that are already certain
-        aCellID  = list()
-        for i in range(ncell):
-            pCell = aMpas[i]
-            lCellID = pCell.lCellID
-            aCellID.append(lCellID)
-
-        
+        #generate the list of cell ID that are already certain        
         if iFlag_fill_hole == 1:   
             #first update neighbor information because some cell should have vitual land neighbor (not present in the mesh)
             #this operation does not increase the number of cells, but it update the neighbor information
             #specifically, it divided the land neighbor into two parts: land and virtual land         
-            for i in range(ncell):
-                pCell = aMpas[i]
+            for pCell in aMpas:               
                 aNeighbor_land = pCell.aNeighbor_land   #including both holes and maps land cutoff by boundary
-                nNeighbor_land = pCell.nNeighbor
                 aNeighbor_land_update = list()
                 aNeighbor_land_virtual = list()
-                nNeighbor_land_update = 0 
-                for j in range(nNeighbor_land): #loop all land neighbors
-                    lNeighbor = int(aNeighbor_land[j])
-                    if lNeighbor in aCellID:
-                        nNeighbor_land_update = nNeighbor_land_update + 1 
+                for lNeighbor in aNeighbor_land: #loop all land neighbors                    
+                    if lNeighbor in aMpas_dict:                        
                         aNeighbor_land_update.append(lNeighbor)
                     else:
                         #a hole or boundary mpas land cell
@@ -438,7 +429,8 @@ def create_mpas_mesh(iFlag_global_in,
                 pCell.nNeighbor_land= len(aNeighbor_land_update)   
                 pCell.aNeighbor_land_virtual = aNeighbor_land_virtual   
                 pCell.nNeighbor_land_virtual = len(aNeighbor_land_virtual)
-                aMpas_middle.append(pCell)
+                pass
+            
 
                 #distance remains unchanged since we just have missing cells.
 
@@ -446,14 +438,12 @@ def create_mpas_mesh(iFlag_global_in,
             #this operation will increase the number of cells  
             #it will also update the neighbor information for some cells, 
             #not all cells will be updated (because some cells have 2+ virtual land neighbors)
-            for i in range(ncell):
-                pCell = aMpas_middle[i]  
+            for pCell in aMpas:                     
                 if pCell.nNeighbor_land_virtual == 1:  #only one virtual land means it is likely next to a hole 
                     lNeighbor_hole = pCell.aNeighbor_land_virtual[0]
                     j = lNeighbor_hole-1
                     dLat = convert_360_to_180 (aLatitudeCell[j])
                     dLon = convert_360_to_180 (aLongitudeCell[j])
-
                     #vertex
                     aVertexOnCellIndex = np.array(aVertexOnCell[j,:])
                     dummy0 = np.where(aVertexOnCellIndex > 0)
@@ -461,9 +451,7 @@ def create_mpas_mesh(iFlag_global_in,
                     aLonVertex = aLongitudeVertex[aVertexIndex-1]
                     aLatVertex = aLatitudeVertex[aVertexIndex-1]
                     nVertex = len(aLonVertex)
-
                     #first check if it is within the boundary
-
                     ring = ogr.Geometry(ogr.wkbLinearRing)
                     aCoords = np.full((nVertex,2), -9999.0, dtype=float)
                     for k in range(nVertex):
@@ -485,19 +473,16 @@ def create_mpas_mesh(iFlag_global_in,
                     dElevation_profile0 = float(aBed_elevation_profile[j,0])
                     dArea = float(aCellArea[j])
 
-                    if lCellID not in aCellID:   
+                    if lCellID not in aMpas_dict:   
                         aMpas_middle = add_cell_into_list(aMpas_middle, j, lCellID, dArea, dElevation_mean, dElevation_profile0, aCoords )
-                        aCellID.append(lCellID)
-
+                        aMpas_dict[lCellID] = lCellIndex
+                        lCellIndex = lCellIndex + 1
                         #now we need to update the neightboring information as well
                         pCell.aNeighbor_land.append(lCellID)
                         pCell.nNeighbor_land = pCell.nNeighbor_land + 1
-
                         pCell.aNeighbor_land_virtual = None
                         pCell.nNeighbor_land_virtual = 0
-
                         #save mesh cell
-
                         if iFlag_save_mesh_in ==1:                
                             pFeature.SetGeometry(pPolygon)
                             pFeature.SetField("cellid", int(lCellID) )
@@ -516,7 +501,6 @@ def create_mpas_mesh(iFlag_global_in,
                         pCell.nNeighbor_land = pCell.nNeighbor_land + 1
                         pCell.aNeighbor_land_virtual = None
                         pCell.nNeighbor_land_virtual = 0
-
                         pass
 
                 #how about distance? still unchanged, but the orders are changed
@@ -524,20 +508,14 @@ def create_mpas_mesh(iFlag_global_in,
             #now update again because some cell has more than one virutal land neighbor, but now none of them is virtual anymore
             #this fix will move virtual land neighbor back to land neighbor
             #the ocean neighbor will remain unchanged
-            ncell = len(aMpas_middle)
-            for i in range(ncell):
-                pCell = aMpas_middle[i]      
+        
+            for pCell in aMpas:            
                 aNeighbor_land_update = list()   
-                aNeighbor_land = pCell.aNeighbor_land                    
-                nNeighbor_land = pCell.nNeighbor_land
+                aNeighbor_land = pCell.aNeighbor_land  
                 aNeighbor_land_virtual_update = list()      
-                aNeighbor_land_virtual = pCell.aNeighbor_land_virtual
-                nNeighbor_land_virtual = pCell.nNeighbor_land_virtual
-                aNeighbor_distance = pCell.aNeighbor_distance     
-                for j in range(nNeighbor_land):
-                    lNeighbor = int(aNeighbor_land[j])
-                    dDistance = aNeighbor_distance[j]
-                    if lNeighbor in aCellID:
+                aNeighbor_land_virtual = pCell.aNeighbor_land_virtual                        
+                for lNeighbor in aNeighbor_land:     
+                    if lNeighbor in aMpas_dict:
                         aNeighbor_land_update.append(lNeighbor)                    
                         pass
                     else:
@@ -545,9 +523,8 @@ def create_mpas_mesh(iFlag_global_in,
                         pass
 
                 #for book keeping only        
-                for j in range(nNeighbor_land_virtual):
-                    lNeighbor = int(aNeighbor_land_virtual[j])
-                    if lNeighbor in aCellID:
+                for lNeighbor in aNeighbor_land_virtual:         
+                    if lNeighbor in aMpas_dict:
                         #this cell is actually not virtual anymore                    
                         aNeighbor_land_update.append(lNeighbor)
                     else:

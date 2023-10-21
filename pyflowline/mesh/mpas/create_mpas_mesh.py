@@ -188,8 +188,8 @@ def create_mpas_mesh(iFlag_global_in,
     aVertexOnCell = verticesOnCell0[:]
     aVertexOnEdge0 = verticesOnEdge0[:]    
     aIndexToCellID = indexToCellID0[:]
-    aIndexToEdgeID = indexToEdgeID0[:]
-    aIndexToVertexID = indexToVertexID0[:]
+    #aIndexToEdgeID = indexToEdgeID0[:]
+    #aIndexToVertexID = indexToVertexID0[:]
     aBed_elevation = bed_elevation0[:]
     aIce_thickness = ice_thickness0[:]
     aCellArea = areaCell0[:]
@@ -201,9 +201,11 @@ def create_mpas_mesh(iFlag_global_in,
     lCellIndex=0
 
     #add a mpas cell into a list
-    def add_cell_into_list(aList, i, lCellID, dArea,dElevation_mean,dElevation_profile0, aCoords  ):
-        dLat = convert_360_to_180 (aLatitudeCell[i])
+    def add_cell_into_list(aList, i, lCellID, dArea, dElevation_mean, dElevation_profile0, aCoords  ):
         dLon = convert_360_to_180 (aLongitudeCell[i])
+        dLat =  (aLatitudeCell[i])        
+        if dLon > 100:
+            print('Warning: longitude > 100')
         #vertex
         aCellOnCellIndex = np.array(aCellsOnCell[i,:])
         aEdgesOnCellIndex = np.array(aEdgesOnCell[i,:])
@@ -240,9 +242,9 @@ def create_mpas_mesh(iFlag_global_in,
             pmpas.nNeighbor_land=len(aNeighborIndex)
 
         aDistance=list()
-        for i in range(pmpas.nNeighbor):
+        for j in range(pmpas.nNeighbor):
             #find shared edge
-            lEdgeID= aEdgeIndex[i]
+            lEdgeID= aEdgeIndex[j]
             lIndex = lEdgeID-1
             dDistance = aDcEdge[lIndex]
             aDistance.append(dDistance)
@@ -258,8 +260,9 @@ def create_mpas_mesh(iFlag_global_in,
         #if it is antarctic, we dont need the boundary
         for i in range(ncell):
             #center
-            dLat = convert_360_to_180 (aLatitudeCell[i])
             dLon = convert_360_to_180 (aLongitudeCell[i])
+            dLat =  (aLatitudeCell[i])
+            
             aVertexOnCellIndex = np.array(aVertexOnCell[i,:])
             dummy0 = np.where(aVertexOnCellIndex > 0)
             aVertexIndex = aVertexOnCellIndex[dummy0]
@@ -327,8 +330,7 @@ def create_mpas_mesh(iFlag_global_in,
         iFlag_remove_ice = 1
         for i in range(ncell):
             #center
-            dLat = convert_360_to_180 (aLatitudeCell[i])
-            dLon = convert_360_to_180 (aLongitudeCell[i])
+                  
             #vertex
             aVertexOnCellIndex = np.array(aVertexOnCell[i,:])
             dummy0 = np.where(aVertexOnCellIndex > 0)
@@ -337,7 +339,7 @@ def create_mpas_mesh(iFlag_global_in,
             aLatVertex = aLatitudeVertex[aVertexIndex-1]
             nVertex = len(aLonVertex)
             #first check if it is within the boundary
-            iFlag = False
+            
             ring = ogr.Geometry(ogr.wkbLinearRing)
             aCoords = np.full((nVertex,2), -9999.0, dtype=float)
             for j in range(nVertex):
@@ -358,11 +360,17 @@ def create_mpas_mesh(iFlag_global_in,
             if pPolygon.Within(pBoundary):
                 iFlag = True
             else:
-                #then check intersection
-                if pPolygon.Intersects(pBoundary):
-                    iFlag = True
-                else:
+                dLon_min = np.min(aCoords[:,0])
+                dLon_max = np.max(aCoords[:,0])
+                if np.abs(dLon_min) > 100: #this polygon cross international date line
+                    #print('Warning: longitude > 100')
                     pass
+                else:
+                    #then check intersection
+                    if pPolygon.Intersects(pBoundary):
+                        iFlag = True
+                    else:
+                        pass
 
             if ( iFlag == True ):
                 lCellID = int(aIndexToCellID[i])
@@ -379,15 +387,19 @@ def create_mpas_mesh(iFlag_global_in,
                         pass
                 else:
                     pass           
-                #call fuction to add the cell               
+                #call fuction to add the cell   
+                            
                 
                 aMpas = add_cell_into_list(aMpas, i, lCellID, dArea, dElevation_mean, dElevation_profile0, aCoords )
                 aMpas_dict[lCellID] = lCellIndex
                 lCellIndex = lCellIndex + 1
                 #save mesh cell
-                if iFlag_save_mesh_in == 1:                
+                if iFlag_save_mesh_in == 1:      
+                    dLon = convert_360_to_180 (aLongitudeCell[i])
+                    dLat =  (aLatitudeCell[i])            
                     pFeature.SetGeometry(pPolygon)
                     pFeature.SetField("cellid", int(lCellID) )
+                   
                     pFeature.SetField("longitude", dLon )
                     pFeature.SetField("latitude", dLat )
                     pFeature.SetField("area", dArea )
@@ -442,8 +454,8 @@ def create_mpas_mesh(iFlag_global_in,
                 if pCell.nNeighbor_land_virtual == 1:  #only one virtual land means it is likely next to a hole 
                     lNeighbor_hole = pCell.aNeighbor_land_virtual[0]
                     j = lNeighbor_hole-1
-                    dLat = convert_360_to_180 (aLatitudeCell[j])
                     dLon = convert_360_to_180 (aLongitudeCell[j])
+                    dLat =  aLatitudeCell[j]                    
                     #vertex
                     aVertexOnCellIndex = np.array(aVertexOnCell[j,:])
                     dummy0 = np.where(aVertexOnCellIndex > 0)

@@ -48,6 +48,7 @@ class pyedge(object):
     dLength=0.0    
     lIndex_upstream=-1
     lIndex_downstream=-1
+    pBound=None
 
     def __init__(self, pVertex_start_in, pVertex_end_in):
         """
@@ -63,8 +64,19 @@ class pyedge(object):
             self.pVertex_start = pVertex_start_in
             self.pVertex_end = pVertex_end_in
             self.dLength = self.calculate_length()
+            self.calculate_edge_bound()
 
         return
+    
+    def calculate_edge_bound(self):
+        
+        dLon_max = np.max( [self.pVertex_start.dLongitude_degree, self.pVertex_end.dLongitude_degree] )
+        dLon_min = np.min( [self.pVertex_start.dLongitude_degree, self.pVertex_end.dLongitude_degree] )
+        dLat_max = np.max( [self.pVertex_start.dLatitude_degree, self.pVertex_end.dLatitude_degree] )
+        dLat_min = np.min( [self.pVertex_start.dLatitude_degree, self.pVertex_end.dLatitude_degree] )
+        
+        self.pBound = (dLon_min, dLat_min, dLon_max, dLat_max)
+        return self.pBound
 
     def calculate_length(self):
         """

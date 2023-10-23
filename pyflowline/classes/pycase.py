@@ -152,6 +152,8 @@ class flowlinecase(object):
     aCellID_outlet = list()
     aCell=list()
 
+    pRTree_mesh = None #only when rtree is used
+
     iFlag_visual = importlib.util.find_spec("cartopy")
     if iFlag_visual is not None:
         from ._visual import plot
@@ -162,7 +164,7 @@ class flowlinecase(object):
     else:
         pass
 
-    from ._hpc import _create_hpc_job
+    from ._hpc import _pyflowline_create_hpc_job
 
     def __init__(self, aConfig_in,
                  iFlag_standalone_in= None,
@@ -459,22 +461,22 @@ class flowlinecase(object):
         return
 
 
-    def convert_flowline_to_geojson(self):
+    def pyflowline_convert_flowline_to_geojson(self):
         if self.iFlag_flowline == 1:
             for pBasin in self.aBasin:
-                pBasin.convert_flowline_to_geojson()
+                pBasin.basin_convert_flowline_to_geojson()
                 pass
 
         return
 
-    def flowline_simplification(self):
+    def pyflowline_flowline_simplification(self):
         aFlowline_out = list()   #store all the flowline
         #export the outlet into a single file
         aOutlet = list()
         if self.iFlag_simplification == 1:
             for i in range(self.nOutlet):
                 pBasin = self.aBasin[i]
-                aFlowline_basin = pBasin.flowline_simplification()
+                aFlowline_basin = pBasin.basin_flowline_simplification()
                 aFlowline_out = aFlowline_out + aFlowline_basin
                 aOutlet.append(pBasin.pVertex_outlet)
 
@@ -483,7 +485,7 @@ class flowlinecase(object):
 
         return aFlowline_out
 
-    def mesh_generation(self, iFlag_antarctic_in=None):
+    def pyflowline_mesh_generation(self, iFlag_antarctic_in=None):
         """
         The mesh generation operation
 
@@ -853,11 +855,19 @@ class flowlinecase(object):
         else:            
             pass
 
+        #build rtree
+        if iFlag_use_rtree == 1:
+            interleaved = True
+            self.pRTree_mesh = RTree(interleaved=interleaved, max_cap=5, min_cap=2)
+            for lCellIndex in range(len(self.aCell)):                
+                pBound = self.aCell[lCellIndex].pBound                                    
+                self.pRTree_mesh.insert(lCellIndex, pBound)  #  
+
         
         print('Finish mesh generation.')
         return self.aCell
 
-    def reconstruct_topological_relationship(self):
+    def pyflowline_reconstruct_topological_relationship(self):
         """
         The topological relationship reconstruction operation
 
@@ -870,82 +880,101 @@ class flowlinecase(object):
         print('Start topology reconstruction.')
         iFlag_intersect = self.iFlag_intersect
         if iFlag_intersect == 1:
-            iMesh_type = self.iMesh_type
-            sWorkspace_output = self.sWorkspace_output
-            nOutlet = self.nOutlet
-            sFilename_mesh=self.sFilename_mesh
-            #self.aCell = aCell_raw should ready in the second step
+            iMesh_type = self.iMesh_type 
+            sFilename_mesh=self.sFilename_mesh         
             aFlowline_conceptual = list()   #store all the flowline
             aCellID_outlet = list()
             aBasin = list()
             aCell_intersect=list()
             ncell=len(self.aCell)
+            #there is a one-to-one match between cell id and cell center because each cell has only one center         
+            
+            
             for pBasin in self.aBasin:
-                aCell_intersect_basin = pBasin.reconstruct_topological_relationship(iMesh_type,sFilename_mesh)
+                aCell_intersect_basin = pBasin.basin_reconstruct_topological_relationship(iMesh_type,sFilename_mesh)
                 aFlowline_conceptual = aFlowline_conceptual + pBasin.aFlowline_basin_conceptual
                 aBasin.append(pBasin)
                 aCellID_outlet.append(pBasin.lCellID_outlet)
                 aCell_intersect = aCell_intersect + aCell_intersect_basin
 
-                #set topology here
-                nFlowline = len(pBasin.aFlowline_basin_conceptual)
-                for i in range(nFlowline):
-                    pFlowline = pBasin.aFlowline_basin_conceptual[i]
-                    nEdge = pFlowline.nEdge
-                    nVertex = pFlowline.nVertex
-                    aEdge = pFlowline.aEdge
-                    iStream_segment = pFlowline.iStream_segment
-                    iStream_order = pFlowline.iStream_order
-                    for j in range(nEdge):
-                        try:
-                            pEdge = aEdge[j]
+                if iFlag_use_rtree == 1:
+                    #use rtree to update topology and length
+                    for pFlowline in pBasin.aFlowline_basin_conceptual:                    
+                        iStream_segment = pFlowline.iStream_segment
+                        iStream_order = pFlowline.iStream_order                    
+                        for pEdge in pFlowline.aEdge:
                             pVertex_start = pEdge.pVertex_start
                             pVertex_end = pEdge.pVertex_end
-                            for k in range(ncell):
-                                pVertex_center = self.aCell[k].pVertex_center
-                                if pVertex_center == pVertex_start:
+                            pBound = pEdge.pBound
+                            aIntersect = list(self.pRTree_mesh.search(pBound))
+                            for k in aIntersect:
+                                pCell = self.aCell[k]
+                                if pVertex_start.calculate_distance(pCell.pVertex_center) < 1.0E-6:
                                     self.aCell[k].iStream_segment_burned = iStream_segment
                                     self.aCell[k].iStream_order_burned = iStream_order
-                                    for l in range(ncell):
-                                        pVertex_center2 = self.aCell[l].pVertex_center
-                                        lCellID = self.aCell[l].lCellID
-                                        if pVertex_center2 == pVertex_end:
-                                            self.aCell[k].lCellID_downstream_burned = lCellID
-                                            if lCellID ==  pBasin.lCellID_outlet:
-                                                self.aCell[l].iStream_segment_burned = iStream_segment
-                                                self.aCell[l].iStream_order_burned = iStream_order
+                                    lCellIndex_upstream = k
+                                
+                                if pVertex_end.calculate_distance(pCell.pVertex_center) < 1.0E-6:
+                                    self.aCell[k].iStream_segment_burned = iStream_segment
+                                    self.aCell[k].iStream_order_burned = iStream_order
+                                    lCellIndex_downstream = k
 
-                                            break
-                        except:
-                            print("error in step")
-                            print(pFlowline.tojson())
-                            print(pEdge.tojson())
-                            print(pVertex_start.tojson())
-                            print(pVertex_end.tojson())
-                            pass
+                            self.aCell[lCellIndex_upstream].lCellID_downstream_burned = self.aCell[lCellIndex_downstream].lCellID
 
-            #update length using rtree
-            if iFlag_use_rtree == 1:
-                interleaved = True
-                index_mesh = RTree(interleaved=interleaved, max_cap=5, min_cap=2)
-                for i in range(len(self.aCell)):
-                    lID = i 
-                    pBound = self.aCell[i].pBound                
-                    #pBound= (left, bottom, right, top)
-                    index_mesh.insert(lID, pBound)  #  
+                    for pCell2 in aCell_intersect_basin:
+                        pBound = pCell2.pBound
+                        aIntersect = list(self.pRTree_mesh.search(pBound))
+                        for k in aIntersect:
+                            pCell = self.aCell[k]
+                            if pCell2.lCellID == pCell.lCellID:
+                                pCell.dLength_flowline = pCell2.dLength_flowline
+                        pass
+                else:
+                    #set topology here               
+                    for pFlowline in pBasin.aFlowline_basin_conceptual:                    
+                        iStream_segment = pFlowline.iStream_segment
+                        iStream_order = pFlowline.iStream_order                    
+                        for pEdge in pFlowline.aEdge:
+                            try:                            
+                                pVertex_start = pEdge.pVertex_start
+                                pVertex_end = pEdge.pVertex_end
+                                iFlag_found_start = 0
+                                for k in range(ncell):
+                                    pVertex_center = self.aCell[k].pVertex_center
+                                    if pVertex_center == pVertex_start:
+                                        iFlag_found_start = 1
+                                        self.aCell[k].iStream_segment_burned = iStream_segment
+                                        self.aCell[k].iStream_order_burned = iStream_order
+                                        iFlag_found_end = 0
+                                        for l in range(ncell):
+                                            pVertex_center2 = self.aCell[l].pVertex_center
+                                            lCellID = self.aCell[l].lCellID
+                                            if pVertex_center2 == pVertex_end:
+                                                iFlag_found_end = 1
+                                                self.aCell[k].lCellID_downstream_burned = lCellID
+                                                if lCellID ==  pBasin.lCellID_outlet:
+                                                    self.aCell[l].iStream_segment_burned = iStream_segment
+                                                    self.aCell[l].iStream_order_burned = iStream_order
+                                                break
+                                        if iFlag_found_end == 0:
+                                            print('End not found')
+                                            pass
+                                if iFlag_found_start == 0:
+                                    print('Start not found')
+                                    pass
+                            except:
+                                print("error in step")
+                                print(pFlowline.tojson())
+                                print(pEdge.tojson())
+                                print(pVertex_start.tojson())
+                                print(pVertex_end.tojson())
+                                pass
 
-                for pCell2 in aCell_intersect:
-                    pBound = pCell2.pBound
-                    aIntersect = list(index_mesh.search(pBound))
-                    for k in aIntersect:
-                        pCell = self.aCell[k]
-                        if pCell2.lCellID == pCell.lCellID:
-                            pCell.dLength_flowline = pCell2.dLength_flowline
-            else:
-                for pCell in self.aCell:
-                    for pCell2 in aCell_intersect:
-                        if pCell2.lCellID == pCell.lCellID:
-                            pCell.dLength_flowline = pCell2.dLength_flowline
+                    #update length using rtree            
+                    for pCell in self.aCell:
+                        for pCell2 in aCell_intersect_basin:
+                            if pCell2.lCellID == pCell.lCellID:
+                                pCell.dLength_flowline = pCell2.dLength_flowline
 
             self.aFlowline_conceptual = aFlowline_conceptual
             self.aCellID_outlet = aCellID_outlet
@@ -955,7 +984,7 @@ class flowlinecase(object):
 
             return None
 
-    def merge_cell_info(self, aCell_raw):
+    def pyflowline_merge_cell_info(self, aCell_raw):
         """
         Merge cell information after reconstruction
 
@@ -980,7 +1009,7 @@ class flowlinecase(object):
 
         return self.aCell
 
-    def analyze(self):
+    def pyflowline_analyze(self):
         """
         Analyze the domain results for every watershed
         """
@@ -989,12 +1018,12 @@ class flowlinecase(object):
                 pBasin.analyze()
         return
 
-    def setup(self):
+    def pyflowline_setup(self):
         """
         Set up the flowlinecase
         """
         if self.iFlag_flowline == 1:
-            self.convert_flowline_to_geojson()
+            self.pyflowline_convert_flowline_to_geojson()
             pass
         
         if self.iFlag_dggrid == 1:
@@ -1015,7 +1044,7 @@ class flowlinecase(object):
             pass
         return
 
-    def change_model_parameter(self, sVariable_in, dValue, iFlag_basin_in = None):
+    def pyflowline_change_model_parameter(self, sVariable_in, dValue, iFlag_basin_in = None):
         if iFlag_basin_in is None:
             if hasattr(self, sVariable_in):
                 #get default data type                
@@ -1050,7 +1079,7 @@ class flowlinecase(object):
                     print("This model parameter is unknown, please check the full parameter list in the documentation: " + sVariable_in)
                     return False
 
-    def run(self):
+    def pyflowline_run(self):
         """
         Run the flowlinecase simulation
 
@@ -1059,12 +1088,12 @@ class flowlinecase(object):
         """
         aCell_out = None
         if self.iFlag_flowline == 1:
-            self.flowline_simplification()       
+            self.pyflowline_flowline_simplification()       
         else:
             pass            
 
         if self.iFlag_create_mesh:
-            self.aCell = self.mesh_generation(iFlag_antarctic_in= self.iFlag_antarctic)
+            self.aCell = self.pyflowline_mesh_generation(iFlag_antarctic_in= self.iFlag_antarctic)
             aCell_out = self.aCell
             pass
         else:
@@ -1076,7 +1105,7 @@ class flowlinecase(object):
             pass
 
         if self.iFlag_intersect == 1:
-            self.aCell, a, b = self.reconstruct_topological_relationship()
+            self.aCell, a, b = self.pyflowline_reconstruct_topological_relationship()
             aCell_out = self.aCell
             pass
         else:
@@ -1084,7 +1113,7 @@ class flowlinecase(object):
 
         return aCell_out
 
-    def evaluate(self):
+    def pyflowline_evaluate(self):
         """
         Evaluate the model performance
         """
@@ -1092,14 +1121,14 @@ class flowlinecase(object):
             pBasin.evaluate(self.iMesh_type, self.sMesh_type)
         return
 
-    def export(self):
+    def pyflowline_export(self):
         """
         Export the model outputs
         """
         print('Started export elevation')
         ptimer = pytimer()
         ptimer.start()
-        self.export_mesh_info_to_json()
+        self.pyflowline_export_mesh_info_to_json()
         #convert the mesh into the kml format so it can be visualized in google earth and google map
         #shoule move this to the export function
         if iFlag_kml is not None:
@@ -1107,13 +1136,13 @@ class flowlinecase(object):
 
         if self.iFlag_flowline ==1:
             for pBasin in self.aBasin:
-                pBasin.export()
+                pBasin.basin_export()
 
         self.tojson()
         ptimer.stop()
         return
 
-    def export_mesh_info_to_json(self):
+    def pyflowline_export_mesh_info_to_json(self):
         """
         Export the mesh information to a json file
         """
@@ -1144,26 +1173,28 @@ class flowlinecase(object):
         """
         aSkip = ['aBasin', \
                  'aFlowline_simplified','aFlowline_conceptual','aCellID_outlet',
-                 'aCell']
+                 'aCell', 'pRTree_mesh']
 
         obj = self.__dict__.copy()
         for sKey in aSkip:
             obj.pop(sKey, None)
-            sJson = json.dumps(obj,\
+            pass
+        
+        sJson = json.dumps(obj,\
                                sort_keys=True, \
                                indent = 4, \
                                ensure_ascii=True, \
                                cls=CaseClassEncoder)
         return sJson
 
-    def print(self):
+    def pyflowline_print(self):
         """
         Print the flowline case object
         """
         print(self.tojson())
         return
 
-    def export_config_to_json(self, sFilename_output_in = None):
+    def pyflowline_export_config_to_json(self, sFilename_output_in = None):
         """
         Export the configuration to a json file
 
@@ -1227,7 +1258,7 @@ class flowlinecase(object):
                       cls=CaseClassEncoder)
         return
 
-    def export_basin_config_to_json(self, sFilename_output_in= None):
+    def pyflowline_export_basin_config_to_json(self, sFilename_output_in= None):
         """
         Export the member basin configuration to a json file
 

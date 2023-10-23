@@ -362,7 +362,7 @@ def create_mpas_mesh(iFlag_global_in,
             else:
                 dLon_min = np.min(aCoords[:,0])
                 dLon_max = np.max(aCoords[:,0])
-                if np.abs(dLon_min) > 100: #this polygon cross international date line
+                if np.abs(dLon_min-dLon_max) > 100: #this polygon cross international date line
                     #print('Warning: longitude > 100')
                     pass
                 else:
@@ -398,8 +398,7 @@ def create_mpas_mesh(iFlag_global_in,
                     dLon = convert_360_to_180 (aLongitudeCell[i])
                     dLat =  (aLatitudeCell[i])            
                     pFeature.SetGeometry(pPolygon)
-                    pFeature.SetField("cellid", int(lCellID) )
-                   
+                    pFeature.SetField("cellid", int(lCellID) )                   
                     pFeature.SetField("longitude", dLon )
                     pFeature.SetField("latitude", dLat )
                     pFeature.SetField("area", dArea )
@@ -550,7 +549,22 @@ def create_mpas_mesh(iFlag_global_in,
                 aMpas_out.append(pCell)
         else:
             #no hole filling applied
-            aMpas_out = aMpas
+            #still need to get rid cell that are not in the domain
+            for pCell in aMpas:       
+                aNeighbor = pCell.aNeighbor         
+                aNeighbor_land_update = list() 
+                for lNeighbor in aNeighbor:              
+                    if lNeighbor in aMpas_dict:           
+                        aNeighbor_land_update.append(lNeighbor)
+
+                #for latlon, there is no ocean concept
+                pCell.aNeighbor = aNeighbor_land_update
+                pCell.nNeighbor= len(aNeighbor_land_update)     
+                pCell.aNeighbor_land = aNeighbor_land_update       
+                pCell.nNeighbor_land= len(aNeighbor_land_update)            
+                pCell.nNeighbor_ocean = pCell.nVertex - pCell.nNeighbor_land
+                aMpas_out.append(pCell)
+          
             pass
 
     return aMpas_out

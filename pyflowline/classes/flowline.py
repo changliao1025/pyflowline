@@ -65,6 +65,8 @@ class pyflowline(object):
     #for stream topology
     lFlowline_downstream = None #only store the index, not the actual objects
     aFlowline_upstream = None #only store the index, not the actual objects
+
+    pBound=None
     
     def __init__(self, aEdge):
         """
@@ -91,6 +93,8 @@ class pyflowline(object):
         self.aFlowlineID_start_end = list()
         self.aFlowlineID_end_start = list()
         self.aFlowlineID_end_end = list()
+
+        self.calculate_flowline_bound()
      
         return
 
@@ -112,6 +116,20 @@ class pyflowline(object):
         self.dLength= dLength
 
         return dLength
+    
+    def calculate_flowline_bound(self):
+        dLat_min = 90
+        dLat_max = -90
+        dLon_min = 180
+        dLon_max = -180
+        for i in range(self.nVertex):
+            dLon_max = np.max( [dLon_max, self.aVertex[i].dLongitude_degree] )
+            dLon_min = np.min( [dLon_min, self.aVertex[i].dLongitude_degree] )
+            dLat_max = np.max( [dLat_max, self.aVertex[i].dLatitude_degree] )
+            dLat_min = np.min( [dLat_min, self.aVertex[i].dLatitude_degree] )
+        
+        self.pBound = (dLon_min, dLat_min, dLon_max, dLat_max)
+        return self.pBound
 
     def check_upstream(self, other):
         """
@@ -322,13 +340,14 @@ class pyflowline(object):
         Returns:
             json str: A json string
         """
-        aSkip = ['aEdge', \
+        aSkip = ['aEdge', 
                 'aVertex','aFlowlineID_start_start','aFlowlineID_start_end',
                 'aFlowlineID_end_start','aFlowlineID_end_end']
 
         obj = self.__dict__.copy()
         for sKey in aSkip:
             obj.pop(sKey, None)
+            pass
 
 
         sJson = json.dumps(obj,  

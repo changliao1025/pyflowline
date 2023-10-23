@@ -49,6 +49,7 @@ def create_hexagon_mesh(iFlag_rotation_in,
     
     if os.path.exists(sFilename_output_in): 
         os.remove(sFilename_output_in)
+        pass
     
     if os.path.exists(sFilename_spatial_reference_in): 
         pass
@@ -82,6 +83,8 @@ def create_hexagon_mesh(iFlag_rotation_in,
     #hexagon edge
     dLength_edge = np.sqrt(  2.0 * dArea / (3.0* np.sqrt(3.0))  )
     dLength_half_edge = 0.5 * dLength_edge
+    aHexagon_dict = dict()
+    lCellIndex = 0
 
     def add_cell_into_list1(aList, lCellID, iRow, iColumn, dLongitude_center, dLatitude_center, aCoords ):
         pHexagon = convert_gcs_coordinates_to_cell(1, dLongitude_center, dLatitude_center, aCoords)
@@ -262,8 +265,8 @@ def create_hexagon_mesh(iFlag_rotation_in,
     #--(x6,y6)----------------(x3,y3)
     #--------(x1,y1)----(x2,y2)
     #...............#
+    
     if iFlag_rotation_in == 0:
-
         dX_shift = dLength_half_edge * np.sqrt(3.0)
         dY_shift = dLength_half_edge
         dX_spacing = dLength_edge * np.sqrt(3.0)
@@ -317,7 +320,7 @@ def create_hexagon_mesh(iFlag_rotation_in,
                     aCoords[i, 0] = x
                     aCoords[i, 1] = y
            
-                dummy1= np.array(aCoords)
+                
                 dLongitude_center = np.mean(aCoords[0:6,0])
                 dLatitude_center = np.mean(aCoords[0:6,1])                
 
@@ -332,8 +335,9 @@ def create_hexagon_mesh(iFlag_rotation_in,
                         pass
 
                 if ( iFlag == True ):         
-                    aHexagon, dArea = add_cell_into_list1(aHexagon, lCellID, iRow, iColumn, dLongitude_center,dLatitude_center, dummy1 ) 
-        
+                    aHexagon, dArea = add_cell_into_list1(aHexagon, lCellID, iRow, iColumn, dLongitude_center,dLatitude_center, aCoords ) 
+                    aHexagon_dict[lCellID] = lCellIndex
+                    lCellIndex = lCellIndex + 1  
                     #save feature
                     pFeature.SetGeometry(pPolygon)
                     pFeature.SetField("cellid", lCellID) 
@@ -341,7 +345,7 @@ def create_hexagon_mesh(iFlag_rotation_in,
                     pFeature.SetField("latitude", dLatitude_center )
                     pFeature.SetField("area", dArea )
                     pLayer.CreateFeature(pFeature)
-  
+                    
                     pass
                 else:
                     #this cell center is out of boundary
@@ -397,9 +401,8 @@ def create_hexagon_mesh(iFlag_rotation_in,
                 aCoords = np.full((7,2), -9999.0, dtype=float)
                 for i, (x, y) in enumerate(coordinates):
                     aCoords[i, 0] = x
-                    aCoords[i, 1] = y
-                    
-                dummy1= np.array(aCoords)
+                    aCoords[i, 1] = y                    
+             
                 dLongitude_center = np.mean(aCoords[0:6,0])
                 dLatitude_center = np.mean(aCoords[0:6,1])     
                 iFlag == False
@@ -414,8 +417,9 @@ def create_hexagon_mesh(iFlag_rotation_in,
                 if ( iFlag == True ):  
                     aHexagon, dArea = add_cell_into_list2(aHexagon, lCellID, iRow, iColumn, 
                                                           dLongitude_center,dLatitude_center, 
-                                                          dummy1 )
-                    
+                                                          aCoords )                    
+                    aHexagon_dict[lCellID] = lCellIndex
+                    lCellIndex = lCellIndex + 1
                     pFeature.SetGeometry(pPolygon)
                     pFeature.SetField("cellid", lCellID)
                     pFeature.SetField("longitude", dLongitude_center )
@@ -429,263 +433,252 @@ def create_hexagon_mesh(iFlag_rotation_in,
                     pass
        
         
-         
-
     #maybe rebuild topology?
-    
+    iFlag_fill_hole = 0    
     aHexagon_out = list()
-    aHexagon_middle = list()
-    ncell = len(aHexagon)
-    aCellID  = list()
-    for i in range(ncell):
-        pCell = aHexagon[i]
-        lCellID = pCell.lCellID
-        aCellID.append(lCellID)
 
-    for i in range(ncell):
-        pCell = aHexagon[i]
-        aNeighbor_land = pCell.aNeighbor_land   #including both holes and maps land cutoff by boundary
-        nNeighbor_land = pCell.nNeighbor
-        aNeighbor_land_update = list()
-        aNeighbor_land_virtual = list()
-        nNeighbor_land_update = 0 
-        for j in range(nNeighbor_land): #loop all land neighbors
-            lNeighbor = int(aNeighbor_land[j])
-            if lNeighbor in aCellID:
-                nNeighbor_land_update = nNeighbor_land_update + 1 
-                aNeighbor_land_update.append(lNeighbor)
-            else:
-                #a hole or boundary mpas land cell
-                aNeighbor_land_virtual.append(lNeighbor)
-                
-        pCell.nNeighbor= len(aNeighbor_land_update)
-        pCell.aNeighbor = aNeighbor_land_update        
-        pCell.aNeighbor_land = aNeighbor_land_update
-        pCell.nNeighbor_land= len(aNeighbor_land_update)   
-        pCell.aNeighbor_land_virtual = aNeighbor_land_virtual   
-        
-        pCell.nNeighbor_land_virtual = len(aNeighbor_land_virtual)
-        aHexagon_middle.append(pCell)
+    if iFlag_fill_hole ==1:
+        #find the virtual neighbors
+        for pCell in aHexagon:            
+            aNeighbor_land = pCell.aNeighbor_land   #including both holes and maps land cutoff by boundary
+            nNeighbor_land = pCell.nNeighbor
+            aNeighbor_land_update = list()
+            aNeighbor_land_virtual = list()
+            nNeighbor_land_update = 0 
+            for lNeighbor in aNeighbor_land: #loop all land neighbors               
+                if lNeighbor in aHexagon_dict:
+                    nNeighbor_land_update = nNeighbor_land_update + 1 
+                    aNeighbor_land_update.append(lNeighbor)
+                else:
+                    #a hole or boundary mpas land cell
+                    aNeighbor_land_virtual.append(lNeighbor)
 
-    #add hole back
-    for i in range(ncell):
-        pCell = aHexagon_middle[i]  
-          
-        if pCell.nNeighbor_land_virtual ==1:  #only one virtual land means it is likely next to a hole 
-            lNeighbor_hole = pCell.aNeighbor_land_virtual[0]
-            #now find its row and column indices
-            #id start with 1 so we need to refind the row and column index
-            iRow, iColumn = index_to_row_col(lNeighbor_hole, ncolumn_in)          
-            lCellID = (iRow-1) * ncolumn_in + iColumn
-            if lCellID != lNeighbor_hole:
-                print("error")
-                return
-            
-            #now build the cell    
-            #define a polygon here
-            if iFlag_rotation_in == 0:
-                dX_shift = dLength_half_edge * np.sqrt(3.0)
-                dY_shift = dLength_half_edge
-                dX_spacing = dLength_edge * np.sqrt(3.0)
-                dY_spacing = dLength_edge * 1.5
-                if iRow % 2 == 1 : #odd
+            pCell.nNeighbor= len(aNeighbor_land_update)
+            pCell.aNeighbor = aNeighbor_land_update        
+            pCell.aNeighbor_land = aNeighbor_land_update
+            pCell.nNeighbor_land= len(aNeighbor_land_update)   
+            pCell.aNeighbor_land_virtual = aNeighbor_land_virtual   
+
+            pCell.nNeighbor_land_virtual = len(aNeighbor_land_virtual)
+            aHexagon_middle.append(pCell)
+
+        #add holes back, we also need to add into the unsorted map 
+        for pCell in aHexagon:              
+
+            if pCell.nNeighbor_land_virtual ==1:  #only one virtual land means it is likely next to a hole 
+                lNeighbor_hole = pCell.aNeighbor_land_virtual[0]
+                #now find its row and column indices
+                #id start with 1 so we need to refind the row and column index
+                iRow, iColumn = index_to_row_col(lNeighbor_hole, ncolumn_in)          
+                lCellID = (iRow-1) * ncolumn_in + iColumn    
+                #now build the cell    
                 #define a polygon here
-                    x1 = xleft + (iColumn-1) * dX_spacing
-                    y1 = ybottom + (iRow -1) * dY_spacing
+                if iFlag_rotation_in == 0:
+                    dX_shift = dLength_half_edge * np.sqrt(3.0)
+                    dY_shift = dLength_half_edge
+                    dX_spacing = dLength_edge * np.sqrt(3.0)
+                    dY_spacing = dLength_edge * 1.5
+                    if iRow % 2 == 1 : #odd
+                    #define a polygon here
+                        x1 = xleft + (iColumn-1) * dX_spacing
+                        y1 = ybottom + (iRow -1) * dY_spacing
+                    else:
+                        x1 = xleft + (iColumn-1) * dX_spacing + dX_shift
+                        y1 = ybottom + (iRow -1) * dY_spacing    
+
+                    x2 = x1 + dX_shift
+                    y2 = y1 + dY_shift
+
+                    x3 = x2
+                    y3 = y2 + dLength_edge            
+
+                    x4 = x1 
+                    y4 = y2 + dY_spacing
+
+                    x5 = x1- dX_shift 
+                    y5 = y3 
+
+                    x6 = x5
+                    y6 = y2                  
+
+                    x = [x1, x2, x3, x4, x5, x6]
+                    y = [y1, y2, y3, y4, y5, y6]
+
+                    x_new , y_new = reproject_coordinates_batch(x, y, pSpatial_reference, \
+                        spatial_reference_target = pSpatial_reference_gcs)
+
+                    x1, x2, x3, x4, x5, x6 = x_new
+                    y1, y2, y3, y4, y5, y6 = y_new
+                    coordinates = [(x1, y1), (x2, y2), (x3, y3), (x4, y4), (x5, y5), (x6, y6), (x1, y1)]
+
+                    ring = ogr.Geometry(ogr.wkbLinearRing)
+                    for x, y in coordinates:
+                        ring.AddPoint(x, y)
+
+                    pPolygon = ogr.Geometry(ogr.wkbPolygon)
+                    pPolygon.AddGeometry(ring)    
+
+                    aCoords = np.full((7,2), -9999.0, dtype=float)
+                    for i, (x, y) in enumerate(coordinates):
+                        aCoords[i, 0] = x
+                        aCoords[i, 1] = y
+                        pass
+                    
+                    dLongitude_center = np.mean(aCoords[0:6,0])
+                    dLatitude_center = np.mean(aCoords[0:6,1])                  
+
+                    if lCellID not in aHexagon_dict:    
+                        aHexagon_middle, dArea = add_cell_into_list1(aHexagon_middle, lCellID, iRow, iColumn, dLongitude_center,dLatitude_center, aCoords)        
+                        aHexagon_dict[lCellID] = lCellIndex
+                        lCellIndex = lCellIndex + 1
+                        pFeature.SetGeometry(pPolygon)
+                        pFeature.SetField("cellid", int(lCellID) )
+                        pFeature.SetField("longitude", dLongitude_center )
+                        pFeature.SetField("latitude", dLatitude_center )
+                        pFeature.SetField("area", dArea )                
+                        pLayer.CreateFeature(pFeature)
+
+                    else:
+                        #this hole was added already, but we need to update the neighbor information
+                        pCell.aNeighbor_land.append(lCellID)
+                        pCell.nNeighbor_land = pCell.nNeighbor_land + 1
+                        pCell.aNeighbor_land_virtual = None
+                        pCell.nNeighbor_land_virtual = 0
+                        pass
+                    
                 else:
-                    x1 = xleft + (iColumn-1) * dX_spacing + dX_shift
-                    y1 = ybottom + (iRow -1) * dY_spacing    
+                    dX_shift = 0.5 * dLength_edge #short displacement 
+                    dY_shift = 0.5 * dLength_edge * np.sqrt(3.0) #long displacement
+                    dX_spacing = dLength_edge * 1.5 #cell to cell displacement in x
+                    dY_spacing = dLength_edge * np.sqrt(3.0) #cell to cell displacement in y
+                    if iColumn % 2 == 0 :
+                    #define a polygon here
+                        x1 = xleft + (iColumn-1) * dX_spacing
+                        y1 = ybottom + (iRow-2) * dY_spacing + dY_shift
+                    else:
+                        x1 = xleft + (iColumn-1) * dX_spacing 
+                        y1 = ybottom + (iRow-1) * dY_spacing     
 
-                x2 = x1 + dX_shift
-                y2 = y1 + dY_shift
-    
-                x3 = x2
-                y3 = y2 + dLength_edge            
-    
-                x4 = x1 
-                y4 = y2 + dY_spacing
-    
-                x5 = x1- dX_shift 
-                y5 = y3 
-    
-                x6 = x5
-                y6 = y2                  
-                
-                x = [x1, x2, x3, x4, x5, x6]
-                y = [y1, y2, y3, y4, y5, y6]
+                    x2 = x1 + dLength_edge
+                    y2 = y1  
 
-                x_new , y_new = reproject_coordinates_batch(x, y, pSpatial_reference, \
-                    spatial_reference_target = pSpatial_reference_gcs)
+                    x3 = x2 + dX_shift
+                    y3 = y2 + dY_shift
 
-                x1, x2, x3, x4, x5, x6 = x_new
-                y1, y2, y3, y4, y5, y6 = y_new
-                coordinates = [(x1, y1), (x2, y2), (x3, y3), (x4, y4), (x5, y5), (x6, y6), (x1, y1)]
-    
-                ring = ogr.Geometry(ogr.wkbLinearRing)
-                for x, y in coordinates:
-                    ring.AddPoint(x, y)
-                
-                pPolygon = ogr.Geometry(ogr.wkbPolygon)
-                pPolygon.AddGeometry(ring)    
+                    x4 = x1 + dLength_edge
+                    y4 = y1 + dY_shift * 2.0
 
-                aCoords = np.full((7,2), -9999.0, dtype=float)
-                for i, (x, y) in enumerate(coordinates):
-                    aCoords[i, 0] = x
-                    aCoords[i, 1] = y
-           
-                dummy1= np.array(aCoords)
-                dLongitude_center = np.mean(aCoords[0:6,0])
-                dLatitude_center = np.mean(aCoords[0:6,1])   
-                
+                    x5 = x1 
+                    y5 = y1 + dY_shift * 2.0
 
-                dummy1= np.array(aCoords)
-                dLongitude_center = np.mean(aCoords[0:4,0])
-                dLatitude_center = np.mean(aCoords[0:4,1])   
+                    x6 = x1 - dX_shift
+                    y6 = y1 + dY_shift      
 
-                if lCellID not in aCellID:    
-                    aHexagon_middle, dArea = add_cell_into_list1(aHexagon_middle, lCellID, iRow, iColumn, dLongitude_center,dLatitude_center, dummy1 )        
-                    aCellID.append(lCellID)
+                    x_new , y_new = reproject_coordinates_batch(x, y, pSpatial_reference, \
+                        spatial_reference_target = pSpatial_reference_gcs)
 
-                    pFeature.SetGeometry(pPolygon)
-                    pFeature.SetField("cellid", int(lCellID) )
-                    pFeature.SetField("longitude", dLongitude_center )
-                    pFeature.SetField("latitude", dLatitude_center )
-                    pFeature.SetField("area", dArea )                
-                    pLayer.CreateFeature(pFeature)
+                    x1, x2, x3, x4, x5, x6 = x_new
+                    y1, y2, y3, y4, y5, y6 = y_new
+                    coordinates = [(x1, y1), (x2, y2), (x3, y3), (x4, y4), (x5, y5), (x6, y6), (x1, y1)]
 
-                else:
-                    #this hole was added already, but we need to update the neighbor information
-                    pCell.aNeighbor_land.append(lCellID)
-                    pCell.nNeighbor_land = pCell.nNeighbor_land + 1
-                    pCell.aNeighbor_land_virtual = None
-                    pCell.nNeighbor_land_virtual = 0
+                    ring = ogr.Geometry(ogr.wkbLinearRing)
+                    for x, y in coordinates:
+                        ring.AddPoint(x, y)
+
+                    pPolygon = ogr.Geometry(ogr.wkbPolygon)
+                    pPolygon.AddGeometry(ring)    
+
+                    aCoords = np.full((7,2), -9999.0, dtype=float)
+                    for i, (x, y) in enumerate(coordinates):
+                        aCoords[i, 0] = x
+                        aCoords[i, 1] = y
+                        pass
+       
+                    dLongitude_center = np.mean(aCoords[0:6,0])
+                    dLatitude_center = np.mean(aCoords[0:6,1])                   
+
+                    if lCellID not in aHexagon_dict:    
+                        aHexagon_middle, dArea = add_cell_into_list1(aHexagon_middle, lCellID, iRow, iColumn, dLongitude_center,dLatitude_center, aCoords)        
+                        aHexagon_dict[lCellID] = lCellIndex
+                        lCellIndex = lCellIndex + 1
+                        pFeature.SetGeometry(pPolygon)
+                        pFeature.SetField("cellid", int(lCellID) )
+                        pFeature.SetField("longitude", dLongitude_center )
+                        pFeature.SetField("latitude", dLatitude_center )
+                        pFeature.SetField("area", dArea )                
+                        pLayer.CreateFeature(pFeature)
+
+                    else:
+                        #this hole was added already, but we need to update the neighbor information
+                        pCell.aNeighbor_land.append(lCellID)
+                        pCell.nNeighbor_land = pCell.nNeighbor_land + 1
+                        pCell.aNeighbor_land_virtual = None
+                        pCell.nNeighbor_land_virtual = 0
+                        pass
                     pass
-            
-            else:
-                dX_shift = 0.5 * dLength_edge #short displacement 
-                dY_shift = 0.5 * dLength_edge * np.sqrt(3.0) #long displacement
-                dX_spacing = dLength_edge * 1.5 #cell to cell displacement in x
-                dY_spacing = dLength_edge * np.sqrt(3.0) #cell to cell displacement in y
-                if iColumn % 2 == 0 :
-                #define a polygon here
-                    x1 = xleft + (iColumn-1) * dX_spacing
-                    y1 = ybottom + (iRow-2) * dY_spacing + dY_shift
-                else:
-                    x1 = xleft + (iColumn-1) * dX_spacing 
-                    y1 = ybottom + (iRow-1) * dY_spacing     
-    
-                x2 = x1 + dLength_edge
-                y2 = y1  
 
-                x3 = x2 + dX_shift
-                y3 = y2 + dY_shift
-    
-                x4 = x1 + dLength_edge
-                y4 = y1 + dY_shift * 2.0
-
-                x5 = x1 
-                y5 = y1 + dY_shift * 2.0
-    
-                x6 = x1 - dX_shift
-                y6 = y1 + dY_shift      
-
-                x_new , y_new = reproject_coordinates_batch(x, y, pSpatial_reference, \
-                    spatial_reference_target = pSpatial_reference_gcs)
-
-                x1, x2, x3, x4, x5, x6 = x_new
-                y1, y2, y3, y4, y5, y6 = y_new
-                coordinates = [(x1, y1), (x2, y2), (x3, y3), (x4, y4), (x5, y5), (x6, y6), (x1, y1)]
-    
-                ring = ogr.Geometry(ogr.wkbLinearRing)
-                for x, y in coordinates:
-                    ring.AddPoint(x, y)
-                
-                pPolygon = ogr.Geometry(ogr.wkbPolygon)
-                pPolygon.AddGeometry(ring)    
-
-                aCoords = np.full((7,2), -9999.0, dtype=float)
-                for i, (x, y) in enumerate(coordinates):
-                    aCoords[i, 0] = x
-                    aCoords[i, 1] = y
-           
-                dummy1= np.array(aCoords)
-                dLongitude_center = np.mean(aCoords[0:6,0])
-                dLatitude_center = np.mean(aCoords[0:6,1])   
-                
-
-                dummy1= np.array(aCoords)
-                dLongitude_center = np.mean(aCoords[0:4,0])
-                dLatitude_center = np.mean(aCoords[0:4,1])   
-
-                if lCellID not in aCellID:    
-                    aHexagon_middle, dArea = add_cell_into_list1(aHexagon_middle, lCellID, iRow, iColumn, dLongitude_center,dLatitude_center, dummy1 )        
-                    aCellID.append(lCellID)
-
-                    pFeature.SetGeometry(pPolygon)
-                    pFeature.SetField("cellid", int(lCellID) )
-                    pFeature.SetField("longitude", dLongitude_center )
-                    pFeature.SetField("latitude", dLatitude_center )
-                    pFeature.SetField("area", dArea )                
-                    pLayer.CreateFeature(pFeature)
-
-                else:
-                    #this hole was added already, but we need to update the neighbor information
-                    pCell.aNeighbor_land.append(lCellID)
-                    pCell.nNeighbor_land = pCell.nNeighbor_land + 1
-                    pCell.aNeighbor_land_virtual = None
-                    pCell.nNeighbor_land_virtual = 0
+        #update neighbor information      
+        for pCell in aHexagon:     
+            aNeighbor_land_update = list()   
+            aNeighbor_land = pCell.aNeighbor_land                    
+            nNeighbor_land = pCell.nNeighbor_land
+            aNeighbor_land_virtual_update = list()      
+            aNeighbor_land_virtual = pCell.aNeighbor_land_virtual           
+            for lNeighbor in aNeighbor_land:   
+                if lNeighbor in aHexagon_dict:
+                    aNeighbor_land_update.append(lNeighbor)
                     pass
-                pass
+                else:
+                    #this is a land cell in mpas, but it may be clipped by boundary
+                    pass
 
-    ncell = len(aHexagon_middle)
-    for i in range(ncell):
-        pCell = aHexagon_middle[i]
-        aNeighbor_land_update = list()   
-        aNeighbor_land = pCell.aNeighbor_land                    
-        nNeighbor_land = pCell.nNeighbor_land
-        aNeighbor_land_virtual_update = list()      
-        aNeighbor_land_virtual = pCell.aNeighbor_land_virtual
-        nNeighbor_land_virtual = pCell.nNeighbor_land_virtual       
-        
-        for j in range(nNeighbor_land):
-            lNeighbor = int(aNeighbor_land[j])
-            
-            if lNeighbor in aCellID:
-                aNeighbor_land_update.append(lNeighbor)
-                
-                pass
-            else:
-                #this is a land cell in mpas, but it may be clipped by boundary
-                pass
+            #for book keeping only        
+            for lNeighbor in aNeighbor_land_virtual:             
+                if lNeighbor in aHexagon_dict:
+                    #this cell is actually not virtual anymore                    
+                    aNeighbor_land_update.append(lNeighbor)
+                else:
+                    aNeighbor_land_virtual_update.append(lNeighbor)
+    
+            pCell.aNeighbor = aNeighbor_land_update 
+            pCell.nNeighbor= len(aNeighbor_land_update)                   
+            pCell.aNeighbor_land = aNeighbor_land_update
+            pCell.nNeighbor_land= len(aNeighbor_land_update)   
+            pCell.aNeighbor_land_virtual = aNeighbor_land_virtual_update   #for book keeping only
+            pCell.nNeighbor_land_virtual = len(aNeighbor_land_virtual_update)
 
-        #for book keeping only        
-        for j in range(nNeighbor_land_virtual):
-            lNeighbor = int(aNeighbor_land_virtual[j])
-            if lNeighbor in aCellID:
-                #this cell is actually not virtual anymore                    
-                aNeighbor_land_update.append(lNeighbor)
-            else:
-                aNeighbor_land_virtual_update.append(lNeighbor)
-   
-        pCell.nNeighbor= len(aNeighbor_land_update)
-        pCell.aNeighbor = aNeighbor_land_update        
-        pCell.aNeighbor_land = aNeighbor_land_update
-        pCell.nNeighbor_land= len(aNeighbor_land_update)   
-        pCell.aNeighbor_land_virtual = aNeighbor_land_virtual_update   #for book keeping only
-        pCell.nNeighbor_land_virtual = len(aNeighbor_land_virtual_update)
-        
-        aHexagon_out.append(pCell)
-        
+            aHexagon_out.append(pCell)
+    else:
+      
+        for pCell in aHexagon:     
+            aNeighbor_land_update = list()   
+            aNeighbor_land = pCell.aNeighbor_land       
+            for lNeighbor in aNeighbor_land: 
+                if lNeighbor in aHexagon_dict:
+                    aNeighbor_land_update.append(lNeighbor)
+                    pass
+                else:
+                    #this is a land cell in mpas, but it may be clipped by boundary
+                    pass
+           
+            pCell.aNeighbor = aNeighbor_land_update  
+            pCell.nNeighbor= len(aNeighbor_land_update)                  
+            pCell.aNeighbor_land = aNeighbor_land_update
+            pCell.nNeighbor_land= len(aNeighbor_land_update)  
+            aHexagon_out.append(pCell)
+        pass 
+
     #calculate neighbor distance
     for pHexagon in aHexagon_out:
         aNeighbor = pHexagon.aNeighbor
         pHexagon.aNeighbor_distance=list()
         for lCellID1 in aNeighbor:
-            for pHexagon1 in aHexagon_out:
-                if pHexagon1.lCellID == lCellID1:
-                    dDistance = pHexagon.pVertex_center.calculate_distance( pHexagon1.pVertex_center )
-                    pHexagon.aNeighbor_distance.append(dDistance)
-                    break
+            lCellID1 = int(lCellID1)            
+            lIndex = aHexagon_dict[lCellID1]
+            pHexagon1 = aHexagon_out[lIndex]     
+            dDistance = pHexagon.pVertex_center.calculate_distance( pHexagon1.pVertex_center )
+            pHexagon.aNeighbor_distance.append(dDistance)
+         
 
     pDataset = pLayer = pFeature  = None 
     return aHexagon_out

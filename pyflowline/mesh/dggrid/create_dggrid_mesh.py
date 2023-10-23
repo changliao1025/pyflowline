@@ -146,6 +146,9 @@ def convert_dggrid_mesh_to_pyflowline_mesh(sFilename_dggrid_mesh, sFilename_mesh
         os.remove(sFilename_mesh_pyflowline)
 
     aDggrid=list()
+    aDggrid_dict = dict()
+    lCellIndex = 0
+
     pDriver_geojson = ogr.GetDriverByName('GeoJSON')    
     pDataset_mesh = pDriver_geojson.Open(sFilename_dggrid_mesh, gdal.GA_ReadOnly)
     pLayer_mesh = pDataset_mesh.GetLayer(0)
@@ -191,6 +194,8 @@ def convert_dggrid_mesh_to_pyflowline_mesh(sFilename_dggrid_mesh, sFilename_mesh
             pdggrid.aNeighbor.append( int(aNeighbor[i]) )       
 
         aDggrid.append(pdggrid)
+        aDggrid_dict[lCellID] = lCellIndex
+        lCellIndex = lCellIndex + 1
 
         nVertex = pdggrid.nVertex 
         ring = ogr.Geometry(ogr.wkbLinearRing)        
@@ -214,47 +219,35 @@ def convert_dggrid_mesh_to_pyflowline_mesh(sFilename_dggrid_mesh, sFilename_mesh
 
     #rebuild neighbor list    
     aDggrid_out = list()
+    
     ncell = len(aDggrid)
     aCellID  = list()
-    for i in range(ncell):
-        pCell = aDggrid[i]
-        lCellID = pCell.lCellID
-        aCellID.append(lCellID)
-    for i in range(ncell):
-        pCell = aDggrid[i]        
-        aNeighbor = pCell.aNeighbor
-        nNeighbor = pCell.nNeighbor
-        aNeighbor_new = list()
-        nNeighbor_new = 0 
-        for j in range(nNeighbor):
-            lNeighbor = int(aNeighbor[j])
-            if lNeighbor in aCellID:
-                nNeighbor_new = nNeighbor_new + 1 
+ 
+    for pCell in aDggrid:           
+        aNeighbor = pCell.aNeighbor       
+        aNeighbor_new = list()       
+        for lNeighbor in aNeighbor:            
+            if lNeighbor in aDggrid_dict:                
                 aNeighbor_new.append(lNeighbor)
-
-            if nNeighbor_new == pCell.nVertex:
-                break
-
-        pCell.nNeighbor = nNeighbor_new
+        
         pCell.aNeighbor = aNeighbor_new
+        pCell.nNeighbor = len(aNeighbor_new)
         pCell.nNeighbor_land= len(aNeighbor_new)
         pCell.aNeighbor_land = aNeighbor_new
         pCell.nNeighbor_ocean = pCell.nVertex - pCell.nNeighbor_land
         aDggrid_out.append(pCell)
-
 
     #calculate neighbor distance
     for pDggrid in aDggrid_out:
         aNeighbor = pDggrid.aNeighbor
         pDggrid.aNeighbor_distance=list()
         for lCellID1 in aNeighbor:
-            for pDggrid1 in aDggrid_out:
-                if pDggrid1.lCellID == lCellID1:
-                    dDistance = pDggrid.pVertex_center.calculate_distance( pDggrid1.pVertex_center )
-                    pDggrid.aNeighbor_distance.append(dDistance)
-                    break 
-
-
+            lIndex = aDggrid_dict[lCellID1]
+            pDggrid1 = aDggrid_out[lIndex]  
+            dDistance = pDggrid.pVertex_center.calculate_distance( pDggrid1.pVertex_center )
+            pDggrid.aNeighbor_distance.append(dDistance)
+     
+    pDataset = pLayer = pFeature  = None  
     return aDggrid_out
 
 def create_dggrid_mesh(iFlag_global,
@@ -293,7 +286,7 @@ def create_dggrid_mesh(iFlag_global,
     else:
         iFlag_crop = 0   
 
-    iFlag_mode = 1
+    iFlag_mode = 1 
 
     if iFlag_mode == 1: #call the binary directly    
         #write configuration

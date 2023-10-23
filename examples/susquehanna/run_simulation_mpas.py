@@ -45,17 +45,17 @@ oPyflowline = pyflowline_read_model_configuration_file(sFilename_configuration_i
 
 #take a look at the model parameters
 
-oPyflowline.print()
+oPyflowline.pyflowline_print()
 
 #now we can change the following model parameters
 #there are two ways to change the model parameters
 #use a function or assign a value directly
 
-oPyflowline.change_model_parameter(sVariable_in='sWorkspace_output', sValue_in=sWorkspace_output)
+oPyflowline.pyflowline_change_model_parameter(sVariable_in='sWorkspace_output', sValue_in=sWorkspace_output)
 
 #if you need to change a parameter for a basin instead of the whole model domain, use the iFlag_basin_in option, this will change all the basins
-oPyflowline.change_model_parameter(sVariable_in='dLatitude_outlet_degree', sValue_in=39.462000, iFlag_basin_in=1)
-oPyflowline.change_model_parameter(sVariable_in='dLongitude_outlet_degree', sValue_in=-76.009300, iFlag_basin_in=1)
+oPyflowline.pyflowline_change_model_parameter(sVariable_in='dLatitude_outlet_degree', sValue_in=39.462000, iFlag_basin_in=1)
+oPyflowline.pyflowline_change_model_parameter(sVariable_in='dLongitude_outlet_degree', sValue_in=-76.009300, iFlag_basin_in=1)
 
 
 #the second way is to assign a value directly
@@ -68,7 +68,7 @@ if iFlag_visualization ==1:
     pass
 
 if iFlag_simulation == 1:
-    #oPyflowline.flowline_simplification()
+    #oPyflowline.pyflowline_flowline_simplification()
     pass
 
 if iFlag_visualization == 1:
@@ -80,14 +80,14 @@ if iFlag_visualization == 1:
     pass
 
 if iFlag_simulation == 1:
-    aCell = oPyflowline.mesh_generation()
+    aCell = oPyflowline.pyflowline_mesh_generation()
 
 if iFlag_visualization == 1:
     oPyflowline.plot( sVariable_in='mesh', sFilename_output_in = 'mesh.png' ) 
     pass
 
 if iFlag_simulation == 1:
-    oPyflowline.reconstruct_topological_relationship(aCell)
+    oPyflowline.pyflowline_reconstruct_topological_relationship(aCell)
 
 if iFlag_visualization == 1:
     oPyflowline.plot(  sVariable_in='overlap', sFilename_output_in = 'mesh_w_flowline.png',)

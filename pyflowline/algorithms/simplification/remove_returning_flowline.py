@@ -51,7 +51,7 @@ def remove_returning_flowline(iMesh_type_in, aCell_intersect_in, pVertex_outlet_
                     pVertex_end = pFlowline.pVertex_end
                     iStream_segment = pFlowline.iStream_segment
                     iStream_order = pFlowline.iStream_order
-                    if pVertex_end == pVertex_end_current:
+                    if pVertex_end == pVertex_end_current: #be careful because this function is strict
                         if iStream_segment == iSegment_in:                            
                             dLength = pFlowline.dLength
                             iFlag_found2, dummy2 = pCell.which_edge_cross_this_vertex(pVertex_start)

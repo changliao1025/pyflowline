@@ -438,6 +438,7 @@ def create_hexagon_mesh(iFlag_rotation_in,
     aHexagon_out = list()
 
     if iFlag_fill_hole ==1:
+       
         #find the virtual neighbors
         for pCell in aHexagon:            
             aNeighbor_land = pCell.aNeighbor_land   #including both holes and maps land cutoff by boundary
@@ -449,9 +450,11 @@ def create_hexagon_mesh(iFlag_rotation_in,
                 if lNeighbor in aHexagon_dict:
                     nNeighbor_land_update = nNeighbor_land_update + 1 
                     aNeighbor_land_update.append(lNeighbor)
+                    pass
                 else:
                     #a hole or boundary mpas land cell
                     aNeighbor_land_virtual.append(lNeighbor)
+                    pass
 
             pCell.nNeighbor= len(aNeighbor_land_update)
             pCell.aNeighbor = aNeighbor_land_update        
@@ -460,11 +463,10 @@ def create_hexagon_mesh(iFlag_rotation_in,
             pCell.aNeighbor_land_virtual = aNeighbor_land_virtual   
 
             pCell.nNeighbor_land_virtual = len(aNeighbor_land_virtual)
-            aHexagon_middle.append(pCell)
+           
 
         #add holes back, we also need to add into the unsorted map 
         for pCell in aHexagon:              
-
             if pCell.nNeighbor_land_virtual ==1:  #only one virtual land means it is likely next to a hole 
                 lNeighbor_hole = pCell.aNeighbor_land_virtual[0]
                 #now find its row and column indices
@@ -528,7 +530,7 @@ def create_hexagon_mesh(iFlag_rotation_in,
                     dLatitude_center = np.mean(aCoords[0:6,1])                  
 
                     if lCellID not in aHexagon_dict:    
-                        aHexagon_middle, dArea = add_cell_into_list1(aHexagon_middle, lCellID, iRow, iColumn, dLongitude_center,dLatitude_center, aCoords)        
+                        aHexagon, dArea = add_cell_into_list1(aHexagon, lCellID, iRow, iColumn, dLongitude_center,dLatitude_center, aCoords)        
                         aHexagon_dict[lCellID] = lCellIndex
                         lCellIndex = lCellIndex + 1
                         pFeature.SetGeometry(pPolygon)
@@ -598,7 +600,7 @@ def create_hexagon_mesh(iFlag_rotation_in,
                     dLatitude_center = np.mean(aCoords[0:6,1])                   
 
                     if lCellID not in aHexagon_dict:    
-                        aHexagon_middle, dArea = add_cell_into_list1(aHexagon_middle, lCellID, iRow, iColumn, dLongitude_center,dLatitude_center, aCoords)        
+                        aHexagon, dArea = add_cell_into_list1(aHexagon, lCellID, iRow, iColumn, dLongitude_center,dLatitude_center, aCoords)        
                         aHexagon_dict[lCellID] = lCellIndex
                         lCellIndex = lCellIndex + 1
                         pFeature.SetGeometry(pPolygon)

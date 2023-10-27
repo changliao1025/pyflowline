@@ -179,17 +179,21 @@ def export_flowline_to_shapefile(iFlag_projected_in, aFlowline_in, pSpatial_refe
     for i in range(nFlowline):
         pFlowline = aFlowline_in[i]
         dummy =pFlowline.aVertex
-        aPoint=list()
+        #aPoint=list()
+        pLine = ogr.Geometry(ogr.wkbLineString)
         for j in dummy:
             if iFlag_projected_in ==1:
-                aPoint.append( Point( j.dx, j.dy ) )                
+                #aPoint.append( Point( j.dx, j.dy ) )            
+                pLine.AddPoint(j.dx, j.dy)    
                 pass
             else:
-                aPoint.append( Point( j.dLongitude_degree, j.dLatitude_degree ) )
+                #aPoint.append( Point( j.dLongitude_degree, j.dLatitude_degree ) )
+                pLine.AddPoint(j.dLongitude_degree, j.dLatitude_degree)
                 pass
 
-        dummy1= LineString( aPoint )
-        pGeometry_out = ogr.CreateGeometryFromWkb(dummy1.wkb)
+        #dummy1= LineString( aPoint )
+        pGeometry_out = ogr.CreateGeometryFromWkb(pLine.ExportToWkb())
+        #pGeometry_out = ogr.CreateGeometryFromWkb(dummy1.wkb)
         pFeature_out.SetGeometry(pGeometry_out)
    
         pFeature_out.SetField("id", lID)

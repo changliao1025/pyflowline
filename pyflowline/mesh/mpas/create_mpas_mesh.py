@@ -421,7 +421,8 @@ def create_mpas_mesh(iFlag_global_in,
         aMpas_out = list()
         ncell = len(aMpas)
         #generate the list of cell ID that are already certain        
-        if iFlag_fill_hole == 1:   
+        if iFlag_fill_hole == 1:  
+            
             #first update neighbor information because some cell should have vitual land neighbor (not present in the mesh)
             #this operation does not increase the number of cells, but it update the neighbor information
             #specifically, it divided the land neighbor into two parts: land and virtual land         
@@ -485,7 +486,7 @@ def create_mpas_mesh(iFlag_global_in,
                     dArea = float(aCellArea[j])
 
                     if lCellID not in aMpas_dict:   
-                        aMpas_middle = add_cell_into_list(aMpas_middle, j, lCellID, dArea, dElevation_mean, dElevation_profile0, aCoords )
+                        aMpas = add_cell_into_list(aMpas, j, lCellID, dArea, dElevation_mean, dElevation_profile0, aCoords )
                         aMpas_dict[lCellID] = lCellIndex
                         lCellIndex = lCellIndex + 1
                         #now we need to update the neightboring information as well

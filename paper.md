@@ -18,7 +18,7 @@ authors:
     affiliation: 1
 
 affiliations:
- - name: Atmospheric Sciences and Global Change, Pacific Northwest National Laboratory, Richland, WA, USA
+ - name: Atmospheric, Climate, and Earth Sciences, Pacific Northwest National Laboratory, Richland, WA, USA
    index: 1 
 date: 23 Mar 2023
 

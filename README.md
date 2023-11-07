@@ -1,5 +1,6 @@
 ### PyFlowline
 
+[![DOI](https://joss.theoj.org/papers/10.21105/joss.05446/status.svg)](https://doi.org/10.21105/joss.05446)
 [![DOI](https://zenodo.org/badge/368338554.svg)](https://zenodo.org/badge/latestdoi/368338554)
 [![Downloads](https://static.pepy.tech/badge/pyflowline)](https://pepy.tech/project/pyflowline)
 
@@ -77,6 +78,8 @@ Copyright © 2022, Battelle Memorial Institute
 ### References
 
 Several publications describe the algorithms used in `PyFlowline` in detail. If you make use of `PyFlowline` in your work, please consider including a reference to the following:
+
+* Liao et al., (2023). pyflowline: a mesh-independent river network generator for hydrologic models. Journal of Open Source Software, 8(91), 5446, https://doi.org/10.21105/joss.05446
 
 * Liao. C. Cooper, M (2022) Pyflowline: a mesh-independent river network generator for hydrologic models. Zenodo.
 https://doi.org/10.5281/zenodo.6407298

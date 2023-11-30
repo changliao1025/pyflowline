@@ -6,9 +6,9 @@ import numpy as np
 
 iFlag_cython = importlib.util.find_spec("cython") 
 if iFlag_cython is not None:
-    from pyflowline.algorithms.cython.kernel import calculate_distance_based_on_lon_lat
+    from pyflowline.algorithms.cython.kernel import calculate_distance_based_on_longitude_latitude
 else:
-    from pyflowline.external.pyearth.gis.gdal.gdal_functions import calculate_distance_based_on_lon_lat
+    from pyearth.gis.geometry.calculate_distance_based_on_longitude_latitude import calculate_distance_based_on_longitude_latitude
 
 class VertexClassEncoder(JSONEncoder):
     def default(self, obj):
@@ -175,7 +175,7 @@ class pyvertex(object):
         lat1 = self.dLatitude_degree    
         lon2 = other.dLongitude_degree
         lat2 = other.dLatitude_degree
-        dDistance = calculate_distance_based_on_lon_lat(lon1, lat1, lon2, lat2)        
+        dDistance = calculate_distance_based_on_longitude_latitude(lon1, lat1, lon2, lat2)        
         return dDistance
     
     def tojson(self):

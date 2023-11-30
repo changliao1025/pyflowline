@@ -7,7 +7,7 @@ import os
 from osgeo import ogr, osr
 import numpy as np
 from pyflowline.formats.convert_coordinates import convert_gcs_coordinates_to_cell
-from pyflowline.external.pyearth.gis.gdal.gdal_functions import  reproject_coordinates_batch
+from pyearth.gis.spatialref.reproject_coodinates import  reproject_coordinates_batch
 
 def index_to_row_col(index, num_columns):
     index -= 1  # Adjust for 1-based indexing

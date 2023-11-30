@@ -10,14 +10,14 @@ from pyflowline.classes.mpas import pympas
 from pyflowline.classes.tin import pytin
 from pyflowline.classes.dggrid import pydggrid
 
-from pyflowline.external.pyearth.gis.gdal.gdal_functions import reproject_coordinates
+from pyearth.gis.spatialref.reproject_coodinates import reproject_coordinates
 iFlag_cython = importlib.util.find_spec("cython") 
 if iFlag_cython is not None:
     from pyflowline.algorithms.cython.kernel import calculate_angle_betwen_vertex
     from pyflowline.algorithms.cython.kernel import calculate_distance_to_plane
-else:
-    from pyflowline.external.pyearth.gis.gdal.gdal_functions import  calculate_angle_betwen_vertex
-    from pyflowline.external.pyearth.gis.gdal.gdal_functions import calculate_distance_to_plane
+else:   
+    from pyearth.gis.geometry.calculate_angle_betwen_vertex import calculate_angle_betwen_vertex
+    from pyearth.gis.geometry.calculate_distance_to_plane import calculate_distance_to_plane
 
 def convert_gcs_coordinates_to_cell(iMesh_type_in,     
                                     dLongitude_center_in,     

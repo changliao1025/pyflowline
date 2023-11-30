@@ -2,7 +2,7 @@ import os
 import numpy as np
 from osgeo import ogr, osr
 from pyflowline.formats.convert_coordinates import convert_gcs_coordinates_to_cell
-from pyflowline.external.pyearth.gis.gdal.gdal_functions import reproject_coordinates_batch
+from pyearth.gis.spatialref.reproject_coodinates import reproject_coordinates_batch
 
 def create_tin_mesh(dX_left_in, dY_bot_in, 
                     dResolution_meter_in, 

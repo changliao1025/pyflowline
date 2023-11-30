@@ -14,7 +14,7 @@ cdef double pi = 3.14159265358979323846264338327
 cdef double dRadius = 6378137.0 
 
 @cython.boundscheck(False)  # deactivate bnds checking
-cpdef  calculate_distance_based_on_lon_lat(double dLongitude_degree1_in, double dLatitude_degree1_in, double dLongitude_degree2_in, double dLatitude_degree2_in):
+cpdef  calculate_distance_based_on_longitude_latitude(double dLongitude_degree1_in, double dLatitude_degree1_in, double dLongitude_degree2_in, double dLatitude_degree2_in):
     """
     Calculate the great circle distance between two points 
     on the earth (specified in decimal degrees)

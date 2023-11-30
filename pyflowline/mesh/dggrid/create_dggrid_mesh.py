@@ -9,9 +9,9 @@ from osgeo import osr, ogr, gdal
 #from shapely.wkt import loads
 from pyflowline.formats.convert_coordinates import convert_gcs_coordinates_to_cell
 
-from pyflowline.external.pyearth.system.define_global_variables import *
+from pyearth.system.define_global_variables import *
 from pyflowline.formats.convert_attributes import convert_gcs_attributes_to_cell
-from pyflowline.external.pyearth.gis.gdal.gdal_functions import get_geometry_coords
+from pyearth.gis.location.get_geometry_coordinates import get_geometry_coordinates
 
 pDate = datetime.datetime.today()
 sDate_default = "{:04d}".format(pDate.year) + "{:02d}".format(pDate.month) + "{:02d}".format(pDate.day)

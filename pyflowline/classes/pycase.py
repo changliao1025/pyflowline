@@ -9,7 +9,7 @@ from shutil import copy2
 import numpy as np
 from osgeo import ogr, osr, gdal
 
-from pyflowline.external.pyearth.system.define_global_variables import *
+from pyearth.system.define_global_variables import *
 from pyflowline.classes.timer import pytimer
 from pyflowline.classes.mpas import pympas
 from pyflowline.classes.hexagon import pyhexagon
@@ -21,18 +21,17 @@ from pyflowline.classes.basin import pybasin
 from pyflowline.classes.flowline import pyflowline
 from pyflowline.classes.edge import pyedge
 from pyflowline.formats.read_mesh import read_mesh_json, read_mesh_json_w_topology
-from pyflowline.external.pyearth.gis.gdal.gdal_functions import reproject_coordinates
-from pyflowline.external.pyearth.gis.gdal.gdal_functions  import degree_to_meter
-from pyflowline.external.pyearth.gis.gdal.gdal_functions  import meter_to_degree
-from pyflowline.external.pyearth.gis.gdal.gdal_functions import retrieve_geotiff_metadata
-from pyflowline.external.pyearth.gis.gdal.gdal_functions import read_mesh_boundary
-from pyflowline.external.pyearth.gis.gdal.gdal_functions import get_utm_spatial_reference
+
+
+from pyearth.gis.spatialref.reproject_coodinates import reproject_coordinates
+from pyearth.gis.spatialref.conversion_between_degree_and_meter  import degree_to_meter
+from pyearth.gis.spatialref.conversion_between_degree_and_meter  import meter_to_degree
+from pyearth.gis.gdal.read.raster.gdal_read_geotiff_file import gdal_read_geotiff_file
+from pyearth.gis.gdal.read.vector.gdal_read_geojson_boundary import gdal_read_geojson_boundary
+from pyearth.gis.spatialref.get_utm_spatial_reference import get_utm_spatial_reference
 
 iFlag_kml = importlib.util.find_spec("simplekml") 
-if iFlag_kml is not None:
-    from pyflowline.external.pyearth.gis.kml.convert_geojson_to_kml import convert_geojson_to_kml
-else:
-    pass
+
 
 iFlag_cython = importlib.util.find_spec("cython") 
 if iFlag_cython is not None:
@@ -513,7 +512,7 @@ class flowlinecase(object):
 
             if iFlag_mesh_boundary ==1:
                 #create a polygon based on real boundary
-                pBoundary_wkt, aExtent = read_mesh_boundary(self.sFilename_mesh_boundary)           
+                pBoundary_wkt, aExtent = gdal_read_geojson_boundary(self.sFilename_mesh_boundary)           
 
                 if iMesh_type != 4: #not mpas
                     spatial_reference_target = osr.SpatialReference()
@@ -521,8 +520,18 @@ class flowlinecase(object):
 
                     #check whether DEM exists
                     if os.path.isfile(sFilename_dem):
-                        dPixelWidth, pPixelHeight, dOriginX, dOriginY, nrow, ncolumn, pSpatialRef_dem, pProjection, pGeotransform\
-                            = retrieve_geotiff_metadata(sFilename_dem)
+                        #dPixelWidth, pPixelHeight, dOriginX, dOriginY, nrow, ncolumn, pSpatialRef_dem, pProjection, pGeotransform\
+                        #    = retrieve_geotiff_metadata(sFilename_dem)
+                        dummy = gdal_read_geotiff_file(sFilename_dem, iFlag_metadata_only= 1)
+                        dPixelWidth = dummy['pixelWidth']                        
+                        pPixelHeight = dummy['pixelHeight']
+                        dOriginX = dummy['originX']
+                        dOriginY = dummy['originY']
+                        nrow = dummy['nrow']
+                        ncolumn = dummy['ncolumn']
+                        pSpatialRef_dem = dummy['spatialReference']
+                        pProjection= dummy['projection']
+                        pGeotransform = dummy['geotransform']
 
                         #lower left
                         dX_lowerleft  = dOriginX
@@ -600,8 +609,16 @@ class flowlinecase(object):
 
                     #check whether DEM exists
                     if os.path.isfile(sFilename_dem):
-                        dPixelWidth, dOriginX, dOriginY, nrow, ncolumn, pSpatialRef_dem, pProjection, pGeotransform\
-                            = retrieve_geotiff_metadata(sFilename_dem)
+                        dummy = gdal_read_geotiff_file(sFilename_dem, iFlag_metadata_only= 1)
+                        dPixelWidth = dummy['pixelWidth']                        
+                        pPixelHeight = dummy['pixelHeight']
+                        dOriginX = dummy['originX']
+                        dOriginY = dummy['originY']
+                        nrow = dummy['nrow']
+                        ncolumn = dummy['ncolumn']
+                        pSpatialRef_dem = dummy['spatialReference']
+                        pProjection= dummy['projection']
+                        pGeotransform = dummy['geotransform']
 
                         #lower left
                         dX_lowerleft  = dOriginX
@@ -664,7 +681,7 @@ class flowlinecase(object):
 
                 if iFlag_mesh_boundary ==1:
                     #create a polygon based on real boundary
-                    pBoundary_wkt, aExtent = read_mesh_boundary(self.sFilename_mesh_boundary)
+                    pBoundary_wkt, aExtent = gdal_read_geojson_boundary(self.sFilename_mesh_boundary)
 
                     aHexagon = create_hexagon_mesh(iFlag_rotation, dX_lowerleft, dY_lowerleft, dResolution_meter, ncolumn, nrow, 
                                                    sFilename_mesh, sFilename_spatial_reference, pBoundary_wkt)
@@ -691,7 +708,7 @@ class flowlinecase(object):
                     nrow= int( (dY_upperleft - dY_lowerleft) / dResolution_meter )
                     if iFlag_mesh_boundary ==1:
                         #create a polygon based on real boundary
-                        pBoundary_wkt, aExtent= read_mesh_boundary(self.sFilename_mesh_boundary)
+                        pBoundary_wkt, aExtent= gdal_read_geojson_boundary(self.sFilename_mesh_boundary)
 
                         aSquare = create_square_mesh(dX_lowerleft, dY_lowerleft, dResolution_meter, ncolumn, nrow, 
                                                      sFilename_mesh, sFilename_spatial_reference, pBoundary_wkt)
@@ -721,7 +738,7 @@ class flowlinecase(object):
                         if iFlag_mesh_boundary ==1:
                             #create a polygon based on real boundary
                             #already produced
-                            pBoundary_wkt , aExtent= read_mesh_boundary(self.sFilename_mesh_boundary)
+                            pBoundary_wkt , aExtent= gdal_read_geojson_boundary(self.sFilename_mesh_boundary)
                             aLatlon = create_latlon_mesh(dLongitude_left, dLatitude_bot, dResolution_degree, ncolumn, nrow, 
                                                          sFilename_mesh, pBoundary_wkt)
                             pass
@@ -762,7 +779,7 @@ class flowlinecase(object):
                                 if iFlag_mesh_boundary ==1:
                                     #create a polygon based on
                                     #read boundary
-                                    pBoundary_wkt, aExtent = read_mesh_boundary(self.sFilename_mesh_boundary)
+                                    pBoundary_wkt, aExtent = gdal_read_geojson_boundary(self.sFilename_mesh_boundary)
 
                                     aMpas = create_mpas_mesh(iFlag_global, iFlag_use_mesh_dem, iFlag_save_mesh,
                                                              sFilename_mesh_netcdf,  sFilename_mesh, iFlag_antarctic_in=iFlag_antarctic_in, pBoundary_in = pBoundary_wkt)
@@ -1132,7 +1149,8 @@ class flowlinecase(object):
         #convert the mesh into the kml format so it can be visualized in google earth and google map
         #shoule move this to the export function
         if iFlag_kml is not None:
-            convert_geojson_to_kml(self.sFilename_mesh, self.sFilename_mesh_kml)
+            #convert_geojson_to_kml(self.sFilename_mesh, self.sFilename_mesh_kml)
+            pass
 
         if self.iFlag_flowline ==1:
             for pBasin in self.aBasin:

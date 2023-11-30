@@ -1,9 +1,9 @@
 import os
-from pathlib import Path
+
 #dependency packages
-from pyflowline.external.pyearth.visual.map.map_vector_polygon_data import map_vector_polygon_data
-from pyflowline.external.pyearth.visual.map.map_vector_polyline_data import map_vector_polyline_data
-from pyflowline.external.pyearth.visual.map.map_multiple_vector_data import map_multiple_vector_data
+from pyearth.visual.map.vector.map_vector_polygon_data import map_vector_polygon_data
+from pyearth.visual.map.vector.map_vector_polyline_data import map_vector_polyline_data
+from pyearth.visual.map.vector.map_multiple_vector_data import map_multiple_vector_data
 
 def replace_last_occurrence(sFilename_path_in, sSubstring_in, sSubstring_out):
     last_occurrence_index = sFilename_path_in.rfind(sSubstring_in)

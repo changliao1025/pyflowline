@@ -17,7 +17,7 @@ from pyflowline.formats.read_nhdplus_flowline_shapefile import track_nhdplus_flo
 from pyflowline.formats.convert_flowline_to_geojson import convert_flowline_to_geojson
 from pyflowline.formats.export_flowline import export_flowline_to_geojson
 from pyflowline.formats.export_vertex import export_vertex_to_geojson
-from pyflowline.external.pyearth.toolbox.reader.text_reader_string import text_reader_string
+from pyearth.toolbox.reader.text_reader_string import text_reader_string
 iFlag_cython = importlib.util.find_spec("cython") 
 if iFlag_cython is not None:
     from pyflowline.external.tinyr.tinyr.tinyr import RTree
@@ -52,7 +52,8 @@ else:
 
 iFlag_kml = importlib.util.find_spec("simplekml") 
 if iFlag_kml is not None:
-    from pyflowline.external.pyearth.gis.kml.convert_geojson_to_kml import convert_geojson_to_kml
+    #from pyearth.gis.kml.convert_geojson_to_kml import convert_geojson_to_kml
+    pass
 else:
     pass
 sys.setrecursionlimit(10000)
@@ -968,7 +969,7 @@ class pybasin(object):
             sFilename_conceptual = self.sFilename_flowline_conceptual
             sFilename_conceptual_kml = self.sFilename_flowline_conceptual_kml
             
-            convert_geojson_to_kml(sFilename_conceptual, sFilename_conceptual_kml)
+            #convert_geojson_to_kml(sFilename_conceptual, sFilename_conceptual_kml)
 
 
         return

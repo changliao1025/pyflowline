@@ -4,8 +4,9 @@ from osgeo import ogr, osr
 import importlib
 
 from pyflowline.algorithms.auxiliary.find_index_in_list import find_list_in_list 
-from pyflowline.external.pyearth.gis.gdal.gdal_functions import calculate_angle_betwen_vertex_normal
-from pyflowline.external.pyearth.gis.gdal.gdal_functions import calculate_polygon_area
+
+from pyearth.gis.geometry.calculate_angle_betwen_vertex_normal import calculate_angle_betwen_vertex_normal
+from pyearth.gis.geometry.calculate_polygon_area import calculate_polygon_area
 
 iFlag_cython = importlib.util.find_spec("cython") 
 if iFlag_cython is not None:

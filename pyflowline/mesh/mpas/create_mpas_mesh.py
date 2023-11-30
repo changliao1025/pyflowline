@@ -9,7 +9,7 @@ iFlag_cython = importlib.util.find_spec("cython")
 if iFlag_cython is not None:
     from pyflowline.algorithms.cython.kernel import convert_360_to_180
 else:
-    from pyflowline.external.pyearth.gis.gdal.gdal_functions import convert_360_to_180
+    from pyearth.gis.geometry.convert_longitude_range import convert_360_to_180
 
 def create_mpas_mesh(iFlag_global_in, 
     iFlag_use_mesh_dem, 

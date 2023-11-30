@@ -1490,7 +1490,7 @@ static int __Pyx_InitStrings(__Pyx_StringTabEntry *t);
 /* Module declarations from 'kernel' */
 static double __pyx_v_6kernel_pi;
 static double __pyx_v_6kernel_dRadius;
-static PyObject *__pyx_f_6kernel_calculate_distance_based_on_lon_lat(double, double, double, double, int __pyx_skip_dispatch); /*proto*/
+static PyObject *__pyx_f_6kernel_calculate_distance_based_on_longitude_latitude(double, double, double, double, int __pyx_skip_dispatch); /*proto*/
 static PyObject *__pyx_f_6kernel_convert_360_to_180(double, int __pyx_skip_dispatch); /*proto*/
 static PyObject *__pyx_f_6kernel_find_vertex_in_list(PyObject *, PyObject *, int __pyx_skip_dispatch, struct __pyx_opt_args_6kernel_find_vertex_in_list *__pyx_optional_args); /*proto*/
 static PyObject *__pyx_f_6kernel_find_vertex_on_edge(PyObject *, PyObject *, int __pyx_skip_dispatch); /*proto*/
@@ -1592,7 +1592,7 @@ static PyObject *__pyx_n_s_y1;
 static PyObject *__pyx_n_s_y2;
 static PyObject *__pyx_n_s_z1;
 static PyObject *__pyx_n_s_z2;
-static PyObject *__pyx_pf_6kernel_calculate_distance_based_on_lon_lat(CYTHON_UNUSED PyObject *__pyx_self, double __pyx_v_dLongitude_degree1_in, double __pyx_v_dLatitude_degree1_in, double __pyx_v_dLongitude_degree2_in, double __pyx_v_dLatitude_degree2_in); /* proto */
+static PyObject *__pyx_pf_6kernel_calculate_distance_based_on_longitude_latitude(CYTHON_UNUSED PyObject *__pyx_self, double __pyx_v_dLongitude_degree1_in, double __pyx_v_dLatitude_degree1_in, double __pyx_v_dLongitude_degree2_in, double __pyx_v_dLatitude_degree2_in); /* proto */
 static PyObject *__pyx_pf_6kernel_2convert_360_to_180(CYTHON_UNUSED PyObject *__pyx_self, double __pyx_v_dLongitude_in); /* proto */
 static PyObject *__pyx_pf_6kernel_4find_vertex_in_list(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_aVertex_in, PyObject *__pyx_v_pVertex_in, double __pyx_v_dThreshold_in); /* proto */
 static PyObject *__pyx_pf_6kernel_6find_vertex_on_edge(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_aVertex_in, PyObject *__pyx_v_pEdge_in); /* proto */
@@ -1611,13 +1611,13 @@ static PyObject *__pyx_int_5;
 /* "kernel.pyx":17
  * 
  * @cython.boundscheck(False)  # deactivate bnds checking
- * cpdef  calculate_distance_based_on_lon_lat(double dLongitude_degree1_in, double dLatitude_degree1_in, double dLongitude_degree2_in, double dLatitude_degree2_in):             # <<<<<<<<<<<<<<
+ * cpdef  calculate_distance_based_on_longitude_latitude(double dLongitude_degree1_in, double dLatitude_degree1_in, double dLongitude_degree2_in, double dLatitude_degree2_in):             # <<<<<<<<<<<<<<
  *     """
  *     Calculate the great circle distance between two points
  */
 
-static PyObject *__pyx_pw_6kernel_1calculate_distance_based_on_lon_lat(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyObject *__pyx_f_6kernel_calculate_distance_based_on_lon_lat(double __pyx_v_dLongitude_degree1_in, double __pyx_v_dLatitude_degree1_in, double __pyx_v_dLongitude_degree2_in, double __pyx_v_dLatitude_degree2_in, CYTHON_UNUSED int __pyx_skip_dispatch) {
+static PyObject *__pyx_pw_6kernel_1calculate_distance_based_on_longitude_latitude(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyObject *__pyx_f_6kernel_calculate_distance_based_on_longitude_latitude(double __pyx_v_dLongitude_degree1_in, double __pyx_v_dLatitude_degree1_in, double __pyx_v_dLongitude_degree2_in, double __pyx_v_dLatitude_degree2_in, CYTHON_UNUSED int __pyx_skip_dispatch) {
   double __pyx_v_dLongitude_radian1_in;
   double __pyx_v_dLatitude_radian1_in;
   double __pyx_v_dLongitude_radian2_in;
@@ -1633,7 +1633,7 @@ static PyObject *__pyx_f_6kernel_calculate_distance_based_on_lon_lat(double __py
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
-  __Pyx_RefNannySetupContext("calculate_distance_based_on_lon_lat", 0);
+  __Pyx_RefNannySetupContext("calculate_distance_based_on_longitude_latitude", 0);
 
   /* "kernel.pyx":30
  *     # Radius of earth in kilometers. Use 3956 for miles
@@ -1733,7 +1733,7 @@ static PyObject *__pyx_f_6kernel_calculate_distance_based_on_lon_lat(double __py
   /* "kernel.pyx":17
  * 
  * @cython.boundscheck(False)  # deactivate bnds checking
- * cpdef  calculate_distance_based_on_lon_lat(double dLongitude_degree1_in, double dLatitude_degree1_in, double dLongitude_degree2_in, double dLatitude_degree2_in):             # <<<<<<<<<<<<<<
+ * cpdef  calculate_distance_based_on_longitude_latitude(double dLongitude_degree1_in, double dLatitude_degree1_in, double dLongitude_degree2_in, double dLatitude_degree2_in):             # <<<<<<<<<<<<<<
  *     """
  *     Calculate the great circle distance between two points
  */
@@ -1741,7 +1741,7 @@ static PyObject *__pyx_f_6kernel_calculate_distance_based_on_lon_lat(double __py
   /* function exit code */
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_1);
-  __Pyx_AddTraceback("kernel.calculate_distance_based_on_lon_lat", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("kernel.calculate_distance_based_on_longitude_latitude", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = 0;
   __pyx_L0:;
   __Pyx_XGIVEREF(__pyx_r);
@@ -1750,9 +1750,9 @@ static PyObject *__pyx_f_6kernel_calculate_distance_based_on_lon_lat(double __py
 }
 
 /* Python wrapper */
-static PyObject *__pyx_pw_6kernel_1calculate_distance_based_on_lon_lat(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_6kernel_calculate_distance_based_on_lon_lat[] = "\n    Calculate the great circle distance between two points \n    on the earth (specified in decimal degrees)\n    ";
-static PyObject *__pyx_pw_6kernel_1calculate_distance_based_on_lon_lat(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_6kernel_1calculate_distance_based_on_longitude_latitude(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static char __pyx_doc_6kernel_calculate_distance_based_on_longitude_latitude[] = "\n    Calculate the great circle distance between two points \n    on the earth (specified in decimal degrees)\n    ";
+static PyObject *__pyx_pw_6kernel_1calculate_distance_based_on_longitude_latitude(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   double __pyx_v_dLongitude_degree1_in;
   double __pyx_v_dLatitude_degree1_in;
   double __pyx_v_dLongitude_degree2_in;
@@ -1762,7 +1762,7 @@ static PyObject *__pyx_pw_6kernel_1calculate_distance_based_on_lon_lat(PyObject 
   int __pyx_clineno = 0;
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
-  __Pyx_RefNannySetupContext("calculate_distance_based_on_lon_lat (wrapper)", 0);
+  __Pyx_RefNannySetupContext("calculate_distance_based_on_longitude_latitude (wrapper)", 0);
   {
     static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_dLongitude_degree1_in,&__pyx_n_s_dLatitude_degree1_in,&__pyx_n_s_dLongitude_degree2_in,&__pyx_n_s_dLatitude_degree2_in,0};
     PyObject* values[4] = {0,0,0,0};
@@ -1790,23 +1790,23 @@ static PyObject *__pyx_pw_6kernel_1calculate_distance_based_on_lon_lat(PyObject 
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_dLatitude_degree1_in)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calculate_distance_based_on_lon_lat", 1, 4, 4, 1); __PYX_ERR(0, 17, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calculate_distance_based_on_longitude_latitude", 1, 4, 4, 1); __PYX_ERR(0, 17, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_dLongitude_degree2_in)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calculate_distance_based_on_lon_lat", 1, 4, 4, 2); __PYX_ERR(0, 17, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calculate_distance_based_on_longitude_latitude", 1, 4, 4, 2); __PYX_ERR(0, 17, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_dLatitude_degree2_in)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("calculate_distance_based_on_lon_lat", 1, 4, 4, 3); __PYX_ERR(0, 17, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("calculate_distance_based_on_longitude_latitude", 1, 4, 4, 3); __PYX_ERR(0, 17, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "calculate_distance_based_on_lon_lat") < 0)) __PYX_ERR(0, 17, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "calculate_distance_based_on_longitude_latitude") < 0)) __PYX_ERR(0, 17, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 4) {
       goto __pyx_L5_argtuple_error;
@@ -1823,29 +1823,29 @@ static PyObject *__pyx_pw_6kernel_1calculate_distance_based_on_lon_lat(PyObject 
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("calculate_distance_based_on_lon_lat", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 17, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("calculate_distance_based_on_longitude_latitude", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 17, __pyx_L3_error)
   __pyx_L3_error:;
-  __Pyx_AddTraceback("kernel.calculate_distance_based_on_lon_lat", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("kernel.calculate_distance_based_on_longitude_latitude", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_6kernel_calculate_distance_based_on_lon_lat(__pyx_self, __pyx_v_dLongitude_degree1_in, __pyx_v_dLatitude_degree1_in, __pyx_v_dLongitude_degree2_in, __pyx_v_dLatitude_degree2_in);
+  __pyx_r = __pyx_pf_6kernel_calculate_distance_based_on_longitude_latitude(__pyx_self, __pyx_v_dLongitude_degree1_in, __pyx_v_dLatitude_degree1_in, __pyx_v_dLongitude_degree2_in, __pyx_v_dLatitude_degree2_in);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_6kernel_calculate_distance_based_on_lon_lat(CYTHON_UNUSED PyObject *__pyx_self, double __pyx_v_dLongitude_degree1_in, double __pyx_v_dLatitude_degree1_in, double __pyx_v_dLongitude_degree2_in, double __pyx_v_dLatitude_degree2_in) {
+static PyObject *__pyx_pf_6kernel_calculate_distance_based_on_longitude_latitude(CYTHON_UNUSED PyObject *__pyx_self, double __pyx_v_dLongitude_degree1_in, double __pyx_v_dLatitude_degree1_in, double __pyx_v_dLongitude_degree2_in, double __pyx_v_dLatitude_degree2_in) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
-  __Pyx_RefNannySetupContext("calculate_distance_based_on_lon_lat", 0);
+  __Pyx_RefNannySetupContext("calculate_distance_based_on_longitude_latitude", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __pyx_f_6kernel_calculate_distance_based_on_lon_lat(__pyx_v_dLongitude_degree1_in, __pyx_v_dLatitude_degree1_in, __pyx_v_dLongitude_degree2_in, __pyx_v_dLatitude_degree2_in, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 17, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_6kernel_calculate_distance_based_on_longitude_latitude(__pyx_v_dLongitude_degree1_in, __pyx_v_dLatitude_degree1_in, __pyx_v_dLongitude_degree2_in, __pyx_v_dLatitude_degree2_in, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 17, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -1854,7 +1854,7 @@ static PyObject *__pyx_pf_6kernel_calculate_distance_based_on_lon_lat(CYTHON_UNU
   /* function exit code */
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_1);
-  __Pyx_AddTraceback("kernel.calculate_distance_based_on_lon_lat", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("kernel.calculate_distance_based_on_longitude_latitude", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XGIVEREF(__pyx_r);
@@ -5633,7 +5633,7 @@ static std::vector<int>  __pyx_convert_vector_from_py_int(PyObject *__pyx_v_o) {
 }
 
 static PyMethodDef __pyx_methods[] = {
-  {"calculate_distance_based_on_lon_lat", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_6kernel_1calculate_distance_based_on_lon_lat, METH_VARARGS|METH_KEYWORDS, __pyx_doc_6kernel_calculate_distance_based_on_lon_lat},
+  {"calculate_distance_based_on_longitude_latitude", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_6kernel_1calculate_distance_based_on_longitude_latitude, METH_VARARGS|METH_KEYWORDS, __pyx_doc_6kernel_calculate_distance_based_on_longitude_latitude},
   {"convert_360_to_180", (PyCFunction)__pyx_pw_6kernel_3convert_360_to_180, METH_O, __pyx_doc_6kernel_2convert_360_to_180},
   {"find_vertex_in_list", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_6kernel_5find_vertex_in_list, METH_VARARGS|METH_KEYWORDS, __pyx_doc_6kernel_4find_vertex_in_list},
   {"find_vertex_on_edge", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_6kernel_7find_vertex_on_edge, METH_VARARGS|METH_KEYWORDS, 0},

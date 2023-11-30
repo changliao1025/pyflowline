@@ -3,7 +3,7 @@ import numpy as np
 from osgeo import ogr, gdal
 #from shapely.wkt import loads
 from pyflowline.formats.convert_coordinates import convert_gcs_coordinates_to_cell
-from pyflowline.external.pyearth.gis.gdal.gdal_functions import get_geometry_coords
+from pyearth.gis.location.get_geometry_coordinates import get_geometry_coordinates
 def read_mesh_json(iMesh_type_in, sFilename_mesh_in):
     """
     convert a shpefile to json format.

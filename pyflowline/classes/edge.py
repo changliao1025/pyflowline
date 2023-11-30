@@ -11,8 +11,9 @@ if iFlag_cython is not None:
     from pyflowline.algorithms.cython.kernel import calculate_angle_betwen_vertex
     from pyflowline.algorithms.cython.kernel import calculate_distance_to_plane
 else:
-    from pyflowline.external.pyearth.gis.gdal.gdal_functions import  calculate_angle_betwen_vertex
-    from pyflowline.external.pyearth.gis.gdal.gdal_functions import calculate_distance_to_plane
+    from pyearth.gis.geometry.calculate_angle_betwen_vertex import  calculate_angle_betwen_vertex
+    from pyearth.gis.geometry.calculate_distance_to_plane import calculate_distance_to_plane
+
 
 class EdgeClassEncoder(JSONEncoder):
     def default(self, obj):

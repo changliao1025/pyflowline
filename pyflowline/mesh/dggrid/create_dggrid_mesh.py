@@ -6,11 +6,10 @@ import subprocess
 import datetime
 from shutil import copy2
 from osgeo import osr, ogr, gdal
-#from shapely.wkt import loads
-from pyflowline.formats.convert_coordinates import convert_gcs_coordinates_to_cell
 
-from pyearth.system.define_global_variables import *
+from pyflowline.formats.convert_coordinates import convert_gcs_coordinates_to_cell
 from pyflowline.formats.convert_attributes import convert_gcs_attributes_to_cell
+from pyearth.system.define_global_variables import *
 from pyearth.gis.location.get_geometry_coordinates import get_geometry_coordinates
 
 pDate = datetime.datetime.today()
@@ -176,7 +175,7 @@ def convert_dggrid_mesh_to_pyflowline_mesh(sFilename_dggrid_mesh, sFilename_mesh
         #dummy0 = loads( pGeometry_mesh.ExportToWkt() )
         #aCoords_gcs = dummy0.exterior.coords
         #aCoords_gcs= np.array(aCoords_gcs)  
-        aCoords_gcs = get_geometry_coords(pGeometry_mesh)   
+        aCoords_gcs = get_geometry_coordinates(pGeometry_mesh)   
         dLongitude_center = np.mean(aCoords_gcs[:-1,0])
         dLatitude_center = np.mean(aCoords_gcs[:-1,1])   
 

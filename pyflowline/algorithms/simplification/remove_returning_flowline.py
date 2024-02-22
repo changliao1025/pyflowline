@@ -28,8 +28,39 @@ def remove_returning_flowline(iMesh_type_in, aCell_intersect_in, pVertex_outlet_
             
             aCell_flowline_out = simplify_list(aCell_flowline_out)
         return   aCell_flowline_out
+    
+    def simplify_list2(aCell_flowline_in):
+        aCell_flowline_out = copy.deepcopy(aCell_flowline_in)
+        nCell = len(aCell_flowline_out)
+
+        # Check if list contains duplicates
+        iFlag_unique = check_if_duplicates(aCell_flowline_out)
+        if iFlag_unique == 1:
+            return aCell_flowline_out
+
+        # Create a dictionary to store counts of elements
+        elem_counts = {}
+        for elem in aCell_flowline_out:
+            elem_counts[elem] = elem_counts.get(elem, 0) + 1
+
+        i = 0
+        while i < nCell - 1:
+            elem = aCell_flowline_out[i]
+            if elem_counts[elem] > 1:
+                indices = [j for j, x in enumerate(aCell_flowline_out) if x == elem]
+                start = indices[0]
+                end = indices[-1]
+                del aCell_flowline_out[start + 1 : end]
+                nCell = len(aCell_flowline_out)
+            else:
+                i += 1
+
+        return aCell_flowline_out
 
     def retrieve_flowline_intersect_index(iSegment_in, iStream_order_in, pVertex_end_in):
+        lCellID =-1
+        if iSegment_in == 608:
+            print('here')
         iFlag_found = 1
         pVertex_end_current = pVertex_end_in
         aCell_flowline=list()  
@@ -39,10 +70,15 @@ def remove_returning_flowline(iMesh_type_in, aCell_intersect_in, pVertex_outlet_
         iFlag_skip = 0
         iFlag_previous_overlap=0
         while iFlag_found == 1:
-            iFlag_found = 0             
+            iFlag_found = 0    
+            #if lCellID == 110191:
+            #    print('here')
+            #    pass         
             for j in range(nCell):
                 pCell = aCell_intersect_in[j]
                 lCellID = pCell.lCellID
+                #if lCellID == 110921:
+                #    print('here')
                 aFlowline= pCell.aFlowline
                 nFlowline = len(aFlowline)
                 for i in range(nFlowline):
@@ -124,6 +160,10 @@ def remove_returning_flowline(iMesh_type_in, aCell_intersect_in, pVertex_outlet_
         if iFlag_found == 0:
             #reverse 
             aCell_flowline = aCell_flowline[::-1]
+            #if 112378 in aCell_flowline:
+            #    print(aCell_flowline)
+            #    print('here')
+            #    pass
             #simplify list         
             aCell_simple = simplify_list(aCell_flowline)
             #save the output
@@ -144,8 +184,8 @@ def remove_returning_flowline(iMesh_type_in, aCell_intersect_in, pVertex_outlet_
                 aFlowline_out.append(pFlowline)
 
             sort_index = np.argsort(aStream_order)            
-            sort_index = sort_index[::-1]
-            nUpstream = len(aSegment_upstream)
+            #sort_index = sort_index[::-1] #can we process low order first?
+            #nUpstream = len(aSegment_upstream)
             for i in sort_index:
                 retrieve_flowline_intersect_index(aSegment_upstream[i], aStream_order[i], aVertex_end_upstream[i])
                 pass

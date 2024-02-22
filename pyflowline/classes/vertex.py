@@ -129,20 +129,23 @@ class pyvertex(object):
             int: 1 if equivalent, 0 if not
         """
         iFlag = False
-        #dThreshold_in = 1.0E-6        
+        dThreshold_in = 1.0E-10        
         if isinstance(other, pyvertex):
-            #c = self.calculate_distance(other)
-            #if( c <= dThreshold_in ): #be careful
-            #    #print(self.dLongitude_degree ,self.dLatitude_degree , 
-            #    #other.dLongitude_degree, other.dLatitude_degree)
-            #    iFlag = True
-            #else:
-            #    iFlag = False    
+              
             if (self.dLongitude_degree == other.dLongitude_degree) and \
                 (self.dLatitude_degree == other.dLatitude_degree):
                 iFlag = True
-            else:
-                iFlag = False
+            else:                
+                #use absolute difference to check whether two vertices are the same
+                if (abs(self.dLongitude_degree - other.dLongitude_degree) < dThreshold_in) and \
+                    (abs(self.dLatitude_degree - other.dLatitude_degree) < dThreshold_in):
+                     #be careful
+                    #print(self.dLongitude_degree ,self.dLatitude_degree , 
+                    #other.dLongitude_degree, other.dLatitude_degree)
+                    iFlag = True
+                else:
+                    iFlag = False  
+              
         else:
             iFlag = False 
 

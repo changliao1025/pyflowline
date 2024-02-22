@@ -727,7 +727,7 @@ class pybasin(object):
             if self.iFlag_debug ==1:
                 sFilename_out = 'flowline_simplified_after_intersect.geojson'
                 sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)  
-                export_flowline_to_geojson(aFlowline_basin_conceptual,  sFilename_out)    
+                export_flowline_to_geojson(aFlowline_basin_conceptual, sFilename_out)    
         except:
             print('Error in remove_returning_flowline.')
         
@@ -785,7 +785,10 @@ class pybasin(object):
         except:
             print('Error in remove_flowline_loop.')
             
-        aFlowline_basin_conceptual = update_head_water_stream_order(aFlowline_basin_conceptual )
+        try:
+            aFlowline_basin_conceptual = update_head_water_stream_order(aFlowline_basin_conceptual )
+        except:
+            print('Error in update_head_water_stream_order.')
   
         try:
             print('Basin ',  self.sBasinID, 'Start find flowline confluence')          

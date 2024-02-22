@@ -226,11 +226,12 @@ def read_flowline_geojson(sFilename_geojson_in):
 
                 dummy1= np.array(aCoords)
                 pFlowline = convert_gcs_coordinates_to_flowline(dummy1)
-                pFlowline.lFlowlineIndex = lFlowlineIndex
-                pFlowline.lFlowlineID = lFlowlineID
-                pFlowline.lNHDPlusID= lNHDPlusID
-                aFlowline.append(pFlowline)
-                lFlowlineIndex = lFlowlineIndex + 1
+                if pFlowline is not None:
+                    pFlowline.lFlowlineIndex = lFlowlineIndex
+                    pFlowline.lFlowlineID = lFlowlineID
+                    pFlowline.lNHDPlusID= lNHDPlusID
+                    aFlowline.append(pFlowline)
+                    lFlowlineIndex = lFlowlineIndex + 1
         
         else:
             if sGeometry_type =='LINESTRING':                  
@@ -242,13 +243,14 @@ def read_flowline_geojson(sFilename_geojson_in):
 
                 dummy1= np.array(aCoords)
                 pFlowline = convert_gcs_coordinates_to_flowline(dummy1)
-                pFlowline.lFlowlineIndex = lFlowlineIndex
-                pFlowline.iStream_segment = iStream_segment
-                pFlowline.iStream_order = iStream_order
-                pFlowline.lFlowlineID = lFlowlineID
-                pFlowline.lNHDPlusID = lNHDPlusID
-                aFlowline.append(pFlowline)
-                lFlowlineIndex = lFlowlineIndex + 1            
+                if pFlowline is not None:
+                    pFlowline.lFlowlineIndex = lFlowlineIndex
+                    pFlowline.iStream_segment = iStream_segment
+                    pFlowline.iStream_order = iStream_order
+                    pFlowline.lFlowlineID = lFlowlineID
+                    pFlowline.lNHDPlusID = lNHDPlusID
+                    aFlowline.append(pFlowline)
+                    lFlowlineIndex = lFlowlineIndex + 1            
             else:
                 print(sGeometry_type)
                 pass        

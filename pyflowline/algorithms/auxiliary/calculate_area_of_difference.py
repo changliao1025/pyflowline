@@ -5,7 +5,6 @@ import importlib
 
 from pyflowline.algorithms.auxiliary.find_index_in_list import find_list_in_list 
 
-from pyearth.gis.geometry.calculate_angle_betwen_vertex_normal import calculate_angle_betwen_vertex_normal
 from pyearth.gis.geometry.calculate_polygon_area import calculate_polygon_area
 
 iFlag_cython = importlib.util.find_spec("cython") 

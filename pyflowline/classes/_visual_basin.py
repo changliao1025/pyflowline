@@ -85,10 +85,12 @@ def basin_plot(self,
                         aFilename_in = [sFilename_mesh, sFilename]
                         map_multiple_vector_data(aFiletype_in,
                                              aFilename_in,
+                                             aFlag_thickness_in=[0, 1],
+                                             aVariable_in=['', 'drainage_area'],
                                              sFilename_output_in=sFilename_output_in,
                                              sTitle_in= 'Mesh with flowline',
                                              aFlag_color_in=[0, 0],
-                                             aFlag_fill_in = [0,0])
+                                             aFlag_fill_in = [0, 0])
                     else:
                         if sVariable_in == "flow_direction_with_observation":
                             sFilename0 = self.sFilename_flow_direction #this can be either domain wide or subbasin level
@@ -218,7 +220,7 @@ def _plot_polyline_variable(self,
         pass
                
     
-    map_vector_polyline_data(sFilename_json,
+    map_vector_polyline_data(1, sFilename_json,
                              sFilename_output_in= sFilename_output_in,                             
                              iFlag_thickness_in= iFlag_thickness  ,
                              sTitle_in=sTitle,
@@ -354,7 +356,7 @@ def _plot_polygon_variable(self,
         sTitle=''
         pass
 
-    map_vector_polygon_data(sFilename,
+    map_vector_polygon_data(1,sFilename,
                             iFlag_color_in = 1,
                              iFlag_colorbar_in = iFlag_colorbar_in,
                              iFont_size_in = iFont_size_in,

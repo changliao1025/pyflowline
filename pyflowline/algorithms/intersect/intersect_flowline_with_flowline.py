@@ -82,10 +82,7 @@ def intersect_flowline_with_flowline( sFilename_flowline_a_in, sFilename_flowlin
 
         #convert geometry to edge
         pGeometrytype_flowline_a = pGeometry_flowline_a.GetGeometryName()
-        if(pGeometrytype_flowline_a == 'LINESTRING'):            
-            
-                     
-            aFlowline_intersect = list()
+        if(pGeometrytype_flowline_a == 'LINESTRING'):                                                     
             iFlag_intersected = 0 
             for j in range (nfeature_flowline_b):
             #for pFeature_flowline in pLayer_flowline:

@@ -313,7 +313,7 @@ class flowlinecase(object):
             if self.iFlag_mesh_boundary==1:
                 if not os.path.isfile(self.sFilename_mesh_boundary ):
                     print("The mesh boundary file does not exist, you should update this parameter before running the model!")
-                    exit()
+                    #exit()
                 pass
 
         if 'sFilename_spatial_reference' in aConfig_in:
@@ -422,7 +422,7 @@ class flowlinecase(object):
                 exit()
         else:
             if not os.path.isfile(self.sFilename_dem ): #why DEM is required?
-                print("The DEM file does not exist!")
+                print("The DEM file does not exist in pyflowline!")
                 #exit()
 
         self.aBasin = list()
@@ -877,7 +877,7 @@ class flowlinecase(object):
                                 return
 
             #no matter what type of mash, we will convert it to geoparquet for easy visualization
-            convert_geojson_to_geoparquet(sFilename_mesh, sFilename_mesh.replace('.geojson','.parquet'))    
+            #convert_geojson_to_geoparquet(sFilename_mesh, sFilename_mesh.replace('.geojson','.parquet'))    
         else:            
             pass
 
@@ -1151,7 +1151,7 @@ class flowlinecase(object):
         """
         Export the model outputs
         """
-        print('Started export elevation')
+        print('PyFlowline started export results')
         ptimer = pytimer()
         ptimer.start()
         self.pyflowline_export_mesh_info_to_json()

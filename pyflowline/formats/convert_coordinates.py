@@ -208,7 +208,12 @@ def convert_gcs_coordinates_to_flowline(aCoordinates_in):
             pEdge = pyedge( aVertex[j], aVertex[j+1] )
             aEdge.append(pEdge)
     
-    pFlowline = pyflowline( aEdge)    
+    if len(aEdge) == 0:
+        print('No edge is created')
+        pFlowline = None
+        pass
+    else:
+        pFlowline = pyflowline( aEdge)    
     return pFlowline
 
 def convert_pcs_coordinates_to_flowline(aCoordinates_in, pSpatial_reference_in):

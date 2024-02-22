@@ -1100,7 +1100,7 @@ class pybasin(object):
 
         aSkip = ['aFlowline_basin_filtered', \
                 'aFlowline_basin_simplified','aFlowline_basin_conceptual','aConfluence_basin_simplified',
-                'aConfluence_basin_conceptual']
+                'aConfluence_basin_conceptual','aFlowline_basin_edge']
         obj = self.__dict__.copy()
         for sKey in aSkip:
             obj.pop(sKey, None)

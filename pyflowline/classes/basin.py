@@ -895,21 +895,44 @@ class pybasin(object):
             list [pyconfluence]: A list of confluences in this basin
         """
         #this can only be calculated for confluence
-        aConfluence_basin=list()
-        for pVertex in aVertex_confluence_in:   
-            aFlowline_upstream =list()
-            for pFlowline in aFlowline_basin_in:
-                pVertex_start = pFlowline.pVertex_start
-                pVertex_end = pFlowline.pVertex_end
-                if pVertex_end == pVertex:                 
-                    aFlowline_upstream.append(pFlowline)
-                    pass
-                if pVertex_start == pVertex:
-                    pFlowline_downstream=pFlowline
+        # Create a dictionary to map each vertex to its upstream and downstream flowlines
+        vertex_to_flowlines = {}
+        for pFlowline in aFlowline_basin_in:
+            pVertex_start = pFlowline.pVertex_start
+            pVertex_end = pFlowline.pVertex_end
 
+            if pVertex_end not in vertex_to_flowlines:
+                vertex_to_flowlines[pVertex_end] = {'upstream': [], 'downstream': None}
+            vertex_to_flowlines[pVertex_end]['upstream'].append(pFlowline)
+
+            if pVertex_start not in vertex_to_flowlines:
+                vertex_to_flowlines[pVertex_start] = {'upstream': [], 'downstream': None}
+            vertex_to_flowlines[pVertex_start]['downstream'] = pFlowline
+
+        # Build the confluence for each vertex
+        aConfluence_basin = []
+        for pVertex in aVertex_confluence_in:
+            aFlowline_upstream = vertex_to_flowlines[pVertex]['upstream']
+            pFlowline_downstream = vertex_to_flowlines[pVertex]['downstream']
             pConfluence = pyconfluence(pVertex, aFlowline_upstream, pFlowline_downstream)
-            aConfluence_basin.append(pConfluence)   
+            aConfluence_basin.append(pConfluence)
+
+        #aConfluence_basin=list()
+        #for pVertex in aVertex_confluence_in:   
+        #    aFlowline_upstream =list()
+        #    for pFlowline in aFlowline_basin_in:
+        #        pVertex_start = pFlowline.pVertex_start
+        #        pVertex_end = pFlowline.pVertex_end
+        #        if pVertex_end == pVertex:                 
+        #            aFlowline_upstream.append(pFlowline)
+        #            pass
+        #        if pVertex_start == pVertex:
+        #            pFlowline_downstream=pFlowline
+        #    pConfluence = pyconfluence(pVertex, aFlowline_upstream, pFlowline_downstream)
+        #    aConfluence_basin.append(pConfluence)  
+             
         return aConfluence_basin
+    
 
     def basin_analyze(self):
         """

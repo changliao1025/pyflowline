@@ -39,22 +39,26 @@ def merge_flowline(aFlowline_in,
     if aIndex_middle.size == 0:
         return aFlowline_in
     
-    aVertex_headwater=aVertex[aIndex_headwater]    
-    aVertex_middle=aVertex[aIndex_middle]   
+    #aVertex_headwater=aVertex[aIndex_headwater]    
+    #aVertex_middle=aVertex[aIndex_middle]   
+    #if aIndex_middle.size == 0:
+    #    return aFlowline_in
 
     #convert to set
     aVertex_headwater_set = set(aVertex[aIndex_headwater])  
     aVertex_middle_set = set(aVertex[aIndex_middle])  
+    if aVertex_middle_set.size == 0:
+        return aFlowline_in
 
     if aIndex_confluence.size > 0:        
         iFlag_confluence = 1
-        aVertex_confluence=aVertex[aIndex_confluence]    
+        #aVertex_confluence=aVertex[aIndex_confluence]    
         aVertex_confluence_set = set(aVertex[aIndex_confluence])  
     else:
         iFlag_confluence = 0
         pass
     
-    def merge_flowline_reach(lIndex_in, pVertex_start_in, pVertex_end_in):
+    def merge_flowline_reach(lIndex_in, pVertex_start_in):
         global lID
         pFlowline = aFlowline_in[lIndex_in]
         iSegment = pFlowline.iStream_segment
@@ -94,27 +98,38 @@ def merge_flowline(aFlowline_in,
                     pVertex_start = pFlowline3.pVertex_start
                     pVertex_end = pFlowline3.pVertex_end
                     if pVertex_end == pVertex_current:
-                        merge_flowline_reach(k, pVertex_start, pVertex_end)
+                        merge_flowline_reach(k, pVertex_start)
                                 
     
     #find outlet
-    iFlag_first=1
+    #iFlag_first=1
+    #for i in range(nFlowline):        
+    #    pFlowline = aFlowline_in[i]                
+    #    pVertex_start = pFlowline.pVertex_start
+    #    pVertex_end = pFlowline.pVertex_end
+    #    dDiatance = pVertex_end.calculate_distance( pVertex_outlet_in)
+    #    if iFlag_first ==1:
+    #        dDiatance_min = dDiatance                
+    #        lIndex_outlet = i            
+    #        iFlag_first=0    
+    #    else:            
+    #        if  dDiatance < dDiatance_min:
+    #            dDiatance_min = dDiatance           
+    #            lIndex_outlet = i                
+    #            pass    
+    #        else:
+    #            pass
+    #find outlet
+    dDiatance_min = float('inf')
     for i in range(nFlowline):        
         pFlowline = aFlowline_in[i]                
-        pVertex_start = pFlowline.pVertex_start
         pVertex_end = pFlowline.pVertex_end
-        dDiatance = pVertex_end.calculate_distance( pVertex_outlet_in)
-        if iFlag_first ==1:
-            dDiatance_min = dDiatance                
-            lIndex_outlet = i            
-            iFlag_first=0    
-        else:            
-            if  dDiatance < dDiatance_min:
-                dDiatance_min = dDiatance           
-                lIndex_outlet = i                
-                pass    
-            else:
-                pass
+        dDiatance = pVertex_end.calculate_distance(pVertex_outlet_in)
+        if dDiatance < dDiatance_min:
+            dDiatance_min = dDiatance
+            lIndex_outlet = i
+
+    
             
     pFlowline = aFlowline_in[lIndex_outlet]            
     pVertex_start = pFlowline.pVertex_start
@@ -129,13 +144,12 @@ def merge_flowline(aFlowline_in,
                 pFlowline = aFlowline_in[i]  
                 pVertex_start_dummy = pFlowline.pVertex_start
                 pVertex_end_dummy = pFlowline.pVertex_end
-
                 if pVertex_end == pVertex_end_dummy:
                     #this is 
-                    merge_flowline_reach(i, pVertex_start_dummy, pVertex_end_dummy)  
+                    merge_flowline_reach(i, pVertex_start_dummy)  
             pass
         else:
-            merge_flowline_reach(lIndex_outlet, pVertex_start, pVertex_end)   
+            merge_flowline_reach(lIndex_outlet, pVertex_start)   
     else:
-        merge_flowline_reach(lIndex_outlet, pVertex_start, pVertex_end)   
+        merge_flowline_reach(lIndex_outlet, pVertex_start)   
     return aFlowline_out

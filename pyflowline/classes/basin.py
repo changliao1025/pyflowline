@@ -1131,13 +1131,14 @@ class pybasin(object):
         Returns:
             float: The total length of all flowlines
         """
-        dLength = 0.0
-        nflowline = len(aFlowline_in)
-        for i in range(nflowline):
-            pFlowline= aFlowline_in[i]
-            pFlowline.calculate_length()
-            dLength = dLength + pFlowline.dLength        
-        return dLength
+        #dLength = 0.0
+        #nflowline = len(aFlowline_in)
+        #for i in range(nflowline):
+        #    pFlowline= aFlowline_in[i]
+        #    pFlowline.calculate_length()
+        #    dLength = dLength + pFlowline.dLength        
+        #return dLength
+        return sum(pFlowline.dLength for pFlowline in aFlowline_in)
 
     def basin_calculate_river_sinuosity(self):
         """

@@ -15,13 +15,12 @@ def export_flowline_to_geojson( aFlowline_in,
     
     
     """
-    convert a shpefile to json format.
+    convert a flowlist object list to json format.
     This function should be used for stream flowline only.
     """
 
     if os.path.exists(sFilename_json_in): 
         os.remove(sFilename_json_in)
-        pass
 
     nFlowline = len(aFlowline_in)
     if iFlag_projected_in is None:
@@ -35,83 +34,102 @@ def export_flowline_to_geojson( aFlowline_in,
     else:
         pass
 
-    if aAttribute_field is not None and aAttribute_data is not None and aAttribute_dtype is not None:
-        iFlag_attribute = 1
+    iFlag_attribute = int(all([aAttribute_field, aAttribute_data, aAttribute_dtype]))
 
-        nAttribute1 = len(aAttribute_field)
-        nAttribute2 = len(aAttribute_data)
-        nAttribute3 = len(aAttribute_dtype)
-        nAttribute4 = len(aAttribute_data[0])
-        if nAttribute3 != nAttribute1 or nAttribute1 != nAttribute2 or nFlowline!= nAttribute4:
+
+    #if aAttribute_field is not None and aAttribute_data is not None and aAttribute_dtype is not None:
+    #    iFlag_attribute = 1
+    #    nAttribute1 = len(aAttribute_field)
+    #    nAttribute2 = len(aAttribute_data)
+    #    nAttribute3 = len(aAttribute_dtype)
+    #    nAttribute4 = len(aAttribute_data[0])
+    #    if nAttribute3 != nAttribute1 or nAttribute1 != nAttribute2 or nFlowline!= nAttribute4:
+    #        print('The attribute is not correct, please check!')
+    #        return
+    #    else:
+    #        iFlag_attribute = 1
+    #else:
+    #    iFlag_attribute=0
+    #    pass
+
+    if iFlag_attribute:
+        nAttribute1, nAttribute2, nAttribute3, nAttribute4 = map(len, [aAttribute_field, aAttribute_data, aAttribute_dtype, aAttribute_data[0]])
+        if not nAttribute1 == nAttribute2 == nAttribute3 == nFlowline == nAttribute4:
             print('The attribute is not correct, please check!')
             return
-        else:
-            iFlag_attribute = 1
-    else:
-        iFlag_attribute=0
-        pass
 
 
-    pDriver_json = ogr.GetDriverByName('GeoJSON')
-    
-    pDataset_json = pDriver_json.CreateDataSource(sFilename_json_in)  
-    
-
+    pDriver_json = ogr.GetDriverByName('GeoJSON')    
+    pDataset_json = pDriver_json.CreateDataSource(sFilename_json_in)     
     pLayer_json = pDataset_json.CreateLayer('flowline', pSpatial_reference_in, ogr.wkbLineString)
     # Add one attribute
     pLayer_json.CreateField(ogr.FieldDefn('lineid', ogr.OFTInteger64)) #long type for high resolution
 
     #add the other fields
-    if iFlag_attribute ==1:
-        for i in range(nAttribute1):
-            sField = aAttribute_field[i]
-            dtype = aAttribute_dtype[i]
-            if dtype == 'int':
-                pLayer_json.CreateField(ogr.FieldDefn(sField, ogr.OFTInteger64))
-                pass
-            else:
-                pLayer_json.CreateField(ogr.FieldDefn(sField, ogr.OFTReal))
-                pass
+    #if iFlag_attribute ==1:
+    #    for i in range(nAttribute1):
+    #        sField = aAttribute_field[i]
+    #        dtype = aAttribute_dtype[i]
+    #        if dtype == 'int':
+    #            pLayer_json.CreateField(ogr.FieldDefn(sField, ogr.OFTInteger64))
+    #            pass
+    #        else:
+    #            pLayer_json.CreateField(ogr.FieldDefn(sField, ogr.OFTReal))
+    #            pass
+    
+    dtype_to_ogr = {'int': ogr.OFTInteger64, 'float': ogr.OFTReal}
+    if iFlag_attribute:
+        for field, dtype in zip(aAttribute_field, aAttribute_dtype):
+            pLayer_json.CreateField(ogr.FieldDefn(field, dtype_to_ogr[dtype]))
         
     
     pLayerDefn = pLayer_json.GetLayerDefn()
     pFeature_out = ogr.Feature(pLayerDefn)
 
-    lID = 0
-    for i in range(nFlowline):
-        pFlowline = aFlowline_in[i]
-        dummy =pFlowline.aVertex
+    #lID = 0
+    flag_to_attr = {1: ('dx', 'dy'), 0: ('dLongitude_degree', 'dLatitude_degree')}
+    for lID in range(nFlowline):
+        pFlowline = aFlowline_in[lID]
+        #dummy =pFlowline.aVertex
         #replace shapely with gdal function
         #aPoint=list()
         pLine = ogr.Geometry(ogr.wkbLineString)
-        for j in dummy:
-            if iFlag_projected_in ==1:
-                #aPoint.append( Point( j.dx, j.dy ) )                
-                pLine.AddPoint(j.dx, j.dy)
-                pass
-            else:
-                #aPoint.append( Point( j.dLongitude_degree, j.dLatitude_degree ) )
-                pLine.AddPoint(j.dLongitude_degree, j.dLatitude_degree)
-                pass
+        #for j in dummy:
+        #    if iFlag_projected_in ==1:
+        #        #aPoint.append( Point( j.dx, j.dy ) )                
+        #        pLine.AddPoint(j.dx, j.dy)
+        #        pass
+        #    else:
+        #        #aPoint.append( Point( j.dLongitude_degree, j.dLatitude_degree ) )
+        #        pLine.AddPoint(j.dLongitude_degree, j.dLatitude_degree)
+        #        pass
+
+        for vertex in pFlowline.aVertex:
+            pLine.AddPoint(*(getattr(vertex, attr) for attr in flag_to_attr[iFlag_projected_in]))
+
 
         #dummy1= LineString( aPoint )
         pGeometry_out = ogr.CreateGeometryFromWkb(pLine.ExportToWkb())
-        pFeature_out.SetGeometry(pGeometry_out)
-   
+        pFeature_out.SetGeometry(pGeometry_out)   
         pFeature_out.SetField("lineid", lID)
-        if iFlag_attribute == 1:
-            for k in range(nAttribute1):
-                sField = aAttribute_field[k]
-                dtype = aAttribute_dtype[k]
-                dummy = aAttribute_data[k]
-                if dtype == 'int':
-                    pFeature_out.SetField(sField, int(dummy[i]))
-                else:
-                    pFeature_out.SetField(sField, float(dummy[i]))
+        #if iFlag_attribute == 1:
+        #    for k in range(nAttribute1):
+        #        sField = aAttribute_field[k]
+        #        dtype = aAttribute_dtype[k]
+        #        dummy = aAttribute_data[k]
+        #        if dtype == 'int':
+        #            pFeature_out.SetField(sField, int(dummy[i]))
+        #        else:
+        #            pFeature_out.SetField(sField, float(dummy[i]))
+                
+
+        if iFlag_attribute:
+            for field, dtype, data in zip(aAttribute_field, aAttribute_dtype, aAttribute_data):
+                pFeature_out.SetField(field, dtype_to_ogr[dtype](data[lID]))
         
         # Add new pFeature_shapefile to output Layer
         pLayer_json.CreateFeature(pFeature_out)        
-        lID =  lID + 1
+      
         pass
         
     pDataset_json.FlushCache()

@@ -1,5 +1,3 @@
-
-
 import importlib
 iFlag_cython = importlib.util.find_spec("cython") 
 if iFlag_cython is not None:
@@ -18,30 +16,21 @@ def find_flowline_vertex(aFlowline_in, dThreshold_in=1.0E-6):
         _type_: _description_
     """
     aVertex = set()
-    nFlowline = len(aFlowline_in) 
+    #nFlowline = len(aFlowline_in) 
     #set up index and id first
     lVertexID = 1
     
-    for i in range(0, nFlowline):
-        pFlowline = aFlowline_in[i]        
-        #update the start and end vertex
+    for pFlowline in aFlowline_in:
         pFlowline.pVertex_start.lVertexID = lVertexID
-        lVertexID = lVertexID + 1
+        pFlowline.pVertex_start.lFlowlineID = pFlowline.lFlowlineID
+        lVertexID += 1
         pFlowline.pVertex_end.lVertexID = lVertexID
-        lVertexID = lVertexID + 1
-        aVertex.add(pFlowline.pVertex_start) 
-        aVertex.add(pFlowline.pVertex_end)         
-        pass
+        pFlowline.pVertex_end.lFlowlineID = pFlowline.lFlowlineID
+        lVertexID += 1
+        aVertex.update([pFlowline.pVertex_start, pFlowline.pVertex_end])
 
     #conver the set back to list
-    aVertex=list(aVertex)
-    #for i in range(0, nFlowline):      
-    #    pFlowline = aFlowline_in[i]
-    #    pVertex_start = pFlowline.pVertex_start
-    #    pVertex_end = pFlowline.pVertex_end        
-    #    aVertex, dummy = add_unique_vertex(aVertex, pVertex_start,dThreshold_in)
-    #    aVertex, dummy = add_unique_vertex(aVertex, pVertex_end, dThreshold_in)
-    #    pass
+    aVertex=list(aVertex)  
 
     return aVertex
 

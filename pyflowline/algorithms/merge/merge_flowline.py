@@ -1,7 +1,5 @@
 
 import numpy as np
-
-
 import importlib
 iFlag_cython = importlib.util.find_spec("cython") 
 if iFlag_cython is not None:
@@ -43,9 +41,15 @@ def merge_flowline(aFlowline_in,
     
     aVertex_headwater=aVertex[aIndex_headwater]    
     aVertex_middle=aVertex[aIndex_middle]   
+
+    #convert to set
+    aVertex_headwater_set = set(aVertex[aIndex_headwater])  
+    aVertex_middle_set = set(aVertex[aIndex_middle])  
+
     if aIndex_confluence.size > 0:        
         iFlag_confluence = 1
         aVertex_confluence=aVertex[aIndex_confluence]    
+        aVertex_confluence_set = set(aVertex[aIndex_confluence])  
     else:
         iFlag_confluence = 0
         pass
@@ -56,7 +60,8 @@ def merge_flowline(aFlowline_in,
         iSegment = pFlowline.iStream_segment
         pVertex_current = pVertex_start_in
         
-        while (find_vertex_in_list(aVertex_middle.tolist(), pVertex_current)[0] ==1):            
+        #while (find_vertex_in_list(aVertex_middle.tolist(), pVertex_current)[0] ==1):            
+        while (pVertex_current in aVertex_middle_set): 
             for j in range(0, nFlowline):      
                 pFlowline2 = aFlowline_in[j]                
                 pVertex_start = pFlowline2.pVertex_start
@@ -65,12 +70,11 @@ def merge_flowline(aFlowline_in,
                     pFlowline = pFlowline.merge_upstream(pFlowline2)
                     pVertex_current = pVertex_start                    
                     break
-                else:
-                    pass
-
+                
                
         #go to next 
-        if find_vertex_in_list(aVertex_headwater.tolist(), pVertex_current)[0] ==1: 
+        #if find_vertex_in_list(aVertex_headwater.tolist(), pVertex_current)[0] ==1: 
+        if pVertex_current in aVertex_headwater_set:
             pFlowline.iStream_segment = iSegment      
             pFlowline.iStream_order = 1           
             pFlowline.lFlowlineIndex = lID
@@ -83,7 +87,8 @@ def merge_flowline(aFlowline_in,
             aFlowline_out.append(pFlowline)        
             lID = lID + 1 
             #confluence
-            if find_vertex_in_list(aVertex_confluence.tolist(), pVertex_current)[0] ==1: 
+            #if find_vertex_in_list(aVertex_confluence.tolist(), pVertex_current)[0] ==1: 
+            if pVertex_current in aVertex_confluence_set:
                 for k in range(0, nFlowline):                      
                     pFlowline3 = aFlowline_in[k]                
                     pVertex_start = pFlowline3.pVertex_start
@@ -118,7 +123,8 @@ def merge_flowline(aFlowline_in,
     #now start from outlet
     if iFlag_confluence == 1:
         #check whether outlet is a confluence
-        if  (find_vertex_in_list(aVertex_confluence.tolist(), pVertex_end)[0] ==1):
+        #if  (find_vertex_in_list(aVertex_confluence.tolist(), pVertex_end)[0] ==1):
+        if pVertex_end in aVertex_confluence_set:
             for i in range(nFlowline):
                 pFlowline = aFlowline_in[i]  
                 pVertex_start_dummy = pFlowline.pVertex_start

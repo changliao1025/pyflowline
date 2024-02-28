@@ -207,7 +207,7 @@ def read_flowline_geojson(sFilename_geojson_in):
         if iFlag_id ==1:
             lFlowlineID = pFeature_geojson.GetField("lineid")
         else:
-            lFlowlineID = -1
+            pass
 
         if iFlag_NHDPlusID ==1:
             lNHDPlusID = pFeature_geojson.GetField("NHDPlusID")
@@ -217,32 +217,21 @@ def read_flowline_geojson(sFilename_geojson_in):
         if(sGeometry_type == 'MULTILINESTRING'):
             nLine = pGeometry_in.GetGeometryCount()
             for i in range(nLine):
-                Line = pGeometry_in.GetGeometryRef(i)       
-                aCoords = list()
-                for i in range(0,  Line.GetPointCount()):                   
-                    pt = Line.GetPoint(i)
-                    aCoords.append( [ pt[0], pt[1]]) 
-                    pass
-
-                dummy1= np.array(aCoords)
-                pFlowline = convert_gcs_coordinates_to_flowline(dummy1)
+                Line = pGeometry_in.GetGeometryRef(i)                    
+                aCoords = [[pt[0], pt[1]] for pt in Line.GetPoints()]
+                pFlowline = convert_gcs_coordinates_to_flowline(np.array(aCoords))
                 if pFlowline is not None:
                     pFlowline.lFlowlineIndex = lFlowlineIndex
                     pFlowline.lFlowlineID = lFlowlineID
                     pFlowline.lNHDPlusID= lNHDPlusID
                     aFlowline.append(pFlowline)
                     lFlowlineIndex = lFlowlineIndex + 1
+                    lFlowlineID = lFlowlineID + 1 #careful
         
         else:
-            if sGeometry_type =='LINESTRING':                  
-                aCoords = list()
-                for i in range(0, pGeometry_in.GetPointCount()):                   
-                    pt = pGeometry_in.GetPoint(i)
-                    aCoords.append( [ pt[0], pt[1]])
-                    pass      
-
-                dummy1= np.array(aCoords)
-                pFlowline = convert_gcs_coordinates_to_flowline(dummy1)
+            if sGeometry_type =='LINESTRING':         
+                aCoords = [[pt[0], pt[1]] for pt in pGeometry_in.GetPoints()]
+                pFlowline = convert_gcs_coordinates_to_flowline(np.array(aCoords))
                 if pFlowline is not None:
                     pFlowline.lFlowlineIndex = lFlowlineIndex
                     pFlowline.iStream_segment = iStream_segment
@@ -250,7 +239,8 @@ def read_flowline_geojson(sFilename_geojson_in):
                     pFlowline.lFlowlineID = lFlowlineID
                     pFlowline.lNHDPlusID = lNHDPlusID
                     aFlowline.append(pFlowline)
-                    lFlowlineIndex = lFlowlineIndex + 1            
+                    lFlowlineIndex = lFlowlineIndex + 1   
+                    lFlowlineID = lFlowlineID + 1  #careful        
             else:
                 print(sGeometry_type)
                 pass        

@@ -1,6 +1,6 @@
 import os
 from osgeo import ogr, osr
-#from shapely.geometry import Point
+
 
 def export_vertex_to_geojson(aVertex_in, 
         sFilename_json_in,
@@ -22,26 +22,18 @@ def export_vertex_to_geojson(aVertex_in,
 
     if os.path.exists(sFilename_json_in): 
         os.remove(sFilename_json_in)
-        pass
-    
-    if iFlag_projected_in is None:
-        iFlag_projected_in = 0
-    else:
-        iFlag_projected_in = 1
+
+    iFlag_projected_in = 0 if iFlag_projected_in is None else 1
 
     if  pSpatial_reference_in is None:        
         pSpatial_reference_in = osr.SpatialReference()  
         pSpatial_reference_in.ImportFromEPSG(4326)    # WGS84 lat/lon
-    else:
-        pass
 
-    if aAttribute_data is not None:
-        aAttribute= aAttribute_data
-        iFlag_attribute =1
-    else:
-        iFlag_attribute=0
 
-    nVertex = len(aVertex_in)
+    iFlag_attribute = 1 if aAttribute_data is not None else 0
+    aAttribute = aAttribute_data if aAttribute_data is not None else []
+
+    #nVertex = len(aVertex_in)
     pDriver = ogr.GetDriverByName('GeoJSON')        
     pDataset_json = pDriver.CreateDataSource(sFilename_json_in)
     pLayer_json = pDataset_json.CreateLayer('vertex', pSpatial_reference_in, ogr.wkbPoint)
@@ -53,29 +45,41 @@ def export_vertex_to_geojson(aVertex_in,
 
     pLayerDefn = pLayer_json.GetLayerDefn()
     pFeature_out = ogr.Feature(pLayerDefn)
-    lID = 0
-    for i in range(nVertex):       
-        pVertex = aVertex_in[i]
-        pPoint = ogr.Geometry(ogr.wkbPoint)
-        if iFlag_projected_in ==1:
-            #dummy1= Point( pVertex.dx, pVertex.dy )
-            pPoint.AddPoint(pVertex.dx, pVertex.dy)
-            pass
-        else:
-            #dummy1= Point( pVertex.dLongitude_degree, pVertex.dLatitude_degree ) 
-            pPoint.AddPoint(pVertex.dLongitude_degree, pVertex.dLatitude_degree)
-            pass
+    #lID = 0
+    #for i in range(nVertex):       
+    #    pVertex = aVertex_in[i]
+    #    pPoint = ogr.Geometry(ogr.wkbPoint)
+    #    if iFlag_projected_in ==1:           
+    #        pPoint.AddPoint(pVertex.dx, pVertex.dy)
+    #        pass
+    #    else:
+    #        pPoint.AddPoint(pVertex.dLongitude_degree, pVertex.dLatitude_degree)
+    #        pass
+    #    pGeometry_out = ogr.CreateGeometryFromWkb(pPoint.ExportToWkb())
+    #    pFeature_out.SetGeometry(pGeometry_out)   
+    #    pFeature_out.SetField("pointid", lID)
+    #    if iFlag_attribute ==1:
+    #        pFeature_out.SetField("connectivity", int(aAttribute[i]) )
+    #            
+    #    pLayer_json.CreateFeature(pFeature_out)        
+    #    lID =  lID + 1
+    #    pass
 
+    for lID, pVertex in enumerate(aVertex_in):
+        pPoint = ogr.Geometry(ogr.wkbPoint)
+        if iFlag_projected_in == 1:
+            pPoint.AddPoint(pVertex.dx, pVertex.dy)
+        else:
+            pPoint.AddPoint(pVertex.dLongitude_degree, pVertex.dLatitude_degree)
 
         pGeometry_out = ogr.CreateGeometryFromWkb(pPoint.ExportToWkb())
         pFeature_out.SetGeometry(pGeometry_out)   
         pFeature_out.SetField("pointid", lID)
-        if iFlag_attribute ==1:
-            pFeature_out.SetField("connectivity", int(aAttribute[i]) )
-                
-        pLayer_json.CreateFeature(pFeature_out)        
-        lID =  lID + 1
-        pass
+
+        if iFlag_attribute == 1:
+            pFeature_out.SetField("connectivity", int(aAttribute[lID]))
+
+        pLayer_json.CreateFeature(pFeature_out)    
         
     pDataset_json.FlushCache()
     pDataset_json = pLayer_json = pFeature_out  = None    

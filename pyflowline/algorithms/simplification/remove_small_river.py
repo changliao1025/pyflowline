@@ -8,38 +8,35 @@ def remove_small_river(aFlowline_in, dThreshold_in):
 
     Returns:
         List: Theortically, the flowline should be ordered from outlet to headwater
-    """
-    nFlowline = len(aFlowline_in)
-    aFlowline_out=list()        
-    if nFlowline == 1:
-        aFlowline_out.append(aFlowline_in[0])
+    """  
+         
+    if len(aFlowline_in) == 1:
+        return [aFlowline_in[0]]
     else:
+        aFlowline_out=list()   
         lID = 0        
-        for i in range(nFlowline):
-            pFlowline = aFlowline_in[i]      
-            iFlag_dam = pFlowline.iFlag_dam
-            pVertex_start = pFlowline.pVertex_start
-            pVertex_end = pFlowline.pVertex_end
+        for pFlowline in aFlowline_in:            
+            iFlag_dam = pFlowline.iFlag_dam           
             dLength = pFlowline.calculate_length()
-            if iFlag_dam ==1:
+            if iFlag_dam == 1 or pFlowline.iStream_order != 1 or dLength > dThreshold_in:
                 pFlowline.lFlowlineIndex = lID
                 aFlowline_out.append(pFlowline)
-                lID = lID +1       
-            else:
-                if pFlowline.iStream_order == 1:
-                    if dLength > dThreshold_in :
-                        pFlowline.lFlowlineIndex = lID
-                        aFlowline_out.append(pFlowline)
-                        lID = lID + 1 
-                        pass
-                    else:
-                        pass
-                    pass
-                else: #this one might be not used     
-                    pFlowline.lFlowlineIndex = lID
-                    aFlowline_out.append(pFlowline)
-                    lID = lID +1       
-                    pass        
+                lID += 1
+            #if iFlag_dam ==1:
+            #    pFlowline.lFlowlineIndex = lID
+            #    aFlowline_out.append(pFlowline)
+            #    lID = lID +1       
+            #else:
+            #    if pFlowline.iStream_order == 1:
+            #        if dLength > dThreshold_in :
+            #            pFlowline.lFlowlineIndex = lID
+            #            aFlowline_out.append(pFlowline)
+            #            lID = lID + 1                        
+            #    else: #this one might be not used     
+            #        pFlowline.lFlowlineIndex = lID
+            #        aFlowline_out.append(pFlowline)
+            #        lID = lID +1       
+            #        pass        
                     #if check_head_water(aFlowline_in, pVertex_start)==1:
                     #    if dLength > dThreshold_in :
                     #        pFlowline.lIndex = lID
@@ -54,6 +51,6 @@ def remove_small_river(aFlowline_in, dThreshold_in):
                     #    lID = lID +1       
                     #    pass            
             
-            pass    
+           
 
     return aFlowline_out

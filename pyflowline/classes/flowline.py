@@ -105,17 +105,19 @@ class pyflowline(object):
         Returns:
             float: The length of the flowline
         """
-        dLength =0.0
+        #dLength =0.0
         #loop though
-        for i in range(self.nEdge):
+        #for i in range(self.nEdge):
         #for edge in self.aEdge:
-            self.aEdge[i].calculate_length()
-            dLength = dLength + self.aEdge[i].dLength
+        #    self.aEdge[i].calculate_length()
+        #    dLength = dLength + self.aEdge[i].dLength
 
         #assing
-        self.dLength= dLength
+        #self.dLength= dLength
 
-        return dLength
+   
+        self.dLength = sum(edge.dLength for edge in self.aEdge)
+        return self.dLength
     
     def calculate_flowline_bound(self):
         dLat_min = 90
@@ -270,7 +272,7 @@ class pyflowline(object):
         aEdge=list()
         pFlowline_out=None
         for edge in self.aEdge:
-            edge.calculate_length()
+            #edge.calculate_length()
             if edge.dLength > dDistance:
                 #break it
                 aEdge0=edge.split_by_length(dDistance)

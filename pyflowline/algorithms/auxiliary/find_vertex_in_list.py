@@ -23,9 +23,7 @@ def find_vertex_in_list(aVertex_in, pVertex_in, dThreshold_in=1.0E-6):
     iFlag_exist = 0
     lIndex= -1
     nVertex= len(aVertex_in)
-
     if iFlag_use_rtree == 1:
-
         #can we use rtree here?
         #index_vertex = rtree.index.Index()
         index_vertex = RTree(max_cap=5, min_cap=2)

@@ -19,6 +19,10 @@ def correct_flowline_direction(aFlowline_in, pVertex_outlet_in):
     aFlag_process=None
     global lFlowlineIndex    
     nFlowline = len(aFlowline_in)
+    # Create sets for faster lookup
+    pVertex_start_in_set = {flowline.pVertex_start for flowline in aFlowline_in}
+    pVertex_end_in_set = {flowline.pVertex_end for flowline in aFlowline_in}
+
     aFlag_process=np.full(nFlowline, 0, dtype =int)
     iFlag_first = 1
     for i in range(nFlowline):
@@ -26,21 +30,18 @@ def correct_flowline_direction(aFlowline_in, pVertex_outlet_in):
         iFlag_dam = pFlowline.iFlag_dam
         iStream_order = pFlowline.iStream_order
         pVertex_start = pFlowline.pVertex_start
-        pVertex_end = pFlowline.pVertex_end
-        dDiatance = pVertex_end.calculate_distance( pVertex_outlet_in )   
+        pVertex_end = pFlowline.pVertex_end         
         if iFlag_first == 1:
-            dDiatance_min = dDiatance                
+            dDiatance_min = pVertex_end.calculate_distance( pVertex_outlet_in )                             
             lIndex_outlet = i            
             iFlag_first=0    
-        else:            
+        else:        
+            dDiatance = pFlowline.pVertex_end.calculate_distance(pVertex_outlet_in)              
             if  dDiatance < dDiatance_min:
                 dDiatance_min = dDiatance
                 #found it
                 lIndex_outlet = i      
-                pass    
-            else:
-          
-                pass
+                
         
     lFlowlineIndex = 0 
     pFlowline = aFlowline_in[lIndex_outlet]
@@ -59,7 +60,8 @@ def correct_flowline_direction(aFlowline_in, pVertex_outlet_in):
             pFlowline = aFlowline_in[i]
             pVerter_start = pFlowline.pVertex_start
             pVerter_end = pFlowline.pVertex_end
-            if pVerter_end == pVertex_start_in  and pVerter_start!=pVertex_end_in:
+            #if pVerter_end == pVertex_start_in  and pVerter_start!=pVertex_end_in:
+            if pVerter_end in pVertex_start_in_set and pVerter_start != pVertex_end_in:
                 if aFlag_process[i] != 1:
                     nUpstream = nUpstream + 1
                     aUpstream.append(i)
@@ -67,7 +69,8 @@ def correct_flowline_direction(aFlowline_in, pVertex_outlet_in):
                     aFlag_process[i] = 1
                     pass
             else:
-                if pVerter_start == pVertex_start_in and pVerter_end !=pVertex_end_in :
+                #if pVerter_start == pVertex_start_in and pVerter_end !=pVertex_end_in :
+                if pVerter_start in pVertex_start_in_set and pVerter_end != pVertex_end_in:
                     if aFlag_process[i] != 1:
                         nUpstream = nUpstream + 1
                         aUpstream.append(i)

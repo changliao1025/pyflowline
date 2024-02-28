@@ -27,7 +27,7 @@ def remove_flowline_loop(aFlowline_in):
         for j in range(nFlowline):
             pFlowline = aFlowline_in[j]
             pVertex_start = pFlowline.pVertex_start
-            pVertex_end = pFlowline.pVertex_end
+            #pVertex_end = pFlowline.pVertex_end
             if pVertex_start == pVertex_start_in: 
                 ndownstream= ndownstream+1
                 aDownstream.append(j)
@@ -40,8 +40,8 @@ def remove_flowline_loop(aFlowline_in):
     for i in range(nFlowline):
         pFlowline = aFlowline_in[i]      
         pVertex_start = pFlowline.pVertex_start
-        pVertex_end = pFlowline.pVertex_end
-        iStream_order = pFlowline.iStream_order        
+        #pVertex_end = pFlowline.pVertex_end
+        #iStream_order = pFlowline.iStream_order        
         #ndownstream , aDownstream, aStream_order = find_paralle_stream( pVertex_start)
 
         # Get all parallel streams

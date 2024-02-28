@@ -10,6 +10,8 @@ if iFlag_cython is not None:
 else:
     from pyearth.gis.geometry.calculate_distance_based_on_longitude_latitude import calculate_distance_based_on_longitude_latitude
 
+iPrecision_default = 8 #used for comparison
+
 class VertexClassEncoder(JSONEncoder):
     def default(self, obj):
         if isinstance(obj, np.integer):
@@ -100,7 +102,7 @@ class pyvertex(object):
         pNvector = pynvector(point)
         return pNvector
     
-    def __hash__(self, precision=6):
+    def __hash__(self, precision=iPrecision_default):
 
         #design a hash function that uses both dLongitude and dLatitude
 
@@ -129,19 +131,15 @@ class pyvertex(object):
             int: 1 if equivalent, 0 if not
         """
         iFlag = False
-        dThreshold_in = 1.0E-10        
-        if isinstance(other, pyvertex):
-              
+        dThreshold_in = 10 ** (-1 * iPrecision_default)     
+        if isinstance(other, pyvertex):              
             if (self.dLongitude_degree == other.dLongitude_degree) and \
                 (self.dLatitude_degree == other.dLatitude_degree):
                 iFlag = True
             else:                
                 #use absolute difference to check whether two vertices are the same
                 if (abs(self.dLongitude_degree - other.dLongitude_degree) < dThreshold_in) and \
-                    (abs(self.dLatitude_degree - other.dLatitude_degree) < dThreshold_in):
-                     #be careful
-                    #print(self.dLongitude_degree ,self.dLatitude_degree , 
-                    #other.dLongitude_degree, other.dLatitude_degree)
+                    (abs(self.dLatitude_degree - other.dLatitude_degree) < dThreshold_in):                  
                     iFlag = True
                 else:
                     iFlag = False  

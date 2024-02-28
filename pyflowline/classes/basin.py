@@ -520,6 +520,7 @@ class pybasin(object):
         try:
             print('Basin ',  self.sBasinID, 'started correction flow direction')
             ptimer.start()
+            sys.stdout.flush()
             nFlowline_before = len(aFlowline_basin_simplified)  
             #this flowline is ordered from downstream to upstream      
             aFlowline_basin_simplified = correct_flowline_direction(aFlowline_basin_simplified,  pVertex_outlet )
@@ -541,6 +542,7 @@ class pybasin(object):
         try:
             print('Basin ',  self.sBasinID, 'started loop removal')
             ptimer.start()
+            sys.stdout.flush()
             aFlowline_basin_simplified = remove_flowline_loop(aFlowline_basin_simplified)   
             ptimer.stop() 
             sys.stdout.flush()

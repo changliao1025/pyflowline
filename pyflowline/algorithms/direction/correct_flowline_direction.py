@@ -8,6 +8,8 @@ def correct_flowline_direction(aFlowline_in, pVertex_outlet_in):
     nFlowline = len(aFlowline_in)
     dDiatance_min = float('inf')       
     unfinished_flowlines = set()
+    vertex_to_flowlines = {}  # New dictionary to map each vertex to its flowlines
+
     for i in range(nFlowline):        
         pFlowline = aFlowline_in[i]                
         pVertex_end = pFlowline.pVertex_end
@@ -17,6 +19,10 @@ def correct_flowline_direction(aFlowline_in, pVertex_outlet_in):
             lIndex_outlet = i  
 
         unfinished_flowlines.add(aFlowline_in[i])
+         # Update the dictionary
+        vertex_to_flowlines.setdefault(pFlowline.pVertex_start, []).append(pFlowline)
+        vertex_to_flowlines.setdefault(pFlowline.pVertex_end, []).append(pFlowline)
+       
         
     unfinished_flowlines.remove(aFlowline_in[lIndex_outlet])
     aVertex_downslope_table = [aFlowline_in[lIndex_outlet].pVertex_start]    
@@ -25,7 +31,8 @@ def correct_flowline_direction(aFlowline_in, pVertex_outlet_in):
         aVertex_downslope_current= []        
         for pVertex_dummy in aVertex_downslope_table:       
             to_remove = set()       
-            for pFlowline in unfinished_flowlines:     
+            #for pFlowline in unfinished_flowlines:     
+            for pFlowline in vertex_to_flowlines.get(pVertex_dummy, []):  # Use the dictionary here
                 if pFlowline.pVertex_end == pVertex_dummy :
                     aVertex_downslope_current.append(pFlowline.pVertex_start)
                     to_remove.add(pFlowline)

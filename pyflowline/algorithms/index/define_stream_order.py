@@ -18,7 +18,6 @@ def update_head_water_stream_order(aFlowline_in):
         pVertex_start = pFlowline.pVertex_start  
         if check_head_water(aFlowline_in, pVertex_start)==1:
             pFlowline.iStream_order = 1
-            pass
         else:
             pFlowline.iStream_order = -1
         

@@ -877,7 +877,7 @@ class flowlinecase(object):
                                 return
 
             #no matter what type of mash, we will convert it to geoparquet for easy visualization
-            #convert_geojson_to_geoparquet(sFilename_mesh, sFilename_mesh.replace('.geojson','.parquet'))    
+            convert_geojson_to_geoparquet(sFilename_mesh, sFilename_mesh.replace('.geojson','.parquet'))    
         else:            
             pass
 

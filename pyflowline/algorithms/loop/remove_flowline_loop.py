@@ -20,20 +20,20 @@ def remove_flowline_loop(aFlowline_in):
             flowline_dict[pVertex_start] = []
         flowline_dict[pVertex_start].append((i, pFlowline))
 
-    def find_paralle_stream( pVertex_start_in):        
-        ndownstream=0
-        aDownstream=list()
-        aStream_order_out=list()
-        for j in range(nFlowline):
-            pFlowline = aFlowline_in[j]
-            pVertex_start = pFlowline.pVertex_start
-            #pVertex_end = pFlowline.pVertex_end
-            if pVertex_start == pVertex_start_in: 
-                ndownstream= ndownstream+1
-                aDownstream.append(j)
-                aStream_order_out.append(  pFlowline.iStream_order  )
-                pass                
-        return ndownstream, aDownstream, aStream_order_out
+    #old method
+    #def find_paralle_stream( pVertex_start_in):        
+    #    ndownstream=0
+    #    aDownstream=list()
+    #    aStream_order_out=list()
+    #    for j in range(nFlowline):
+    #        pFlowline = aFlowline_in[j]
+    #        pVertex_start = pFlowline.pVertex_start
+    #        if pVertex_start == pVertex_start_in: 
+    #            ndownstream= ndownstream+1
+    #            aDownstream.append(j)
+    #            aStream_order_out.append(  pFlowline.iStream_order  )
+    #            pass                
+    #    return ndownstream, aDownstream, aStream_order_out
 
     lID=0
     aFlag = np.full(nFlowline, 0, dtype=int)
@@ -43,7 +43,6 @@ def remove_flowline_loop(aFlowline_in):
         #pVertex_end = pFlowline.pVertex_end
         #iStream_order = pFlowline.iStream_order        
         #ndownstream , aDownstream, aStream_order = find_paralle_stream( pVertex_start)
-
         # Get all parallel streams
         parallel_streams = flowline_dict.get(pVertex_start, [])
         ndownstream = len(parallel_streams)

@@ -29,7 +29,7 @@ def merge_flowline(aFlowline_in,
         List: The flowline are strictly ordered from outlet to headwater
     """
 
-    nVertex=len(aVertex_in)
+    #nVertex=len(aVertex_in)
     nFlowline = len(aFlowline_in)
     aFlowline_out=list()               
     aVertex = np.array(aVertex_in)
@@ -47,8 +47,6 @@ def merge_flowline(aFlowline_in,
     #convert to set
     aVertex_headwater_set = set(aVertex[aIndex_headwater])  
     aVertex_middle_set = set(aVertex[aIndex_middle])  
-    if aVertex_middle_set.size == 0:
-        return aFlowline_in
 
     if aIndex_confluence.size > 0:        
         iFlag_confluence = 1
@@ -128,8 +126,6 @@ def merge_flowline(aFlowline_in,
         if dDiatance < dDiatance_min:
             dDiatance_min = dDiatance
             lIndex_outlet = i
-
-    
             
     pFlowline = aFlowline_in[lIndex_outlet]            
     pVertex_start = pFlowline.pVertex_start

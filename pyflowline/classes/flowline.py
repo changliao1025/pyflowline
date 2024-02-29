@@ -76,7 +76,7 @@ class pyflowline(object):
             aEdge (list [pyedge]): A list of edge objects
         """
         self.aEdge = aEdge
-        nEdge  = len(aEdge)
+        nEdge = len(aEdge)
         self.nEdge = nEdge
         self.pVertex_start = aEdge[0].pVertex_start
         self.pVertex_end =  aEdge[ nEdge-1  ].pVertex_end
@@ -97,7 +97,15 @@ class pyflowline(object):
         self.calculate_flowline_bound()
      
         return
-
+    
+    def __hash__(self):
+        return hash((self.pVertex_start, self.pVertex_end))
+    
+    def __eq__(self, other):
+        if isinstance(other, pyflowline):
+            return self.pVertex_start == other.pVertex_start and self.pVertex_end == other.pVertex_end and self.aVertex == other.aVertex
+        return False
+    
     def calculate_length(self):
         """
         Calcualte the length

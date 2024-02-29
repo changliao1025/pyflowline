@@ -21,19 +21,13 @@ def find_flowline_confluence(aFlowline_in, pVertex_outlet_in):
     Returns:
         List: _description_
     """
-
-    nFlowline = len(aFlowline_in) 
     aVertex=list()
     aIndex_headwater=list()
     aIndex_confluence=list()
     aIndex_middle =list()
     lIndex_outlet = -1
-
     aVertex = find_flowline_vertex(aFlowline_in)
-
     vertex_to_index = {vertex: index for index, vertex in enumerate(aVertex)}
-
-
     nVertex=len(aVertex)
     aConnectivity  = np.full(  nVertex , 0, dtype=int )
     #iFlag_first=1
@@ -58,7 +52,6 @@ def find_flowline_confluence(aFlowline_in, pVertex_outlet_in):
     distances = [vertex.calculate_distance(pVertex_outlet_in) for vertex in aVertex]
     lIndex_outlet = np.argmin(distances)
     pVertex_outlet_out = aVertex[lIndex_outlet]
-
     #a outlet can be a confluence, so we won't set it     
     aConnectivity[lIndex_outlet] =0 
 
@@ -97,7 +90,6 @@ def find_flowline_confluence(aFlowline_in, pVertex_outlet_in):
         pVertex_start = pFlowline.pVertex_start
         pVertex_end = pFlowline.pVertex_end
         lIndex_end = vertex_to_index.get(pVertex_end)
-
         if lIndex_end != lIndex_outlet:
             if pFlowline.iStream_order == 1:
                 lIndex_start = vertex_to_index.get(pVertex_start)
@@ -116,7 +108,6 @@ def find_flowline_confluence(aFlowline_in, pVertex_outlet_in):
             if lIndex_end is not None:
                 aConnectivity[lIndex_end] += 1
     #reset outlet
-    
     #for i in range(0, nVertex): 
     #    if i == lIndex_outlet:
     #        if (aConnectivity[i] >1):

@@ -37,6 +37,7 @@ from pyflowline.algorithms.intersect.intersect_flowline_with_mesh import interse
 from pyflowline.algorithms.intersect.intersect_flowline_with_flowline import intersect_flowline_with_flowline
 from pyflowline.algorithms.auxiliary.calculate_area_of_difference import calculate_area_of_difference_simplified
 
+#cython for performance improvement
 iFlag_cython = importlib.util.find_spec("cython")
 if iFlag_cython is not None:
 
@@ -45,14 +46,15 @@ if iFlag_cython is not None:
     iFlag_use_rtree = 1
 else:
     from pyflowline.algorithms.auxiliary.find_vertex_in_list import find_vertex_in_list
-    iFlag_use_rtree =0
+    iFlag_use_rtree = 0
 
+#kml support for google earth visualization
 iFlag_kml = importlib.util.find_spec("simplekml")
 if iFlag_kml is not None:
     #from pyearth.gis.kml.convert_geojson_to_kml import convert_geojson_to_kml
     pass
 
-
+#change the default recursive call limit
 sys.setrecursionlimit(100000)
 
 class BasinClassEncoder(JSONEncoder):
@@ -97,6 +99,7 @@ class pybasin(object):
     iFlag_disconnected =0
     iFlag_remove_small_river = 0
     iFlag_remove_low_order_river = 0
+    iFlag_correct_flowline_direction = 0
     iFlag_dam=0
 
     iFlag_break_by_distance = 0
@@ -204,6 +207,11 @@ class pybasin(object):
             self.iFlag_remove_low_order_river = int(aParameter['iFlag_remove_low_order_river'])
         else:
             self.iFlag_remove_low_order_river = 0
+
+        if 'iFlag_correct_flowline_direction' in aParameter:
+            self.iFlag_correct_flowline_direction             = int(aParameter['iFlag_correct_flowline_direction'])
+        else:
+            self.iFlag_correct_flowline_direction   = 0
 
         if 'iFlag_dam' in aParameter:
             self.iFlag_dam             = int(aParameter['iFlag_dam'])
@@ -371,7 +379,7 @@ class pybasin(object):
             ndam = len(aData_dam)
             aNHDPlusID_dams_headwater = list()
             aFlowline_dams_nonheadwater = list()
-            aVertex_dams_nonheadwater=list()
+            aVertex_dams_nonheadwater = list()
             n=0
             for j in range(0, ndam):
                 dLon = float(aData_dam[j][1])
@@ -515,18 +523,15 @@ class pybasin(object):
         point['dLatitude_degree'] = self.dLatitude_outlet_degree
         pVertex_outlet=pyvertex(point)
 
-
         try:
             print('Basin ',  self.sBasinID, 'started correction flow direction')
             sys.stdout.flush()
             ptimer.start()
-
             nFlowline_before = len(aFlowline_basin_simplified)
             #this flowline is ordered from downstream to upstream
             aFlowline_basin_simplified = correct_flowline_direction(aFlowline_basin_simplified,  pVertex_outlet )
             nFlowline_after = len(aFlowline_basin_simplified)
             ptimer.stop()
-
             pVertex_outlet = aFlowline_basin_simplified[0].pVertex_end
             self.pVertex_outlet = pVertex_outlet
             if self.iFlag_debug ==1:
@@ -535,8 +540,6 @@ class pybasin(object):
                 export_flowline_to_geojson( aFlowline_basin_simplified,  sFilename_out)
         except:
             print('Error in flow direction correction')
-
-
 
         #step 4: remove loops
         try:
@@ -694,21 +697,20 @@ class pybasin(object):
         Returns:
             list [pyflowline]: A list of intersected cells
         """
-        print('Basin ',  self.sBasinID, 'Start topology reconstruction')
-
+        print('Basin ',  self.sBasinID, 'Start topology reconstruction')        
         ptimer = pytimer()
-
         sWorkspace_output_basin = self.sWorkspace_output_basin
         sFilename_flowline_in = self.sFilename_flowline_simplified
         sFilename_flowline_intersect_out = self.sFilename_flowline_intersect
 
         try:
             print('Basin ',  self.sBasinID, 'Start flowline and mesh intersection')
+            sys.stdout.flush()
             ptimer.start()
             aCell, aCell_intersect_basin, aFlowline_intersect_all = intersect_flowline_with_mesh(iMesh_type, sFilename_mesh, \
                 sFilename_flowline_in, sFilename_flowline_intersect_out)
             ptimer.stop()
-            sys.stdout.flush()
+            
             if self.iFlag_debug ==1:
                 sFilename_out = 'flowline_intersect_flowline_with_mesh.geojson'
                 sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
@@ -726,10 +728,10 @@ class pybasin(object):
         #segment based
         try:
             print('Basin ',  self.sBasinID, 'Start return flowline removal')
+            sys.stdout.flush()
             ptimer.start()
             aFlowline_basin_conceptual, lCellID_outlet, pVertex_outlet = remove_returning_flowline(iMesh_type, aCell_intersect_basin, pVertex_outlet_initial)
-            ptimer.stop()
-            sys.stdout.flush()
+            ptimer.stop()           
             if self.iFlag_debug ==1:
                 sFilename_out = 'flowline_simplified_after_intersect.geojson'
                 sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
@@ -741,10 +743,10 @@ class pybasin(object):
         #edge based
         try:
             print('Basin ',  self.sBasinID, 'Start split flowline to edge')
+            sys.stdout.flush()
             ptimer.start()
             aFlowline_basin_conceptual, aEdge = split_flowline_to_edge(aFlowline_basin_conceptual)
             ptimer.stop()
-            sys.stdout.flush()
             if self.iFlag_debug ==1:
                 sFilename_out = 'flowline_edge_split_flowline_to_edge.geojson'
                 sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
@@ -754,10 +756,10 @@ class pybasin(object):
 
         try:
             print('Basin ',  self.sBasinID, 'Start remove duplicate flowline')
+            sys.stdout.flush()
             ptimer.start()
             aFlowline_basin_conceptual = remove_duplicate_flowline(aFlowline_basin_conceptual)
-            ptimer.stop()
-            sys.stdout.flush()
+            ptimer.stop()            
             if self.iFlag_debug ==1:
                 sFilename_out = 'flowline_edge_remove_duplicate_flowline.geojson'
                 sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
@@ -767,10 +769,10 @@ class pybasin(object):
 
         try:
             print('Basin ',  self.sBasinID, 'Start flowline direction correction')
+            sys.stdout.flush()
             ptimer.start()
             aFlowline_basin_conceptual = correct_flowline_direction(aFlowline_basin_conceptual,  pVertex_outlet )
             ptimer.stop()
-            sys.stdout.flush()
             if self.iFlag_debug ==1:
                 sFilename_out = 'flowline_edge_correct_flowline_direction.geojson'
                 sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
@@ -780,10 +782,10 @@ class pybasin(object):
 
         try:
             print('Basin ',  self.sBasinID, 'Start flowline direction correction')
+            sys.stdout.flush()
             ptimer.start()
             aFlowline_basin_conceptual = remove_flowline_loop(aFlowline_basin_conceptual )
             ptimer.stop()
-            sys.stdout.flush()
             if self.iFlag_debug ==1:
                 sFilename_out = 'flowline_edge_remove_flowline_loop.geojson'
                 sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
@@ -798,11 +800,11 @@ class pybasin(object):
 
         try:
             print('Basin ',  self.sBasinID, 'Start find flowline confluence')
+            sys.stdout.flush()
             ptimer.start()
             aVertex, lIndex_outlet, aIndex_headwater,aIndex_middle, aIndex_confluence, aConnectivity, pVertex_outlet\
                 = find_flowline_confluence(aFlowline_basin_conceptual,  pVertex_outlet)
             ptimer.stop()
-            sys.stdout.flush()
             if self.iFlag_debug ==1:
                 sFilename_out = 'flowline_vertex_with_confluence_after_intersect.geojson'
                 sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
@@ -813,10 +815,10 @@ class pybasin(object):
         #segment based
         try:
             print('Basin ',  self.sBasinID, 'Start merge flowline')
+            sys.stdout.flush()
             ptimer.start()
             aFlowline_basin_conceptual = merge_flowline( aFlowline_basin_conceptual,aVertex, pVertex_outlet, aIndex_headwater,aIndex_middle, aIndex_confluence  )
             ptimer.stop()
-            sys.stdout.flush()
         except:
             print('Error in merge_flowline.')
 
@@ -824,11 +826,11 @@ class pybasin(object):
 
         try:
             print('Basin ',  self.sBasinID, 'Start find flowline confluence')
+            sys.stdout.flush()
             ptimer.start()
             aVertex, lIndex_outlet, aIndex_headwater,aIndex_middle, aIndex_confluence, aConnectivity, pVertex_outlet\
                 = find_flowline_confluence(aFlowline_basin_conceptual,  pVertex_outlet)
             ptimer.stop()
-            sys.stdout.flush()
         except:
             print('Error in find_flowline_confluence.')
 
@@ -846,10 +848,10 @@ class pybasin(object):
 
         #change added a new function to build stream topology
         print('Basin ',  self.sBasinID, 'started stream topology definition')
+        sys.stdout.flush()
         ptimer.start()
         aFlowline_basin_conceptual = define_stream_topology(aFlowline_basin_conceptual, aConfluence_basin_conceptual)
         ptimer.stop()
-        sys.stdout.flush()
 
         aFlowline_basin_conceptual, aStream_order = define_stream_order(aFlowline_basin_conceptual, aConfluence_basin_conceptual)
 

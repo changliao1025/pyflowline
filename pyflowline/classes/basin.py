@@ -96,6 +96,7 @@ class pybasin(object):
     sBasinID=''
     lCellID_outlet=-1
     iFlag_debug = 0
+    iFlag_simplification_done = 0
     iFlag_disconnected =0
     iFlag_remove_small_river = 0
     iFlag_remove_low_order_river = 0
@@ -533,7 +534,9 @@ class pybasin(object):
             aFlowline_basin_simplified = correct_flowline_direction(aFlowline_basin_simplified,  pVertex_outlet )
             nFlowline_after = len(aFlowline_basin_simplified)
             ptimer.stop()
+            #update outlet
             pVertex_outlet = aFlowline_basin_simplified[0].pVertex_end
+            print(pVertex_outlet.dLongitude_degree, pVertex_outlet.dLatitude_degree)
             self.pVertex_outlet = pVertex_outlet
             if self.iFlag_debug ==1:
                 sFilename_out = 'flowline_direction_before_intersect.geojson'
@@ -685,6 +688,8 @@ class pybasin(object):
         self.aFlowline_basin_simplified= aFlowline_basin_simplified
         print('Finish flowline simplification:',  self.sBasinID)
         sys.stdout.flush()
+
+        self.iFlag_simplification_done = 1
         return aFlowline_basin_simplified
 
     def basin_reconstruct_topological_relationship(self, iMesh_type, sFilename_mesh):
@@ -719,19 +724,25 @@ class pybasin(object):
         except:
             print('Error in flowline and mesh intersection.')
 
-
-        point= dict()
-        point['dLongitude_degree'] = self.dLongitude_outlet_degree
-        point['dLatitude_degree'] = self.dLatitude_outlet_degree
-        pVertex_outlet_initial=pyvertex(point)
+        #not an ideal setup, but it could be improved
+        if self.iFlag_simplification_done ==1:
+            pVertex_outlet_initial = self.pVertex_outlet
+        else:    
+            point= dict()
+            point['dLongitude_degree'] = self.dLongitude_outlet_degree
+            point['dLatitude_degree'] = self.dLatitude_outlet_degree
+            pVertex_outlet_initial=pyvertex(point)
 
         #from this point, aFlowline_basin is conceptual
         #segment based
         try:
-            print('Basin ',  self.sBasinID, 'Start return flowline removal')
+            print('Basin ', self.sBasinID, 'Start return flowline removal')
             sys.stdout.flush()
             ptimer.start()
             aFlowline_basin_conceptual, lCellID_outlet, pVertex_outlet = remove_returning_flowline(iMesh_type, aCell_intersect_basin, pVertex_outlet_initial)
+            print('Outlet ID', lCellID_outlet)
+            #this outlet is the one intersect outlet cell, not cell center
+            print('Outlet location', pVertex_outlet.dLongitude_degree, pVertex_outlet.dLatitude_degree)
             ptimer.stop()           
             if self.iFlag_debug ==1:
                 sFilename_out = 'flowline_simplified_after_intersect.geojson'
@@ -772,7 +783,7 @@ class pybasin(object):
             print('Basin ',  self.sBasinID, 'Start flowline direction correction')
             sys.stdout.flush()
             ptimer.start()
-            aFlowline_basin_conceptual = correct_flowline_direction(aFlowline_basin_conceptual,  pVertex_outlet )
+            aFlowline_basin_conceptual = correct_flowline_direction(aFlowline_basin_conceptual, pVertex_outlet)
             ptimer.stop()
             if self.iFlag_debug ==1:
                 sFilename_out = 'flowline_edge_correct_flowline_direction.geojson'
@@ -818,7 +829,7 @@ class pybasin(object):
             print('Basin ',  self.sBasinID, 'Start merge flowline')
             sys.stdout.flush()
             ptimer.start()
-            aFlowline_basin_conceptual = merge_flowline( aFlowline_basin_conceptual,aVertex, pVertex_outlet, aIndex_headwater,aIndex_middle, aIndex_confluence  )
+            aFlowline_basin_conceptual = merge_flowline( aFlowline_basin_conceptual, aVertex, pVertex_outlet, aIndex_headwater,aIndex_middle, aIndex_confluence  )
             ptimer.stop()
         except:
             print('Error in merge_flowline.')
@@ -872,9 +883,13 @@ class pybasin(object):
         self.aFlowline_basin_conceptual = aFlowline_basin_conceptual
         self.aFlowline_basin_edge = aFlowline_basin_edge
 
+        #check whether they are changed or not
+        self.pVertex_outlet = pVertex_outlet
         self.lCellID_outlet = lCellID_outlet
         self.dLongitude_outlet_degree = pVertex_outlet.dLongitude_degree
         self.dLatitude_outlet_degree = pVertex_outlet.dLatitude_degree
+        print('Outlet ID', lCellID_outlet)
+        print('Outlet location', pVertex_outlet.dLongitude_degree, pVertex_outlet.dLatitude_degree)
 
         print('Finish topology reconstruction:',  self.sBasinID)
         sys.stdout.flush()
@@ -951,12 +966,14 @@ class pybasin(object):
             sFilename_flowline_filter = self.sFilename_flowline_filter
             sFilename_flowline_filter_geojson = self.sFilename_flowline_filter_geojson
             self.aFlowline_basin_filtered, pSpatial_reference = read_flowline_geojson( sFilename_flowline_filter_geojson )
-            self.dLength_flowline_filtered = self.calculate_flowline_length(self.aFlowline_basin_filtered)
+            self.dLength_flowline_filtered = self.basin_calculate_flowline_length(self.aFlowline_basin_filtered)
 
+        #maybe we should use the exisitng result
         point= dict()
         point['dLongitude_degree'] = self.dLongitude_outlet_degree
         point['dLatitude_degree'] = self.dLatitude_outlet_degree
         pVertex_outlet_initial=pyvertex(point)
+
         if self.aFlowline_basin_simplified is None:
             sFilename_flowline_in = self.sFilename_flowline_simplified
             aFlowline_simplified,pSpatial_reference = read_flowline_geojson( sFilename_flowline_in )
@@ -970,7 +987,7 @@ class pybasin(object):
                 aVertex_confluence = aVertex[aIndex_confluence]
                 self.aConfluence_basin_simplified = self.build_confluence(self.aFlowline_basin_simplified, aVertex_confluence)
 
-        self.dLength_flowline_simplified = self.calculate_flowline_length(self.aFlowline_basin_simplified)
+        self.dLength_flowline_simplified = self.basin_calculate_flowline_length(self.aFlowline_basin_simplified)
 
         if self.aFlowline_basin_conceptual is None:
             sFilename_flowline_in = self.sFilename_flowline_conceptual
@@ -985,9 +1002,9 @@ class pybasin(object):
                 aVertex_confluence = aVertex[aIndex_confluence]
                 self.aConfluence_basin_conceptual = self.build_confluence(self.aFlowline_basin_conceptual, aVertex_confluence)
 
-        self.dLength_flowline_conceptual = self.calculate_flowline_length(self.aFlowline_basin_conceptual)
-        self.calculate_river_sinuosity()
-        self.calculate_confluence_branching_angle()
+        self.dLength_flowline_conceptual = self.basin_calculate_flowline_length(self.aFlowline_basin_conceptual)
+        self.basin_calculate_river_sinuosity()
+        self.basin_calculate_confluence_branching_angle()
         return
 
     def basin_export(self):

@@ -263,12 +263,12 @@ class pyedge(object):
 
         Args:
             other (pyedge): The other edge
+            how about direction?
 
         Returns:
             int: 1 if equivalent; 0 if not
         """
-        iFlag_overlap = self.is_overlap(other)  
-        return iFlag_overlap
+        return int( self.pVertex_start == other.pVertex_start and self.pVertex_end == other.pVertex_end )
 
     def __ne__(self, other):
         """

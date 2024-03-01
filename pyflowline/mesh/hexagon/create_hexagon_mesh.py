@@ -156,10 +156,7 @@ def create_hexagon_mesh(iFlag_rotation_in,
             iColumn_dummy = iColumn - 1
             lCellID6 = (iRow_dummy-1) * ncolumn_in + iColumn_dummy
             aNeighbor.append(lCellID6)
-
-        if check_if_duplicates(aNeighbor) == 0:
-            print('error')  
-
+      
         pHexagon.aNeighbor = aNeighbor
         pHexagon.nNeighbor = len(aNeighbor)
         pHexagon.aNeighbor_land= aNeighbor
@@ -235,11 +232,7 @@ def create_hexagon_mesh(iFlag_rotation_in,
                     iColumn_dummy = iColumn - 1
                     lCellID6 = (iRow_dummy-1) * ncolumn_in + iColumn_dummy
                     aNeighbor.append(lCellID6)
-        
-        
-        if check_if_duplicates(aNeighbor) == 0:
-            print('error')  
-
+         
         pHexagon.aNeighbor = aNeighbor
         pHexagon.nNeighbor = len(aNeighbor)
         pHexagon.aNeighbor_land= aNeighbor

@@ -913,8 +913,7 @@ class flowlinecase(object):
             aBasin = list()
             aCell_intersect=list()
             ncell=len(self.aCell)
-            #there is a one-to-one match between cell id and cell center because each cell has only one center         
-            
+            #there is a one-to-one match between cell id and cell center because each cell has only one center                  
             
             for pBasin in self.aBasin:
                 aCell_intersect_basin = pBasin.basin_reconstruct_topological_relationship(iMesh_type,sFilename_mesh)
@@ -922,7 +921,6 @@ class flowlinecase(object):
                 aBasin.append(pBasin)
                 aCellID_outlet.append(pBasin.lCellID_outlet)
                 aCell_intersect = aCell_intersect + aCell_intersect_basin
-
                 if iFlag_use_rtree == 1:
                     #use rtree to update topology and length
                     for pFlowline in pBasin.aFlowline_basin_conceptual:                    
@@ -1041,7 +1039,8 @@ class flowlinecase(object):
         """
         if self.iFlag_flowline == 1:
             for pBasin in self.aBasin:
-                pBasin.analyze()
+                #pBasin.basin_analyze()
+                pass
         return
 
     def pyflowline_setup(self):

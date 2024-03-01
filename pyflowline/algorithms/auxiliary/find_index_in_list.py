@@ -1,7 +1,5 @@
 import copy
 import numpy as np
-
-
 import importlib
 iFlag_cython = importlib.util.find_spec("cython") 
 if iFlag_cython is not None:
@@ -27,10 +25,10 @@ def find_vertex_on_edge(aVertex_in, pEdge_in):
                 lID = i 
                 x = aVertex_in[i].dLongitude_degree
                 y = aVertex_in[i].dLatitude_degree   
-                left= x - 1E-5
-                right= x + 1E-5
-                bottom= y-1E-5
-                top=    y+1E-5
+                left =   x - 1E-5
+                right =  x + 1E-5
+                bottom = y - 1E-5
+                top =    y + 1E-5
                 pBound= (left, bottom, right, top)
                 index_vertex.insert(lID, pBound)  # 
                 pass
@@ -111,13 +109,7 @@ def find_edge_in_list(aEdge_in, pEdge_in):
                 iFlag_exist = 1      
                 lIndex = i 
                 break                
-            else:
-                pass
-
-        pass        
-        
-    else:
-        pass
+            
     
     return iFlag_exist, lIndex
 
@@ -142,14 +134,7 @@ def find_flowline_in_list(aFlowline_in, pFlowline_in):
             if pFlowline == pFlowline_in:
                 iFlag_exist = 1      
                 lIndex = i 
-                break                
-            else:
-                pass
-
-        pass        
-        
-    else:
-        pass
+                break                        
     
     return iFlag_exist, lIndex
 
@@ -169,10 +154,7 @@ def find_hexagon_through_edge(aHexagon_in, pEdge_in):
     for i in range(nHexagon):
         pHexagon = aHexagon_in[i]
         if pHexagon.has_this_edge(pEdge_in) ==1:
-            aHexagon_out.append(pHexagon)
-            pass
-        else:
-            pass
+            aHexagon_out.append(pHexagon)            
 
     return aHexagon_out
 
@@ -182,15 +164,15 @@ def check_if_duplicates(aList_in):
     Returns:
         [type]: [description]
     """
-    iFlag_unique = 1
-    for elem in aList_in:
-        if aList_in.count(elem) > 1:
-            iFlag_unique = 0
-            break
-        else:
-            pass
-    
-    return iFlag_unique
+    #iFlag_unique = 1
+    #for elem in aList_in:
+    #    if aList_in.count(elem) > 1:
+    #        iFlag_unique = 0
+    #        break
+    #    else:
+    #        pass    
+    #return iFlag_unique
+    return int(len(aList_in) == len(set(aList_in)))
 
 
 def add_unique_vertex(aVertex_in, pVertex_in, dThreshold_in = 1.0E-6):

@@ -101,11 +101,6 @@ class pyflowline(object):
     def __hash__(self):
         return hash((self.pVertex_start, self.pVertex_end))
     
-    def __eq__(self, other):
-        if isinstance(other, pyflowline):
-            return self.pVertex_start == other.pVertex_start and self.pVertex_end == other.pVertex_end and self.aVertex == other.aVertex
-        return False
-    
     def calculate_length(self):
         """
         Calcualte the length
@@ -306,30 +301,17 @@ class pyflowline(object):
     def __eq__(self, other):
         """
         Check whether two flowline are equivalent
-
+    
         Args:
             other (pyflowline): The other flowline
-
+    
         Returns:
             int: 1 if equivalent, 0 if not
         """
-        iFlag_overlap = 0 
-        nEdge1 = self.nEdge
-        nEdge2 = other.nEdge
-        if nEdge1 == nEdge2:
-            for i in np.arange( nEdge1):
-                pEdge1 = self.aEdge[i]
-                pEdge2 = other.aEdge[i]
-                if pEdge1 == pEdge2:
-                    iFlag_overlap =1 
-                else:
-                    iFlag_overlap =0 
-                    break                
-            
-        else:
-            iFlag_overlap = 0
-
-        return iFlag_overlap
+        if len(self.aEdge) != len(other.aEdge):
+            return 0
+    
+        return int(all(edge1 == edge2 for edge1, edge2 in zip(self.aEdge, other.aEdge)))
 
     def __ne__(self, other):
         """

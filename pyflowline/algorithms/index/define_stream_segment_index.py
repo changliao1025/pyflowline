@@ -1,4 +1,4 @@
-#from pyflowline.algorithms.auxiliary.check_head_water import check_head_water
+
 def define_stream_segment_index(aFlowline_in):
     """build stream segment index, because they are ordered from outlet to headwater, so the index is from 1 to n
 

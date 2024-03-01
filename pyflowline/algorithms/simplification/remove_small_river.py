@@ -1,4 +1,3 @@
-from pyflowline.algorithms.auxiliary.check_head_water import check_head_water
 def remove_small_river(aFlowline_in, dThreshold_in):
     """Remove small river that meet the threshold and headwater requirement, also dam flowline are reserved
 

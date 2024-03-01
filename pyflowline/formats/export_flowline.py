@@ -53,8 +53,8 @@ def export_flowline_to_geojson( aFlowline_in,
     #    pass
 
     if iFlag_attribute:
-        nAttribute1, nAttribute2, nAttribute3, nAttribute4 = map(len, [aAttribute_field, aAttribute_data, aAttribute_dtype, aAttribute_data[0]])
-        if not nAttribute1 == nAttribute2 == nAttribute3 == nFlowline == nAttribute4:
+        nAttribute1, nAttribute2, nAttribute3 = map(len, [aAttribute_field, aAttribute_data, aAttribute_dtype])
+        if not nAttribute1 == nAttribute2 == nAttribute3 and nFlowline != len(aAttribute_data[0]):
             print('The attribute is not correct, please check!')
             return
 
@@ -112,20 +112,20 @@ def export_flowline_to_geojson( aFlowline_in,
         pGeometry_out = ogr.CreateGeometryFromWkb(pLine.ExportToWkb())
         pFeature_out.SetGeometry(pGeometry_out)   
         pFeature_out.SetField("lineid", lID)
+
         #if iFlag_attribute == 1:
         #    for k in range(nAttribute1):
         #        sField = aAttribute_field[k]
         #        dtype = aAttribute_dtype[k]
         #        dummy = aAttribute_data[k]
         #        if dtype == 'int':
-        #            pFeature_out.SetField(sField, int(dummy[i]))
+        #            pFeature_out.SetField(sField, int(dummy[lID]))
         #        else:
-        #            pFeature_out.SetField(sField, float(dummy[i]))
+        #            pFeature_out.SetField(sField, float(dummy[lID]))
                 
-
-        if iFlag_attribute:
-            for field, dtype, data in zip(aAttribute_field, aAttribute_dtype, aAttribute_data):
-                pFeature_out.SetField(field, dtype_to_ogr[dtype](data[lID]))
+        if iFlag_attribute == 1:
+            for sField, dtype, dummy in zip(aAttribute_field, aAttribute_dtype, aAttribute_data):
+                pFeature_out.SetField(sField, int(dummy[lID]) if dtype == 'int' else float(dummy[lID]))
         
         # Add new pFeature_shapefile to output Layer
         pLayer_json.CreateFeature(pFeature_out)        

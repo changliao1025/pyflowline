@@ -8,7 +8,13 @@ def check_head_water(aFlowline_in, pVertex_start_in):
 
     Returns:
         [int]: [0: not headwater; 1: is headwater]
-    """
+    """    
+    start_vertices = {flowline.pVertex_start for flowline in aFlowline_in}
+    end_vertices = {flowline.pVertex_end for flowline in aFlowline_in}
+    # Check if the vertex is a headwater
+    is_headwater = pVertex_start_in in start_vertices and pVertex_start_in not in end_vertices
+    return int(is_headwater)
+
     #nFlowline = len(aFlowline_in)
     #iFlag_head_water = -1
     #iCount = 0
@@ -28,11 +34,4 @@ def check_head_water(aFlowline_in, pVertex_start_in):
     #    
     #return iFlag_head_water
     #Create sets of all start and end vertices
-    start_vertices = {flowline.pVertex_start for flowline in aFlowline_in}
-    end_vertices = {flowline.pVertex_end for flowline in aFlowline_in}
-
-    # Check if the vertex is a headwater
-    is_headwater = pVertex_start_in in start_vertices and pVertex_start_in not in end_vertices
-
-    return int(is_headwater)
 

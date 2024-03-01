@@ -90,7 +90,7 @@ def intersect_flowline_with_flowline( sFilename_flowline_a_in, sFilename_flowlin
                 pGeometry_flowline_b = pFeature_flowline_b.GetGeometryRef()
 
                 if iFlag_id ==1:
-                    lFlowlineID = pFeature_flowline_b.GetField("id")
+                    lFlowlineID = pFeature_flowline_b.GetField("lineid")
                 else:
                     lFlowlineID = -1
 

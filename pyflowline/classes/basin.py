@@ -359,7 +359,8 @@ class pybasin(object):
         ptimer = pytimer()
 
         if self.iFlag_dam == 1:
-            sFilename_flowline_filter = self.sFilename_flowline_filter
+            #sFilename_flowline_filter = self.sFilename_flowline_filter
+            sFilename_flowline_filter = self.sFilename_flowline_filter_geojson
             aFlowline_basin_filtered_raw, pSpatial_reference = read_flowline_geojson( sFilename_flowline_filter )
             aVertex_filtered = find_flowline_vertex(aFlowline_basin_filtered_raw)
 
@@ -460,8 +461,8 @@ class pybasin(object):
             print('Basin ',  self.sBasinID, ' has dam', nFlowline_before, nFlowline_after)
             ptimer.stop()
         else:
-            print('Basin ',  self.sBasinID, ' has no dam')
-            sFilename_flowline_filter = self.sFilename_flowline_filter
+            print('Basin ',  self.sBasinID, ' has no dam')            
+            sFilename_flowline_filter = self.sFilename_flowline_filter_geojson #sFilename_flowline_filter = self.sFilename_flowline_filter
             aFlowline_basin_filtered, pSpatial_reference = read_flowline_geojson( sFilename_flowline_filter )
             #aVertex_filtered = find_flowline_vertex(aFlowline_basin_filtered)
 
@@ -618,7 +619,7 @@ class pybasin(object):
             pass
 
         #the final vertex info
-        print('Basin ',  self.sBasinID, 'find flowline confluence')
+        print('Basin ', self.sBasinID, 'find flowline confluence')
         sys.stdout.flush()
         ptimer.start()
         aVertex, lIndex_outlet, aIndex_headwater,aIndex_middle, aIndex_confluence, aConnectivity, pVertex_outlet = find_flowline_confluence(aFlowline_basin_simplified,  pVertex_outlet)
@@ -941,7 +942,6 @@ class pybasin(object):
 
         return aConfluence_basin
 
-
     def basin_analyze(self):
         """
         Analyze the basin results including length, sinuosity, and breaching angle
@@ -1101,7 +1101,7 @@ class pybasin(object):
         """
         aSkip = ['aFlowline_basin_filtered', \
                 'aFlowline_basin_simplified','aFlowline_basin_conceptual','aConfluence_basin_simplified',
-                'aConfluence_basin_conceptual','pRTree_flowline', 'pRTree_edge']
+                'aConfluence_basin_conceptual','pRTree_flowline', 'pRTree_edge','aFlowline_basin_edge']
 
         obj = self.__dict__.copy()
         for sKey in aSkip:

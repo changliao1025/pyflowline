@@ -18,33 +18,41 @@ def correct_flowline_direction(aFlowline_in, pVertex_outlet_in):
             dDiatance_min = dDiatance
             lIndex_outlet = i  
 
-        unfinished_flowlines.add(aFlowline_in[i])
-         # Update the dictionary
-        vertex_to_flowlines.setdefault(pFlowline.pVertex_start, []).append(pFlowline)
-        vertex_to_flowlines.setdefault(pFlowline.pVertex_end, []).append(pFlowline)
+    for i in range(nFlowline):        
+        if i != lIndex_outlet:
+            pFlowline = aFlowline_in[i]   
+            unfinished_flowlines.add(aFlowline_in[i])
+            # Update the dictionary
+            vertex_to_flowlines.setdefault(pFlowline.pVertex_start, []).append(pFlowline)
+            vertex_to_flowlines.setdefault(pFlowline.pVertex_end, []).append(pFlowline)
        
-        
-    unfinished_flowlines.remove(aFlowline_in[lIndex_outlet])
     aVertex_downslope_table = [aFlowline_in[lIndex_outlet].pVertex_start]    
     aFlowline_out= [aFlowline_in[lIndex_outlet]]    
     while unfinished_flowlines:
-        aVertex_downslope_current= []        
+        aVertex_downslope_current= []  
+        iCount = 0      
         for pVertex_dummy in aVertex_downslope_table:       
             to_remove = set()       
-            #for pFlowline in unfinished_flowlines:     
+            #for pFlowline in unfinished_flowlines:              
             for pFlowline in vertex_to_flowlines.get(pVertex_dummy, []):  # Use the dictionary here
-                if pFlowline.pVertex_end == pVertex_dummy :
-                    aVertex_downslope_current.append(pFlowline.pVertex_start)
-                    to_remove.add(pFlowline)
-                    aFlowline_out.append(pFlowline)                    
-                else:
-                    if pFlowline.pVertex_start ==  pVertex_dummy :
-                        pFlowline.reverse()
-                        aVertex_downslope_current.append(pFlowline.pVertex_start)                            
+                if pFlowline in unfinished_flowlines:
+                    if pFlowline.pVertex_end == pVertex_dummy :
+                        aVertex_downslope_current.append(pFlowline.pVertex_start)
                         to_remove.add(pFlowline)
-                        aFlowline_out.append(pFlowline)
+                        aFlowline_out.append(pFlowline)  
+                        iCount = iCount + 1                  
+                    else:
+                        if pFlowline.pVertex_start ==  pVertex_dummy :
+                            pFlowline.reverse()
+                            aVertex_downslope_current.append(pFlowline.pVertex_start)                            
+                            to_remove.add(pFlowline)
+                            aFlowline_out.append(pFlowline)
+                            iCount = iCount + 1     
             
-            unfinished_flowlines -= to_remove                    
+            unfinished_flowlines -= to_remove  
+
+        if iCount == 0:            
+           break
         
         if len(unfinished_flowlines)==0:
            break

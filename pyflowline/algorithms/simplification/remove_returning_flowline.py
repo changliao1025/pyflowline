@@ -5,6 +5,7 @@ from pyflowline.formats.convert_coordinates import convert_gcs_coordinates_to_fl
 def remove_returning_flowline(iMesh_type_in, aCell_intersect_in, pVertex_outlet_in):    
     aFlowline_out=list()    
     nCell =  len(aCell_intersect_in)
+    #lCellID_to_cell = {cell.lCellID: cell for cell in aCell_intersect_in}
     def simplify_list(aCell_flowline_in):
         aCell_flowline_out = copy.deepcopy(aCell_flowline_in)
         nCell2 = len(aCell_flowline_out)          

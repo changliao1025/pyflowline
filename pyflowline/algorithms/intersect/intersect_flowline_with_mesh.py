@@ -1,6 +1,6 @@
 
 import os
-import importlib
+import importlib.util
 import numpy as np
 from osgeo import ogr, osr
 #from shapely.wkt import loads

@@ -1,4 +1,4 @@
-import importlib
+import importlib.util
 iFlag_cython = importlib.util.find_spec("cython") 
 if iFlag_cython is not None:
     from pyflowline.algorithms.cython.kernel import add_unique_vertex

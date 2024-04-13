@@ -1,6 +1,6 @@
 
 import numpy as np 
-import importlib
+import importlib.util
 from pyflowline.algorithms.auxiliary.check_head_water import check_head_water #this function should not be used since stream order of headwater is available 
 iFlag_cython = importlib.util.find_spec("cython") 
 if iFlag_cython is not None:

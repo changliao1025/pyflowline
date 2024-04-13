@@ -1,4 +1,4 @@
-import importlib
+import importlib.util
 from pyflowline.classes.vertex import pyvertex
 from pyflowline.classes.edge import pyedge
 from pyflowline.classes.flowline import pyflowline

@@ -1,7 +1,7 @@
 import os
 import numpy as np
 from osgeo import ogr, osr
-import importlib
+import importlib.util
 
 from pyflowline.algorithms.auxiliary.find_index_in_list import find_list_in_list 
 

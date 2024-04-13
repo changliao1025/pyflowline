@@ -129,7 +129,8 @@ def dggrid_find_resolution_by_index(sDggrid_type, iResolution_index):
 
     return dResolution
 
-def convert_dggrid_mesh_to_pyflowline_mesh(sFilename_dggrid_mesh, sFilename_mesh_pyflowline):
+def convert_dggrid_mesh_to_pyflowline_mesh(sFilename_dggrid_mesh, sFilename_mesh_pyflowline,
+                                            iFlag_global_in = None):
     
     iReturn_code = 1
     if os.path.isfile(sFilename_dggrid_mesh):
@@ -140,6 +141,11 @@ def convert_dggrid_mesh_to_pyflowline_mesh(sFilename_dggrid_mesh, sFilename_mesh
         iReturn_code = 0
         return iReturn_code
     
+    if iFlag_global_in is not None:
+        iFlag_global = iFlag_global_in
+    else:
+        iFlag_global = 0
+    
     if os.path.isfile(sFilename_mesh_pyflowline):
         print('This mesh file already exists: ', sFilename_mesh_pyflowline )
         os.remove(sFilename_mesh_pyflowline)
@@ -147,7 +153,6 @@ def convert_dggrid_mesh_to_pyflowline_mesh(sFilename_dggrid_mesh, sFilename_mesh
     aDggrid=list()
     aDggrid_dict = dict()
     lCellIndex = 0
-
     pDriver_geojson = ogr.GetDriverByName('GeoJSON')    
     pDataset_mesh = pDriver_geojson.Open(sFilename_dggrid_mesh, gdal.GA_ReadOnly)
     pLayer_mesh = pDataset_mesh.GetLayer(0)
@@ -171,21 +176,16 @@ def convert_dggrid_mesh_to_pyflowline_mesh(sFilename_dggrid_mesh, sFilename_mesh
     
     #we also need to spatial reference
     for pFeature_mesh in pLayer_mesh:
-        pGeometry_mesh = pFeature_mesh.GetGeometryRef()        
-        #dummy0 = loads( pGeometry_mesh.ExportToWkt() )
-        #aCoords_gcs = dummy0.exterior.coords
-        #aCoords_gcs= np.array(aCoords_gcs)  
+        pGeometry_mesh = pFeature_mesh.GetGeometryRef()              
         aCoords_gcs = get_geometry_coordinates(pGeometry_mesh)   
         dLongitude_center = np.mean(aCoords_gcs[:-1,0])
         dLatitude_center = np.mean(aCoords_gcs[:-1,1])   
-
         lCellID = int(pFeature_mesh.GetField("name") )
         pdggrid = convert_gcs_coordinates_to_cell(5, dLongitude_center, dLatitude_center, aCoords_gcs)  
         dArea = pdggrid.calculate_cell_area()
         pdggrid.calculate_edge_length()
         pdggrid.dLength_flowline = pdggrid.dLength #Default
         pdggrid.lCellID = lCellID      
-
         aNeighbor = pFeature_mesh.GetField("neighbors")   
         pdggrid.nNeighbor = len(aNeighbor)
         pdggrid.aNeighbor = list()
@@ -217,11 +217,7 @@ def convert_dggrid_mesh_to_pyflowline_mesh(sFilename_dggrid_mesh, sFilename_mesh
         pLayer.CreateFeature(pFeature)
 
     #rebuild neighbor list    
-    aDggrid_out = list()
-    
-    ncell = len(aDggrid)
-    aCellID  = list()
- 
+    aDggrid_middle = list()      
     for pCell in aDggrid:           
         aNeighbor = pCell.aNeighbor       
         aNeighbor_new = list()       
@@ -234,20 +230,24 @@ def convert_dggrid_mesh_to_pyflowline_mesh(sFilename_dggrid_mesh, sFilename_mesh
         pCell.nNeighbor_land= len(aNeighbor_new)
         pCell.aNeighbor_land = aNeighbor_new
         pCell.nNeighbor_ocean = pCell.nVertex - pCell.nNeighbor_land
-        aDggrid_out.append(pCell)
+        aDggrid_middle.append(pCell)
 
     #calculate neighbor distance
-    for pDggrid in aDggrid_out:
+    for pDggrid in aDggrid_middle:
         aNeighbor = pDggrid.aNeighbor
         pDggrid.aNeighbor_distance=list()
         for lCellID1 in aNeighbor:
             lIndex = aDggrid_dict[lCellID1]
-            pDggrid1 = aDggrid_out[lIndex]  
+            pDggrid1 = aDggrid_middle[lIndex]  
             dDistance = pDggrid.pVertex_center.calculate_distance( pDggrid1.pVertex_center )
             pDggrid.aNeighbor_distance.append(dDistance)
      
     pDataset = pLayer = pFeature  = None  
-    return aDggrid_out
+
+    #currently we do not fill the holes in dggrid, it is recommended to modify the input data directly.
+
+    
+    return aDggrid_middle
 
 def create_dggrid_mesh(iFlag_global,
                          iFlag_save_mesh,
@@ -278,10 +278,13 @@ def create_dggrid_mesh(iFlag_global,
 
     if sFilename_boundary_in is not None:
         if os.path.isfile(sFilename_boundary_in):
-            iFlag_crop =1
+            iFlag_crop = 1
+            iFlag_global = 0
             sFilename_crop_geojson = sFilename_boundary_in
         else:
             iFlag_crop = 0
+            iFlag_global = 1
+
     else:
         iFlag_crop = 0   
 
@@ -331,7 +334,8 @@ def create_dggrid_mesh(iFlag_global,
 
         #convert the pyflowline mesh format
              
-        aDggrid = convert_dggrid_mesh_to_pyflowline_mesh(sFilename_cell, sFilename_mesh)
+        aDggrid = convert_dggrid_mesh_to_pyflowline_mesh(sFilename_cell, sFilename_mesh,
+                                                          iFlag_global_in = iFlag_global)
         
     return aDggrid
 

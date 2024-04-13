@@ -1,7 +1,7 @@
 
 import json
 from json import JSONEncoder
-import importlib
+import importlib.util
 import numpy as np
 
 iFlag_cython = importlib.util.find_spec("cython") 

@@ -430,12 +430,10 @@ def create_hexagon_mesh(iFlag_rotation_in,
     iFlag_fill_hole = 0    
     aHexagon_out = list()
 
-    if iFlag_fill_hole ==1:
-       
+    if iFlag_fill_hole ==1:       
         #find the virtual neighbors
         for pCell in aHexagon:            
             aNeighbor_land = pCell.aNeighbor_land   #including both holes and maps land cutoff by boundary
-            nNeighbor_land = pCell.nNeighbor
             aNeighbor_land_update = list()
             aNeighbor_land_virtual = list()
             nNeighbor_land_update = 0 

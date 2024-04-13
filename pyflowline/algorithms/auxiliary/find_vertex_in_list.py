@@ -1,5 +1,5 @@
 
-import importlib
+import importlib.util
 import numpy as np
 iFlag_cython = importlib.util.find_spec("cython") 
 if iFlag_cython is not None:

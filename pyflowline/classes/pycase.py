@@ -4,7 +4,7 @@ from pathlib import Path
 import json
 from json import JSONEncoder
 import datetime
-import importlib
+import importlib.util
 from shutil import copy2
 import numpy as np
 from osgeo import ogr, osr, gdal

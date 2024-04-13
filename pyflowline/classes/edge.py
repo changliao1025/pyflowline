@@ -1,7 +1,7 @@
 
 import json
 from json import JSONEncoder
-import importlib
+import importlib.util
 import numpy as np
 from pyflowline.classes.vertex import pyvertex
 from pyflowline.algorithms.split.split_by_length import split_edge_by_length

@@ -1,6 +1,6 @@
 
 import numpy as np
-import importlib
+import importlib.util
 iFlag_cython = importlib.util.find_spec("cython") 
 
 from pyflowline.algorithms.split.find_flowline_vertex import find_flowline_vertex

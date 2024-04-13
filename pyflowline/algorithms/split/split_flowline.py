@@ -3,7 +3,7 @@ import numpy as np
 from pyflowline.classes.edge import pyedge
 from pyflowline.classes.flowline import pyflowline
 
-import importlib
+import importlib.util
 iFlag_cython = importlib.util.find_spec("cython") 
 if iFlag_cython is not None:
     from pyflowline.algorithms.cython.kernel import find_vertex_on_edge

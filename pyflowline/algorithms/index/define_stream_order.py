@@ -1,6 +1,6 @@
 
 import numpy as np 
-import importlib
+import importlib.util
 from pyflowline.algorithms.auxiliary.check_head_water import check_head_water #this function should not be used since stream order of headwater is available 
 iFlag_cython = importlib.util.find_spec("cython") 
 if iFlag_cython is not None:
@@ -11,20 +11,28 @@ else:
     pass
 
 def update_head_water_stream_order(aFlowline_in):
-    nFlowline = len(aFlowline_in)
-    aFlowline_out = list()
-    for i in range(nFlowline):
-        pFlowline = aFlowline_in[i]          
-        pVertex_start = pFlowline.pVertex_start  
-        if check_head_water(aFlowline_in, pVertex_start)==1:
-            pFlowline.iStream_order = 1
-            pass
-        else:
-            pFlowline.iStream_order = -1
-        
-        aFlowline_out.append(pFlowline)
+    start_vertices = {flowline.pVertex_start for flowline in aFlowline_in}
+    end_vertices = {flowline.pVertex_end for flowline in aFlowline_in}
 
-    return aFlowline_out
+    for flowline in aFlowline_in:
+        pVertex_start = flowline.pVertex_start
+        is_headwater = pVertex_start in start_vertices and pVertex_start not in end_vertices
+        flowline.iStream_order = 1 if is_headwater else -1
+
+    return aFlowline_in
+
+    #nFlowline = len(aFlowline_in)
+    #aFlowline_out = list()
+    #for i in range(nFlowline):
+    #    pFlowline = aFlowline_in[i]          
+    #    pVertex_start = pFlowline.pVertex_start  
+    #    if check_head_water(aFlowline_in, pVertex_start)==1:
+    #        pFlowline.iStream_order = 1
+    #    else:
+    #        pFlowline.iStream_order = -1
+    #    
+    #    aFlowline_out.append(pFlowline)
+    #return aFlowline_out
 
 
 def define_stream_order(aFlowline_in, aConfluence_in):
@@ -54,18 +62,12 @@ def define_stream_order(aFlowline_in, aConfluence_in):
             nConfleunce = len(aConfluence_in)
             aFlag_confluence_treated = np.full(nConfleunce, 0, dtype=int)
             #build rtree for confluence
-            index_confluence = RTree( max_cap=5, min_cap=2)
-            for i in range(nConfleunce):
-                lID = i 
-                pVertex_confluence = aConfluence_in[i].pVertex_confluence 
-                x = pVertex_confluence.dLongitude_degree
-                y = pVertex_confluence.dLatitude_degree   
-                left =   x - 1E-5
-                right =  x + 1E-5
-                bottom = y - 1E-5
-                top =    y + 1E-5
-                pBound= (left, bottom, right, top)                
-                index_confluence.insert(lID, pBound)  #
+            index_confluence = RTree( max_cap=5, min_cap=2)          
+            for i, confluence in enumerate(aConfluence_in):
+                pVertex_confluence = confluence.pVertex_confluence 
+                x, y = pVertex_confluence.dLongitude_degree, pVertex_confluence.dLatitude_degree
+                pBound = (x - 1E-5, y - 1E-5, x + 1E-5, y + 1E-5)
+                index_confluence.insert(i, pBound)
 
           
             while aFlowline_in[0].iStream_order < 0:
@@ -77,43 +79,45 @@ def define_stream_order(aFlowline_in, aConfluence_in):
                     aFlowline_upstream = pConfluence.aFlowline_upstream 
                     pFlowline_downstream = pConfluence.pFlowline_downstream
                     iStream_segment = pFlowline_downstream.iStream_segment
-                    iFlag_upstream_done = 1
-                    nUpstream = len(aFlowline_upstream)
-                    aStrord = list()
-                    for j in range(nUpstream):
-                        pFlowline_upstream = aFlowline_upstream[j]
-                        iStream_order_upstream = pFlowline_upstream.iStream_order
-                        if iStream_order_upstream < 1:
-                            iFlag_upstream_done = 0
-                            break
-                        else:
-                            aStrord.append( iStream_order_upstream  )
-                        pass
+                    #iFlag_upstream_done = 1
+                    #nUpstream = len(aFlowline_upstream)
+                    aStrord = [upstream.iStream_order for upstream in aFlowline_upstream if upstream.iStream_order >= 1]
+      
+                    #aStrord = list()
+                    #for j in range(nUpstream):
+                    #    pFlowline_upstream = aFlowline_upstream[j]
+                    #    iStream_order_upstream = pFlowline_upstream.iStream_order
+                    #    if iStream_order_upstream < 1:
+                    #        iFlag_upstream_done = 0
+                    #        break
+                    #    else:
+                    #        aStrord.append( iStream_order_upstream  )               
 
-                    if iFlag_upstream_done == 1:
+                    #if iFlag_upstream_done == 1:
+                    if len(aStrord) == len(aFlowline_upstream):
                         aFlag_confluence_treated[i] = 1
                         #now we can process the downstream
                         #get unique value
-                        dummy = np.array(aStrord)
-                        dummy1 = np.unique(dummy)
-                        if len(dummy1) == 1: #all upstreams have the same order
-                            iStream_order = aStrord[0] + 1
-                        else:
-                            iStream_order = np.max(dummy)  
-                        pass
-                        
+                        iStream_order = max(aStrord) if len(set(aStrord)) > 1 else aStrord[0] + 1                        
+                                              
                         #update
                         pFlowline_downstream.iStream_order = iStream_order
                         aFlowline_in[nSegment-iStream_segment].iStream_order = iStream_order
                         #update confluence
-                        x = pFlowline_downstream.pVertex_end.dLongitude_degree
-                        y = pFlowline_downstream.pVertex_end.dLatitude_degree   
-                        left =   x - 1E-5
-                        right =  x + 1E-5
-                        bottom = y - 1E-5
-                        top =    y + 1E-5
-                        pBound= (left, bottom, right, top)  
+                        #x = pFlowline_downstream.pVertex_end.dLongitude_degree
+                        #y = pFlowline_downstream.pVertex_end.dLatitude_degree   
+                        #left =   x - 1E-5
+                        #right =  x + 1E-5
+                        #bottom = y - 1E-5
+                        #top =    y + 1E-5
+                        #pBound= (left, bottom, right, top)  
+                        #aIntersect = list(index_confluence.search(pBound))
+
+                        #update confluence
+                        x, y = pFlowline_downstream.pVertex_end.dLongitude_degree, pFlowline_downstream.pVertex_end.dLatitude_degree
+                        pBound = (x - 1E-5, y - 1E-5, x + 1E-5, y + 1E-5)
                         aIntersect = list(index_confluence.search(pBound))
+
                         for k in aIntersect:
                             pConfluence2 = aConfluence_in[k]
                             if pConfluence2.pVertex_confluence == pFlowline_downstream.pVertex_end:
@@ -124,15 +128,13 @@ def define_stream_order(aFlowline_in, aConfluence_in):
                             pass
 
                                              
-            for i in range(nFlowline):
-                pFlowline = aFlowline_in[i]      
-                pFlowline.iStream_order =    aFlowline_in[i].iStream_order   
-                aFlowline_out.append(pFlowline)
-                aStream_order[i] = pFlowline.iStream_order
+            
+            for i, flowline in enumerate(aFlowline_in):                
+                aFlowline_out.append(flowline)
+                aStream_order[i] = flowline.iStream_order
                 
-            pass
-        else: #the old method, not computationally efficient enough
-              
+      
+        else: #the old method, not computationally efficient enough              
             for i in range(nFlowline):
                 pFlowline = aFlowline_in[i]
                 pVertex_start=pFlowline.pVertex_start

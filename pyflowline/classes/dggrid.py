@@ -5,7 +5,7 @@ from pyflowline.classes.vertex import pyvertex
 from pyflowline.classes.edge import pyedge
 from pyflowline.classes.cell import pycell
 from pyflowline.classes.flowline import pyflowline
-from pyflowline.external.pyearth.gis.gdal.gdal_functions import calculate_polygon_area
+from pyearth.gis.geometry.calculate_polygon_area import calculate_polygon_area
 
 class DggridClassEncoder(JSONEncoder):
     def default(self, obj):

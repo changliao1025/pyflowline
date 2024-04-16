@@ -1,9 +1,67 @@
 import sys
-sys.setrecursionlimit(10000)
 import numpy as np 
 from pyflowline.algorithms.auxiliary.check_head_water import check_head_water
+sys.setrecursionlimit(100000)
 lFlowlineIndex=0
-def correct_flowline_direction(aFlowline_in, pVertex_outlet_in):    
+
+def correct_flowline_direction(aFlowline_in, pVertex_outlet_in):
+    nFlowline = len(aFlowline_in)
+    dDiatance_min = float('inf')       
+    unfinished_flowlines = set()
+    vertex_to_flowlines = {}  # New dictionary to map each vertex to its flowlines
+
+    for i in range(nFlowline):        
+        pFlowline = aFlowline_in[i]                
+        pVertex_end = pFlowline.pVertex_end
+        dDiatance = pVertex_end.calculate_distance(pVertex_outlet_in)
+        if dDiatance < dDiatance_min:
+            dDiatance_min = dDiatance
+            lIndex_outlet = i  
+
+    for i in range(nFlowline):        
+        if i != lIndex_outlet:
+            pFlowline = aFlowline_in[i]   
+            unfinished_flowlines.add(aFlowline_in[i])
+            # Update the dictionary
+            vertex_to_flowlines.setdefault(pFlowline.pVertex_start, []).append(pFlowline)
+            vertex_to_flowlines.setdefault(pFlowline.pVertex_end, []).append(pFlowline)
+       
+    aVertex_downslope_table = [aFlowline_in[lIndex_outlet].pVertex_start]    
+    aFlowline_out= [aFlowline_in[lIndex_outlet]]    
+    while unfinished_flowlines:
+        aVertex_downslope_current= []  
+        iCount = 0      
+        for pVertex_dummy in aVertex_downslope_table:       
+            to_remove = set()       
+            #for pFlowline in unfinished_flowlines:              
+            for pFlowline in vertex_to_flowlines.get(pVertex_dummy, []):  # Use the dictionary here
+                if pFlowline in unfinished_flowlines:
+                    if pFlowline.pVertex_end == pVertex_dummy :
+                        aVertex_downslope_current.append(pFlowline.pVertex_start)
+                        to_remove.add(pFlowline)
+                        aFlowline_out.append(pFlowline)  
+                        iCount = iCount + 1                  
+                    else:
+                        if pFlowline.pVertex_start ==  pVertex_dummy :
+                            pFlowline.reverse()
+                            aVertex_downslope_current.append(pFlowline.pVertex_start)                            
+                            to_remove.add(pFlowline)
+                            aFlowline_out.append(pFlowline)
+                            iCount = iCount + 1     
+            
+            unfinished_flowlines -= to_remove  
+
+        if iCount == 0:            
+           break
+        
+        if len(unfinished_flowlines)==0:
+           break
+        aVertex_downslope_table = aVertex_downslope_current 
+        
+    return  aFlowline_out  
+
+
+def correct_flowline_direction_old(aFlowline_in, pVertex_outlet_in):    
     """_summary_ This function should expect the flowline may not be ordered, so the stream order info is not available.
 
     Args:
@@ -19,28 +77,17 @@ def correct_flowline_direction(aFlowline_in, pVertex_outlet_in):
     aFlag_process=None
     global lFlowlineIndex    
     nFlowline = len(aFlowline_in)
-    aFlag_process=np.full(nFlowline, 0, dtype =int)
-    iFlag_first = 1
-    for i in range(nFlowline):
-        pFlowline = aFlowline_in[i]
-        iFlag_dam = pFlowline.iFlag_dam
-        iStream_order = pFlowline.iStream_order
-        pVertex_start = pFlowline.pVertex_start
+    # Create sets for faster lookup
+    pVertex_start_in_set = {flowline.pVertex_start for flowline in aFlowline_in}    
+    aFlag_process=np.full(nFlowline, 0, dtype =int)   
+    dDiatance_min = float('inf')
+    for i in range(nFlowline):        
+        pFlowline = aFlowline_in[i]                
         pVertex_end = pFlowline.pVertex_end
-        dDiatance = pVertex_end.calculate_distance( pVertex_outlet_in )   
-        if iFlag_first == 1:
-            dDiatance_min = dDiatance                
-            lIndex_outlet = i            
-            iFlag_first=0    
-        else:            
-            if  dDiatance < dDiatance_min:
-                dDiatance_min = dDiatance
-                #found it
-                lIndex_outlet = i      
-                pass    
-            else:
-          
-                pass
+        dDiatance = pVertex_end.calculate_distance(pVertex_outlet_in)
+        if dDiatance < dDiatance_min:
+            dDiatance_min = dDiatance
+            lIndex_outlet = i                  
         
     lFlowlineIndex = 0 
     pFlowline = aFlowline_in[lIndex_outlet]
@@ -51,44 +98,38 @@ def correct_flowline_direction(aFlowline_in, pVertex_outlet_in):
     pVertex_end = pFlowline.pVertex_end
     lFlowlineIndex = lFlowlineIndex + 1    
     #we might find more than 1 upstream    
-    def find_upstream_flowline(pVertex_start_in, pVertex_end_in):
+    def find_upstream_flowline( pVertex_end_in):
         nUpstream = 0 
         aUpstream=list()
         aReverse=list()
         for i in range(nFlowline):
             pFlowline = aFlowline_in[i]
             pVerter_start = pFlowline.pVertex_start
-            pVerter_end = pFlowline.pVertex_end
-            if pVerter_end == pVertex_start_in  and pVerter_start!=pVertex_end_in:
+            pVerter_end = pFlowline.pVertex_end            
+            if pVerter_end in pVertex_start_in_set and pVerter_start != pVertex_end_in:
                 if aFlag_process[i] != 1:
                     nUpstream = nUpstream + 1
                     aUpstream.append(i)
                     aReverse.append(0)
                     aFlag_process[i] = 1
                     pass
-            else:
-                if pVerter_start == pVertex_start_in and pVerter_end !=pVertex_end_in :
+            else:                
+                if pVerter_start in pVertex_start_in_set and pVerter_end != pVertex_end_in:
                     if aFlag_process[i] != 1:
                         nUpstream = nUpstream + 1
                         aUpstream.append(i)
                         aReverse.append(1)
                         aFlag_process[i] = 1
-                        pass
-                pass
-
-            pass
-        return nUpstream, aUpstream, aReverse
+                       
+        return nUpstream, aUpstream, aReverse    
     
-    
-    def tag_upstream(pVertex_start_in, pVertex_end_in):
-        
+    def tag_upstream(pVertex_start_in, pVertex_end_in):        
         global lFlowlineIndex
         if(check_head_water(aFlowline_in, pVertex_start_in)==1):            
             pass
         else:
-            nUpstream, aUpstream, aReverse = find_upstream_flowline(pVertex_start_in, pVertex_end_in)
-            if nUpstream > 0:
-                
+            nUpstream, aUpstream, aReverse = find_upstream_flowline( pVertex_end_in)
+            if nUpstream > 0:                
                 for j in range(nUpstream):
                     pFlowline = aFlowline_in[ aUpstream[j] ] 
                     if (aReverse[j]==1):             

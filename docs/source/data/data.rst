@@ -230,15 +230,16 @@ Inputs
 The following recommended workspace structure and example input files are provided to run a PyFlowline simulation. Although the repo includes example configuration files in the examples/ directory, they can be placed wherever the user prefers, as long as the paths within them point to the correct locations for input (and output) data.
 
 ::
-	data
-	└── <domain_name>
-		├── input
-		│   ├── boundary_wgs.geojson
-		│   ├── flowline.geojson
-		│   ├── pyflowline_<domain_name>_<meshtype>.json
-		│   └── pyflowline_<domain_name>_basins.json 
-		└── output 
-			└── ...
+
+    data
+    └── <domain_name>
+        ├── input
+        │   ├── boundary_wgs.geojson
+        │   ├── flowline.geojson
+        │   ├── pyflowline_<domain_name>_<meshtype>.json
+        │   └── pyflowline_<domain_name>_basins.json
+        └── output
+            └── ...
 
 ==============================
 Outputs

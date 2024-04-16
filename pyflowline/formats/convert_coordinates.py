@@ -1,4 +1,4 @@
-import importlib
+import importlib.util
 from pyflowline.classes.vertex import pyvertex
 from pyflowline.classes.edge import pyedge
 from pyflowline.classes.flowline import pyflowline
@@ -10,14 +10,14 @@ from pyflowline.classes.mpas import pympas
 from pyflowline.classes.tin import pytin
 from pyflowline.classes.dggrid import pydggrid
 
-from pyflowline.external.pyearth.gis.gdal.gdal_functions import reproject_coordinates
+from pyearth.gis.spatialref.reproject_coodinates import reproject_coordinates
 iFlag_cython = importlib.util.find_spec("cython") 
 if iFlag_cython is not None:
     from pyflowline.algorithms.cython.kernel import calculate_angle_betwen_vertex
     from pyflowline.algorithms.cython.kernel import calculate_distance_to_plane
-else:
-    from pyflowline.external.pyearth.gis.gdal.gdal_functions import  calculate_angle_betwen_vertex
-    from pyflowline.external.pyearth.gis.gdal.gdal_functions import calculate_distance_to_plane
+else:   
+    from pyearth.gis.geometry.calculate_angle_betwen_vertex import calculate_angle_betwen_vertex
+    from pyearth.gis.geometry.calculate_distance_to_plane import calculate_distance_to_plane
 
 def convert_gcs_coordinates_to_cell(iMesh_type_in,     
                                     dLongitude_center_in,     
@@ -189,27 +189,37 @@ def convert_gcs_coordinates_to_flowline(aCoordinates_in):
     
     npoint = len(aCoordinates_in)
     
-    aVertex=list()
-    for i in range(npoint):
-        x = aCoordinates_in[i][0]
-        y = aCoordinates_in[i][1]
-        dummy = dict()
-        dummy['dLongitude_degree'] = x
-        dummy['dLatitude_degree'] = y
-        pVertex = pyvertex(dummy)
-        aVertex.append(pVertex)
-        
-    aEdge=list()
-    for j in range(npoint-1):
-        if aVertex[j] == aVertex[j+1]:
-            print('Two vertices are the same')
-            pass
-        else:
-            pEdge = pyedge( aVertex[j], aVertex[j+1] )
-            aEdge.append(pEdge)
+    #aVertex=list()
+    #for i in range(npoint):
+    #    x = aCoordinates_in[i][0]
+    #    y = aCoordinates_in[i][1]
+    #    dummy = dict()
+    #    dummy['dLongitude_degree'] = x
+    #    dummy['dLatitude_degree'] = y
+    #    pVertex = pyvertex(dummy)
+    #    aVertex.append(pVertex)
+
+    #simplified using a list comprehension.
+
+    aVertex = [pyvertex({'dLongitude_degree': x, 'dLatitude_degree': y}) for x, y in aCoordinates_in]
     
-    pFlowline = pyflowline( aEdge)    
-    return pFlowline
+        
+    #aEdge=list()
+    #for j in range(npoint-1):
+    #    if aVertex[j] == aVertex[j+1]:
+    #        print('Two vertices are the same')
+    #        pass
+    #    else:
+    #        pEdge = pyedge( aVertex[j], aVertex[j+1] )
+    #        aEdge.append(pEdge)
+
+    aEdge = [pyedge(aVertex[j], aVertex[j+1]) for j in range(npoint - 1) if aVertex[j] != aVertex[j+1]]
+    
+    if len(aEdge) == 0:
+        print('No edge is created')
+        return None
+    
+    return pyflowline(aEdge)
 
 def convert_pcs_coordinates_to_flowline(aCoordinates_in, pSpatial_reference_in):
     npoint = len(aCoordinates_in)

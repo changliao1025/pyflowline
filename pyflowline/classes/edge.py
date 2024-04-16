@@ -1,7 +1,7 @@
 
 import json
 from json import JSONEncoder
-import importlib
+import importlib.util
 import numpy as np
 from pyflowline.classes.vertex import pyvertex
 from pyflowline.algorithms.split.split_by_length import split_edge_by_length
@@ -11,8 +11,9 @@ if iFlag_cython is not None:
     from pyflowline.algorithms.cython.kernel import calculate_angle_betwen_vertex
     from pyflowline.algorithms.cython.kernel import calculate_distance_to_plane
 else:
-    from pyflowline.external.pyearth.gis.gdal.gdal_functions import  calculate_angle_betwen_vertex
-    from pyflowline.external.pyearth.gis.gdal.gdal_functions import calculate_distance_to_plane
+    from pyearth.gis.geometry.calculate_angle_betwen_vertex import  calculate_angle_betwen_vertex
+    from pyearth.gis.geometry.calculate_distance_to_plane import calculate_distance_to_plane
+
 
 class EdgeClassEncoder(JSONEncoder):
     def default(self, obj):
@@ -262,12 +263,12 @@ class pyedge(object):
 
         Args:
             other (pyedge): The other edge
+            how about direction?
 
         Returns:
             int: 1 if equivalent; 0 if not
         """
-        iFlag_overlap = self.is_overlap(other)  
-        return iFlag_overlap
+        return int( self.pVertex_start == other.pVertex_start and self.pVertex_end == other.pVertex_end )
 
     def __ne__(self, other):
         """

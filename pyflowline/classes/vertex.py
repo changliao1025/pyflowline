@@ -1,14 +1,16 @@
 
 import json
 from json import JSONEncoder
-import importlib
+import importlib.util
 import numpy as np
 
 iFlag_cython = importlib.util.find_spec("cython") 
 if iFlag_cython is not None:
-    from pyflowline.algorithms.cython.kernel import calculate_distance_based_on_lon_lat
+    from pyflowline.algorithms.cython.kernel import calculate_distance_based_on_longitude_latitude
 else:
-    from pyflowline.external.pyearth.gis.gdal.gdal_functions import calculate_distance_based_on_lon_lat
+    from pyearth.gis.geometry.calculate_distance_based_on_longitude_latitude import calculate_distance_based_on_longitude_latitude
+
+iPrecision_default = 8 #used for comparison
 
 class VertexClassEncoder(JSONEncoder):
     def default(self, obj):
@@ -100,7 +102,7 @@ class pyvertex(object):
         pNvector = pynvector(point)
         return pNvector
     
-    def __hash__(self, precision=6):
+    def __hash__(self, precision=iPrecision_default):
 
         #design a hash function that uses both dLongitude and dLatitude
 
@@ -129,20 +131,19 @@ class pyvertex(object):
             int: 1 if equivalent, 0 if not
         """
         iFlag = False
-        #dThreshold_in = 1.0E-6        
-        if isinstance(other, pyvertex):
-            #c = self.calculate_distance(other)
-            #if( c <= dThreshold_in ): #be careful
-            #    #print(self.dLongitude_degree ,self.dLatitude_degree , 
-            #    #other.dLongitude_degree, other.dLatitude_degree)
-            #    iFlag = True
-            #else:
-            #    iFlag = False    
+        dThreshold_in = 10 ** (-1 * iPrecision_default)     
+        if isinstance(other, pyvertex):              
             if (self.dLongitude_degree == other.dLongitude_degree) and \
                 (self.dLatitude_degree == other.dLatitude_degree):
                 iFlag = True
-            else:
-                iFlag = False
+            else:                
+                #use absolute difference to check whether two vertices are the same
+                if (abs(self.dLongitude_degree - other.dLongitude_degree) < dThreshold_in) and \
+                    (abs(self.dLatitude_degree - other.dLatitude_degree) < dThreshold_in):                  
+                    iFlag = True
+                else:
+                    iFlag = False  
+              
         else:
             iFlag = False 
 
@@ -175,7 +176,7 @@ class pyvertex(object):
         lat1 = self.dLatitude_degree    
         lon2 = other.dLongitude_degree
         lat2 = other.dLatitude_degree
-        dDistance = calculate_distance_based_on_lon_lat(lon1, lat1, lon2, lat2)        
+        dDistance = calculate_distance_based_on_longitude_latitude(lon1, lat1, lon2, lat2)        
         return dDistance
     
     def tojson(self):

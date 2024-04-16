@@ -8,7 +8,7 @@ import numpy as np
 from osgeo import ogr, osr
 from pyflowline.formats.convert_coordinates import convert_gcs_coordinates_to_cell
 from pyflowline.algorithms.auxiliary.find_index_in_list import check_if_duplicates
-from pyflowline.external.pyearth.gis.gdal.gdal_functions import reproject_coordinates_batch
+from pyearth.gis.spatialref.reproject_coodinates import reproject_coordinates_batch
 
 def index_to_row_col(index, num_columns):
     index -= 1  # Adjust for 1-based indexing
@@ -156,10 +156,7 @@ def create_hexagon_mesh(iFlag_rotation_in,
             iColumn_dummy = iColumn - 1
             lCellID6 = (iRow_dummy-1) * ncolumn_in + iColumn_dummy
             aNeighbor.append(lCellID6)
-
-        if check_if_duplicates(aNeighbor) == 0:
-            print('error')  
-
+      
         pHexagon.aNeighbor = aNeighbor
         pHexagon.nNeighbor = len(aNeighbor)
         pHexagon.aNeighbor_land= aNeighbor
@@ -235,11 +232,7 @@ def create_hexagon_mesh(iFlag_rotation_in,
                     iColumn_dummy = iColumn - 1
                     lCellID6 = (iRow_dummy-1) * ncolumn_in + iColumn_dummy
                     aNeighbor.append(lCellID6)
-        
-        
-        if check_if_duplicates(aNeighbor) == 0:
-            print('error')  
-
+         
         pHexagon.aNeighbor = aNeighbor
         pHexagon.nNeighbor = len(aNeighbor)
         pHexagon.aNeighbor_land= aNeighbor
@@ -437,12 +430,10 @@ def create_hexagon_mesh(iFlag_rotation_in,
     iFlag_fill_hole = 0    
     aHexagon_out = list()
 
-    if iFlag_fill_hole ==1:
-       
+    if iFlag_fill_hole ==1:       
         #find the virtual neighbors
         for pCell in aHexagon:            
             aNeighbor_land = pCell.aNeighbor_land   #including both holes and maps land cutoff by boundary
-            nNeighbor_land = pCell.nNeighbor
             aNeighbor_land_update = list()
             aNeighbor_land_virtual = list()
             nNeighbor_land_update = 0 

@@ -1,6 +1,6 @@
 import os
 import math
-import importlib
+import importlib.util
 import numpy as np
 from osgeo import ogr, osr, gdal
 from pyflowline.formats.convert_attributes import convert_gcs_attributes_to_cell
@@ -9,7 +9,7 @@ iFlag_cython = importlib.util.find_spec("cython")
 if iFlag_cython is not None:
     from pyflowline.algorithms.cython.kernel import convert_360_to_180
 else:
-    from pyflowline.external.pyearth.gis.gdal.gdal_functions import convert_360_to_180
+    from pyearth.gis.geometry.convert_longitude_range import convert_360_to_180
 
 def create_mpas_mesh(iFlag_global_in, 
     iFlag_use_mesh_dem, 
@@ -328,9 +328,7 @@ def create_mpas_mesh(iFlag_global_in,
             
     else:
         iFlag_remove_ice = 1
-        for i in range(ncell):
-            #center
-                  
+        for i in range(ncell):           
             #vertex
             aVertexOnCellIndex = np.array(aVertexOnCell[i,:])
             dummy0 = np.where(aVertexOnCellIndex > 0)
@@ -421,8 +419,7 @@ def create_mpas_mesh(iFlag_global_in,
         aMpas_out = list()
         ncell = len(aMpas)
         #generate the list of cell ID that are already certain        
-        if iFlag_fill_hole == 1:  
-            
+        if iFlag_fill_hole == 1:              
             #first update neighbor information because some cell should have vitual land neighbor (not present in the mesh)
             #this operation does not increase the number of cells, but it update the neighbor information
             #specifically, it divided the land neighbor into two parts: land and virtual land         

@@ -1,13 +1,13 @@
 
 import os
-import importlib
+import importlib.util
 import numpy as np
 from osgeo import ogr, osr
 #from shapely.wkt import loads
 
 from pyflowline.formats.convert_coordinates import convert_gcs_coordinates_to_cell
 from pyflowline.formats.convert_coordinates import convert_gcs_coordinates_to_flowline
-from pyflowline.external.pyearth.gis.gdal.gdal_functions import get_geometry_coords
+from pyearth.gis.location.get_geometry_coordinates import get_geometry_coordinates
 
 iFlag_cython = importlib.util.find_spec("cython") 
 if iFlag_cython is not None:
@@ -78,7 +78,7 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh_in, sFilename_flo
         for j in range (nfeature_mesh):
             pFeature_mesh = pLayer_mesh.GetFeature(j)
             pGeometry_mesh = pFeature_mesh.GetGeometryRef()
-            aCoords_gcs = get_geometry_coords(pGeometry_mesh)
+            aCoords_gcs = get_geometry_coordinates(pGeometry_mesh)
             lCellID = pFeature_mesh.GetField("cellid")
             dLon = pFeature_mesh.GetField("longitude")
             dLat = pFeature_mesh.GetField("latitude")        
@@ -187,11 +187,8 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh_in, sFilename_flo
     else:        
           
         for pFeature_mesh in pLayer_mesh:       
-            pGeometry_mesh = pFeature_mesh.GetGeometryRef()        
-            #dummy0 = loads( pGeometry_mesh.ExportToWkt() )
-            #aCoords_gcs = dummy0.exterior.coords
-            #aCoords_gcs= np.array(aCoords_gcs)       
-            aCoords_gcs = get_geometry_coords(pGeometry_mesh)
+            pGeometry_mesh = pFeature_mesh.GetGeometryRef()                    
+            aCoords_gcs = get_geometry_coordinates(pGeometry_mesh)
 
             lCellID = pFeature_mesh.GetField("cellid")
             dLon = pFeature_mesh.GetField("longitude")

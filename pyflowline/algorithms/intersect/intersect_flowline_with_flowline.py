@@ -4,7 +4,7 @@ from osgeo import ogr, osr
 #from shapely.wkt import loads
 from pyflowline.classes.vertex import pyvertex
 
-import importlib
+import importlib.util
 iFlag_cython = importlib.util.find_spec("cython") 
 if iFlag_cython is not None:
     from pyflowline.algorithms.cython.kernel import find_vertex_in_list
@@ -82,10 +82,7 @@ def intersect_flowline_with_flowline( sFilename_flowline_a_in, sFilename_flowlin
 
         #convert geometry to edge
         pGeometrytype_flowline_a = pGeometry_flowline_a.GetGeometryName()
-        if(pGeometrytype_flowline_a == 'LINESTRING'):            
-            
-                     
-            aFlowline_intersect = list()
+        if(pGeometrytype_flowline_a == 'LINESTRING'):                                                     
             iFlag_intersected = 0 
             for j in range (nfeature_flowline_b):
             #for pFeature_flowline in pLayer_flowline:
@@ -93,7 +90,7 @@ def intersect_flowline_with_flowline( sFilename_flowline_a_in, sFilename_flowlin
                 pGeometry_flowline_b = pFeature_flowline_b.GetGeometryRef()
 
                 if iFlag_id ==1:
-                    lFlowlineID = pFeature_flowline_b.GetField("id")
+                    lFlowlineID = pFeature_flowline_b.GetField("lineid")
                 else:
                     lFlowlineID = -1
 

@@ -76,7 +76,7 @@ class pyflowline(object):
             aEdge (list [pyedge]): A list of edge objects
         """
         self.aEdge = aEdge
-        nEdge  = len(aEdge)
+        nEdge = len(aEdge)
         self.nEdge = nEdge
         self.pVertex_start = aEdge[0].pVertex_start
         self.pVertex_end =  aEdge[ nEdge-1  ].pVertex_end
@@ -97,7 +97,10 @@ class pyflowline(object):
         self.calculate_flowline_bound()
      
         return
-
+    
+    def __hash__(self):
+        return hash((self.pVertex_start, self.pVertex_end))
+    
     def calculate_length(self):
         """
         Calcualte the length
@@ -105,17 +108,19 @@ class pyflowline(object):
         Returns:
             float: The length of the flowline
         """
-        dLength =0.0
+        #dLength =0.0
         #loop though
-        for i in range(self.nEdge):
+        #for i in range(self.nEdge):
         #for edge in self.aEdge:
-            self.aEdge[i].calculate_length()
-            dLength = dLength + self.aEdge[i].dLength
+        #    self.aEdge[i].calculate_length()
+        #    dLength = dLength + self.aEdge[i].dLength
 
         #assing
-        self.dLength= dLength
+        #self.dLength= dLength
 
-        return dLength
+   
+        self.dLength = sum(edge.dLength for edge in self.aEdge)
+        return self.dLength
     
     def calculate_flowline_bound(self):
         dLat_min = 90
@@ -270,7 +275,7 @@ class pyflowline(object):
         aEdge=list()
         pFlowline_out=None
         for edge in self.aEdge:
-            edge.calculate_length()
+            #edge.calculate_length()
             if edge.dLength > dDistance:
                 #break it
                 aEdge0=edge.split_by_length(dDistance)
@@ -296,30 +301,17 @@ class pyflowline(object):
     def __eq__(self, other):
         """
         Check whether two flowline are equivalent
-
+    
         Args:
             other (pyflowline): The other flowline
-
+    
         Returns:
             int: 1 if equivalent, 0 if not
         """
-        iFlag_overlap = 0 
-        nEdge1 = self.nEdge
-        nEdge2 = other.nEdge
-        if nEdge1 == nEdge2:
-            for i in np.arange( nEdge1):
-                pEdge1 = self.aEdge[i]
-                pEdge2 = other.aEdge[i]
-                if pEdge1 == pEdge2:
-                    iFlag_overlap =1 
-                else:
-                    iFlag_overlap =0 
-                    break                
-            
-        else:
-            iFlag_overlap = 0
-
-        return iFlag_overlap
+        if len(self.aEdge) != len(other.aEdge):
+            return 0
+    
+        return int(all(edge1 == edge2 for edge1, edge2 in zip(self.aEdge, other.aEdge)))
 
     def __ne__(self, other):
         """

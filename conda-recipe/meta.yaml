@@ -1,6 +1,6 @@
 {% set name = "hexwatershed" %}
 {% set git_rev = "main" %}
-{% set version = "0.3.7" %}
+{% set version = "0.3.8" %}
 
 package:
   name: {{ name|lower }}

@@ -23,7 +23,7 @@ metadata:
   # Package name
   name: pyflowline
   # Package version
-  version: "0.3.7"
+  version: "0.3.8"
   # Package summary
   summary: A mesh-independent river network generator for hydrologic models.
   # Package homepage

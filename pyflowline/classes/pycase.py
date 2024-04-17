@@ -103,6 +103,7 @@ class flowlinecase(object):
     iFlag_antarctic = 0
     iFlag_multiple_outlet = 0
     iFlag_mesh_boundary = 0
+    iFlag_user_provided_binary = 0
     #iFlag_use_shapefile_extent=1
     iFlag_use_mesh_dem=0
     iFlag_save_mesh = 0
@@ -234,6 +235,11 @@ class flowlinecase(object):
         #if 'iFlag_use_shapefile_extent' in aConfig_in:
         #    self.iFlag_use_shapefile_extent = int(aConfig_in['iFlag_use_shapefile_extent'])
 
+        if 'iFlag_user_provided_binary' in aConfig_in:
+            self.iFlag_user_provided_binary  = int(aConfig_in[ 'iFlag_user_provided_binary'])
+        else:
+            self.iFlag_user_provided_binary = 0
+
         if 'iFlag_rotation' in aConfig_in:
             self.iFlag_rotation = int(aConfig_in['iFlag_rotation'])
 
@@ -328,12 +334,12 @@ class flowlinecase(object):
                 self.sFilename_dggrid = aConfig_in['sFilename_dggrid']
                 if not os.path.isfile(self.sFilename_dggrid ):
                     print("The dggrid binary file does not exist, you need to update this parameter before running the model!")
-                    exit()
+                    #exit()
                 pass
 
             else:
                 print('Please specify the dggrid binary file.')
-                exit()
+                #exit()
 
         if 'sFilename_mesh_netcdf' in aConfig_in:
             self.sFilename_mesh_netcdf = aConfig_in['sFilename_mesh_netcdf']
@@ -419,7 +425,7 @@ class flowlinecase(object):
         if self.iMesh_type == 4:
             if not os.path.isfile(self.sFilename_mesh_netcdf ):
                 print("The MPAS mesh file does not exist!")
-                exit()
+                #exit()
         else:
             if not os.path.isfile(self.sFilename_dem ): #why DEM is required?
                 print("The DEM file does not exist in pyflowline!")
@@ -431,20 +437,20 @@ class flowlinecase(object):
             if 'sFilename_basins' in aConfig_in:
                 self.sFilename_basins = aConfig_in['sFilename_basins']
                 if os.path.isfile(self.sFilename_basins):
-                    pass
+                    with open(self.sFilename_basins) as json_file:
+                        dummy_data = json.load(json_file)
+                        for i in range(self.nOutlet):
+                            sBasin =  "{:08d}".format(i+1)
+                            dummy_basin = dummy_data[i]
+                            dummy_basin['sWorkspace_output_basin'] = str(Path(self.sWorkspace_output) / sBasin )
+                            pBasin = pybasin(dummy_basin)
+                            self.aBasin.append(pBasin)    
                 else:
                     print('This basin configuration file does not exist: ', self.sFilename_basins )
                     print('Please update this parameter before running the model!')
-                    exit()
+                    #exit()
                     
-                with open(self.sFilename_basins) as json_file:
-                    dummy_data = json.load(json_file)
-                    for i in range(self.nOutlet):
-                        sBasin =  "{:08d}".format(i+1)
-                        dummy_basin = dummy_data[i]
-                        dummy_basin['sWorkspace_output_basin'] = str(Path(self.sWorkspace_output) / sBasin )
-                        pBasin = pybasin(dummy_basin)
-                        self.aBasin.append(pBasin)
+                
             else:
                 pass
         else:
@@ -1047,6 +1053,7 @@ class flowlinecase(object):
         """
         Set up the flowlinecase
         """
+        system = platform.system()
         if self.iFlag_flowline == 1:
             self.pyflowline_convert_flowline_to_geojson()
             pass
@@ -1063,10 +1070,36 @@ class flowlinecase(object):
             Path(sWorkspace_output).mkdir(parents=True, exist_ok=True)
             #then copy the binary file to the folder
             #copy execulate
-            sFilename_new = sWorkspace_output + slash + 'dggrid'
-            copy2(self.sFilename_dggrid, sFilename_new)
-            os.chmod(sFilename_new, stat.S_IREAD | stat.S_IWRITE | stat.S_IXUSR)
-            pass
+            if self.iFlag_user_provided_binary == 1:
+                sFilename_new = sWorkspace_output + slash + 'dggrid'
+                copy2(self.sFilename_dggrid, sFilename_new)
+                os.chmod(sFilename_new, stat.S_IREAD | stat.S_IWRITE | stat.S_IXUSR)
+                pass
+            else:      
+                if system == 'Windows':
+                    sFilename_executable = 'dggrid.exe'
+                else:
+                    sFilename_executable = 'dggrid'     
+
+                #search for system wide binary in the system path
+                iFlag_found_binary = 0
+                for folder in os.environ['PATH'].split(os.pathsep):
+                    sFilename_dggrid_bin = os.path.join(folder, sFilename_executable)
+                    if os.path.isfile(sFilename_dggrid_bin):
+                        print('Found binary at:', sFilename_dggrid_bin)
+                        iFlag_found_binary = 1
+                        break
+                else:
+                    print('Binary not found in system path.')
+                if iFlag_found_binary ==1:
+                    sFilename_new = sWorkspace_output + slash + 'dggrid'
+                    copy2(sFilename_dggrid_bin, sFilename_new)
+                    os.chmod(sFilename_new, stat.S_IREAD | stat.S_IWRITE | stat.S_IXUSR)    
+                else:
+                    print('Binary not found in system path.')
+                    return                            
+                    
+                       
         return
 
     def pyflowline_change_model_parameter(self, sVariable_in, dValue, iFlag_basin_in = None):

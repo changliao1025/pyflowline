@@ -1082,6 +1082,7 @@ class flowlinecase(object):
                     sFilename_executable = 'dggrid'     
 
                 #search for system wide binary in the system path
+                iFlag_found_binary = 0
                 for folder in os.environ['PATH'].split(os.pathsep):
                     sFilename_dggrid_bin = os.path.join(folder, sFilename_executable)
                     if os.path.isfile(sFilename_dggrid_bin):
@@ -1093,7 +1094,10 @@ class flowlinecase(object):
                 if iFlag_found_binary ==1:
                     sFilename_new = sWorkspace_output + slash + 'dggrid'
                     copy2(sFilename_dggrid_bin, sFilename_new)
-                    os.chmod(sFilename_new, stat.S_IREAD | stat.S_IWRITE | stat.S_IXUSR)                                
+                    os.chmod(sFilename_new, stat.S_IREAD | stat.S_IWRITE | stat.S_IXUSR)    
+                else:
+                    print('Binary not found in system path.')
+                    return                            
                     
                        
         return

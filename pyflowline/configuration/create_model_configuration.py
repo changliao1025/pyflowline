@@ -3,7 +3,7 @@ from pathlib import Path
 from os.path import realpath
 import argparse
 
-from pyflowline.pyflowline_create_template_configuration_file import pyflowline_create_template_configuration_file
+from pyflowline.configuration.create_template_configuration_file import pyflowline_create_template_configuration_file
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--sMesh_type", help = "sMesh_type",  type = str)

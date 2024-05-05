@@ -6,7 +6,11 @@ import json
 from pyflowline.classes.pycase import flowlinecase
 from pyflowline.classes.basin import pybasin
 
-def pyflowline_create_basin_template_configuration_file(sFilename_basins_json, nBasin, sWorkspace_input_in, sWorkspace_output_in):
+def pyflowline_create_template_basin_configuration_file(
+        sFilename_basins_json,
+        nBasin,
+        sWorkspace_input_in,
+        sWorkspace_output_in):
     """generate basin configuration
 
     Args:
@@ -47,9 +51,18 @@ def pyflowline_create_basin_template_configuration_file(sFilename_basins_json, n
 
     return aBasin_out
 
-def pyflowline_create_template_configuration_file(sFilename_json, \
-    sWorkspace_input, sWorkspace_output, iFlag_standalone_in=None, \
-        iFlag_use_mesh_dem_in=None,  iCase_index_in=None,  dResolution_degree_in = None, dResolution_meter_in = None,   sDate_in = None,  sMesh_type_in = None,    sModel_in = None):
+def pyflowline_create_template_configuration_file(
+        sFilename_json,
+        sWorkspace_input,
+        sWorkspace_output,
+        iFlag_standalone_in=None,
+        iFlag_use_mesh_dem_in=None,
+        iCase_index_in=None,
+        dResolution_degree_in=None,
+        dResolution_meter_in=None,
+        sDate_in=None,
+        sMesh_type_in=None,
+        sModel_in=None):
     """generate pyflowline config template file
 
     Args:
@@ -101,15 +114,12 @@ def pyflowline_create_template_configuration_file(sFilename_json, \
     else:
         sDate = '20220202'
         pass
-    
-    
+
     nBasin = 1
 
- 
-    #use a dict to initialize the class
+    # Use a dict to initialize the class
     aConfig = {}
-    
-    
+
     #aConfig['iFlag_use_shapefile_extent'] = iFlag_use_shapefile_extent 
     aConfig['iFlag_use_mesh_dem'] = iFlag_use_mesh_dem
     aConfig['iFlag_save_mesh'] = 1
@@ -130,7 +140,7 @@ def pyflowline_create_template_configuration_file(sFilename_json, \
     aConfig['dLongitude_right'] = 180
     aConfig['dLatitude_bot'] = -90
     aConfig['dLatitude_top'] = 90
-    aConfig['sFilename_model_configuration']  = sFilename_json 
+    aConfig['sFilename_model_configuration'] = sFilename_json 
     aConfig['sWorkspace_input'] = sWorkspace_input    
     aConfig['sWorkspace_output'] = sWorkspace_output        
     aConfig['sRegion'] = 'susquehanna'
@@ -147,14 +157,20 @@ def pyflowline_create_template_configuration_file(sFilename_json, \
     aConfig['sFilename_mesh_info'] = 'mesh_info.json'
     aConfig['sFilename_elevation'] = 'elevation.json' 
     oModel = flowlinecase(aConfig)
-    #generate basin
+
+    # Generate basin
     sDirname = os.path.dirname(sFilename_json)
     sFilename =  Path(sFilename_json).stem + '_basins.json'
     sFilename_basins_json = os.path.join(sDirname, sFilename)   
-    aBasin = pyflowline_create_basin_template_configuration_file(sFilename_basins_json, nBasin, sWorkspace_input,  oModel.sWorkspace_output)
+
+    aBasin = pyflowline_create_template_basin_configuration_file(
+        sFilename_basins_json,
+        nBasin,
+        sWorkspace_input,
+        oModel.sWorkspace_output)
+
     oModel.aBasin = aBasin
     oModel.sFilename_basins = sFilename_basins_json
     oModel.export_config_to_json(sFilename_json)    
 
     return oModel
-

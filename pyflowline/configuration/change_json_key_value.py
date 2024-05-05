@@ -1,6 +1,11 @@
 import json
 
-def pyflowline_change_json_key_value(sFilename_json_in, sKey, new_value, iFlag_basin_in= None):
+def pyflowline_change_json_key_value(
+        sFilename_json_in,
+        sKey,
+        new_value,
+        iFlag_basin_in=None):
+
     # Read the JSON file
     with open(sFilename_json_in, 'r') as file:
         data = json.load(file)

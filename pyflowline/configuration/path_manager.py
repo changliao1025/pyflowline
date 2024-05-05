@@ -1,11 +1,26 @@
 from pathlib import Path
 from pkg_resources import resource_filename
+"""
+path_manager
+All paths are created with Path and call resolve()
+"""
+
+def join_project_path(*args: str) -> Path:
+    """
+    Join components of a path relative to the project root.
+
+    Args:
+        *args: Variable number of string arguments representing path components.
+
+    Returns:
+        Path: Absolute path joined with the project root.
+    """
+    project_root = pyflowline_project_root()
+    return project_root.joinpath(*args)
 
 def pyflowline_project_root() -> Path:
     """
-    Attempt to find the root path of the project dynamically.
-    It first tries to find a 'setup.py' file. If not found, it uses pkg_resources
-    to find the installation path.
+    Attempt to find the root path of the project, first by looking for a 'setup.py' file, and then using pkg_resources to find the installation path.
     """
     try:
         return root_path_from_setup_file()

@@ -1,15 +1,11 @@
 import os, sys
 from pathlib import Path
-from os.path import realpath
 
 from pyflowline.configuration.change_json_key_value import pyflowline_change_json_key_value
 from pyflowline.configuration.read_configuration_file import pyflowline_read_configuration_file
+from pyflowline.configuration import path_manager as pyflowline_path_manager
 
-#%% Set up workspace path
-sPath_parent = str(Path(__file__).parents[2]) # data is located two dir's up
-sys.path.append(sPath_parent)
-
-#%% Define the case information
+#%% Define the case information (configuration file parameters)
 sDomainName = 'susquehanna'
 iCase_index = 1
 iFlag_simulation = 0
@@ -17,94 +13,93 @@ iFlag_visualization = 1
 sMesh = 'mpas'
 sDate = '20230701'
 
-sFilename_domain_configuration = 'pyflowline_susquehanna_mpas.json'
-sFilename_basins_configuration = 'pyflowline_susquehanna_basins.json'
-sFilename_flowline = 'flowline.geojson'
-sFilename_mesh_netcdf = 'lnd_cull_mesh.nc'
-sFilename_mesh_boundary = 'boundary_wgs.geojson'
-
-#%% Define the configuration file parameters (paths to inputs and outputs)
+#%% Define workspace paths and configuration file path parameters
+oPath_parent = pyflowline_path_manager.pyflowline_project_root()
+sys.path.append(str(oPath_parent))
 
 # Define the full path to the input and output folders.
-sFolder_input = realpath(os.path.join(
-    sPath_parent, 'data', sDomainName, 'input'))
-sFolder_output = realpath(os.path.join(
-    sPath_parent, 'data', sDomainName, 'output'))
+oFolder_input = oPath_parent.joinpath(
+    'data', sDomainName, 'input')
+oFolder_output = oPath_parent.joinpath(
+    'data', sDomainName, 'output')
 
 # Define the full path to the domain ("parent") configuration file.
-sFilename_domain_configuration = realpath(os.path.join(
-    sFolder_input, sFilename_domain_configuration))
+oFilename_domain_config = oFolder_input.joinpath(
+    'pyflowline_susquehanna_mpas.json')
 
 # Define the full path to the individual basin ("child") configuration file.
-sFilename_basins_configuration = realpath(os.path.join(
-    sFolder_input, sFilename_basins_configuration))
+oFilename_basins_config = oFolder_input.joinpath(
+    'pyflowline_susquehanna_basins.json')
 
 # Define the full path to the MPAS mesh file
-sFilename_mesh_netcdf = realpath(os.path.join(
-    sFolder_input, sFilename_mesh_netcdf))
+oFilename_mesh_netcdf = oFolder_input.joinpath(
+    'lnd_cull_mesh.nc')
 
 # Define the full path to the input flowline file.
-sFilename_flowline = realpath(os.path.join(
-    sFolder_input, sFilename_flowline))
+oFilename_flowline = oFolder_input.joinpath(
+    'flowline.geojson')
 
 # Define the full path to the boundary file used to clip the mesh.
-sFilename_mesh_boundary = realpath(os.path.join(
-    sFolder_input, sFilename_mesh_boundary))
+oFilename_mesh_boundary = oFolder_input.joinpath(
+    'boundary_wgs.geojson')
 
 # Confirm that the domain configuration file exists.
-if os.path.isfile(sFilename_domain_configuration):
+if os.path.isfile(oFilename_domain_config):
     pass
 else:
-    print('The domain configuration file does not exist: ', sFilename_domain_configuration)
+    print('The domain configuration file does not exist: ', oFilename_domain_config)
 
-#%% Update the domain ("parent") configuration file
+#%% Update the domain (parent) configuration file
 
-# As noted in the pyflowline docs, some parameters in the configuration file need to be set before we can create the flowline object. The following parameters need to be set in the domain configuration file (pyflowline_susquehanna_mpas.json):
-# 
+# The following parameters need to be set in the configuration file:
 #   sWorkspace_output: full/path/to/output
 #   sFilename_mesh_netcdf: full/path/to/lnd_cull_mesh.nc
 #   sFilename_mesh_boundary: full/path/to/boundary_wgs.geojson
 # 	sFilename_basins: full/path/to/pyflowline_susquehanna_basins.json.
-#
+
 # The json file will be overwritten, you may want to make a copy of it first.
 
-# The first argument is the configuration file name, followed by one key-value pair, and then the iFlag_basin_in flag. If iFlag_basin_in is None, then the function updates the "parent" (domain) configuration file. Otherwise, it updates the "child" (basin) configuration file.
-
 # Set the path to the output folder
+# Pass the configuration filename followed by a single key-value pair.
 pyflowline_change_json_key_value(
-    sFilename_domain_configuration, 
-    'sWorkspace_output', sFolder_output)
+    oFilename_domain_config, 
+    'sWorkspace_output', str(oFolder_output))
 
-# Set the path to the mpas file we just downloaded
+# Set the path to the mpas mesh file
 pyflowline_change_json_key_value(
-    sFilename_domain_configuration, 
-    'sFilename_mesh_netcdf', sFilename_mesh_netcdf) 
+    oFilename_domain_config, 
+    'sFilename_mesh_netcdf', str(oFilename_mesh_netcdf))
 
 # Set the path to the boundary file used to clip the mesh
 pyflowline_change_json_key_value(
-    sFilename_domain_configuration, 
-    'sFilename_mesh_boundary', sFilename_mesh_boundary) 
+    oFilename_domain_config, 
+    'sFilename_mesh_boundary', str(oFilename_mesh_boundary)) 
 
-# Set the path to the individual-basin ("child") configuration file
+# Set the path to the basin ("child") configuration file
 pyflowline_change_json_key_value(
-    sFilename_domain_configuration, 
-    'sFilename_basins', sFilename_basins_configuration) 
+    oFilename_domain_config, 
+    'sFilename_basins', str(oFilename_basins_config))
 
-#%% Update the basin configuration file
-
-# For the basin configuration file (pyflowline_susquehanna_basins.json), the following parameters need to be set:
-# 
-# 	sFilename_flowline_filter: full/path/to/flowline.geojson
-
-# Set the path to the user-provided flowline. Note that when changing the basin ("child") configuration file, set iFlag_basin_in=1.
+# These parameters are not strictly necessary, but will reduce the potential for errors or confusion.
 pyflowline_change_json_key_value(
-    sFilename_basins_configuration, 
-    'sFilename_flowline_filter', sFilename_flowline, 
-    iFlag_basin_in=1)
+    oFilename_domain_config, 
+    'sFilename_model_configuration', str(oFilename_domain_config))
+
+pyflowline_change_json_key_value(
+    oFilename_domain_config, 
+    'sWorkspace_data', str(oPath_parent.joinpath('data')))
+
+#%% Update the basin ("child") configuration file
+
+# Set the path to the flowline file. 
+pyflowline_change_json_key_value(
+    oFilename_basins_config, 
+    'sFilename_flowline_filter', str(oFilename_flowline), 
+    iFlag_basin_in=1) # Set iFlag_basin_in=1 when changing the basin configuration file.
 
 #%% Read the configuration file
 oPyflowline = pyflowline_read_configuration_file(
-    sFilename_domain_configuration, 
+    oFilename_domain_config, 
     iCase_index_in=iCase_index, 
     sDate_in=sDate)
 
@@ -113,9 +108,9 @@ oPyflowline.pyflowline_print()
 
 #%% Now we can change some model parameters
 
-# There are two ways to change the model parameters: 1) use a function, or 2) assign a value directly.
+# There are two ways to change the model parameters: 1) use a function, or 2) assign a value directly. Use the function:
 oPyflowline.pyflowline_change_model_parameter(
-    'sWorkspace_output', sFolder_output)
+    'sWorkspace_output', str(oFolder_output))
 
 # To change a parameter for a basin instead of the whole model domain, use the iFlag_basin_in option, this will change the value for all of the basins in the basin configuration file.
 oPyflowline.pyflowline_change_model_parameter(

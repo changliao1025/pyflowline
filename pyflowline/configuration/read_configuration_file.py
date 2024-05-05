@@ -19,12 +19,12 @@ def pyflowline_read_configuration_file(
         sMesh_type_in=None,
         sModel_in=None,
         sDate_in=None,
-        sDggrid_type_in = None,
+        sDggrid_type_in=None,
         sWorkspace_output_in=None):
     """read a model configuration
 
     Args:
-        sFilename_configuration_in (str): _description_
+        sFilename_configuration_in (str or Path): _description_
         iFlag_standalone_in (int, optional): _description_. Defaults to None.
         iFlag_use_mesh_dem_in (int, optional): _description_. Defaults to None.
         iCase_index_in (int, optional): _description_. Defaults to None.
@@ -33,11 +33,14 @@ def pyflowline_read_configuration_file(
         sMesh_type_in (str, optional): _description_. Defaults to None.
         sModel_in (str, optional): _description_. Defaults to None.
         sDate_in (str, optional): _description_. Defaults to None.
-        sWorkspace_output_in (str, optional): _description_. Defaults to None.
+        sWorkspace_output_in (str or Path, optional): _description_. Defaults to None.
 
     Returns:
         _type_: _description_
     """
+    # Ensure input filenames are strings
+    sFilename_configuration_in = str(sFilename_configuration_in)
+    sWorkspace_output_in = str(sWorkspace_output_in)
 
     if not os.path.isfile(sFilename_configuration_in):
         print(sFilename_configuration_in + ' does not exist')

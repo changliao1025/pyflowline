@@ -14,14 +14,19 @@ def pyflowline_create_template_basin_configuration_file(
     """generate basin configuration
 
     Args:
-        sFilename_basins_json (str): the filename
+        sFilename_basins_json (str or Path): the filename
         nBasin (int): the total number of basin
-        sWorkspace_input_in (str): the input data path
-        sWorkspace_output (str): the output path
+        sWorkspace_input_in (str or Path): the input data path
+        sWorkspace_output (str or Path): the output path
 
     Returns:
         basin: a basin object
     """
+
+    # Ensure input pathnames are strings
+    sFilename_basins_json = str(sFilename_basins_json)
+    sWorkspace_input_in = str(sWorkspace_input_in)
+    sWorkspace_output_in = str(sWorkspace_output_in)
 
     aBasin_out = list()
     for i in range(nBasin):
@@ -66,8 +71,9 @@ def pyflowline_create_template_configuration_file(
     """generate pyflowline config template file
 
     Args:
-        sFilename_json (str): _description_
-        sWorkspace_input (str): _description_
+        sFilename_json (str or Path): _description_.
+        sWorkspace_input (str or Path): _description_.
+        sWorkspace_output (str or Path): _description_.
         iFlag_standalone_in (int, optional): _description_. Defaults to None.
         iFlag_use_mesh_dem_in (int, optional): _description_. Defaults to None.        
         iCase_index_in (int, optional): _description_. Defaults to None.
@@ -76,11 +82,16 @@ def pyflowline_create_template_configuration_file(
         sDate_in (str, optional): _description_. Defaults to None.
         sMesh_type_in (str, optional): _description_. Defaults to None.
         sModel_in (str, optional): _description_. Defaults to None.
-        sWorkspace_output_in (str, optional): _description_. Defaults to None.
 
     Returns:
         _type_: _description_
     """
+
+    # Ensure input pathnames are strings
+    sFilename_json = str(sFilename_json)
+    sWorkspace_input = str(sWorkspace_input)
+    sWorkspace_output = str(sWorkspace_output)
+
     if os.path.exists(sFilename_json):         
         os.remove(sFilename_json)
 

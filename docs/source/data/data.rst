@@ -54,7 +54,7 @@ PyFlowline uses two JSON-format configuration files to manage all input informat
 
 These files serve as the entry point for setting up and running a PyFlowline case. They can exist wherever the user prefers, but PyFlowline uses the paths specified in these files to locate model inputs and write outputs. Model inputs, outputs, and a recommended directory structure are described in the following two sections.
 
-To create a new PyFlowline case, pass the full path to the parent configuration file to the `pyflowline_read_model_configuration_file` function. This will return a PyFlowline object configured with the values from the file, and it can be used to run the model. See the example notebooks for a demonstration.
+To create a new PyFlowline case, pass the full path to the parent configuration file to the `pyflowline_read_configuration_file` function. This will return a PyFlowline object configured with the values from the file, and it can be used to run the model. See the example notebooks for a demonstration.
 
 Note that the "parent" configuration file contains one block of parameter-value pairs that apply to the entire domain. In contrast, the "child" configuration file contains one block of parameter-value pairs for each watershed. A domain with a single watershed will have a single block in the "child" configuration file, while a domain with multiple watersheds will have multiple blocks.
 

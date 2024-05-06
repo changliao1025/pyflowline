@@ -1,3 +1,8 @@
+# pyflowline
+data/**/output/
+examples/**/output/
+examples/**/*.png
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

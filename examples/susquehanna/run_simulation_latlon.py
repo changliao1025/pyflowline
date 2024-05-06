@@ -9,7 +9,7 @@ sPath_parent = str(Path(__file__).parents[2]) # data is located two dir's up
 sPath_parent = str(Path(__file__).parents[2]) # data is located two dir's up
 import sys
 sys.path.append(sPath_parent)
-from pyflowline.configuration.pyflowline_read_model_configuration_file import pyflowline_read_model_configuration_file
+from pyflowline.configuration.pyflowline_read_configuration_file import pyflowline_read_model_configuration_file
 sPath_data = realpath( sPath_parent +  '/data/susquehanna' )
 sWorkspace_input =  str(Path(sPath_data)  /  'input')
 sWorkspace_output=  str(Path(sPath_data)  /  'output')

@@ -8,7 +8,7 @@ sPath_parent = str(Path(__file__).parents[2]) # data is located two dir's up
 
 sys.path.append(sPath_parent)
 from pyflowline.configuration.change_json_key_value import change_json_key_value
-from pyflowline.configuration.pyflowline_read_model_configuration_file import pyflowline_read_model_configuration_file
+from pyflowline.configuration.pyflowline_read_configuration_file import pyflowline_read_model_configuration_file
 
 sPath_data = realpath( sPath_parent +  '/data/susquehanna' )
 sWorkspace_input =  str(Path(sPath_data)  /  'input')

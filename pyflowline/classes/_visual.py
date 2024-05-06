@@ -34,12 +34,12 @@ def plot(self,
     if sVariable_in is None:
         sVariable_in = 'flowline_conceptual'
     else:
-        if sVariable_in == 'mesh': 
+        if sVariable_in == 'mesh':
             iFlag_type_in = 3
         else:
             if sVariable_in == 'overlap':
                 iFlag_type_in = 4
-    
+
 
     if iFlag_type_in == 1: #point based, such as dam
         #currently, this feature is not supported
@@ -48,13 +48,13 @@ def plot(self,
         if iFlag_type_in == 2:
             #polyline based, only flowline
             aLegend = list()
-            sText = 'Case: ' + "{:0d}".format( int(self.iCase_index) ) 
+            sText = 'Case: ' + "{:0d}".format( int(self.iCase_index) )
             aLegend.append(sText)
             sText = 'Mesh type: ' + self.sMesh_type.title()
             aLegend.append(sText)
             sResolution =  'Resolution: ' + "{:0d}".format( int(self.dResolution_meter) ) + 'm'
-            aLegend.append(sResolution)            
-            for pBasin in self.aBasin:                
+            aLegend.append(sResolution)
+            for pBasin in self.aBasin:
                 pBasin.basin_plot(iFlag_type_in,
                                   self.sMesh_type,
                                   iFlag_title_in= iFlag_title_in,
@@ -86,15 +86,15 @@ def plot(self,
 
         return
 
-def _plot_mesh(self, 
-               sFilename_output_in=None, 
-               aExtent_in=None, 
+def _plot_mesh(self,
+               sFilename_output_in=None,
+               aExtent_in=None,
                pProjection_map_in = None):
 
-    sFilename_in = self.sFilename_mesh 
+    sFilename_in = self.sFilename_mesh
     sMesh_type = self.sMesh_type
 
-    map_vector_polygon_data(sFilename_in,
+    map_vector_polygon_data(1, sFilename_in,
                             sFilename_output_in = sFilename_output_in,
                             sTitle_in = sMesh_type,
                             aExtent_in = aExtent_in,
@@ -116,7 +116,7 @@ def _plot_mesh_with_flowline(self,
     aFilename_in.append(self.sFilename_mesh)
     aFiletype_in.append(3)
     aFlag_color.append(0)
-    
+
     aVariable_in.append(None)
 
     for pBasin in self.aBasin:

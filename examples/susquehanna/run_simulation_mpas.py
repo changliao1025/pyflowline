@@ -7,8 +7,8 @@ from os.path import realpath
 sPath_parent = str(Path(__file__).parents[2]) # data is located two dir's up
 
 sys.path.append(sPath_parent)
-from pyflowline.change_json_key_value import change_json_key_value
-from pyflowline.pyflowline_read_model_configuration_file import pyflowline_read_model_configuration_file
+from pyflowline.configuration.change_json_key_value import change_json_key_value
+from pyflowline.configuration.pyflowline_read_model_configuration_file import pyflowline_read_model_configuration_file
 
 sPath_data = realpath( sPath_parent +  '/data/susquehanna' )
 sWorkspace_input =  str(Path(sPath_data)  /  'input')
@@ -40,7 +40,7 @@ sFilename_flowline = realpath( os.path.join(sFolder_input, 'flowline.geojson') )
 sFilename_basins =  realpath( os.path.join(sFolder_input , 'pyflowline_susquehanna_basins.json' ))
 change_json_key_value(sFilename_basins, 'sFilename_flowline_filter', sFilename_flowline, iFlag_basin_in=1)
 
-oPyflowline = pyflowline_read_model_configuration_file(sFilename_configuration_in, 
+oPyflowline = pyflowline_read_model_configuration_file(sFilename_configuration_in,
     iCase_index_in=iCase_index, sDate_in=sDate)
 
 #take a look at the model parameters
@@ -72,10 +72,10 @@ if iFlag_simulation == 1:
     pass
 
 if iFlag_visualization == 1:
-     
-    aExtent_meander = [-76.5,-76.2, 41.6,41.9] 
-    #oPyflowline.plot( sVariable_in='flowline_simplified' , sFilename_output_in = 'flowline_simplified.png' ) 
-    #oPyflowline.plot( sVariable_in='flowline_simplified' , sFilename_output_in = 'flowline_simplified_zoom.png', aExtent_in =aExtent_meander ) 
+
+    aExtent_meander = [-76.5,-76.2, 41.6,41.9]
+    #oPyflowline.plot( sVariable_in='flowline_simplified' , sFilename_output_in = 'flowline_simplified.png' )
+    #oPyflowline.plot( sVariable_in='flowline_simplified' , sFilename_output_in = 'flowline_simplified_zoom.png', aExtent_in =aExtent_meander )
 
     pass
 
@@ -83,7 +83,7 @@ if iFlag_simulation == 1:
     aCell = oPyflowline.pyflowline_mesh_generation()
 
 if iFlag_visualization == 1:
-    oPyflowline.plot( sVariable_in='mesh', sFilename_output_in = 'mesh.png' ) 
+    oPyflowline.plot( sVariable_in='mesh', sFilename_output_in = 'mesh.png' )
     pass
 
 if iFlag_simulation == 1:

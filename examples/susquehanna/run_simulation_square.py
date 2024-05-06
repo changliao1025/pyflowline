@@ -9,7 +9,7 @@ from os.path import realpath
 sPath_parent = str(Path(__file__).parents[2]) # data is located two dir's up
 import sys
 sys.path.append(sPath_parent)
-from pyflowline.pyflowline_read_model_configuration_file import pyflowline_read_model_configuration_file
+from pyflowline.configuration.pyflowline_read_model_configuration_file import pyflowline_read_model_configuration_file
 sPath_data = realpath( sPath_parent +  '/data/susquehanna' )
 sWorkspace_input =  str(Path(sPath_data)  /  'input')
 sWorkspace_output=  str(Path(sPath_data)  /  'output')
@@ -32,7 +32,7 @@ dResolution_meter =  50000
 sMesh = 'square'
 sDate='20230101'
 
-  
+
 
 oPyflowline = pyflowline_read_model_configuration_file(sFilename_configuration_in, \
 iCase_index_in=iCase_index, dResolution_meter_in=dResolution_meter, sDate_in=sDate)

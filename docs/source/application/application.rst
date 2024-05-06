@@ -24,9 +24,9 @@ The example `run_simulation_mpas.py` script import a few packages and functions.
     import os, sys
     from pathlib import Path
     from os.path import realpath
-    from pyflowline.pyflowline_read_model_configuration_file import pyflowline_read_model_configuration_file
+    from pyflowline.configuration.read_configuration_file import pyflowline_read_configuration_file
 
-The `pyflowline_read_model_configuration_file` function reads in a JSON configuration file and loads all the necessary model parameters. 
+The `pyflowline_read_configuration_file` function reads in a JSON configuration file and loads all the necessary model parameters. 
 
 
 ================
@@ -55,7 +55,7 @@ Check the configuration file:
     if os.path.isfile(sFilename_configuration_in):
         pass
     else:
-        print('This configuration does not exist: ', sFilename_configuration_in )
+        print('The domain configuration file does not exist: ',sFilename_configuration_in )
 
 ================
 Step 4
@@ -70,7 +70,7 @@ Set up case information and read the configuration file.
     Date='20220901'
 
 
-    oPyflowline = pyflowline_read_model_configuration_file(sFilename_configuration_in, \
+    oPyflowline = pyflowline_read_configuration_file(sFilename_configuration_in, \
        iCase_index_in=iCase_index, sDate_in=sDate)
     oPyflowline.aBasin[0].dLatitude_outlet_degree=39.462000
     oPyflowline.aBasin[0].dLongitude_outlet_degree=-76.009300

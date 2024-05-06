@@ -8,21 +8,6 @@ pDate = datetime.datetime.today()
 sDate_default = "{:04d}".format(pDate.year) + \
     "{:02d}".format(pDate.month) + "{:02d}".format(pDate.day)
 
-<<<<<<<< HEAD:pyflowline/configuration/read_configuration_file.py
-def pyflowline_read_configuration_file(
-        sFilename_configuration_in,
-        iFlag_standalone_in=None,
-        iFlag_use_mesh_dem_in=None,
-        iCase_index_in=None,
-        iResolution_index_in=None,
-        dResolution_degree_in=None,
-        dResolution_meter_in=None,
-        sMesh_type_in=None,
-        sModel_in=None,
-        sDate_in=None,
-        sDggrid_type_in=None,
-        sWorkspace_output_in=None):
-========
 
 def pyflowline_read_configuration_file(sFilename_configuration_in,
                                              iFlag_standalone_in=None,
@@ -36,7 +21,7 @@ def pyflowline_read_configuration_file(sFilename_configuration_in,
                                              sDate_in=None,
                                               sDggrid_type_in = None,
                                              sWorkspace_output_in=None):
->>>>>>>> main:pyflowline/configuration/pyflowline_read_configuration_file.py
+
     """read a model configuration
 
     Args:

@@ -8,7 +8,7 @@ sDate_default = "{:04d}".format(
     pDate.year) + "{:02d}".format(pDate.month) + "{:02d}".format(pDate.day)
 
 
-def pyflowline_read_model_configuration_file(sFilename_configuration_in,
+def pyflowline_read_configuration_file(sFilename_configuration_in,
                                              iFlag_standalone_in=None,
                                              iFlag_use_mesh_dem_in=None,
                                              iCase_index_in=None,
@@ -50,15 +50,15 @@ def pyflowline_read_model_configuration_file(sFilename_configuration_in,
         iCase_index = iCase_index_in
     else:
         iCase_index = int(aConfig['iCase_index'])
-    
-    if iResolution_index_in is not None:    
+
+    if iResolution_index_in is not None:
         iResolution_index = iResolution_index_in
     else:
-        if "iResolution_index" in aConfig:            
+        if "iResolution_index" in aConfig:
             iResolution_index =  int( aConfig['iResolution_index'])
         else:
             iResolution_index = 10
-      
+
         pass
 
     if iFlag_standalone_in is not None:
@@ -80,7 +80,7 @@ def pyflowline_read_model_configuration_file(sFilename_configuration_in,
     if sDggrid_type_in is not None:
         sDggrid_type = sDggrid_type_in
     else:
-        if "sDggrid_type" in aConfig:            
+        if "sDggrid_type" in aConfig:
             sDggrid_type = aConfig["sDggrid_type"]
         else:
             sDggrid_type = 'ISEA3H'

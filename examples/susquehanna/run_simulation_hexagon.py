@@ -10,7 +10,7 @@ from os.path import realpath
 sPath_parent = str(Path(__file__).parents[2]) # data is located two dir's up
 import sys
 sys.path.append(sPath_parent)
-from pyflowline.pyflowline_read_model_configuration_file import pyflowline_read_model_configuration_file
+from pyflowline.configuration.pyflowline_read_configuration_file import pyflowline_read_model_configuration_file
 
 sPath_data = realpath( sPath_parent +  '/data/susquehanna' )
 sWorkspace_input =  str(Path(sPath_data)  /  'input')
@@ -34,9 +34,9 @@ dResolution_meter = 50000
 sMesh = 'hexagon'
 sDate='20230101'
 
-  
-  
-    
+
+
+
 oPyflowline = pyflowline_read_model_configuration_file(sFilename_configuration_in, \
 iCase_index_in=iCase_index, dResolution_meter_in=dResolution_meter, sDate_in=sDate)
 oPyflowline.aBasin[0].dLatitude_outlet_degree=39.462000
@@ -47,7 +47,7 @@ aCell = oPyflowline.mesh_generation()
 oPyflowline.reconstruct_topological_relationship(aCell)
 oPyflowline.export()
 iCase_index= iCase_index+1
-           
+
 print('Finished')
 
 

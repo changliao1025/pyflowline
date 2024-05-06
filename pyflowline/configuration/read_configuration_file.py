@@ -39,8 +39,10 @@ def pyflowline_read_configuration_file(
         _type_: _description_
     """
     # Ensure input filenames are strings
-    sFilename_configuration_in = str(sFilename_configuration_in)
-    sWorkspace_output_in = str(sWorkspace_output_in)
+    if isinstance(sFilename_configuration_in, Path):
+        sFilename_configuration_in = str(sFilename_configuration_in)
+    if isinstance(sWorkspace_output_in, Path):
+        sWorkspace_output_in = str(sWorkspace_output_in)
 
     if not os.path.isfile(sFilename_configuration_in):
         print(sFilename_configuration_in + ' does not exist')
@@ -120,8 +122,9 @@ def pyflowline_read_configuration_file(
         # try to create this output folder first using
 
     try:
-        print(sWorkspace_output)
+        print("Creating the specified output workspace (if it does not exist): \n", sWorkspace_output)
         Path(sWorkspace_output).mkdir(parents=True, exist_ok=True)
+        print("The specified output workspace is: \n", sWorkspace_output)
     except ValueError:
         print("The specified output workspace cannot be created!")
         exit

@@ -1,8 +1,8 @@
 import os, sys
 from pathlib import Path
 
-from pyflowline.configuration.change_json_key_value import pyflowline_change_json_key_value
 from pyflowline.configuration.read_configuration_file import pyflowline_read_configuration_file
+from pyflowline.configuration.change_json_key_value import pyflowline_change_json_key_value
 from pyflowline.configuration import path_manager as pyflowline_path_manager
 
 #%% Define the case information (configuration file parameters)
@@ -103,7 +103,7 @@ oPyflowline = pyflowline_read_configuration_file(
     iCase_index_in=iCase_index, 
     sDate_in=sDate)
 
-# Check the model parameters
+#%% Check the model parameters
 oPyflowline.pyflowline_print()
 
 #%% Now we can change some model parameters

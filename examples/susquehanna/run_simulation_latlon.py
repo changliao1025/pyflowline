@@ -7,7 +7,9 @@ sPath_parent = str(Path(__file__).parents[2]) # data is located two dir's up
 sPath_parent = str(Path(__file__).parents[2]) # data is located two dir's up
 import sys
 sys.path.append(sPath_parent)
-from pyflowline.configuration.read_configuration_file import pyflowline_read_configuration_file
+
+from pyflowline.configuration.pyflowline_read_configuration_file import pyflowline_read_configuration_file
+
 sPath_data = realpath( sPath_parent +  '/data/susquehanna' )
 sWorkspace_input =  str(Path(sPath_data)  /  'input')
 sWorkspace_output=  str(Path(sPath_data)  /  'output')
@@ -29,7 +31,7 @@ sDate='20230101'
 oPyflowline = pyflowline_read_configuration_file(sFilename_configuration_in, \
 iCase_index_in=iCase_index, dResolution_meter_in=dResolution_meter, sDate_in=sDate)
 
-#%% 
+#%%
 oPyflowline.aBasin[0].dLatitude_outlet_degree=39.462000
 oPyflowline.aBasin[0].dLongitude_outlet_degree=-76.009300
 oPyflowline.setup()

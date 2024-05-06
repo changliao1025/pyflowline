@@ -1,9 +1,11 @@
 import os, sys
 from pathlib import Path
 
+
 from pyflowline.configuration.read_configuration_file import pyflowline_read_configuration_file
 from pyflowline.configuration.change_json_key_value import pyflowline_change_json_key_value
 from pyflowline.configuration import path_manager as pyflowline_path_manager
+
 
 #%% Define the case information (configuration file parameters)
 sDomainName = 'susquehanna'
@@ -62,45 +64,45 @@ else:
 # Set the path to the output folder
 # Pass the configuration filename followed by a single key-value pair.
 pyflowline_change_json_key_value(
-    oFilename_domain_config, 
+    oFilename_domain_config,
     'sWorkspace_output', str(oFolder_output))
 
 # Set the path to the mpas mesh file
 pyflowline_change_json_key_value(
-    oFilename_domain_config, 
+    oFilename_domain_config,
     'sFilename_mesh_netcdf', str(oFilename_mesh_netcdf))
 
 # Set the path to the boundary file used to clip the mesh
 pyflowline_change_json_key_value(
-    oFilename_domain_config, 
-    'sFilename_mesh_boundary', str(oFilename_mesh_boundary)) 
+    oFilename_domain_config,
+    'sFilename_mesh_boundary', str(oFilename_mesh_boundary))
 
 # Set the path to the basin ("child") configuration file
 pyflowline_change_json_key_value(
-    oFilename_domain_config, 
+    oFilename_domain_config,
     'sFilename_basins', str(oFilename_basins_config))
 
 # These parameters are not strictly necessary, but will reduce the potential for errors or confusion.
 pyflowline_change_json_key_value(
-    oFilename_domain_config, 
+    oFilename_domain_config,
     'sFilename_model_configuration', str(oFilename_domain_config))
 
 pyflowline_change_json_key_value(
-    oFilename_domain_config, 
+    oFilename_domain_config,
     'sWorkspace_data', str(oPath_parent.joinpath('data')))
 
 #%% Update the basin ("child") configuration file
 
-# Set the path to the flowline file. 
+# Set the path to the flowline file.
 pyflowline_change_json_key_value(
-    oFilename_basins_config, 
-    'sFilename_flowline_filter', str(oFilename_flowline), 
+    oFilename_basins_config,
+    'sFilename_flowline_filter', str(oFilename_flowline),
     iFlag_basin_in=1) # Set iFlag_basin_in=1 when changing the basin configuration file.
 
 #%% Read the configuration file
 oPyflowline = pyflowline_read_configuration_file(
-    oFilename_domain_config, 
-    iCase_index_in=iCase_index, 
+    oFilename_domain_config,
+    iCase_index_in=iCase_index,
     sDate_in=sDate)
 
 #%% Check the model parameters
@@ -114,11 +116,11 @@ oPyflowline.pyflowline_change_model_parameter(
 
 # To change a parameter for a basin instead of the whole model domain, use the iFlag_basin_in option, this will change the value for all of the basins in the basin configuration file.
 oPyflowline.pyflowline_change_model_parameter(
-    'dLatitude_outlet_degree', 39.462000, 
+    'dLatitude_outlet_degree', 39.462000,
     iFlag_basin_in=1)
 
 oPyflowline.pyflowline_change_model_parameter(
-    'dLongitude_outlet_degree', -76.009300, 
+    'dLongitude_outlet_degree', -76.009300,
     iFlag_basin_in=1)
 
 # The second way is to assign a value directly
@@ -140,12 +142,12 @@ if iFlag_simulation == 1:
 
 #%%
 if iFlag_visualization == 1:
-     
+
     aExtent_meander = [-76.5, -76.2, 41.6, 41.9]
     # oPyflowline.plot(sVariable_in='flowline_simplified', sFilename_output_in='flowline_simplified.png')
-    # oPyflowline.plot(sVariable_in='flowline_simplified', 
-    #                  sFilename_output_in='flowline_simplified_zoom.png', 
-    #                  aExtent_in=aExtent_meander) 
+    # oPyflowline.plot(sVariable_in='flowline_simplified',
+    #                  sFilename_output_in='flowline_simplified_zoom.png',
+    #                  aExtent_in=aExtent_meander)
     pass
 
 #%%
@@ -155,7 +157,7 @@ if iFlag_simulation == 1:
 #%%
 if iFlag_visualization == 1:
     # This will fail unless iFlag_simulation is true or has been run
-    # oPyflowline.plot(sVariable_in='mesh', sFilename_output_in='mesh.png' ) 
+    # oPyflowline.plot(sVariable_in='mesh', sFilename_output_in='mesh.png' )
     pass
 #%%
 if iFlag_simulation == 1:

@@ -6,7 +6,9 @@ from os.path import realpath
 sPath_parent = str(Path(__file__).parents[2]) # data is located two dir's up
 import sys
 sys.path.append(sPath_parent)
+
 from pyflowline.configuration.read_configuration_file import pyflowline_read_configuration_file
+
 
 sPath_data = realpath( sPath_parent +  '/data/susquehanna' )
 sWorkspace_input =  str(Path(sPath_data)  /  'input')
@@ -36,7 +38,7 @@ aCell = oPyflowline.mesh_generation()
 oPyflowline.reconstruct_topological_relationship(aCell)
 oPyflowline.export()
 iCase_index= iCase_index+1
-           
+
 print('Finished')
 
 # %%

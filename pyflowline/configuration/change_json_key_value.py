@@ -3,7 +3,7 @@ from pathlib import Path
 import shutil
 import tempfile
 
-def pyflowline_change_json_key_value(sFilename_json_in, sKey, new_value, iFlag_basin_in=None):
+def change_json_key_value(sFilename_json_in, sKey, new_value, iFlag_basin_in=None):
     """
     Change the value associated with the specified key in a JSON file safely.
 

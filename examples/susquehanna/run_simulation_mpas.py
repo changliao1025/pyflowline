@@ -8,7 +8,7 @@ from pyflowline.configuration import path_manager as pyflowline_path_manager
 
 
 #%% Define the case information (configuration file parameters)
-sDomainName = 'susquehanna'
+sRegion = 'susquehanna'
 iCase_index = 1
 iFlag_simulation = 0
 iFlag_visualization = 1
@@ -21,9 +21,9 @@ sys.path.append(str(oPath_parent))
 
 # Define the full path to the input and output folders.
 oFolder_input = oPath_parent.joinpath(
-    'data', sDomainName, 'input')
+    'data', sRegion, 'input')
 oFolder_output = oPath_parent.joinpath(
-    'data', sDomainName, 'output')
+    'data', sRegion, 'output')
 
 # Define the full path to the domain ("parent") configuration file.
 oFilename_domain_config = oFolder_input.joinpath(

@@ -10,16 +10,16 @@ sDate_default = "{:04d}".format(pDate.year) + \
 
 
 def pyflowline_read_configuration_file(sFilename_configuration_in,
-                                             iFlag_standalone_in=None,
+                                             iFlag_standalone_in=1,
                                              iFlag_use_mesh_dem_in=None,
                                              iCase_index_in=None,
                                              iResolution_index_in = None,
                                              dResolution_degree_in=None,
                                              dResolution_meter_in=None,
                                              sMesh_type_in=None,
-                                             sModel_in=None,
+                                             sModel_in='pyflowline',
                                              sDate_in=None,
-                                              sDggrid_type_in = None,
+                                             sDggrid_type_in = None,
                                              sWorkspace_output_in=None):
 
     """read a model configuration

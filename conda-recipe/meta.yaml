@@ -1,6 +1,6 @@
 {% set name = "hexwatershed" %}
 {% set git_rev = "main" %}
-{% set version = "0.3.8" %}
+{% set version = "0.3.9" %}
 
 package:
   name: {{ name|lower }}
@@ -9,21 +9,21 @@ package:
 source:
   path: $RECIPE_DIR/../..
 
-build:  
+build:
   noarch: python
   number: 0
-  
-requirements:  
-  
+
+requirements:
+
   build:
-    - python >=3.8    
+    - python >=3.8
     - setuptools
     - pip
-  
+
   host:
-    - python >=3.8  
+    - python >=3.8
     - pip
- 
+
   run:
     - python >=3.8
     - numpy
@@ -34,7 +34,7 @@ requirements:
 test:
   imports:
     - pyflowline
-  
+
 
 about:
   home: https://github.com/changliao1025/pyflowline

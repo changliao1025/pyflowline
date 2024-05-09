@@ -146,6 +146,7 @@ class flowlinecase(object):
     sFilename_mesh_info=''
     sFilename_mesh_netcdf=''
     sFilename_mesh_kml=''
+    sFilename_mesh_parquet=''
 
     aBasin = list()
     aFlowline_simplified=list()
@@ -461,8 +462,10 @@ class flowlinecase(object):
         #model generated files
 
         self.sFilename_mesh = os.path.join(str(Path(self.sWorkspace_output)  ) , sMesh_type + ".geojson" )
+
         self.sFilename_mesh_info= os.path.join(str(Path(self.sWorkspace_output)  ) , sMesh_type + "_mesh_info.json"  )
         self.sFilename_mesh_kml = os.path.join(str(Path(self.sWorkspace_output)  ) , sMesh_type + ".kml" ) #for google service
+        self.sFilename_mesh_parquet = os.path.join(str(Path(self.sWorkspace_output)  ) , sMesh_type + ".parquet" )
 
         return
 
@@ -883,7 +886,7 @@ class flowlinecase(object):
                                 return
 
             #no matter what type of mash, we will convert it to geoparquet for easy visualization
-            convert_geojson_to_geoparquet(sFilename_mesh, sFilename_mesh.replace('.geojson','.parquet'))
+            convert_geojson_to_geoparquet(sFilename_mesh, self.sFilename_mesh_parquet)
         else:
             pass
 

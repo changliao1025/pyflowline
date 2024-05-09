@@ -52,7 +52,15 @@ def plot(self,
             aLegend.append(sText)
             sText = 'Mesh type: ' + self.sMesh_type.title()
             aLegend.append(sText)
-            sResolution =  'Resolution: ' + "{:0d}".format( int(self.dResolution_meter) ) + 'm'
+            #sResolution =  'Resolution: ' + "{:0d}".format( int(self.dResolution_meter) ) + 'm'
+            if self.iMesh_type == 4:
+                sResolution =  'Resolution: 3 ~ 10 km'
+            else:
+                if self.dResolution_meter > 1000:
+                    sResolution =  'Resolution: ' + "{:0d}".format( int(self.dResolution_meter/1000) ) + ' km'
+                else:
+                    sResolution =  'Resolution: ' + "{:0d}".format( int(self.dResolution_meter) ) + ' m'
+
             aLegend.append(sResolution)
             for pBasin in self.aBasin:
                 pBasin.basin_plot(iFlag_type_in,
@@ -95,6 +103,9 @@ def _plot_mesh(self,
     sMesh_type = self.sMesh_type
 
     map_vector_polygon_data(1, sFilename_in,
+                            iFlag_zebra_in= 1,
+                            iFlag_color_in = 0,
+                            iFlag_fill_in= False,
                             sFilename_output_in = sFilename_output_in,
                             sTitle_in = sMesh_type,
                             aExtent_in = aExtent_in,
@@ -112,10 +123,14 @@ def _plot_mesh_with_flowline(self,
     aFiletype_in = list()
     aFilename_in = list()
     aFlag_color = list()
+    aFlag_discrete = list()
+    aFlag_fill = list()
     aVariable_in = list()
     aFilename_in.append(self.sFilename_mesh)
     aFiletype_in.append(3)
     aFlag_color.append(0)
+    aFlag_discrete.append(0)
+    aFlag_fill.append(False)
 
     aVariable_in.append(None)
 
@@ -126,13 +141,18 @@ def _plot_mesh_with_flowline(self,
         aFilename_in.append(sFilename_json)
         aFlag_color.append(1)
         aVariable_in.append('stream_segment')
+        aFlag_discrete.append(1)
+        aFlag_fill.append(True)
 
     map_multiple_vector_data(aFiletype_in,
                              aFilename_in,
                              sFilename_output_in=sFilename_output_in,
                              sTitle_in= 'Mesh with flowline',
                              aFlag_color_in = aFlag_color,
+                             aFlag_fill_in = aFlag_fill,
+                             aFlag_discrete_in = aFlag_discrete,
                              aExtent_in = aExtent_in,
+                             aVariable_in = aVariable_in,
                              pProjection_map_in = pProjection_map_in)
     return
 

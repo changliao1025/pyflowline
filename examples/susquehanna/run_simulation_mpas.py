@@ -127,15 +127,23 @@ oPyflowline.pyflowline_change_model_parameter(
 oPyflowline.aBasin[0].dLatitude_outlet_degree=39.462000
 oPyflowline.aBasin[0].dLongitude_outlet_degree=-76.009300
 
-#%%
+#%% Export the config file after changing parameters
+
+# If desired, the config file can be exported to disk after changing parameters. By default, the configuration files are written to the output folder.
+oPyflowline.pyflowline_export_config_to_json()
+
+#%% Now we can build the flowline 
+
+# Set up the flowlinecase and optionally plot the flowline.
 oPyflowline.pyflowline_setup()
 
-#%%
 if iFlag_visualization == 1:
     oPyflowline.plot(sVariable_in='flowline_filter', sFilename_output_in='filter_flowline.png')
     pass
 
-#%%
+#%% Run the flowline simplification step.
+
+# [see](https://pyflowline.readthedocs.io/en/latest/algorithm/algorithm.html#flowline-simplification)
 if iFlag_simulation == 1:
     oPyflowline.pyflowline_flowline_simplification()
     pass

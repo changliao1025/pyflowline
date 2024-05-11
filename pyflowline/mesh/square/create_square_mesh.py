@@ -18,9 +18,9 @@ def index_to_row_col(index, num_columns):
 def create_square_mesh(dX_left_in, dY_bot_in,
                         dResolution_meter_in,
                         ncolumn_in, nrow_in,
-    sFilename_output_in, 
-    sFilename_spatial_reference_in, 
-    pBoundary_in):   
+    sFilename_output_in,
+    pProjection_reference_in,
+    pBoundary_in):
     """
     _summary_
 
@@ -38,19 +38,17 @@ def create_square_mesh(dX_left_in, dY_bot_in,
     """
     #for the reason that a geometry object will be crash if the associated dataset is closed, we must pass wkt string
     #https://gdal.org/api/python_gotchas.html
-    pBoundary = ogr.CreateGeometryFromWkt(pBoundary_in)
 
-    if os.path.exists(sFilename_output_in): 
+    pSpatial_reference = osr.SpatialReference()
+    pSpatial_reference.ImportFromWkt(pProjection_reference_in)
+    pBoundary = ogr.CreateGeometryFromWkt(pBoundary_in)
+    if os.path.exists(sFilename_output_in):
         os.remove(sFilename_output_in)
 
-    pDriver_shapefile = ogr.GetDriverByName('Esri Shapefile')
     pDriver_geojson = ogr.GetDriverByName('GeoJSON')
-    pDataset_shapefile = pDriver_shapefile.Open(sFilename_spatial_reference_in, 0)
-    pLayer_shapefile = pDataset_shapefile.GetLayer(0)
-    pSpatial_reference = pLayer_shapefile.GetSpatialRef()          
-    pDataset = pDriver_geojson.CreateDataSource(sFilename_output_in)    
-    pSpatial_reference_gcs = osr.SpatialReference()  
-    pSpatial_reference_gcs.ImportFromEPSG(4326)    # WGS84 lat/lon     
+    pDataset = pDriver_geojson.CreateDataSource(sFilename_output_in)
+    pSpatial_reference_gcs = osr.SpatialReference()
+    pSpatial_reference_gcs.ImportFromEPSG(4326)    # WGS84 lat/lon
     pSpatial_reference_gcs.SetAxisMappingStrategy(osr.OAMS_TRADITIONAL_GIS_ORDER)
     pLayer = pDataset.CreateLayer('cell', pSpatial_reference_gcs, ogr.wkbPolygon)
     # Add one attribute
@@ -63,7 +61,7 @@ def create_square_mesh(dX_left_in, dY_bot_in,
     pLayer.CreateField(pArea_field)
 
     pLayerDefn = pLayer.GetLayerDefn()
-    pFeature = ogr.Feature(pLayerDefn)    
+    pFeature = ogr.Feature(pLayerDefn)
 
     xleft = dX_left_in
     xspacing= dResolution_meter_in
@@ -73,15 +71,15 @@ def create_square_mesh(dX_left_in, dY_bot_in,
     aSquare = list()
     aSquare_dict = dict()
     lCellIndex = 0
-    def add_cell_into_list(aList, lCellID, iRow, iColumn, dLongitude_center, dLatitude_center, aCoords ):          
-    
+    def add_cell_into_list(aList, lCellID, iRow, iColumn, dLongitude_center, dLatitude_center, aCoords ):
+
         pSquare = convert_gcs_coordinates_to_cell(2, dLongitude_center, dLatitude_center, aCoords)
         pSquare.lCellID = lCellID
         dArea = pSquare.calculate_cell_area()
-        pSquare.calculate_edge_length()                
+        pSquare.calculate_edge_length()
         #build topoloy
         aNeighbor=list()
-        
+
         #lCellID_center = lCellID
         #counter-clock wise direction to add the neighbor
         if iRow > 1:#under
@@ -90,34 +88,34 @@ def create_square_mesh(dX_left_in, dY_bot_in,
                 iColumn_dummy = iColumn - 1
                 lCellID2 = (iRow_dummy-1) * ncolumn_in + iColumn_dummy #lCellID0 - nrow_in
                 aNeighbor.append(lCellID2)
-                
+
             lCellID0 =  (iRow_dummy-1) * ncolumn_in + iColumn
-            aNeighbor.append(lCellID0)                    
+            aNeighbor.append(lCellID0)
         if iColumn  < ncolumn_in  : #right
             iColumn_dummy = iColumn + 1
             if iRow > 1:
                 iRow_dummy = iRow - 1
                 lCellID7 = (iRow_dummy-1) * ncolumn_in + iColumn_dummy# lCellID5 -1
-                aNeighbor.append(lCellID7) 
-            lCellID5 = (iRow-1) * ncolumn_in + iColumn_dummy #nrow_in * iColumn + iRow 
-            aNeighbor.append(lCellID5)                       
+                aNeighbor.append(lCellID7)
+            lCellID5 = (iRow-1) * ncolumn_in + iColumn_dummy #nrow_in * iColumn + iRow
+            aNeighbor.append(lCellID5)
         if iRow < nrow_in:#top
             iRow_dummy = iRow + 1
             if iColumn < ncolumn_in:
                 iColumn_dummy = iColumn + 1
                 lCellID6 = (iRow_dummy-1) * ncolumn_in + iColumn_dummy #lCellID3 + nrow_in
-                aNeighbor.append(lCellID6) 
+                aNeighbor.append(lCellID6)
             lCellID3 = (iRow_dummy-1) * ncolumn_in + iColumn #lCellID_center + 1
-            aNeighbor.append(lCellID3)         
-        
+            aNeighbor.append(lCellID3)
+
         if iColumn> 1:#left
             iColumn_dummy = iColumn - 1
             if iRow < nrow_in:
                 iRow_dummy = iRow + 1
                 lCellID4 = (iRow_dummy-1) * ncolumn_in + iColumn_dummy #lCellID1 + 1
-                aNeighbor.append(lCellID4)   
-            lCellID1 = (iRow-1) * ncolumn_in + iColumn_dummy #nrow_in * (iColumn-2) + iRow 
-            aNeighbor.append(lCellID1)  
+                aNeighbor.append(lCellID4)
+            lCellID1 = (iRow-1) * ncolumn_in + iColumn_dummy #nrow_in * (iColumn-2) + iRow
+            aNeighbor.append(lCellID1)
 
         pSquare.aNeighbor = aNeighbor
         pSquare.nNeighbor = len(aNeighbor)
@@ -138,10 +136,10 @@ def create_square_mesh(dX_left_in, dY_bot_in,
     #   |           |
     #(x1,y1)-----(x2,y2)
     #...............
-    
-    
-    for iRow in range(1, nrow_in+1):    
-        for iColumn in range(1, ncolumn_in+1):        
+
+
+    for iRow in range(1, nrow_in+1):
+        for iColumn in range(1, ncolumn_in+1):
             #global cell id for the mesh
             lCellID = (iRow-1) * ncolumn_in + iColumn
 
@@ -150,20 +148,20 @@ def create_square_mesh(dX_left_in, dY_bot_in,
             y1 = ybottom + ((iRow-1) * yspacing)
 
             x2 = xleft + ((iColumn ) * xspacing)
-            y2 = ybottom + ((iRow-1) * yspacing)     
+            y2 = ybottom + ((iRow-1) * yspacing)
 
             x3 = xleft + ((iColumn ) * xspacing)
             y3 = ybottom + ((iRow ) * yspacing)
 
             x4 = xleft + ((iColumn-1) * xspacing)
-            y4 = ybottom + ((iRow ) * yspacing)  
+            y4 = ybottom + ((iRow ) * yspacing)
 
             x = [x1, x2, x3, x4]
             y = [y1, y2, y3, y4]
-           
+
             x_new , y_new = reproject_coordinates_batch(x, y, pSpatial_reference, pSpatial_reference_gcs)
             x1, x2, x3, x4 = x_new
-            y1, y2, y3, y4 = y_new       
+            y1, y2, y3, y4 = y_new
             coordinates = [(x1, y1), (x2, y2), (x3, y3), (x4, y4), (x1, y1)]
 
 
@@ -179,9 +177,9 @@ def create_square_mesh(dX_left_in, dY_bot_in,
                 aCoords[i, 0] = x
                 aCoords[i, 1] = y
 
-        
+
             dLongitude_center = np.mean(aCoords[0:4,0])
-            dLatitude_center = np.mean(aCoords[0:4,1])     
+            dLatitude_center = np.mean(aCoords[0:4,1])
 
             iFlag = False
             if pPolygon.Within(pBoundary):
@@ -192,10 +190,10 @@ def create_square_mesh(dX_left_in, dY_bot_in,
                     iFlag = True
                 else:
                     pass
-                
-                
+
+
             if ( iFlag == True ):
-                aSquare, dArea = add_cell_into_list(aSquare, lCellID, iRow, iColumn, dLongitude_center,dLatitude_center, aCoords ) 
+                aSquare, dArea = add_cell_into_list(aSquare, lCellID, iRow, iColumn, dLongitude_center,dLatitude_center, aCoords )
                 #add to dictionary
                 aSquare_dict[lCellID] = lCellIndex
                 lCellIndex = lCellIndex + 1
@@ -208,66 +206,66 @@ def create_square_mesh(dX_left_in, dY_bot_in,
                 pLayer.CreateFeature(pFeature)
                 pass
 
-    
+
     iFlag_fill_hole = 0
-    aSquare_out = list()        
-    #aCellID = [pCell.lCellID for pCell in aSquare]   
-    if iFlag_fill_hole == 1:       
+    aSquare_out = list()
+    #aCellID = [pCell.lCellID for pCell in aSquare]
+    if iFlag_fill_hole == 1:
         #find virtual land cells
         for pCell in aSquare:
             aNeighbor_land = pCell.aNeighbor_land   #including both holes and maps land cutoff by boundary
             nNeighbor_land = pCell.nNeighbor
             aNeighbor_land_update = list()
             aNeighbor_land_virtual = list()
-            nNeighbor_land_update = 0 
+            nNeighbor_land_update = 0
             for j in range(nNeighbor_land): #loop all land neighbors
                 lNeighbor = int(aNeighbor_land[j])
                 if lNeighbor in aSquare_dict:
-                    nNeighbor_land_update = nNeighbor_land_update + 1 
+                    nNeighbor_land_update = nNeighbor_land_update + 1
                     aNeighbor_land_update.append(lNeighbor)
                 else:
                     #a hole or boundary mpas land cell
                     aNeighbor_land_virtual.append(lNeighbor)
 
             pCell.nNeighbor= len(aNeighbor_land_update)
-            pCell.aNeighbor = aNeighbor_land_update        
+            pCell.aNeighbor = aNeighbor_land_update
             pCell.aNeighbor_land = aNeighbor_land_update
-            pCell.nNeighbor_land= len(aNeighbor_land_update)   
-            pCell.aNeighbor_land_virtual = aNeighbor_land_virtual   
+            pCell.nNeighbor_land= len(aNeighbor_land_update)
+            pCell.aNeighbor_land_virtual = aNeighbor_land_virtual
 
             pCell.nNeighbor_land_virtual = len(aNeighbor_land_virtual)
-            
+
 
         #add hole back
-        for pCell in aSquare:                  
-            if pCell.nNeighbor_land_virtual ==1:  #only one virtual land means it is likely next to a hole 
+        for pCell in aSquare:
+            if pCell.nNeighbor_land_virtual ==1:  #only one virtual land means it is likely next to a hole
                 lNeighbor_hole = pCell.aNeighbor_land_virtual[0]
                 #now find its row and column indices
                 #id start with 1 so we need to refind the row and column index
-                iRow, iColumn = index_to_row_col(lNeighbor_hole, ncolumn_in)          
+                iRow, iColumn = index_to_row_col(lNeighbor_hole, ncolumn_in)
                 lCellID = (iRow-1) * ncolumn_in + iColumn
 
-                #now build the cell    
+                #now build the cell
                 #define a polygon here
                 x1 = xleft + ((iColumn-1) * xspacing)
                 y1 = ybottom + ((iRow-1) * yspacing)
 
                 x2 = xleft + ((iColumn ) * xspacing)
-                y2 = ybottom + ((iRow-1) * yspacing)     
+                y2 = ybottom + ((iRow-1) * yspacing)
 
                 x3 = xleft + ((iColumn ) * xspacing)
                 y3 = ybottom + ((iRow ) * yspacing)
 
                 x4 = xleft + ((iColumn-1) * xspacing)
-                y4 = ybottom + ((iRow ) * yspacing)  
+                y4 = ybottom + ((iRow ) * yspacing)
 
                 x = [x1, x2, x3, x4]
                 y = [y1, y2, y3, y4]
 
                 x_new , y_new = reproject_coordinates_batch(x, y, pSpatial_reference)
                 x1, x2, x3, x4 = x_new
-                y1, y2, y3, y4 = y_new       
-                coordinates = [(x1, y1), (x2, y2), (x3, y3), (x4, y4), (x1, y1)]        
+                y1, y2, y3, y4 = y_new
+                coordinates = [(x1, y1), (x2, y2), (x3, y3), (x4, y4), (x1, y1)]
 
                 ring = ogr.Geometry(ogr.wkbLinearRing)
                 for x, y in coordinates:
@@ -280,20 +278,20 @@ def create_square_mesh(dX_left_in, dY_bot_in,
                 for i, (x, y) in enumerate(coordinates):
                     aCoords[i, 0] = x
                     aCoords[i, 1] = y
-           
-                dLongitude_center = np.mean(aCoords[0:4,0])
-                dLatitude_center = np.mean(aCoords[0:4,1])   
 
-                if lCellID not in aSquare_dict:    
-                    aSquare, dArea = add_cell_into_list(aSquare, lCellID, iRow, iColumn, dLongitude_center,dLatitude_center, aCoords )        
+                dLongitude_center = np.mean(aCoords[0:4,0])
+                dLatitude_center = np.mean(aCoords[0:4,1])
+
+                if lCellID not in aSquare_dict:
+                    aSquare, dArea = add_cell_into_list(aSquare, lCellID, iRow, iColumn, dLongitude_center,dLatitude_center, aCoords )
                     aSquare_dict[lCellID] = lCellIndex
                     lCellIndex = lCellIndex + 1
                     pFeature.SetGeometry(pPolygon)
                     pFeature.SetField("cellid", int(lCellID) )
                     pFeature.SetField("longitude", dLongitude_center )
                     pFeature.SetField("latitude", dLatitude_center )
-                    pFeature.SetField("area", dArea )                
-                    pLayer.CreateFeature(pFeature)                    
+                    pFeature.SetField("area", dArea )
+                    pLayer.CreateFeature(pFeature)
                     pass
                 else:
                     #this hole was added already, but we need to update the neighbor information
@@ -304,13 +302,13 @@ def create_square_mesh(dX_left_in, dY_bot_in,
                     pass
 
         #update
-        
+
         for pCell in aSquare:
-            
-            aNeighbor_land_update = list()   
-            aNeighbor_land = pCell.aNeighbor_land     
-            aNeighbor_land_virtual_update = list()      
-            aNeighbor_land_virtual = pCell.aNeighbor_land_virtual         
+
+            aNeighbor_land_update = list()
+            aNeighbor_land = pCell.aNeighbor_land
+            aNeighbor_land_virtual_update = list()
+            aNeighbor_land_virtual = pCell.aNeighbor_land_virtual
             for lNeighbor in aNeighbor_land:
                 if lNeighbor in aSquare_dict:
                     aNeighbor_land_update.append(lNeighbor)
@@ -319,32 +317,32 @@ def create_square_mesh(dX_left_in, dY_bot_in,
                     #this is a land cell in mpas, but it may be clipped by boundary
                     pass
 
-            #for book keeping only        
+            #for book keeping only
             for lNeighbor in aNeighbor_land_virtual:
                 if lNeighbor in aSquare_dict:
-                    #this cell is actually not virtual anymore                    
+                    #this cell is actually not virtual anymore
                     aNeighbor_land_update.append(lNeighbor)
                 else:
-                    aNeighbor_land_virtual_update.append(lNeighbor)    
-            
-            pCell.aNeighbor = aNeighbor_land_update     
-            pCell.nNeighbor= len(aNeighbor_land_update)   
+                    aNeighbor_land_virtual_update.append(lNeighbor)
+
+            pCell.aNeighbor = aNeighbor_land_update
+            pCell.nNeighbor= len(aNeighbor_land_update)
             pCell.aNeighbor_land = aNeighbor_land_update
-            pCell.nNeighbor_land= len(aNeighbor_land_update)   
+            pCell.nNeighbor_land= len(aNeighbor_land_update)
             pCell.aNeighbor_land_virtual = aNeighbor_land_virtual_update   #for book keeping only
             pCell.nNeighbor_land_virtual = len(aNeighbor_land_virtual_update)
             aSquare_out.append(pCell)
     else:
-        for pCell in aSquare:            
-            aNeighbor = pCell.aNeighbor           
-            aNeighbor_land_update = list()            
+        for pCell in aSquare:
+            aNeighbor = pCell.aNeighbor
+            aNeighbor_land_update = list()
             for lNeighbor in aNeighbor:
                 if lNeighbor in aSquare_dict:
                     aNeighbor_land_update.append(lNeighbor)
 
             #for latlon, there is no ocean concept
             pCell.aNeighbor = aNeighbor_land_update
-            pCell.nNeighbor = len(aNeighbor_land_update)    
+            pCell.nNeighbor = len(aNeighbor_land_update)
             pCell.aNeighbor_land = aNeighbor_land_update
             pCell.nNeighbor_land= len(aNeighbor_land_update)
             pCell.nNeighbor_ocean = pCell.nVertex - pCell.nNeighbor_land
@@ -356,12 +354,12 @@ def create_square_mesh(dX_left_in, dY_bot_in,
         aNeighbor = pSquare.aNeighbor
         pSquare.aNeighbor_distance=list()
         for lCellID1 in aNeighbor:
-            #use dictionary to get index         
+            #use dictionary to get index
             lIndex = aSquare_dict[lCellID1]
-            pLatlon1 = aSquare_out[lIndex]                
+            pLatlon1 = aSquare_out[lIndex]
             dDistance = pSquare.pVertex_center.calculate_distance( pLatlon1.pVertex_center )
-            pSquare.aNeighbor_distance.append(dDistance)   
+            pSquare.aNeighbor_distance.append(dDistance)
 
-    pDataset = pLayer = pFeature  = None  
+    pDataset = pLayer = pFeature  = None
     return aSquare_out
 

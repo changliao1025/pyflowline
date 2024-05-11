@@ -1,22 +1,17 @@
 import os, sys
 from pathlib import Path
-
-
-from pyflowline.configuration.read_configuration_file import pyflowline_read_configuration_file
-from pyflowline.configuration.change_json_key_value import pyflowline_change_json_key_value
-from pyflowline.configuration import path_manager as pyflowline_path_manager
-
+from datetime import datetime
 
 #%% Define the case information (configuration file parameters)
+sMesh = 'mpas'
 sRegion = 'susquehanna'
 iCase_index = 1
-iFlag_simulation = 0
+iFlag_simulation = 1
 iFlag_visualization = 1
-sMesh = 'mpas'
-sDate = '20230701'
+sDate = datetime.now().strftime('%Y%m%d')
 
 #%% Define workspace paths and configuration file path parameters
-oPath_parent = pyflowline_path_manager.pyflowline_project_root()
+oPath_parent = Path(__file__).parents[2] # data is located two dir's up
 sys.path.append(str(oPath_parent))
 
 # Define the full path to the input and output folders.
@@ -49,7 +44,7 @@ oFilename_mesh_boundary = oFolder_input.joinpath(
 if os.path.isfile(oFilename_domain_config):
     pass
 else:
-    print('The domain configuration file does not exist: ', oFilename_domain_config)
+    print('The domain configuration file does not exist: \n', oFilename_domain_config)
 
 #%% Update the domain (parent) configuration file
 
@@ -60,6 +55,8 @@ else:
 # 	sFilename_basins: full/path/to/pyflowline_susquehanna_basins.json.
 
 # The json file will be overwritten, you may want to make a copy of it first.
+
+from pyflowline.configuration.change_json_key_value import change_json_key_value as pyflowline_change_json_key_value
 
 # Set the path to the output folder
 # Pass the configuration filename followed by a single key-value pair.
@@ -100,6 +97,8 @@ pyflowline_change_json_key_value(
     iFlag_basin_in=1) # Set iFlag_basin_in=1 when changing the basin configuration file.
 
 #%% Read the configuration file
+from pyflowline.configuration.read_configuration_file import pyflowline_read_configuration_file
+
 oPyflowline = pyflowline_read_configuration_file(
     oFilename_domain_config,
     iCase_index_in=iCase_index,
@@ -130,7 +129,7 @@ oPyflowline.aBasin[0].dLongitude_outlet_degree=-76.009300
 #%% Export the config file after changing parameters
 
 # If desired, the config file can be exported to disk after changing parameters. By default, the configuration files are written to the output folder.
-oPyflowline.pyflowline_export_config_to_json()
+# oPyflowline.pyflowline_export_config_to_json()
 
 #%% Now we can build the flowline 
 
@@ -145,13 +144,13 @@ if iFlag_visualization == 1:
 
 # [see](https://pyflowline.readthedocs.io/en/latest/algorithm/algorithm.html#flowline-simplification)
 if iFlag_simulation == 1:
-    oPyflowline.pyflowline_flowline_simplification()
+    oPyflowline.pyflowline_flowline_simplification();
     pass
 
 #%%
 if iFlag_visualization == 1:
 
-    aExtent_meander = [-76.5, -76.2, 41.6, 41.9]
+    # aExtent_meander = [-76.5, -76.2, 41.6, 41.9]
     # oPyflowline.plot(sVariable_in='flowline_simplified', sFilename_output_in='flowline_simplified.png')
     # oPyflowline.plot(sVariable_in='flowline_simplified',
     #                  sFilename_output_in='flowline_simplified_zoom.png',
@@ -170,14 +169,13 @@ if iFlag_visualization == 1:
 #%%
 if iFlag_simulation == 1:
     oPyflowline.pyflowline_reconstruct_topological_relationship(aCell)
+    # oPyflowline.pyflowline_export()
 
 #%%
 if iFlag_visualization == 1:
     # oPyflowline.plot(sVariable_in='overlap', sFilename_output_in='mesh_w_flowline.png')
     pass
 
-# oPyflowline.pyflowline_export()
-
-print('Finished')
-
 # %%
+print('Finished')
+print('Try opening the mesh and flowline files in QGIS for visualization.')

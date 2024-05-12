@@ -51,20 +51,14 @@ def create_hexagon_mesh(iFlag_rotation_in,
         os.remove(sFilename_output_in)
         pass
 
-
-    #replace spatial reference file with wkt
-    #pDriver_shapefile = ogr.GetDriverByName('Esri Shapefile')
-    #pDataset_shapefile = pDriver_shapefile.Open(sFilename_spatial_reference_in, 0)
-    #pLayer_shapefile = pDataset_shapefile.GetLayer(0)
-    #pSpatial_reference = pLayer_shapefile.GetSpatialRef()
-    pSpatial_reference = osr.SpatialReference()
-    pSpatial_reference.ImportFromWkt(pProjection_reference_in)
-
-    pDriver_geojson = ogr.GetDriverByName('GeoJSON')
-    pDataset = pDriver_geojson.CreateDataSource(sFilename_output_in)
     pSpatial_reference_gcs = osr.SpatialReference()
     pSpatial_reference_gcs.ImportFromEPSG(4326)    # WGS84 lat/lon
     pSpatial_reference_gcs.SetAxisMappingStrategy(osr.OAMS_TRADITIONAL_GIS_ORDER)
+    pProjection_target = pSpatial_reference_gcs.ExportToWkt()
+
+    pDriver_geojson = ogr.GetDriverByName('GeoJSON')
+    pDataset = pDriver_geojson.CreateDataSource(sFilename_output_in)
+
     pLayer = pDataset.CreateLayer('cell', pSpatial_reference_gcs, ogr.wkbPolygon)
     # Add one attribute
     pLayer.CreateField(ogr.FieldDefn('cellid', ogr.OFTInteger64)) #long type for high resolution
@@ -293,8 +287,7 @@ def create_hexagon_mesh(iFlag_rotation_in,
                 x = [x1, x2, x3, x4, x5, x6]
                 y = [y1, y2, y3, y4, y5, y6]
 
-                x_new , y_new = reproject_coordinates_batch(x, y, pSpatial_reference,
-                    spatial_reference_target = pSpatial_reference_gcs)
+                x_new , y_new = reproject_coordinates_batch(x, y, pProjection_reference_in)
 
                 x1, x2, x3, x4, x5, x6 = x_new
                 y1, y2, y3, y4, y5, y6 = y_new
@@ -377,7 +370,7 @@ def create_hexagon_mesh(iFlag_rotation_in,
                 x = [x1, x2, x3, x4, x5, x6]
                 y = [y1, y2, y3, y4, y5, y6]
 
-                x_new , y_new = reproject_coordinates_batch(x, y, pSpatial_reference)
+                x_new , y_new = reproject_coordinates_batch(x, y, pProjection_reference_in)
                 x1, x2, x3, x4, x5, x6 = x_new
                 y1, y2, y3, y4, y5, y6 = y_new
                 coordinates = [(x1, y1), (x2, y2), (x3, y3), (x4, y4), (x5, y5), (x6, y6), (x1, y1)]
@@ -496,8 +489,7 @@ def create_hexagon_mesh(iFlag_rotation_in,
                     x = [x1, x2, x3, x4, x5, x6]
                     y = [y1, y2, y3, y4, y5, y6]
 
-                    x_new , y_new = reproject_coordinates_batch(x, y, pSpatial_reference,
-                        spatial_reference_target = pSpatial_reference_gcs)
+                    x_new , y_new = reproject_coordinates_batch(x, y, pProjection_reference_in)
 
                     x1, x2, x3, x4, x5, x6 = x_new
                     y1, y2, y3, y4, y5, y6 = y_new
@@ -566,8 +558,7 @@ def create_hexagon_mesh(iFlag_rotation_in,
                     x6 = x1 - dX_shift
                     y6 = y1 + dY_shift
 
-                    x_new , y_new = reproject_coordinates_batch(x, y, pSpatial_reference,
-                        spatial_reference_target = pSpatial_reference_gcs)
+                    x_new , y_new = reproject_coordinates_batch(x, y, pProjection_reference_in)
 
                     x1, x2, x3, x4, x5, x6 = x_new
                     y1, y2, y3, y4, y5, y6 = y_new

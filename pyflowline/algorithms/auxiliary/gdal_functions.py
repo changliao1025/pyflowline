@@ -13,3 +13,10 @@ def check_file_type(filename):
     # If neither worked, the file is either not a spatial data file, or it's not a format that GDAL/OGR can read
     return 'unknown'
 
+def gdal_get_vector_spatial_ref_wkt(sFilename_in):
+    dataset = ogr.Open(sFilename_in)
+    layer = dataset.GetLayer(0)
+    spatial_ref = layer.GetSpatialRef()
+    pProjection_reference = spatial_ref.ExportToWkt()
+    return pProjection_reference
+

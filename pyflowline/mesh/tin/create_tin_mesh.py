@@ -7,22 +7,23 @@ from pyearth.gis.spatialref.reproject_coodinates import reproject_coordinates_ba
 def create_tin_mesh(dX_left_in, dY_bot_in,
                     dResolution_meter_in,
                     ncolumn_in, nrow_in,
-sFilename_output_in,
-pProjection_reference_in,
-pBoundary_in):
+                    sFilename_output_in,
+                    pProjection_reference_in,
+                    pBoundary_in):
 
     #for the reason that a geometry object will be crash if the associated dataset is closed, we must pass wkt string
     #https://gdal.org/api/python_gotchas.html
-    pSpatial_reference = osr.SpatialReference()
-    pSpatial_reference.ImportFromWkt(pProjection_reference_in)
+
     pBoundary = ogr.CreateGeometryFromWkt(pBoundary_in)
     if os.path.exists(sFilename_output_in):
         #delete it if it exists
         os.remove(sFilename_output_in)
 
     pDriver_geojson = ogr.GetDriverByName('GeoJSON')
+
     pSpatial_reference_gcs = osr.SpatialReference()
     pSpatial_reference_gcs.ImportFromEPSG(4326)    # WGS84 lat/lon
+
     pDataset = pDriver_geojson.CreateDataSource(sFilename_output_in)
     pLayer = pDataset.CreateLayer('cell', pSpatial_reference_gcs, ogr.wkbPolygon)
     # Add one attribute
@@ -102,7 +103,7 @@ pBoundary_in):
             y.append(y2)
             y.append(y3)
 
-            x_new , y_new = reproject_coordinates_batch(x, y, pSpatial_reference)
+            x_new , y_new = reproject_coordinates_batch(x, y, pProjection_reference_in)
             x1=x_new[0]
             x2=x_new[1]
             x3=x_new[2]

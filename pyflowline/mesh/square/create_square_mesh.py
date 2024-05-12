@@ -39,17 +39,19 @@ def create_square_mesh(dX_left_in, dY_bot_in,
     #for the reason that a geometry object will be crash if the associated dataset is closed, we must pass wkt string
     #https://gdal.org/api/python_gotchas.html
 
-    pSpatial_reference = osr.SpatialReference()
-    pSpatial_reference.ImportFromWkt(pProjection_reference_in)
+    pSpatial_reference_gcs = osr.SpatialReference()
+    pSpatial_reference_gcs.ImportFromEPSG(4326)    # WGS84 lat/lon
+    pSpatial_reference_gcs.SetAxisMappingStrategy(osr.OAMS_TRADITIONAL_GIS_ORDER)
+    pProjection_target = pSpatial_reference_gcs.ExportToWkt()
+
+
     pBoundary = ogr.CreateGeometryFromWkt(pBoundary_in)
     if os.path.exists(sFilename_output_in):
         os.remove(sFilename_output_in)
 
     pDriver_geojson = ogr.GetDriverByName('GeoJSON')
     pDataset = pDriver_geojson.CreateDataSource(sFilename_output_in)
-    pSpatial_reference_gcs = osr.SpatialReference()
-    pSpatial_reference_gcs.ImportFromEPSG(4326)    # WGS84 lat/lon
-    pSpatial_reference_gcs.SetAxisMappingStrategy(osr.OAMS_TRADITIONAL_GIS_ORDER)
+
     pLayer = pDataset.CreateLayer('cell', pSpatial_reference_gcs, ogr.wkbPolygon)
     # Add one attribute
     pLayer.CreateField(ogr.FieldDefn('cellid', ogr.OFTInteger64)) #long type for high resolution
@@ -159,7 +161,7 @@ def create_square_mesh(dX_left_in, dY_bot_in,
             x = [x1, x2, x3, x4]
             y = [y1, y2, y3, y4]
 
-            x_new , y_new = reproject_coordinates_batch(x, y, pSpatial_reference, pSpatial_reference_gcs)
+            x_new , y_new = reproject_coordinates_batch(x, y, pProjection_reference_in)
             x1, x2, x3, x4 = x_new
             y1, y2, y3, y4 = y_new
             coordinates = [(x1, y1), (x2, y2), (x3, y3), (x4, y4), (x1, y1)]
@@ -176,7 +178,6 @@ def create_square_mesh(dX_left_in, dY_bot_in,
             for i, (x, y) in enumerate(coordinates):
                 aCoords[i, 0] = x
                 aCoords[i, 1] = y
-
 
             dLongitude_center = np.mean(aCoords[0:4,0])
             dLatitude_center = np.mean(aCoords[0:4,1])
@@ -262,7 +263,7 @@ def create_square_mesh(dX_left_in, dY_bot_in,
                 x = [x1, x2, x3, x4]
                 y = [y1, y2, y3, y4]
 
-                x_new , y_new = reproject_coordinates_batch(x, y, pSpatial_reference)
+                x_new , y_new = reproject_coordinates_batch(x, y, pProjection_reference_in)
                 x1, x2, x3, x4 = x_new
                 y1, y2, y3, y4 = y_new
                 coordinates = [(x1, y1), (x2, y2), (x3, y3), (x4, y4), (x1, y1)]

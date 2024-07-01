@@ -1,10 +1,10 @@
 import copy
 import numpy as np
 import importlib.util
-iFlag_cython = importlib.util.find_spec("cython") 
+iFlag_cython = importlib.util.find_spec("cython")
 if iFlag_cython is not None:
     from pyflowline.algorithms.cython.kernel import find_vertex_in_list
-    from pyflowline.external.tinyr.tinyr.tinyr import RTree
+    from tinyr import RTree
     iFlag_use_rtree = 1
 else:
     iFlag_use_rtree =0
@@ -17,26 +17,26 @@ def find_vertex_on_edge(aVertex_in, pEdge_in):
     aIndex_order=list()
     aDistance=list()
     nVertex= len(aVertex_in)
-    npoint = 0    
+    npoint = 0
     if nVertex > 0 :
         if iFlag_use_rtree == 1:
             index_vertex = RTree(max_cap=5, min_cap=2)
             for i in range(nVertex):
-                lID = i 
+                lID = i
                 x = aVertex_in[i].dLongitude_degree
-                y = aVertex_in[i].dLatitude_degree   
+                y = aVertex_in[i].dLatitude_degree
                 left =   x - 1E-5
                 right =  x + 1E-5
                 bottom = y - 1E-5
                 top =    y + 1E-5
                 pBound= (left, bottom, right, top)
-                index_vertex.insert(lID, pBound)  # 
+                index_vertex.insert(lID, pBound)  #
                 pass
             #now the new vertex
             pVertex_start = pEdge_in.pVertex_start
             pVertex_end = pEdge_in.pVertex_end
             x1=pVertex_start.dLongitude_degree
-            y1=pVertex_start.dLatitude_degree   
+            y1=pVertex_start.dLatitude_degree
             x2=pVertex_end.dLongitude_degree
             y2=pVertex_end.dLatitude_degree
             left   = np.min([x1, x2])
@@ -48,12 +48,12 @@ def find_vertex_on_edge(aVertex_in, pEdge_in):
             for k in aIntersect:
                 pVertex = aVertex_in[k]
                 iFlag_overlap, dDistance, diff = pEdge_in.check_vertex_on_edge(pVertex)
-                if iFlag_overlap == 1:                
-                    iFlag_exist = 1                      
+                if iFlag_overlap == 1:
+                    iFlag_exist = 1
                     aDistance.append(dDistance)
-                    aIndex.append(k) 
-                    npoint = npoint + 1          
-                else:                
+                    aIndex.append(k)
+                    npoint = npoint + 1
+                else:
                     if diff < 1.0:
                         iFlag_overlap = pEdge_in.check_vertex_on_edge(pVertex)
 
@@ -64,27 +64,27 @@ def find_vertex_on_edge(aVertex_in, pEdge_in):
             for i in np.arange( nVertex):
                 pVertex = aVertex_in[i]
                 iFlag_overlap, dDistance, diff = pEdge_in.check_vertex_on_edge(pVertex)
-                if iFlag_overlap == 1:                
-                    iFlag_exist = 1                      
+                if iFlag_overlap == 1:
+                    iFlag_exist = 1
                     aDistance.append(dDistance)
-                    aIndex.append(i) 
-                    npoint = npoint + 1          
-                else:                
+                    aIndex.append(i)
+                    npoint = npoint + 1
+                else:
                     if  diff < 1.0:
                         iFlag_overlap = pEdge_in.check_vertex_on_edge(pVertex)
 
                     pass
 
-            #re-order 
+            #re-order
             if iFlag_exist == 1 :
                 x = np.array(aDistance)
                 b = np.argsort(x)
                 c = np.array(aIndex)
                 d= c[b]
-                aIndex_order = list(d)        
+                aIndex_order = list(d)
     else:
         pass
-    
+
     return iFlag_exist, npoint , aIndex_order
 
 
@@ -106,11 +106,11 @@ def find_edge_in_list(aEdge_in, pEdge_in):
         for i in np.arange( nEdge):
             pEdge = aEdge_in[i]
             if pEdge == pEdge_in:
-                iFlag_exist = 1      
-                lIndex = i 
-                break                
-            
-    
+                iFlag_exist = 1
+                lIndex = i
+                break
+
+
     return iFlag_exist, lIndex
 
 
@@ -132,10 +132,10 @@ def find_flowline_in_list(aFlowline_in, pFlowline_in):
         for i in np.arange( nFlowline):
             pFlowline = aFlowline_in[i]
             if pFlowline == pFlowline_in:
-                iFlag_exist = 1      
-                lIndex = i 
-                break                        
-    
+                iFlag_exist = 1
+                lIndex = i
+                break
+
     return iFlag_exist, lIndex
 
 def find_hexagon_through_edge(aHexagon_in, pEdge_in):
@@ -154,7 +154,7 @@ def find_hexagon_through_edge(aHexagon_in, pEdge_in):
     for i in range(nHexagon):
         pHexagon = aHexagon_in[i]
         if pHexagon.has_this_edge(pEdge_in) ==1:
-            aHexagon_out.append(pHexagon)            
+            aHexagon_out.append(pHexagon)
 
     return aHexagon_out
 
@@ -170,7 +170,7 @@ def check_if_duplicates(aList_in):
     #        iFlag_unique = 0
     #        break
     #    else:
-    #        pass    
+    #        pass
     #return iFlag_unique
     return int(len(aList_in) == len(set(aList_in)))
 
@@ -186,7 +186,7 @@ def add_unique_vertex(aVertex_in, pVertex_in, dThreshold_in = 1.0E-6):
         [type]: [description]
     """
     iFlag_exist = 0
-    nVertex = len(aVertex_in)     
+    nVertex = len(aVertex_in)
 
     iFlag_exist, dummy =  find_vertex_in_list(aVertex_in, pVertex_in, dThreshold_in)
 
@@ -208,9 +208,9 @@ def find_list_in_list(aList_in, pList_in):
         b = copy.deepcopy(a)
         b.sort()
         if (b == c ):
-            iFlag =1 
+            iFlag =1
             break
         else:
             iFlag = 0
-   
+
     return iFlag

@@ -2299,6 +2299,7 @@ static const char __pyx_k_RTree[] = "RTree";
 static const char __pyx_k_array[] = "array";
 static const char __pyx_k_numpy[] = "numpy";
 static const char __pyx_k_range[] = "range";
+static const char __pyx_k_tinyr[] = "tinyr";
 static const char __pyx_k_import[] = "__import__";
 static const char __pyx_k_insert[] = "insert";
 static const char __pyx_k_kernel[] = "kernel";
@@ -2339,7 +2340,6 @@ static const char __pyx_k_dLongitude_degree2_in[] = "dLongitude_degree2_in";
 static const char __pyx_k_dLongitude_degree3_in[] = "dLongitude_degree3_in";
 static const char __pyx_k_calculate_distance_to_plane[] = "calculate_distance_to_plane";
 static const char __pyx_k_calculate_angle_betwen_vertex[] = "calculate_angle_betwen_vertex";
-static const char __pyx_k_pyflowline_external_tinyr_tinyr[] = "pyflowline.external.tinyr.tinyr.tinyr";
 static const char __pyx_k_angle_between_vectors_coordinate[] = "angle_between_vectors_coordinates";
 static const char __pyx_k_calculate_distance_based_on_long[] = "calculate_distance_based_on_longitude_latitude";
 /* #### Code section: decls ### */
@@ -2439,11 +2439,11 @@ typedef struct {
   PyObject *__pyx_n_s_pVertex_end;
   PyObject *__pyx_n_s_pVertex_in;
   PyObject *__pyx_n_s_pVertex_start;
-  PyObject *__pyx_n_s_pyflowline_external_tinyr_tinyr;
   PyObject *__pyx_n_s_range;
   PyObject *__pyx_n_s_search;
   PyObject *__pyx_n_s_spec;
   PyObject *__pyx_n_s_test;
+  PyObject *__pyx_n_s_tinyr;
   PyObject *__pyx_n_s_x1;
   PyObject *__pyx_n_s_x2;
   PyObject *__pyx_n_s_y1;
@@ -2568,11 +2568,11 @@ static int __pyx_m_clear(PyObject *m) {
   Py_CLEAR(clear_module_state->__pyx_n_s_pVertex_end);
   Py_CLEAR(clear_module_state->__pyx_n_s_pVertex_in);
   Py_CLEAR(clear_module_state->__pyx_n_s_pVertex_start);
-  Py_CLEAR(clear_module_state->__pyx_n_s_pyflowline_external_tinyr_tinyr);
   Py_CLEAR(clear_module_state->__pyx_n_s_range);
   Py_CLEAR(clear_module_state->__pyx_n_s_search);
   Py_CLEAR(clear_module_state->__pyx_n_s_spec);
   Py_CLEAR(clear_module_state->__pyx_n_s_test);
+  Py_CLEAR(clear_module_state->__pyx_n_s_tinyr);
   Py_CLEAR(clear_module_state->__pyx_n_s_x1);
   Py_CLEAR(clear_module_state->__pyx_n_s_x2);
   Py_CLEAR(clear_module_state->__pyx_n_s_y1);
@@ -2675,11 +2675,11 @@ static int __pyx_m_traverse(PyObject *m, visitproc visit, void *arg) {
   Py_VISIT(traverse_module_state->__pyx_n_s_pVertex_end);
   Py_VISIT(traverse_module_state->__pyx_n_s_pVertex_in);
   Py_VISIT(traverse_module_state->__pyx_n_s_pVertex_start);
-  Py_VISIT(traverse_module_state->__pyx_n_s_pyflowline_external_tinyr_tinyr);
   Py_VISIT(traverse_module_state->__pyx_n_s_range);
   Py_VISIT(traverse_module_state->__pyx_n_s_search);
   Py_VISIT(traverse_module_state->__pyx_n_s_spec);
   Py_VISIT(traverse_module_state->__pyx_n_s_test);
+  Py_VISIT(traverse_module_state->__pyx_n_s_tinyr);
   Py_VISIT(traverse_module_state->__pyx_n_s_x1);
   Py_VISIT(traverse_module_state->__pyx_n_s_x2);
   Py_VISIT(traverse_module_state->__pyx_n_s_y1);
@@ -2798,11 +2798,11 @@ static int __pyx_m_traverse(PyObject *m, visitproc visit, void *arg) {
 #define __pyx_n_s_pVertex_end __pyx_mstate_global->__pyx_n_s_pVertex_end
 #define __pyx_n_s_pVertex_in __pyx_mstate_global->__pyx_n_s_pVertex_in
 #define __pyx_n_s_pVertex_start __pyx_mstate_global->__pyx_n_s_pVertex_start
-#define __pyx_n_s_pyflowline_external_tinyr_tinyr __pyx_mstate_global->__pyx_n_s_pyflowline_external_tinyr_tinyr
 #define __pyx_n_s_range __pyx_mstate_global->__pyx_n_s_range
 #define __pyx_n_s_search __pyx_mstate_global->__pyx_n_s_search
 #define __pyx_n_s_spec __pyx_mstate_global->__pyx_n_s_spec
 #define __pyx_n_s_test __pyx_mstate_global->__pyx_n_s_test
+#define __pyx_n_s_tinyr __pyx_mstate_global->__pyx_n_s_tinyr
 #define __pyx_n_s_x1 __pyx_mstate_global->__pyx_n_s_x1
 #define __pyx_n_s_x2 __pyx_mstate_global->__pyx_n_s_x2
 #define __pyx_n_s_y1 __pyx_mstate_global->__pyx_n_s_y1
@@ -3420,7 +3420,7 @@ PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 PyObject *__pyx_args, PyObject *__pyx_kwds
 #endif
 ); /*proto*/
-PyDoc_STRVAR(__pyx_doc_6kernel_calculate_distance_based_on_longitude_latitude, "\n    Calculate the great circle distance between two points \n    on the earth (specified in decimal degrees)\n    ");
+PyDoc_STRVAR(__pyx_doc_6kernel_calculate_distance_based_on_longitude_latitude, "\n    Calculate the great circle distance between two points\n    on the earth (specified in decimal degrees)\n    ");
 static PyMethodDef __pyx_mdef_6kernel_1calculate_distance_based_on_longitude_latitude = {"calculate_distance_based_on_longitude_latitude", (PyCFunction)(void*)(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_6kernel_1calculate_distance_based_on_longitude_latitude, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_6kernel_calculate_distance_based_on_longitude_latitude};
 static PyObject *__pyx_pw_6kernel_1calculate_distance_based_on_longitude_latitude(PyObject *__pyx_self, 
 #if CYTHON_METH_FASTCALL
@@ -7724,11 +7724,11 @@ static int __Pyx_CreateStringTabAndInitStrings(void) {
     {&__pyx_n_s_pVertex_end, __pyx_k_pVertex_end, sizeof(__pyx_k_pVertex_end), 0, 0, 1, 1},
     {&__pyx_n_s_pVertex_in, __pyx_k_pVertex_in, sizeof(__pyx_k_pVertex_in), 0, 0, 1, 1},
     {&__pyx_n_s_pVertex_start, __pyx_k_pVertex_start, sizeof(__pyx_k_pVertex_start), 0, 0, 1, 1},
-    {&__pyx_n_s_pyflowline_external_tinyr_tinyr, __pyx_k_pyflowline_external_tinyr_tinyr, sizeof(__pyx_k_pyflowline_external_tinyr_tinyr), 0, 0, 1, 1},
     {&__pyx_n_s_range, __pyx_k_range, sizeof(__pyx_k_range), 0, 0, 1, 1},
     {&__pyx_n_s_search, __pyx_k_search, sizeof(__pyx_k_search), 0, 0, 1, 1},
     {&__pyx_n_s_spec, __pyx_k_spec, sizeof(__pyx_k_spec), 0, 0, 1, 1},
     {&__pyx_n_s_test, __pyx_k_test, sizeof(__pyx_k_test), 0, 0, 1, 1},
+    {&__pyx_n_s_tinyr, __pyx_k_tinyr, sizeof(__pyx_k_tinyr), 0, 0, 1, 1},
     {&__pyx_n_s_x1, __pyx_k_x1, sizeof(__pyx_k_x1), 0, 0, 1, 1},
     {&__pyx_n_s_x2, __pyx_k_x2, sizeof(__pyx_k_x2), 0, 0, 1, 1},
     {&__pyx_n_s_y1, __pyx_k_y1, sizeof(__pyx_k_y1), 0, 0, 1, 1},
@@ -8243,7 +8243,7 @@ if (!__Pyx_RefNanny) {
   /* "kernel.pyx":5
  * from libcpp.vector cimport vector
  * from libc.math cimport sin, cos, asin,acos, sqrt, abs
- * from pyflowline.external.tinyr.tinyr.tinyr import RTree             # <<<<<<<<<<<<<<
+ * from tinyr import RTree             # <<<<<<<<<<<<<<
  * 
  * """ Low-level function for pyflowline
  */
@@ -8252,7 +8252,7 @@ if (!__Pyx_RefNanny) {
   __Pyx_INCREF(__pyx_n_s_RTree);
   __Pyx_GIVEREF(__pyx_n_s_RTree);
   if (__Pyx_PyList_SET_ITEM(__pyx_t_2, 0, __pyx_n_s_RTree)) __PYX_ERR(0, 5, __pyx_L1_error);
-  __pyx_t_3 = __Pyx_Import(__pyx_n_s_pyflowline_external_tinyr_tinyr, __pyx_t_2, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 5, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_Import(__pyx_n_s_tinyr, __pyx_t_2, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 5, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_t_2 = __Pyx_ImportFrom(__pyx_t_3, __pyx_n_s_RTree); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 5, __pyx_L1_error)

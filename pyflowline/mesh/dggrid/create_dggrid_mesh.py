@@ -18,17 +18,17 @@ sDate_default = "{:04d}".format(pDate.year) + "{:02d}".format(pDate.month) + "{:
 #setup common resolution
 aISEA3H = [4320.490,
            2539.690,
-           1480.02, 
+           1480.02,
            855.419,
            494.959,
            285.6520,
-           165.058, 
-           95.2636, 
-           55.0226, 
-           31.7596, 
+           165.058,
+           95.2636,
+           55.0226,
+           31.7596,
            18.341,
-             10.5871, 
-             6.11367, 
+             10.5871,
+             6.11367,
              3.52911]
 
 aISEA4H = [3764.92,
@@ -36,11 +36,11 @@ aISEA4H = [3764.92,
            961.978,
            481.7710,
            241.0470,
-           120.56, 
-           60.2893, 
-           30.147, 
-           15.0741, 
-           7.53719, 
+           120.56,
+           60.2893,
+           30.147,
+           15.0741,
+           7.53719,
            3.76863]
 
 def generate_bash_script(sWorkspace_output):
@@ -98,7 +98,7 @@ def find_number_range(number, aArray):
     for i in range(nPoint):
         if aArray[i] <= number <= aArray[i+1]:
             return i  # Return the index of the range where the number falls
-    return -1  
+    return -1
 
 
 def dggrid_find_index_by_resolution(sDggrid_type, dResolution):
@@ -118,7 +118,7 @@ def dggrid_find_index_by_resolution(sDggrid_type, dResolution):
 
 def dggrid_find_resolution_by_index(sDggrid_type, iResolution_index):
     if sDggrid_type == 'ISEA3H':
-       
+
         dResolution = aISEA3H[iResolution_index-1 ] * 1000
         pass
     else:
@@ -131,7 +131,7 @@ def dggrid_find_resolution_by_index(sDggrid_type, iResolution_index):
 
 def convert_dggrid_mesh_to_pyflowline_mesh(sFilename_dggrid_mesh, sFilename_mesh_pyflowline,
                                             iFlag_global_in = None):
-    
+
     iReturn_code = 1
     if os.path.isfile(sFilename_dggrid_mesh):
         print(sFilename_dggrid_mesh)
@@ -140,12 +140,12 @@ def convert_dggrid_mesh_to_pyflowline_mesh(sFilename_dggrid_mesh, sFilename_mesh
         print('This mesh file does not exist: ', sFilename_dggrid_mesh )
         iReturn_code = 0
         return iReturn_code
-    
+
     if iFlag_global_in is not None:
         iFlag_global = iFlag_global_in
     else:
         iFlag_global = 0
-    
+
     if os.path.isfile(sFilename_mesh_pyflowline):
         print('This mesh file already exists: ', sFilename_mesh_pyflowline )
         os.remove(sFilename_mesh_pyflowline)
@@ -153,14 +153,14 @@ def convert_dggrid_mesh_to_pyflowline_mesh(sFilename_dggrid_mesh, sFilename_mesh
     aDggrid=list()
     aDggrid_dict = dict()
     lCellIndex = 0
-    pDriver_geojson = ogr.GetDriverByName('GeoJSON')    
+    pDriver_geojson = ogr.GetDriverByName('GeoJSON')
     pDataset_mesh = pDriver_geojson.Open(sFilename_dggrid_mesh, gdal.GA_ReadOnly)
     pLayer_mesh = pDataset_mesh.GetLayer(0)
     pSpatial_reference_out = pLayer_mesh.GetSpatialRef()
     ldefn = pLayer_mesh.GetLayerDefn()
 
-    pSpatial_reference_gcs = osr.SpatialReference()  
-    pSpatial_reference_gcs.ImportFromEPSG(4326)    # WGS84 lat/lon  
+    pSpatial_reference_gcs = osr.SpatialReference()
+    pSpatial_reference_gcs.ImportFromEPSG(4326)    # WGS84 lat/lon
     pDataset = pDriver_geojson.CreateDataSource(sFilename_mesh_pyflowline)
     pLayer = pDataset.CreateLayer('cell', pSpatial_reference_gcs, ogr.wkbPolygon)
     # Add one attribute
@@ -172,40 +172,40 @@ def convert_dggrid_mesh_to_pyflowline_mesh(sFilename_dggrid_mesh, sFilename_mesh
     pArea_field.SetPrecision(2)
     pLayer.CreateField(pArea_field)
     pLayerDefn = pLayer.GetLayerDefn()
-    pFeature = ogr.Feature(pLayerDefn)   
-    
+    pFeature = ogr.Feature(pLayerDefn)
+
     #we also need to spatial reference
     for pFeature_mesh in pLayer_mesh:
-        pGeometry_mesh = pFeature_mesh.GetGeometryRef()              
-        aCoords_gcs = get_geometry_coordinates(pGeometry_mesh)   
+        pGeometry_mesh = pFeature_mesh.GetGeometryRef()
+        aCoords_gcs = get_geometry_coordinates(pGeometry_mesh)
         dLongitude_center = np.mean(aCoords_gcs[:-1,0])
-        dLatitude_center = np.mean(aCoords_gcs[:-1,1])   
+        dLatitude_center = np.mean(aCoords_gcs[:-1,1])
         lCellID = int(pFeature_mesh.GetField("name") )
-        pdggrid = convert_gcs_coordinates_to_cell(5, dLongitude_center, dLatitude_center, aCoords_gcs)  
+        pdggrid = convert_gcs_coordinates_to_cell(5, dLongitude_center, dLatitude_center, aCoords_gcs)
         dArea = pdggrid.calculate_cell_area()
         pdggrid.calculate_edge_length()
         pdggrid.dLength_flowline = pdggrid.dLength #Default
-        pdggrid.lCellID = lCellID      
-        aNeighbor = pFeature_mesh.GetField("neighbors")   
+        pdggrid.lCellID = lCellID
+        aNeighbor = pFeature_mesh.GetField("neighbors")
         pdggrid.nNeighbor = len(aNeighbor)
         pdggrid.aNeighbor = list()
         for i in range(len(aNeighbor)):
-            pdggrid.aNeighbor.append( int(aNeighbor[i]) )       
+            pdggrid.aNeighbor.append( int(aNeighbor[i]) )
 
         aDggrid.append(pdggrid)
         aDggrid_dict[lCellID] = lCellIndex
         lCellIndex = lCellIndex + 1
 
-        nVertex = pdggrid.nVertex 
-        ring = ogr.Geometry(ogr.wkbLinearRing)        
+        nVertex = pdggrid.nVertex
+        ring = ogr.Geometry(ogr.wkbLinearRing)
         for j in range(nVertex):
             x1 = pdggrid.aVertex[j].dLongitude_degree
             y1 = pdggrid.aVertex[j].dLatitude_degree
-            ring.AddPoint(x1, y1)           
+            ring.AddPoint(x1, y1)
             pass
         x1 = pdggrid.aVertex[0].dLongitude_degree
         y1 = pdggrid.aVertex[0].dLatitude_degree
-        ring.AddPoint(x1, y1) #double check            
+        ring.AddPoint(x1, y1) #double check
         pPolygon = ogr.Geometry(ogr.wkbPolygon)
         pPolygon.AddGeometry(ring)
         pFeature.SetGeometry(pPolygon)
@@ -213,18 +213,18 @@ def convert_dggrid_mesh_to_pyflowline_mesh(sFilename_dggrid_mesh, sFilename_mesh
         pFeature.SetField("longitude", dLongitude_center )
         pFeature.SetField("latitude", dLatitude_center )
         pFeature.SetField("area", dArea )
-      
+
         pLayer.CreateFeature(pFeature)
 
-    #rebuild neighbor list    
-    aDggrid_middle = list()      
-    for pCell in aDggrid:           
-        aNeighbor = pCell.aNeighbor       
-        aNeighbor_new = list()       
-        for lNeighbor in aNeighbor:            
-            if lNeighbor in aDggrid_dict:                
+    #rebuild neighbor list
+    aDggrid_middle = list()
+    for pCell in aDggrid:
+        aNeighbor = pCell.aNeighbor
+        aNeighbor_new = list()
+        for lNeighbor in aNeighbor:
+            if lNeighbor in aDggrid_dict:
                 aNeighbor_new.append(lNeighbor)
-        
+
         pCell.aNeighbor = aNeighbor_new
         pCell.nNeighbor = len(aNeighbor_new)
         pCell.nNeighbor_land= len(aNeighbor_new)
@@ -238,15 +238,15 @@ def convert_dggrid_mesh_to_pyflowline_mesh(sFilename_dggrid_mesh, sFilename_mesh
         pDggrid.aNeighbor_distance=list()
         for lCellID1 in aNeighbor:
             lIndex = aDggrid_dict[lCellID1]
-            pDggrid1 = aDggrid_middle[lIndex]  
+            pDggrid1 = aDggrid_middle[lIndex]
             dDistance = pDggrid.pVertex_center.calculate_distance( pDggrid1.pVertex_center )
             pDggrid.aNeighbor_distance.append(dDistance)
-     
-    pDataset = pLayer = pFeature  = None  
+
+    pDataset = pLayer = pFeature  = None
 
     #currently we do not fill the holes in dggrid, it is recommended to modify the input data directly.
 
-    
+
     return aDggrid_middle
 
 def create_dggrid_mesh(iFlag_global,
@@ -256,10 +256,11 @@ def create_dggrid_mesh(iFlag_global,
                          iResolution_index_in = None,
                          sDggrid_type_in= None,
                          iFlag_antarctic_in=None,
+                          iFlag_arctic_in=None,
                          sFilename_boundary_in = None ):
 
-    #use dggrid table to determine the resolution index   
-    sFilename_cell = sWorkspace_output + slash + 'cells'    
+    #use dggrid table to determine the resolution index
+    sFilename_cell = sWorkspace_output + slash + 'cells'
 
     if iResolution_index_in is not None:
         iResolution_index = iResolution_index_in
@@ -271,9 +272,9 @@ def create_dggrid_mesh(iFlag_global,
     else:
         sDggrid_type = 'ISEA3H' #default
 
-    dResolution= dggrid_find_resolution_by_index(sDggrid_type, iResolution_index)  
+    dResolution= dggrid_find_resolution_by_index(sDggrid_type, iResolution_index)
     print('Resolution is: ', dResolution)
-    #  
+    #
     sResolution = "{:0d}".format( iResolution_index )
 
     if sFilename_boundary_in is not None:
@@ -286,11 +287,11 @@ def create_dggrid_mesh(iFlag_global,
             iFlag_global = 1
 
     else:
-        iFlag_crop = 0   
+        iFlag_crop = 0
 
-    iFlag_mode = 1 
+    iFlag_mode = 1
 
-    if iFlag_mode == 1: #call the binary directly    
+    if iFlag_mode == 1: #call the binary directly
         #write configuration
         sFilename_config= sWorkspace_output + slash +   'dggrid.ini'
         ofs = open(sFilename_config, 'w')
@@ -321,8 +322,8 @@ def create_dggrid_mesh(iFlag_global,
         sLine = 'max_cells_per_output_file 0'  + '\n'
         ofs.write(sLine)
         sLine = 'neighbor_output_type GDAL_COLLECTION'  + '\n'
-        ofs.write(sLine)       
-        
+        ofs.write(sLine)
+
         ofs.close()
         #writen normal run script
         generate_bash_script(sWorkspace_output)
@@ -333,10 +334,10 @@ def create_dggrid_mesh(iFlag_global,
         p.wait()
 
         #convert the pyflowline mesh format
-             
+
         aDggrid = convert_dggrid_mesh_to_pyflowline_mesh(sFilename_cell, sFilename_mesh,
                                                           iFlag_global_in = iFlag_global)
-        
+
     return aDggrid
 
 if __name__ == '__main__':

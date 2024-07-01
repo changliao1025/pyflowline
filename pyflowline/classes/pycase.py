@@ -45,7 +45,7 @@ iFlag_kml = importlib.util.find_spec("simplekml")
 
 iFlag_cython = importlib.util.find_spec("cython")
 if iFlag_cython is not None:
-    from pyflowline.external.tinyr.tinyr.tinyr import RTree
+    from tinyr import RTree
     iFlag_use_rtree = 1
 else:
     iFlag_use_rtree =0
@@ -110,6 +110,7 @@ class flowlinecase(object):
     iFlag_flowline = 1
     iFlag_global = 0
     iFlag_antarctic = 0
+    iFlag_arctic = 0
     iFlag_multiple_outlet = 0
     iFlag_mesh_boundary = 0
     iFlag_user_provided_binary = 0
@@ -229,6 +230,9 @@ class flowlinecase(object):
         if 'iFlag_antarctic' in aConfig_in:
             self.iFlag_antarctic        = int(aConfig_in[ 'iFlag_antarctic'])
 
+        if 'iFlag_arctic' in aConfig_in:
+            self.iFlag_arctic        = int(aConfig_in[ 'iFlag_arctic'])
+
         if 'iFlag_mesh_boundary' in aConfig_in:
             self.iFlag_mesh_boundary       = int(aConfig_in[ 'iFlag_mesh_boundary'])
         else:
@@ -245,6 +249,8 @@ class flowlinecase(object):
             self.iFlag_simplification  = 1
         if self.iFlag_simplification ==1:
             self.iFlag_flowline = 1
+        else:
+            self.iFlag_flowline = 0
 
         if 'iFlag_create_mesh' in aConfig_in:
             self.iFlag_create_mesh = int(aConfig_in['iFlag_create_mesh'])
@@ -551,6 +557,9 @@ class flowlinecase(object):
             #other requirements maybe needed
             pass
         else:
+            if self.iFlag_antarctic==1 and self.iFlag_arctic==1:
+                print('Both antarctic and arctic flags are on, please check the parameters!')
+
             if self.iFlag_mesh_boundary == 1:
                 if not os.path.isfile(self.sFilename_mesh_boundary ):
                     print("The mesh boundary file does not exist, you should update this parameter before running the model!")
@@ -560,7 +569,6 @@ class flowlinecase(object):
                     self.dLongitude_mean = 0.5 * (aExtent[0] + aExtent[2])
                     self.dLatitude_mean = 0.5 * (aExtent[1] + aExtent[3])
                     pass
-
 
             if sMesh_type =='hexagon': #hexagon #need spatial referece
                 #check boundary
@@ -741,7 +749,7 @@ class flowlinecase(object):
 
         return aFlowline_out
 
-    def pyflowline_mesh_generation(self, iFlag_antarctic_in=None):
+    def pyflowline_mesh_generation(self, iFlag_antarctic_in=None, iFlag_arctic_in=None):
         """
         The mesh generation operation
 
@@ -751,9 +759,14 @@ class flowlinecase(object):
         print('Start mesh generation.')
 
         if iFlag_antarctic_in is None:
-            iFlag_antarctic = 0
+            iFlag_antarctic = self.iFlag_antarctic
         else:
             iFlag_antarctic = iFlag_antarctic_in
+
+        if iFlag_arctic_in is None:
+            iFlag_arctic = self.iFlag_arctic
+        else:
+            iFlag_arctic = iFlag_arctic_in
 
         if self.iFlag_create_mesh ==1:
             iFlag_global =  self.iFlag_global
@@ -867,10 +880,11 @@ class flowlinecase(object):
                             dLongitude_left  = self.dLongitude_left
                             dLongitude_right = self.dLongitude_right
 
-                            if iFlag_antarctic ==1:
+                            if iFlag_antarctic ==1 or iFlag_arctic ==1:
                                 aMpas = create_mpas_mesh(iFlag_global, iFlag_use_mesh_dem, iFlag_save_mesh,
                                                          sFilename_mesh_netcdf, sFilename_mesh,
-                                                         iFlag_antarctic_in=iFlag_antarctic_in )
+                                                         iFlag_antarctic_in=iFlag_antarctic,
+                                                          iFlag_arctic_in=iFlag_arctic)
                                 pass
                             else:
                                 if iFlag_mesh_boundary ==1:
@@ -881,6 +895,7 @@ class flowlinecase(object):
                                     aMpas = create_mpas_mesh(iFlag_global, iFlag_use_mesh_dem, iFlag_save_mesh,
                                                              sFilename_mesh_netcdf,  sFilename_mesh,
                                                              iFlag_antarctic_in=iFlag_antarctic_in,
+                                                             iFlag_arctic_in=iFlag_arctic_in,
                                                              pBoundary_in = pBoundary_wkt)
                                     pass
                                 else:
@@ -898,6 +913,7 @@ class flowlinecase(object):
                                     aMpas = create_mpas_mesh(iFlag_global, iFlag_use_mesh_dem, iFlag_save_mesh,
                                                              sFilename_mesh_netcdf, sFilename_mesh,
                                                              iFlag_antarctic_in= iFlag_antarctic_in,
+                                                             iFlag_arctic_in=iFlag_arctic_in,
                                                              pBoundary_in = pBoundary_wkt  )
                                     pass
 
@@ -927,6 +943,7 @@ class flowlinecase(object):
                                                                      sWorkspace_output,
                                                                      iResolution_index_in= self.iResolution_index,
                                                                      iFlag_antarctic_in=iFlag_antarctic_in,
+                                                                     iFlag_arctic_in=iFlag_arctic_in,
                                                                      sDggrid_type_in = self.sDggrid_type,
                                                                      sFilename_boundary_in = self.sFilename_mesh_boundary)
 
@@ -1135,7 +1152,7 @@ class flowlinecase(object):
             pass
 
         if self.iFlag_create_mesh:
-            self.aCell = self.pyflowline_mesh_generation(iFlag_antarctic_in= self.iFlag_antarctic)
+            self.aCell = self.pyflowline_mesh_generation(iFlag_antarctic_in= self.iFlag_antarctic, iFlag_arctic_in=self.iFlag_arctic)
             aCell_out = self.aCell
             pass
         else:
@@ -1233,10 +1250,10 @@ class flowlinecase(object):
             obj.pop(sKey, None)
             pass
 
-        sJson = json.dumps(obj,\
-                               sort_keys=True, \
-                               indent = 4, \
-                               ensure_ascii=True, \
+        sJson = json.dumps(obj,
+                               sort_keys=True,
+                               indent = 4,
+                               ensure_ascii=True,
                                cls=CaseClassEncoder)
         return sJson
 

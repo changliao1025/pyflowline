@@ -40,9 +40,8 @@ from pyflowline.algorithms.auxiliary.calculate_area_of_difference import calcula
 #cython for performance improvement
 iFlag_cython = importlib.util.find_spec("cython")
 if iFlag_cython is not None:
-
     from pyflowline.algorithms.cython.kernel import find_vertex_in_list
-    from pyflowline.external.tinyr.tinyr.tinyr import RTree
+    from tinyr import RTree
     iFlag_use_rtree = 1
 else:
     from pyflowline.algorithms.auxiliary.find_vertex_in_list import find_vertex_in_list
@@ -163,7 +162,7 @@ class pybasin(object):
     sFilename_stream_segment=''
     sFilename_stream_edge=''
 
-    
+
 
     sFilename_variable_polygon=''
     sFilename_variable_polyline=''
@@ -336,7 +335,7 @@ class pybasin(object):
         self.sFilename_confluence_simplified_info = os.path.join(str(self.sWorkspace_output_basin ),'confluence_simplified_info.json')
 
         #geojson, full path of the file
-        #full paths are required for the following files        
+        #full paths are required for the following files
         self.sFilename_flowline_segment_index_before_intersect = os.path.join(str(self.sWorkspace_output_basin ),'flowline_segment_index_before_intersect.geojson')
         self.sFilename_flowline_simplified = os.path.join(str(self.sWorkspace_output_basin ),'flowline_simplified.geojson')
         self.sFilename_flowline_split = os.path.join(str(self.sWorkspace_output_basin ),'flowline_split.geojson')
@@ -486,7 +485,7 @@ class pybasin(object):
             print('Basin ',  self.sBasinID, ' has dam', nFlowline_before, nFlowline_after)
             ptimer.stop()
         else:
-            print('Basin ',  self.sBasinID, ' has no dam')            
+            print('Basin ',  self.sBasinID, ' has no dam')
             sFilename_flowline_filter = self.sFilename_flowline_filter_geojson #sFilename_flowline_filter = self.sFilename_flowline_filter
             aFlowline_basin_filtered, pSpatial_reference = read_flowline_geojson( sFilename_flowline_filter )
             #aVertex_filtered = find_flowline_vertex(aFlowline_basin_filtered)
@@ -529,7 +528,7 @@ class pybasin(object):
             print('Basin ', self.sBasinID, 'split flowline')
             sys.stdout.flush()
             ptimer.start()
-       
+
             nFlowline_before = len(aFlowline_basin_filtered)
             aFlowline_basin_simplified = split_flowline(aFlowline_basin_filtered, aVertex)
             nFlowline_after = len(aFlowline_basin_simplified)
@@ -727,7 +726,7 @@ class pybasin(object):
         Returns:
             list [pyflowline]: A list of intersected cells
         """
-        print('Basin ',  self.sBasinID, 'Start topology reconstruction')        
+        print('Basin ',  self.sBasinID, 'Start topology reconstruction')
         ptimer = pytimer()
         sWorkspace_output_basin = self.sWorkspace_output_basin
         sFilename_flowline_in = self.sFilename_flowline_simplified
@@ -740,7 +739,7 @@ class pybasin(object):
             aCell, aCell_intersect_basin, aFlowline_intersect_all = intersect_flowline_with_mesh(iMesh_type, sFilename_mesh, \
                 sFilename_flowline_in, sFilename_flowline_intersect_out)
             ptimer.stop()
-            
+
             if self.iFlag_debug ==1:
                 sFilename_out = 'flowline_intersect_flowline_with_mesh.geojson'
                 sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
@@ -751,7 +750,7 @@ class pybasin(object):
         #not an ideal setup, but it could be improved
         if self.iFlag_simplification_done ==1:
             pVertex_outlet_initial = self.pVertex_outlet
-        else:    
+        else:
             point= dict()
             point['dLongitude_degree'] = self.dLongitude_outlet_degree
             point['dLatitude_degree'] = self.dLatitude_outlet_degree
@@ -767,7 +766,7 @@ class pybasin(object):
             print('Outlet ID', lCellID_outlet)
             #this outlet is the one intersect outlet cell, not cell center
             print('Outlet location', pVertex_outlet.dLongitude_degree, pVertex_outlet.dLatitude_degree)
-            ptimer.stop()           
+            ptimer.stop()
             if self.iFlag_debug ==1:
                 sFilename_out = 'flowline_simplified_after_intersect.geojson'
                 sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
@@ -795,7 +794,7 @@ class pybasin(object):
             sys.stdout.flush()
             ptimer.start()
             aFlowline_basin_conceptual = remove_duplicate_flowline(aFlowline_basin_conceptual)
-            ptimer.stop()            
+            ptimer.stop()
             if self.iFlag_debug ==1:
                 sFilename_out = 'flowline_edge_remove_duplicate_flowline.geojson'
                 sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)

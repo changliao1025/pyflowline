@@ -29,8 +29,9 @@ def basin_plot(self,
                dData_max_in = None,
                sVariable_in=None,
                aExtent_in = None,
-                aLegend_in = None,
-               pProjection_map_in = None):
+               aLegend_in = None,
+               pProjection_map_in = None,
+               pProjection_data_in = None):
     """_summary_
 
     Args:

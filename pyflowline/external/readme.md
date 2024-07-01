@@ -1,0 +1,1 @@
+Both PyEarth and Tinyr should be installed independently.

@@ -10,10 +10,12 @@ from pyearth.visual.map.vector.map_multiple_vector_data import map_multiple_vect
 def plot(self,
          iFlag_type_in = None,
          iFlag_title_in = None,
+         iDPI_in = None,
          sFilename_output_in = None,
          sVariable_in = None,
          aExtent_in = None,
-         pProjection_map_in = None):
+         pProjection_map_in = None,
+         pProjection_data_in=None):
     """_summary_
 
     Args:
@@ -76,6 +78,8 @@ def plot(self,
                 if sVariable_in == 'mesh':
                     self._plot_mesh(sFilename_output_in=sFilename_output_in,
                                     aExtent_in = aExtent_in,
+                                    iDPI_in = iDPI_in,
+                                    pProjection_data_in = pProjection_data_in,
                                     pProjection_map_in = pProjection_map_in)
 
             else:
@@ -97,6 +101,8 @@ def plot(self,
 def _plot_mesh(self,
                sFilename_output_in=None,
                aExtent_in=None,
+               iDPI_in=None,
+               pProjection_data_in = None,
                pProjection_map_in = None):
 
     sFilename_in = self.sFilename_mesh
@@ -106,9 +112,11 @@ def _plot_mesh(self,
                             iFlag_zebra_in= 1,
                             iFlag_color_in = 0,
                             iFlag_fill_in= False,
+                            iDPI_in=iDPI_in,
                             sFilename_output_in = sFilename_output_in,
                             sTitle_in = sMesh_type,
                             aExtent_in = aExtent_in,
+                            pProjection_data_in= pProjection_data_in,
                             pProjection_map_in = pProjection_map_in)
 
     return
@@ -153,6 +161,7 @@ def _plot_mesh_with_flowline(self,
                              aFlag_discrete_in = aFlag_discrete,
                              aExtent_in = aExtent_in,
                              aVariable_in = aVariable_in,
+
                              pProjection_map_in = pProjection_map_in)
     return
 

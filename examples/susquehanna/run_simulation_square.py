@@ -29,11 +29,11 @@ oPyflowline = pyflowline_read_configuration_file(sFilename_configuration_in, \
 iCase_index_in=iCase_index, dResolution_meter_in=dResolution_meter, sDate_in=sDate)
 oPyflowline.aBasin[0].dLatitude_outlet_degree=39.462000
 oPyflowline.aBasin[0].dLongitude_outlet_degree=-76.009300
-oPyflowline.setup()
-oPyflowline.flowline_simplification()
-aCell = oPyflowline.mesh_generation()
-oPyflowline.reconstruct_topological_relationship(aCell)
-oPyflowline.export()
-
+oPyflowline.pyflowline_setup()
+oPyflowline.pyflowline_flowline_simplification()
+aCell = oPyflowline.pyflowline_mesh_generation()
+oPyflowline.pyflowline_reconstruct_topological_relationship(aCell)
+oPyflowline.pyflowline_export()
+oPyflowline.pyflowline_export_config_to_json()
 
 print('Finished')

@@ -34,7 +34,7 @@ class pyvertex(object):
 
 
     lVerterIndex=-1 #this index will be used for array - class variable
-    lVertexID=-1
+    lVertexID= 1
     lFlowlineID = -1  #we use this id only for intersect
     dX_meter=-9999
     dY_meter=-9999

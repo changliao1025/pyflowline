@@ -6,10 +6,7 @@ from osgeo import ogr, osr, gdal
 from pyflowline.formats.convert_attributes import convert_gcs_attributes_to_cell
 from pyflowline.algorithms.potentiometric.calculate_potentiometric import calculate_potentiometric
 gdal.UseExceptions()
-
 iFlag_cython = importlib.util.find_spec("cython")
-
-
 if iFlag_cython is not None:
     from pyflowline.algorithms.cython.kernel import convert_360_to_180
 else:
@@ -20,6 +17,8 @@ def create_mpas_mesh(iFlag_global_in,
     iFlag_save_mesh_in,
     sFilename_mesh_netcdf_in,
     sFilename_output_in,
+    iFlag_read_mesh_in  = None,
+    iFlag_generate_mesh_in=None,
     iFlag_antarctic_in=None,
     iFlag_arctic_in=None,
     pBoundary_in = None):
@@ -669,3 +668,52 @@ def create_mpas_mesh(iFlag_global_in,
             pass
 
     return aMpas_out
+
+def run_jigsaw_model(sFilename_jigsaw_geometry_in,
+                             aFilename_river_in=None,
+                               aFilename_watershed_boundary_in= None,
+                               aFilenamae_lake_boundary_in = None,
+                               aFilename_coastline_in = None):
+
+
+    import jigsawpy
+    opts = jigsawpy.jigsaw_jig_t()
+    mesh = jigsawpy.jigsaw_msh_t()
+    opts.geom_file = sFilename_jigsaw_geometry_in
+    sFilename_spac = sFilename_jigsaw_geometry_in.replace('.msh', '_spac.msh')
+    opts.hfun_file = sFilename_spac
+    #opts.init_file = args.msh_tags + "_init.msh"
+    sFilename_mesh = sFilename_jigsaw_geometry_in.replace('.msh', '_mesh.msh')
+    opts.mesh_file = sFilename_mesh
+    aFilename_opts = sFilename_jigsaw_geometry_in.replace('.msh', '_opts.jig')
+    opts.jcfg_file = aFilename_opts
+    opts.verbosity = +1
+    opts.hfun_scal = "absolute"
+    opts.hfun_hmax = float("inf")       # null HFUN limits
+    #opts.hfun_hmin = float(+0.00)
+    opts.optm_qlim = +.95
+    opts.mesh_dims = +2
+    opts.mesh_rad2 = +1.20              # relax edge-ratio
+    #opts.mesh_eps1 = +1.00
+    #opts.mesh_top1 = True
+    #opts.optm_iter = +64                # tight optim. tol
+    #opts.optm_qtol = +5.E-05
+    #opts.optm_cost = "skew-cos"
+    #opts.optm_dual = True
+
+    jigsawpy.cmd.jigsaw(opts, mesh)
+
+    return
+
+def convert_jigsaw_mesh_to_mpas_mesh(pJigsaw_mesh, sFilename_out):
+
+
+    return
+
+
+
+
+
+
+
+

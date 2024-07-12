@@ -60,7 +60,7 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh_in, sFilename_flo
     pLayerDefn = pLayerOut.GetLayerDefn()
     pFeatureOut = ogr.Feature(pLayerDefn)
 
-    lFlowlineID = 0
+    lFlowlineID = 1
     aFlowline_intersect_all=list()
     if iFlag_use_rtree ==1: #use the rtree to speed up
         #index_flowline = rtree.index.Index()

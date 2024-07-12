@@ -46,8 +46,8 @@ def _pyflowline_create_hpc_job(self, sSlurm_in=None):
     sLine = 'oPyflowline.pyflowline_analyze()' + '\n'
     ofs_pyflowline.write(sLine)
 
-    # sLine = 'oPyflowline.pyflowline_evaluate()' + '\n'
-    # ofs_pyflowline.write(sLine)
+    sLine = 'oPyflowline.pyflowline_evaluate()' + '\n'
+    ofs_pyflowline.write(sLine)
 
     sLine = 'oPyflowline.pyflowline_export()' + '\n'
     ofs_pyflowline.write(sLine)

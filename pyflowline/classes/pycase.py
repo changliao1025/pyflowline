@@ -122,6 +122,8 @@ class flowlinecase(object):
     iFlag_intersect = 1
     iFlag_rotation=0
     iFlag_break_by_distance = 0  #if the distance between two vertice are far,
+    iFlag_analysis = 0
+    iFlag_evaluation = 0 #run evaluation or not
     iResolution_index = 10
     iFlag_dggrid = 0
     nOutlet = 1 #by default , there shoule ne only one ouelet
@@ -226,6 +228,12 @@ class flowlinecase(object):
 
         if 'iFlag_global' in aConfig_in:
             self.iFlag_global      = int(aConfig_in[ 'iFlag_global'])
+
+        if 'iFlag_analysis' in aConfig_in:
+            self.iFlag_analysis      = int(aConfig_in[ 'iFlag_analysis'])
+
+        if 'iFlag_evaluation' in aConfig_in:
+            self.iFlag_evaluation      = int(aConfig_in[ 'iFlag_evaluation'])
 
         if 'iFlag_antarctic' in aConfig_in:
             self.iFlag_antarctic        = int(aConfig_in[ 'iFlag_antarctic'])
@@ -984,6 +992,7 @@ class flowlinecase(object):
             #no matter what type of mash, we will convert it to geoparquet for easy visualization
             convert_geojson_to_geoparquet(sFilename_mesh, self.sFilename_mesh_parquet)
         else:
+            #this means the mesh is already generated, we need a function that can read an existing pyflowline compatible mesh
             pass
 
         #build rtree
@@ -1176,18 +1185,28 @@ class flowlinecase(object):
         """
         Analyze the domain results for every watershed
         """
+        print('PyFlowline started analyze results')
+        ptimer = pytimer()
+        ptimer.start()
         if self.iFlag_flowline == 1:
-            for pBasin in self.aBasin:
-                #pBasin.basin_analyze()
-                pass
+            if self.iFlag_analysis == 1:
+                for pBasin in self.aBasin:
+                    pBasin.basin_analyze()
+                    pass
+        ptimer.stop()
         return
 
     def pyflowline_evaluate(self):
         """
         Evaluate the model performance
         """
-        for pBasin in self.aBasin:
-            pBasin.evaluate(self.iMesh_type, self.sMesh_type)
+        print('PyFlowline started evaluate results')
+        ptimer = pytimer()
+        ptimer.start()
+        if self.iFlag_evaluation == 1:
+            for pBasin in self.aBasin:
+                pBasin.basin_evaluate(self.iMesh_type, self.sMesh_type)
+        ptimer.stop()
         return
 
     def pyflowline_export(self):

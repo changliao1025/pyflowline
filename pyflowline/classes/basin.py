@@ -183,7 +183,7 @@ class pybasin(object):
         from ._visual_basin import _plot_polyline_variable
         from ._visual_basin import _plot_polygon_variable
 
-        from ._visual_basin import _plot_area_of_difference
+        #from ._visual_basin import _plot_area_of_difference
     else:
         pass
 
@@ -385,7 +385,7 @@ class pybasin(object):
         if self.iFlag_dam == 1:
             #sFilename_flowline_filter = self.sFilename_flowline_filter
             sFilename_flowline_filter = self.sFilename_flowline_filter_geojson
-            aFlowline_basin_filtered_raw, pSpatial_reference = read_flowline_geojson( sFilename_flowline_filter )
+            aFlowline_basin_filtered_raw, pProjection_geojson = read_flowline_geojson( sFilename_flowline_filter )
             aVertex_filtered = find_flowline_vertex(aFlowline_basin_filtered_raw)
 
             ptimer.start()
@@ -487,7 +487,7 @@ class pybasin(object):
         else:
             print('Basin ',  self.sBasinID, ' has no dam')
             sFilename_flowline_filter = self.sFilename_flowline_filter_geojson #sFilename_flowline_filter = self.sFilename_flowline_filter
-            aFlowline_basin_filtered, pSpatial_reference = read_flowline_geojson( sFilename_flowline_filter )
+            aFlowline_basin_filtered, pProjection_geojson = read_flowline_geojson( sFilename_flowline_filter )
             #aVertex_filtered = find_flowline_vertex(aFlowline_basin_filtered)
 
             pass
@@ -988,7 +988,7 @@ class pybasin(object):
         if self.aFlowline_basin_filtered is None:
             sFilename_flowline_filter = self.sFilename_flowline_filter
             sFilename_flowline_filter_geojson = self.sFilename_flowline_filter_geojson
-            self.aFlowline_basin_filtered, pSpatial_reference = read_flowline_geojson( sFilename_flowline_filter_geojson )
+            self.aFlowline_basin_filtered, pProjection_geojson = read_flowline_geojson( sFilename_flowline_filter_geojson )
             self.dLength_flowline_filtered = self.basin_calculate_flowline_length(self.aFlowline_basin_filtered)
 
         #maybe we should use the exisitng result
@@ -999,7 +999,7 @@ class pybasin(object):
 
         if self.aFlowline_basin_simplified is None:
             sFilename_flowline_in = self.sFilename_flowline_simplified
-            aFlowline_simplified,pSpatial_reference = read_flowline_geojson( sFilename_flowline_in )
+            aFlowline_simplified, pProjection_geojson = read_flowline_geojson( sFilename_flowline_in )
 
             self.aFlowline_basin_simplified = aFlowline_simplified
             aVertex, lIndex_outlet, aIndex_headwater,aIndex_middle, aIndex_confluence, aConnectivity, pVertex_outlet\
@@ -1014,7 +1014,7 @@ class pybasin(object):
 
         if self.aFlowline_basin_conceptual is None:
             sFilename_flowline_in = self.sFilename_flowline_conceptual
-            aFlowline_conceptual, pSpatial_reference = read_flowline_geojson( sFilename_flowline_in )
+            aFlowline_conceptual, pProjection_geojson = read_flowline_geojson( sFilename_flowline_in )
             self.aFlowline_basin_conceptual = aFlowline_conceptual
 
             aVertex, lIndex_outlet, aIndex_headwater,aIndex_middle, aIndex_confluence, aConnectivity, pVertex_outlet\
@@ -1242,7 +1242,7 @@ class pybasin(object):
             sMesh_type (str): The mesh type
         """
 
-        self.evaluate_area_of_difference(iMesh_type, sMesh_type)
+        self.basin_evaluate_area_of_difference(iMesh_type, sMesh_type)
         return
 
     def basin_evaluate_area_of_difference(self, iMesh_type, sMesh_type):
@@ -1270,14 +1270,14 @@ class pybasin(object):
         point['dLatitude_degree'] = self.dLatitude_outlet_degree
         pVertex_outlet=pyvertex(point)
 
-        aFlowline_simplified,pSpatial_reference = read_flowline_geojson( sFilename_simplified )
+        aFlowline_simplified, pProjection_geojson = read_flowline_geojson( sFilename_simplified )
         aVertex_simplified, lIndex_outlet_simplified, \
             aIndex_headwater_simplified, aIndex_middle, \
                 aIndex_confluence_simplified, aConnectivity, pVertex_outlet\
                 = find_flowline_confluence(aFlowline_simplified,  pVertex_outlet)
 
 
-        aFlowline_conceptual,pSpatial_reference = read_flowline_geojson( sFilename_flowline_edge )
+        aFlowline_conceptual, pProjection_geojson = read_flowline_geojson( sFilename_flowline_edge )
         aVertex_conceptual, lIndex_outlet_conceptual, \
             aIndex_headwater_conceptual, aIndex_middle_conceptual, \
             aIndex_confluence_conceptual,  aConnectivity, pVertex_outlet \
@@ -1324,6 +1324,10 @@ class pybasin(object):
         if self.iFlag_debug ==1:
             sFilename_output= os.path.join(self.sWorkspace_output_basin, 'vertex_split_all.json')
             export_vertex_to_geojson( aVertex_all, sFilename_output)
+            sFilename_output= os.path.join(self.sWorkspace_output_basin, 'vertex_split_simpified.json')
+            export_vertex_to_geojson( aVertex_all_simplified, sFilename_output)
+            sFilename_output= os.path.join(self.sWorkspace_output_basin, 'vertex_split_conceptual.json')
+            export_vertex_to_geojson( aVertex_all_conceptual, sFilename_output)
 
         #split
         aFlowline_simplified_split = split_flowline(aFlowline_simplified, aVertex_all_simplified,iFlag_intersect =1)
@@ -1333,7 +1337,7 @@ class pybasin(object):
             sFilename_out = os.path.join(self.sWorkspace_output_basin, sFilename_out)
             export_flowline_to_geojson(aFlowline_simplified_split, sFilename_out)
 
-        aFlowline_conceptual_split = split_flowline(aFlowline_conceptual, aVertex_all_conceptual,\
+        aFlowline_conceptual_split = split_flowline(aFlowline_conceptual, aVertex_all_conceptual,
             iFlag_intersect =1, iFlag_use_id=1)
         self.iFlag_debug =1
         if self.iFlag_debug ==1:
@@ -1350,6 +1354,8 @@ class pybasin(object):
         aPolygon_out, dArea = calculate_area_of_difference_simplified(aFlowline_all, aVertex_all, sFilename_output)
         print('Area of difference: ', dArea)
         self.dArea_of_difference = dArea
-        self.dDistance_displace = dArea / self.dLength_flowline_simplified
+        if self.dLength_flowline_simplified >0:
+            self.dArea_of_difference_ratio = dArea / self.dLength_flowline_simplified
+
 
         return

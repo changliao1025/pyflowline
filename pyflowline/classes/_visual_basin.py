@@ -13,8 +13,6 @@ def replace_last_occurrence(sFilename_path_in, sSubstring_in, sSubstring_out):
     else:
         return sFilename_path_in[:last_occurrence_index] + sSubstring_out + sFilename_path_in[last_occurrence_index+len(sSubstring_in):]
 
-
-
 def basin_plot(self,
                iFlag_type_in,
                sMesh_type,
@@ -109,6 +107,7 @@ def basin_plot(self,
                                              aFilename_in,
                                              iFlag_title_in=iFlag_title_in,
                                              iFont_size_in=iFont_size_in,
+                                              iFlag_zebra_in= 1,
                                              iFlag_openstreetmap_in=iFlag_openstreetmap_in,
                                              sFilename_output_in=sFilename_output_in,
                                              sTitle_in= 'Flow direction with observation',
@@ -167,9 +166,6 @@ def _plot_polyline_variable(self,
                              aLegend_in = None,
                              pProjection_map_in = None):
 
-
-
-
     iFlag_label = 0
     iFlag_discrete = 0
     iFlag_thickness = 0
@@ -227,15 +223,7 @@ def _plot_polyline_variable(self,
                             sField_thickness = 'drainage_area'
                             sTitle = 'Flow direction'
                         else:
-                            if sVariable_in ==  'aof':
-                                sFilename_json = self.sFilename_area_of_difference
-                                sTitle = 'Conceptual flowline'
-                                iFlag_label = 1
-                                self._plot_area_of_difference( sFilename_output_in,
-                                                         aExtent_in = aExtent_in)
-                                return
-                            else:
-                                print('Unsupported variable: ', sVariable_in, ' in basin_plot.')
+                            print('Unsupported variable: ', sVariable_in, ' in basin_plot.')
                             pass
                 pass
     else:
@@ -299,6 +287,7 @@ def _plot_polygon_variable(self,
     sMesh_type = self.sMesh_type
     iFiletype = 1 #most file are geojson, but some are parquet
     iFlag_integer_in = 0 #most variable are real, if not, it will be set to 1
+    iFlag_color = 1
 
     if sMesh_type == 'mpas':
         #start with integer
@@ -356,7 +345,7 @@ def _plot_polygon_variable(self,
                         else:
                             if sVariable=='slope':
                                 sTitle = 'Surface slope'
-                                sUnit = 'Unit: percent'
+                                sUnit = 'Unit: ratio'
                                 sColormap='Spectral_r'
                                 dData_min = 0.0
                                 dData_max = dData_max_in
@@ -431,12 +420,29 @@ def _plot_polygon_variable(self,
                                 if sVariable_in=='slope':
                                     sVariable  = 'slope'
                                     sTitle = 'Surface slope'
-                                    sUnit = r'Unit: percent'
+                                    sUnit = r'Unit: ratio'
                                     sColormap='Spectral_r'
                                     dData_min = dData_min_in
                                     dData_max = dData_max_in
                                     sFilename = self.sFilename_variable_polygon
                                 else:
+                                    if sVariable_in ==  'area_of_difference':
+                                        sVariable = None
+                                        iFiletype = 1
+                                        sFilename_dummy = self.sFilename_area_of_difference
+                                        #now replace the folder string
+                                        sFilename = replace_last_occurrence(sFilename_dummy, 'hexwatershed', 'pyflowline')
+                                        sTitle = 'Area of difference'
+                                        sUnit = r'Units: $m^{2}$'
+                                        sColormap = None
+                                        iFlag_label = 1
+                                        dData_min = dData_min_in
+                                        dData_max = dData_max_in
+                                        iFlag_colorbar_in = 0
+                                        iFlag_color = 0
+                                        #self._plot_area_of_difference(sFilename_output_in,
+                                        #                         aExtent_in = aExtent_in)
+
                                     pass
                     pass
 
@@ -450,7 +456,7 @@ def _plot_polygon_variable(self,
         pass
 
     map_vector_polygon_data(iFiletype, sFilename,
-                            iFlag_color_in = 1,
+                            iFlag_color_in = iFlag_color,
                              iFlag_colorbar_in = iFlag_colorbar_in,
                              iFont_size_in = iFont_size_in,
                              iFlag_scientific_notation_colorbar_in = iFlag_scientific_notation_colorbar_in,
@@ -529,14 +535,14 @@ def _plot_mesh_with_flow_direction(self,
     return
 
 #this is a reserved function
-def _plot_area_of_difference(self, sFilename_figure_in, aExtent_in = None, pProjection_map_in = None):
-
-    sFilename_json = self.sFilename_area_of_difference
-
-    sFilename_in = self.sFilename_mesh
-    sFilename_out = sFilename_figure_in
-
-    map_vector_polygon_data(1, sFilename_in, sFilename_out, 'cell')
-
-
-    return
+#def _plot_area_of_difference(self, sFilename_figure_in, aExtent_in = None, pProjection_map_in = None):
+#
+#    sFilename_json = self.sFilename_area_of_difference
+#
+#    sFilename_in = self.sFilename_mesh
+#    sFilename_out = sFilename_figure_in
+#
+#    map_vector_polygon_data(1, sFilename_in, sFilename_out, 'cell')
+#
+#
+#    return

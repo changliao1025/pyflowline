@@ -343,6 +343,7 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh_in, sFilename_flo
         #now check the connectivity of the flowlines because the flowlines are not necessarily connected
         iFlag_done = 0
         while (iFlag_done ==0):
+            iFlag_found = 0
             nFlowline_last = len(aFlowline_last)
             for i in range(nFlowline_last):
                 pFlowline = aFlowline_last[i]

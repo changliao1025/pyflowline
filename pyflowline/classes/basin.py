@@ -751,12 +751,11 @@ class pybasin(object):
         #if self.iFlag_simplification_done == 1:
         pVertex_outlet_initial = pVertex_outlet_checked #self.pVertex_outlet
         #else:
-            #point= dict()
-            #point['dLongitude_degree'] = self.dLongitude_outlet_degree
-            #point['dLatitude_degree'] = self.dLatitude_outlet_degree
-            #pVertex_outlet_initial= pVertex_outlet_checked #pyvertex(point)
+        #point= dict()
+        #point['dLongitude_degree'] = self.dLongitude_outlet_degree
+        #point['dLatitude_degree'] = self.dLatitude_outlet_degree
+        #pVertex_outlet_initial= pVertex_outlet_checked #pyvertex(point)
 
-        print('Outlet ID initial', pVertex_outlet_initial.lID)
         print('Outlet initial location', pVertex_outlet_initial.dLongitude_degree, pVertex_outlet_initial.dLatitude_degree)
 
         #from this point, aFlowline_basin is conceptual

@@ -1168,8 +1168,8 @@ class flowlinecase(object):
             #may be read mesh
             iMesh_type = self.iMesh_type
             #there must be some auxiliary file associated with the mesh file
-            self.aCell = read_mesh_json_w_topology(iMesh_type, self.sFilename_mesh)
-            aCell_out = self.aCell
+            #self.aCell = read_mesh_json_w_topology(iMesh_type, self.sFilename_mesh)
+            #aCell_out = self.aCell
             pass
 
         if self.iFlag_intersect == 1:

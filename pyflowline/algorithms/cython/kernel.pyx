@@ -89,14 +89,15 @@ cpdef  find_vertex_in_list(list aVertex_in, pVertex_in, double dThreshold_in = 1
             index_vertex.insert(i, pBound)
 
         #now the new vertex
-        x=pVertex_in.dLongitude_degree
-        y=pVertex_in.dLatitude_degree
-        left =   x - 1E-5
-        right =  x + 1E-5
-        bottom = y - 1E-5
-        top =    y + 1E-5
-        pBound= (left, bottom, right, top)
-        aIntersect = list(index_vertex.search(pBound))
+        #x=pVertex_in.dLongitude_degree
+        #y=pVertex_in.dLatitude_degree
+        #left =   x - 1E-5
+        #right =  x + 1E-5
+        #bottom = y - 1E-5
+        #top =    y + 1E-5
+        #pBound= (left, bottom, right, top)
+        #aIntersect = list(index_vertex.search(pBound))
+        aIntersect = list(index_vertex.search_surrounding([pVertex_in.dLongitude_degree, pVertex_in.dLatitude_degree]))
 
         for k in aIntersect:
             pVertex = aVertex_in[k]

@@ -56,10 +56,6 @@ def find_vertex_on_edge(aVertex_in, pEdge_in):
                 else:
                     if diff < 1.0:
                         iFlag_overlap = pEdge_in.check_vertex_on_edge(pVertex)
-
-                    pass
-
-
         else:
             for i in np.arange( nVertex):
                 pVertex = aVertex_in[i]

@@ -83,7 +83,6 @@ def find_vertex_on_edge(aVertex_in, pEdge_in):
 
     return iFlag_exist, npoint , aIndex_order
 
-
 def find_edge_in_list(aEdge_in, pEdge_in):
     """[find the index of an edge in a list]
 
@@ -108,7 +107,6 @@ def find_edge_in_list(aEdge_in, pEdge_in):
 
 
     return iFlag_exist, lIndex
-
 
 def find_flowline_in_list(aFlowline_in, pFlowline_in):
     """[find the index of a flowline in a list]
@@ -169,7 +167,6 @@ def check_if_duplicates(aList_in):
     #        pass
     #return iFlag_unique
     return int(len(aList_in) == len(set(aList_in)))
-
 
 def add_unique_vertex(aVertex_in, pVertex_in, dThreshold_in = 1.0E-6):
     """[add a vertex to a list if it is not already included]

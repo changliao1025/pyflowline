@@ -554,7 +554,7 @@ class pybasin(object):
             ptimer.start()
             nFlowline_before = len(aFlowline_basin_simplified)
             #this flowline is ordered from downstream to upstream
-            aFlowline_basin_simplified = correct_flowline_direction(aFlowline_basin_simplified,  pVertex_outlet )
+            aFlowline_basin_simplified = correct_flowline_direction(aFlowline_basin_simplified,  pVertex_outlet)
             nFlowline_after = len(aFlowline_basin_simplified)
             ptimer.stop()
             #update outlet
@@ -736,7 +736,7 @@ class pybasin(object):
             print('Basin ',  self.sBasinID, 'Start flowline and mesh intersection')
             sys.stdout.flush()
             ptimer.start()
-            aCell, aCell_intersect_basin, aFlowline_intersect_all = intersect_flowline_with_mesh(iMesh_type, sFilename_mesh, \
+            aCell_intersect_basin, aFlowline_intersect_all, pVertex_outlet_checked = intersect_flowline_with_mesh(iMesh_type, sFilename_mesh, \
                 sFilename_flowline_in, sFilename_flowline_intersect_out)
             ptimer.stop()
 
@@ -748,13 +748,16 @@ class pybasin(object):
             print('Error in flowline and mesh intersection.')
 
         #not an ideal setup, but it could be improved
-        if self.iFlag_simplification_done ==1:
-            pVertex_outlet_initial = self.pVertex_outlet
-        else:
-            point= dict()
-            point['dLongitude_degree'] = self.dLongitude_outlet_degree
-            point['dLatitude_degree'] = self.dLatitude_outlet_degree
-            pVertex_outlet_initial=pyvertex(point)
+        #if self.iFlag_simplification_done == 1:
+        pVertex_outlet_initial = pVertex_outlet_checked #self.pVertex_outlet
+        #else:
+            #point= dict()
+            #point['dLongitude_degree'] = self.dLongitude_outlet_degree
+            #point['dLatitude_degree'] = self.dLatitude_outlet_degree
+            #pVertex_outlet_initial= pVertex_outlet_checked #pyvertex(point)
+
+        print('Outlet ID initial', pVertex_outlet_initial.lID)
+        print('Outlet initial location', pVertex_outlet_initial.dLongitude_degree, pVertex_outlet_initial.dLatitude_degree)
 
         #from this point, aFlowline_basin is conceptual
         #segment based

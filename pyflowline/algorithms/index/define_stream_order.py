@@ -69,7 +69,6 @@ def define_stream_order(aFlowline_in, aConfluence_in):
                 pBound = (x - 1E-5, y - 1E-5, x + 1E-5, y + 1E-5)
                 index_confluence.insert(i, pBound)
 
-
             while aFlowline_in[0].iStream_order < 0:
                 for i in range(nConfleunce):
                     if aFlag_confluence_treated[i] == 1:

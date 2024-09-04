@@ -1,9 +1,9 @@
 import os
 
 #dependency packages
-from pyearth.visual.map.vector.map_vector_polygon_data import map_vector_polygon_data
-from pyearth.visual.map.vector.map_vector_polyline_data import map_vector_polyline_data
-from pyearth.visual.map.vector.map_multiple_vector_data import map_multiple_vector_data
+from pyearth.visual.map.vector.map_vector_polygon_file import map_vector_polygon_file
+from pyearth.visual.map.vector.map_vector_polyline_file import map_vector_polyline_file
+from pyearth.visual.map.vector.map_multiple_vector_files import map_multiple_vector_files
 
 def replace_last_occurrence(sFilename_path_in, sSubstring_in, sSubstring_out):
     last_occurrence_index = sFilename_path_in.rfind(sSubstring_in)
@@ -82,8 +82,9 @@ def basin_plot(self,
                         sFilename = self.sFilename_flow_direction #this can be either domain wide or subbasin level
                         aFiletype_in = [3, 2]
                         aFilename_in = [sFilename_mesh, sFilename]
-                        map_multiple_vector_data(aFiletype_in,
+                        map_multiple_vector_files(aFiletype_in,
                                              aFilename_in,
+                                             iFlag_zebra_in= 1,
                                              aFlag_thickness_in=[0, 1],
                                              aVariable_in=['', 'drainage_area'],
                                              sFilename_output_in=sFilename_output_in,
@@ -103,7 +104,7 @@ def basin_plot(self,
 
                             aFiletype_in = [2, 2, 2]
                             aFilename_in = [sFilename0, sFilename1, sFilename2]
-                            map_multiple_vector_data(aFiletype_in,
+                            map_multiple_vector_files(aFiletype_in,
                                              aFilename_in,
                                              iFlag_title_in=iFlag_title_in,
                                              iFont_size_in=iFont_size_in,
@@ -125,11 +126,12 @@ def basin_plot(self,
                                 sFilename1 = self.sFilename_flow_direction
                                 aFiletype_in = [3, 2]
                                 aFilename_in = [sFilename0, sFilename1]
-                                map_multiple_vector_data(aFiletype_in,
+                                map_multiple_vector_files(aFiletype_in,
                                              aFilename_in,
                                              iFlag_title_in=iFlag_title_in,
                                              iFont_size_in=iFont_size_in,
                                              iFlag_openstreetmap_in=iFlag_openstreetmap_in,
+                                             iFlag_zebra_in= 1,
                                              sFilename_output_in=sFilename_output_in,
                                              sTitle_in= 'Flow direction with hillslope',
                                              aData_min_in=[1, 1],
@@ -241,7 +243,7 @@ def _plot_polyline_variable(self,
         pass
 
 
-    map_vector_polyline_data(1, sFilename_json,
+    map_vector_polyline_file(1, sFilename_json,
                              sFilename_output_in= sFilename_output_in,
                              iFlag_thickness_in= iFlag_thickness  ,
                              iFlag_color_in= iFlag_color,
@@ -455,7 +457,7 @@ def _plot_polygon_variable(self,
         sTitle=''
         pass
 
-    map_vector_polygon_data(iFiletype, sFilename,
+    map_vector_polygon_file(iFiletype, sFilename,
                             iFlag_color_in = iFlag_color,
                              iFlag_colorbar_in = iFlag_colorbar_in,
                              iFont_size_in = iFont_size_in,
@@ -495,8 +497,9 @@ def _plot_mesh_with_flowline(self,
     aFilename_in.append(sFilename_json)
     aFlag_color.append(1)
 
-    map_multiple_vector_data(aFiletype_in,
+    map_multiple_vector_files(aFiletype_in,
                              aFilename_in,
+                             iFlag_zebra_in= 1,
                              sFilename_output_in=sFilename_output_in,
                              sTitle_in= 'Mesh with flowline',
                              aFlag_color_in=aFlag_color,

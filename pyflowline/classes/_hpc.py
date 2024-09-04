@@ -85,7 +85,7 @@ def _pyflowline_create_hpc_job(self, sSlurm_in=None):
     sLine = 'module load gcc/8.1.0' + '\n'
     ofs.write(sLine)
 
-    if self.iFlag_dggrid == 1:
+    if self.iFlag_run_dggrid == 1:
         sLine = 'module load gdal/2.3.1' + '\n'
         ofs.write(sLine)
 

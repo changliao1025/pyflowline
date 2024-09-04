@@ -1,9 +1,9 @@
 import os
 
 #dependency packages
-from pyearth.visual.map.vector.map_vector_polygon_data import map_vector_polygon_data
-from pyearth.visual.map.vector.map_vector_polyline_data import map_vector_polyline_data
-from pyearth.visual.map.vector.map_multiple_vector_data import map_multiple_vector_data
+#from pyearth.visual.map.vector.map_vector_polygon_file import map_vector_polygon_file
+#from pyearth.visual.map.vector.map_vector_polyline_file import map_vector_polyline_file
+#from pyearth.visual.map.vector.map_multiple_vector_files import map_multiple_vector_files
 
 #plot function
 

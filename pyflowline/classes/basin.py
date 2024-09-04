@@ -15,6 +15,7 @@ from pyflowline.formats.read_nhdplus_flowline_shapefile import  read_nhdplus_flo
 from pyflowline.formats.read_nhdplus_flowline_shapefile import extract_nhdplus_flowline_shapefile_by_attribute
 from pyflowline.formats.read_nhdplus_flowline_shapefile import track_nhdplus_flowline
 from pyflowline.formats.convert_flowline_to_geojson import convert_flowline_to_geojson
+from pyflowline.formats.convert_boundary_to_geojson import convert_boundary_to_geojson
 from pyflowline.formats.export_flowline import export_flowline_to_geojson
 from pyflowline.formats.export_vertex import export_vertex_to_geojson
 from pyearth.toolbox.reader.text_reader_string import text_reader_string
@@ -1178,9 +1179,9 @@ class pybasin(object):
         for sKey in aSkip:
             obj.pop(sKey, None)
         with open(sFilename_output, 'w', encoding='utf-8') as f:
-            json.dump(obj, f,sort_keys=True, \
-                ensure_ascii=False, \
-                indent=4, \
+            json.dump(obj, f,sort_keys=True,
+                ensure_ascii=False,
+                indent=4,
                 cls=BasinClassEncoder)
         return
 
@@ -1191,7 +1192,14 @@ class pybasin(object):
         sFilename_raw = self.sFilename_flowline_filter
         sFilename_out = self.sFilename_flowline_filter_geojson
         print('Basin '+ self.sBasinID + ': initial flowline:', sFilename_raw )
-        convert_flowline_to_geojson(1, sFilename_raw, sFilename_out)
+        convert_flowline_to_geojson(sFilename_raw, sFilename_out)
+        return
+
+    def basin_convert_boundary_to_geojson(self):
+        """
+        Convert the boundary to geojson
+        """
+
         return
 
     def basin_calculate_flowline_length(self, aFlowline_in):

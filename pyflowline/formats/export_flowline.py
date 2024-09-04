@@ -139,10 +139,10 @@ def export_flowline_to_geojson( aFlowline_in,
 
 
 
-def export_flowline_to_shapefile(iFlag_projected_in, aFlowline_in, pSpatial_reference_in, \
-    sFilename_shapefile_in, \
-    aAttribute_field=None,\
-    aAttribute_data=None,\
+def export_flowline_to_shapefile(iFlag_projected_in, aFlowline_in, pSpatial_reference_in,
+    sFilename_shapefile_in,
+    aAttribute_field=None,
+    aAttribute_data=None,
         aAttribute_dtype=None):
     """
     convert a shpefile to json format.

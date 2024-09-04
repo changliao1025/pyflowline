@@ -22,9 +22,13 @@ def read_flowline_shapefile(sFilename_shapefile_in):
     pDataset_shapefile = pDriver_shapefile.Open(sFilename_shapefile_in, gdal.GA_ReadOnly)
     pLayer_shapefile = pDataset_shapefile.GetLayer(0)
     pSpatialRef_shapefile = pLayer_shapefile.GetSpatialRef()
+    pProjection_geojson = pSpatialRef_shapefile.ExportToWkt()
+
     pSpatial_reference_gcs = osr.SpatialReference()
     pSpatial_reference_gcs.ImportFromEPSG(4326)
     pSpatial_reference_gcs.SetAxisMappingStrategy(osr.OAMS_TRADITIONAL_GIS_ORDER)
+
+    
     comparison = pSpatialRef_shapefile.IsSame(pSpatial_reference_gcs)
     if(comparison != 1):
         iFlag_transform =1
@@ -80,7 +84,7 @@ def read_flowline_shapefile(sFilename_shapefile_in):
 
     #we also need to spatial reference
 
-    return aFlowline, pSpatialRef_shapefile
+    return aFlowline, pProjection_geojson
 
 def read_flowline_shapefile_swat(sFilename_shapefile_in):
     """
@@ -146,7 +150,6 @@ def read_flowline_shapefile_swat(sFilename_shapefile_in):
 
 
     return aFlowline, pSpatialRef_shapefile
-
 
 def read_flowline_geojson(sFilename_geojson_in, sFilename_out = None):
     """

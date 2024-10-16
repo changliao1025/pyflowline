@@ -1,4 +1,5 @@
 import os
+import shutil
 import stat
 from pathlib import Path
 import json
@@ -559,6 +560,11 @@ class flowlinecase(object):
                 sWorkspace_output = self.sWorkspace_output + slash + '..'+ slash + 'jigsaw'
                 sWorkspace_output = os.path.abspath(sWorkspace_output)
 
+            #check if the folder exists
+            if os.path.exists(sWorkspace_output):
+                #delete the folder
+                shutil.rmtree(sWorkspace_output)
+
             Path(sWorkspace_output).mkdir(parents=True, exist_ok=True)
             self.sWorkspace_jigsaw = sWorkspace_output
             #then copy the binary file to the folder
@@ -567,6 +573,10 @@ class flowlinecase(object):
                 sFilename_new = sWorkspace_output + slash + 'jigsaw'
                 copy2(self.sFilename_dggrid, sFilename_new)
                 os.chmod(sFilename_new, stat.S_IREAD | stat.S_IWRITE | stat.S_IXUSR)
+                #make this binary as the default one and overwrite other binaries
+                # Add the destination directory ahead of the system PATH
+                os.environ["PATH"] = sWorkspace_output + os.pathsep + os.environ["PATH"]
+                # Verify that the binary is in the PATH and is the default
                 pass
             else:
                 if system == 'Windows':
@@ -599,6 +609,10 @@ class flowlinecase(object):
             else:
                 sWorkspace_output = self.sWorkspace_output + slash + '..'+ slash + 'dggrid'
                 sWorkspace_output = os.path.abspath(sWorkspace_output)
+
+            if os.path.exists(sWorkspace_output):
+                #delete the folder
+                shutil.rmtree(sWorkspace_output)
 
             Path(sWorkspace_output).mkdir(parents=True, exist_ok=True)
             self.sWorkspace_dggrid = sWorkspace_output
@@ -996,22 +1010,23 @@ class flowlinecase(object):
 
                             if self.iFlag_run_jigsaw == 1: #run the jigsaw mesh generation workflow, the user also need to provide a json configuration file for jisgaw
 
-                                sFilename_jigsaw_geometry_in = os.path.join(self.sWorkspace_jigsaw, 'jigsaw.msh')
+                                sWorkspace_jigsaw = self.sWorkspace_jigsaw
                                 aFilename_river = list()
                                 aFilename_watershed_boundary = list()
                                 aFilenamae_lake_boundary = list()
                                 aFilename_coastline = list()
 
-                                run_jigsaw_mpas_workflow(sFilename_jigsaw_geometry_in,
-                                                         aConfig_jigsaw_in = self.aConfig_jissaw,
+                                sFilename_mesh_netcdf = run_jigsaw_mpas_workflow(sWorkspace_jigsaw,
+                                                         aConfig_in = self.aConfig_jissaw,
                                     aFilename_river_in=aFilename_river,
                                     aFilename_watershed_boundary_in= aFilename_watershed_boundary,
                                     aFilenamae_lake_boundary_in = aFilenamae_lake_boundary,
                                     aFilename_coastline_in = aFilename_coastline)
 
-                                pass
+                                print('The generated MPAS mesh is: ',sFilename_mesh_netcdf)
+
                             iFlag_use_mesh_dem = self.iFlag_use_mesh_dem
-                            sFilename_mesh_netcdf = self.sFilename_mesh_netcdf
+                            self.sFilename_mesh_netcdf = sFilename_mesh_netcdf
                             dLatitude_top    = self.dLatitude_top
                             dLatitude_bot    = self.dLatitude_bot
                             dLongitude_left  = self.dLongitude_left
@@ -1028,7 +1043,7 @@ class flowlinecase(object):
                                     #create a polygon based on
                                     #read boundary
                                     pBoundary_wkt, aExtent = gdal_read_geojson_boundary(self.sFilename_mesh_boundary_geojson)
-
+                                    print(sFilename_mesh_netcdf)
                                     aMpas = create_mpas_mesh(iFlag_global, iFlag_use_mesh_dem, iFlag_save_mesh,
                                                              sFilename_mesh_netcdf,  sFilename_mesh,
                                                              iFlag_antarctic_in=iFlag_antarctic_in,

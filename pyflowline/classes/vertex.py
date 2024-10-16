@@ -75,6 +75,10 @@ class pyvertex(object):
         except:
             print('Initialization of vertex failed!')
 
+        #calcualte x y z based on dLongitude and dLatitude and earth radius
+        self.dX_meter, self.dY_meter, self.dZ_meter = self.calculate_xyz()
+
+
         return
 
     def toNvector(self):
@@ -178,6 +182,22 @@ class pyvertex(object):
         lat2 = other.dLatitude_degree
         dDistance = calculate_distance_based_on_longitude_latitude(lon1, lat1, lon2, lat2)
         return dDistance
+
+    def calculate_xyz(self):
+        """
+        Calculate the x, y, z based on dLongitude and dLatitude
+
+        Returns:
+            tuple: The x, y, z
+        """
+        dX_meter = 0.0
+        dY_meter = 0.0
+        dZ_meter = 0.0
+        dRadius = 6371000.0 #earth radius in meter
+        dX_meter = dRadius * np.cos(self.dLatitude_radian) * np.cos(self.dLongitude_radian)
+        dY_meter = dRadius * np.cos(self.dLatitude_radian) * np.sin(self.dLongitude_radian)
+        dZ_meter = dRadius * np.sin(self.dLatitude_radian)
+        return dX_meter, dY_meter, dZ_meter
 
     def tojson(self):
         """

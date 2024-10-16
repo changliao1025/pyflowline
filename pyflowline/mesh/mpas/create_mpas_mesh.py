@@ -167,6 +167,7 @@ def create_mpas_mesh(iFlag_global_in,
             bed_elevation0 = aValue
             iFlag_bed_elevation = 1
         else:
+            iFlag_bed_elevation = 0
             pass
 
         if sKey == 'ice_thickness':
@@ -189,6 +190,7 @@ def create_mpas_mesh(iFlag_global_in,
             iFlag_elevation_profile = 1
             bed_elevation_profile0 = aValue
         else:
+            iFlag_elevation_profile = 0
             pass
 
     aLatitudeVertex = latVertex0[:] / math.pi * 180
@@ -474,9 +476,20 @@ def create_mpas_mesh(iFlag_global_in,
 
                 if ( iFlag == True ):
                     lCellID = int(aIndexToCellID[i])
-                    dElevation_mean = float(aBed_elevation[i])
-                    dElevation_profile0 = float(aBed_elevation_profile[i,0])
-                    dThickness_ice = float( aIce_thickness[i] )
+
+                    if iFlag_bed_elevation == 1:
+                        dElevation_mean = float(aBed_elevation[i])
+                    else:
+                        dElevation_mean = -9999
+                    if iFlag_elevation_profile == 1:
+                        dElevation_profile0 = float(aBed_elevation_profile[i,0])
+                    else:
+                        dElevation_profile0 = -9999
+                    if iFlag_ice_thickness == 1:
+                        dThickness_ice = float( aIce_thickness[i] )
+                    else:
+                        dThickness_ice = -9999  
+
                     dArea = float(aCellArea[i])
 
                     #then check if it is ice free
@@ -668,13 +681,5 @@ def create_mpas_mesh(iFlag_global_in,
             pass
 
     return aMpas_out
-
-
-
-
-
-
-
-
 
 

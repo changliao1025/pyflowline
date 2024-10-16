@@ -1,20 +1,25 @@
 import os
 import stat
 from pathlib import Path
-
-
+from pyearth.system.python.retrieve_python_environment import retrieve_python_environment
 def _pyflowline_create_hpc_job(self, sSlurm_in=None):
     """create a HPC job for this simulation
     """
     os.chdir(self.sWorkspace_output)
-
+    sConda_env_path , sConda_env_name = retrieve_python_environment()
     # part 1 python script
 
     sFilename_pyflowline = os.path.join(
         str(Path(self.sWorkspace_output)), "run_pyflowline.py")
     ofs_pyflowline = open(sFilename_pyflowline, 'w')
 
-    sLine = '#!/qfs/people/liao313/.conda/envs/pyflowline/bin/' + 'python3' + '\n'
+    sLine = '#!/qfs/people/liao313/.conda/envs/' +  sConda_env_name + '/bin/' + 'python3' + '\n'
+    ofs_pyflowline.write(sLine)
+    sLine = 'import os' + '\n'
+    ofs_pyflowline.write(sLine)
+    sLine = "os.environ['PROJ_LIB']=" + '"'+ sConda_env_path  + '/share/proj' +'"'+ '\n'
+    ofs_pyflowline.write(sLine)
+    sLine = "os.environ['LD_LIBRARY_PATH']=" + '"' + sConda_env_path + '/lib:${LD_LIBRARY_PATH}"' + '\n'
     ofs_pyflowline.write(sLine)
     sLine = 'from pyflowline.configuration.read_configuration_file import pyflowline_read_configuration_file' + '\n'
     ofs_pyflowline.write(sLine)
@@ -64,7 +69,7 @@ def _pyflowline_create_hpc_job(self, sSlurm_in=None):
     ofs.write(sLine)
     sLine = '#SBATCH --job-name=' + self.sCase + '\n'
     ofs.write(sLine)
-    sLine = '#SBATCH -t 1:00:00' + '\n'
+    sLine = '#SBATCH -t 4:00:00' + '\n'
     ofs.write(sLine)
     sLine = '#SBATCH --nodes=1' + '\n'
     ofs.write(sLine)
@@ -93,7 +98,7 @@ def _pyflowline_create_hpc_job(self, sSlurm_in=None):
     ofs.write(sLine)
     sLine = 'source /share/apps/python/miniconda4.12.0/etc/profile.d/conda.sh' + '\n'
     ofs.write(sLine)
-    sLine = 'conda activate hexwatershed' + '\n'
+    sLine = 'conda activate '+ sConda_env_name + '\n'
     ofs.write(sLine)
     sLine = 'cd $SLURM_SUBMIT_DIR\n'
     ofs.write(sLine)

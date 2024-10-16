@@ -529,17 +529,8 @@ def runjgsw(sWorkspace_jigsaw_in,  projector,
     jigsawpy.savemsh(opts.geom_file, geom,
                      opts.geom_tags)
 
-
-    if iFlag_spacing_grid  ==1 :
-        #this is the old grid based spacing method
-        jigsawpy.savemsh(opts.hfun_file, spac,
+    jigsawpy.savemsh(opts.hfun_file, spac,
                      opts.hfun_tags)
-        pass
-    else:
-        #this is the mesh-based spacing method
-        jigsawpy.savemsh(opts.hfun_file, spac,
-                     opts.hfun_tags)
-        pass
 
     jigsawpy.savemsh(opts.init_file, init,
                      opts.init_tags)

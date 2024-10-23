@@ -11,23 +11,40 @@ from pyearth.gis.gdal.read.raster.gdal_read_geotiff_file import gdal_read_geotif
 import mpas_tools.mesh.creation.mesh_definition_tools as mdt
 from pyflowline.mesh.mpas.jigsaw.inpoly2 import inpoly2
 from pyflowline.mesh.mpas.jigsaw.loadgeo import loadgeo
-from pyflowline.classes.vertex import pyvertex
+from pyflowline.mesh.mpas.jigsaw.utility import addpoly, addline, innerto
+#from pyflowline.classes.vertex import pyvertex
 
-def compute_mask(aData, value, pixelWidth, pixelHeight, nspace_column, nspace_row):
+def compute_mask(aData, value, dLongitude_upper_left, dLatitude_upper_left, pixelWidth, pixelHeight, ncolumn_space, nrow_space):
     dummy_index = np.where(aData == value)
     irows, icols = dummy_index
-    dLon = -180.0 + icols * pixelWidth
-    dLat = 90.0 + irows * pixelHeight
-    iX = ((dLon + 180.0) / (360.0 / nspace_column)).astype(int)
-    iY = ((dLat + 90) / (180.0 / nspace_row)).astype(int)
+    dLon = dLongitude_upper_left + icols * pixelWidth
+    dLat = dLatitude_upper_left + irows * pixelHeight
+    iX = ((dLon + 180.0) / (360.0 / ncolumn_space)).astype(int)
+    iY = ((dLat + 90) / (180.0 / nrow_space)).astype(int)
     # Ensure indices are within range
-    iX = np.clip(iX, 0, nspace_column - 1)
-    iY = np.clip(iY, 0, nspace_row - 1)
+    iX = np.clip(iX, 0, ncolumn_space - 1)
+    iY = np.clip(iY, 0, nrow_space - 1)
     # Create a mask with the same shape as the grid
-    mask = np.full((nspace_row, nspace_column), False, dtype=bool)
+    mask = np.full((nrow_space, ncolumn_space), False, dtype=bool)
     # Use 2D indexing to set the mask
     mask[iY, iX] = True
     return mask
+
+def coarsen_mask(mask, down):
+#-- down-sample the mask by combining every set of DOWN pixels into one
+    rows = mask.shape[0] // down
+    cols = mask.shape[1] // down
+
+    mtmp = np.full((rows, cols), False, dtype=bool)
+    for jpos in range(down):
+        for ipos in range(down):
+            iend = mask.shape[0] - down + ipos + 1
+            jend = mask.shape[1] - down + jpos + 1
+            mtmp = np.logical_or(
+                mtmp,
+            mask[ipos:iend:down, jpos:jend:down])
+
+    return mtmp
 
 def retrieve_coordinates_from_array(aData_in, dValue_in, pixelWidth, pixelHeight):
     dummy_index = np.where(aData_in == dValue_in)
@@ -127,15 +144,15 @@ def runjgsw(sWorkspace_jigsaw_in,  projector,
 #------------------------------------ setup via user COMPOSE
     FULL_SPHERE_RADIUS = +6371.0 #unit check
     if aConfig_in is not None:
-        if "nspace_column" in aConfig_in:
-            nspace_column = aConfig_in["nspace_column"]
+        if "ncolumn_space" in aConfig_in:
+            ncolumn_space = aConfig_in["ncolumn_space"]
         else:
-            nspace_column = 360 #1 degree spacing
+            ncolumn_space = 360 #1 degree spacing
 
-        if "nspace_row" in aConfig_in:
-            nspace_row = aConfig_in["nspace_row"]
+        if "nrow_space" in aConfig_in:
+            nrow_space = aConfig_in["nrow_space"]
         else:
-            nspace_row = 180 #1 degree spacing
+            nrow_space = 180 #1 degree spacing
 
         if "dSpac_value" in aConfig_in:
             dSpac_value = aConfig_in["dSpac_value"]
@@ -205,14 +222,9 @@ def runjgsw(sWorkspace_jigsaw_in,  projector,
         if "spac_mshID" in aConfig_in:
             spac_mshID = aConfig_in["spac_mshID"]
         else:
-            spac_mshID = "ellipsoid-mesh" # "ellipsoid-grid"
+            spac_mshID = "ellipsoid-grid" # "ellipsoid-grid"
 
-        if spac_mshID == "ellipsoid-grid":
-            iFlag_spacing_grid = 1
-            iFlag_spacing_mesh = 0
-        else:
-            iFlag_spacing_grid = 0
-            iFlag_spacing_mesh = 1
+
 
         if "hfun_scal" in aConfig_in:
             hfun_scal = aConfig_in["hfun_scal"]
@@ -278,9 +290,14 @@ def runjgsw(sWorkspace_jigsaw_in,  projector,
             dResolution_river_networks = float(aConfig_in["dResolution_river_networks"])
         else:
             dResolution_river_networks = 3.0
+
+        if "dhdx_lim" in aConfig_in:
+            dhdx_lim = aConfig_in["dhdx_lim"]
+        else:
+            dhdx_lim = 0.25
     else:
-        nspace_column = 360
-        nspace_row = 180
+        ncolumn_space = 360
+        nrow_space = 180
         dSpac_value = 50.0
         iFlag_geom = False
         iFlag_spac = False
@@ -301,184 +318,159 @@ def runjgsw(sWorkspace_jigsaw_in,  projector,
         optm_qlim = +9.5E-01           # tighter opt. tol
         optm_iter = +32
         optm_qtol = +1.0E-05
-
-    dhdx_lim = 0.0625                   # |dH/dx| thresh
+        dhdx_lim = 0.25                   # |dH/dx| thresh smaller values will make h(x) more smooth
 
     geom = jigsawpy.jigsaw_msh_t()
     if iFlag_geom:
         geom.mshID = geom_mshID
         geom.radii = np.full(3, FULL_SPHERE_RADIUS, dtype=geom.REALS_t)
 
+        poly = jigsawpy.jigsaw_msh_t()
+        print("BUILDING MESH GEOM.")
+        if iFlag_coastline:
+            sFilename_land_ocean_mask = aConfig_in["sFilename_land_ocean_mask"]
+            loadgeo(sFilename_land_ocean_mask, poly)
+            poly.point["coord"] *= np.pi / +180.
+            addline(geom, poly, +1)
+            pass
+
+        if iFlag_watershed_boundary:
+            sFilename_watershed_boundary = aConfig_in["sFilename_watershed_boundary"]
+            loadgeo(sFilename_watershed_boundary, poly)
+            poly.point["coord"] *= np.pi / +180.
+            addpoly(geom, poly, +1)
+            pass
+
+        if iFlag_lake_boundary:
+            sFilename_lake_boundary = aConfig_in["sFilename_lake_boundary"]
+            loadgeo(sFilename_lake_boundary, poly)
+            poly.point["coord"] *= np.pi / +180.
+            addpoly(geom, poly, +2)
+            pass
+
+        if iFlag_river_network:
+            sFilename_river_networks = aConfig_in["sFilename_river_networks"]
+            loadgeo(sFilename_river_networks, poly)
+            poly.point["coord"] *= np.pi / +180.
+            addline(geom, poly, +2)
+            pass
+
+
     spac = jigsawpy.jigsaw_msh_t()
     if iFlag_spac:
         print("Compute global h(x)... for spac")
-        print(nspace_column, nspace_row, dResolution_land)
+        print(ncolumn_space, nrow_space, dResolution_land)
         spac.mshID = spac_mshID
         spac.radii = np.full( 3, FULL_SPHERE_RADIUS, dtype=spac.REALS_t)
         sFilename_land_ocean_mask = aConfig_in["sFilename_land_ocean_mask"]
-        dummy = gdal_read_geotiff_file(sFilename_land_ocean_mask) #1km, 30/3600.0
+        #check file type is vector or raster
+        if sFilename_land_ocean_mask.endswith('.geojson'): #in the future, we will support more vector file types
+            print("The vector file will be converted to raster file")
+            #call pyearth api to convert vector to raster
+            pass
+        else:
+            #check spatial reference, reproject if needed
+            #sProjection =
+
+            dummy = gdal_read_geotiff_file(sFilename_land_ocean_mask) #1km, 30/3600.0
+
         aLand_ocean_mask = dummy['dataOut']
+        dOriginX = dummy['originX']
+        dOriginY = dummy['originY']
         pixelHeight = dummy['pixelHeight'] #30/3600.0
         pixelWidth = dummy['pixelWidth']
         missingValue = dummy['missingValue']
 
-        xgrid_low = np.linspace( -1. * np.pi, +1. * np.pi, 360)
-        ygrid_low = np.linspace( -.5 * np.pi, +.5 * np.pi, 180)
-        xgrd_low, ygrd_low = np.meshgrid(xgrid_low, ygrid_low)
-        xgrid_high = np.linspace( -1. * np.pi, +1. * np.pi, nspace_column)
-        ygrid_high = np.linspace( -.5 * np.pi, +.5 * np.pi, nspace_row)
-        xgrd_high, ygrd_high = np.meshgrid(xgrid_high, ygrid_high)
 
-        if iFlag_spacing_grid ==1:
-            spac.xgrid = xgrid_high
-            spac.ygrid = ygrid_high
-            spac.value = np.full( (nspace_row, nspace_column), dResolution_land, dtype=spac.REALS_t)
-            #to [x, y] list
-            #grid = np.concatenate((  xgrd_high.reshape((xgrd_high.size, +1)),  ygrd_high.reshape((ygrd_high.size, +1))), axis=+1)
-            if iFlag_ocean :
-                print("Compute global ocean h(x)...")
-                vals = mdt.EC_CellWidthVsLat(spac.ygrid * 180. / np.pi)
-                vals = np.reshape(vals, (spac.ygrid.size, 1))
-                ocean_value = np.array(np.tile( vals, (1, spac.xgrid.size)), dtype=spac.REALS_t)
-                aOcean_mask = compute_mask(aData, missingValue, pixelWidth, pixelHeight, nspace_column, nspace_row)
-                spac.value[aOcean_mask] =  np.minimum(ocean_value[aOcean_mask], spac.value[aOcean_mask])
-                pass
+        aCoast_mask = compute_mask(aLand_ocean_mask, 1, dOriginX, dOriginY, pixelWidth, pixelHeight, ncolumn_space, nrow_space)
+        #we need to downsample the mask if the resolution is too high
+        if ncolumn_space > 40000 and nrow_space > 20000:
+            aCoast_mask = coarsen_mask(aCoast_mask, down=4)
+            nrow_space = aCoast_mask.shape[0]
+            ncolumn_space = aCoast_mask.shape[1]
 
-            if iFlag_coastline:
-                print("Compute global h(x)... for coastline")
-                sFilename_land_ocean_mask = aConfig_in["sFilename_land_ocean_mask"]
-                aCoast_mask = compute_mask(aData, 1, pixelWidth, pixelHeight, nspace_column, nspace_row)
-                spac.value[aCoast_mask] =  np.minimum(dResolution_coastline, spac.value[aCoast_mask])
-                pass
+        #the low resolution grid
+        #xgrid_low = np.linspace( -1. * np.pi, +1. * np.pi, 360)
+        #ygrid_low = np.linspace( -.5 * np.pi, +.5 * np.pi, 180)
 
-            if iFlag_land : #land feature, maybe mountain, etc
-                print("Compute global h(x)... for land")
-                sFilename_land_ocean_mask = aConfig_in["sFilename_land_ocean_mask"]
-                aLand_mask = compute_mask(aData, 1, pixelWidth, pixelHeight, nspace_column, nspace_row)
-                spac.value[aLand_mask] =  np.minimum(dResolution_land, spac.value[aLand_mask])
-                pass
+        #the high resolution grid
+        xgrid_high = np.linspace( -1. * np.pi, +1. * np.pi, ncolumn_space)
+        ygrid_high = np.linspace( -.5 * np.pi, +.5 * np.pi, nrow_space)
 
-            if iFlag_lake_boundary:
-                sFilename_lake_boundary = aConfig_in["sFilename_lake_boundary"]
-                dummy = gdal_read_geotiff_file(sFilename_lake_boundary)
-                aData = dummy['dataOut']
-                pixelHeight = dummy['pixelHeight'] #30/3600.0
-                pixelWidth = dummy['pixelWidth']
-                aLake_mask = compute_mask(aData, 1, pixelWidth, pixelHeight, nspace_column, nspace_row)
-                spac.value[aLake_mask] =  np.minimum(dResolution_lake_boundary, spac.value[aLake_mask])
-                pass
+        spac.xgrid = xgrid_high
+        spac.ygrid = ygrid_high
+        spac.value = np.full( (nrow_space, ncolumn_space), dSpac_value, dtype=spac.REALS_t)
 
-            if iFlag_watershed_boundary:
-                sFilename_watershed_boundary = aConfig_in["sFilename_watershed_boundary"]
-                dummy = gdal_read_geotiff_file(sFilename_watershed_boundary)
-                aData = dummy['dataOut']
-                pixelHeight = dummy['pixelHeight'] #30/3600.0
-                pixelWidth = dummy['pixelWidth']
-                aWatershed_mask = compute_mask(aData, 1, pixelWidth, pixelHeight, nspace_column, nspace_row)
-                spac.value[aWatershed_mask] = np.minimum(dResolution_watershed_boundary, spac.value[aWatershed_mask])
-                pass
-
-            if iFlag_river_network:
-                sFilename_river_networks = aConfig_in["sFilename_river_networks"]
-                dummy = gdal_read_geotiff_file(sFilename_river_networks)
-                aData = dummy['dataOut']
-                pixelHeight = dummy['pixelHeight'] #30/3600.0
-                pixelWidth = dummy['pixelWidth']
-                aRiver_network_mask = compute_mask(aData, 1, pixelWidth, pixelHeight, nspace_column, nspace_row)
-                spac.value[aRiver_network_mask] = np.minimum(dResolution_river_networks, spac.value[aRiver_network_mask])
-                pass
-
+        if iFlag_ocean :
+            print("Compute global ocean h(x)...")
+            vals = mdt.EC_CellWidthVsLat(spac.ygrid * 180. / np.pi)
+            vals = np.reshape(vals, (spac.ygrid.size, 1))
+            ocean_value = np.array(np.tile( vals, (1, spac.xgrid.size)), dtype=spac.REALS_t)
+            aOcean_mask = compute_mask(aLand_ocean_mask, missingValue, dOriginX, dOriginY, pixelWidth, pixelHeight, ncolumn_space, nrow_space)
+            spac.value[aOcean_mask] =  np.minimum(ocean_value[aOcean_mask], spac.value[aOcean_mask])
             pass
-        else:
-            if iFlag_spacing_mesh ==1:
-                #read land ocean buffer mask
-                sFilename_land_ocean_buffer = aConfig_in["sFilename_land_ocean_buffer"]
-                dummy = gdal_read_geotiff_file(sFilename_land_ocean_buffer) #1km, 30/3600.0
-                aData_buffer = dummy['dataOut']
-                nrow = aData_buffer.shape[0]
-                ncolumn = aData_buffer.shape[1]
-                aDate_buffer_mask = np.full((nrow, ncolumn), 1, dtype=int)
-                aDate_buffer_mask[np.where(aData_buffer <= (dResolution_land * 1000))] = 0
 
-                aVertex = list()
-                aValue = list()
+        if iFlag_coastline:
+            print("Compute global h(x)... for coastline")
+            spac.value[aCoast_mask] =  np.minimum(dResolution_coastline, spac.value[aCoast_mask])
+            pass
 
-                if iFlag_ocean :
-                    print("Compute global ocean h(x)...")
-                    vals = mdt.EC_CellWidthVsLat(ygrid_low * 180. / np.pi)
-                    vals = np.reshape(vals, (ygrid_low.size, 1))
-                    ocean_value = np.array(np.tile( vals, (1, xgrid_low.size)), dtype=spac.REALS_t)
-                    pass
+        if iFlag_land : #land feature, maybe mountain, etc
+            print("Compute global h(x)... for land")
+            aLand_mask = compute_mask(aLand_ocean_mask, 2, dOriginX, dOriginY, pixelWidth, pixelHeight, ncolumn_space, nrow_space)
+            spac.value[aLand_mask] =  np.minimum(dResolution_land, spac.value[aLand_mask])
+            pass
 
-                if iFlag_coastline:
-                    print("Compute global h(x)... for coastline")
-                    sFilename_land_ocean_mask = aConfig_in["sFilename_land_ocean_mask"]
-                    #convert the coastline to a list of vertices
-                    #aLon, aLat = retrieve_coordinates_from_array(aLand_ocean_mask, 1, pixelWidth, pixelHeight)
-                    aCoast_mask = compute_mask(aLand_ocean_mask, 1, pixelWidth, pixelHeight, nspace_column, nspace_row)
-                    aLon_filtered = xgrd_high[aCoast_mask] * 180.0 / np.pi
-                    aLat_filtered = ygrd_high[aCoast_mask] * 180.0 / np.pi
-                    aValue_coastline = np.full((nspace_row, nspace_column), dResolution_coastline, dtype=float)
-                    aValue_filtered = aValue_coastline[aCoast_mask]
-                    aVertex.extend([pyvertex({'dLongitude_degree': lon, 'dLatitude_degree': lat}) for lon, lat in zip(aLon_filtered, aLat_filtered)])
-                    aValue.extend(aValue_filtered)
+        if iFlag_lake_boundary:
+            print("Compute global h(x)... for lake boundary")
+            sFilename_lake_boundary = aConfig_in["sFilename_lake_boundary"]
+            if sFilename_lake_boundary.endswith('.geojson'):
+                pass
+            else:
+                dummy = gdal_read_geotiff_file(sFilename_lake_boundary)
+            aData = dummy['dataOut']
+            dOriginX = dummy['originX']
+            dOriginY = dummy['originY']
+            pixelHeight = dummy['pixelHeight'] #30/3600.0
+            pixelWidth = dummy['pixelWidth']
+            aLake_mask = compute_mask(aData, 1, dOriginX, dOriginY, pixelWidth, pixelHeight, ncolumn_space, nrow_space)
+            spac.value[aLake_mask] =  np.minimum(dResolution_lake_boundary, spac.value[aLake_mask])
+            pass
 
-                if iFlag_land : #land feature, maybe mountain, etc
-                    print("Compute global h(x)... for land")
-                    sFilename_land_ocean_mask = aConfig_in["sFilename_land_ocean_mask"]
-                    pass
+        if iFlag_watershed_boundary:
+            print("Compute global h(x)... for watershed boundary")
+            sFilename_watershed_boundary = aConfig_in["sFilename_watershed_boundary"]
+            if sFilename_watershed_boundary.endswith('.geojson'):
+                pass
+            else:
+                dummy = gdal_read_geotiff_file(sFilename_watershed_boundary)
+            aData = dummy['dataOut']
+            dOriginX = dummy['originX']
+            dOriginY = dummy['originY']
+            pixelHeight = dummy['pixelHeight'] #30/3600.0
+            pixelWidth = dummy['pixelWidth']
+            aWatershed_mask = compute_mask(aData, 1, dOriginX, dOriginY, pixelWidth, pixelHeight, ncolumn_space, nrow_space)
+            spac.value[aWatershed_mask] = np.minimum(dResolution_watershed_boundary, spac.value[aWatershed_mask])
+            pass
 
-                if iFlag_lake_boundary:
-                    sFilename_lake_boundary = aConfig_in["sFilename_lake_boundary"]
-                    dummy = gdal_read_geotiff_file(sFilename_lake_boundary)
-                    aData = dummy['dataOut']
-                    pixelHeight = dummy['pixelHeight'] #30/3600.0
-                    pixelWidth = dummy['pixelWidth']
-                    pass
+        if iFlag_river_network:
+            print("Compute global h(x)... for river network")
+            sFilename_river_networks = aConfig_in["sFilename_river_networks"]
+            if sFilename_river_networks.endswith('.geojson'):
+                pass
+            else:
+                dummy = gdal_read_geotiff_file(sFilename_river_networks)
+            aData = dummy['dataOut']
+            dOriginX = dummy['originX']
+            dOriginY = dummy['originY']
+            pixelHeight = dummy['pixelHeight'] #30/3600.0
+            pixelWidth = dummy['pixelWidth']
+            aRiver_network_mask = compute_mask(aData, 1, dOriginX, dOriginY, pixelWidth, pixelHeight, ncolumn_space, nrow_space)
+            spac.value[aRiver_network_mask] = np.minimum(dResolution_river_networks, spac.value[aRiver_network_mask])
+            pass
 
-                if iFlag_watershed_boundary:
-                    sFilename_watershed_boundary = aConfig_in["sFilename_watershed_boundary"]
-                    dummy = gdal_read_geotiff_file(sFilename_watershed_boundary)
-                    aData = dummy['dataOut']
-                    pixelHeight = dummy['pixelHeight'] #30/3600.0
-                    pixelWidth = dummy['pixelWidth']
-                    pass
-
-                if iFlag_river_network:
-                    sFilename_river_networks = aConfig_in["sFilename_river_networks"]
-                    dummy = gdal_read_geotiff_file(sFilename_river_networks)
-                    aData = dummy['dataOut']
-                    pixelHeight = dummy['pixelHeight'] #30/3600.0
-                    pixelWidth = dummy['pixelWidth']
-
-                #add the remaining space back
-
-                if iFlag_ocean:
-                    aValue_space = ocean_value
-                else:
-                    aValue_space = np.full((180, 360), dResolution_land, dtype=float)
-
-                aBuffer_mask = compute_mask(aDate_buffer_mask, 1, pixelWidth, pixelHeight, 360, 180)
-                aLon_filtered = xgrd_low[aBuffer_mask] * 180.0 / np.pi
-                aLat_filtered = ygrd_low[aBuffer_mask] * 180.0 / np.pi
-                aValue_filtered = aValue_space[aBuffer_mask]
-
-                aVertex.extend([pyvertex({'dLongitude_degree': lon, 'dLatitude_degree': lat}) for lon, lat in zip(aLon_filtered, aLat_filtered)])
-                aValue.extend(aValue_filtered)
-
-                nVertex = len(aVertex)
-                spac.vert2 = np.empty(nVertex, dtype=spac.VERT2_t)
-                spac.value = np.array(aValue, dtype=spac.REALS_t)
-                # Extract dX_meter, dY_meter, and dZ_meter from aVertex
-                aLongitude_degree = np.array([vertex.dLongitude_degree for vertex in aVertex])
-                aLatitude_degree = np.array([vertex.dLatitude_degree for vertex in aVertex])
-                aX_meter = np.array([vertex.dX_meter for vertex in aVertex])
-                dY_meter = np.array([vertex.dY_meter for vertex in aVertex])
-                dZ_meter = np.array([vertex.dZ_meter for vertex in aVertex])
-                spac.vert2['coord'] = np.column_stack((np.pi * aLongitude_degree / 180.0, np.pi * aLatitude_degree / 180.0))
-                #add the IDtag starting from 0
-                spac.vert2['IDtag'] = np.arange(nVertex)
-                #spac.vert3['coord'] = np.column_stack([aX_meter/1000.0, dY_meter/1000.0, dZ_meter/1000.0])
+        spac.slope = np.full(spac.value.shape, dhdx_lim, dtype=spac.REALS_t)
+        pass
 
     opts = jigsawpy.jigsaw_jig_t()
     opts.verbosity=1
@@ -492,18 +484,10 @@ def runjgsw(sWorkspace_jigsaw_in,  projector,
         opts.optm_iter = optm_iter
         opts.optm_qtol = optm_qtol
 
-
     init = jigsawpy.jigsaw_msh_t()
     if iFlag_init:
-        init.mshID = 'ellipsoid-grid'
-        init.radii = np.full( 3, FULL_SPHERE_RADIUS, dtype=init.REALS_t)
-        xgrid_low = np.linspace( -1. * np.pi, +1. * np.pi, 360)
-        ygrid_low = np.linspace( -.5 * np.pi, +.5 * np.pi, 180)
-        init.xgrid = xgrid_high
-        init.ygrid = ygrid_high
+
         pass
-
-
 #------------------------------------ setup files for JIGSAW
 
     sWorkspace_tmp = os.path.join(sWorkspace_jigsaw_in, "tmp")
@@ -536,11 +520,8 @@ def runjgsw(sWorkspace_jigsaw_in,  projector,
                      opts.init_tags)
 
     if iFlag_spac:
-        #print("Impose |DH/DX| threshold...")
-        #spac.slope = np.full(spac.value.shape, dhdx_lim, dtype=spac.REALS_t)
-        #jigsawpy.cmd.marche(opts, spac)
-
-        #spac.slope = np.empty((+0), dtype=spac.REALS_t)
+        # call jigsaw's Eikonal solver to impose the gradient constraint on h(x)
+        jigsawpy.cmd.marche(opts, spac)
         pass
 
 #------------------------------------ make mesh using JIGSAW

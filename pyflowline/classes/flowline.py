@@ -16,12 +16,12 @@ class FlowlineClassEncoder(JSONEncoder):
         if isinstance(obj, np.ndarray):
             return obj.tolist()
         if isinstance(obj, list):
-            pass  
+            pass
         if isinstance(obj, pyvertex):
-            return json.loads(obj.tojson()) 
+            return json.loads(obj.tojson())
         if isinstance(obj, pyedge):
-            return obj.lEdgeID         
-            
+            return obj.lEdgeID
+
         return JSONEncoder.default(self, obj)
 
 class pyflowline(object):
@@ -35,9 +35,12 @@ class pyflowline(object):
     """
 
     lFlowlineID=-1
+    lFlowlineID_downstream=-1 #if braided, then we need a list
     lFlowlineIndex=-1
     lIndex_upstream=-1
     lIndex_downstream=-1
+
+    iFlag_keep = 1 #used for simplification algorithm
 
     iFlag_dam = 0
     lNHDPlusID=-1
@@ -49,6 +52,7 @@ class pyflowline(object):
 
     dLength=0.0
     dSinuosity=0.0
+    dDrainage_area=0.0
 
     iStream_segment=-1
     iStream_order = -1
@@ -63,11 +67,11 @@ class pyflowline(object):
     aFlowlineID_end_end = None
 
     #for stream topology
-    lFlowline_downstream = None #only store the index, not the actual objects
-    aFlowline_upstream = None #only store the index, not the actual objects
+    lFlowlineIndex_downstream = None #only store the index, not the actual objects
+    aFlowline_upstream = None
 
     pBound=None
-    
+
     def __init__(self, aEdge):
         """
         Initilize a flowline object
@@ -93,14 +97,15 @@ class pyflowline(object):
         self.aFlowlineID_start_end = list()
         self.aFlowlineID_end_start = list()
         self.aFlowlineID_end_end = list()
+        self.iFlag_keep = 1
 
         self.calculate_flowline_bound()
-     
+
         return
-    
+
     def __hash__(self):
         return hash((self.pVertex_start, self.pVertex_end))
-    
+
     def calculate_length(self):
         """
         Calcualte the length
@@ -118,10 +123,10 @@ class pyflowline(object):
         #assing
         #self.dLength= dLength
 
-   
+
         self.dLength = sum(edge.dLength for edge in self.aEdge)
         return self.dLength
-    
+
     def calculate_flowline_bound(self):
         dLat_min = 90
         dLat_max = -90
@@ -132,8 +137,8 @@ class pyflowline(object):
             dLon_min = np.min( [dLon_min, self.aVertex[i].dLongitude_degree] )
             dLat_max = np.max( [dLat_max, self.aVertex[i].dLatitude_degree] )
             dLat_min = np.min( [dLat_min, self.aVertex[i].dLatitude_degree] )
-        
-        self.pBound = (dLon_min, dLat_min, dLon_max, dLat_max)
+
+        self.pBound = (float(dLon_min), float(dLat_min), float(dLon_max), float(dLat_max))
         return self.pBound
 
     def check_upstream(self, other):
@@ -162,7 +167,7 @@ class pyflowline(object):
 
     def check_downstream(self, other):
         """
-        Check whether another flowline is downstream or not 
+        Check whether another flowline is downstream or not
 
         Args:
             other (pyflowline): The other flowline
@@ -181,12 +186,12 @@ class pyflowline(object):
             iFlag_downstream=0
 
         return iFlag_downstream
-    
+
     def reverse(self):
         """
         Reverse a flowline
         """
-        aVertex = self.aVertex 
+        aVertex = self.aVertex
         nVertex = self.nVertex
         aVertex_new = list()
         for i in range(nVertex-1,-1,-1) :
@@ -199,7 +204,7 @@ class pyflowline(object):
             pEdge = pyedge( self.aVertex[i], self.aVertex[i+1] )
             aEdge.append(pEdge)
             pass
-        
+
         self.aEdge = aEdge
         nEdge = len(aEdge)
         self.pVertex_start = aEdge[0].pVertex_start
@@ -215,8 +220,8 @@ class pyflowline(object):
         Returns:
             pyflowline: The merged flowline
         """
-        pFlowline_out = copy.deepcopy(other)    
-        
+        pFlowline_out = copy.deepcopy(other)
+
         iFlag_dam1 = other.iFlag_dam
         pVertex_start1 = other.pVertex_start
         pVertex_end1 = other.pVertex_end
@@ -234,7 +239,7 @@ class pyflowline(object):
             #this is the supposed operation because they should connect
 
             nVertex = nVertex1 + nVertex2 - 1
-            nEdge = nVertex -1 
+            nEdge = nVertex -1
             aEdge = copy.deepcopy(other.aEdge )
             for i in range(nEdge2):
                 aEdge.append( self.aEdge[i] )
@@ -244,7 +249,7 @@ class pyflowline(object):
             for i in range(1, nVertex2):
                 aVertex.append( self.aVertex[i] )
                 pass
-            
+
             pFlowline_out.iFlag_dam = max(iFlag_dam1, iFlag_dam2)
             pFlowline_out.aEdge = aEdge
             pFlowline_out.aVertex = aVertex
@@ -261,7 +266,7 @@ class pyflowline(object):
         #pFlowline_out.iStream_segment = self.iStream_segment
 
         return pFlowline_out
-    
+
     def split_by_length(self, dDistance):
         """
         Split a flowline using the length threshold
@@ -286,7 +291,31 @@ class pyflowline(object):
                 aEdge.append(edge)
                 pass
         pFlowline_out=pyflowline(aEdge)
+        #copy the attributes
+        pFlowline_out.copy_attributes(self)
+
         return pFlowline_out
+
+    def copy_attributes(self, other):
+        """
+        Copy the attributes from another flowline
+
+        Args:
+            other (pyflowline): The other flowline
+        """
+        self.lFlowlineID = other.lFlowlineID
+        self.lFlowlineID_downstream = other.lFlowlineID_downstream
+        self.lFlowlineIndex = other.lFlowlineIndex
+        self.iFlag_dam = other.iFlag_dam
+        self.lNHDPlusID = other.lNHDPlusID
+        self.iStream_segment = other.iStream_segment
+        self.iStream_order = other.iStream_order
+        self.dDrainage_area = other.dDrainage_area
+        self.iFlag_right = other.iFlag_right
+        self.iFlag_left = other.iFlag_left
+        self.iFlag_keep = other.iFlag_keep
+        self.lFlowlineIndex_downstream = other.lFlowlineIndex_downstream
+        return
 
     def calculate_flowline_sinuosity(self):
         """
@@ -298,19 +327,48 @@ class pyflowline(object):
         self.dSinuosity = self.dLength / dDistance
         return
 
+    def calculate_distance_to_vertex(self, pVertex):
+        dDistance_min_vertex = 1.0E10
+        pVertex_min_vertex = None
+        for i in range(self.nVertex):
+            dDistance = pVertex.calculate_distance(self.aVertex[i])
+            if dDistance < dDistance_min_vertex:
+                dDistance_min_vertex = dDistance
+                pVertex_min_vertex = self.aVertex[i]
+            pass
+
+        dDistance_min_edge = 1.0E10
+        pVertex_min_edge = None
+        for i in range(self.nEdge):
+            dDistance, pVertex_out_edge = self.aEdge[i].calculate_distance_to_vertex(pVertex)
+            if dDistance < dDistance_min_edge:
+                dDistance_min_edge = dDistance
+                pVertex_min_edge = pVertex_out_edge
+            pass
+
+        if dDistance_min_vertex < dDistance_min_edge:
+            dDistance_min = dDistance_min_vertex
+            pVertex_out = pVertex_min_vertex
+        else:
+            dDistance_min = dDistance_min_edge
+            pVertex_out = pVertex_min_edge
+            pass
+
+        return dDistance_min, pVertex_out
+
     def __eq__(self, other):
         """
         Check whether two flowline are equivalent
-    
+
         Args:
             other (pyflowline): The other flowline
-    
+
         Returns:
             int: 1 if equivalent, 0 if not
         """
         if len(self.aEdge) != len(other.aEdge):
             return 0
-    
+
         return int(all(edge1 == edge2 for edge1, edge2 in zip(self.aEdge, other.aEdge)))
 
     def __ne__(self, other):
@@ -324,7 +382,7 @@ class pyflowline(object):
             int: 0 if equivalent, 1 if not
         """
         return not self.__eq__(other)
-    
+
     def tojson(self):
         """
         Convert a pyflowline object to a json string
@@ -332,7 +390,7 @@ class pyflowline(object):
         Returns:
             json str: A json string
         """
-        aSkip = ['aEdge', 
+        aSkip = ['aEdge',
                 'aVertex','aFlowlineID_start_start','aFlowlineID_start_end',
                 'aFlowlineID_end_start','aFlowlineID_end_end']
 
@@ -342,10 +400,9 @@ class pyflowline(object):
             pass
 
 
-        sJson = json.dumps(obj,  
-            sort_keys=True, 
-                indent = 4, 
-                    ensure_ascii=True, 
+        sJson = json.dumps(obj,
+            sort_keys=True,
+                indent = 4,
+                    ensure_ascii=True,
                         cls=FlowlineClassEncoder)
         return sJson
-        

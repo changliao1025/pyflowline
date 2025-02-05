@@ -1,4 +1,3 @@
-
 import os, stat
 import numpy as np
 from pathlib import Path
@@ -94,14 +93,15 @@ def generate_bash_script(sWorkspace_output):
     return
 
 def find_number_range(number, aArray):
+    number = float(number)
     nPoint = len(aArray)
-    for i in range(nPoint):
-        if aArray[i] <= number <= aArray[i+1]:
+    for i in range(nPoint-1):
+        if aArray[i+1] <= number <= aArray[i]:
             return i  # Return the index of the range where the number falls
     return -1
 
-
 def dggrid_find_index_by_resolution(sDggrid_type, dResolution):
+    dResolution = float(dResolution)
     if sDggrid_type == 'ISEA3H':
         #unit km
         index = find_number_range(dResolution * 0.001, aISEA3H)
@@ -330,6 +330,13 @@ def create_dggrid_mesh(iFlag_global,
         os.chdir(sWorkspace_output)
         sCommand = "./run_dggrid.sh"
         print(sCommand)
+        #confirm the binary exists
+        sFilename_binary = sWorkspace_output + slash + 'dggrid'
+        if os.path.isfile(sFilename_binary):
+            pass
+        else:
+            print('The binary does not exist: ', sFilename_binary)
+            return
         p = subprocess.Popen(sCommand, shell= True)
         p.wait()
 
@@ -339,31 +346,3 @@ def create_dggrid_mesh(iFlag_global,
                                                           iFlag_global_in = iFlag_global)
 
     return aDggrid
-
-if __name__ == '__main__':
-
-
-    sRegion = 'conus'
-
-    sWorkspace_job = '/qfs/people/liao313/jobs/' + 'dggrid' + slash + sRegion + slash + 'simulation'
-    sWorkspace_output = '/pic/scratch/liao313/04model/dggrid/' + slash + sRegion + slash + 'simulation'
-
-
-    sFilename_boundary = '/qfs/people/liao313/data/dggrid/conus/vector/conus_simple.shp'
-    iCase_index = 1
-    sDggrid_type='isea3h'
-    for i  in np.arange(1, 15):
-        sWalltime =  "{:02d}".format( iCase_index )
-        iResolution_index = i
-        create_dggrid_mesh( iCase_index, \
-                            iResolution_index ,  \
-                            sDggrid_type,
-
-                       sFilename_boundary_in=  sFilename_boundary)
-
-
-
-
-
-
-    pass

@@ -189,6 +189,7 @@ def jigsaw_mesh_to_netcdf(mesh, output_name, on_sphere, sphere_radius=None):
     #          and Darren Engwirda
 
     grid = NetCDFFile(output_name, 'w', format='NETCDF3_CLASSIC')
+    #grid = NetCDFFile(output_name, 'w', format='NETCDF4')
 
     # Get dimensions
     # Get nCells
@@ -260,24 +261,27 @@ def jigsaw_mesh_to_netcdf(mesh, output_name, on_sphere, sphere_radius=None):
         yVertex_full[iVertex] = pv.y
         zVertex_full[iVertex] = pv.z
 
-    var = grid.createVariable('xCell', 'f8', ('nCells',))
-    var[:] = xCell_full
-    var = grid.createVariable('yCell', 'f8', ('nCells',))
-    var[:] = yCell_full
-    var = grid.createVariable('zCell', 'f8', ('nCells',))
-    var[:] = zCell_full
-    var = grid.createVariable('featureTagCell', 'i4', ('nCells',))
-    var[:] = mesh.point['IDtag']
-    var = grid.createVariable('xVertex', 'f8', ('nVertices',))
-    var[:] = xVertex_full
-    var = grid.createVariable('yVertex', 'f8', ('nVertices',))
-    var[:] = yVertex_full
-    var = grid.createVariable('zVertex', 'f8', ('nVertices',))
-    var[:] = zVertex_full
-    var = grid.createVariable('featureTagVertex', 'i4', ('nVertices',))
-    var[:] = mesh.tria3['IDtag']
-    var = grid.createVariable(
+    xCell = grid.createVariable('xCell', 'f8', ('nCells',))
+    yCell = grid.createVariable('yCell', 'f8', ('nCells',))
+    zCell = grid.createVariable('zCell', 'f8', ('nCells',))
+    featureTagCell = grid.createVariable('featureTagCell', 'i4', ('nCells',))
+    xVertex = grid.createVariable('xVertex', 'f8', ('nVertices',))
+    yVertex = grid.createVariable('yVertex', 'f8', ('nVertices',))
+    zVertex = grid.createVariable('zVertex', 'f8', ('nVertices',))
+    featureTagVertex = grid.createVariable('featureTagVertex', 'i4', ('nVertices',))
+    cellsOnVertex = grid.createVariable(
         'cellsOnVertex', 'i4', ('nVertices', 'vertexDegree',))
-    var[:] = cellsOnVertex_full
+    #grid.enddef()
+
+    xCell[:] = xCell_full
+    yCell[:] = yCell_full
+    zCell[:] = zCell_full
+    featureTagCell[:] = mesh.point['IDtag']
+    xVertex[:] = xVertex_full
+    yVertex[:] = yVertex_full
+    zVertex[:] = zVertex_full
+    featureTagVertex[:] = mesh.tria3['IDtag']
+    cellsOnVertex[:] = cellsOnVertex_full
 
     grid.close()
+    return

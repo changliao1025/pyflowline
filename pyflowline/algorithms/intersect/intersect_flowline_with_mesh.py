@@ -82,8 +82,8 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh_in, sFilename_flo
             pGeometry_mesh = pFeature_mesh.GetGeometryRef()
             aCoords_gcs = get_geometry_coordinates(pGeometry_mesh)
             lCellID = pFeature_mesh.GetField("cellid")
-            dLon = pFeature_mesh.GetField("longitude")
-            dLat = pFeature_mesh.GetField("latitude")
+            dLongitude_center = pFeature_mesh.GetField("longitude")
+            dLatitude_center = pFeature_mesh.GetField("latitude")
             dArea = pFeature_mesh.GetField("area")
             if (pGeometry_mesh.IsValid()):
                 pass
@@ -92,7 +92,7 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh_in, sFilename_flo
 
             pGeometrytype_mesh = pGeometry_mesh.GetGeometryName()
             if(pGeometrytype_mesh == 'POLYGON'):
-                pCell = convert_gcs_coordinates_to_cell(iMesh_type_in, dLon, dLat, aCoords_gcs)
+                pCell = convert_gcs_coordinates_to_cell(iMesh_type_in, dLongitude_center, dLatitude_center, aCoords_gcs)
                 pCell.lCellID = lCellID
                 pCell.dArea = dArea
                 pCell.dLength = pCell.calculate_edge_length()
@@ -193,8 +193,8 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh_in, sFilename_flo
             aCoords_gcs = get_geometry_coordinates(pGeometry_mesh)
 
             lCellID = pFeature_mesh.GetField("cellid")
-            dLon = pFeature_mesh.GetField("longitude")
-            dLat = pFeature_mesh.GetField("latitude")
+            dLongitude_center = pFeature_mesh.GetField("longitude")
+            dLatitude_center = pFeature_mesh.GetField("latitude")
             dArea = pFeature_mesh.GetField("area")
             if (iFlag_transform ==1):
                 pGeometry_mesh.Transform(transform)
@@ -205,7 +205,7 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh_in, sFilename_flo
 
             pGeometrytype_mesh = pGeometry_mesh.GetGeometryName()
             if(pGeometrytype_mesh == 'POLYGON'):
-                pCell = convert_gcs_coordinates_to_cell(iMesh_type_in, dLon, dLat, aCoords_gcs)
+                pCell = convert_gcs_coordinates_to_cell(iMesh_type_in, dLongitude_center, dLatitude_center, aCoords_gcs)
                 pCell.lCellID = lCellID
                 pCell.dArea = dArea
                 pCell.dLength = pCell.calculate_edge_length()

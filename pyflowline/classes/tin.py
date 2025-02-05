@@ -1,7 +1,8 @@
 import json
 from json import JSONEncoder
 import numpy as np
-
+from pyearth.gis.geometry.calculate_polygon_area import calculate_polygon_area
+from pyearth.gis.geometry.calculate_spherical_triangle_area import calculate_spherical_triangle_area
 from pyflowline.classes.vertex import pyvertex
 from pyflowline.classes.edge import pyedge
 from pyflowline.classes.cell import pycell
@@ -16,18 +17,18 @@ class TINClassEncoder(JSONEncoder):
         if isinstance(obj, np.ndarray):
             return obj.tolist()
         if isinstance(obj, list):
-            pass  
+            pass
         if isinstance(obj, pyvertex):
-            return json.loads(obj.tojson()) 
+            return json.loads(obj.tojson())
         if isinstance(obj, pyedge):
-            return obj.lEdgeID        
+            return obj.lEdgeID
         if isinstance(obj, pyflowline):
             return obj.lFlowlineID
         if isinstance(obj, pytin):
-            return obj.lCellID     
+            return obj.lCellID
         return JSONEncoder.default(self, obj)
 
-class pytin(pycell):   
+class pytin(pycell):
     """tin class
 
     Args:
@@ -36,14 +37,17 @@ class pytin(pycell):
     Returns:
         _type_: _description_
     """
+    
 
     nFlowline=0
-    nVertex =0 
+    nVertex =0
     nEdge=0
     dLength=0.0
     dArea=0.0
     dX_center_meter=0.0
     dY_center_meter=0.0
+    dLongitude_center_degree=0.0
+    dLatitude_center_degree=0.0
     aEdge=None
     aVertex=None
     aFlowline=None
@@ -56,24 +60,29 @@ class pytin(pycell):
     aNeighbor_distance = None
     pBound=None
 
-    def __init__(self, aEdge,aVertex, dLon, dLat):       
+    def __init__(self, dLon, dLat, aEdge,aVertex):
         nEdge = len(aEdge)
         if nEdge !=3:
             pass
-        else:           
+        else:
             self.aEdge = aEdge
             self.aVertex = aVertex #the first one and last one are the same
             self.nEdge = len(aEdge)
-            self.nVertex = len(aVertex) - 1
-            self.dLongitude_center = dLon
-            self.dLatitude_center = dLat
-            pVertex = dict()        
-            pVertex['lon'] =self.dLongitude_center
-            pVertex['lat'] =self.dLatitude_center           
+            self.nVertex = len(aVertex)
+            self.dLongitude_center_degree = dLon
+            self.dLatitude_center_degree = dLat
+            pVertex = dict()
+            pVertex['dLongitude_degree'] =self.dLongitude_center_degree
+            pVertex['dLatitude_degree'] =self.dLatitude_center_degree
             self.pVertex_center = pyvertex(pVertex)
-            self.calculate_cell_bound() #bound for rtree 
+            self.lCellID_downstream_burned=-1
+            self.iStream_order_burned=-1
+            self.iStream_segment_burned=-1
+            self.dElevation_mean=-9999.0
+            self.calculate_cell_bound() #bound for rtree
             pass
-        pass    
+        pass
+
     def calculate_cell_bound(self):
         dLat_min = 90
         dLat_max = -90
@@ -84,18 +93,19 @@ class pytin(pycell):
             dLon_min = np.min( [dLon_min, self.aVertex[i].dLongitude_degree] )
             dLat_max = np.max( [dLat_max, self.aVertex[i].dLatitude_degree] )
             dLat_min = np.min( [dLat_min, self.aVertex[i].dLatitude_degree] )
-        
+
         self.pBound = (dLon_min, dLat_min, dLon_max, dLat_max)
         return self.pBound
+
     def has_this_edge(self, pEdge_in):
         iFlag_found = 0
         for pEdge in self.aEdge:
             if pEdge.is_overlap(pEdge_in):
-                iFlag_found =1 
+                iFlag_found =1
                 break
             else:
-                pass       
-        
+                pass
+
         return iFlag_found
 
     def which_edge_cross_this_vertex(self, pVertex_in):
@@ -111,21 +121,30 @@ class pytin(pycell):
                 pass
 
         return iFlag_found, pEdge_out
-    
-    def calculate_cell_area(self):           
-        #self.dArea = 0.0
+
+    def calculate_cell_area(self):
+        lons=list()
+        lats=list()
+        for i in range(self.nVertex):
+            lons.append( self.aVertex[i].dLongitude_degree )
+            lats.append( self.aVertex[i].dLatitude_degree )
+
+        self.dArea = calculate_spherical_triangle_area(lons ,lats)
+        #calculate_polygon_area( lons ,lats)
         return self.dArea
 
-    def calculate_edge_length(self):        
-        self.dLength_edge =0.0
-        return self.dLength_edge
-    
+    def calculate_edge_length(self):
+        dArea = self.dArea
+        dLength_edge = np.sqrt(   dArea   )
+        self.dLength = dLength_edge
+        return dLength_edge
+
     def share_edge(self, other):
         iFlag_share = 0
         for pEdge in self.aEdge:
             for pEdge2 in other.aEdge:
                 if pEdge.is_overlap(pEdge2) ==1 :
-                    iFlag_share = 1 
+                    iFlag_share = 1
                     break
 
         return iFlag_share
@@ -142,9 +161,9 @@ class pytin(pycell):
         obj = self.__dict__.copy()
         for sKey in aSkip:
             obj.pop(sKey, None)
-        sJson = json.dumps(obj, \
-            sort_keys=True, \
-            indent = 4, \
-            ensure_ascii=True, \
+        sJson = json.dumps(obj,
+            sort_keys=True,
+            indent = 4,
+            ensure_ascii=True,
             cls=TINClassEncoder)
         return sJson

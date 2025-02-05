@@ -4,7 +4,7 @@ from scipy import spatial
 from scipy import interpolate
 import jigsawpy
 
-from pyflowline.mesh.mpas.jigsaw.utility import zipmesh
+from pyflowline.mesh.jigsaw.utility import zipmesh
 
 
 def sphdist(rsph, xone, yone, xtwo, ytwo):

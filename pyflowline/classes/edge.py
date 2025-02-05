@@ -6,14 +6,17 @@ import numpy as np
 from pyflowline.classes.vertex import pyvertex
 from pyflowline.algorithms.split.split_by_length import split_edge_by_length
 
-iFlag_cython = importlib.util.find_spec("cython") 
+from pyearth.gis.geometry.calculate_intersect_on_great_circle import calculate_intersect_on_great_circle
+
+iFlag_cython = importlib.util.find_spec("cython")
 if iFlag_cython is not None:
+    from pyflowline.algorithms.cython.kernel import calculate_distance_based_on_longitude_latitude
     from pyflowline.algorithms.cython.kernel import calculate_angle_betwen_vertex
     from pyflowline.algorithms.cython.kernel import calculate_distance_to_plane
 else:
-    from pyearth.gis.geometry.calculate_angle_betwen_vertex import  calculate_angle_betwen_vertex
+    from pyearth.gis.geometry.calculate_distance_based_on_longitude_latitude import calculate_distance_based_on_longitude_latitude
+    from pyearth.gis.geometry.calculate_angle_betwen_vertex import calculate_angle_betwen_vertex
     from pyearth.gis.geometry.calculate_distance_to_plane import calculate_distance_to_plane
-
 
 class EdgeClassEncoder(JSONEncoder):
     def default(self, obj):
@@ -24,11 +27,11 @@ class EdgeClassEncoder(JSONEncoder):
         if isinstance(obj, np.ndarray):
             return obj.tolist()
         if isinstance(obj, list):
-            pass  
+            pass
         if isinstance(obj, pyvertex):
-            return json.loads(obj.tojson()) 
-          
-            
+            return json.loads(obj.tojson())
+
+
         return JSONEncoder.default(self, obj)
 
 class pyedge(object):
@@ -46,7 +49,7 @@ class pyedge(object):
     lEdgeIndex=-1
     pVertex_start = None
     pVertex_end = None
-    dLength=0.0    
+    dLength=0.0
     lIndex_upstream=-1
     lIndex_downstream=-1
     pBound=None
@@ -60,7 +63,7 @@ class pyedge(object):
             pVertex_end_in (pyvertex): The ending vertex
         """
         if pVertex_start_in == pVertex_end_in:
-            print('The two vertices are the same')    
+            print('The two vertices are the same')
         else:
             self.pVertex_start = pVertex_start_in
             self.pVertex_end = pVertex_end_in
@@ -68,14 +71,14 @@ class pyedge(object):
             self.calculate_edge_bound()
 
         return
-    
+
     def calculate_edge_bound(self):
-        
+
         dLon_max = np.max( [self.pVertex_start.dLongitude_degree, self.pVertex_end.dLongitude_degree] )
         dLon_min = np.min( [self.pVertex_start.dLongitude_degree, self.pVertex_end.dLongitude_degree] )
         dLat_max = np.max( [self.pVertex_start.dLatitude_degree, self.pVertex_end.dLatitude_degree] )
         dLat_min = np.min( [self.pVertex_start.dLatitude_degree, self.pVertex_end.dLatitude_degree] )
-        
+
         self.pBound = (dLon_min, dLat_min, dLon_max, dLat_max)
         return self.pBound
 
@@ -112,7 +115,7 @@ class pyedge(object):
             iFlag_shared = 0
 
         return iFlag_shared
-    
+
     def check_upstream(self, other):
         """
         Check whether another edge is the upstream of current edge
@@ -157,7 +160,7 @@ class pyedge(object):
             iFlag_downstream=0
 
         return iFlag_downstream
-    
+
     def split_by_length(self,dLength_in):
         """
         Split an edge using the threshold
@@ -169,7 +172,7 @@ class pyedge(object):
             list [pyedge]: A list of edge objects, length of 1 if it meets the requirement
         """
         aEdge_out=list()
-        if self.dLength <=aEdge_out:
+        if self.dLength <= dLength_in:
             aEdge_out.append(self)
         else:
             #find location from up to down
@@ -186,7 +189,7 @@ class pyedge(object):
         self.pVertex_start = v1
         self.pVertex_end = v0
         return
-    
+
     def is_overlap(self, pEdge_in):
         """
         Check if two edges overlap each other
@@ -223,15 +226,15 @@ class pyedge(object):
         Returns:
             tuple[int, float, float]: 1 if it is on; 0 if not. Length and distance are calculated if on.
         """
-        iFlag =0 
+        iFlag =0
         dDistance = -1
         dDistance_plane = 9999
         pVertex_start = self.pVertex_start
         pVertex_end = self.pVertex_end
         self.dLength = pVertex_start.calculate_distance(pVertex_end)
         if pVertex_in != pVertex_start and pVertex_in!=pVertex_end:
-            d1 = pVertex_start.calculate_distance(pVertex_in)            
-            d2 = pVertex_end.calculate_distance(pVertex_in)  
+            d1 = pVertex_start.calculate_distance(pVertex_in)
+            d2 = pVertex_end.calculate_distance(pVertex_in)
             d3 = d1 + d2 - self.dLength
             angle3deg = calculate_angle_betwen_vertex(\
                  pVertex_start.dLongitude_degree, pVertex_start.dLatitude_degree,\
@@ -251,12 +254,76 @@ class pyedge(object):
                 dDistance = d1
             else:
                 iFlag = 0
-            
+
         else:
-            iFlag = 0 
+            iFlag = 0
 
         return iFlag, dDistance, dDistance_plane
-    
+
+    def calculate_distance_to_vertex(self, pVertex_in):
+        pVertex_start = self.pVertex_start
+        pVertex_end = self.pVertex_end
+        pVertex_out = None
+        dDistance_min = 1.0E9
+
+        d1 = pVertex_start.calculate_distance(pVertex_in)
+        d2 = pVertex_end.calculate_distance(pVertex_in)
+        d3 = d1 + d2 - self.dLength
+        angle3deg = calculate_angle_betwen_vertex(\
+                 pVertex_start.dLongitude_degree, pVertex_start.dLatitude_degree,\
+                 pVertex_in.dLongitude_degree, pVertex_in.dLatitude_degree,\
+                 pVertex_end.dLongitude_degree,pVertex_end.dLatitude_degree)
+
+        if  angle3deg > 90 : #care
+            dDistance_plane = calculate_distance_to_plane(\
+                 pVertex_start.dLongitude_degree, pVertex_start.dLatitude_degree,\
+                 pVertex_in.dLongitude_degree, pVertex_in.dLatitude_degree,\
+                 pVertex_end.dLongitude_degree,pVertex_end.dLatitude_degree)
+
+            if dDistance_plane < d1 and dDistance_plane < d2:
+                dLongitude_intersect, dLatitude_intersect = calculate_intersect_on_great_circle(\
+                    pVertex_start.dLongitude_degree, pVertex_start.dLatitude_degree,\
+                 pVertex_in.dLongitude_degree, pVertex_in.dLatitude_degree,\
+                 pVertex_end.dLongitude_degree,pVertex_end.dLatitude_degree)
+
+                point= dict()
+                point['dLongitude_degree'] = dLongitude_intersect
+                point['dLatitude_degree'] = dLatitude_intersect
+                pVertex_out=pyvertex(point)
+                #check it is on the edge
+                #iFlag, dDistance, dDistance_plane = self.check_vertex_on_edge(pVertex_out)
+                #if iFlag == 1:
+                #    print('success')
+                #else:
+                #    print('error')
+                #    pass
+
+                dDistance_min = pVertex_out.calculate_distance(pVertex_in)
+                if dDistance_min < d1 and dDistance_min < d2:
+                    pass
+                else:
+                    if d1 < d2:
+                        pVertex_out = pVertex_start
+                        dDistance_min = d1
+                    else:
+                        pVertex_out = pVertex_end
+                        dDistance_min = d2
+                    pass
+            else:
+                print('error')
+                pass
+        else:
+            if d1 < d2:
+                pVertex_out = pVertex_start
+                dDistance_min = d1
+            else:
+                pVertex_out = pVertex_end
+                dDistance_min = d2
+            pass
+
+
+        return dDistance_min, pVertex_out
+
     def __eq__(self, other):
         """
         Check if two edges are equivalent
@@ -291,7 +358,7 @@ class pyedge(object):
         """
 
         obj = self.__dict__.copy()
-        
+
         sJson = json.dumps(obj, \
             sort_keys=True, \
                 indent = 4, \

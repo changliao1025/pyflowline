@@ -2,7 +2,7 @@ import os
 import stat
 from pathlib import Path
 from pyearth.system.python.retrieve_python_environment import retrieve_python_environment
-def _pyflowline_create_hpc_job(self, sSlurm_in=None):
+def _pyflowline_create_hpc_job(self, sSlurm_in=None, hours_in = 10):
     """create a HPC job for this simulation
     """
     os.chdir(self.sWorkspace_output)
@@ -56,6 +56,9 @@ def _pyflowline_create_hpc_job(self, sSlurm_in=None):
 
     sLine = 'oPyflowline.pyflowline_export()' + '\n'
     ofs_pyflowline.write(sLine)
+
+    sLine = "print('Finished')" + '\n'
+    ofs_pyflowline.write(sLine)
     ofs_pyflowline.close()
     os.chmod(sFilename_pyflowline, stat.S_IREAD | stat.S_IWRITE | stat.S_IXUSR)
 
@@ -69,7 +72,8 @@ def _pyflowline_create_hpc_job(self, sSlurm_in=None):
     ofs.write(sLine)
     sLine = '#SBATCH --job-name=' + self.sCase + '\n'
     ofs.write(sLine)
-    sLine = '#SBATCH -t 4:00:00' + '\n'
+    sHour = "{:02d}".format(hours_in)
+    sLine = '#SBATCH -t ' + sHour + ':00:00' + '\n'
     ofs.write(sLine)
     sLine = '#SBATCH --nodes=1' + '\n'
     ofs.write(sLine)

@@ -8,7 +8,7 @@ import numpy as np
 from osgeo import ogr, osr
 from pyflowline.formats.convert_coordinates import convert_gcs_coordinates_to_cell
 from pyflowline.algorithms.auxiliary.find_index_in_list import check_if_duplicates
-from pyearth.gis.spatialref.reproject_coodinates import reproject_coordinates_batch
+from pyearth.gis.spatialref.reproject_coordinates import reproject_coordinates_batch
 
 def index_to_row_col(index, num_columns):
     index -= 1  # Adjust for 1-based indexing
@@ -300,14 +300,14 @@ def create_hexagon_mesh(iFlag_rotation_in,
                 pPolygon = ogr.Geometry(ogr.wkbPolygon)
                 pPolygon.AddGeometry(ring)
 
-                aCoords = np.full((7,2), -9999.0, dtype=float)
+                aCoords_gcs = np.full((7,2), -9999.0, dtype=float)
                 for i, (x, y) in enumerate(coordinates):
-                    aCoords[i, 0] = x
-                    aCoords[i, 1] = y
+                    aCoords_gcs[i, 0] = x
+                    aCoords_gcs[i, 1] = y
 
 
-                dLongitude_center = np.mean(aCoords[0:6,0])
-                dLatitude_center = np.mean(aCoords[0:6,1])
+                dLongitude_center = np.mean(aCoords_gcs[0:6,0])
+                dLatitude_center = np.mean(aCoords_gcs[0:6,1])
 
                 iFlag = False
                 if pPolygon.Within(pBoundary):
@@ -320,7 +320,7 @@ def create_hexagon_mesh(iFlag_rotation_in,
                         pass
 
                 if ( iFlag == True ):
-                    aHexagon, dArea = add_cell_into_list1(aHexagon, lCellID, iRow, iColumn, dLongitude_center,dLatitude_center, aCoords )
+                    aHexagon, dArea = add_cell_into_list1(aHexagon, lCellID, iRow, iColumn, dLongitude_center, dLatitude_center, aCoords_gcs )
                     aHexagon_dict[lCellID] = lCellIndex
                     lCellIndex = lCellIndex + 1
                     #save feature
@@ -383,13 +383,13 @@ def create_hexagon_mesh(iFlag_rotation_in,
                 pPolygon = ogr.Geometry(ogr.wkbPolygon)
                 pPolygon.AddGeometry(ring)
 
-                aCoords = np.full((7,2), -9999.0, dtype=float)
+                aCoords_gcs = np.full((7,2), -9999.0, dtype=float)
                 for i, (x, y) in enumerate(coordinates):
-                    aCoords[i, 0] = x
-                    aCoords[i, 1] = y
+                    aCoords_gcs[i, 0] = x
+                    aCoords_gcs[i, 1] = y
 
-                dLongitude_center = np.mean(aCoords[0:6,0])
-                dLatitude_center = np.mean(aCoords[0:6,1])
+                dLongitude_center = np.mean(aCoords_gcs[0:6,0])
+                dLatitude_center = np.mean(aCoords_gcs[0:6,1])
                 iFlag == False
                 if pPolygon.Within(pBoundary):
                     iFlag = True
@@ -402,7 +402,7 @@ def create_hexagon_mesh(iFlag_rotation_in,
                 if ( iFlag == True ):
                     aHexagon, dArea = add_cell_into_list2(aHexagon, lCellID, iRow, iColumn,
                                                           dLongitude_center,dLatitude_center,
-                                                          aCoords )
+                                                          aCoords_gcs )
                     aHexagon_dict[lCellID] = lCellIndex
                     lCellIndex = lCellIndex + 1
                     pFeature.SetGeometry(pPolygon)
@@ -502,17 +502,17 @@ def create_hexagon_mesh(iFlag_rotation_in,
                     pPolygon = ogr.Geometry(ogr.wkbPolygon)
                     pPolygon.AddGeometry(ring)
 
-                    aCoords = np.full((7,2), -9999.0, dtype=float)
+                    aCoords_gcs = np.full((7,2), -9999.0, dtype=float)
                     for i, (x, y) in enumerate(coordinates):
-                        aCoords[i, 0] = x
-                        aCoords[i, 1] = y
+                        aCoords_gcs[i, 0] = x
+                        aCoords_gcs[i, 1] = y
                         pass
 
-                    dLongitude_center = np.mean(aCoords[0:6,0])
-                    dLatitude_center = np.mean(aCoords[0:6,1])
+                    dLongitude_center = np.mean(aCoords_gcs[0:6,0])
+                    dLatitude_center = np.mean(aCoords_gcs[0:6,1])
 
                     if lCellID not in aHexagon_dict:
-                        aHexagon, dArea = add_cell_into_list1(aHexagon, lCellID, iRow, iColumn, dLongitude_center,dLatitude_center, aCoords)
+                        aHexagon, dArea = add_cell_into_list1(aHexagon, lCellID, iRow, iColumn, dLongitude_center,dLatitude_center, aCoords_gcs)
                         aHexagon_dict[lCellID] = lCellIndex
                         lCellIndex = lCellIndex + 1
                         pFeature.SetGeometry(pPolygon)
@@ -571,17 +571,17 @@ def create_hexagon_mesh(iFlag_rotation_in,
                     pPolygon = ogr.Geometry(ogr.wkbPolygon)
                     pPolygon.AddGeometry(ring)
 
-                    aCoords = np.full((7,2), -9999.0, dtype=float)
+                    aCoords_gcs = np.full((7,2), -9999.0, dtype=float)
                     for i, (x, y) in enumerate(coordinates):
-                        aCoords[i, 0] = x
-                        aCoords[i, 1] = y
+                        aCoords_gcs[i, 0] = x
+                        aCoords_gcs[i, 1] = y
                         pass
 
-                    dLongitude_center = np.mean(aCoords[0:6,0])
-                    dLatitude_center = np.mean(aCoords[0:6,1])
+                    dLongitude_center = np.mean(aCoords_gcs[0:6,0])
+                    dLatitude_center = np.mean(aCoords_gcs[0:6,1])
 
                     if lCellID not in aHexagon_dict:
-                        aHexagon, dArea = add_cell_into_list1(aHexagon, lCellID, iRow, iColumn, dLongitude_center,dLatitude_center, aCoords)
+                        aHexagon, dArea = add_cell_into_list1(aHexagon, lCellID, iRow, iColumn, dLongitude_center,dLatitude_center, aCoords_gcs)
                         aHexagon_dict[lCellID] = lCellIndex
                         lCellIndex = lCellIndex + 1
                         pFeature.SetGeometry(pPolygon)

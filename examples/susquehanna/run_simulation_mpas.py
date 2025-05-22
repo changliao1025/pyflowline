@@ -3,7 +3,7 @@ from pathlib import Path
 
 
 from pyflowline.configuration.read_configuration_file import pyflowline_read_configuration_file
-from pyflowline.configuration.change_json_key_value import pyflowline_change_json_key_value
+from pyflowline.configuration.change_json_key_value import change_json_key_value
 from pyflowline.configuration import path_manager as pyflowline_path_manager
 
 

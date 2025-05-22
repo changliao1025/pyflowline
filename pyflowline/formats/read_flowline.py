@@ -18,25 +18,37 @@ def read_flowline_shapefile(sFilename_shapefile_in):
         return iReturn_code
 
     aFlowline=list()
-    pDriver_shapefile = ogr.GetDriverByName('ESRI Shapefile')   
+    pDriver_shapefile = ogr.GetDriverByName('ESRI Shapefile')
     pDataset_shapefile = pDriver_shapefile.Open(sFilename_shapefile_in, gdal.GA_ReadOnly)
     pLayer_shapefile = pDataset_shapefile.GetLayer(0)
     pSpatialRef_shapefile = pLayer_shapefile.GetSpatialRef()
+
     pSpatial_reference_gcs = osr.SpatialReference()
     pSpatial_reference_gcs.ImportFromEPSG(4326)
     pSpatial_reference_gcs.SetAxisMappingStrategy(osr.OAMS_TRADITIONAL_GIS_ORDER)
-    comparison = pSpatialRef_shapefile.IsSame(pSpatial_reference_gcs)
-    if(comparison != 1):
-        iFlag_transform =1
-        pTransform = osr.CoordinateTransformation(pSpatialRef_shapefile, pSpatial_reference_gcs)
+
+    if pSpatialRef_shapefile is not None:
+        pProjection_geojson = pSpatialRef_shapefile.ExportToWkt()
+        comparison = pSpatialRef_shapefile.IsSame(pSpatial_reference_gcs)
+        if(comparison != 1):
+            iFlag_transform =1
+            pTransform = osr.CoordinateTransformation(pSpatialRef_shapefile, pSpatial_reference_gcs)
+        else:
+            iFlag_transform =0
+
     else:
-        iFlag_transform =0
-   
+        pProjection_geojson = None
+        iFlag_transform = 0
+
     lFlowlineIndex = 0
-    for pFeature_shapefile in pLayer_shapefile:        
+    for pFeature_shapefile in pLayer_shapefile:
         pGeometry_in = pFeature_shapefile.GetGeometryRef()
         sGeometry_type = pGeometry_in.GetGeometryName()
-        lNHDPlusID = int(pFeature_shapefile.GetField("NHDPlusID"))
+        #check whether it has a field called NHDPlusID
+        if pFeature_shapefile.GetFieldIndex("NHDPlusID") != -1:
+            lNHDPlusID = int(pFeature_shapefile.GetField("NHDPlusID"))
+        else:
+            lNHDPlusID = -1
         if (iFlag_transform ==1): #projections are different
             pGeometry_in.Transform(pTransform)
         if (pGeometry_in.IsValid()):
@@ -49,38 +61,36 @@ def read_flowline_shapefile(sFilename_shapefile_in):
             for i in range(nLine):
                 Line = pGeometry_in.GetGeometryRef(i)
                 aCoords = list()
-                for i in range(0,  Line.GetPointCount()):                   
+                for i in range(0,  Line.GetPointCount()):
                     pt = Line.GetPoint(i)
-                    aCoords.append( [ pt[0], pt[1]])       
+                    aCoords.append( [ pt[0], pt[1]])
                 dummy1= np.array(aCoords)
                 pFlowline = convert_gcs_coordinates_to_flowline(dummy1)
                 pFlowline.lFlowlineIndex = lFlowlineIndex
                 pFlowline.lNHDPlusID= lNHDPlusID
                 aFlowline.append(pFlowline)
                 lFlowlineIndex = lFlowlineIndex + 1
-               
+
         else:
             if sGeometry_type =='LINESTRING':
                 aCoords = list()
-                for i in range(0, pGeometry_in.GetPointCount()):                   
+                for i in range(0, pGeometry_in.GetPointCount()):
                     pt = pGeometry_in.GetPoint(i)
-                    aCoords.append( [ pt[0], pt[1]])                
+                    aCoords.append( [ pt[0], pt[1]])
                 dummy1= np.array(aCoords)
                 pFlowline = convert_gcs_coordinates_to_flowline(dummy1)
                 pFlowline.lFlowlineIndex = lFlowlineIndex
                 pFlowline.lNHDPlusID= lNHDPlusID
                 aFlowline.append(pFlowline)
                 lFlowlineIndex = lFlowlineIndex + 1
-                
+
             else:
                 print(sGeometry_type)
                 pass
-        
-        
-    
+
     #we also need to spatial reference
 
-    return aFlowline, pSpatialRef_shapefile
+    return aFlowline, pProjection_geojson
 
 def read_flowline_shapefile_swat(sFilename_shapefile_in):
     """
@@ -88,7 +98,7 @@ def read_flowline_shapefile_swat(sFilename_shapefile_in):
     This function should be used for stream flowline only.
     """
     aFlowline=list()
-    pDriver_shapefile = ogr.GetDriverByName('ESRI Shapefile')   
+    pDriver_shapefile = ogr.GetDriverByName('ESRI Shapefile')
     pDataset_shapefile = pDriver_shapefile.Open(sFilename_shapefile_in, gdal.GA_ReadOnly)
     pLayer_shapefile = pDataset_shapefile.GetLayer(0)
     pSpatialRef_shapefile = pLayer_shapefile.GetSpatialRef()
@@ -103,7 +113,7 @@ def read_flowline_shapefile_swat(sFilename_shapefile_in):
         iFlag_transform =0
 
     lFlowlineIndex = 0
-    for pFeature_shapefile in pLayer_shapefile:        
+    for pFeature_shapefile in pLayer_shapefile:
         pGeometry_in = pFeature_shapefile.GetGeometryRef()
         sGeometry_type = pGeometry_in.GetGeometryName()
         if (iFlag_transform ==1): #projections are different
@@ -117,36 +127,35 @@ def read_flowline_shapefile_swat(sFilename_shapefile_in):
         if(sGeometry_type == 'MULTILINESTRING'):
             nLine = pGeometry_in.GetGeometryCount()
             for i in range(nLine):
-                Line = pGeometry_in.GetGeometryRef(i) 
+                Line = pGeometry_in.GetGeometryRef(i)
                 aCoords = list()
-                for i in range(0,  Line.GetPointCount()):                   
+                for i in range(0,  Line.GetPointCount()):
                     pt = Line.GetPoint(i)
-                    aCoords.append( [ pt[0], pt[1]])    
+                    aCoords.append( [ pt[0], pt[1]])
                 dummy1= np.array(aCoords)
                 pFlowline = convert_gcs_coordinates_to_flowline(dummy1)
-                pFlowline.lFlowlineIndex = lFlowlineIndex            
+                pFlowline.lFlowlineIndex = lFlowlineIndex
                 aFlowline.append(pFlowline)
                 lFlowlineIndex = lFlowlineIndex + 1
-               
+
         else:
             if sGeometry_type =='LINESTRING':
                 aCoords = list()
-                for i in range(0, pGeometry_in.GetPointCount()):                   
+                for i in range(0, pGeometry_in.GetPointCount()):
                     pt = pGeometry_in.GetPoint(i)
-                    aCoords.append( [ pt[0], pt[1]])               
+                    aCoords.append( [ pt[0], pt[1]])
                 dummy1= np.array(aCoords)
                 pFlowline = convert_gcs_coordinates_to_flowline(dummy1)
-                pFlowline.lFlowlineIndex = lFlowlineIndex       
+                pFlowline.lFlowlineIndex = lFlowlineIndex
                 aFlowline.append(pFlowline)
                 lFlowlineIndex = lFlowlineIndex + 1
-                
+
             else:
                 print(sGeometry_type)
                 pass
-    
+
 
     return aFlowline, pSpatialRef_shapefile
-
 
 def read_flowline_geojson(sFilename_geojson_in, sFilename_out = None):
     """
@@ -154,7 +163,7 @@ def read_flowline_geojson(sFilename_geojson_in, sFilename_out = None):
     This function should be used for stream flowline only.
     """
     aFlowline=list()
-    pDriver_geojson = ogr.GetDriverByName('GeoJSON')   
+    pDriver_geojson = ogr.GetDriverByName('GeoJSON')
     if os.path.isfile(sFilename_geojson_in):
         #print(sFilename_geojson_in)
         pass
@@ -163,7 +172,7 @@ def read_flowline_geojson(sFilename_geojson_in, sFilename_out = None):
         exit()
 
     if sFilename_out is not None:
-        # Open the GeoJSON file        
+        # Open the GeoJSON file
         dataSource = pDriver_geojson.Open(sFilename_geojson_in, 1)  # 1 means writable
         # Get the layer
         layer = dataSource.GetLayer()
@@ -200,10 +209,12 @@ def read_flowline_geojson(sFilename_geojson_in, sFilename_out = None):
         dataSource = None
         new_dataSource = None
         sFilename_geojson_in = sFilename_out #use this dataset because it has lineid
-            
+
     pDataset_geojson = pDriver_geojson.Open(sFilename_geojson_in, gdal.GA_ReadOnly)
     pLayer_geojson = pDataset_geojson.GetLayer(0)
     pSpatialRef_geojson = pLayer_geojson.GetSpatialRef()
+    #convert to wkt
+    pProjection_geojson = pSpatialRef_geojson.ExportToWkt() #by default, geojson only supports one osr
     ldefn = pLayer_geojson.GetLayerDefn()
     schema = list()
     for n in range(ldefn.GetFieldCount()):
@@ -212,11 +223,11 @@ def read_flowline_geojson(sFilename_geojson_in, sFilename_out = None):
     if 'stream_segment' in schema:
         iFlag_segment = 1
     else:
-        iFlag_segment = 0    
+        iFlag_segment = 0
     if 'stream_order' in schema:
         iFlag_order = 1
     else:
-        iFlag_order = 0    
+        iFlag_order = 0
     if 'lineid' in schema:
         iFlag_id = 1
     else:
@@ -225,7 +236,7 @@ def read_flowline_geojson(sFilename_geojson_in, sFilename_out = None):
         iFlag_NHDPlusID = 1
     else:
         iFlag_NHDPlusID = 0
-    
+
 
     lFlowlineIndex = 0
     lFlowlineID = 1
@@ -246,22 +257,22 @@ def read_flowline_geojson(sFilename_geojson_in, sFilename_out = None):
             iStream_order = pFeature_geojson.GetField("stream_order")
         else:
             iStream_order = -1
-        
+
         if iFlag_id ==1:
             lFlowlineID = pFeature_geojson.GetField("lineid")
         else:
-            lFlowlineID=-1
+            lFlowlineID= 1
             pass
 
         if iFlag_NHDPlusID ==1:
             lNHDPlusID = pFeature_geojson.GetField("NHDPlusID")
         else:
             lNHDPlusID = -1
-        
+
         if(sGeometry_type == 'MULTILINESTRING'):
             nLine = pGeometry_in.GetGeometryCount()
             for i in range(nLine):
-                Line = pGeometry_in.GetGeometryRef(i)                    
+                Line = pGeometry_in.GetGeometryRef(i)
                 aCoords = [[pt[0], pt[1]] for pt in Line.GetPoints()]
                 pFlowline = convert_gcs_coordinates_to_flowline(np.array(aCoords))
                 if pFlowline is not None:
@@ -273,10 +284,10 @@ def read_flowline_geojson(sFilename_geojson_in, sFilename_out = None):
                     if iFlag_id !=1:
                         lFlowlineID = lFlowlineID + 1 #careful
                 else:
-                    print('Error in reading multi flowline: ', iFeature, i, aCoords) 
-        
+                    print('Error in reading multi flowline: ', iFeature, i, aCoords)
+
         else:
-            if sGeometry_type =='LINESTRING':         
+            if sGeometry_type =='LINESTRING':
                 aCoords = [[pt[0], pt[1]] for pt in pGeometry_in.GetPoints()]
                 pFlowline = convert_gcs_coordinates_to_flowline(np.array(aCoords))
                 if pFlowline is not None:
@@ -286,14 +297,14 @@ def read_flowline_geojson(sFilename_geojson_in, sFilename_out = None):
                     pFlowline.lFlowlineID = lFlowlineID
                     pFlowline.lNHDPlusID = lNHDPlusID
                     aFlowline.append(pFlowline)
-                    lFlowlineIndex = lFlowlineIndex + 1   
+                    lFlowlineIndex = lFlowlineIndex + 1
                     if iFlag_id !=1:
-                        lFlowlineID = lFlowlineID + 1  #careful   
+                        lFlowlineID = lFlowlineID + 1  #careful
                 else:
-                    print('Error in reading single flowline: ', iFeature)     
+                    print('Error in reading single flowline: ', iFeature)
             else:
                 print(sGeometry_type)
-                pass        
+                pass
 
 
-    return aFlowline, pSpatialRef_geojson
+    return aFlowline, pProjection_geojson

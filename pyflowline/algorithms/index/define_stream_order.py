@@ -69,7 +69,6 @@ def define_stream_order(aFlowline_in, aConfluence_in):
                 pBound = (x - 1E-5, y - 1E-5, x + 1E-5, y + 1E-5)
                 index_confluence.insert(i, pBound)
 
-
             while aFlowline_in[0].iStream_order < 0:
                 for i in range(nConfleunce):
                     if aFlag_confluence_treated[i] == 1:
@@ -115,8 +114,9 @@ def define_stream_order(aFlowline_in, aConfluence_in):
 
                         #update confluence
                         x, y = pFlowline_downstream.pVertex_end.dLongitude_degree, pFlowline_downstream.pVertex_end.dLatitude_degree
-                        pBound = (x - 1E-5, y - 1E-5, x + 1E-5, y + 1E-5)
-                        aIntersect = list(index_confluence.search(pBound))
+                        #pBound = (x - 1E-5, y - 1E-5, x + 1E-5, y + 1E-5)
+                        #aIntersect = list(index_confluence.search(pBound))
+                        aIntersect = list(index_confluence.search_surrounding([x, y]))
 
                         for k in aIntersect:
                             pConfluence2 = aConfluence_in[k]

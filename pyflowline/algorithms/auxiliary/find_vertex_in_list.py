@@ -40,20 +40,20 @@ def find_vertex_in_list(aVertex_in, pVertex_in, dThreshold_in=1.0E-6):
             pass
 
         #now the new vertex
-        x=pVertex_in.dLongitude_degree
-        y=pVertex_in.dLatitude_degree
-        left = x - 1E-5
-        right = x + 1E-5
-        bottom = y-1E-5
-        top =    y+1E-5
-        pBound= (left, bottom, right, top)
-        aIntersect = list(index_vertex.search(pBound))
+        #x=pVertex_in.dLongitude_degree
+        #y=pVertex_in.dLatitude_degree
+        #left = x - 1E-5
+        #right = x + 1E-5
+        #bottom = y-1E-5
+        #top =    y+1E-5
+        #pBound= (left, bottom, right, top)
+        #aIntersect = list(index_vertex.search(pBound))
+        aIntersect = list(index_vertex.search_surrounding([pVertex_in.dLongitude_degree, pVertex_in.dLatitude_degree]))
 
         for k in aIntersect:
             pVertex = aVertex_in[k]
             #dDistance = pVertex.calculate_distance(pVertex_in)
             if pVertex == pVertex_in: #if dDistance < dThreshold_in:
-
                 iFlag_exist = 1
                 lIndex = k
                 break
@@ -67,7 +67,6 @@ def find_vertex_in_list(aVertex_in, pVertex_in, dThreshold_in=1.0E-6):
                 pVertex = aVertex_in[i]
                 #dDistance = pVertex.calculate_distance(pVertex_in)
                 if pVertex == pVertex_in: #if dDistance < dThreshold_in:
-
                     iFlag_exist = 1
                     lIndex = i
                     break

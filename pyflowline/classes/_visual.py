@@ -1,17 +1,22 @@
 import os
 
 #dependency packages
-from pyearth.visual.map.vector.map_vector_polygon_data import map_vector_polygon_data
-from pyearth.visual.map.vector.map_vector_polyline_data import map_vector_polyline_data
-from pyearth.visual.map.vector.map_multiple_vector_data import map_multiple_vector_data
+from pyearth.visual.map.vector.map_vector_polygon_file import map_vector_polygon_file
+from pyearth.visual.map.vector.map_vector_polyline_file import map_vector_polyline_file
+from pyearth.visual.map.vector.map_multiple_vector_files import map_multiple_vector_files
 
 #plot function
 
 def plot(self,
          iFlag_type_in = None,
          iFlag_title_in = None,
+         iFlag_openstreetmap_in=None,
+         iFlag_terrain_image_in=None,
+         iFlag_esri_hydro_image_in=None,
+         iBasemap_zoom_level_in=None,
          iDPI_in = None,
          sFilename_output_in = None,
+         sTitle_in = None,
          sVariable_in = None,
          aExtent_in = None,
          pProjection_map_in = None,
@@ -79,6 +84,11 @@ def plot(self,
                     self._plot_mesh(sFilename_output_in=sFilename_output_in,
                                     aExtent_in = aExtent_in,
                                     iDPI_in = iDPI_in,
+                                     iFlag_openstreetmap_in= iFlag_openstreetmap_in,
+                                    iFlag_terrain_image_in= iFlag_terrain_image_in,
+                                    iFlag_esri_hydro_image_in= iFlag_esri_hydro_image_in,
+                                    iBasemap_zoom_level_in = iBasemap_zoom_level_in,
+                                    sTitle_in = sTitle_in,
                                     pProjection_data_in = pProjection_data_in,
                                     pProjection_map_in = pProjection_map_in)
 
@@ -102,16 +112,34 @@ def _plot_mesh(self,
                sFilename_output_in=None,
                aExtent_in=None,
                iDPI_in=None,
+               iFlag_openstreetmap_in=None,
+               iFlag_terrain_image_in=None,
+               iFlag_esri_hydro_image_in=None,
+               iBasemap_zoom_level_in=None,
+               sTitle_in=None,
                pProjection_data_in = None,
                pProjection_map_in = None):
 
     sFilename_in = self.sFilename_mesh
-    sMesh_type = self.sMesh_type
+    if self.iMesh_type == 4:
+        sMesh_type = 'MPAS mesh'
+    else:
+        sMesh_type = self.sMesh_type
+        #captilize the first letter
+        sMesh_type = sMesh_type.title() + ' mesh'
 
-    map_vector_polygon_data(1, sFilename_in,
+    if sTitle_in is not None:
+        sMesh_type = sTitle_in
+
+    map_vector_polygon_file(1, sFilename_in,
                             iFlag_zebra_in= 1,
                             iFlag_color_in = 0,
                             iFlag_fill_in= False,
+                            iFlag_filter_in= 1, #for mesh alone, we need to filter out the boundary
+                            iFlag_openstreetmap_in= iFlag_openstreetmap_in,
+                            iFlag_terrain_image_in= iFlag_terrain_image_in,
+                            iFlag_esri_hydro_image_in= iFlag_esri_hydro_image_in,
+                            iBasemap_zoom_level_in= iBasemap_zoom_level_in,
                             iDPI_in=iDPI_in,
                             sFilename_output_in = sFilename_output_in,
                             sTitle_in = sMesh_type,
@@ -152,7 +180,7 @@ def _plot_mesh_with_flowline(self,
         aFlag_discrete.append(1)
         aFlag_fill.append(True)
 
-    map_multiple_vector_data(aFiletype_in,
+    map_multiple_vector_files(aFiletype_in,
                              aFilename_in,
                              sFilename_output_in=sFilename_output_in,
                              sTitle_in= 'Mesh with flowline',

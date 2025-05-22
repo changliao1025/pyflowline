@@ -7,7 +7,7 @@ import os
 from osgeo import ogr, osr
 import numpy as np
 from pyflowline.formats.convert_coordinates import convert_gcs_coordinates_to_cell
-from pyearth.gis.spatialref.reproject_coodinates import  reproject_coordinates_batch
+from pyearth.gis.spatialref.reproject_coordinates import  reproject_coordinates_batch
 
 def index_to_row_col(index, num_columns):
     index -= 1  # Adjust for 1-based indexing
@@ -174,13 +174,13 @@ def create_square_mesh(dX_left_in, dY_bot_in,
             pPolygon = ogr.Geometry(ogr.wkbPolygon)
             pPolygon.AddGeometry(ring)
 
-            aCoords = np.full((5,2), -9999.0, dtype=float)
+            aCoords_gcs = np.full((5,2), -9999.0, dtype=float)
             for i, (x, y) in enumerate(coordinates):
-                aCoords[i, 0] = x
-                aCoords[i, 1] = y
+                aCoords_gcs[i, 0] = x
+                aCoords_gcs[i, 1] = y
 
-            dLongitude_center = np.mean(aCoords[0:4,0])
-            dLatitude_center = np.mean(aCoords[0:4,1])
+            dLongitude_center = np.mean(aCoords_gcs[0:4,0])
+            dLatitude_center = np.mean(aCoords_gcs[0:4,1])
 
             iFlag = False
             if pPolygon.Within(pBoundary):
@@ -194,7 +194,7 @@ def create_square_mesh(dX_left_in, dY_bot_in,
 
 
             if ( iFlag == True ):
-                aSquare, dArea = add_cell_into_list(aSquare, lCellID, iRow, iColumn, dLongitude_center,dLatitude_center, aCoords )
+                aSquare, dArea = add_cell_into_list(aSquare, lCellID, iRow, iColumn, dLongitude_center,dLatitude_center, aCoords_gcs )
                 #add to dictionary
                 aSquare_dict[lCellID] = lCellIndex
                 lCellIndex = lCellIndex + 1
@@ -275,16 +275,16 @@ def create_square_mesh(dX_left_in, dY_bot_in,
                 pPolygon = ogr.Geometry(ogr.wkbPolygon)
                 pPolygon.AddGeometry(ring)
 
-                aCoords = np.full((5,2), -9999.0, dtype=float)
+                aCoords_gcs = np.full((5,2), -9999.0, dtype=float)
                 for i, (x, y) in enumerate(coordinates):
-                    aCoords[i, 0] = x
-                    aCoords[i, 1] = y
+                    aCoords_gcs[i, 0] = x
+                    aCoords_gcs[i, 1] = y
 
-                dLongitude_center = np.mean(aCoords[0:4,0])
-                dLatitude_center = np.mean(aCoords[0:4,1])
+                dLongitude_center = np.mean(aCoords_gcs[0:4,0])
+                dLatitude_center = np.mean(aCoords_gcs[0:4,1])
 
                 if lCellID not in aSquare_dict:
-                    aSquare, dArea = add_cell_into_list(aSquare, lCellID, iRow, iColumn, dLongitude_center,dLatitude_center, aCoords )
+                    aSquare, dArea = add_cell_into_list(aSquare, lCellID, iRow, iColumn, dLongitude_center,dLatitude_center, aCoords_gcs )
                     aSquare_dict[lCellID] = lCellIndex
                     lCellIndex = lCellIndex + 1
                     pFeature.SetGeometry(pPolygon)

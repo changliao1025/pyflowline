@@ -5,21 +5,19 @@ from osgeo import ogr, osr
 from pyflowline.classes.edge import pyedge
 from pyflowline.classes.link import pycelllink
 
-def export_flowline_to_geojson( aFlowline_in, 
-    sFilename_json_in, 
-    iFlag_projected_in= None, 
-    pSpatial_reference_in=None, 
+def export_flowline_to_geojson( aFlowline_in,
+    sFilename_json_in,
+    iFlag_projected_in= None,
+    pSpatial_reference_in=None,
     aAttribute_field=None,
     aAttribute_data=None,
     aAttribute_dtype=None):
-    
-    
     """
     convert a flowlist object list to json format.
     This function should be used for stream flowline only.
     """
 
-    if os.path.exists(sFilename_json_in): 
+    if os.path.exists(sFilename_json_in):
         os.remove(sFilename_json_in)
 
     nFlowline = len(aFlowline_in)
@@ -28,14 +26,13 @@ def export_flowline_to_geojson( aFlowline_in,
     else:
         iFlag_projected_in = 1
 
-    if  pSpatial_reference_in is None:        
-        pSpatial_reference_in = osr.SpatialReference()  
+    if  pSpatial_reference_in is None:
+        pSpatial_reference_in = osr.SpatialReference()
         pSpatial_reference_in.ImportFromEPSG(4326)    # WGS84 lat/lon
     else:
         pass
 
     iFlag_attribute = int(all([aAttribute_field, aAttribute_data, aAttribute_dtype]))
-
 
     #if aAttribute_field is not None and aAttribute_data is not None and aAttribute_dtype is not None:
     #    iFlag_attribute = 1
@@ -58,9 +55,8 @@ def export_flowline_to_geojson( aFlowline_in,
             print('The attribute is not correct, please check!')
             return
 
-
-    pDriver_json = ogr.GetDriverByName('GeoJSON')    
-    pDataset_json = pDriver_json.CreateDataSource(sFilename_json_in)     
+    pDriver_json = ogr.GetDriverByName('GeoJSON')
+    pDataset_json = pDriver_json.CreateDataSource(sFilename_json_in)
     pLayer_json = pDataset_json.CreateLayer('flowline', pSpatial_reference_in, ogr.wkbLineString)
     # Add one attribute
     pLayer_json.CreateField(ogr.FieldDefn('lineid', ogr.OFTInteger64)) #long type for high resolution
@@ -76,13 +72,12 @@ def export_flowline_to_geojson( aFlowline_in,
     #        else:
     #            pLayer_json.CreateField(ogr.FieldDefn(sField, ogr.OFTReal))
     #            pass
-    
+
     dtype_to_ogr = {'int': ogr.OFTInteger64, 'float': ogr.OFTReal}
     if iFlag_attribute:
         for field, dtype in zip(aAttribute_field, aAttribute_dtype):
             pLayer_json.CreateField(ogr.FieldDefn(field, dtype_to_ogr[dtype]))
-        
-    
+
     pLayerDefn = pLayer_json.GetLayerDefn()
     pFeature_out = ogr.Feature(pLayerDefn)
 
@@ -90,28 +85,15 @@ def export_flowline_to_geojson( aFlowline_in,
     flag_to_attr = {1: ('dx', 'dy'), 0: ('dLongitude_degree', 'dLatitude_degree')}
     for lID in range(nFlowline):
         pFlowline = aFlowline_in[lID]
-        #dummy =pFlowline.aVertex
-        #replace shapely with gdal function
-        #aPoint=list()
         pLine = ogr.Geometry(ogr.wkbLineString)
-        #for j in dummy:
-        #    if iFlag_projected_in ==1:
-        #        #aPoint.append( Point( j.dx, j.dy ) )                
-        #        pLine.AddPoint(j.dx, j.dy)
-        #        pass
-        #    else:
-        #        #aPoint.append( Point( j.dLongitude_degree, j.dLatitude_degree ) )
-        #        pLine.AddPoint(j.dLongitude_degree, j.dLatitude_degree)
-        #        pass
-
         for vertex in pFlowline.aVertex:
             pLine.AddPoint(*(getattr(vertex, attr) for attr in flag_to_attr[iFlag_projected_in]))
 
-
+        pLine.FlattenTo2D()
         #dummy1= LineString( aPoint )
-        pGeometry_out = ogr.CreateGeometryFromWkb(pLine.ExportToWkb())
-        pFeature_out.SetGeometry(pGeometry_out)   
-        pFeature_out.SetField("lineid", lID)
+        #pGeometry_out = ogr.CreateGeometryFromWkb(pLine.ExportToWkb())
+        pFeature_out.SetGeometry(pLine)
+        pFeature_out.SetField("lineid", lID + 1)
 
         #if iFlag_attribute == 1:
         #    for k in range(nAttribute1):
@@ -122,34 +104,31 @@ def export_flowline_to_geojson( aFlowline_in,
         #            pFeature_out.SetField(sField, int(dummy[lID]))
         #        else:
         #            pFeature_out.SetField(sField, float(dummy[lID]))
-                
+
         if iFlag_attribute == 1:
             for sField, dtype, dummy in zip(aAttribute_field, aAttribute_dtype, aAttribute_data):
                 pFeature_out.SetField(sField, int(dummy[lID]) if dtype == 'int' else float(dummy[lID]))
-        
+
         # Add new pFeature_shapefile to output Layer
-        pLayer_json.CreateFeature(pFeature_out)        
-      
+        pLayer_json.CreateFeature(pFeature_out)
         pass
-        
+
     pDataset_json.FlushCache()
-    pDataset_json = pLayer_json = pFeature_out  = None    
+    pDataset_json = pLayer_json = pFeature_out  = None
 
     return
 
-    
-
-def export_flowline_to_shapefile(iFlag_projected_in, aFlowline_in, pSpatial_reference_in, \
-    sFilename_shapefile_in, \
-    aAttribute_field=None,\
-    aAttribute_data=None,\
+def export_flowline_to_shapefile(iFlag_projected_in, aFlowline_in, pSpatial_reference_in,
+    sFilename_shapefile_in,
+    aAttribute_field=None,
+    aAttribute_data=None,
         aAttribute_dtype=None):
     """
     convert a shpefile to json format.
     This function should be used for stream flowline only.
     """
 
-    if os.path.exists(sFilename_shapefile_in): 
+    if os.path.exists(sFilename_shapefile_in):
         #delete it if it exists
         os.remove(sFilename_shapefile_in)
         pass
@@ -173,7 +152,7 @@ def export_flowline_to_shapefile(iFlag_projected_in, aFlowline_in, pSpatial_refe
         pass
 
     pDriver_shapefile = ogr.GetDriverByName('ESRI Shapefile')
-    pDataset_shapefile = pDriver_shapefile.CreateDataSource(sFilename_shapefile_in)      
+    pDataset_shapefile = pDriver_shapefile.CreateDataSource(sFilename_shapefile_in)
     pLayer_shapefile = pDataset_shapefile.CreateLayer('flowline', pSpatial_reference_in, ogr.wkbLineString)
     # Add one attribute
     pLayer_shapefile.CreateField(ogr.FieldDefn('id', ogr.OFTInteger64)) #long type for high resolution
@@ -188,8 +167,8 @@ def export_flowline_to_shapefile(iFlag_projected_in, aFlowline_in, pSpatial_refe
             else:
                 pLayer_shapefile.CreateField(ogr.FieldDefn(sField, ogr.OFTReal))
                 pass
-        
-    
+
+
     pLayerDefn = pLayer_shapefile.GetLayerDefn()
     pFeature_out = ogr.Feature(pLayerDefn)
 
@@ -201,8 +180,8 @@ def export_flowline_to_shapefile(iFlag_projected_in, aFlowline_in, pSpatial_refe
         pLine = ogr.Geometry(ogr.wkbLineString)
         for j in dummy:
             if iFlag_projected_in ==1:
-                #aPoint.append( Point( j.dx, j.dy ) )            
-                pLine.AddPoint(j.dx, j.dy)    
+                #aPoint.append( Point( j.dx, j.dy ) )
+                pLine.AddPoint(j.dx, j.dy)
                 pass
             else:
                 #aPoint.append( Point( j.dLongitude_degree, j.dLatitude_degree ) )
@@ -213,7 +192,7 @@ def export_flowline_to_shapefile(iFlag_projected_in, aFlowline_in, pSpatial_refe
         pGeometry_out = ogr.CreateGeometryFromWkb(pLine.ExportToWkb())
         #pGeometry_out = ogr.CreateGeometryFromWkb(dummy1.wkb)
         pFeature_out.SetGeometry(pGeometry_out)
-   
+
         pFeature_out.SetField("id", lID)
         if iFlag_attribute ==1:
             for k in range(nAttribute1):
@@ -224,29 +203,29 @@ def export_flowline_to_shapefile(iFlag_projected_in, aFlowline_in, pSpatial_refe
                     pFeature_out.SetField(sField, int(dummy[i]))
                 else:
                     pFeature_out.SetField(sField, float(dummy[i]))
-        
+
         # Add new pFeature_shapefile to output Layer
-        pLayer_shapefile.CreateFeature(pFeature_out)        
+        pLayer_shapefile.CreateFeature(pFeature_out)
         lID =  lID + 1
         pass
-        
+
     pDataset_shapefile.FlushCache()
-    pDataset_shapefile = pLayer_shapefile = pFeature_out  = None    
+    pDataset_shapefile = pLayer_shapefile = pFeature_out  = None
 
     return
 
-  
 
-def export_flowline_info_to_json(aCell, aCell_intersect_in, aFlowline_in, sFilename_json_out):    
+
+def export_flowline_info_to_json(aCell, aCell_intersect_in, aFlowline_in, sFilename_json_out):
     #export the flowline topology to json
     ncell= len(aCell_intersect_in)
     nflowline= len(aFlowline_in)
-    aLink =list()   
+    aLink =list()
     for i in range(1, nflowline+1):
         pFlowline = aFlowline_in[i-1]
         nVertex = pFlowline.nVertex
         nEdge = pFlowline.nEdge
-        for j in range(1, nEdge+1):         
+        for j in range(1, nEdge+1):
             pEdge = pFlowline.aEdge[j-1]
             pVertex_start = pEdge.pVertex_start
             pVertex_end = pEdge.pVertex_end
@@ -257,17 +236,16 @@ def export_flowline_info_to_json(aCell, aCell_intersect_in, aFlowline_in, sFilen
                 if aCell_intersect_in[k].pVertex_center == pVertex_end:
                     pMpas_end = aCell_intersect_in[k]
                     pass
-            pEdge_link = pyedge(pVertex_start, pVertex_end)  
+            pEdge_link = pyedge(pVertex_start, pVertex_end)
             pLink = pycelllink(pMpas_start, pMpas_end, pEdge_link)
             aLink.append(pLink)
 
     with open(sFilename_json_out, 'w', encoding='utf-8') as f:
         sJson = json.dumps([json.loads(ob.tojson()) for ob in aLink], indent = 4)
-        f.write(sJson)    
+        f.write(sJson)
         f.close()
-                
-    
+
+
     return
 
-    
-   
+

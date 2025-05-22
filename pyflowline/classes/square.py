@@ -16,15 +16,15 @@ class SquareClassEncoder(JSONEncoder):
         if isinstance(obj, np.ndarray):
             return obj.tolist()
         if isinstance(obj, list):
-            pass  
+            pass
         if isinstance(obj, pyvertex):
             return json.loads(obj.tojson())
         if isinstance(obj, pyedge):
-            return obj.lEdgeID        
+            return obj.lEdgeID
         if isinstance(obj, pyflowline):
             return obj.lFlowlineID
         if isinstance(obj, pysquare):
-            return obj.lCellID     
+            return obj.lCellID
         return JSONEncoder.default(self, obj)
 
 class pysquare(pycell):
@@ -40,7 +40,7 @@ class pysquare(pycell):
 
     lCellID  = -1
     nFlowline=0
-    nVertex =0 
+    nVertex =0
     nEdge=0
     dLength=0.0
     dArea=0.0
@@ -62,7 +62,7 @@ class pysquare(pycell):
     aVertex=None
     aVertexID=None
     pVertex_center = None
-    aFlowline=None    
+    aFlowline=None
     nNeighbor=-1
     nNeighbor_land=-1
     nNeighbor_ocean=-1
@@ -74,38 +74,38 @@ class pysquare(pycell):
     aNeighbor_distance = None
     pBound=None
 
-    def __init__(self, dLon, dLat, aEdge, aVertex):    
+    def __init__(self, dLon, dLat, aEdge, aVertex):
         """
         Initilize a square cell object
 
         Args:
-            dLon (float): The longitude of center 
-            dLat (float): The latitude of center 
+            dLon (float): The longitude of center
+            dLat (float): The latitude of center
             aEdge (list [pyedge]): A list of edges that define the square cell
             aVertex (list [pyvertex]): A list of vertices the define the square cell
         """
         nEdge = len(aEdge)
         if nEdge != 4:
             pass
-        else:          
+        else:
             self.aEdge = aEdge
             self.aVertex = aVertex #the first one and last one are the same
             self.nEdge = 4
             self.nVertex = 4
             self.dLongitude_center_degree = dLon
             self.dLatitude_center_degree = dLat
-            pVertex = dict()        
+            pVertex = dict()
             pVertex['dLongitude_degree'] =self.dLongitude_center_degree
-            pVertex['dLatitude_degree'] =self.dLatitude_center_degree         
+            pVertex['dLatitude_degree'] =self.dLatitude_center_degree
             self.pVertex_center = pyvertex(pVertex)
             self.lCellID_downstream_burned=-1
             self.iStream_order_burned=-1
             self.iStream_segment_burned=-1
             self.dElevation_mean=-9999.0
-            self.calculate_cell_bound() #bound for rtree 
+            self.calculate_cell_bound() #bound for rtree
             pass
         pass
-    
+
     def calculate_cell_bound(self):
         dLat_min = 90
         dLat_max = -90
@@ -116,7 +116,7 @@ class pysquare(pycell):
             dLon_min = np.min( [dLon_min, self.aVertex[i].dLongitude_degree] )
             dLat_max = np.max( [dLat_max, self.aVertex[i].dLatitude_degree] )
             dLat_min = np.min( [dLat_min, self.aVertex[i].dLatitude_degree] )
-        
+
         self.pBound = (dLon_min, dLat_min, dLon_max, dLat_max)
         return self.pBound
     def has_this_edge(self, pEdge_in):
@@ -132,11 +132,11 @@ class pysquare(pycell):
         iFlag_found = 0
         for pEdge in self.aEdge:
             if pEdge.is_overlap(pEdge_in):
-                iFlag_found =1 
+                iFlag_found =1
                 break
             else:
-                pass       
-        
+                pass
+
         return iFlag_found
 
     def which_edge_cross_this_vertex(self, pVertex_in):
@@ -171,12 +171,12 @@ class pysquare(pycell):
             float: The area in m2
         """
         lons=list()
-        lats=list()        
-        for i in range(self.nVertex):            
+        lats=list()
+        for i in range(self.nVertex):
             lons.append( self.aVertex[i].dLongitude_degree )
             lats.append( self.aVertex[i].dLatitude_degree )
 
-        self.dArea = calculate_polygon_area( lons,lats)        
+        self.dArea = calculate_polygon_area(lons,lats)
         return self.dArea
 
     def calculate_edge_length(self):
@@ -205,7 +205,7 @@ class pysquare(pycell):
         for pEdge in self.aEdge:
             for pEdge2 in other.aEdge:
                 if pEdge.is_overlap(pEdge2) ==1 :
-                    iFlag_share = 1 
+                    iFlag_share = 1
                     break
 
         return iFlag_share

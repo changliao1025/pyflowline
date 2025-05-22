@@ -10,7 +10,7 @@ from pyflowline.classes.mpas import pympas
 from pyflowline.classes.tin import pytin
 from pyflowline.classes.dggrid import pydggrid
 
-from pyearth.gis.spatialref.reproject_coodinates import reproject_coordinates
+from pyearth.gis.spatialref.reproject_coordinates import reproject_coordinates
 iFlag_cython = importlib.util.find_spec("cython")
 if iFlag_cython is not None:
     from pyflowline.algorithms.cython.kernel import calculate_angle_betwen_vertex
@@ -115,61 +115,20 @@ def convert_gcs_coordinates_to_cell(iMesh_type_in,
                         return pdggrid
 
                     else:
-                        if iMesh_type_in ==6 : #tin
-                            pTin = pytin(dLongitude_center_in, dLatitude_center_in, aEdge, aVertex)
-                            return pTin
+                        if iMesh_type_in == 6 : #triangular
+                            pTriangular = pytin(dLongitude_center_in, dLatitude_center_in, aEdge, aVertex)
+                            return pTriangular
                         else:
-                            print('What mesh type are you using?')
+                            if iMesh_type_in == 7: #tin
+                                pTin = pytin(dLongitude_center_in, dLatitude_center_in, aEdge, aVertex)
+                                return pTin
+                            else:
+                                if iMesh_type_in == 8:
+                                    pCubicSphere = pylatlon(dLongitude_center_in, dLatitude_center_in, aEdge, aVertex)
+                                    return pCubicSphere
+                                else:
+                                    print('What mesh type are you using?')
                         return None
-
-def convert_pcs_coordinates_to_cell(iMesh_type_in, aCoordinates_pcs_in, pProjection_in):
-    npoint = len(aCoordinates_pcs_in)
-    aVertex=list()
-    aEdge=list()
-
-    for i in range(npoint):
-        x = aCoordinates_pcs_in[i][0]
-        y = aCoordinates_pcs_in[i][1]
-        dummy = dict()
-        dummy['x'] = x
-        dummy['y'] = y
-
-        dummy['dLongitude_degree'], dummy['dLatitude_degree'] = reproject_coordinates(x, y , pProjection_in)
-        pVertex = pyvertex(dummy)
-        aVertex.append(pVertex)
-    for j in range(npoint-1):
-        pEdge = pyedge( aVertex[j], aVertex[j+1] )
-        aEdge.append(pEdge)
-
-    if iMesh_type_in ==1: #hexagon
-
-        pHexagon = pyhexagon(  aEdge, aVertex)
-        return pHexagon
-    else:
-        if iMesh_type_in ==2: #sqaure
-            pSquare = pysquare( aEdge, aVertex)
-            return pSquare
-        else:
-            if iMesh_type_in ==3: #latlon
-                pLatlon = pylatlon( aEdge, aVertex)
-                return pLatlon
-            else:
-                if iMesh_type_in ==4: #mpas
-                    pMpas = pympas( aEdge, aVertex)
-                    return pMpas
-                else:
-                    if iMesh_type_in ==5: #dggrid
-                        pdggrid = pydggrid( aEdge, aVertex)
-                        return pdggrid
-
-                    else:
-                        if iMesh_type_in ==6: #tin
-                            pTin = pytin( aEdge, aVertex)
-                            return pTin
-                        else:
-                            print('What mesh type are you using?')
-                            return None
-
 
 def convert_gcs_coordinates_to_flowline(aCoordinates_in):
     """convert coordinates to flowline, but we cannot setup index and id yet

@@ -18,17 +18,17 @@ class MpasClassEncoder(JSONEncoder):
         if isinstance(obj, np.ndarray):
             return obj.tolist()
         if isinstance(obj, list):
-            pass  
+            pass
         if isinstance(obj, pyvertex):
-            return json.loads(obj.tojson()) 
+            return json.loads(obj.tojson())
         if isinstance(obj, pyedge):
-            return obj.lEdgeID        
+            return obj.lEdgeID
         if isinstance(obj, pyflowline):
             return obj.lFlowlineID
-        
+
         if isinstance(obj, pympas):
             return obj.lCellID
-            
+
         return JSONEncoder.default(self, obj)
 
 
@@ -43,9 +43,9 @@ class pympas(pycell):
     Returns:
         pympas: A mpas cell object
     """
-    lCellID  = -1  
+    lCellID  = -1
     nFlowline=0
-    nVertex =0 
+    nVertex =0
     nEdge=0
     dLength=0.0
     dArea=0.0
@@ -67,15 +67,15 @@ class pympas(pycell):
     aVertex=None
     aVertexID=None
     pVertex_center = None
-    aFlowline=None    
-    nNeighbor=-1 
+    aFlowline=None
+    nNeighbor=-1
     nNeighbor_land=-1
     nNeighbor_land_virtual = -1
     aNeighbor_land_virtual = None
     nNeighbor_ocean=-1
     aNeighbor=None #the global ID of all neighbors, execluding null
     aNeighbor_land=None #the global ID of all neighbors
-    
+
     aNeighbor_ocean=None #the global ID of all neighbors
     aNeighbor_distance = None
     pBound=None
@@ -85,42 +85,49 @@ class pympas(pycell):
         Initilize a mpas cell object
 
         Args:
-            dLon (float): The longitude of center 
-            dLat (float): The latitude of center 
+            dLon (float): The longitude of center
+            dLat (float): The latitude of center
             aEdge (list [pyedge]): A list of edges that define the hexagon
             aVertex (list [pyvertex]): A list of vertices the define the hexagon
         """
 
         nEdge = len(aEdge)
-        if nEdge < 3 or nEdge > 9:
-            print('At lease 3 edges are required!', nEdge)
+        if nEdge < 3 or nEdge > 10:
+            print('At least 3 edges are required!', nEdge)
             pass
-        else:                          
+        else:
             self.aEdge = aEdge
             self.aVertex = aVertex #the first one and last one are the same
             self.nEdge = len(aEdge)
-            self.nVertex = len(aVertex) 
+            self.nVertex = len(aVertex)
             #initialize the neighbor but without the actual neighbor information
             self.nNeighbor = -1
             self.nNeighbor_land = -1
             self.nNeighbor_land_virtual = -1
             self.nNeighbor_ocean = -1
-            self.iFlag_coast = 0      
+            self.iFlag_coast = 0
             self.dLongitude_center_degree = dLon
             self.dLatitude_center_degree = dLat
-            pVertex = dict()        
+            pVertex = dict()
             pVertex['dLongitude_degree'] =self.dLongitude_center_degree
-            pVertex['dLatitude_degree'] =self.dLatitude_center_degree           
+            pVertex['dLatitude_degree'] =self.dLatitude_center_degree
             self.pVertex_center = pyvertex(pVertex)
             self.lCellID_downstream_burned=-1
             self.iStream_order_burned=-1
             self.iStream_segment_burned=-1
             self.dElevation_mean=-9999.0
             self.dElevation_profile0=-9999.0
-            self.calculate_cell_bound() #bound for rtree 
+            self.calculate_cell_bound() #bound for rtree
             pass
         pass
+
     def calculate_cell_bound(self):
+        """
+        Calculate the bounding box of a cell,
+        this method may need to consider whether a mesh cell crosses the international date line
+        this method should also be used for the rtree index
+        this method should also be used by other unstructured mesh cells, such as dggrid?
+        """
         dLat_min = 90
         dLat_max = -90
         dLon_min = 180
@@ -130,10 +137,16 @@ class pympas(pycell):
             dLon_min = np.min( [dLon_min, self.aVertex[i].dLongitude_degree] )
             dLat_max = np.max( [dLat_max, self.aVertex[i].dLatitude_degree] )
             dLat_min = np.min( [dLat_min, self.aVertex[i].dLatitude_degree] )
-        
-        self.pBound = (dLon_min, dLat_min, dLon_max, dLat_max)
+
+        if dLon_max - dLon_min > 180: #cross the international date line
+            tmp = dLon_max  #swap the value
+            dLon_max = dLon_min + 360
+            dLon_min = tmp
+            self.pBound = (dLon_min, dLat_min, dLon_max, dLat_max)
+        else:
+            self.pBound = (dLon_min, dLat_min, dLon_max, dLat_max)
         return self.pBound
-   
+
     def has_this_edge(self, pEdge_in):
         """
         Check whether the cell contains an edge
@@ -147,11 +160,11 @@ class pympas(pycell):
         iFlag_found = 0
         for pEdge in self.aEdge:
             if pEdge.is_overlap(pEdge_in):
-                iFlag_found =1 
+                iFlag_found =1
                 break
             else:
-                pass       
-        
+                pass
+
         return iFlag_found
 
     def which_edge_cross_this_vertex(self, pVertex_in):
@@ -162,7 +175,7 @@ class pympas(pycell):
             pVertex_in (pyvertex): the intersected vertex
 
         Returns:
-            tuple: (1, edge) if contains; or else (0, None) 
+            tuple: (1, edge) if contains; or else (0, None)
         """
         iFlag_found = 0
         pEdge_out = None
@@ -176,7 +189,7 @@ class pympas(pycell):
                 pass
 
         return iFlag_found, pEdge_out
-    
+
     def calculate_cell_area(self):
         """
         Calculate the area of a cell, this function is not used for mpas cell
@@ -185,13 +198,13 @@ class pympas(pycell):
             float: cell area
         """
         lons=list()
-        lats=list()        
-        for i in range(self.nVertex):            
+        lats=list()
+        for i in range(self.nVertex):
             lons.append( self.aVertex[i].dLongitude_degree )
             lats.append( self.aVertex[i].dLatitude_degree )
 
         self.dArea = calculate_polygon_area(lons,lats )
-        return self.dArea
+        return float(self.dArea)
 
     def calculate_edge_length(self):
         """
@@ -200,9 +213,12 @@ class pympas(pycell):
         Returns:
             float: effective cell length/resolution
         """
+        if self.dArea is None or self.dArea <= 0:
+            raise ValueError("Invalid area value: Area must be non-negative and defined.", self.dArea)
+
         self.dLength_edge = np.sqrt( self.dArea )
-        return self.dLength_edge
-    
+        return float(self.dLength_edge)
+
     def share_edge(self, other):
         """
         Check if two cells share an edge
@@ -217,12 +233,11 @@ class pympas(pycell):
         for pEdge in self.aEdge:
             for pEdge2 in other.aEdge:
                 if pEdge.is_overlap(pEdge2) ==1 :
-                    iFlag_share = 1 
+                    iFlag_share = 1
                     break
 
         return iFlag_share
 
-    
     def tojson(self):
         """
         Convert a cell into a json string

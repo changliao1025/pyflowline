@@ -3,6 +3,8 @@ import json
 from json import JSONEncoder
 import importlib.util
 import numpy as np
+from geographiclib.geodesic import Geodesic
+from pyflowline.formats.export_vertex import export_vertex_as_polygon
 
 iFlag_cython = importlib.util.find_spec("cython")
 if iFlag_cython is not None:
@@ -10,7 +12,7 @@ if iFlag_cython is not None:
 else:
     from pyearth.gis.geometry.calculate_distance_based_on_longitude_latitude import calculate_distance_based_on_longitude_latitude
 
-iPrecision_default = 8 #used for comparison
+iPrecision_default = 12 #used for comparison
 
 class VertexClassEncoder(JSONEncoder):
     def default(self, obj):
@@ -30,11 +32,8 @@ class pyvertex(object):
     Returns:
         pyvertex: A vertex object
     """
-
-
-
     lVerterIndex=-1 #this index will be used for array - class variable
-    lVertexID=-1
+    lVertexID= 1
     lFlowlineID = -1  #we use this id only for intersect
     dX_meter=-9999
     dY_meter=-9999
@@ -74,6 +73,10 @@ class pyvertex(object):
 
         except:
             print('Initialization of vertex failed!')
+
+        #calcualte x y z based on dLongitude and dLatitude and earth radius
+        self.dX_meter, self.dY_meter, self.dZ_meter = self.calculate_xyz()
+
 
         return
 
@@ -178,6 +181,55 @@ class pyvertex(object):
         lat2 = other.dLatitude_degree
         dDistance = calculate_distance_based_on_longitude_latitude(lon1, lat1, lon2, lat2)
         return dDistance
+
+    def calculate_buffer_zone_vertex(self, dRadius, dBearing=90):
+        # Create a geodesic object
+        geod = Geodesic.WGS84 #the default is WGS84
+        # Calculate the geodesic buffer
+        pVertex_buffer = geod.Direct(self.dLatitude_degree, self.dLongitude_degree, dBearing, dRadius)
+        # Extract the latitude and longitude of the buffer point
+        #create a vertex object using the buffer point
+        point0= dict()
+        point0['dLongitude_degree'] = pVertex_buffer['lon2']
+        point0['dLatitude_degree'] = pVertex_buffer['lat2']
+        pVertex_out = pyvertex(point0)
+        return pVertex_out
+
+    def calculate_buffer_zone_circle(self, dRadius, nPoint = 360, sFilename_out=None):
+        # Create a geodesic object
+        geod = Geodesic.WGS84 #the default is WGS84
+        aVertex = []
+        # Calculate the geodesic buffer
+        for i in range(0, 360, 360//nPoint):
+            pVertex_buffer = geod.Direct(self.dLatitude_degree, self.dLongitude_degree, i, dRadius)
+            point0= dict()
+            point0['dLongitude_degree'] = pVertex_buffer['lon2']
+            point0['dLatitude_degree'] = pVertex_buffer['lat2']
+            pVertex_out = pyvertex(point0)
+            aVertex.append(pVertex_out)
+
+        if sFilename_out is not None:
+            #save as a geojson file
+            export_vertex_as_polygon(aVertex, sFilename_out)
+
+        return aVertex
+
+
+    def calculate_xyz(self):
+        """
+        Calculate the x, y, z based on dLongitude and dLatitude
+
+        Returns:
+            tuple: The x, y, z
+        """
+        dX_meter = 0.0
+        dY_meter = 0.0
+        dZ_meter = 0.0
+        dRadius = 6371000.0 #earth radius in meter
+        dX_meter = dRadius * np.cos(self.dLatitude_radian) * np.cos(self.dLongitude_radian)
+        dY_meter = dRadius * np.cos(self.dLatitude_radian) * np.sin(self.dLongitude_radian)
+        dZ_meter = dRadius * np.sin(self.dLatitude_radian)
+        return dX_meter, dY_meter, dZ_meter
 
     def tojson(self):
         """

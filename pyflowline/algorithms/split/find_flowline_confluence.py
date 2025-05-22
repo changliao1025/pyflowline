@@ -2,7 +2,6 @@
 import numpy as np
 import importlib.util
 iFlag_cython = importlib.util.find_spec("cython") 
-
 from pyflowline.algorithms.split.find_flowline_vertex import find_flowline_vertex
 if iFlag_cython is not None:
     from pyflowline.algorithms.cython.kernel import add_unique_vertex
@@ -11,7 +10,7 @@ else:
     from pyflowline.algorithms.auxiliary.find_index_in_list import add_unique_vertex
     from pyflowline.algorithms.auxiliary.find_vertex_in_list import find_vertex_in_list
 
-def find_flowline_confluence(aFlowline_in, pVertex_outlet_in):    
+def find_flowline_confluence(aFlowline_in, pVertex_outlet_in):
     """_summary_
 
     Args:
@@ -31,43 +30,43 @@ def find_flowline_confluence(aFlowline_in, pVertex_outlet_in):
     nVertex=len(aVertex)
     aConnectivity  = np.full(  nVertex , 0, dtype=int )
     #iFlag_first=1
-    #for i in range(nVertex):        
+    #for i in range(nVertex):
     #    pVertex = aVertex[i]
-    #    dDiatance = pVertex.calculate_distance( pVertex_outlet_in) 
+    #    dDiatance = pVertex.calculate_distance( pVertex_outlet_in)
     #    if iFlag_first ==1:
-    #        dDiatance_min = dDiatance                
-    #        lIndex_outlet = i            
+    #        dDiatance_min = dDiatance
+    #        lIndex_outlet = i
     #        pVertex_outlet_out =  pVertex
     #        iFlag_first=0
     #    else:
     #        if  dDiatance < dDiatance_min:
     #            dDiatance_min = dDiatance
     #            #found it
-    #            lIndex_outlet = i       
+    #            lIndex_outlet = i
     #            pVertex_outlet_out =  pVertex
-    #            pass    
+    #            pass
     #        else:
     #            pass
 
     distances = [vertex.calculate_distance(pVertex_outlet_in) for vertex in aVertex]
     lIndex_outlet = np.argmin(distances)
     pVertex_outlet_out = aVertex[lIndex_outlet]
-    #a outlet can be a confluence, so we won't set it     
-    aConnectivity[lIndex_outlet] =0 
+    #a outlet can be a confluence, so we won't set it
+    aConnectivity[lIndex_outlet] =0
 
-    #for i in range(0, nFlowline):      
+    #for i in range(0, nFlowline):
     #    pFlowline = aFlowline_in[i]
     #    pVertex_start = pFlowline.pVertex_start
     #    pVertex_end = pFlowline.pVertex_end
-    #    
-    #    iFlag_exist, lIndex =  find_vertex_in_list(aVertex, pVertex_end)  
+    #
+    #    iFlag_exist, lIndex =  find_vertex_in_list(aVertex, pVertex_end)
     #    if lIndex != lIndex_outlet:
     #        #if check_head_water(aFlowline_in, pVertex_start)==1:
     #        if pFlowline.iStream_order == 1:
-    #            iFlag_exist, lIndex =  find_vertex_in_list(aVertex, pVertex_start)            
+    #            iFlag_exist, lIndex =  find_vertex_in_list(aVertex, pVertex_start)
     #            aConnectivity[lIndex] = 1
-    #            iFlag_exist, lIndex =  find_vertex_in_list(aVertex, pVertex_end)            
-    #            aConnectivity[lIndex] = aConnectivity[lIndex] + 1        
+    #            iFlag_exist, lIndex =  find_vertex_in_list(aVertex, pVertex_end)
+    #            aConnectivity[lIndex] = aConnectivity[lIndex] + 1
     #        else:
     #            #middle point, or confluence
     #            iFlag_exist, lIndex =  find_vertex_in_list(aVertex, pVertex_start)
@@ -108,7 +107,7 @@ def find_flowline_confluence(aFlowline_in, pVertex_outlet_in):
             if lIndex_end is not None:
                 aConnectivity[lIndex_end] += 1
     #reset outlet
-    #for i in range(0, nVertex): 
+    #for i in range(0, nVertex):
     #    if i == lIndex_outlet:
     #        if (aConnectivity[i] >1):
     #            aIndex_confluence.append(i)
@@ -121,7 +120,7 @@ def find_flowline_confluence(aFlowline_in, pVertex_outlet_in):
     #            if (aConnectivity[i] ==1):
     #                aIndex_headwater.append(i)
     #            else:
-    #                if (aConnectivity[i] ==2):  
+    #                if (aConnectivity[i] ==2):
     #                    aIndex_middle.append(i)
     #                else:
     #                    #this is outlet
@@ -130,5 +129,5 @@ def find_flowline_confluence(aFlowline_in, pVertex_outlet_in):
     aIndex_headwater = [i for i, x in enumerate(aConnectivity) if x == 1 and i != lIndex_outlet]
     aIndex_middle = [i for i, x in enumerate(aConnectivity) if x == 2 and i != lIndex_outlet]
     aIndex_confluence = [i for i, x in enumerate(aConnectivity) if x >= 3 or (i == lIndex_outlet and x > 1)]
-                    
+
     return aVertex, lIndex_outlet, aIndex_headwater, aIndex_middle, aIndex_confluence, aConnectivity, pVertex_outlet_out

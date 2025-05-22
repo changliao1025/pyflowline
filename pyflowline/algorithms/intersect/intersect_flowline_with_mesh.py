@@ -13,8 +13,10 @@ iFlag_cython = importlib.util.find_spec("cython")
 if iFlag_cython is not None:
     from tinyr import RTree
     iFlag_use_rtree = 1
+    from pyflowline.algorithms.cython.kernel import find_vertex_in_list
 else:
-    iFlag_use_rtree =0
+    iFlag_use_rtree = 0
+    from pyflowline.algorithms.auxiliary.find_vertex_in_list import find_vertex_in_list
     pass
 
 def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh_in, sFilename_flowline_in, sFilename_output_in):
@@ -29,7 +31,7 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh_in, sFilename_flo
 
 
     pDriver_geojson = ogr.GetDriverByName( "GeoJSON")
-    aCell=list()
+    #aCell=list()
     aCell_intersect=list()
 
     pDataset_mesh = pDriver_geojson.Open(sFilename_mesh_in, 0)
@@ -60,7 +62,7 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh_in, sFilename_flo
     pLayerDefn = pLayerOut.GetLayerDefn()
     pFeatureOut = ogr.Feature(pLayerDefn)
 
-    lFlowlineID = 0
+    lFlowlineID = 1
     aFlowline_intersect_all=list()
     if iFlag_use_rtree ==1: #use the rtree to speed up
         #index_flowline = rtree.index.Index()
@@ -80,8 +82,8 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh_in, sFilename_flo
             pGeometry_mesh = pFeature_mesh.GetGeometryRef()
             aCoords_gcs = get_geometry_coordinates(pGeometry_mesh)
             lCellID = pFeature_mesh.GetField("cellid")
-            dLon = pFeature_mesh.GetField("longitude")
-            dLat = pFeature_mesh.GetField("latitude")
+            dLongitude_center = pFeature_mesh.GetField("longitude")
+            dLatitude_center = pFeature_mesh.GetField("latitude")
             dArea = pFeature_mesh.GetField("area")
             if (pGeometry_mesh.IsValid()):
                 pass
@@ -90,7 +92,7 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh_in, sFilename_flo
 
             pGeometrytype_mesh = pGeometry_mesh.GetGeometryName()
             if(pGeometrytype_mesh == 'POLYGON'):
-                pCell = convert_gcs_coordinates_to_cell(iMesh_type_in, dLon, dLat, aCoords_gcs)
+                pCell = convert_gcs_coordinates_to_cell(iMesh_type_in, dLongitude_center, dLatitude_center, aCoords_gcs)
                 pCell.lCellID = lCellID
                 pCell.dArea = dArea
                 pCell.dLength = pCell.calculate_edge_length()
@@ -179,10 +181,10 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh_in, sFilename_flo
 
                     #replace flowline length if there is an actual flowline
                     aCell_intersect.append(pCell)
-                    aCell.append(pCell)
+                    #aCell.append(pCell)
                 else:
                     pCell.iFlag_intersected = 0
-                    aCell.append(pCell)
+                    #aCell.append(pCell)
                     pass
     else:
 
@@ -191,8 +193,8 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh_in, sFilename_flo
             aCoords_gcs = get_geometry_coordinates(pGeometry_mesh)
 
             lCellID = pFeature_mesh.GetField("cellid")
-            dLon = pFeature_mesh.GetField("longitude")
-            dLat = pFeature_mesh.GetField("latitude")
+            dLongitude_center = pFeature_mesh.GetField("longitude")
+            dLatitude_center = pFeature_mesh.GetField("latitude")
             dArea = pFeature_mesh.GetField("area")
             if (iFlag_transform ==1):
                 pGeometry_mesh.Transform(transform)
@@ -203,7 +205,7 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh_in, sFilename_flo
 
             pGeometrytype_mesh = pGeometry_mesh.GetGeometryName()
             if(pGeometrytype_mesh == 'POLYGON'):
-                pCell = convert_gcs_coordinates_to_cell(iMesh_type_in, dLon, dLat, aCoords_gcs)
+                pCell = convert_gcs_coordinates_to_cell(iMesh_type_in, dLongitude_center, dLatitude_center, aCoords_gcs)
                 pCell.lCellID = lCellID
                 pCell.dArea = dArea
                 pCell.dLength = pCell.calculate_edge_length()
@@ -292,14 +294,85 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh_in, sFilename_flo
 
                     #replace flowline length if there is an actual flowline
                     aCell_intersect.append(pCell)
-                    aCell.append(pCell)
+                    #aCell.append(pCell)
                 else:
                     pCell.iFlag_intersected = 0
-                    aCell.append(pCell)
+                    #aCell.append(pCell)
                     pass
 
             else:
                 pass
 
 
-    return  aCell, aCell_intersect, aFlowline_intersect_all
+
+    #quality control
+    #find the flowline that has the largest stream segment index
+    pVertex_outlet = None
+    iSegment_max = 0
+    iIndex_flowline = -1
+    for i in range(nfeature_flowline):
+        pFeature_flowline = pLayer_flowline.GetFeature(i)
+        iStream_segment = pFeature_flowline.GetField("stream_segment")
+        if (iStream_segment > iSegment_max):
+            iSegment_max = iStream_segment
+            iIndex_flowline = i
+
+    if (iIndex_flowline != -1):
+        #find all the flowlines and cells that have the same stream segment
+
+        #get the first vertex of the flowline
+        pFeature_flowline = pLayer_flowline.GetFeature(iIndex_flowline)
+        pGeometry_flowline = pFeature_flowline.GetGeometryRef()
+        aCoords = list()
+        for i in range(0, pGeometry_flowline.GetPointCount()):
+            pt = pGeometry_flowline.GetPoint(i)
+            aCoords.append( [ pt[0], pt[1]])
+        dummy1= np.array(aCoords)
+        pFlowline = convert_gcs_coordinates_to_flowline(dummy1)
+        pVertex_start = pFlowline.pVertex_start
+        pVertex_outlet = pFlowline.pVertex_end
+        aFlowline_last = list()
+        nFlowline_intersect = len(aFlowline_intersect_all)
+        for i in range(nFlowline_intersect):
+            pFlowline = aFlowline_intersect_all[i]
+            if ( pFlowline.iStream_segment == iSegment_max):
+                aFlowline_last.append(pFlowline)
+
+
+        aFlowline_stay = list()
+        #now check the connectivity of the flowlines because the flowlines are not necessarily connected
+        iFlag_done = 0
+        while (iFlag_done ==0):
+            iFlag_found = 0
+            nFlowline_last = len(aFlowline_last)
+            for i in range(nFlowline_last):
+                pFlowline = aFlowline_last[i]
+                pVertex_start_dummy = pFlowline.pVertex_start
+                pVertex_end_dummy = pFlowline.pVertex_end
+                if pVertex_start_dummy == pVertex_start:
+                    #found the head
+                    iFlag_found = 1
+                    pVertex_start = pVertex_end_dummy
+                    aFlowline_stay.append(i)
+                    pVertex_outlet = pVertex_end_dummy
+                    break
+
+            if iFlag_found == 1:
+                iFlag_done = 0
+            else:
+                iFlag_done = 1
+
+        #check the size of stay
+        #nFlowline_stay = len(aFlowline_stay)
+        #if (nFlowline_stay == nFlowline_intersect):
+        #    print('All flowlines in the last segment are connected')
+        #else:
+        #    for i in range(nFlowline_last):
+        #        if i not in aFlowline_stay:
+        #            pFlowline = aFlowline_last[i]
+        #            #remove this flowline from the result
+        #            pass
+
+
+    #return  aCell, aCell_intersect, aFlowline_intersect_all, pVertex_outlet
+    return   aCell_intersect, aFlowline_intersect_all, pVertex_outlet

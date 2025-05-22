@@ -1,0 +1,11 @@
+{
+    "geom_mshID": "ellipsoid-mesh",
+    "hfun_scal": "absolute",
+    "hfun_hmax": "inf",
+    "mesh_dims": 2  ,
+    "bisection": -1,
+    "optm_qlim": 9.5E-01,
+    "optm_iter": 32,
+    "optm_qtol": 1.0E-05,
+    "spac_mshID": "ellipsoid-grid"
+}

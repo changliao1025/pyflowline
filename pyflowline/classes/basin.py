@@ -1264,12 +1264,8 @@ class pybasin(object):
             sMesh_type (str): The mesh type
         """
 
-
         sFilename_simplified = self.sFilename_flowline_simplified
-
-
         sFilename_flowline_edge = self.sFilename_flowline_edge
-
         #intersect first
         sFilename_output= os.path.join(self.sWorkspace_output_basin, 'flowline_intersect_flowline.json')
         aVertex_intersect = intersect_flowline_with_flowline(sFilename_simplified, sFilename_flowline_edge, sFilename_output)
@@ -1286,7 +1282,6 @@ class pybasin(object):
                 aIndex_confluence_simplified, aConnectivity, pVertex_outlet\
                 = find_flowline_confluence(aFlowline_simplified,  pVertex_outlet)
 
-
         aFlowline_conceptual, pProjection_geojson = read_flowline_geojson( sFilename_flowline_edge )
         aVertex_conceptual, lIndex_outlet_conceptual, \
             aIndex_headwater_conceptual, aIndex_middle_conceptual, \
@@ -1301,7 +1296,7 @@ class pybasin(object):
         e = list(np.array(aVertex_conceptual)[b] )
         f = list(np.array(aVertex_conceptual)[c] )
 
-        g = aVertex_intersect  + d + e + f
+        g = aVertex_intersect + d + e + f
 
         aVertex_all =list()
         for i in g:
@@ -1320,7 +1315,7 @@ class pybasin(object):
             else:
                 aVertex_all_simplified.append(i)
 
-        j = aVertex_intersect  + e + f
+        j = aVertex_intersect + e + f
         aVertex_all_conceptual =list()
         for i in j:
             iFlag_exist, lIndex = find_vertex_in_list( aVertex_all_conceptual,  i)
@@ -1330,19 +1325,19 @@ class pybasin(object):
                 aVertex_all_conceptual.append(i)
 
         #export
-        self.iFlag_debug =1
-        if self.iFlag_debug ==1:
-            sFilename_output= os.path.join(self.sWorkspace_output_basin, 'vertex_split_all.json')
+        self.iFlag_debug = 1
+        if self.iFlag_debug == 1:
+            sFilename_output= os.path.join(self.sWorkspace_output_basin, 'vertex_split_all.geojson')
             export_vertex_to_geojson( aVertex_all, sFilename_output)
-            sFilename_output= os.path.join(self.sWorkspace_output_basin, 'vertex_split_simpified.json')
+            sFilename_output= os.path.join(self.sWorkspace_output_basin, 'vertex_split_simpified.geojson')
             export_vertex_to_geojson( aVertex_all_simplified, sFilename_output)
-            sFilename_output= os.path.join(self.sWorkspace_output_basin, 'vertex_split_conceptual.json')
+            sFilename_output= os.path.join(self.sWorkspace_output_basin, 'vertex_split_conceptual.geojson')
             export_vertex_to_geojson( aVertex_all_conceptual, sFilename_output)
 
         #split
-        aFlowline_simplified_split = split_flowline(aFlowline_simplified, aVertex_all_simplified,iFlag_intersect =1)
-        self.iFlag_debug =1
-        if self.iFlag_debug ==1:
+        aFlowline_simplified_split = split_flowline(aFlowline_simplified, aVertex_all_simplified, iFlag_intersect =1)
+        self.iFlag_debug = 1
+        if self.iFlag_debug == 1:
             sFilename_out = 'flowline_split_simplified.json'
             sFilename_out = os.path.join(self.sWorkspace_output_basin, sFilename_out)
             export_flowline_to_geojson(aFlowline_simplified_split, sFilename_out)
@@ -1354,7 +1349,6 @@ class pybasin(object):
             sFilename_out = 'flowline_split_conceptual.json'
             sFilename_out = os.path.join(self.sWorkspace_output_basin, sFilename_out)
             export_flowline_to_geojson(aFlowline_conceptual_split, sFilename_out)
-            #aFlowline_conceptual_split, dummy = read_flowline_geojson(sFilename_out)
 
         aFlowline_all = aFlowline_simplified_split + aFlowline_conceptual_split
 

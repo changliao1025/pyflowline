@@ -92,7 +92,13 @@ def polygeo(loop, nset, eset, nobj, last):
 
         last = last + npts
 
-        temp.vert2["coord"] = loop[:-1:]
+        #modified by Chang Liao
+        # Check if z coordinates are present
+        loop_array = np.array(loop)
+        if len(loop[0]) == 3:
+            temp.vert2["coord"] = loop_array[:-1, 0:2]
+        else:
+            temp.vert2["coord"] = loop_array[:-1, 0:2]
 
         temp.edge2["index"][:, 0] = idx1
         temp.edge2["index"][:, 1] = idx2

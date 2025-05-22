@@ -1,12 +1,15 @@
-
+import os
 import json
 from json import JSONEncoder
 import importlib.util
 import numpy as np
-from pyflowline.classes.vertex import pyvertex
-from pyflowline.algorithms.split.split_by_length import split_edge_by_length
-
 from pyearth.gis.geometry.calculate_intersect_on_great_circle import calculate_intersect_on_great_circle
+
+from pyflowline.classes.vertex import pyvertex
+from pyflowline.classes.circle import pycircle
+from pyflowline.algorithms.split.split_by_length import split_edge_by_length
+from pyflowline.formats.export_vertex import export_vertex_as_polygon
+from pyflowline.algorithms.find_minimal_enclosing_polygon import find_minimal_enclosing_polygon
 
 iFlag_cython = importlib.util.find_spec("cython")
 if iFlag_cython is not None:
@@ -64,6 +67,7 @@ class pyedge(object):
         """
         if pVertex_start_in == pVertex_end_in:
             print('The two vertices are the same')
+            return None
         else:
             self.pVertex_start = pVertex_start_in
             self.pVertex_end = pVertex_end_in
@@ -71,6 +75,23 @@ class pyedge(object):
             self.calculate_edge_bound()
 
         return
+
+    @classmethod
+    def create(cls, pVertex_start_in, pVertex_end_in):
+        """
+        Factory method to create a pyedge object
+
+        Args:
+            pVertex_start_in (pyvertex): The starting vertex
+            pVertex_end_in (pyvertex): The ending vertex
+
+        Returns:
+            pyedge or None: A pyedge object if valid, otherwise None
+        """
+        if pVertex_start_in == pVertex_end_in:
+            print("The two vertices are the same. Returning None.")
+            return None
+        return cls(pVertex_start_in, pVertex_end_in)
 
     def calculate_edge_bound(self):
 
@@ -274,7 +295,7 @@ class pyedge(object):
                  pVertex_in.dLongitude_degree, pVertex_in.dLatitude_degree,\
                  pVertex_end.dLongitude_degree,pVertex_end.dLatitude_degree)
 
-        if  angle3deg > 90 : #care
+        if angle3deg > 90: #care
             dDistance_plane = calculate_distance_to_plane(\
                  pVertex_start.dLongitude_degree, pVertex_start.dLatitude_degree,\
                  pVertex_in.dLongitude_degree, pVertex_in.dLatitude_degree,\
@@ -290,13 +311,6 @@ class pyedge(object):
                 point['dLongitude_degree'] = dLongitude_intersect
                 point['dLatitude_degree'] = dLatitude_intersect
                 pVertex_out=pyvertex(point)
-                #check it is on the edge
-                #iFlag, dDistance, dDistance_plane = self.check_vertex_on_edge(pVertex_out)
-                #if iFlag == 1:
-                #    print('success')
-                #else:
-                #    print('error')
-                #    pass
 
                 dDistance_min = pVertex_out.calculate_distance(pVertex_in)
                 if dDistance_min < d1 and dDistance_min < d2:
@@ -323,6 +337,69 @@ class pyedge(object):
 
 
         return dDistance_min, pVertex_out
+
+    def calculate_buffer_zone_polygon(self, dRadius, nPoint = 36, sFilename_out=None, sFolder_out=None):
+        # Create a geodesic object
+
+        if self.dLength < dRadius * 2.0:
+            aEdge = [self]
+        else:
+            aEdge = self.split_by_length(dRadius)
+
+        nEdge = len(aEdge)
+        aVertex_out = list()
+        aVertex_center = list()
+        aVertex_circle = list()
+        aLongitude_degree = []
+        aLatitude_degree = []
+        aCircle = list()
+        for i in range(nEdge):
+            pEdge = aEdge[i]
+            pVertex_start = pEdge.pVertex_start
+            pVertex_end = pEdge.pVertex_end
+
+            aVertex_center.append(pVertex_start)
+            aVertex_center.append(pVertex_end) #might, but should be ok have duplicate
+            # Calculate the geodesic buffer
+
+            aVertex_start = pVertex_start.calculate_buffer_zone_circle(dRadius, nPoint)
+            #create a circle object
+            pEdge.pCircle_start = pycircle(pVertex_start, aVertex_start)
+            aVertex_circle.extend(aVertex_start)
+            for pVertex_buffer0 in aVertex_start:
+                aLongitude_degree.append(pVertex_buffer0.dLongitude_degree)
+                aLatitude_degree.append(pVertex_buffer0.dLatitude_degree)
+
+            aVertex_end = pVertex_end.calculate_buffer_zone_circle(dRadius, nPoint)
+            pEdge.pCircle_end = pycircle(pVertex_end, aVertex_end)
+            aVertex_circle.extend(aVertex_end)
+            for pVertex_buffer1 in aVertex_end:
+                aLongitude_degree.append(pVertex_buffer1.dLongitude_degree)
+                aLatitude_degree.append(pVertex_buffer1.dLatitude_degree)
+
+            if sFolder_out is not None:
+                sFilename_dummy = os.path.join(sFolder_out, 'buffer_zone_start_%d.geojson' % i)
+                export_vertex_as_polygon(aVertex_start, sFilename_dummy)
+                sFilename_dummy = os.path.join(sFolder_out, 'buffer_zone_end_%d.geojson'% i)
+                export_vertex_as_polygon(aVertex_end, sFilename_dummy)
+
+            aCircle.append(pEdge.pCircle_start)
+            aCircle.append(pEdge.pCircle_end)
+
+        #combine them using convex function
+        pPolygon_out = find_minimal_enclosing_polygon(aLongitude_degree, aLatitude_degree)
+        #return as a list of vectex is more friendly
+
+        for p in pPolygon_out:
+            point0= dict()
+            point0['dLongitude_degree'] = p[0]
+            point0['dLatitude_degree'] = p[1]
+            pVertex_out = pyvertex(point0)
+            aVertex_out.append(pVertex_out)
+        if sFilename_out is not None:
+            export_vertex_as_polygon(aVertex_out, sFilename_out)
+
+        return aVertex_out, aVertex_center, aVertex_circle, aCircle
 
     def __eq__(self, other):
         """

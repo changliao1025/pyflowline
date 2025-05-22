@@ -22,25 +22,33 @@ def read_flowline_shapefile(sFilename_shapefile_in):
     pDataset_shapefile = pDriver_shapefile.Open(sFilename_shapefile_in, gdal.GA_ReadOnly)
     pLayer_shapefile = pDataset_shapefile.GetLayer(0)
     pSpatialRef_shapefile = pLayer_shapefile.GetSpatialRef()
-    pProjection_geojson = pSpatialRef_shapefile.ExportToWkt()
 
     pSpatial_reference_gcs = osr.SpatialReference()
     pSpatial_reference_gcs.ImportFromEPSG(4326)
     pSpatial_reference_gcs.SetAxisMappingStrategy(osr.OAMS_TRADITIONAL_GIS_ORDER)
 
-    
-    comparison = pSpatialRef_shapefile.IsSame(pSpatial_reference_gcs)
-    if(comparison != 1):
-        iFlag_transform =1
-        pTransform = osr.CoordinateTransformation(pSpatialRef_shapefile, pSpatial_reference_gcs)
+    if pSpatialRef_shapefile is not None:
+        pProjection_geojson = pSpatialRef_shapefile.ExportToWkt()
+        comparison = pSpatialRef_shapefile.IsSame(pSpatial_reference_gcs)
+        if(comparison != 1):
+            iFlag_transform =1
+            pTransform = osr.CoordinateTransformation(pSpatialRef_shapefile, pSpatial_reference_gcs)
+        else:
+            iFlag_transform =0
+
     else:
-        iFlag_transform =0
+        pProjection_geojson = None
+        iFlag_transform = 0
 
     lFlowlineIndex = 0
     for pFeature_shapefile in pLayer_shapefile:
         pGeometry_in = pFeature_shapefile.GetGeometryRef()
         sGeometry_type = pGeometry_in.GetGeometryName()
-        lNHDPlusID = int(pFeature_shapefile.GetField("NHDPlusID"))
+        #check whether it has a field called NHDPlusID
+        if pFeature_shapefile.GetFieldIndex("NHDPlusID") != -1:
+            lNHDPlusID = int(pFeature_shapefile.GetField("NHDPlusID"))
+        else:
+            lNHDPlusID = -1
         if (iFlag_transform ==1): #projections are different
             pGeometry_in.Transform(pTransform)
         if (pGeometry_in.IsValid()):
@@ -79,8 +87,6 @@ def read_flowline_shapefile(sFilename_shapefile_in):
             else:
                 print(sGeometry_type)
                 pass
-
-
 
     #we also need to spatial reference
 

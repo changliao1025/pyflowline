@@ -62,7 +62,7 @@ def retrieve_coordinates_from_array(aData_in, dValue_in, pixelWidth, pixelHeight
 #                             projector=[0.0, 0.0],
 #                             aFilename_river_in=None,
 #                             aFilename_watershed_boundary_in= None,
-#                             aFilenamae_lake_boundary_in = None,
+#                             aFilename_lake_boundary_in = None,
 #                             aFilename_coastline_in = None):
 #    """
 #    run_jigsaw_mpas_workflow: main call to the ICoM mesh-gen. infrastructure.
@@ -84,7 +84,7 @@ def retrieve_coordinates_from_array(aData_in, dValue_in, pixelWidth, pixelHeight
 #                                      aConfig_in=aConfig_in,
 #                                      aFilename_river_in=aFilename_river_in,
 #                                      aFilename_watershed_boundary_in= aFilename_watershed_boundary_in,
-#                                      aFilenamae_lake_boundary_in = aFilenamae_lake_boundary_in,
+#                                      aFilename_lake_boundary_in = aFilename_lake_boundary_in,
 #                                      aFilename_coastline_in = aFilename_coastline_in)
 #
 #
@@ -106,7 +106,7 @@ def run_jigsaw(sWorkspace_jigsaw_in, projector,
             aConfig_in=None,
             aFilename_river_network_in=None,
             aFilename_watershed_boundary_in= None,
-            aFilenamae_lake_boundary_in = None,
+            aFilename_lake_boundary_in = None,
             aFilename_coastline_in = None):
     """
     RUNJGSW: main call to JIGSAW to build the triangulation.
@@ -189,35 +189,65 @@ def run_jigsaw(sWorkspace_jigsaw_in, projector,
         else:
             iFlag_land = False
 
-        if "iFlag_dam" in aConfig_in:
-            iFlag_dam = aConfig_in["iFlag_dam"]
+        if "iFlag_geom_dam" in aConfig_in:
+            iFlag_geom_dam = aConfig_in["iFlag_geom_dam"]
         else:
-            iFlag_dam = False
+            iFlag_geom_dam = False
 
-        if "iFlag_city" in aConfig_in:
-            iFlag_city = aConfig_in["iFlag_city"]
+        if "iFlag_spac_dam" in aConfig_in:
+            iFlag_spac_dam = aConfig_in["iFlag_spac_dam"]
         else:
-            iFlag_city = False
+            iFlag_spac_dam = False
 
-        if "iFlag_river_network" in aConfig_in:
-            iFlag_river_network = aConfig_in["iFlag_river_network"]
+        if "iFlag_geom_city" in aConfig_in:
+            iFlag_geom_city = aConfig_in["iFlag_geom_city"]
         else:
-            iFlag_river_network = False
+            iFlag_geom_city = False
 
-        if "iFlag_coastline" in aConfig_in:
-            iFlag_coastline = aConfig_in["iFlag_coastline"]
+        if "iFlag_spac_city" in aConfig_in:
+            iFlag_spac_city = aConfig_in["iFlag_spac_city"]
         else:
-            iFlag_coastline = False
+            iFlag_spac_city = False
 
-        if "iFlag_watershed_boundary" in aConfig_in:
-            iFlag_watershed_boundary = aConfig_in["iFlag_watershed_boundary"]
+        if "iFlag_geom_river_network" in aConfig_in:
+            iFlag_geom_river_network = aConfig_in["iFlag_geom_river_network"]
         else:
-            iFlag_watershed_boundary = False
+            iFlag_geom_river_network = False
 
-        if "iFlag_lake_boundary" in aConfig_in:
-            iFlag_lake_boundary = aConfig_in["iFlag_lake_boundary"]
+        if "iFlag_spac_river_network" in aConfig_in:
+            iFlag_spac_river_network = aConfig_in["iFlag_spac_river_network"]
         else:
-            iFlag_lake_boundary = False
+            iFlag_spac_river_network = False
+
+        if "iFlag_geom_coastline" in aConfig_in:
+            iFlag_geom_coastline = aConfig_in["iFlag_geom_coastline"]
+        else:
+            iFlag_geom_coastline = False
+
+        if "iFlag_spac_coastline" in aConfig_in:
+            iFlag_spac_coastline = aConfig_in["iFlag_spac_coastline"]
+        else:
+            iFlag_spac_coastline = False
+
+        if "iFlag_geom_watershed_boundary" in aConfig_in:
+            iFlag_geom_watershed_boundary = aConfig_in["iFlag_geom_watershed_boundary"]
+        else:
+            iFlag_geom_watershed_boundary = False
+
+        if "iFlag_spac_watershed_boundary" in aConfig_in:
+            iFlag_spac_watershed_boundary = aConfig_in["iFlag_spac_watershed_boundary"]
+        else:
+            iFlag_spac_watershed_boundary = False
+
+        if "iFlag_geom_lake_boundary" in aConfig_in:
+            iFlag_geom_lake_boundary = aConfig_in["iFlag_geom_lake_boundary"]
+        else:
+            iFlag_geom_lake_boundary = False
+
+        if "iFlag_spac_lake_boundary" in aConfig_in:
+            iFlag_spac_lake_boundary = aConfig_in["iFlag_spac_lake_boundary"]
+        else:
+            iFlag_spac_lake_boundary = False
 
         if "FULL_SPHERE_RADIUS" in aConfig_in:
             FULL_SPHERE_RADIUS = aConfig_in["FULL_SPHERE_RADIUS"]
@@ -233,8 +263,6 @@ def run_jigsaw(sWorkspace_jigsaw_in, projector,
             spac_mshID = aConfig_in["spac_mshID"]
         else:
             spac_mshID = "ellipsoid-grid" # "ellipsoid-grid"
-
-
 
         if "hfun_scal" in aConfig_in:
             hfun_scal = aConfig_in["hfun_scal"]
@@ -312,8 +340,6 @@ def run_jigsaw(sWorkspace_jigsaw_in, projector,
         else:
             dResolution_watershed_boundary = 3.0
 
-
-
         if "dhdx_lim" in aConfig_in:
             dhdx_lim = aConfig_in["dhdx_lim"]
         else:
@@ -329,14 +355,22 @@ def run_jigsaw(sWorkspace_jigsaw_in, projector,
         iFlag_ocean = False
         iFlag_land = False
         #point
-        iFlag_dam = False
-        iFlag_city = False
+        iFlag_geom_dam = False
+        iFlag_geom_city = False
         #polyline
-        iFlag_river_network = False
-        iFlag_coastline = False
+        iFlag_geom_river_network = False
+        iFlag_geom_coastline = False
         #polygon
-        iFlag_watershed_boundary = False
-        iFlag_lake_boundary = False
+        iFlag_geom_watershed_boundary = False
+        iFlag_geom_lake_boundary = False
+
+        #spacing
+        iFlag_spac_dam = False
+        iFlag_spac_city = False
+        iFlag_spac_river_network = False
+        iFlag_spac_coastline = False
+        iFlag_spac_watershed_boundary = False
+        iFlag_spac_lake_boundary = False
 
         hfun_scal = "absolute"
         hfun_hmax = float("inf")       # null spacing lim
@@ -354,11 +388,12 @@ def run_jigsaw(sWorkspace_jigsaw_in, projector,
         geom.radii = np.full(3, FULL_SPHERE_RADIUS, dtype=geom.REALS_t)
 
         poly = jigsawpy.jigsaw_msh_t()
+        nPolygon = 1
         print("BUILDING MESH GEOM.")
 
         #iFlag_dam = False
         #iFlag_city = False
-        if iFlag_dam :
+        if iFlag_geom_dam :
             sFilename_dam_vector = aConfig_in["sFilename_dam_vector"]
             if not os.path.exists(sFilename_dam_vector):
                 print("The file does not exist", sFilename_dam_vector)
@@ -368,7 +403,7 @@ def run_jigsaw(sWorkspace_jigsaw_in, projector,
                 addpoint(geom, poly, +1)
             pass
 
-        if iFlag_city:
+        if iFlag_geom_city:
             sFilename_city_vector = aConfig_in["sFilename_city_vector"]
             if not os.path.exists(sFilename_city_vector):
                 print("The file does not exist", sFilename_city_vector)
@@ -378,7 +413,7 @@ def run_jigsaw(sWorkspace_jigsaw_in, projector,
                 addpoint(geom, poly, +2)
             pass
 
-        if iFlag_river_network:
+        if iFlag_geom_river_network:
             sFilename_river_network_vector = aConfig_in["sFilename_river_network_vector"]
             if not os.path.exists(sFilename_river_network_vector):
                 print("The file does not exist", sFilename_river_network_vector)
@@ -388,34 +423,43 @@ def run_jigsaw(sWorkspace_jigsaw_in, projector,
                 addline(geom, poly, +1)
             pass
 
-        if iFlag_coastline:
-            sFilename_coastline_vector = aConfig_in["sFilename_coastline_vector"]
-            if not os.path.exists(sFilename_coastline_vector):
-                print("The file does not exist", sFilename_coastline_vector)
-            else:
-                loadgeo(sFilename_coastline_vector, poly)
-                poly.point["coord"] *= np.pi / +180.
-                addpoly(geom, poly, +1) #coastline is actually a polygon, not line
+        if iFlag_geom_coastline:
+            #skip the coastline for geom,
+            #it will be only used for spac
+            iFlag_coastline_geom = 1
+            if iFlag_coastline_geom == 1:
+                sFilename_coastline_vector = aConfig_in["sFilename_coastline_vector"]
+                if not os.path.exists(sFilename_coastline_vector):
+                    print("The file does not exist", sFilename_coastline_vector)
+                else:
+                    loadgeo(sFilename_coastline_vector, poly)
+                    poly.point["coord"] *= np.pi / +180.
+                    addpoly(geom, poly, nPolygon) #coastline is actually a polygon, not line
+                    nPolygon += 1
+                pass
+
+        if iFlag_geom_watershed_boundary:
+            iFlag_watershed_boundary_geom = 0
+            if iFlag_watershed_boundary_geom == 1:
+                sFilename_watershed_boundary_vector = aConfig_in["sFilename_watershed_boundary_vector"]
+                if not os.path.exists(sFilename_watershed_boundary_vector):
+                    print("The file does not exist", sFilename_watershed_boundary_vector)
+                else:
+                    loadgeo(sFilename_watershed_boundary_vector, poly)
+                    poly.point["coord"] *= np.pi / +180.
+                    addpoly(geom, poly, nPolygon)
+                    nPolygon += 1
             pass
 
-        if iFlag_watershed_boundary:
-            sFilename_watershed_boundary_vector = aConfig_in["sFilename_watershed_boundary_vector"]
-            if not os.path.exists(sFilename_watershed_boundary_vector):
-                print("The file does not exist", sFilename_watershed_boundary_vector)
-            else:
-                loadgeo(sFilename_watershed_boundary_vector, poly)
-                poly.point["coord"] *= np.pi / +180.
-                addpoly(geom, poly, +2)
-            pass
-
-        if iFlag_lake_boundary:
+        if iFlag_geom_lake_boundary:
             sFilename_lake_boundary_vector = aConfig_in["sFilename_lake_boundary_vector"]
             if not os.path.exists(sFilename_lake_boundary_vector):
                 print("The file does not exist", sFilename_lake_boundary_vector)
             else:
                 loadgeo(sFilename_lake_boundary_vector, poly)
                 poly.point["coord"] *= np.pi / +180.
-                addpoly(geom, poly, +3)
+                addpoly(geom, poly, nPolygon)
+                nPolygon += 1
             pass
 
     spac = jigsawpy.jigsaw_msh_t()
@@ -424,29 +468,52 @@ def run_jigsaw(sWorkspace_jigsaw_in, projector,
         print(ncolumn_space, nrow_space, dResolution_land)
         spac.mshID = spac_mshID
         spac.radii = np.full( 3, FULL_SPHERE_RADIUS, dtype=spac.REALS_t)
-        sFilename_coastline_raster = aConfig_in["sFilename_coastline_raster"]
-        #check if it exists
-        if not os.path.exists(sFilename_coastline_raster):
-            print("The file does not exist")
-            print("The vector file will be converted to raster file")
+        #for space setting base matrix, we prioritize the river network
+        #if river network is not available, we will use the coastline
+        if iFlag_spac_river_network:
+            sFilename_river_network_raster = aConfig_in["sFilename_river_network_raster"]
+            if not os.path.exists(sFilename_river_network_raster):
+                pass
+            else:
+                dummy = gdal_read_geotiff_file(sFilename_river_network_raster)
+            aData_river_network = dummy['dataOut']
+            dOriginX = dummy['originX']
+            dOriginY = dummy['originY']
+            pixelHeight = dummy['pixelHeight'] #30/3600.0
+            pixelWidth = dummy['pixelWidth']
+            missingValue = dummy['missingValue']
+            aRiver_network_mask = compute_mask(aData_river_network, 1, dOriginX, dOriginY, pixelWidth, pixelHeight, ncolumn_space, nrow_space)
+            #we need to downsample the mask if the resolution is too high
+            if ncolumn_space > 40000 and nrow_space > 20000:
+                aRiver_network_mask = coarsen_mask(aRiver_network_mask, down=4)
+                nrow_space = aRiver_network_mask.shape[0]
+                ncolumn_space = aRiver_network_mask.shape[1]
+
         else:
-            #check spatial reference, reproject if needed
-            #sProjection =
-            dummy = gdal_read_geotiff_file(sFilename_coastline_raster) #1km, 30/3600.0
-
-        aLand_ocean_mask = dummy['dataOut']
-        dOriginX = dummy['originX']
-        dOriginY = dummy['originY']
-        pixelHeight = dummy['pixelHeight'] #30/3600.0
-        pixelWidth = dummy['pixelWidth']
-        missingValue = dummy['missingValue']
-
-        aCoastline_mask = compute_mask(aLand_ocean_mask, 1, dOriginX, dOriginY, pixelWidth, pixelHeight, ncolumn_space, nrow_space)
-        #we need to downsample the mask if the resolution is too high
-        if ncolumn_space > 40000 and nrow_space > 20000:
-            aCoastline_mask = coarsen_mask(aCoastline_mask, down=4)
-            nrow_space = aCoastline_mask.shape[0]
-            ncolumn_space = aCoastline_mask.shape[1]
+            if iFlag_spac_coastline:
+                sFilename_coastline_raster = aConfig_in["sFilename_coastline_raster"]
+                #check if it exists
+                if not os.path.exists(sFilename_coastline_raster):
+                    print("The file does not exist")
+                    print("The vector file will be converted to raster file")
+                else:
+                    #check spatial reference, reproject if needed
+                    #sProjection =
+                    dummy = gdal_read_geotiff_file(sFilename_coastline_raster) #1km, 30/3600.0
+                aLand_ocean_mask = dummy['dataOut']
+                dOriginX = dummy['originX']
+                dOriginY = dummy['originY']
+                pixelHeight = dummy['pixelHeight'] #30/3600.0
+                pixelWidth = dummy['pixelWidth']
+                missingValue = dummy['missingValue']
+                aCoastline_mask = compute_mask(aLand_ocean_mask, 1, dOriginX, dOriginY, pixelWidth, pixelHeight, ncolumn_space, nrow_space)
+                #we need to downsample the mask if the resolution is too high
+                if ncolumn_space > 40000 and nrow_space > 20000:
+                    aCoastline_mask = coarsen_mask(aCoastline_mask, down=4)
+                    nrow_space = aCoastline_mask.shape[0]
+                    ncolumn_space = aCoastline_mask.shape[1]
+            else:
+                print("You need to provide either coastline or river network to set the base spacing")
 
         #the low resolution grid
         #xgrid_low = np.linspace( -1. * np.pi, +1. * np.pi, 360)
@@ -460,16 +527,20 @@ def run_jigsaw(sWorkspace_jigsaw_in, projector,
         spac.ygrid = ygrid_high
         spac.value = np.full( (nrow_space, ncolumn_space), dSpac_value, dtype=spac.REALS_t)
 
-        if iFlag_ocean :
-            print("Compute global ocean h(x)...")
-            vals = mdt.EC_CellWidthVsLat(spac.ygrid * 180. / np.pi)
-            vals = np.reshape(vals, (spac.ygrid.size, 1))
-            aOcean_value = np.array(np.tile( vals, (1, spac.xgrid.size)), dtype=spac.REALS_t)
-            aOcean_mask = compute_mask(aLand_ocean_mask, missingValue, dOriginX, dOriginY, pixelWidth, pixelHeight, ncolumn_space, nrow_space)
-            spac.value[aOcean_mask] =  np.minimum(aOcean_value[aOcean_mask], spac.value[aOcean_mask])
+        if iFlag_ocean : #this requires the coastline
+            if iFlag_spac_coastline:
+                print("Compute global ocean h(x)...")
+                vals = mdt.EC_CellWidthVsLat(spac.ygrid * 180. / np.pi)
+                vals = np.reshape(vals, (spac.ygrid.size, 1))
+                aOcean_value = np.array(np.tile( vals, (1, spac.xgrid.size)), dtype=spac.REALS_t)
+                aOcean_mask = compute_mask(aLand_ocean_mask, missingValue, dOriginX, dOriginY, pixelWidth, pixelHeight, ncolumn_space, nrow_space)
+                spac.value[aOcean_mask] =  np.minimum(aOcean_value[aOcean_mask], spac.value[aOcean_mask])
+            else:
+                print("You need to provide coastline to set the ocean spacing")
+                pass
             pass
 
-        if iFlag_coastline:
+        if iFlag_spac_coastline:
             print("Compute global h(x)... for coastline")
             spac.value[aCoastline_mask] =  np.minimum(dResolution_coastline, spac.value[aCoastline_mask])
             pass
@@ -480,7 +551,7 @@ def run_jigsaw(sWorkspace_jigsaw_in, projector,
             spac.value[aLand_mask] =  np.minimum(dResolution_land, spac.value[aLand_mask])
             pass
 
-        if iFlag_dam:
+        if iFlag_spac_dam:
             print("Compute global h(x)... for dam")
             sFilename_dam_raster = aConfig_in["sFilename_dam_raster"]
             if not os.path.exists(sFilename_dam_raster):
@@ -497,7 +568,7 @@ def run_jigsaw(sWorkspace_jigsaw_in, projector,
             aDam_mask = compute_mask(aData, 1, dOriginX, dOriginY, pixelWidth, pixelHeight, ncolumn_space, nrow_space)
             spac.value[aDam_mask] =  np.minimum(dResolution_dam, spac.value[aDam_mask])
 
-        if iFlag_city:
+        if iFlag_spac_city:
             print("Compute global h(x)... for city")
             sFilename_city_raster = aConfig_in["sFilename_city_raster"]
             if not os.path.exists(sFilename_city_raster):
@@ -514,23 +585,23 @@ def run_jigsaw(sWorkspace_jigsaw_in, projector,
             aCity_mask = compute_mask(aData, 1, dOriginX, dOriginY, pixelWidth, pixelHeight, ncolumn_space, nrow_space)
             spac.value[aCity_mask] =  np.minimum(dResolution_city, spac.value[aCity_mask])
 
-        if iFlag_river_network:
+        if iFlag_spac_river_network:
             print("Compute global h(x)... for river network")
-            sFilename_river_network_raster = aConfig_in["sFilename_river_network_raster"]
-            if not os.path.exists(sFilename_river_network_raster):
-                pass
-            else:
-                dummy = gdal_read_geotiff_file(sFilename_river_network_raster)
-            aData = dummy['dataOut']
-            dOriginX = dummy['originX']
-            dOriginY = dummy['originY']
-            pixelHeight = dummy['pixelHeight'] #30/3600.0
-            pixelWidth = dummy['pixelWidth']
-            aRiver_network_mask = compute_mask(aData, 1, dOriginX, dOriginY, pixelWidth, pixelHeight, ncolumn_space, nrow_space)
+            #sFilename_river_network_raster = aConfig_in["sFilename_river_network_raster"]
+            #if not os.path.exists(sFilename_river_network_raster):
+            #    pass
+            #else:
+            #    dummy = gdal_read_geotiff_file(sFilename_river_network_raster)
+            #aData_river_network = dummy['dataOut']
+            #dOriginX = dummy['originX']
+            #dOriginY = dummy['originY']
+            #pixelHeight = dummy['pixelHeight'] #30/3600.0
+            #pixelWidth = dummy['pixelWidth']
+            #aRiver_network_mask = compute_mask(aData_river_network, 1, dOriginX, dOriginY, pixelWidth, pixelHeight, ncolumn_space, nrow_space)
             spac.value[aRiver_network_mask] = np.minimum(dResolution_river_network, spac.value[aRiver_network_mask])
             pass
 
-        if iFlag_watershed_boundary:
+        if iFlag_spac_watershed_boundary:
             print("Compute global h(x)... for watershed boundary")
             sFilename_watershed_boundary_raster = aConfig_in["sFilename_watershed_boundary_raster"]
             if not os.path.exists(sFilename_watershed_boundary_raster):
@@ -546,7 +617,7 @@ def run_jigsaw(sWorkspace_jigsaw_in, projector,
             spac.value[aWatershed_mask] = np.minimum(dResolution_watershed_boundary, spac.value[aWatershed_mask])
             pass
 
-        if iFlag_lake_boundary:
+        if iFlag_spac_lake_boundary:
             print("Compute global h(x)... for lake boundary")
             sFilename_lake_boundary_raster = aConfig_in["sFilename_lake_boundary_raster"]
             if not os.path.exists(sFilename_lake_boundary_raster):

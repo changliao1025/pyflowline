@@ -12,8 +12,6 @@ def export_flowline_to_geojson( aFlowline_in,
     aAttribute_field=None,
     aAttribute_data=None,
     aAttribute_dtype=None):
-
-
     """
     convert a flowlist object list to json format.
     This function should be used for stream flowline only.
@@ -36,7 +34,6 @@ def export_flowline_to_geojson( aFlowline_in,
 
     iFlag_attribute = int(all([aAttribute_field, aAttribute_data, aAttribute_dtype]))
 
-
     #if aAttribute_field is not None and aAttribute_data is not None and aAttribute_dtype is not None:
     #    iFlag_attribute = 1
     #    nAttribute1 = len(aAttribute_field)
@@ -57,7 +54,6 @@ def export_flowline_to_geojson( aFlowline_in,
         if not nAttribute1 == nAttribute2 == nAttribute3 and nFlowline != len(aAttribute_data[0]):
             print('The attribute is not correct, please check!')
             return
-
 
     pDriver_json = ogr.GetDriverByName('GeoJSON')
     pDataset_json = pDriver_json.CreateDataSource(sFilename_json_in)
@@ -82,7 +78,6 @@ def export_flowline_to_geojson( aFlowline_in,
         for field, dtype in zip(aAttribute_field, aAttribute_dtype):
             pLayer_json.CreateField(ogr.FieldDefn(field, dtype_to_ogr[dtype]))
 
-
     pLayerDefn = pLayer_json.GetLayerDefn()
     pFeature_out = ogr.Feature(pLayerDefn)
 
@@ -90,28 +85,15 @@ def export_flowline_to_geojson( aFlowline_in,
     flag_to_attr = {1: ('dx', 'dy'), 0: ('dLongitude_degree', 'dLatitude_degree')}
     for lID in range(nFlowline):
         pFlowline = aFlowline_in[lID]
-        #dummy =pFlowline.aVertex
-        #replace shapely with gdal function
-        #aPoint=list()
         pLine = ogr.Geometry(ogr.wkbLineString)
-        #for j in dummy:
-        #    if iFlag_projected_in ==1:
-        #        #aPoint.append( Point( j.dx, j.dy ) )
-        #        pLine.AddPoint(j.dx, j.dy)
-        #        pass
-        #    else:
-        #        #aPoint.append( Point( j.dLongitude_degree, j.dLatitude_degree ) )
-        #        pLine.AddPoint(j.dLongitude_degree, j.dLatitude_degree)
-        #        pass
-
         for vertex in pFlowline.aVertex:
             pLine.AddPoint(*(getattr(vertex, attr) for attr in flag_to_attr[iFlag_projected_in]))
 
-
+        pLine.FlattenTo2D()
         #dummy1= LineString( aPoint )
-        pGeometry_out = ogr.CreateGeometryFromWkb(pLine.ExportToWkb())
-        pFeature_out.SetGeometry(pGeometry_out)
-        pFeature_out.SetField("lineid", lID+1)
+        #pGeometry_out = ogr.CreateGeometryFromWkb(pLine.ExportToWkb())
+        pFeature_out.SetGeometry(pLine)
+        pFeature_out.SetField("lineid", lID + 1)
 
         #if iFlag_attribute == 1:
         #    for k in range(nAttribute1):
@@ -129,15 +111,12 @@ def export_flowline_to_geojson( aFlowline_in,
 
         # Add new pFeature_shapefile to output Layer
         pLayer_json.CreateFeature(pFeature_out)
-
         pass
 
     pDataset_json.FlushCache()
     pDataset_json = pLayer_json = pFeature_out  = None
 
     return
-
-
 
 def export_flowline_to_shapefile(iFlag_projected_in, aFlowline_in, pSpatial_reference_in,
     sFilename_shapefile_in,

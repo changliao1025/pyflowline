@@ -30,7 +30,7 @@ def convert_flowline_to_geojson(sFilename_in, sFilename_geojson_out):
     if iFlag_type_in == 1: #shapefile
         sFilename_dummy = sFilename_geojson_out
         sFilename_out = sFilename_dummy.replace('.geojson', '_withID.geojson')
-        aFlowline_basin, pProjection_geojson = read_flowline_shapefile( sFilename_in , sFilename_out = sFilename_out)
+        aFlowline_basin, pProjection_geojson = read_flowline_shapefile( sFilename_in)
         #get lineid
         aFlowlineID = [pFlowline.lFlowlineID for pFlowline in aFlowline_basin]
         #convert it

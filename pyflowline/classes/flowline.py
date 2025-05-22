@@ -1,11 +1,13 @@
 
-
+import os
 import copy
 import json
 from json import JSONEncoder
 import numpy as np
+from osgeo import ogr, gdal, osr
 from pyflowline.classes.vertex import pyvertex
 from pyflowline.classes.edge import pyedge
+from pyflowline.formats.export_vertex import export_vertex_as_polygon
 
 class FlowlineClassEncoder(JSONEncoder):
     def default(self, obj):
@@ -267,7 +269,7 @@ class pyflowline(object):
 
         return pFlowline_out
 
-    def split_by_length(self, dDistance):
+    def split_edge_by_length(self, dDistance):
         """
         Split a flowline using the length threshold
 
@@ -295,6 +297,33 @@ class pyflowline(object):
         pFlowline_out.copy_attributes(self)
 
         return pFlowline_out
+
+    def split_by_length(self, dDistance):
+        aFlowline = list()
+        if self.dLength<=dDistance:
+            aFlowline.append(self)
+        else:
+            #split using the half of the edge
+            nEdge = len(self.aEdge)
+            first_leg = [0, int(nEdge/2)]
+            second_leg = [int(nEdge/2), nEdge]
+            aEdge0 = self.aEdge[first_leg[0]:first_leg[1]]
+            aEdge1 = self.aEdge[second_leg[0]:second_leg[1]]
+            pFlowline0 = pyflowline(aEdge0)
+            pFlowline1 = pyflowline(aEdge1)
+            pFlowline0.copy_attributes(self)
+            pFlowline1.copy_attributes(self)
+            if pFlowline0.dLength > dDistance:
+                aFlowline.extend(pFlowline0.split_by_length(dDistance))
+            else:
+                aFlowline.append(pFlowline0)
+            if pFlowline1.dLength > dDistance:
+                aFlowline.extend(pFlowline1.split_by_length(dDistance))
+            else:
+                aFlowline.append(pFlowline1)
+            pass
+
+        return aFlowline
 
     def copy_attributes(self, other):
         """
@@ -355,6 +384,54 @@ class pyflowline(object):
             pass
 
         return dDistance_min, pVertex_out
+
+    def calculate_buffer_zone_polygon(self, dRadius,sFilename_out = None, sFolder_out=None):
+        """
+        Calculate the buffer zone polygon
+
+        Args:
+            dRadius (float): The buffer zone distance
+
+        Returns:
+            list: A list of buffer zone points
+        """
+        pMultiPolygon = ogr.Geometry(ogr.wkbMultiPolygon)
+        aVertex_out = list()
+        aCircle_out = list()
+        for i in range(self.nEdge):
+            edge = self.aEdge[i]
+            aVertex, aVertex_center, aVertex_circle, aCircle = edge.calculate_buffer_zone_polygon(dRadius)
+
+            aCircle_out.append(aCircle)
+            #create a polygon feature for each edge
+            ring = ogr.Geometry(ogr.wkbLinearRing)
+            for pVertex in aVertex:
+                ring.AddPoint(pVertex.dLongitude_degree, pVertex.dLatitude_degree)
+
+            ring.AddPoint(aVertex[0].dLongitude_degree, aVertex[0].dLatitude_degree) #close the ring
+            # Create a polygon and add the ring to it
+            pPolygon = ogr.Geometry(ogr.wkbPolygon)
+            pPolygon.AddGeometry(ring)
+            # Add the polygon to the MultiPolygon
+            pMultiPolygon.AddGeometry(pPolygon)
+            #save out for debug
+            if sFolder_out is not None:
+                sFilename_dummy= os.path.join(sFolder_out, 'buffer_zone_edge_%d.geojson' % i)
+                export_vertex_as_polygon(aVertex, sFilename_dummy)
+
+        pUnionPolygon = pMultiPolygon.UnionCascaded()
+        for i in range(pUnionPolygon.GetGeometryRef(0).GetPointCount()):
+            lon, lat, _ = pUnionPolygon.GetGeometryRef(0).GetPoint(i)
+            point2= dict()
+            point2['dLongitude_degree'] = lon
+            point2['dLatitude_degree'] =  lat
+            pVertex2 = pyvertex(point2)
+            aVertex_out.append(pVertex2)
+
+        if sFilename_out is not None:
+            export_vertex_as_polygon(aVertex_out, sFilename_out)
+
+        return aVertex_out, aCircle_out
 
     def __eq__(self, other):
         """

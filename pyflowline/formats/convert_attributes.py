@@ -48,8 +48,8 @@ def convert_gcs_attributes_to_cell(iMesh_type_in,
             else:
                 if iMesh_type_in == 4: #mpas
                     for i in range(npoint):
-                        lon = aCoordinates_gcs_in[i][0]
-                        lat = aCoordinates_gcs_in[i][1]
+                        lon = float(aCoordinates_gcs_in[i][0])
+                        lat = float(aCoordinates_gcs_in[i][1])
                         pVertex = dict()
                         pVertex['dLongitude_degree'] =lon
                         pVertex['dLatitude_degree'] =lat
@@ -61,15 +61,21 @@ def convert_gcs_attributes_to_cell(iMesh_type_in,
                         aVertexID_dummy = aVertexIndexOnEdge_in[j,:]
                         pVertex1 = dict()
                         dummy_index = np.where(aVertexID_in == aVertexID_dummy[0])
-                        pVertex1['dLongitude_degree'] =aCoordinates_gcs_in[dummy_index,0]
-                        pVertex1['dLatitude_degree'] =aCoordinates_gcs_in[dummy_index,1]
+                        if len(dummy_index[0]) == 0 :
+                            print('Vertex ID not found')
+                            return None
+                        pVertex1['dLongitude_degree'] = float(aCoordinates_gcs_in[dummy_index,0])
+                        pVertex1['dLatitude_degree']  = float(aCoordinates_gcs_in[dummy_index,1])
                         pVertex_start = pyvertex(pVertex1)
                         pVertex_start.lVertexID = int( aVertexID_dummy[0] )
 
                         pVertex2 = dict()
                         dummy_index = np.where(aVertexID_in == aVertexID_dummy[1])
-                        pVertex2['dLongitude_degree'] =aCoordinates_gcs_in[dummy_index,0]
-                        pVertex2['dLatitude_degree'] =aCoordinates_gcs_in[dummy_index,1]
+                        if len(dummy_index[0]) == 0 :
+                            print('Vertex ID not found')
+                            return None
+                        pVertex2['dLongitude_degree'] = float(aCoordinates_gcs_in[dummy_index,0])
+                        pVertex2['dLatitude_degree']  = float(aCoordinates_gcs_in[dummy_index,1])
                         pVertex_end = pyvertex(pVertex2)
                         pVertex_end.lVertexID = int(aVertexID_dummy[1])
                         pEdge = pyedge( pVertex_start, pVertex_end )

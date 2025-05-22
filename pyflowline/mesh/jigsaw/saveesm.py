@@ -1,11 +1,12 @@
 
 import subprocess
 import os
+import shutil
 import time
 import numpy as np
 import xarray as xr
 from geometric_features import GeometricFeatures
-from pyearth.system.python.retrieve_python_environment import retrieve_python_environment
+from pyearth.system.python.get_python_environment import get_python_environment
 from pyflowline.mesh.mpas.mpas_tools.mpasmsh import jigsaw_mesh_to_netcdf, inject_edge_tags, subtract_critical_passages, mask_reachable_ocean
 
 import mpas_tools
@@ -15,7 +16,9 @@ from mpas_tools.io import write_netcdf
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 
-def saveesm(sWorkspace_jigsaw_out, geom, mesh, sFilename_jigsaw_mesh_netcdf_in = None):
+def saveesm(sWorkspace_jigsaw_out, geom, mesh,
+            sFilename_jigsaw_mesh_netcdf_in = None,
+             sFilename_land_ocean_mask_in = None):
     """
     SAVEESM: export a jigsaw mesh obj. to MPAS-style output.
 
@@ -62,7 +65,7 @@ def saveesm(sWorkspace_jigsaw_out, geom, mesh, sFilename_jigsaw_mesh_netcdf_in =
 
     print("Forming base_mesh.nc")
     sFilename_base_mesh = os.path.join(sWorkspace_jigsaw_out, "out", "base_mesh.nc")
-    dummy = convert(xr.open_dataset( sFilename_triangles))
+    dummy = convert(xr.open_dataset( sFilename_triangles), dir = sWorkspace_jigsaw_out)
     write_netcdf(dummy, fileName=sFilename_base_mesh, format= netcdfFormat)
 
     sFilename_executable = 'paraview_vtk_field_extractor.py'
@@ -85,40 +88,43 @@ def saveesm(sWorkspace_jigsaw_out, geom, mesh, sFilename_jigsaw_mesh_netcdf_in =
     print("")
     print("running:", " ".join(args))
 
-    sConda_env_path , sConda_env_name = retrieve_python_environment()
+    sConda_env_path , sConda_env_name = get_python_environment()
     sPython = sConda_env_path + "/bin/python3"
     args = [sPython] + args
     sEnv = os.environ.copy()
     subprocess.check_call(args, env=sEnv)
 
     # adapted from CULL_MESH.py
-
-
-    #gf = GeometricFeatures(
+    #if sFilename_land_ocean_mask_in is None:
+    #    gf = GeometricFeatures(
     #    cacheLocation="{}".format(os.path.join(
-    #        HERE, "..", "data", "geometric_data")))
-
-    gf = GeometricFeatures(
-        cacheLocation="{}".format(os.path.join(
-            sWorkspace_jigsaw_out, ".", "data", "geometric_data")))
-
-    # start with the land coverage from Natural Earth
-    fcLandCoverage = gf.read(
-        componentName="natural_earth", objectType="region",
-        featureNames=["Land Coverage"])
-
-    # save the feature collection to a geojson file
-    sFilename_land_coverage = os.path.join( sWorkspace_jigsaw_out, "tmp", "land_coverage.geojson")
-    fcLandCoverage.to_geojson(sFilename_land_coverage)
+    #        sWorkspace_jigsaw_out, ".", "data", "geometric_data")))
+    #    # start with the land coverage from Natural Earth
+    #    fcLandCoverage = gf.read(
+    #    componentName="natural_earth", objectType="region",
+    #    featureNames=["Land Coverage"])
+    #    # save the feature collection to a geojson file
+    #    sFilename_land_coverage = os.path.join( sWorkspace_jigsaw_out, "tmp", "land_coverage.geojson")
+    #    fcLandCoverage.to_geojson(sFilename_land_coverage)
+    #else:
+    #    sFilename_land_coverage = sFilename_land_ocean_mask_in
 
     # Create the land mask based on the land coverage,
     # i.e. coastline data.
-    dsBaseMesh = xr.open_dataset(  sFilename_base_mesh)
+    dsBaseMesh = xr.open_dataset(sFilename_base_mesh)
     sFilename_land_mask = os.path.join( sWorkspace_jigsaw_out, "tmp", "land_mask.nc")
 
-    _land_mask_from_geojson( mesh_filename=sFilename_base_mesh,
-                                geojson_filename=sFilename_land_coverage,
-                                mask_filename=sFilename_land_mask)
+    if sFilename_land_ocean_mask_in is None:
+        sFilename_land_coverage = os.path.join( sWorkspace_jigsaw_out, "tmp", "land_coverage.geojson")
+        _land_mask_from_geojson( sFilename_base_mesh,
+                                sFilename_land_coverage,
+                                sFilename_land_mask)
+    else:
+        sFilename_land_coverage = os.path.join( sWorkspace_jigsaw_out, "tmp", "land_coverage.geojson")
+        _land_mask_from_geojson( sFilename_base_mesh,
+                                sFilename_land_coverage,
+                                sFilename_land_mask,
+                                sFilename_land_ocean_mask_in = sFilename_land_ocean_mask_in)
     dsLandMask = xr.open_dataset(sFilename_land_mask)
 
     iFlag_old = 0
@@ -180,35 +186,41 @@ def saveesm(sWorkspace_jigsaw_out, geom, mesh, sFilename_jigsaw_mesh_netcdf_in =
 
     return sFilename_culled_mesh, sFilename_invert_mesh
 
+def _land_mask_from_geojson(sFilename_mesh,
+                            sFilename_geojson_out,
+                            sFilename_mask_out,
+                            sFilename_land_ocean_mask_in = None):
 
-
-def _land_mask_from_geojson( mesh_filename, geojson_filename, mask_filename):
-    gf = GeometricFeatures()
-
-    # start with the land coverage from Natural Earth
-    fcLandCoverage = gf.read(componentName='natural_earth',
+    if sFilename_land_ocean_mask_in is None:
+        gf = GeometricFeatures()
+        # start with the land coverage from Natural Earth
+        fcLandCoverage = gf.read(componentName='natural_earth',
                              objectType='region',
                              featureNames=['Land Coverage'])
 
-    # remove the region south of 60S so we can replace it based on ice-sheet
-    # topography
-    fcSouthMask = gf.read(componentName='ocean', objectType='region',
-                          featureNames=['Global Ocean 90S to 60S'])
+        # remove the region south of 60S so we can replace it based on ice-sheet
+        # topography
+        fcSouthMask = gf.read(componentName='ocean', objectType='region',
+                              featureNames=['Global Ocean 90S to 60S'])
+        fcLandCoverage = fcLandCoverage.difference(fcSouthMask)
+        # Add "land" coverage from either the full ice sheet or just the grounded
+        # part
+        fcAntarcticLand = gf.read(
+                componentName='bedmachine', objectType='region',
+                featureNames=['AntarcticIceCoverage'])
 
-    fcLandCoverage = fcLandCoverage.difference(fcSouthMask)
+        fcLandCoverage.merge(fcAntarcticLand)
 
-    # Add "land" coverage from either the full ice sheet or just the grounded
-    # part
-
-    fcAntarcticLand = gf.read(
-            componentName='bedmachine', objectType='region',
-            featureNames=['AntarcticIceCoverage'])
-
-    fcLandCoverage.merge(fcAntarcticLand)
-
-    # save the feature collection to a geojson file
-    fcLandCoverage.to_geojson(geojson_filename)
-
+        # save the feature collection to a geojson file
+        fcLandCoverage.to_geojson(sFilename_geojson_out)
+    else:
+        #copy the input file sFilename_land_ocean_mask_in to the output file
+        #check if the file exists
+        if os.path.isfile(sFilename_land_ocean_mask_in):
+            shutil.copy(sFilename_land_ocean_mask_in, sFilename_geojson_out)
+        else:
+            print("Error: input file does not exist:", sFilename_land_ocean_mask_in)
+            return
     # these defaults may have been updated from config options -- pass them
     # along to the subprocess
     netcdf_format = mpas_tools.io.default_format
@@ -218,17 +230,17 @@ def _land_mask_from_geojson( mesh_filename, geojson_filename, mask_filename):
     process_count = 1
     #remove engine
     #args = ['compute_mpas_region_masks',
-    #        '-m', mesh_filename,
-    #        '-g', geojson_filename,
-    #        '-o', mask_filename,
+    #        '-m', sFilename_mesh,
+    #        '-g', sFilename_geojson_out,
+    #        '-o', sFilename_mask_out,
     #        '-t', 'cell',
     #        '--process_count', f'{process_count}',
     #        '--format', netcdf_format,
     #        '--engine', netcdf_engine]
     args = ['compute_mpas_region_masks',
-            '-m', mesh_filename,
-            '-g', geojson_filename,
-            '-o', mask_filename,
+            '-m', sFilename_mesh,
+            '-g', sFilename_geojson_out,
+            '-o', sFilename_mask_out,
             '-t', 'cell',
             '--process_count', f'{process_count}',
             '--format', netcdf_format]

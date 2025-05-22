@@ -8,30 +8,29 @@ from pyflowline.mesh.jigsaw.run_jigsaw import run_jigsaw #_mpas_workflow import 
 from pyflowline.algorithms.potentiometric.calculate_potentiometric import calculate_potentiometric
 gdal.UseExceptions()
 iFlag_cython = importlib.util.find_spec("cython")
-if iFlag_cython is not None:
-    from pyflowline.algorithms.cython.kernel import convert_360_to_180
-else:
-    from pyearth.gis.geometry.convert_longitude_range import convert_360_to_180
 from pyearth.gis.geometry.convert_longitude_range import convert_360_to_180_np
+from pyearth.gis.geometry.convert_idl_polygon_to_valid_polygon import convert_idl_polygon_to_valid_polygon
 
 def create_mpas_mesh(sFilename_output_in,
         iFlag_global_in = None,
-    iFlag_use_mesh_dem_in = None,
-    iFlag_save_mesh_in = None,
-    iFlag_run_jigsaw_in=None,
-    iFlag_antarctic_in=None,
-    iFlag_arctic_in=None,
-    pBoundary_in = None,
-    sWorkspace_jigsaw_in = None,
-    sFilename_mpas_mesh_netcdf_in= None,
-    sFilename_jigsaw_mesh_netcdf_in= None,
-    aConfig_jigsaw_in = None,
-    aFilename_river_network_in = None,
-    aFilename_watershed_boundary_in = None,
-    aFilenamae_lake_boundary_in = None,
-    aFilename_coastline_in = None,
-    iFlag_read_mesh_in  = None,
-    iFlag_generate_mesh_in=None):
+        iFlag_use_mesh_dem_in = None,
+        iFlag_save_mesh_in = None,
+        iFlag_run_jigsaw_in=None,
+        iFlag_antarctic_in=None,
+        iFlag_arctic_in=None,
+        iFlag_fill_hole_in=None,
+        pBoundary_in = None,
+        sWorkspace_jigsaw_in = None,
+        sFilename_mpas_mesh_netcdf_in= None,
+        sFilename_jigsaw_mesh_netcdf_in= None,
+        sFilename_land_ocean_mask_in= None,
+        aConfig_jigsaw_in = None,
+        aFilename_river_network_in = None,
+        aFilename_watershed_boundary_in = None,
+        aFilename_lake_boundary_in = None,
+        aFilename_coastline_in = None,
+        iFlag_read_mesh_in  = None,
+        iFlag_generate_mesh_in=None):
     """
     Create a MPAS mesh
 
@@ -122,22 +121,24 @@ def create_mpas_mesh(sFilename_output_in,
         #                         aConfig_in = aConfig_jigsaw_in,
         #    aFilename_river_network_in = aFilename_river_network_in,
         #    aFilename_watershed_boundary_in = aFilename_watershed_boundary_in,
-        #    aFilenamae_lake_boundary_in = aFilenamae_lake_boundary_in,
+        #    aFilename_lake_boundary_in = aFilename_lake_boundary_in,
         #    aFilename_coastline_in = aFilename_coastline_in)
         projector=[0.0, 0.0]
         geom, gprj, mesh, mprj = run_jigsaw(sWorkspace_jigsaw_in, projector,
                                       aConfig_in=aConfig_jigsaw_in,
                                       aFilename_river_network_in=aFilename_river_network_in,
                                       aFilename_watershed_boundary_in= aFilename_watershed_boundary_in,
-                                      aFilenamae_lake_boundary_in = aFilenamae_lake_boundary_in,
+                                      aFilename_lake_boundary_in = aFilename_lake_boundary_in,
                                       aFilename_coastline_in = aFilename_coastline_in)
 
 #-------------------------------------- write output for ESM
 
         iFlag_mpas_tool = 1
-        if iFlag_mpas_tool ==1:
+        if iFlag_mpas_tool == 1:
             from pyflowline.mesh.jigsaw.saveesm import saveesm
-            sFilename_culled_mesh, sFilename_invert_mesh = saveesm(sWorkspace_jigsaw_in, geom, mesh, sFilename_jigsaw_mesh_netcdf_in=sFilename_jigsaw_mesh_netcdf_in)
+            sFilename_culled_mesh, sFilename_invert_mesh = saveesm(sWorkspace_jigsaw_in, geom, mesh,
+                                                                   sFilename_jigsaw_mesh_netcdf_in=sFilename_jigsaw_mesh_netcdf_in,
+                                                                   sFilename_land_ocean_mask_in = sFilename_land_ocean_mask_in)
             print('The generated MPAS mesh is: ', sFilename_invert_mesh)
         else:
             #we will a new function to convert jigsaw mesh to mpas mesh11
@@ -236,7 +237,6 @@ def create_mpas_mesh(sFilename_output_in,
             bed_elevation0 = aValue
             iFlag_bed_elevation = 1
         else:
-            iFlag_bed_elevation = 0
             pass
 
         if sKey == 'ice_thickness':
@@ -259,7 +259,6 @@ def create_mpas_mesh(sFilename_output_in,
             iFlag_elevation_profile = 1
             bed_elevation_profile0 = aValue
         else:
-            iFlag_elevation_profile = 0
             pass
 
     aLatitudeVertex = latVertex0[:] / math.pi * 180
@@ -292,6 +291,7 @@ def create_mpas_mesh(sFilename_output_in,
     aLongitudeVertex_180 = convert_360_to_180_np(aLongitudeVertex)
     #add a mpas cell into a list
     def add_cell_into_list(aList, i, lCellID, dArea, dElevation_mean, dElevation_profile0, aCoords_gcs  ):
+        iFlag_success = 1
         dLongitude_center =  float(aLongitudeCell_180[i])
         dLatitude_center =  float(aLatitudeCell[i])
         if dLongitude_center > 180:
@@ -301,16 +301,18 @@ def create_mpas_mesh(sFilename_output_in,
         aEdgesOnCellIndex = np.array(aEdgesOnCell[i,:])
         aVertexOnCellIndex = np.array(aVertexOnCell[i,:])
         dummy0 = np.where(aVertexOnCellIndex > 0)
-        aVertexIndex = aVertexOnCellIndex[dummy0]-1
+        aVertexIndex = aVertexOnCellIndex[dummy0]
         if len(aVertexIndex) != len(set(aVertexIndex)):
             print("Duplicates found in aVertexIndex")
-            return aList
+            iFlag_success = 0
+            return iFlag_success ,aList
 
         dummy1 = np.where(aEdgesOnCellIndex > 0)
         aEdgeIndex= aEdgesOnCellIndex[dummy1]
         if len(aEdgeIndex) != len(set(aEdgeIndex)):
             print("Duplicates found in aEdgeIndex")
-            return aList
+            iFlag_success = 0
+            return iFlag_success, aList
 
         dummy2 = np.where(aCellOnCellIndex > 0)
         aNeighborIndex= (aCellOnCellIndex[dummy2]).astype(int)
@@ -319,6 +321,10 @@ def create_mpas_mesh(sFilename_output_in,
         #check dimensions are consistent
         if len(aVertexIndex) == len(aEdgeIndex) and len(aEdgeIndex) == len(aVertexIndexOnEdge):
             pmpas = convert_gcs_attributes_to_cell(4, dLongitude_center, dLatitude_center, aCoords_gcs, aVertexIndex, aEdgeIndex, aVertexIndexOnEdge)
+            if pmpas is None:
+                print('Warning: pmpas is None')
+                iFlag_success = 0
+                return iFlag_success, aList
             pmpas.dArea = dArea
             pmpas.calculate_edge_length()
             pmpas.dLength_flowline = pmpas.dLength_edge #Default
@@ -333,8 +339,6 @@ def create_mpas_mesh(sFilename_output_in,
                 pmpas.nNeighbor_ocean = pmpas.nVertex - pmpas.nNeighbor
                 pmpas.aNeighbor_land=aNeighborIndex
                 pmpas.nNeighbor_land=len(aNeighborIndex)
-                #print(lCellID)
-                #print('Warning: nNeighbor != nVertex at the edge?', lCellID)
             else: #this cell is not at the the land-ocean mask coastal line
                 pmpas.nNeighbor_land = pmpas.nNeighbor
                 pmpas.nNeighbor_ocean = 0
@@ -353,14 +357,14 @@ def create_mpas_mesh(sFilename_output_in,
             #this contains all the original mpas neighbor distance
             pmpas.aNeighbor_distance = aDistance
             aList.append(pmpas)
-            return aList
+            return iFlag_success, aList
         else:
             print('Warning: len(aVertexIndex) != len(aVertexIndexOnEdge)', 'cellID:', lCellID)
             #we will not add this cell if something is wrong
-            return aList
+            iFlag_success = 0
+            return iFlag_success, aList
 
     if iFlag_antarctic == 1: #use potentiometric
-        iFlag_remove_ice = 0
         #if it is antarctic, we dont need the boundary
         for i in range(ncell):
             #center
@@ -368,10 +372,13 @@ def create_mpas_mesh(sFilename_output_in,
             dLatitude_center = float(aLatitudeCell[i])
             aVertexOnCellIndex = np.array(aVertexOnCell[i,:])
             dummy0 = np.where(aVertexOnCellIndex > 0)
-            aVertexIndex = aVertexOnCellIndex[dummy0] - 1
-            aLonVertex = aLongitudeVertex_180[aVertexIndex]
-            aLatVertex = aLatitudeVertex[aVertexIndex]
+            aVertexIndex = aVertexOnCellIndex[dummy0]
+            aLonVertex = aLongitudeVertex_180[aVertexIndex-1]
+            aLatVertex = aLatitudeVertex[aVertexIndex-1]
             nVertex = len(aLonVertex)
+            if nVertex < 3:
+                print('Warning: nVertex < 3')
+                continue
             #first check if it is within the boundary
             iFlag = False
             ring = ogr.Geometry(ogr.wkbLinearRing)
@@ -397,19 +404,23 @@ def create_mpas_mesh(sFilename_output_in,
                 pass
 
             if ( iFlag == True ):
+                #check polygon
+                if pPolygon.IsValid() == False:
+                    print('Warning: invalid polygon')
+                    continue
                 lCellID = int(aIndexToCellID[i])
                 if iFlag_bed_elevation == 1:
                     dElevation_mean = float(aBed_elevation[i])
                 else:
-                    dElevation_mean = -9999
+                    dElevation_mean = 0.0 #-9999
                 if iFlag_elevation_profile == 1:
                     dElevation_profile0 = float(aBed_elevation_profile[i,0])
                 else:
-                    dElevation_profile0 = -9999
+                    dElevation_profile0 = 0.0 #-9999
                 if iFlag_ice_thickness == 1:
                     dThickness_ice = float( aIce_thickness[i] )
                 else:
-                    dThickness_ice = -9999
+                    dThickness_ice = 0.0 #-9999
                 dArea = float(aCellArea[i])
 
                 #then check if it is ice free
@@ -420,9 +431,10 @@ def create_mpas_mesh(sFilename_output_in,
                     dElevation_profile0 = calculate_potentiometric(dElevation_profile0 , dThickness_ice)
 
                 #call fuction to add the cell
-                aMpas = add_cell_into_list(aMpas, i, lCellID, dArea, dElevation_mean, dElevation_profile0, aCoords_gcs )
-                aMpas_dict[lCellID] = lCellIndex
-                lCellIndex = lCellIndex + 1
+                iFlag_success, aMpas = add_cell_into_list(aMpas, i, lCellID, dArea, dElevation_mean, dElevation_profile0, aCoords_gcs )
+                if iFlag_success == 1:
+                    aMpas_dict[lCellID] = lCellIndex
+                    lCellIndex = lCellIndex + 1
                 #save mesh cell
                 if iFlag_save_mesh ==1:
                     pFeature.SetGeometry(pPolygon)
@@ -436,18 +448,20 @@ def create_mpas_mesh(sFilename_output_in,
 
                     pLayer.CreateFeature(pFeature)
     else:
-        if iFlag_arctic ==1: #for arctic only
-            iFlag_remove_ice = 0
+        if iFlag_arctic == 1: #for arctic only
             for i in range(ncell):
                 #center
                 dLongitude_center = float(aLongitudeCell_180[i])
                 dLatitude_center = float(aLatitudeCell[i])
                 aVertexOnCellIndex = np.array(aVertexOnCell[i,:])
                 dummy0 = np.where(aVertexOnCellIndex > 0)
-                aVertexIndex = aVertexOnCellIndex[dummy0]-1
-                aLonVertex = aLongitudeVertex_180[aVertexIndex]
-                aLatVertex = aLatitudeVertex[aVertexIndex]
+                aVertexIndex = aVertexOnCellIndex[dummy0]
+                aLonVertex = aLongitudeVertex_180[aVertexIndex-1]
+                aLatVertex = aLatitudeVertex[aVertexIndex-1]
                 nVertex = len(aLonVertex)
+                if nVertex < 3:
+                    print('Warning: nVertex < 3')
+                    continue
                 #first check if it is within the boundary
                 iFlag = False
                 ring = ogr.Geometry(ogr.wkbLinearRing)
@@ -473,19 +487,22 @@ def create_mpas_mesh(sFilename_output_in,
                     pass
 
                 if ( iFlag == True ):
+                    if pPolygon.IsValid() == False:
+                        print('Warning: invalid polygon')
+                        continue
                     lCellID = int(aIndexToCellID[i])
                     if iFlag_bed_elevation == 1:
                         dElevation_mean = float(aBed_elevation[i])
                     else:
-                        dElevation_mean = -9999
+                        dElevation_mean = 0.0 #-9999
                     if iFlag_elevation_profile == 1:
                         dElevation_profile0 = float(aBed_elevation_profile[i,0])
                     else:
-                        dElevation_profile0 = -9999
+                        dElevation_profile0 = 0.0 #-9999
                     if iFlag_ice_thickness == 1:
                         dThickness_ice = float( aIce_thickness[i] )
                     else:
-                        dThickness_ice = -9999
+                        dThickness_ice = 0.0 #-9999
                     dArea = float(aCellArea[i])
 
                     #then check if it is ice free
@@ -496,9 +513,10 @@ def create_mpas_mesh(sFilename_output_in,
 
 
                     #call fuction to add the cell
-                    aMpas = add_cell_into_list(aMpas, i, lCellID, dArea, dElevation_mean, dElevation_profile0, aCoords_gcs )
-                    aMpas_dict[lCellID] = lCellIndex
-                    lCellIndex = lCellIndex + 1
+                    iFlag_success, aMpas = add_cell_into_list(aMpas, i, lCellID, dArea, dElevation_mean, dElevation_profile0, aCoords_gcs )
+                    if iFlag_success == 1:
+                        aMpas_dict[lCellID] = lCellIndex
+                        lCellIndex = lCellIndex + 1
                     #save mesh cell
                     if iFlag_save_mesh ==1:
                         pFeature.SetGeometry(pPolygon)
@@ -511,24 +529,22 @@ def create_mpas_mesh(sFilename_output_in,
                             pFeature.SetField("elevation_profile0", dElevation_profile0 )
 
                         pLayer.CreateFeature(pFeature)
-
             pass
         else:
-            iFlag_remove_ice = 1
             for i in range(ncell):
+                dLongitude_center = float(aLongitudeCell_180[i])
+                dLatitude_center = float(aLatitudeCell[i])
                 #vertex
                 aVertexOnCellIndex = np.array(aVertexOnCell[i,:])
                 dummy0 = np.where(aVertexOnCellIndex > 0)
-                aVertexIndex = aVertexOnCellIndex[dummy0]-1
-                aLonVertex = aLongitudeVertex_180[aVertexIndex]
-                aLatVertex = aLatitudeVertex[aVertexIndex]
+                aVertexIndex = aVertexOnCellIndex[dummy0]
+                aLonVertex = aLongitudeVertex_180[aVertexIndex-1]
+                aLatVertex = aLatitudeVertex[aVertexIndex-1]
                 nVertex = len(aLonVertex)
-
                 if nVertex < 3:
                     print('Warning: nVertex < 3')
                     continue
                 #first check if it is within the boundary
-
                 ring = ogr.Geometry(ogr.wkbLinearRing)
                 aCoords_gcs = np.full((nVertex,2), -9999.0, dtype=float)
                 for j in range(nVertex):
@@ -545,63 +561,98 @@ def create_mpas_mesh(sFilename_output_in,
                 pPolygon = ogr.Geometry(ogr.wkbPolygon)
                 pPolygon.AddGeometry(ring)
 
-                iFlag_debug = 0
-                if iFlag_debug == 1:
-                    dLon_mean = np.mean(aCoords_gcs[:,0])
-                    dLat_mean = np.mean(aCoords_gcs[:,1])
-
                 #check within first
+                dLon_min = np.min(aCoords_gcs[:,0])
+                dLon_max = np.max(aCoords_gcs[:,0])
+                iFlag_debug = 0
+                #if iFlag_debug == 1:
+                #    if dLongitude_center > -90 and dLongitude_center < -80 and dLatitude_center > 40 and dLatitude_center < 50:
+                #        print('test mesh cell')
+                #    else:
+                #        pass
                 if iFlag_global == 1:
-                    iFlag = True
+                    if dLatitude_center >= -60:
+                        if dLatitude_center>85: #exclude the north pole as well
+                            iFlag = False
+                            continue
+                        else:
+                            if np.abs(dLon_min-dLon_max) > 100: #this polygon cross international date line
+                                #print('Warning: longitude > 180')
+                                #keep this but use an alternative way to check
+                                iFlag = True #do not check the polygon?
+                                pPolygon_new = convert_idl_polygon_to_valid_polygon(pPolygon)
+                                if pPolygon_new is not None:
+                                    if pPolygon_new.IsValid() == False:
+                                        print('Warning: invalid polygon')
+                                        continue
+                                    else:
+                                        pass
+                                else:
+                                    continue
+
+                            else:
+                                iFlag = True
+                                if pPolygon.IsValid() == False:
+                                    print('Warning: invalid polygon')
+                                    continue
+                    else:
+                        iFlag = False  #remove antiarctic from global mesh for now
+                        continue
                 else:
                     iFlag = False
-                    if pPolygon.Within(pBoundary):
-                        iFlag = True
+                    if np.abs(dLon_min-dLon_max) > 100: #this polygon cross international date line
+                        #print('Warning: longitude > 180')
+                        continue
                     else:
-                        dLon_min = np.min(aCoords_gcs[:,0])
-                        dLon_max = np.max(aCoords_gcs[:,0])
-                        if np.abs(dLon_min-dLon_max) > 100: #this polygon cross international date line
-                            #print('Warning: longitude > 180')
-                            pass
+                        if pPolygon.IsValid() == False:
+                            print('Warning: invalid polygon')
+                            continue
                         else:
-                            #then check intersection
-                            if pPolygon.Intersects(pBoundary):
+                            if pPolygon.Within(pBoundary):
                                 iFlag = True
                             else:
-                                pass
+                                #then check intersection
+                                if pPolygon.Intersects(pBoundary):
+                                    iFlag = True
 
 
                 if ( iFlag == True ):
                     lCellID = int(aIndexToCellID[i])
-
                     if iFlag_bed_elevation == 1:
                         dElevation_mean = float(aBed_elevation[i])
                     else:
-                        dElevation_mean = -9999
+                        dElevation_mean = 0.0 #-9999
                     if iFlag_elevation_profile == 1:
                         dElevation_profile0 = float(aBed_elevation_profile[i,0])
                     else:
-                        dElevation_profile0 = -9999
+                        dElevation_profile0 = 0.0
                     if iFlag_ice_thickness == 1:
                         dThickness_ice = float( aIce_thickness[i] )
                     else:
-                        dThickness_ice = -9999
-
-                    dArea = float(aCellArea[i])
+                        dThickness_ice = 0.0 #-9999
 
                     #then check if it is ice free
-                    if iFlag_remove_ice == 1:
-                        if dThickness_ice > 0 :
-                            continue
-                        else:
-                            pass
-                    else:
-                        pass
+                    if dThickness_ice > 0 :
+                        #use potentiometric
+                        dElevation_mean = calculate_potentiometric(dElevation_mean , dThickness_ice)
+                        if iFlag_elevation_profile == 1:
+                            dElevation_profile0 = calculate_potentiometric(dElevation_profile0 , dThickness_ice)
+
+                    dArea = float(aCellArea[i])
+                    #then check if it is ice free
+                    #if iFlag_remove_ice == 1:
+                    #    if dThickness_ice > 0 :
+                    #        continue
+                    #    else:
+                    #        pass
+                    #else:
+                    #    pass
                     #call fuction to add the cell
 
-                    aMpas = add_cell_into_list(aMpas, i, lCellID, dArea, dElevation_mean, dElevation_profile0, aCoords_gcs )
-                    aMpas_dict[lCellID] = lCellIndex
-                    lCellIndex = lCellIndex + 1
+                    iFlag_success, aMpas = add_cell_into_list(aMpas, i, lCellID, dArea, dElevation_mean, dElevation_profile0, aCoords_gcs )
+                    if iFlag_success == 1:
+                        aMpas_dict[lCellID] = lCellIndex
+                        lCellIndex = lCellIndex + 1
                     #save mesh cell
                     if iFlag_save_mesh == 1:
                         dLongitude_center = float(aLongitudeCell_180[i])
@@ -624,16 +675,15 @@ def create_mpas_mesh(sFilename_output_in,
     if iFlag_global == 1:
         aMpas_out = aMpas
     else:
-        iFlag_fill_hole = 1
         aMpas_out = list()
         ncell = len(aMpas)
         #generate the list of cell ID that are already certain
-        if iFlag_fill_hole == 1:
+        if iFlag_fill_hole_in == 1:
             #first update neighbor information because some cell should have vitual land neighbor (not present in the mesh)
             #this operation does not increase the number of cells, but it update the neighbor information
             #specifically, it divided the land neighbor into two parts: land and virtual land
             for pCell in aMpas:
-                aNeighbor_land = pCell.aNeighbor_land   #including both holes and maps land cutoff by boundary
+                aNeighbor_land = pCell.aNeighbor_land  #including both holes and maps land cutoff by boundary
                 aNeighbor_land_update = list()
                 aNeighbor_land_virtual = list()
                 for lNeighbor in aNeighbor_land: #loop all land neighbors
@@ -665,10 +715,13 @@ def create_mpas_mesh(sFilename_output_in,
                     #vertex
                     aVertexOnCellIndex = np.array(aVertexOnCell[j,:])
                     dummy0 = np.where(aVertexOnCellIndex > 0)
-                    aVertexIndex = aVertexOnCellIndex[dummy0]-1
-                    aLonVertex = aLongitudeVertex_180[aVertexIndex]
-                    aLatVertex = aLatitudeVertex[aVertexIndex]
+                    aVertexIndex = aVertexOnCellIndex[dummy0]
+                    aLonVertex = aLongitudeVertex_180[aVertexIndex-1]
+                    aLatVertex = aLatitudeVertex[aVertexIndex-1]
                     nVertex = len(aLonVertex)
+                    if nVertex < 3:
+                        print('Warning: nVertex < 3')
+                        continue
                     #first check if it is within the boundary
                     ring = ogr.Geometry(ogr.wkbLinearRing)
                     aCoords_gcs = np.full((nVertex,2), -9999.0, dtype=float)
@@ -685,22 +738,35 @@ def create_mpas_mesh(sFilename_output_in,
                     ring.AddPoint(x1, y1) #double check
                     pPolygon = ogr.Geometry(ogr.wkbPolygon)
                     pPolygon.AddGeometry(ring)
+                    if pPolygon.IsValid() == False:
+                        print('Warning: invalid polygon')
+                        continue
+
+                    if pPolygon.Within(pBoundary):
+                        pass
+                    else:
+                        continue
 
                     lCellID = int(aIndexToCellID[j])
                     if iFlag_bed_elevation == 1:
                         dElevation_mean = float(aBed_elevation[j])
                     else:
-                        dElevation_mean = -9999
+                        dElevation_mean = 0.0 #-9999
                     if iFlag_elevation_profile == 1:
                         dElevation_profile0 = float(aBed_elevation_profile[j,0])
                     else:
-                        dElevation_profile0 = -9999
+                        dElevation_profile0 = 0.0 #-9999
+                    if iFlag_ice_thickness == 1:
+                        dThickness_ice = float( aIce_thickness[j] )
+                    else:
+                        dThickness_ice = 0.0
                     dArea = float(aCellArea[j])
 
                     if lCellID not in aMpas_dict:
-                        aMpas = add_cell_into_list(aMpas, j, lCellID, dArea, dElevation_mean, dElevation_profile0, aCoords_gcs )
-                        aMpas_dict[lCellID] = lCellIndex
-                        lCellIndex = lCellIndex + 1
+                        iFlag_success, aMpas = add_cell_into_list(aMpas, j, lCellID, dArea, dElevation_mean, dElevation_profile0, aCoords_gcs )
+                        if iFlag_success == 1:
+                            aMpas_dict[lCellID] = lCellIndex
+                            lCellIndex = lCellIndex + 1
                         #now we need to update the neightboring information as well
                         pCell.aNeighbor_land.append(lCellID)
                         pCell.nNeighbor_land = pCell.nNeighbor_land + 1
@@ -732,7 +798,6 @@ def create_mpas_mesh(sFilename_output_in,
             #now update again because some cell has more than one virutal land neighbor, but now none of them is virtual anymore
             #this fix will move virtual land neighbor back to land neighbor
             #the ocean neighbor will remain unchanged
-
             for pCell in aMpas:
                 aNeighbor_land_update = list()
                 aNeighbor_land = pCell.aNeighbor_land

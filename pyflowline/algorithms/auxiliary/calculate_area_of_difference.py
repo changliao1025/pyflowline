@@ -2,9 +2,7 @@ import os
 import numpy as np
 from osgeo import ogr, osr
 import importlib.util
-
 from pyflowline.algorithms.auxiliary.find_index_in_list import find_list_in_list
-
 from pyearth.gis.geometry.calculate_polygon_area import calculate_polygon_area
 from pyearth.gis.geometry.calculate_angle_between_vertex_normal import calculate_angle_between_vertex_normal
 
@@ -16,7 +14,6 @@ else:
 
 
 
-
 def calculate_area_of_difference_raw(sFilename_a, sFilename_b):
     #not yet supported
     return
@@ -25,9 +22,10 @@ def calculate_area_of_difference_simplified(aFlowline_in, aVertex_all_in, sFilen
     iFlag_shapely = importlib.util.find_spec("shapely")
     if iFlag_shapely is not None:
         from shapely.ops import polygonize
+        from shapely.geometry.polygon import orient
     else:
         print('shapely is required for this function')
-    pass
+
     if os.path.exists(sFilename_output_in):
         os.remove(sFilename_output_in)
         pass
@@ -36,12 +34,12 @@ def calculate_area_of_difference_simplified(aFlowline_in, aVertex_all_in, sFilen
     nFlowline = len(aFlowline_in)
     nVeretx = len(aVertex_all_in)
     #rebuild index
-    for i  in range(nFlowline):
+    for i in range(nFlowline):
         aFlowline_in[i].lFlowlineID = i + 1
-    for i  in range(nVeretx):
+    for i in range(nVeretx):
         aVertex_all_in[i].lVertexID = i + 1
 
-    for i  in range(nVeretx):
+    for i in range(nVeretx):
         for j in range(nFlowline):
             if aVertex_all_in[i] == aFlowline_in[j].pVertex_start:
                 aFlowline_in[j].pVertex_start.lVertexID = i + 1
@@ -143,7 +141,7 @@ def calculate_area_of_difference_simplified(aFlowline_in, aVertex_all_in, sFilen
 
                 if pFlowline_out.pVertex_start == pVertex_stop:
                     iFlag_reverse_new=0
-                    pVertex_stop_out =   pFlowline_out.pVertex_end
+                    pVertex_stop_out = pFlowline_out.pVertex_end
                 else:
                     iFlag_reverse_new=1
                     pVertex_stop_out=pFlowline_out.pVertex_start
@@ -227,7 +225,7 @@ def calculate_area_of_difference_simplified(aFlowline_in, aVertex_all_in, sFilen
 
     def walk_cycle(iFlag_rightleft, iFlag_reverse, pFlowline_in, pVertex_origin, aFlowline_list, aVertex_list ):
         iFlag_loop = 1
-        if iFlag_reverse ==0:
+        if iFlag_reverse == 0:
             iFlag_right = pFlowline_in.iFlag_right
             if iFlag_right == 1:
                 iFlag_loop = 0
@@ -288,14 +286,14 @@ def calculate_area_of_difference_simplified(aFlowline_in, aVertex_all_in, sFilen
         return iFlag_loop, aFlowline_list
 
     aList_all = list()
-    for i in range(0,nFlowline):
+    for i in range(0, nFlowline):
         pFlowline_in = aFlowline_in[i]
         aFlowline_list=list()
         aVertex_list=list()
-        iFlag_loop , aFlowline_list = walk_cycle(0, 0, pFlowline_in, pFlowline_in.pVertex_start, aFlowline_list, aVertex_list)
+        iFlag_loop, aFlowline_list = walk_cycle(0, 0, pFlowline_in, pFlowline_in.pVertex_start, aFlowline_list, aVertex_list)
         if iFlag_loop == 1:
             aFlowline_list.insert(0, i)
-            iFlag = find_list_in_list(aList_all,aFlowline_list )
+            iFlag = find_list_in_list(aList_all, aFlowline_list)
             if iFlag == 1:
                 pass
             else:
@@ -313,7 +311,7 @@ def calculate_area_of_difference_simplified(aFlowline_in, aVertex_all_in, sFilen
     lCellID = 0
     dArea = 0.0
     #shapely method, but not complete
-    for n in range(0,len(aList_all)):
+    for n in range(0, len(aList_all)):
         aFlowline_list = aList_all[n]
         nFlowline = len(aFlowline_list)
         aFlowline_polygon=list()
@@ -321,7 +319,7 @@ def calculate_area_of_difference_simplified(aFlowline_in, aVertex_all_in, sFilen
             dummy_index = aFlowline_list[m]
             pFlowline = aFlowline_in[dummy_index]
             nVertex= pFlowline.nVertex
-            aCoords_gcs = np.full((nVertex,2), -9999. ,dtype=float)
+            aCoords_gcs = np.full((nVertex,2), -9999., dtype=float)
             for k in range(nVertex):
                 aCoords_gcs[k,0] = pFlowline.aVertex[k].dLongitude_degree
                 aCoords_gcs[k,1] = pFlowline.aVertex[k].dLatitude_degree
@@ -330,7 +328,8 @@ def calculate_area_of_difference_simplified(aFlowline_in, aVertex_all_in, sFilen
             aFlowline_polygon.append(aCoords_gcs)
 
         dummy = polygonize(aFlowline_polygon)
-        aPolygon_out =  list(dummy)
+        aPolygon_out = list(dummy)
+        aPolygon_out = [orient(po, sign=1.0) for po in aPolygon_out]
         for po in aPolygon_out:
             ring = ogr.Geometry(ogr.wkbLinearRing)
             aCoords_gcs = po.exterior.coords

@@ -12,8 +12,8 @@ from osgeo import ogr, osr, gdal
 
 from pyearth.system.define_global_variables import *
 from pyearth.gis.gdal.gdal_check_file_type import gdal_check_file_type
-from pyearth.gis.spatialref.conversion_between_degree_and_meter  import degree_to_meter
-from pyearth.gis.spatialref.conversion_between_degree_and_meter  import meter_to_degree
+from pyearth.gis.spatialref.convert_between_degree_and_meter  import degree_to_meter
+from pyearth.gis.spatialref.convert_between_degree_and_meter  import meter_to_degree
 from pyearth.gis.gdal.read.vector.gdal_read_geojson_boundary import gdal_read_geojson_boundary
 from pyearth.toolbox.data.geoparquet.convert_geojson_to_geoparquet import convert_geojson_to_geoparquet
 from pyearth.gis.gdal.read.raster.gdal_read_geotiff_file import gdal_read_geotiff_file
@@ -125,6 +125,7 @@ class flowlinecase(object):
     iFlag_break_by_distance = 0  #if the distance between two vertice are far,
     iFlag_analysis = 0
     iFlag_evaluation = 0 #run evaluation or not
+    iFlag_fill_hole = 0 #fill holes in the mesh
     iResolution_index = 10
     iFlag_run_dggrid = 0
     nOutlet = 1 #by default , there shoule ne only one ouelet
@@ -319,6 +320,11 @@ class flowlinecase(object):
         else:
             self.iFlag_run_dggrid=0
 
+        if 'iFlag_fill_hole' in aConfig_in:
+            self.iFlag_fill_hole = int(aConfig_in['iFlag_fill_hole'])
+        else:
+            self.iFlag_fill_hole=0
+
         if 'iResolution_index' in aConfig_in:
             self.iResolution_index = int(aConfig_in['iResolution_index'])
         else:
@@ -373,9 +379,7 @@ class flowlinecase(object):
         if 'sFilename_dem' in aConfig_in:
             self.sFilename_dem = aConfig_in['sFilename_dem']
 
-        if self.iFlag_run_dggrid == 1:
-            if 'sFilename_dggrid' in aConfig_in:
-                self.sFilename_dggrid = aConfig_in['sFilename_dggrid']
+
 
         if 'sFilename_mpas_mesh_netcdf' in aConfig_in:
             self.sFilename_mpas_mesh_netcdf = aConfig_in['sFilename_mpas_mesh_netcdf']
@@ -435,11 +439,19 @@ class flowlinecase(object):
                     else:
                         if sMesh_type =='dggrid':
                             self.iMesh_type = 5
+                            self.iFlag_run_dggrid = 1
                         else:
                             if sMesh_type =='tin': #
                                 self.iMesh_type = 6
                             else:
                                 print('Unsupported mesh type?')
+
+        if self.sMesh_type == 'dggrid':
+            self.dResolution_meter = dggrid_find_resolution_by_index(self.sDggrid_type, self.iResolution_index)
+
+        if self.iFlag_run_dggrid == 1:
+            if 'sFilename_dggrid' in aConfig_in:
+                self.sFilename_dggrid = aConfig_in['sFilename_dggrid']
 
         #the model can be run as part of hexwatershed or standalone
         if self.iFlag_standalone == 1:
@@ -589,19 +601,19 @@ class flowlinecase(object):
                 #search for system wide binary in the system path
                 iFlag_found_binary = 0
                 for folder in os.environ['PATH'].split(os.pathsep):
-                    sFilename_dggrid_bin = os.path.join(folder, sFilename_executable)
-                    if os.path.isfile(sFilename_dggrid_bin):
-                        print('Found binary at:', sFilename_dggrid_bin)
+                    sFilename_jigsaw_bin = os.path.join(folder, sFilename_executable)
+                    if os.path.isfile(sFilename_jigsaw_bin):
+                        print('Found binary at:', sFilename_jigsaw_bin)
                         iFlag_found_binary = 1
                         break
                 else:
                     print('Binary not found in system path.')
                 if iFlag_found_binary ==1:
                     sFilename_new = sWorkspace_output + slash + 'jigsaw'
-                    copy2(sFilename_dggrid_bin, sFilename_new)
+                    copy2(sFilename_jigsaw_bin, sFilename_new)
                     os.chmod(sFilename_new, stat.S_IREAD | stat.S_IWRITE | stat.S_IXUSR)
                 else:
-                    print('Binary not found in system path.')
+                    print('Binary not found.')
                     return
             pass
         if self.iFlag_run_dggrid == 1:
@@ -921,7 +933,7 @@ class flowlinecase(object):
             sFilename_mesh = self.sFilename_mesh
             if iMesh_type ==1: #hexagon
                 #hexagon edge
-                dResolution_meter = degree_to_meter(dLatitude_mean, dResolution_degree )
+                dResolution_meter = degree_to_meter(dResolution_degree, dLatitude_mean )
                 dArea = np.power(dResolution_meter,2.0)
                 dLength_edge = np.sqrt(  2.0 * dArea / (3.0* np.sqrt(3.0))  )
                 if iFlag_rotation ==0:
@@ -984,7 +996,7 @@ class flowlinecase(object):
                     self.aCell = aSquare
                 else:
                     if iMesh_type ==3: #latlon
-                        dResolution_meter = degree_to_meter(self.dLatitude_mean, dResolution_degree)
+                        dResolution_meter = degree_to_meter(dResolution_degree,self.dLatitude_mean )
                         dArea = np.power(dResolution_meter,2.0)
                         ncolumn= int( (dLongitude_right - dLongitude_left) / dResolution_degree )
                         nrow= int( (dLatitude_top - dLatitude_bot) / dResolution_degree )
@@ -1021,17 +1033,18 @@ class flowlinecase(object):
                             dLatitude_bot    = self.dLatitude_bot
                             dLongitude_left  = self.dLongitude_left
                             dLongitude_right = self.dLongitude_right
-                            if iFlag_antarctic ==1 or iFlag_arctic ==1:
+                            if iFlag_antarctic == 1 or iFlag_arctic == 1:
                                 aMpas = create_mpas_mesh(sFilename_mesh,
-                                            iFlag_global_in = iFlag_global,
-                                        iFlag_use_mesh_dem_in = iFlag_use_mesh_dem,
-                                        iFlag_save_mesh_in = iFlag_save_mesh,
-                                                         sFilename_mpas_mesh_netcdf_in= sFilename_mpas_mesh_netcdf,
-                                                         iFlag_run_jigsaw_in = self.iFlag_run_jigsaw,
-                                                         iFlag_antarctic_in=iFlag_antarctic,
-                                                          iFlag_arctic_in=iFlag_arctic,
-                                                          aConfig_jigsaw_in = self.aConfig_jigsaw,
-                                                          sWorkspace_jigsaw_in = self.sWorkspace_jigsaw)
+                                                        iFlag_global_in = iFlag_global,
+                                                        iFlag_use_mesh_dem_in = iFlag_use_mesh_dem,
+                                                        iFlag_save_mesh_in = iFlag_save_mesh,
+                                                        sFilename_mpas_mesh_netcdf_in= sFilename_mpas_mesh_netcdf,
+
+                                                        iFlag_run_jigsaw_in = self.iFlag_run_jigsaw,
+                                                        iFlag_antarctic_in=iFlag_antarctic,
+                                                        iFlag_arctic_in=iFlag_arctic,
+                                                        aConfig_jigsaw_in = self.aConfig_jigsaw,
+                                                        sWorkspace_jigsaw_in = self.sWorkspace_jigsaw)
                                 pass
                             else:
                                 if iFlag_mesh_boundary ==1:
@@ -1039,19 +1052,27 @@ class flowlinecase(object):
                                     #read boundary
                                     pBoundary_wkt, aExtent = gdal_read_geojson_boundary(self.sFilename_mesh_boundary_geojson)
                                     print(sFilename_mpas_mesh_netcdf)
+                                    iFlag_land_ocean_mask = 1
+                                    if iFlag_land_ocean_mask == 1:
+                                        sFilename_land_ocean_mask_in = self.sFilename_mesh_boundary_geojson
+                                    else:
+                                        sFilename_land_ocean_mask_in = None
+                                        pass
                                     aMpas = create_mpas_mesh(sFilename_mesh,
                                             iFlag_global_in = iFlag_global,
-                                        iFlag_use_mesh_dem_in = iFlag_use_mesh_dem,
-                                        iFlag_save_mesh_in = iFlag_save_mesh,
-                                                                 iFlag_run_jigsaw_in = self.iFlag_run_jigsaw,
-                                                             iFlag_antarctic_in=iFlag_antarctic_in,
-                                                             iFlag_arctic_in=iFlag_arctic_in,
-                                                              sWorkspace_jigsaw_in = self.sWorkspace_jigsaw,
-                                                              sFilename_mpas_mesh_netcdf_in= sFilename_mpas_mesh_netcdf,
-                                                              sFilename_jigsaw_mesh_netcdf_in= sFilename_jigsaw_mesh_netcdf,
-                                                              aConfig_jigsaw_in = self.aConfig_jigsaw,
-                                                             pBoundary_in = pBoundary_wkt)
-                                    pass
+                                            iFlag_use_mesh_dem_in = iFlag_use_mesh_dem,
+                                            iFlag_save_mesh_in = iFlag_save_mesh,
+                                                                     iFlag_run_jigsaw_in = self.iFlag_run_jigsaw,
+                                                                 iFlag_antarctic_in=iFlag_antarctic_in,
+                                                                 iFlag_arctic_in=iFlag_arctic_in,
+                                                                  sWorkspace_jigsaw_in = self.sWorkspace_jigsaw,
+                                                                  sFilename_mpas_mesh_netcdf_in= sFilename_mpas_mesh_netcdf,
+                                                                  sFilename_jigsaw_mesh_netcdf_in= sFilename_jigsaw_mesh_netcdf,
+                                                                   sFilename_land_ocean_mask_in = sFilename_land_ocean_mask_in,
+                                                                  aConfig_jigsaw_in = self.aConfig_jigsaw,
+                                                                 pBoundary_in = pBoundary_wkt)
+
+
                                 else:
                                     pRing = ogr.Geometry(ogr.wkbLinearRing)
                                     pRing.AddPoint(dLongitude_left, dLatitude_top)
@@ -1179,7 +1200,7 @@ class flowlinecase(object):
                                                 pBoundary_wkt =  pBoundary.ExportToWkt()
                                                 #new method using polygon object
                                                 aMpas = create_tin_mesh(iFlag_global, iFlag_use_mesh_dem, iFlag_save_mesh,
-                                                                         sFilename_mesh_netcdf, sFilename_mesh,
+                                                                         sFilename_jigsaw_mesh_netcdf, sFilename_mesh,
                                                                           iFlag_run_jigsaw_in = self.iFlag_run_jigsaw,
                                                                          iFlag_antarctic_in= iFlag_antarctic_in,
                                                                          iFlag_arctic_in=iFlag_arctic_in,
@@ -1483,17 +1504,21 @@ class flowlinecase(object):
 
         sFilename_json = self.sFilename_mesh_info
 
-        #if iFlag_flowline == 1: #if there is conceptual flowline
-        #    pass
-        #else:
-        #    #only mesh, no flowline
-        #    pass
+        #with open(sFilename_json, 'w', encoding='utf-8') as f:
+        #    sJson = json.dumps([json.loads(ob.tojson()) for ob in self.aCell], indent = 4)
+        #    f.write(sJson)
+        #    f.close()
 
-
+        #a more efficient way to handle large datasets
         with open(sFilename_json, 'w', encoding='utf-8') as f:
-            sJson = json.dumps([json.loads(ob.tojson()) for ob in self.aCell], indent = 4)
-            f.write(sJson)
-            f.close()
+            f.write('[\n')
+            for i, ob in enumerate(self.aCell):
+                sJson = json.dumps(json.loads(ob.tojson()), indent=4)
+                if i < len(self.aCell) - 1:
+                    f.write(sJson + ',\n')
+                else:
+                    f.write(sJson + '\n')
+            f.write(']\n')
 
         return
 

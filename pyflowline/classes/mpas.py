@@ -120,7 +120,14 @@ class pympas(pycell):
             self.calculate_cell_bound() #bound for rtree
             pass
         pass
+
     def calculate_cell_bound(self):
+        """
+        Calculate the bounding box of a cell,
+        this method may need to consider whether a mesh cell crosses the international date line
+        this method should also be used for the rtree index
+        this method should also be used by other unstructured mesh cells, such as dggrid?
+        """
         dLat_min = 90
         dLat_max = -90
         dLon_min = 180
@@ -131,7 +138,13 @@ class pympas(pycell):
             dLat_max = np.max( [dLat_max, self.aVertex[i].dLatitude_degree] )
             dLat_min = np.min( [dLat_min, self.aVertex[i].dLatitude_degree] )
 
-        self.pBound = (dLon_min, dLat_min, dLon_max, dLat_max)
+        if dLon_max - dLon_min > 180: #cross the international date line
+            tmp = dLon_max  #swap the value
+            dLon_max = dLon_min + 360
+            dLon_min = tmp
+            self.pBound = (dLon_min, dLat_min, dLon_max, dLat_max)
+        else:
+            self.pBound = (dLon_min, dLat_min, dLon_max, dLat_max)
         return self.pBound
 
     def has_this_edge(self, pEdge_in):
@@ -224,7 +237,6 @@ class pympas(pycell):
                     break
 
         return iFlag_share
-
 
     def tojson(self):
         """

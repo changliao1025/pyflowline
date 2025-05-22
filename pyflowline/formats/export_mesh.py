@@ -1,8 +1,6 @@
 import os
 import json
 
-
-
 def convert_mesh_to_kml(sFilename_geojson_in, sFilename_kml_out):
     """
     Convert the mesh to a kml file
@@ -35,7 +33,6 @@ def convert_mesh_to_kml(sFilename_geojson_in, sFilename_kml_out):
 
     return
 
-
 def export_mesh_info_to_json(aCell_in, aFlowline_in, aCellID_outlet_iin, sFilename_json_in):
     """
     Export the mesh information into a json file
@@ -46,7 +43,7 @@ def export_mesh_info_to_json(aCell_in, aFlowline_in, aCellID_outlet_iin, sFilena
         aCellID_outlet_iin (_type_): _description_
         sFilename_json_in (_type_): _description_
     """
-    if os.path.exists(sFilename_json_in): 
+    if os.path.exists(sFilename_json_in):
         os.remove(sFilename_json_in)
         pass
     ncell=len(aCell_in)
@@ -76,14 +73,14 @@ def export_mesh_info_to_json(aCell_in, aFlowline_in, aCellID_outlet_iin, sFilena
                                 aCell_in[l].iStream_segment_burned = iStream_segment
                                 aCell_in[l].iStream_order_burned = iStream_order
                             break
-                        
-                        
+
+
         pass
-    
+
 
     with open(sFilename_json_in, 'w', encoding='utf-8') as f:
-        sJson = json.dumps([json.loads(ob.tojson()) for ob in aCell_in], indent = 4)        
-        f.write(sJson)    
+        sJson = json.dumps([json.loads(ob.tojson()) for ob in aCell_in], indent = 4)
+        f.write(sJson)
         f.close()
-    
+
     return

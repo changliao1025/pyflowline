@@ -5,7 +5,7 @@ import time
 
 import numpy as np
 import xarray as xr
-from pyearth.system.python.retrieve_python_environment import retrieve_python_environment
+from pyearth.system.python.get_python_environment import get_python_environment
 from pyflowline.mesh.mpas.mpas_tools.mpasmsh import jigsaw_mesh_to_netcdf, inject_edge_tags
 
 from mpas_tools.mesh.conversion import convert
@@ -57,7 +57,7 @@ def savetin(sWorkspace_jigsaw_out, geom, mesh):
     print("running:", " ".join(args))
 
 
-    sConda_env_path , sConda_env_name = retrieve_python_environment()
+    sConda_env_path , sConda_env_name = get_python_environment()
     sPython = sConda_env_path + "/bin/python3"
     args = [sPython] + args
     sEnv = os.environ.copy()

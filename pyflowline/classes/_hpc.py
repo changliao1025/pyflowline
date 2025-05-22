@@ -1,12 +1,12 @@
 import os
 import stat
 from pathlib import Path
-from pyearth.system.python.retrieve_python_environment import retrieve_python_environment
+from pyearth.system.python.get_python_environment import get_python_environment
 def _pyflowline_create_hpc_job(self, sSlurm_in=None, hours_in = 10):
     """create a HPC job for this simulation
     """
     os.chdir(self.sWorkspace_output)
-    sConda_env_path , sConda_env_name = retrieve_python_environment()
+    sConda_env_path , sConda_env_name = get_python_environment()
     # part 1 python script
 
     sFilename_pyflowline = os.path.join(
@@ -98,9 +98,9 @@ def _pyflowline_create_hpc_job(self, sSlurm_in=None, hours_in = 10):
         sLine = 'module load gdal/2.3.1' + '\n'
         ofs.write(sLine)
 
-    sLine = 'module load python/miniconda4.12.0 ' + '\n'
+    sLine = 'module load python/miniconda2024May29 ' + '\n'
     ofs.write(sLine)
-    sLine = 'source /share/apps/python/miniconda4.12.0/etc/profile.d/conda.sh' + '\n'
+    sLine = 'source /share/apps/python/miniconda2024May29/etc/profile.d/conda.sh' + '\n'
     ofs.write(sLine)
     sLine = 'conda activate '+ sConda_env_name + '\n'
     ofs.write(sLine)

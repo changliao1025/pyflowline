@@ -7,7 +7,7 @@ if iFlag_cython is not None:
     from tinyr import RTree
     iFlag_use_rtree = 1
 else:
-    iFlag_use_rtree =0
+    iFlag_use_rtree = 0
     from pyflowline.algorithms.auxiliary.find_vertex_in_list import find_vertex_in_list
 
 
@@ -71,17 +71,17 @@ def find_vertex_on_edge(aVertex_in, pEdge_in):
 
                     pass
 
-            #re-order
-            if iFlag_exist == 1 :
-                x = np.array(aDistance)
-                b = np.argsort(x)
-                c = np.array(aIndex)
-                d= c[b]
-                aIndex_order = list(d)
+        #re-order, regardless of using rtree or not
+        if iFlag_exist == 1 :
+            x = np.array(aDistance)
+            b = np.argsort(x)
+            c = np.array(aIndex)
+            d= c[b]
+            aIndex_order = list(d)
     else:
         pass
 
-    return iFlag_exist, npoint , aIndex_order
+    return iFlag_exist, npoint, aIndex_order
 
 def find_edge_in_list(aEdge_in, pEdge_in):
     """[find the index of an edge in a list]

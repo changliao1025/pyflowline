@@ -61,10 +61,10 @@ def calculate_distance_between_flowlines(pFlowline_a, pFlowline_b, dDistance_buf
     return dDistance_minimal
 
 
-def simplify_hydroshed(sFilename_flowline_hydroshed_in,
+def simplify_hydrosheds_river_network(sFilename_flowline_hydroshed_in,
                        sFilename_flowline_hydroshed_out,
                        dDistance_tolerance_in,
-                        dDrainage_area_threshold_in        ):
+                        dDrainage_area_threshold_in):
     ### Simplify hydroshed flowlines
     #check file exists
     if not os.path.isfile(sFilename_flowline_hydroshed_in):

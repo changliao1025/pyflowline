@@ -513,6 +513,8 @@ class flowlinecase(object):
             str(Path(self.sWorkspace_output)), 'watershed_boundary.geojson')
         self.sFilename_mesh_boundary_geojson = os.path.join(
             str(Path(self.sWorkspace_output)), 'mesh_boundary.geojson')
+        self.sFilename_coastal_boundary_geojson = os.path.join(
+            str(Path(self.sWorkspace_output)), 'coastal_boundary.geojson')
         # model generated files
         self.sFilename_mesh = os.path.join(
             str(Path(self.sWorkspace_output)), sMesh_type + ".geojson")
@@ -724,7 +726,6 @@ class flowlinecase(object):
                         print(
                             "The coastal boundary file does not exist, the mesh boundary will be used instead!")
                         self.sFilename_coastal_boundary = self.sFilename_mesh_boundary
-                        self.sFilename_coastal_boundary_geojson = self.sFilename_mesh_boundary_geojson
                     pass
 
             if sMesh_type == 'hexagon':  # hexagon #need spatial referece
@@ -951,6 +952,16 @@ class flowlinecase(object):
             self.sFilename_mesh_boundary_geojson)
         self.dLongitude_mean = 0.5 * (aExtent[0] + aExtent[2])
         self.dLatitude_mean = 0.5 * (aExtent[1] + aExtent[3])
+
+        #now do the coastal boundary
+        if self.iFlag_land_ocean_mask == 1:
+            sFilename_raw = self.sFilename_coastal_boundary
+            sFilename_out = self.sFilename_coastal_boundary_geojson
+            # check whether the file exists
+            if os.path.isfile(sFilename_raw):
+                convert_boundary_to_geojson(sFilename_raw, sFilename_out)
+            else:
+                print('The coastal boundary file does not exist!')
         return
 
     def pyflowline_flowline_simplification(self):

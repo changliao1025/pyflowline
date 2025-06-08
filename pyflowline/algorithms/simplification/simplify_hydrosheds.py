@@ -4,6 +4,7 @@ from osgeo import ogr, osr, gdal
 sys.setrecursionlimit(100000)
 from tinyr import RTree
 from pyearth.gis.spatialref.convert_between_degree_and_meter import meter_to_degree
+from pyearth.toolbox.geometry.create_gcs_buffer_zone import create_polyline_buffer_zone
 from pyflowline.classes.vertex import pyvertex
 from pyflowline.formats.convert_coordinates import convert_gcs_coordinates_to_flowline
 from pyflowline.formats.export_flowline import export_flowline_to_geojson
@@ -101,9 +102,6 @@ def simplify_hydrosheds_river_network(sFilename_flowline_hydroshed_in,
     aFlowlineID_outlet = []
 
 
-    #get the number of features
-    iNumber_of_features = pLayer_shapefile.GetFeatureCount()
-
     lFlowlineIndex = 0
     def convert_geometry_flowline(pGeometry_in, lFlowlineIndex, lID, lOutletID, lStream_order):
         aCoords = list()
@@ -125,11 +123,16 @@ def simplify_hydrosheds_river_network(sFilename_flowline_hydroshed_in,
         return pFlowline
 
 
-    for i in range(0, iNumber_of_features):
-        pFeature_shapefile = pLayer_shapefile.GetFeature(i)
+    #for i in range(0, iNumber_of_features):
+    for i, pFeature_shapefile in enumerate(pLayer_shapefile):
+        fid = pFeature_shapefile.GetFID()
+        #pFeature_shapefile = pLayer_shapefile.GetFeature(i)
         pGeometry_shapefile = pFeature_shapefile.GetGeometryRef()
         sGeometry_type = pGeometry_shapefile.GetGeometryName()
         lID = pFeature_shapefile.GetFieldAsInteger("HYRIV_ID")
+        #if lID == 70784289:
+        #    print('debugging flowline: ', lID)
+
         lOutletID = pFeature_shapefile.GetFieldAsInteger("MAIN_RIV")
         lStream_order = pFeature_shapefile.GetFieldAsInteger("ORD_STRA")
         #get the drainage area
@@ -199,22 +202,25 @@ def simplify_hydrosheds_river_network(sFilename_flowline_hydroshed_in,
     nFlowline_outlet = len(aFlowline_hydroshed_outlet)
     index_outlet = RTree(max_cap=5, min_cap=2)
     for i in range(nFlowline_outlet):
-        pBound= aFlowline_hydroshed_outlet[i].pBound
-        #add some buffer using the threshold
-        dLon_min, dLat_min, dLon_max, dLat_max = pBound
-        dBuffer_degree = meter_to_degree(dDistance_tolerance_in, (dLat_min + dLat_max) / 2.0)
-        pBound = ( dLon_min - dBuffer_degree, dLat_min - dBuffer_degree,
-                   dLon_max + dBuffer_degree, dLat_max + dBuffer_degree)
-        index_outlet.insert(i, pBound)  #
+        pflowline = aFlowline_hydroshed_outlet[i]
+        wkt = pflowline.wkt
+        wkt_buffer = create_polyline_buffer_zone(wkt, dDistance_tolerance_in)
+        # Convert the polygon wkt back to a bound (envelope)
+        pBuffer = ogr.CreateGeometryFromWkt(wkt_buffer)
+        pBound0 = pBuffer.GetEnvelope()
+        dLon_min, dLon_max, dLat_min, dLat_max = pBound0
+        pBound = (dLon_min, dLat_min, dLon_max, dLat_max)
+        index_outlet.insert(i, pBound)
         pass
 
     #use intersect to find the outlet flowlines that are too close
     for i in range(nFlowline_outlet):
-        pBound= aFlowline_hydroshed_outlet[i].pBound
-        dLon_min, dLat_min, dLon_max, dLat_max = pBound
-        dBuffer_degree = meter_to_degree(dDistance_tolerance_in, (dLat_min + dLat_max) / 2.0)
-        pBound = ( dLon_min - dBuffer_degree, dLat_min - dBuffer_degree,
-                   dLon_max + dBuffer_degree, dLat_max + dBuffer_degree)
+        wkt = aFlowline_hydroshed_outlet[i].wkt
+        wkt_buffer = create_polyline_buffer_zone(wkt, dDistance_tolerance_in)
+        pBuffer = ogr.CreateGeometryFromWkt(wkt_buffer)
+        pBound0 = pBuffer.GetEnvelope()
+        dLon_min, dLon_max, dLat_min, dLat_max = pBound0
+        pBound = (dLon_min, dLat_min, dLon_max, dLat_max)
         aIntersect = list(index_outlet.search(pBound))
         lon1 = 0.5 * (aFlowline_hydroshed_outlet[i].pVertex_start.dLongitude_degree + aFlowline_hydroshed_outlet[i].pVertex_end.dLongitude_degree)
         lat1 = 0.5 * (aFlowline_hydroshed_outlet[i].pVertex_start.dLatitude_degree + aFlowline_hydroshed_outlet[i].pVertex_end.dLatitude_degree)
@@ -250,6 +256,7 @@ def simplify_hydrosheds_river_network(sFilename_flowline_hydroshed_in,
     aFlowlineID_outlet = np.array(aFlowlineID_outlet).flatten()
 
     #step 2, upstream flowlines, if its most downstream flowline is in the outlet flowlines, we need to consider it
+    aFlowlineID = list()
     for pFlowline in aFlowline_hydroshed_outlet_simplified:
         lFlowlineID = pFlowline.lFlowlineID
         dummy_index = np.where(aFlowlineID_outlet == lFlowlineID)
@@ -258,6 +265,7 @@ def simplify_hydrosheds_river_network(sFilename_flowline_hydroshed_in,
             pFlowline_up = aFlowline_hydroshed_upstream_all[dummy_index[0][i]]
             pFlowline_up.lFlowlineIndex = lFlowlineIndex
             aFlowline_upstream.append(pFlowline_up)
+            aFlowlineID.append(pFlowline_up.lFlowlineID)
             lFlowlineIndex = lFlowlineIndex + 1
             aFlowlineID_downslope.append(pFlowline_up.lFlowlineID_downstream)
             pass
@@ -266,18 +274,17 @@ def simplify_hydrosheds_river_network(sFilename_flowline_hydroshed_in,
     #we do not smplify the outlet flowlines, only the upstream flowlines
     #build the rtree
     index_reach = RTree(max_cap=5, min_cap=2)
-    nFlowline = len(aFlowline_upstream)
-    aFlag_process=np.full(nFlowline, 0, dtype =int)
+    nFlowline_outlet = len(aFlowline_hydroshed_outlet_simplified)
+    #aFlag_process=np.full(nFlowline, 0, dtype = int)
 
-    for i in range(nFlowline):
-        pBound= aFlowline_upstream[i].pBound
-        #add a little buffer zone around the bound
-
-        dLon_min, dLat_min, dLon_max, dLat_max = pBound
-        #convert the distance to degree
-        dBuffer_degree = meter_to_degree(dDistance_tolerance_in, (dLat_min + dLat_max) / 2.0)
-        pBound = ( dLon_min - dBuffer_degree, dLat_min - dBuffer_degree,
-                   dLon_max + dBuffer_degree, dLat_max + dBuffer_degree)
+    for i in range(nFlowline_outlet):
+        pflowline = aFlowline_hydroshed_outlet_simplified[i]
+        wkt = pflowline.wkt
+        wkt_buffer = create_polyline_buffer_zone(wkt, dDistance_tolerance_in)
+        pBuffer = ogr.CreateGeometryFromWkt(wkt_buffer)
+        pBound0 = pBuffer.GetEnvelope()
+        dLon_min, dLon_max, dLat_min,  dLat_max = pBound0
+        pBound = (dLon_min, dLat_min, dLon_max, dLat_max)
         index_reach.insert(i, pBound)  #
         pass
 
@@ -296,25 +303,37 @@ def simplify_hydrosheds_river_network(sFilename_flowline_hydroshed_in,
     aAttribute_dtype=aAttribute_dtype)
     print('Number of all flowlines in the hydroshed: ', len(aFlowline_upstream))
 
-    def find_upstream_flowline(lFlowlineIndex_in):
-        lFlowlineID = aFlowline_upstream[lFlowlineIndex_in].lFlowlineID
-        dummy_index = np.where(aFlowlineID_downslope == lFlowlineID)
+    def find_upstream_flowline(lFlowlineID_in):
+        #lFlowlineID = aFlowline_upstream[lFlowlineIndex_in].lFlowlineID
+        dummy_index = np.where(aFlowlineID_downslope == lFlowlineID_in)
         aUpstream = dummy_index[0]
         nUpstream = len(aUpstream)
         return nUpstream, aUpstream
 
-
-    def mark_upstream(lFlowlineIndex_in):
-        print("mark_upstream", aFlowline_upstream[lFlowlineIndex_in].lFlowlineID)
-        if(aFlowline_upstream[lFlowlineIndex_in].iStream_order==1):
-            pass
-        else:
-            nUpstream, aUpstream = find_upstream_flowline(lFlowlineIndex_in)
-            if nUpstream > 0:
-                for j in range(nUpstream):
-                    pFlowline = aFlowline_upstream[ aUpstream[j] ]
-                    pFlowline.iFlag_keep = 0
-                    mark_upstream(  pFlowline.lFlowlineIndex )
+    def tag_upstream(lFlowlineID_in):
+        lFlowlineIndex= np.where(aFlowlineID == lFlowlineID_in)
+        pFlowline_downstream = aFlowline_upstream[lFlowlineIndex[0][0]]
+        nUpstream, aUpstream = find_upstream_flowline(lFlowlineID_in)
+        if nUpstream > 0:
+            if nUpstream == 1:
+                #check whether it intersects with existing any existing flowlines
+                pFlowline_a = aFlowline_upstream[aUpstream[0]]
+                #get its bound
+                wkt = pFlowline_a.wkt
+                wkt_buffer = create_polyline_buffer_zone(wkt, dDistance_tolerance_in)
+                pBuffer = ogr.CreateGeometryFromWkt(wkt_buffer)
+                pBound0 = pBuffer.GetEnvelope()
+                dLon_min, dLon_max, dLat_min,  dLat_max = pBound0
+                pBound = (dLon_min, dLat_min, dLon_max, dLat_max)
+                aIntersect = list(index_reach.search(pBound))
+                for j in range(len(aIntersect)):
+                    if aIntersect[j] != i:
+                        pFlowline_b = aFlowline_upstream[aIntersect[j]]
+                        dDistance = calculate_distance_between_flowlines(pFlowline_a, pFlowline_b, dDistance_tolerance_in )
+                else:
+                    if nUpstream == 2:
+                        pass
+                tag_upstream( pFlowline.lFlowlineID )
 
     def is_downstream(lFlowlineIndex__down, lFlowlineIndex__up):
         lFlowlineID_a = aFlowline_upstream[lFlowlineIndex__down].lFlowlineID
@@ -331,75 +350,23 @@ def simplify_hydrosheds_river_network(sFilename_flowline_hydroshed_in,
                 pass
             return 0
 
+    #retrieve all the drainage area of the outlet flowlines
+    aDrainage_area_outlet = np.array([pFlowline.dDrainage_area for pFlowline in aFlowline_hydroshed_outlet_simplified])
 
-    #use intersect to find the upstream flowlines
-    for i in range(nFlowline):
-        if aFlag_process[i] == 1:
-            continue
+    # Sort the outlet flowlines by drainage area (largest to smallest)
+    aFlowline_hydroshed_outlet_simplified = sorted(
+        aFlowline_hydroshed_outlet_simplified,
+        key=lambda x: x.dDrainage_area,
+        reverse=True  # Descending order (largest first)
+        )
 
-        print('Processing flowline: ', i, aFlowline_upstream[i].lFlowlineID)
-        pBound= aFlowline_upstream[i].pBound
-        dLon_min, dLat_min, dLon_max, dLat_max = pBound
-        #convert the distance to degree
-        dBuffer_degree = meter_to_degree(dDistance_tolerance_in, (dLat_min + dLat_max) / 2.0)
-        pBound = ( dLon_min - dBuffer_degree, dLat_min - dBuffer_degree,
-                   dLon_max + dBuffer_degree, dLat_max + dBuffer_degree)
-        aIntersect = list(index_reach.search(pBound))
-        lon1 = 0.5 * (aFlowline_upstream[i].pVertex_start.dLongitude_degree + aFlowline_upstream[i].pVertex_end.dLongitude_degree)
-        lat1 = 0.5 * (aFlowline_upstream[i].pVertex_start.dLatitude_degree + aFlowline_upstream[i].pVertex_end.dLatitude_degree)
-        for j in range(len(aIntersect)):
-            if i != aIntersect[j] :
-                if aFlowline_upstream[aIntersect[j]].iFlag_keep == 0:
-                    continue
-                #calculate the distance between two flowlines
-                #check whether they share a end point
-                lon2 = 0.5 * (aFlowline_upstream[aIntersect[j]].pVertex_start.dLongitude_degree + aFlowline_upstream[aIntersect[j]].pVertex_end.dLongitude_degree)
-                lat2 = 0.5 * (aFlowline_upstream[aIntersect[j]].pVertex_start.dLatitude_degree + aFlowline_upstream[aIntersect[j]].pVertex_end.dLatitude_degree)
-                if aFlowline_upstream[i].pVertex_end == aFlowline_upstream[aIntersect[j]].pVertex_end:
-                    print(lon1, lat1, lon2, lat2)
-                    pass
-                else:
-                    dDistance = calculate_distance_between_flowlines(aFlowline_upstream[i], aFlowline_upstream[aIntersect[j]], dDistance_tolerance_in * 2)
-                    dDistance2 = calculate_distance_based_on_longitude_latitude(lon1, lat1, lon2, lat2)
-                    iStream_segment_a= aFlowline_upstream[i].iStream_segment
-                    iStream_segment_b= aFlowline_upstream[aIntersect[j]].iStream_segment
-                    iStream_order_a = aFlowline_upstream[i].iStream_order
-                    iStream_order_b = aFlowline_upstream[aIntersect[j]].iStream_order
-                    dDrainage_area_a = aFlowline_upstream[i].dDrainage_area
-                    dDrainage_area_b = aFlowline_upstream[aIntersect[j]].dDrainage_area
-                    if iStream_segment_a == iStream_segment_b: #same basin
-                        if is_downstream(aIntersect[j], i) == 1 or is_downstream(i, aIntersect[j]) == 1:
-                            #they are on the same channel
-                            continue
-                        else: #same river basin but different subbasin
-                            if dDistance < dDistance_tolerance_in:
-                                if dDrainage_area_a > dDrainage_area_b:
-                                    aFlowline_upstream[aIntersect[j]].iFlag_keep = 0
-                                    #mark all upstream flowlines as 0
-                                    mark_upstream( aIntersect[j] )
-                                else:
-                                    aFlowline_upstream[i].iFlag_keep = 0
-                                    mark_upstream( i )
-                                pass
+    #now let's use this sorted list to greedily simplify the upstream flowlines
+    nFlowline_outlet = len(aFlowline_hydroshed_outlet_simplified)
+    for i in range(nFlowline_outlet):
+        pFlowline_outlet = aFlowline_hydroshed_outlet_simplified[i]
+        lFlowlineID = pFlowline_outlet.lFlowlineID
+        tag_upstream(lFlowlineID)
 
-                    else: #different river basin
-                        if dDistance < dDistance_tolerance_in:
-                            #we need remove one of them
-                            if dDrainage_area_a > dDrainage_area_b :
-                                aFlowline_upstream[aIntersect[j]].iFlag_keep = 0
-                                #mark all upstream flowlines as 0
-                                mark_upstream( aIntersect[j] )
-                            else:
-                                aFlowline_upstream[i].iFlag_keep = 0
-                                mark_upstream( i )
-
-                pass
-            pass
-
-    aFlowline_upstream_simplified = list()
-    for i in range(nFlowline):
-        if aFlowline_upstream[i].iFlag_keep == 1:
-            aFlowline_upstream_simplified.append(aFlowline_upstream[i])
 
     #save the flowlines
     aFlowline_after_distance_operation = aFlowline_hydroshed_outlet_simplified + aFlowline_upstream_simplified

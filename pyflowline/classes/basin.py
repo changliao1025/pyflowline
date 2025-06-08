@@ -188,106 +188,107 @@ class pybasin(object):
     else:
         pass
 
-    def __init__(self, aParameter):
+    def __init__(self, aConfig_in, iFlag_create_directory_in = 1):
         """
         Initialize the basin class object
 
         Args:
-            aParameter (dict): Dictionary for parameters
+            aConfig_in (dict): Dictionary for parameters
         """
 
-        if 'lBasinID' in aParameter:
-            self.lBasinID             = int(aParameter['lBasinID'])
+        if 'lBasinID' in aConfig_in:
+            self.lBasinID             = int(aConfig_in['lBasinID'])
         else:
             self.lBasinID   = 1
 
 
-        if 'lCellID_outlet' in aParameter:
-            self.lCellID_outlet             = int(aParameter['lCellID_outlet'])
+        if 'lCellID_outlet' in aConfig_in:
+            self.lCellID_outlet             = int(aConfig_in['lCellID_outlet'])
         else:
             self.lCellID_outlet   = -1
 
-        if 'iFlag_disconnected' in aParameter:
-            self.iFlag_disconnected             = int(aParameter['iFlag_disconnected'])
+        if 'iFlag_disconnected' in aConfig_in:
+            self.iFlag_disconnected             = int(aConfig_in['iFlag_disconnected'])
         else:
             self.iFlag_disconnected   = 0
 
-        if 'iFlag_remove_small_river' in aParameter:
-            self.iFlag_remove_small_river             = int(aParameter['iFlag_remove_small_river'])
+        if 'iFlag_remove_small_river' in aConfig_in:
+            self.iFlag_remove_small_river             = int(aConfig_in['iFlag_remove_small_river'])
         else:
             self.iFlag_remove_small_river   = 0
 
-        if 'iFlag_remove_low_order_river' in aParameter:
-            self.iFlag_remove_low_order_river = int(aParameter['iFlag_remove_low_order_river'])
+        if 'iFlag_remove_low_order_river' in aConfig_in:
+            self.iFlag_remove_low_order_river = int(aConfig_in['iFlag_remove_low_order_river'])
         else:
             self.iFlag_remove_low_order_river = 0
 
-        if 'iFlag_correct_flowline_direction' in aParameter:
-            self.iFlag_correct_flowline_direction             = int(aParameter['iFlag_correct_flowline_direction'])
+        if 'iFlag_correct_flowline_direction' in aConfig_in:
+            self.iFlag_correct_flowline_direction             = int(aConfig_in['iFlag_correct_flowline_direction'])
         else:
             self.iFlag_correct_flowline_direction   = 0
 
-        if 'iFlag_dam' in aParameter:
-            self.iFlag_dam             = int(aParameter['iFlag_dam'])
+        if 'iFlag_dam' in aConfig_in:
+            self.iFlag_dam             = int(aConfig_in['iFlag_dam'])
         else:
             self.iFlag_dam   = 0
 
-        if 'iFlag_debug' in aParameter:
-            self.iFlag_debug             = int(aParameter['iFlag_debug'])
+        if 'iFlag_debug' in aConfig_in:
+            self.iFlag_debug             = int(aConfig_in['iFlag_debug'])
         else:
             self.iFlag_debug   = 0
 
-        if 'dLongitude_outlet_degree' in aParameter:
-            self.dLongitude_outlet_degree             = float(aParameter['dLongitude_outlet_degree'])
+        if 'dLongitude_outlet_degree' in aConfig_in:
+            self.dLongitude_outlet_degree             = float(aConfig_in['dLongitude_outlet_degree'])
         else:
             self.dLongitude_outlet_degree   = -9999.
 
-        if 'dLatitude_outlet_degree' in aParameter:
-            self.dLatitude_outlet_degree             = float(aParameter['dLatitude_outlet_degree'])
+        if 'dLatitude_outlet_degree' in aConfig_in:
+            self.dLatitude_outlet_degree             = float(aConfig_in['dLatitude_outlet_degree'])
         else:
             self.dLatitude_outlet_degree   = -9999.
 
-        if 'dThreshold_small_river' in aParameter:
-            self.dThreshold_small_river             = float(aParameter['dThreshold_small_river'])
+        if 'dThreshold_small_river' in aConfig_in:
+            self.dThreshold_small_river             = float(aConfig_in['dThreshold_small_river'])
         else:
             self.dThreshold_small_river   = 10000.0
 
-        if 'dAccumulation_threshold' in aParameter:
-            self.dAccumulation_threshold             = float(aParameter['dAccumulation_threshold'])
+        if 'dAccumulation_threshold' in aConfig_in:
+            self.dAccumulation_threshold             = float(aConfig_in['dAccumulation_threshold'])
         else:
             self.dAccumulation_threshold = 100000.0
 
-        if 'sFilename_flowline_raw' in aParameter:
-            self.sFilename_flowline_raw = aParameter['sFilename_flowline_raw']
+        if 'sFilename_flowline_raw' in aConfig_in:
+            self.sFilename_flowline_raw = aConfig_in['sFilename_flowline_raw']
         else:
             self.sFilename_flowline_raw   = ''
 
-        if 'sFilename_flowline_filter' in aParameter:
-            self.sFilename_flowline_filter = aParameter['sFilename_flowline_filter']
+        if 'sFilename_flowline_filter' in aConfig_in:
+            self.sFilename_flowline_filter = aConfig_in['sFilename_flowline_filter']
         else:
             self.sFilename_flowline_filter = ''
 
-        if 'sWorkspace_output_basin' in aParameter:
-            self.sWorkspace_output_basin = aParameter['sWorkspace_output_basin']
+        if 'sWorkspace_output_basin' in aConfig_in:
+            self.sWorkspace_output_basin = aConfig_in['sWorkspace_output_basin']
         else:
             self.sWorkspace_output_basin = '.'
 
-        Path(self.sWorkspace_output_basin).mkdir(parents=True, exist_ok=True)
+        if iFlag_create_directory_in == 1:
+            Path(self.sWorkspace_output_basin).mkdir(parents=True, exist_ok=True)
 
         self.sFilename_flowline_filter_geojson = os.path.join(str(self.sWorkspace_output_basin ), "flowline_filter.geojson"  )
 
-        if 'sFilename_dam' in aParameter:
-            self.sFilename_dam = aParameter['sFilename_dam']
+        if 'sFilename_dam' in aConfig_in:
+            self.sFilename_dam = aConfig_in['sFilename_dam']
         else:
             self.sFilename_dam  = ''
 
-        if 'sFilename_flowline_topo' in aParameter:
-            self.sFilename_flowline_topo = aParameter['sFilename_flowline_topo']
+        if 'sFilename_flowline_topo' in aConfig_in:
+            self.sFilename_flowline_topo = aConfig_in['sFilename_flowline_topo']
         else:
             self.sFilename_flowline_topo = ''
 
-        if 'sMesh_type' in aParameter:
-            self.sMesh_type =  aParameter['sMesh_type']
+        if 'sMesh_type' in aConfig_in:
+            self.sMesh_type =  aConfig_in['sMesh_type']
         else:
             self.sMesh_type = 'hexagon'
 

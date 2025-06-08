@@ -218,6 +218,7 @@ class flowlinecase(object):
 
     def __init__(self, aConfig_in,
                  iFlag_standalone_in=None,
+                 iFlag_create_directory_in = 1,
                  sModel_in=None,
                  sDate_in=None,
                  sWorkspace_output_in=None):
@@ -476,7 +477,9 @@ class flowlinecase(object):
             # use specified output path, also do not add output or input tag
             sPath = self.sWorkspace_output
 
-        Path(sPath).mkdir(parents=True, exist_ok=True)
+        if iFlag_create_directory_in == 1:
+            Path(sPath).mkdir(parents=True, exist_ok=True)
+
         self.aBasin = list()
         if self.iFlag_flowline == 1:
             if 'sFilename_basins' in aConfig_in:
@@ -603,9 +606,9 @@ class flowlinecase(object):
         if self.iFlag_run_jigsaw == 1:
             # create dggrid output folder
             if self.iFlag_standalone == 1:
-                sWorkspace_output = self.sWorkspace_output + slash + 'jigsaw'
+                sWorkspace_output = os.path.join(self.sWorkspace_output , 'jigsaw')
             else:
-                sWorkspace_output = self.sWorkspace_output + slash + '..' + slash + 'jigsaw'
+                sWorkspace_output = os.path.join(self.sWorkspace_output, '..', 'jigsaw')
                 sWorkspace_output = os.path.abspath(sWorkspace_output)
 
             # check if the folder exists
@@ -618,7 +621,7 @@ class flowlinecase(object):
             # then copy the binary file to the folder
             # copy execulate
             if self.iFlag_user_provided_binary == 1:
-                sFilename_new = sWorkspace_output + slash + 'jigsaw'
+                sFilename_new = os.path.join(sWorkspace_output , 'jigsaw')
                 copy2(self.sFilename_dggrid, sFilename_new)
                 os.chmod(sFilename_new, stat.S_IREAD |
                          stat.S_IWRITE | stat.S_IXUSR)
@@ -646,7 +649,7 @@ class flowlinecase(object):
                 else:
                     print('Binary not found in system path.')
                 if iFlag_found_binary == 1:
-                    sFilename_new = sWorkspace_output + slash + 'jigsaw'
+                    sFilename_new = os.path.join(sWorkspace_output , 'jigsaw')
                     copy2(sFilename_jigsaw_bin, sFilename_new)
                     os.chmod(sFilename_new, stat.S_IREAD |
                              stat.S_IWRITE | stat.S_IXUSR)
@@ -657,9 +660,9 @@ class flowlinecase(object):
         if self.iFlag_run_dggrid == 1:
             # create dggrid output folder
             if self.iFlag_standalone == 1:
-                sWorkspace_output = self.sWorkspace_output + slash + 'dggrid'
+                sWorkspace_output = os.path.join(self.sWorkspace_output , 'dggrid')
             else:
-                sWorkspace_output = self.sWorkspace_output + slash + '..' + slash + 'dggrid'
+                sWorkspace_output = os.path.join(self.sWorkspace_output, '..', 'dggrid')
                 sWorkspace_output = os.path.abspath(sWorkspace_output)
 
             if os.path.exists(sWorkspace_output):
@@ -671,7 +674,7 @@ class flowlinecase(object):
             # then copy the binary file to the folder
             # copy execulate
             if self.iFlag_user_provided_binary == 1:
-                sFilename_new = sWorkspace_output + slash + 'dggrid'
+                sFilename_new = os.path.join(sWorkspace_output, 'dggrid')
                 copy2(self.sFilename_dggrid, sFilename_new)
                 os.chmod(sFilename_new, stat.S_IREAD |
                          stat.S_IWRITE | stat.S_IXUSR)
@@ -693,7 +696,7 @@ class flowlinecase(object):
                 else:
                     print('Binary not found in system path.')
                 if iFlag_found_binary == 1:
-                    sFilename_new = sWorkspace_output + slash + 'dggrid'
+                    sFilename_new = os.path.join(sWorkspace_output, 'dggrid')
                     copy2(sFilename_dggrid_bin, sFilename_new)
                     os.chmod(sFilename_new, stat.S_IREAD |
                              stat.S_IWRITE | stat.S_IXUSR)
@@ -1200,10 +1203,10 @@ class flowlinecase(object):
                                 dLongitude_left = self.dLongitude_left
                                 dLongitude_right = self.dLongitude_right
                                 if self.iFlag_standalone == 1:
-                                    sWorkspace_output = self.sWorkspace_output + slash + 'dggrid'
+                                    sWorkspace_output = os.path.join(self.sWorkspace_output, 'dggrid')
                                     pass
                                 else:
-                                    sWorkspace_output = self.sWorkspace_output + slash + '..' + slash + 'dggrid'
+                                    sWorkspace_output = os.path.join(self.sWorkspace_output, '..', 'dggrid')
                                     sWorkspace_output = os.path.abspath(
                                         sWorkspace_output)
                                     pass
@@ -1321,11 +1324,10 @@ class flowlinecase(object):
                                             dLongitude_left = self.dLongitude_left
                                             dLongitude_right = self.dLongitude_right
                                             if self.iFlag_standalone == 1:
-                                                sWorkspace_output = self.sWorkspace_output + slash + ''
+                                                sWorkspace_output = self.sWorkspace_output
                                                 pass
                                             else:
-                                                sWorkspace_output = self.sWorkspace_output + \
-                                                    slash + '..' + slash + 'tempestremap'
+                                                sWorkspace_output = os.path.join(self.sWorkspace_output, '..', 'tempestremap')
                                                 sWorkspace_output = os.path.abspath(
                                                     sWorkspace_output)
                                                 pass
@@ -1660,7 +1662,9 @@ class flowlinecase(object):
         print(self.tojson())
         return
 
-    def pyflowline_export_config_to_json(self, sFilename_output_in=None):
+    def pyflowline_export_config_to_json(self,
+                                         sFilename_output_in=None,
+                                         iFlag_export_basin_in = 1):
         """
         Export the configuration to a json file
 
@@ -1671,46 +1675,51 @@ class flowlinecase(object):
         if self.iFlag_standalone == 1:
             if sFilename_output_in is not None:
                 sFilename_output = sFilename_output_in
+                sPath_current = Path(sFilename_output).parent
             else:
                 # use current output path
                 sFilename_output = os.path.join(
                     self.sWorkspace_output, 'configuration.json')
+                sPath_current = Path(self.sWorkspace_output)
 
             # all basins
-            sName = 'configuration_basin.json'
-            sFilename_configuration = os.path.join(
-                self.sWorkspace_output, sName)
-            with open(sFilename_configuration, 'w', encoding='utf-8') as f:
-                sJson = json.dumps([json.loads(ob.tojson()) for ob in self.aBasin],
-                                   sort_keys=True,
-                                   indent=4)
-                f.write(sJson)
-                f.close()
-                # update
-            self.sFilename_basins = sFilename_configuration
-
+            if iFlag_export_basin_in == 1:
+                sName = 'configuration_basin.json'
+                sFilename_configuration = os.path.join(
+                    sPath_current, sName)
+                with open(sFilename_configuration, 'w', encoding='utf-8') as f:
+                    sJson = json.dumps([json.loads(ob.tojson()) for ob in self.aBasin],
+                                       sort_keys=True,
+                                       indent=4)
+                    f.write(sJson)
+                    f.close()
+                    # update
+                self.sFilename_basins = sFilename_configuration
         else:
             if sFilename_output_in is not None:
                 sFilename_output = sFilename_output_in
+                sPath_current = Path(sFilename_output).parent
             else:
                 # use parent path
-                sPath = Path(self.sWorkspace_output)
+                sPath_current = Path(self.sWorkspace_output)
                 sFilename_output = os.path.join(
-                    sPath.parent.absolute(), 'configuration.json')
-                # all basins
-            sPath = Path(self.sWorkspace_output)
-            sName = 'configuration_basin.json'
-            sFilename_configuration = os.path.join(
-                sPath.parent.absolute(), sName)
-            with open(sFilename_configuration, 'w', encoding='utf-8') as f:
-                sJson = json.dumps([json.loads(ob.tojson()) for ob in self.aBasin],
-                                   sort_keys=True,
-                                   indent=4)
-                f.write(sJson)
-                f.close()
-                # update for pyhexwatershed
-            self.sFilename_basins = sFilename_configuration
-            self.sWorkspace_output = sPath.parent.absolute()
+                    sPath_current, 'configuration.json')
+
+            # all basins
+            if iFlag_export_basin_in == 1:
+                sName = 'configuration_basin.json'
+                sFilename_configuration = os.path.join(
+                    sPath_current, sName)
+                with open(sFilename_configuration, 'w', encoding='utf-8') as f:
+                    sJson = json.dumps([json.loads(ob.tojson()) for ob in self.aBasin],
+                                       sort_keys=True,
+                                       indent=4)
+                    f.write(sJson)
+                    f.close()
+                    # update for pyhexwatershed
+                self.sFilename_basins = sFilename_configuration
+
+            self.sWorkspace_output = sPath_current.parent.absolute()
 
         aSkip = ['aBasin',
                  'aFlowline_simplified', 'aFlowline_conceptual', 'aCellID_outlet',

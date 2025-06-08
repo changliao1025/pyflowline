@@ -11,6 +11,7 @@ sDate_default = "{:04d}".format(pDate.year) + \
 
 def pyflowline_read_configuration_file(sFilename_configuration_in,
                                              iFlag_standalone_in=1,
+                                             iFlag_create_directory_in = None,
                                              iFlag_use_mesh_dem_in=None,
                                              iCase_index_in=None,
                                              iResolution_index_in = None,
@@ -153,6 +154,6 @@ def pyflowline_read_configuration_file(sFilename_configuration_in,
 
     # simulation
 
-    oPyflowline = flowlinecase(aConfig)
+    oPyflowline = flowlinecase(aConfig, iFlag_create_directory_in= iFlag_create_directory_in)
 
     return oPyflowline

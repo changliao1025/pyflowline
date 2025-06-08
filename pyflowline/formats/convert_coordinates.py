@@ -141,33 +141,8 @@ def convert_gcs_coordinates_to_flowline(aCoordinates_in):
     """
 
     npoint = len(aCoordinates_in)
-
-    #aVertex=list()
-    #for i in range(npoint):
-    #    x = aCoordinates_in[i][0]
-    #    y = aCoordinates_in[i][1]
-    #    dummy = dict()
-    #    dummy['dLongitude_degree'] = x
-    #    dummy['dLatitude_degree'] = y
-    #    pVertex = pyvertex(dummy)
-    #    aVertex.append(pVertex)
-
-    #simplified using a list comprehension.
-
     aVertex = [pyvertex({'dLongitude_degree': x, 'dLatitude_degree': y}) for x, y in aCoordinates_in]
-
-
-    #aEdge=list()
-    #for j in range(npoint-1):
-    #    if aVertex[j] == aVertex[j+1]:
-    #        print('Two vertices are the same')
-    #        pass
-    #    else:
-    #        pEdge = pyedge( aVertex[j], aVertex[j+1] )
-    #        aEdge.append(pEdge)
-
     aEdge = [pyedge(aVertex[j], aVertex[j+1]) for j in range(npoint - 1) if aVertex[j] != aVertex[j+1]]
-
     if len(aEdge) == 0:
         print('No edge is created')
         return None

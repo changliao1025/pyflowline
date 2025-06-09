@@ -101,6 +101,14 @@ class pyflowline(object):
         self.aFlowlineID_end_end = list()
         self.iFlag_keep = 1
 
+        #also build wkt string
+        pGeometry = ogr.Geometry(ogr.wkbLineString)
+        for i in range(nVertex):
+            pGeometry.AddPoint(self.aVertex[i].dLongitude_degree, self.aVertex[i].dLatitude_degree)
+
+        self.wkt = pGeometry.ExportToWkt()
+        pGeometry = None
+
         self.calculate_flowline_bound()
 
         return

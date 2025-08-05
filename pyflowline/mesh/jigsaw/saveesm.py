@@ -94,21 +94,6 @@ def saveesm(sWorkspace_jigsaw_out, geom, mesh,
     sEnv = os.environ.copy()
     subprocess.check_call(args, env=sEnv)
 
-    # adapted from CULL_MESH.py
-    #if sFilename_land_ocean_mask_in is None:
-    #    gf = GeometricFeatures(
-    #    cacheLocation="{}".format(os.path.join(
-    #        sWorkspace_jigsaw_out, ".", "data", "geometric_data")))
-    #    # start with the land coverage from Natural Earth
-    #    fcLandCoverage = gf.read(
-    #    componentName="natural_earth", objectType="region",
-    #    featureNames=["Land Coverage"])
-    #    # save the feature collection to a geojson file
-    #    sFilename_land_coverage = os.path.join( sWorkspace_jigsaw_out, "tmp", "land_coverage.geojson")
-    #    fcLandCoverage.to_geojson(sFilename_land_coverage)
-    #else:
-    #    sFilename_land_coverage = sFilename_land_ocean_mask_in
-
     # Create the land mask based on the land coverage,
     # i.e. coastline data.
     dsBaseMesh = xr.open_dataset(sFilename_base_mesh)

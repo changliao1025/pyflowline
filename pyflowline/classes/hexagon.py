@@ -55,6 +55,7 @@ class pyhexagon(pycell):
     dLength_flowline=0.0
     iFlag_intersected=-1
     iFlag_coast = 0
+    iFlag_watershed_boundary_burned = 0
     lCellID_downstream_burned=-1
     iStream_order_burned=-1
     iStream_segment_burned=-1

@@ -32,6 +32,7 @@ from pyearth.gis.spatialref.reproject_coordinates import reproject_coordinates
 from pyearth.gis.gdal.read.vector.gdal_get_vector_spatial_reference import gdal_get_vector_spatial_reference_wkt
 from pyearth.gis.gdal.read.raster.gdal_get_raster_spatial_reference import gdal_get_raster_spatial_reference_wkt
 
+
 from pyflowline.classes.timer import pytimer
 from pyflowline.classes.mpas import pympas
 from pyflowline.classes.hexagon import pyhexagon
@@ -109,7 +110,7 @@ class flowlinecase(object):
     sMesh_type = 1
     iFlag_standalone = 1
     iFlag_flowline = 1
-    iFlag_watershed_boundary = None
+
     iFlag_global = 0
     iFlag_antarctic = 0
     iFlag_arctic = 0
@@ -119,6 +120,7 @@ class flowlinecase(object):
     iFlag_run_jigsaw = 0
     iFlag_user_provided_binary = 0
     # iFlag_use_shapefile_extent=1
+    iFlag_force_watershed_boundary = 0
     iFlag_use_mesh_dem = 0
     iFlag_save_mesh = 0
     iFlag_simplification = 1  # user can turn on/off
@@ -271,6 +273,12 @@ class flowlinecase(object):
             self.iFlag_multiple_outlet = int(
                 aConfig_in['iFlag_multiple_outlet'])
 
+        if 'iFlag_force_watershed_boundary' in aConfig_in:
+            self.iFlag_force_watershed_boundary = int(
+                aConfig_in['iFlag_force_watershed_boundary'])
+        else:
+            self.iFlag_force_watershed_boundary = 0
+
         if 'iFlag_simplification' in aConfig_in:
             self.iFlag_simplification = int(aConfig_in['iFlag_simplification'])
             # if simplification is desired, then we must activate flowline flag
@@ -346,6 +354,9 @@ class flowlinecase(object):
 
         if 'nOutlet' in aConfig_in:
             self.nOutlet = int(aConfig_in['nOutlet'])
+
+        if self.nOutlet > 1:
+            self.iFlag_multiple_outlet = 1
 
         if 'iCase_index' in aConfig_in:
             iCase_index = int(aConfig_in['iCase_index'])
@@ -592,10 +603,9 @@ class flowlinecase(object):
             pass
         else:
             # at least we will creat a folder
-
             pass
 
-        if self.iFlag_watershed_boundary == 1:
+        if self.iFlag_force_watershed_boundary == 1:
             self.pyflowline_convert_watershed_boundary_to_geojson()
             pass
 
@@ -923,8 +933,12 @@ class flowlinecase(object):
         # in the future, there may be a list of boundary file for mesh generation
         # we can either provide a merged boundary file or a list of boundary files
 
-        iFlag_future = 0
+        iFlag_future = 1
         if iFlag_future == 1:
+            if self.iFlag_force_watershed_boundary == 1:
+               for pBasin in self.aBasin:
+                   pBasin.basin_convert_watershed_boundary_to_geojson()
+                   pass
             pass
         else:
             # single watershed boundary
@@ -933,11 +947,6 @@ class flowlinecase(object):
             convert_boundary_to_geojson(sFilename_raw, sFilename_out)
             pass
 
-        # if self.iFlag_watershed_boundary == 1:
-        #    for pBasin in self.aBasin:
-        #        pBasin.basin_convert_boundary_to_geojson()
-        #        pass
-
         return
 
     def pyflowline_convert_mesh_boundary_to_geojson(self):
@@ -945,7 +954,7 @@ class flowlinecase(object):
         sFilename_out = self.sFilename_mesh_boundary_geojson
         # check whether the file exists
         if os.path.isfile(sFilename_raw):
-            convert_boundary_to_geojson(sFilename_raw, sFilename_out)
+            convert_boundary_to_geojson(sFilename_raw, sFilename_out, iFlag_largest_polygon_in = 1  )
         else:
             print('The mesh boundary file does not exist!')
             return
@@ -1033,9 +1042,7 @@ class flowlinecase(object):
                         (self.dY_upperleft - self.dY_lowerleft) / dY_spacing)
 
                 if iFlag_mesh_boundary == 1:
-                    # create a polygon based on real boundary
-                    pBoundary_wkt, aExtent = gdal_read_geojson_boundary(
-                        self.sFilename_mesh_boundary_geojson)
+                    pBoundary_wkt, aExtent = gdal_read_geojson_boundary(self.sFilename_mesh_boundary_geojson)
                     aHexagon = create_hexagon_mesh(iFlag_rotation, self.dX_lowerleft, self.dY_lowerleft, dResolution_meter, ncolumn, nrow,
                                                    sFilename_mesh, self.pProjection_reference, pBoundary_wkt)
                     pass
@@ -1061,8 +1068,7 @@ class flowlinecase(object):
                     nrow = int(
                         (self.dY_upperleft - self.dY_lowerleft) / dResolution_meter)
                     if iFlag_mesh_boundary == 1:
-                        pBoundary_wkt, aExtent = gdal_read_geojson_boundary(
-                            self.sFilename_mesh_boundary_geojson)
+                        pBoundary_wkt, aExtent = gdal_read_geojson_boundary(self.sFilename_mesh_boundary_geojson)
                         aSquare = create_square_mesh(self.dX_lowerleft, self.dY_lowerleft, dResolution_meter,
                                                      ncolumn, nrow,
                                                      sFilename_mesh, self.pProjection_reference, pBoundary_wkt)
@@ -1095,8 +1101,7 @@ class flowlinecase(object):
                         if iFlag_mesh_boundary == 1:
                             # create a polygon based on real boundary
                             # already produced
-                            pBoundary_wkt, aExtent = gdal_read_geojson_boundary(
-                                self.sFilename_mesh_boundary_geojson)
+                            pBoundary_wkt, aExtent = gdal_read_geojson_boundary(self.sFilename_mesh_boundary_geojson)
                             aLatlon = create_latlon_mesh(dLongitude_left, dLatitude_bot, dResolution_degree,
                                                          ncolumn, nrow,
                                                          sFilename_mesh, pBoundary_wkt)
@@ -1141,9 +1146,7 @@ class flowlinecase(object):
                             else:
                                 if iFlag_mesh_boundary == 1:
                                     # create a polygon based on
-                                    # read boundary
-                                    pBoundary_wkt, aExtent = gdal_read_geojson_boundary(
-                                        self.sFilename_mesh_boundary_geojson)
+                                    pBoundary_wkt, aExtent = gdal_read_geojson_boundary(self.sFilename_mesh_boundary_geojson)
                                     print(sFilename_mpas_mesh_netcdf)
                                     # if user wants to use the coastal boundary, then we can replace the default land ocean mask
                                     if self.iFlag_land_ocean_mask == 1:
@@ -1277,10 +1280,8 @@ class flowlinecase(object):
                                             if iFlag_mesh_boundary == 1:
                                                 # create a polygon based on
                                                 # read boundary
-                                                pBoundary_wkt, aExtent = gdal_read_geojson_boundary(
-                                                    self.sFilename_mesh_boundary_geojson)
-                                                print(
-                                                    sFilename_jigsaw_mesh_netcdf)
+                                                pBoundary_wkt, aExtent = gdal_read_geojson_boundary(self.sFilename_mesh_boundary_geojson)
+                                                print(sFilename_jigsaw_mesh_netcdf)
                                                 aMpas = create_tin_mesh(iFlag_global, iFlag_use_mesh_dem, iFlag_save_mesh,
                                                                         sFilename_jigsaw_mesh_netcdf,  sFilename_mesh,
                                                                         iFlag_run_jigsaw_in=self.iFlag_run_jigsaw,
@@ -1362,9 +1363,8 @@ class flowlinecase(object):
                                             print('Unsupported mesh type?')
                                 return
 
-            # no matter what type of mash, we will convert it to geoparquet for easy visualization
-            convert_geojson_to_geoparquet(
-                sFilename_mesh, self.sFilename_mesh_parquet)
+            # no matter what type of mesh, we will convert it to geoparquet for easy visualization
+            convert_geojson_to_geoparquet(sFilename_mesh, self.sFilename_mesh_parquet)
         else:
             # this means the mesh is already generated, we need a function that can read an existing pyflowline compatible mesh
             pass
@@ -1508,7 +1508,6 @@ class flowlinecase(object):
         Returns:
             list [pycell]: The updated list of cell objects.
         """
-
         for pCell in self.aCell:
             for pCell2 in aCell_raw:
                 if pCell.lCellID == pCell2.lCellID:
@@ -1517,7 +1516,6 @@ class flowlinecase(object):
                     pCell.aNeighbor_land = pCell2.aNeighbor_land
                     pCell.nNeighbor_land = pCell2.nNeighbor_land
                     pCell.aNeighbor_distance = pCell2.aNeighbor_distance
-
                     break
 
         return self.aCell
@@ -1550,12 +1548,66 @@ class flowlinecase(object):
 
         if self.iFlag_intersect == 1:
             self.aCell, a, b = self.pyflowline_reconstruct_topological_relationship()
+            self.pyflowline_burn_watershed_boundary()
             aCell_out = self.aCell
             pass
         else:
             pass
 
         return aCell_out
+
+    def pyflowline_burn_watershed_boundary(self):
+        """
+        Burn the watershed boundary into the mesh
+        """
+        print('PyFlowline started burn watershed boundary')
+        ptimer = pytimer()
+        ptimer.start()
+        if self.iFlag_force_watershed_boundary == 1:
+            #read the watershed boundary
+            aBoundary_geometry = []
+            for pBasin in self.aBasin:
+                if not os.path.isfile(pBasin.sFilename_watershed_boundary_geojson):
+                    print('Watershed boundary geojson file does not exist!')
+                    return
+
+                # Read boundary geometries
+                pDataSource = ogr.Open(pBasin.sFilename_watershed_boundary_geojson)
+                pLayer = pDataSource.GetLayer(0)
+                # Get spatial reference
+                pSpatialRef = pLayer.GetSpatialRef()
+                # Process each boundary feature
+                for pFeature in pLayer:
+                    pGeometry = pFeature.GetGeometryRef()
+                    if pGeometry is not None:
+                        aBoundary_geometry.append(pGeometry.Clone())
+
+            print(f'Found {len(aBoundary_geometry)} boundary features')
+            if iFlag_use_rtree == 1 and self.pRTree_mesh is not None:
+                for pBoundary in aBoundary_geometry:
+                    # Convert boundary to a bounding box
+                    left, right, bottom, top= pBoundary.GetEnvelope()
+                    pBound= (left, bottom, right, top)
+                    # Search for intersecting cells
+                    aIntersect = list(self.pRTree_mesh.search(pBound))
+                    for k in aIntersect:
+                        pCell = self.aCell[k]
+                        pRing = ogr.Geometry(ogr.wkbLinearRing)
+                        for pVertex in pCell.aVertex:
+                            pRing.AddPoint(pVertex.dLongitude_degree, pVertex.dLatitude_degree)
+                        pRing.CloseRings()  # Close the ring
+                        pCell_geometry = ogr.Geometry(ogr.wkbPolygon)
+                        pCell_geometry.AddGeometry(pRing)
+                        # Check if the cell geometry Overlaps with the boundary
+                        if pCell_geometry.Overlaps(pBoundary):
+                            # Burn the boundary into the cell
+                            self.aCell[k].iFlag_watershed_boundary_burned = 1
+
+                pass
+            pass
+
+        ptimer.stop()
+        return
 
     def pyflowline_analyze(self):
         """
@@ -1611,9 +1663,7 @@ class flowlinecase(object):
         """
         Export the mesh information to a json file
         """
-
         sFilename_json = self.sFilename_mesh_info
-
         # with open(sFilename_json, 'w', encoding='utf-8') as f:
         #    sJson = json.dumps([json.loads(ob.tojson()) for ob in self.aCell], indent = 4)
         #    f.write(sJson)

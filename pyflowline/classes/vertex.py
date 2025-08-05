@@ -44,6 +44,8 @@ class pyvertex(object):
     dLatitude_radian=0.0
     dElevation=0.0
 
+    wkt = None
+
     def __init__(self, aParameter):
         """
         Initilize a vertex object
@@ -77,6 +79,7 @@ class pyvertex(object):
         #calcualte x y z based on dLongitude and dLatitude and earth radius
         self.dX_meter, self.dY_meter, self.dZ_meter = self.calculate_xyz()
 
+        self.towkt()
 
         return
 
@@ -214,7 +217,6 @@ class pyvertex(object):
 
         return aVertex
 
-
     def calculate_xyz(self):
         """
         Calculate the x, y, z based on dLongitude and dLatitude
@@ -252,6 +254,20 @@ class pyvertex(object):
                 ensure_ascii=True, \
                 cls=VertexClassEncoder)
         return sJson
+    
+    def towkt(self):
+        """
+        Convert a vertex object to a WKT string
+
+        Returns:
+            str: A WKT string
+        """
+        sWKT = 'POINT ('
+        sWKT += str(self.dLongitude_degree) + ' '
+        sWKT += str(self.dLatitude_degree) + ')'
+        self.wkt = sWKT
+        return sWKT
+
 
 
 class pynvector(object):

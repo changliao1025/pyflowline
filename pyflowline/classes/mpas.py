@@ -62,6 +62,7 @@ class pympas(pycell):
     lCellID_downstream_burned=-1
     iStream_order_burned=-1
     iStream_segment_burned=-1
+    iFlag_watershed_boundary_burned = 0
     aEdge=None
     aEdgeID=None
     aVertex=None
@@ -115,6 +116,7 @@ class pympas(pycell):
             self.lCellID_downstream_burned=-1
             self.iStream_order_burned=-1
             self.iStream_segment_burned=-1
+            self.iFlag_watershed_boundary_burned = 0
             self.dElevation_mean=-9999.0
             self.dElevation_profile0=-9999.0
             self.calculate_cell_bound() #bound for rtree

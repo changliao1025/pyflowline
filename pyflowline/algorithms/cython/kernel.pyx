@@ -42,6 +42,84 @@ cpdef  calculate_distance_based_on_longitude_latitude(double dLongitude_degree1_
     return c
 
 @cython.boundscheck(False)  # deactivate bnds checking
+@cython.wraparound(False)  # deactivate negative indexing
+cpdef calculate_distance_based_on_longitude_latitude_array(double[:] dLongitude_degree1_in, double[:] dLatitude_degree1_in,
+                                                         double[:] dLongitude_degree2_in, double[:] dLatitude_degree2_in):
+    """
+    Calculate the great circle distance between arrays of points
+    on the earth (specified in decimal degrees)
+
+    Args:
+        dLongitude_degree1_in: Array of longitude values for first points (in degrees)
+        dLatitude_degree1_in: Array of latitude values for first points (in degrees)
+        dLongitude_degree2_in: Array of longitude values for second points (in degrees)
+        dLatitude_degree2_in: Array of latitude values for second points (in degrees)
+
+    Returns:
+        numpy.ndarray: Array of distances in meters
+    """
+    import numpy as np
+
+    cdef int i
+    cdef int n = dLongitude_degree1_in.shape[0]
+    cdef double[:] result = np.zeros(n, dtype=np.float64)
+
+    cdef double dLongitude_radian1, dLatitude_radian1
+    cdef double dLongitude_radian2, dLatitude_radian2
+    cdef double dLongtitude_diff, dLatitude_diff, a, b, c
+
+    for i in range(n):
+        # Convert decimal degrees to radians
+        dLongitude_radian1 = dLongitude_degree1_in[i] / 180.0 * M_PI
+        dLatitude_radian1 = dLatitude_degree1_in[i] / 180.0 * M_PI
+        dLongitude_radian2 = dLongitude_degree2_in[i] / 180.0 * M_PI
+        dLatitude_radian2 = dLatitude_degree2_in[i] / 180.0 * M_PI
+
+        # Haversine formula
+        dLongtitude_diff = dLongitude_radian2 - dLongitude_radian1
+        dLatitude_diff = dLatitude_radian2 - dLatitude_radian1
+        a = sin(dLatitude_diff/2)*sin(dLatitude_diff/2) + cos(dLatitude_radian1) * cos(dLatitude_radian2) * sin(dLongtitude_diff/2)*sin(dLongtitude_diff/2)
+        b = 2 * asin(sqrt(a))
+        c = b * dRadius
+
+        result[i] = c
+
+    return np.asarray(result)
+
+# For compatibility, also provide a version that works with NumPy arrays directly
+@cython.boundscheck(False)
+@cython.wraparound(False)
+def calculate_distance_based_on_longitude_latitude_numpy(dLongitude_degree1_in, dLatitude_degree1_in,
+                                                      dLongitude_degree2_in, dLatitude_degree2_in):
+    """
+    Calculate the great circle distance between arrays of points using NumPy arrays
+
+    Args:
+        dLongitude_degree1_in: NumPy array of longitude values for first points (in degrees)
+        dLatitude_degree1_in: NumPy array of latitude values for first points (in degrees)
+        dLongitude_degree2_in: NumPy array of longitude values for second points (in degrees)
+        dLatitude_degree2_in: NumPy array of latitude values for second points (in degrees)
+
+    Returns:
+        numpy.ndarray: Array of distances in meters
+    """
+    import numpy as np
+
+    # Convert decimal degrees to radians
+    dLongitude_radian1_in = dLongitude_degree1_in / 180.0 * M_PI
+    dLatitude_radian1_in = dLatitude_degree1_in / 180.0 * M_PI
+    dLongitude_radian2_in = dLongitude_degree2_in / 180.0 * M_PI
+    dLatitude_radian2_in = dLatitude_degree2_in / 180.0 * M_PI
+
+    # Haversine formula
+    dLongtitude_diff = dLongitude_radian2_in - dLongitude_radian1_in
+    dLatitude_diff = dLatitude_radian2_in - dLatitude_radian1_in
+    a = np.sin(dLatitude_diff/2)**2 + np.cos(dLatitude_radian1_in) * np.cos(dLatitude_radian2_in) * np.sin(dLongtitude_diff/2)**2
+    c = 2 * np.arcsin(np.sqrt(a)) * dRadius
+
+    return c
+
+@cython.boundscheck(False)  # deactivate bnds checking
 cpdef  convert_360_to_180(double dLongitude_in):
     """[This function is modified from
     http://www.idlcoyote.com/map_tips/lonconvert.html]

@@ -191,7 +191,7 @@ class JigsawConfigManager:
             # Grid resolution parameters
             "ncolumn_space": 360,        # Number of columns in spacing grid (longitude)
             "nrow_space": 180,           # Number of rows in spacing grid (latitude)
-            "dSpac_value": 50.0,         # Default spacing value
+            "dSpac_value": 100.0,         # Default spacing value
 
             # Feature flags for geometry generation
             "iFlag_geom": False,         # Enable geometry generation
@@ -223,12 +223,12 @@ class JigsawConfigManager:
 
             # Resolution parameters for different features (in degrees)
             "dResolution_land": 45.0,                # Land feature spacing
-            "dResolution_dam": 3.0,                  # Dam feature spacing
-            "dResolution_city": 3.0,                 # City feature spacing
-            "dResolution_river_network": 3.0,        # River network feature spacing
-            "dResolution_coastline": 3.0,            # Coastline feature spacing
-            "dResolution_watershed_boundary": 3.0,    # Watershed boundary feature spacing
-            "dResolution_lake_boundary": 3.0,        # Lake boundary feature spacing
+            "dResolution_dam": 4.0,                  # Dam feature spacing
+            "dResolution_city": 4.0,                 # City feature spacing
+            "dResolution_river_network": 4.0,        # River network feature spacing
+            "dResolution_coastline": 4.0,            # Coastline feature spacing
+            "dResolution_watershed_boundary": 4.0,    # Watershed boundary feature spacing
+            "dResolution_lake_boundary": 4.0,        # Lake boundary feature spacing
 
             # Mesh type identifiers
             "geom_mshID": "ellipsoid-mesh",          # Geometry mesh type
@@ -255,7 +255,7 @@ class JigsawConfigManager:
             "sFilename_lake_boundary_raster": None,  # Lake boundary raster file
 
             # Mesh sizing parameters
-            "hfun_hmax": float("inf"),     # Max. refinement function value
+            "hfun_hmax": "inf",     # Max. refinement function value
             "hfun_hmin": 0.0,              # Min. refinement function value
             "hfun_scal": "absolute",       # Scaling type: "relative" or "absolute"
             "mesh_dims": 2,                # Mesh dimension (2 for surface)

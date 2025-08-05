@@ -488,7 +488,6 @@ def run_jigsaw(sWorkspace_jigsaw_in, projector,
                 aRiver_network_mask = coarsen_mask(aRiver_network_mask, down=4)
                 nrow_space = aRiver_network_mask.shape[0]
                 ncolumn_space = aRiver_network_mask.shape[1]
-
         else:
             if iFlag_spac_coastline:
                 sFilename_coastline_raster = aConfig_in["sFilename_coastline_raster"]

@@ -1,14 +1,12 @@
 import numpy as np
 
-
-
 def split_flowline_by_length(aFlowline_in, dDistance):
 
     aFlowline_out=list()
     nFlowline = len(aFlowline_in)
     for i in range(nFlowline):
         pFlowline = aFlowline_in[i]
-        pFlowline_out = pFlowline.split_edge_by_length(dDistance)
+        pFlowline_out = pFlowline.split_by_length(dDistance)
         aFlowline_out.append(pFlowline_out)
 
     return aFlowline_out

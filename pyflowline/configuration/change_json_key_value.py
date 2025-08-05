@@ -3,7 +3,7 @@ from pathlib import Path
 import shutil
 import tempfile
 
-def change_json_key_value(sFilename_json_in, sKey, new_value, iFlag_basin_in=None):
+def change_json_key_value(sFilename_json_in, sKey, new_value, iFlag_basin_in=None, iBasin_index_in=None):
     """
     Change the value associated with the specified key in a JSON file safely.
 
@@ -28,7 +28,12 @@ def change_json_key_value(sFilename_json_in, sKey, new_value, iFlag_basin_in=Non
     if iFlag_basin_in is None:
         data[sKey] = new_value
     else:
-        data[0][sKey] = new_value
+        if iBasin_index_in is not None:
+            iBasin_index_in = int(iBasin_index_in)
+            data[iBasin_index_in][sKey] = new_value
+        else:
+            data[0][sKey] = new_value
+
 
     # Write the updated data to a temporary file
     with tempfile.NamedTemporaryFile(delete=False, mode='w', suffix='.json') as temp_file:

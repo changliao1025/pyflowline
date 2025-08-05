@@ -668,183 +668,34 @@ def create_mpas_mesh(sFilename_output_in,
 
                         pLayer.CreateFeature(pFeature)
 
+    #close the dataset
+    if iFlag_save_mesh == 1:
+        pFeature = None
+        pLayer = None
+        pDataset = None
+
     #for maps we need to clean some cell because they were not actually in the domain
     #besides, we need to add some smal holes back
     #to do this, we need two steps.
-
     if iFlag_global == 1:
         aMpas_out = aMpas
     else:
         aMpas_out = list()
         ncell = len(aMpas)
-        #generate the list of cell ID that are already certain
-        if iFlag_fill_hole_in == 1:
-            #first update neighbor information because some cell should have vitual land neighbor (not present in the mesh)
-            #this operation does not increase the number of cells, but it update the neighbor information
-            #specifically, it divided the land neighbor into two parts: land and virtual land
-            for pCell in aMpas:
-                aNeighbor_land = pCell.aNeighbor_land  #including both holes and maps land cutoff by boundary
-                aNeighbor_land_update = list()
-                aNeighbor_land_virtual = list()
-                for lNeighbor in aNeighbor_land: #loop all land neighbors
-                    if lNeighbor in aMpas_dict:
-                        aNeighbor_land_update.append(lNeighbor)
-                    else:
-                        #a hole or boundary mpas land cell
-                        aNeighbor_land_virtual.append(lNeighbor)
-
-                pCell.aNeighbor_land = aNeighbor_land_update
-                pCell.nNeighbor_land= len(aNeighbor_land_update)
-                pCell.aNeighbor_land_virtual = aNeighbor_land_virtual
-                pCell.nNeighbor_land_virtual = len(aNeighbor_land_virtual)
-                pass
-
-
-                #distance remains unchanged since we just have missing cells.
-
-            #now add back small holes
-            #this operation will increase the number of cells
-            #it will also update the neighbor information for some cells,
-            #not all cells will be updated (because some cells have 2+ virtual land neighbors)
-            for pCell in aMpas:
-                if pCell.nNeighbor_land_virtual == 1:  #only one virtual land means it is likely next to a hole
-                    lNeighbor_hole = pCell.aNeighbor_land_virtual[0]
-                    j = lNeighbor_hole-1
-                    dLongitude_center = float(aLongitudeCell_180[j])
-                    dLatitude_center = float(aLatitudeCell[j])
-                    #vertex
-                    aVertexOnCellIndex = np.array(aVertexOnCell[j,:])
-                    dummy0 = np.where(aVertexOnCellIndex > 0)
-                    aVertexIndex = aVertexOnCellIndex[dummy0]
-                    aLonVertex = aLongitudeVertex_180[aVertexIndex-1]
-                    aLatVertex = aLatitudeVertex[aVertexIndex-1]
-                    nVertex = len(aLonVertex)
-                    if nVertex < 3:
-                        print('Warning: nVertex < 3')
-                        continue
-                    #first check if it is within the boundary
-                    ring = ogr.Geometry(ogr.wkbLinearRing)
-                    aCoords_gcs = np.full((nVertex,2), -9999.0, dtype=float)
-                    for k in range(nVertex):
-                        x1 = aLonVertex[k]
-                        y1 = aLatVertex[k]
-                        ring.AddPoint(x1, y1)
-                        aCoords_gcs[k,0] = x1
-                        aCoords_gcs[k,1] = y1
-                        pass
-
-                    x1 = aLonVertex[0]
-                    y1 = aLatVertex[0]
-                    ring.AddPoint(x1, y1) #double check
-                    pPolygon = ogr.Geometry(ogr.wkbPolygon)
-                    pPolygon.AddGeometry(ring)
-                    if pPolygon.IsValid() == False:
-                        print('Warning: invalid polygon')
-                        continue
-
-                    if pPolygon.Within(pBoundary):
-                        pass
-                    else:
-                        continue
-
-                    lCellID = int(aIndexToCellID[j])
-                    if iFlag_bed_elevation == 1:
-                        dElevation_mean = float(aBed_elevation[j])
-                    else:
-                        dElevation_mean = 0.0 #-9999
-                    if iFlag_elevation_profile == 1:
-                        dElevation_profile0 = float(aBed_elevation_profile[j,0])
-                    else:
-                        dElevation_profile0 = 0.0 #-9999
-                    if iFlag_ice_thickness == 1:
-                        dThickness_ice = float( aIce_thickness[j] )
-                    else:
-                        dThickness_ice = 0.0
-                    dArea = float(aCellArea[j])
-
-                    if lCellID not in aMpas_dict:
-                        iFlag_success, aMpas = add_cell_into_list(aMpas, j, lCellID, dArea, dElevation_mean, dElevation_profile0, aCoords_gcs )
-                        if iFlag_success == 1:
-                            aMpas_dict[lCellID] = lCellIndex
-                            lCellIndex = lCellIndex + 1
-                        #now we need to update the neightboring information as well
-                        pCell.aNeighbor_land.append(lCellID)
-                        pCell.nNeighbor_land = pCell.nNeighbor_land + 1
-                        pCell.aNeighbor_land_virtual = []
-                        pCell.nNeighbor_land_virtual = 0
-                        #save mesh cell
-                        if iFlag_save_mesh ==1:
-                            pFeature.SetGeometry(pPolygon)
-                            pFeature.SetField("cellid", int(lCellID) )
-                            pFeature.SetField("longitude", dLongitude_center )
-                            pFeature.SetField("latitude", dLatitude_center )
-                            pFeature.SetField("area", dArea )
-                            if iFlag_use_mesh_dem == 1:
-                                pFeature.SetField("elevation_mean", dElevation_mean )
-                                pFeature.SetField("elevation_profile0", dElevation_profile0 )
-
-                            pLayer.CreateFeature(pFeature)
-
-                    else:
-                        #this hole was added already, but we need to update the neighbor information
-                        pCell.aNeighbor_land.append(lCellID)
-                        pCell.nNeighbor_land = pCell.nNeighbor_land + 1
-                        pCell.aNeighbor_land_virtual = []
-                        pCell.nNeighbor_land_virtual = 0
-                        pass
-
-                #how about distance? still unchanged, but the orders are changed
-
-            #now update again because some cell has more than one virutal land neighbor, but now none of them is virtual anymore
-            #this fix will move virtual land neighbor back to land neighbor
-            #the ocean neighbor will remain unchanged
-            for pCell in aMpas:
-                aNeighbor_land_update = list()
-                aNeighbor_land = pCell.aNeighbor_land
-                aNeighbor_land_virtual_update = list()
-                aNeighbor_land_virtual = pCell.aNeighbor_land_virtual
-                for lNeighbor in aNeighbor_land:
-                    if lNeighbor in aMpas_dict:
-                        aNeighbor_land_update.append(lNeighbor)
-                        pass
-                    else:
-                        #this is a land cell in mpas, but it may be clipped by boundary
-                        pass
-
-                #for book keeping only
-                if aNeighbor_land_virtual is not None and len(aNeighbor_land_virtual) > 0:
-                    for lNeighbor in aNeighbor_land_virtual:
-                        if lNeighbor in aMpas_dict:
-                            #this cell is actually not virtual anymore
-                            aNeighbor_land_update.append(lNeighbor)
-                        else:
-                            aNeighbor_land_virtual_update.append(lNeighbor)
-                            pass
-
-                pCell.aNeighbor_land = aNeighbor_land_update
-                pCell.nNeighbor_land= len(aNeighbor_land_update)
-                pCell.aNeighbor_land_virtual = aNeighbor_land_virtual_update   #for book keeping only
-                pCell.nNeighbor_land_virtual = len(aNeighbor_land_virtual_update)
-                aMpas_out.append(pCell)
-        else:
-            #no hole filling applied
-            #still need to get rid cell that are not in the domain
-            for pCell in aMpas:
-                aNeighbor = pCell.aNeighbor
-                aNeighbor_land_update = list()
-                for lNeighbor in aNeighbor:
-                    if lNeighbor in aMpas_dict:
-                        aNeighbor_land_update.append(lNeighbor)
-
-                #for latlon, there is no ocean concept
-                pCell.aNeighbor = aNeighbor_land_update
-                pCell.nNeighbor= len(aNeighbor_land_update)
-                pCell.aNeighbor_land = aNeighbor_land_update
-                pCell.nNeighbor_land= len(aNeighbor_land_update)
-                pCell.nNeighbor_ocean = pCell.nVertex - pCell.nNeighbor_land
-                aMpas_out.append(pCell)
-
-            pass
+        #still need to get rid cell that are not in the domain
+        for pCell in aMpas:
+            aNeighbor = pCell.aNeighbor
+            aNeighbor_land_update = list()
+            for lNeighbor in aNeighbor:
+                if lNeighbor in aMpas_dict:
+                    aNeighbor_land_update.append(lNeighbor)
+            #for latlon, there is no ocean concept
+            pCell.aNeighbor = aNeighbor_land_update
+            pCell.nNeighbor= len(aNeighbor_land_update)
+            pCell.aNeighbor_land = aNeighbor_land_update
+            pCell.nNeighbor_land= len(aNeighbor_land_update)
+            pCell.nNeighbor_ocean = pCell.nVertex - pCell.nNeighbor_land
+            aMpas_out.append(pCell)
 
     return aMpas_out
 

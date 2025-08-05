@@ -35,9 +35,6 @@ def read_mesh_json(iMesh_type_in, sFilename_mesh_in):
     #we also need to spatial reference
     for pFeature_mesh in pLayer_mesh:
         pGeometry_mesh = pFeature_mesh.GetGeometryRef()
-        #dummy0 = loads( pGeometry_mesh.ExportToWkt() )
-        #aCoords_gcs = dummy0.exterior.coords
-        #aCoords_gcs= np.array(aCoords_gcs)
         aCoords_gcs = get_geometry_coordinates(pGeometry_mesh)
         lCellID = pFeature_mesh.GetField("cellid")
         dLongitude_center = pFeature_mesh.GetField("longitude")
@@ -93,9 +90,6 @@ def read_mesh_json_w_topology(iMesh_type_in, sFilename_mesh_in):
     #we also need to spatial reference
     for pFeature_mesh in pLayer_mesh:
         pGeometry_mesh = pFeature_mesh.GetGeometryRef()
-        #dummy0 = loads( pGeometry_mesh.ExportToWkt() )
-        #aCoords_gcs = dummy0.exterior.coords
-        #aCoords_gcs= np.array(aCoords_gcs)
         aCoords_gcs = get_geometry_coordinates(pGeometry_mesh)
         lCellID = pFeature_mesh.GetField("cellid")
         dLongitude_center = pFeature_mesh.GetField("longitude")

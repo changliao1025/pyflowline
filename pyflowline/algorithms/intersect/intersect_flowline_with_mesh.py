@@ -191,7 +191,6 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh_in, sFilename_flo
         for pFeature_mesh in pLayer_mesh:
             pGeometry_mesh = pFeature_mesh.GetGeometryRef()
             aCoords_gcs = get_geometry_coordinates(pGeometry_mesh)
-
             lCellID = pFeature_mesh.GetField("cellid")
             dLongitude_center = pFeature_mesh.GetField("longitude")
             dLatitude_center = pFeature_mesh.GetField("latitude")

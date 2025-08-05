@@ -224,6 +224,7 @@ def _land_mask_from_geojson(sFilename_mesh,
     # these defaults may have been updated from config options -- pass them
     # along to the subprocess
     netcdf_format = mpas_tools.io.default_format
+    #netcdf_format = 'NETCDF4'
     netcdf_engine = 'scipy'
 
     # Create the land mask based on the land coverage, i.e. coastline data

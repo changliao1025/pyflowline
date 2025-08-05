@@ -8,6 +8,7 @@ from osgeo import ogr, gdal, osr
 from pyflowline.classes.vertex import pyvertex
 from pyflowline.classes.edge import pyedge
 from pyflowline.formats.export_vertex import export_vertex_as_polygon
+from pyflowline.algorithms.cython.kernel import calculate_distance_based_on_longitude_latitude_numpy
 
 class FlowlineClassEncoder(JSONEncoder):
     def default(self, obj):
@@ -45,6 +46,7 @@ class pyflowline(object):
     iFlag_keep = 1 #used for simplification algorithm
 
     iFlag_dam = 0
+    iFlag_endorheic = 0 #used for endorheic basin
     lNHDPlusID=-1
 
     pVertex_start=None
@@ -101,14 +103,7 @@ class pyflowline(object):
         self.aFlowlineID_end_end = list()
         self.iFlag_keep = 1
 
-        #also build wkt string
-        pGeometry = ogr.Geometry(ogr.wkbLineString)
-        for i in range(nVertex):
-            pGeometry.AddPoint(self.aVertex[i].dLongitude_degree, self.aVertex[i].dLatitude_degree)
-
-        self.wkt = pGeometry.ExportToWkt()
-        pGeometry = None
-
+        self.towkt()
         self.calculate_flowline_bound()
 
         return
@@ -138,17 +133,25 @@ class pyflowline(object):
         return self.dLength
 
     def calculate_flowline_bound(self):
-        dLat_min = 90
-        dLat_max = -90
-        dLon_min = 180
-        dLon_max = -180
-        for i in range(self.nVertex):
-            dLon_max = np.max( [dLon_max, self.aVertex[i].dLongitude_degree] )
-            dLon_min = np.min( [dLon_min, self.aVertex[i].dLongitude_degree] )
-            dLat_max = np.max( [dLat_max, self.aVertex[i].dLatitude_degree] )
-            dLat_min = np.min( [dLat_min, self.aVertex[i].dLatitude_degree] )
 
-        self.pBound = (float(dLon_min), float(dLat_min), float(dLon_max), float(dLat_max))
+        #use wkt to get bound
+
+        pGeometry = ogr.CreateGeometryFromWkt(self.wkt)
+
+        if pGeometry is None:
+            raise ValueError("Invalid geometry in flowline")
+        (minX, maxX, minY, maxY) = pGeometry.GetEnvelope()  # (minX, maxX, minY, maxY)
+        self.pBound = (float(minX), float(minY), float(maxX), float(maxY))
+        #dLat_min = 90
+        #dLat_max = -90
+        #dLon_min = 180
+        #dLon_max = -180
+        #for i in range(self.nVertex):
+        #    dLon_max = np.max( [dLon_max, self.aVertex[i].dLongitude_degree] )
+        #    dLon_min = np.min( [dLon_min, self.aVertex[i].dLongitude_degree] )
+        #    dLat_max = np.max( [dLat_max, self.aVertex[i].dLatitude_degree] )
+        #    dLat_min = np.min( [dLat_min, self.aVertex[i].dLatitude_degree] )
+        #self.pBound = (float(dLon_min), float(dLat_min), float(dLon_max), float(dLat_max))
         return self.pBound
 
     def check_upstream(self, other):
@@ -441,6 +444,49 @@ class pyflowline(object):
 
         return aVertex_out, aCircle_out
 
+    def calculate_distance_to_flowline(self, pFlowline_other):
+        aVertex_a = np.array([[v.dLongitude_degree, v.dLatitude_degree] for v in self.aVertex])
+        aVertex_b = np.array([[v.dLongitude_degree, v.dLatitude_degree] for v in pFlowline_other.aVertex])
+
+        # Use broadcasting to calculate all pairwise distances at once
+        lon1 = aVertex_a[:, 0:1]  # Convert to column vector
+        lat1 = aVertex_a[:, 1:2]
+        lon2 = aVertex_b[:, 0]    # Keep as row vector
+        lat2 = aVertex_b[:, 1]
+
+        # Vectorized distance calculation
+        distances = calculate_distance_based_on_longitude_latitude_numpy(lon1, lat1, lon2, lat2)
+        return np.min(distances)
+
+    def calculate_bearing_angle(self):
+        #calculate the bearing angle of the flowline using its start and end vertex
+        if self.nVertex < 2:
+            return None
+        pVertex_start = self.pVertex_start
+        pVertex_end = self.pVertex_end
+        dLon_start = pVertex_start.dLongitude_degree
+        dLat_start = pVertex_start.dLatitude_degree
+        dLon_end = pVertex_end.dLongitude_degree
+        dLat_end = pVertex_end.dLatitude_degree
+        # Convert to radians
+        lat1_rad = np.radians(dLat_start)
+        lat2_rad = np.radians(dLat_end)
+        dlon_rad = np.radians(dLon_end - dLon_start)
+    
+        # Calculate bearing using the forward azimuth formula
+        y = np.sin(dlon_rad) * np.cos(lat2_rad)
+        x = np.cos(lat1_rad) * np.sin(lat2_rad) - np.sin(lat1_rad) * np.cos(lat2_rad) * np.cos(dlon_rad)
+
+        # Calculate bearing in radians
+        bearing_rad = np.arctan2(y, x)
+
+        # Convert to degrees and normalize to 0-360°
+        bearing_deg = np.degrees(bearing_rad)
+        bearing_deg = (bearing_deg + 360) % 360
+
+        return bearing_deg
+
+
     def __eq__(self, other):
         """
         Check whether two flowline are equivalent
@@ -491,3 +537,26 @@ class pyflowline(object):
                     ensure_ascii=True,
                         cls=FlowlineClassEncoder)
         return sJson
+
+    def towkt(self):
+        """
+        Convert a pyflowline object to a wkt string
+
+        Returns:
+            str: A wkt string
+        """
+        pGeometry = ogr.Geometry(ogr.wkbLineString)
+        for i in range(self.nVertex):
+            pGeometry.AddPoint(self.aVertex[i].dLongitude_degree, self.aVertex[i].dLatitude_degree)
+
+        sWKT = pGeometry.ExportToWkt()
+        pGeometry = None
+        self.wkt = sWKT
+        return sWKT
+
+    def update_wkt(self):
+        """
+        Update the wkt string of the flowline
+        """
+        self.towkt()
+        return self.wkt

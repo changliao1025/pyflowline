@@ -119,6 +119,8 @@ class pybasin(object):
     sFilename_flowline_raw=''
     sFilename_flowline_filter=''
     sFilename_flowline_filter_geojson=''
+    sFilename_watershed_boundary=''
+    sFilename_watershed_boundary_geojson=''
     sFilename_dam=''
     sFilename_flowline_topo=''
     #before intersect
@@ -267,6 +269,11 @@ class pybasin(object):
         else:
             self.sFilename_flowline_filter = ''
 
+        if 'sFilename_watershed_boundary' in aConfig_in:
+            self.sFilename_watershed_boundary = aConfig_in['sFilename_watershed_boundary']
+        else:
+            self.sFilename_watershed_boundary = ''
+
         if 'sWorkspace_output_basin' in aConfig_in:
             self.sWorkspace_output_basin = aConfig_in['sWorkspace_output_basin']
         else:
@@ -276,6 +283,7 @@ class pybasin(object):
             Path(self.sWorkspace_output_basin).mkdir(parents=True, exist_ok=True)
 
         self.sFilename_flowline_filter_geojson = os.path.join(str(self.sWorkspace_output_basin ), "flowline_filter.geojson"  )
+        self.sFilename_watershed_boundary_geojson = os.path.join(str(self.sWorkspace_output_basin ), "watershed_boundary.geojson"  )
 
         if 'sFilename_dam' in aConfig_in:
             self.sFilename_dam = aConfig_in['sFilename_dam']
@@ -385,7 +393,6 @@ class pybasin(object):
         ptimer = pytimer()
 
         if self.iFlag_dam == 1:
-            #sFilename_flowline_filter = self.sFilename_flowline_filter
             sFilename_flowline_filter = self.sFilename_flowline_filter_geojson
             aFlowline_basin_filtered_raw, pProjection_geojson = read_flowline_geojson( sFilename_flowline_filter )
             aVertex_filtered = find_flowline_vertex(aFlowline_basin_filtered_raw)
@@ -705,9 +712,8 @@ class pybasin(object):
             ptimer.start()
             aFlowline_basin_simplified_split = split_flowline_by_length(aFlowline_basin_simplified, self.dThreshold_break_by_distance)
             ptimer.stop()
-
             sFilename_out = self.sFilename_flowline_split
-            export_flowline_to_geojson(  aFlowline_basin_simplified_split, sFilename_out  )
+            export_flowline_to_geojson( aFlowline_basin_simplified_split, sFilename_out  )
 
         self.aConfluence_basin_simplified = aConfluence_basin_simplified
         self.aFlowline_basin_simplified= aFlowline_basin_simplified
@@ -750,14 +756,7 @@ class pybasin(object):
             print('Error in flowline and mesh intersection.')
 
         #not an ideal setup, but it could be improved
-        #if self.iFlag_simplification_done == 1:
         pVertex_outlet_initial = pVertex_outlet_checked #self.pVertex_outlet
-        #else:
-        #point= dict()
-        #point['dLongitude_degree'] = self.dLongitude_outlet_degree
-        #point['dLatitude_degree'] = self.dLatitude_outlet_degree
-        #pVertex_outlet_initial= pVertex_outlet_checked #pyvertex(point)
-
         print('Outlet initial location', pVertex_outlet_initial.dLongitude_degree, pVertex_outlet_initial.dLatitude_degree)
 
         #from this point, aFlowline_basin is conceptual
@@ -1196,11 +1195,14 @@ class pybasin(object):
         convert_flowline_to_geojson(sFilename_raw, sFilename_out)
         return
 
-    def basin_convert_boundary_to_geojson(self):
+    def basin_convert_watershed_boundary_to_geojson(self):
         """
         Convert the boundary to geojson
         """
-
+        sFilename_raw = self.sFilename_watershed_boundary
+        sFilename_out = self.sFilename_watershed_boundary_geojson
+        print('Basin '+ self.sBasinID + ': initial watershed boundary:', sFilename_raw )
+        convert_boundary_to_geojson(sFilename_raw, sFilename_out, iFlag_largest_polygon_in = 1)
         return
 
     def basin_calculate_flowline_length(self, aFlowline_in):

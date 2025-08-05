@@ -10,17 +10,8 @@ from pyearth.visual.map.vector.map_multiple_vector_files import map_multiple_vec
 def plot(self,
          iFlag_type_in = None,
          iFlag_title_in = None,
-         iFlag_openstreetmap_in=None,
-         iFlag_terrain_image_in=None,
-         iFlag_esri_hydro_image_in=None,
-         iBasemap_zoom_level_in=None,
-         iDPI_in = None,
-         sFilename_output_in = None,
-         sTitle_in = None,
          sVariable_in = None,
-         aExtent_in = None,
-         pProjection_map_in = None,
-         pProjection_data_in=None):
+         **kwargs):
     """_summary_
 
     Args:
@@ -73,32 +64,19 @@ def plot(self,
                 pBasin.basin_plot(iFlag_type_in,
                                   self.sMesh_type,
                                   iFlag_title_in= iFlag_title_in,
-                                  sFilename_output_in=sFilename_output_in,
                                   sVariable_in= sVariable_in,
-                                  aExtent_in = aExtent_in,
                                   aLegend_in = aLegend,
-                                  pProjection_map_in = pProjection_map_in)
+                                  **kwargs)
         else:
             if iFlag_type_in == 3: #polygon based
                 if sVariable_in == 'mesh':
-                    self._plot_mesh(sFilename_output_in=sFilename_output_in,
-                                    aExtent_in = aExtent_in,
-                                    iDPI_in = iDPI_in,
-                                     iFlag_openstreetmap_in= iFlag_openstreetmap_in,
-                                    iFlag_terrain_image_in= iFlag_terrain_image_in,
-                                    iFlag_esri_hydro_image_in= iFlag_esri_hydro_image_in,
-                                    iBasemap_zoom_level_in = iBasemap_zoom_level_in,
-                                    sTitle_in = sTitle_in,
-                                    pProjection_data_in = pProjection_data_in,
-                                    pProjection_map_in = pProjection_map_in)
+                    self._plot_mesh(**kwargs)
 
             else:
                 if iFlag_type_in == 4: #mixed based mesh + flowline
                     if sVariable_in == 'overlap':
-                        self._plot_mesh_with_flowline(sFilename_output_in=sFilename_output_in,
-                                                      iFlag_title_in= iFlag_title_in,
-                                                      aExtent_in=aExtent_in,
-                                                      pProjection_map_in = pProjection_map_in)
+                        self._plot_mesh_with_flowline(       iFlag_title_in= iFlag_title_in,
+                                                      **kwargs)
 
 
 
@@ -108,17 +86,8 @@ def plot(self,
 
         return
 
-def _plot_mesh(self,
-               sFilename_output_in=None,
-               aExtent_in=None,
-               iDPI_in=None,
-               iFlag_openstreetmap_in=None,
-               iFlag_terrain_image_in=None,
-               iFlag_esri_hydro_image_in=None,
-               iBasemap_zoom_level_in=None,
-               sTitle_in=None,
-               pProjection_data_in = None,
-               pProjection_map_in = None):
+def _plot_mesh(self,sTitle_in=None,
+               **kwargs):
 
     sFilename_in = self.sFilename_mesh
     if self.iMesh_type == 4:
@@ -135,17 +104,8 @@ def _plot_mesh(self,
                             iFlag_zebra_in= 1,
                             iFlag_color_in = 0,
                             iFlag_fill_in= False,
-                            iFlag_filter_in= 1, #for mesh alone, we need to filter out the boundary
-                            iFlag_openstreetmap_in= iFlag_openstreetmap_in,
-                            iFlag_terrain_image_in= iFlag_terrain_image_in,
-                            iFlag_esri_hydro_image_in= iFlag_esri_hydro_image_in,
-                            iBasemap_zoom_level_in= iBasemap_zoom_level_in,
-                            iDPI_in=iDPI_in,
-                            sFilename_output_in = sFilename_output_in,
-                            sTitle_in = sMesh_type,
-                            aExtent_in = aExtent_in,
-                            pProjection_data_in= pProjection_data_in,
-                            pProjection_map_in = pProjection_map_in)
+                            iFlag_filter_in= 0, #for mesh alone, we need to filter out the boundary
+                            **kwargs)
 
     return
 

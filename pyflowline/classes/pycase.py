@@ -1508,7 +1508,6 @@ class flowlinecase(object):
         Returns:
             list [pycell]: The updated list of cell objects.
         """
-
         for pCell in self.aCell:
             for pCell2 in aCell_raw:
                 if pCell.lCellID == pCell2.lCellID:
@@ -1517,7 +1516,6 @@ class flowlinecase(object):
                     pCell.aNeighbor_land = pCell2.aNeighbor_land
                     pCell.nNeighbor_land = pCell2.nNeighbor_land
                     pCell.aNeighbor_distance = pCell2.aNeighbor_distance
-
                     break
 
         return self.aCell

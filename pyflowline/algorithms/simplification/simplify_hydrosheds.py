@@ -159,8 +159,6 @@ def simplify_hydrosheds_river_network(sFilename_flowline_hydroshed_in,
         pGeometry_shapefile = pFeature_shapefile.GetGeometryRef()
         sGeometry_type = pGeometry_shapefile.GetGeometryName()
         lID = pFeature_shapefile.GetFieldAsInteger("HYRIV_ID")
-        #if lID == 70784289:
-        #    print('debugging flowline: ', lID)
 
         lOutletID = pFeature_shapefile.GetFieldAsInteger("MAIN_RIV")
         lStream_order = pFeature_shapefile.GetFieldAsInteger("ORD_STRA")

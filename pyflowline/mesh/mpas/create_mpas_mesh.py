@@ -117,12 +117,6 @@ def create_mpas_mesh(sFilename_output_in,
         pFeature = ogr.Feature(pLayerDefn)
 
     if iFlag_run_jigsaw_in ==1:
-        #sFilename_mpas_mesh_netcdf_in = run_jigsaw_mpas_workflow(sWorkspace_jigsaw_in,
-        #                         aConfig_in = aConfig_jigsaw_in,
-        #    aFilename_river_network_in = aFilename_river_network_in,
-        #    aFilename_watershed_boundary_in = aFilename_watershed_boundary_in,
-        #    aFilename_lake_boundary_in = aFilename_lake_boundary_in,
-        #    aFilename_coastline_in = aFilename_coastline_in)
         projector=[0.0, 0.0]
         geom, gprj, mesh, mprj = run_jigsaw(sWorkspace_jigsaw_in, projector,
                                       aConfig_in=aConfig_jigsaw_in,

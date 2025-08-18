@@ -514,10 +514,6 @@ def run_jigsaw(sWorkspace_jigsaw_in, projector,
             else:
                 print("You need to provide either coastline or river network to set the base spacing")
 
-        #the low resolution grid
-        #xgrid_low = np.linspace( -1. * np.pi, +1. * np.pi, 360)
-        #ygrid_low = np.linspace( -.5 * np.pi, +.5 * np.pi, 180)
-
         #the high resolution grid
         xgrid_high = np.linspace( -1. * np.pi, +1. * np.pi, ncolumn_space)
         ygrid_high = np.linspace( -.5 * np.pi, +.5 * np.pi, nrow_space)

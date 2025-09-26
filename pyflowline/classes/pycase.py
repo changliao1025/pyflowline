@@ -1136,7 +1136,6 @@ class flowlinecase(object):
                                                          iFlag_use_mesh_dem_in=iFlag_use_mesh_dem,
                                                          iFlag_save_mesh_in=iFlag_save_mesh,
                                                          sFilename_mpas_mesh_netcdf_in=sFilename_mpas_mesh_netcdf,
-
                                                          iFlag_run_jigsaw_in=self.iFlag_run_jigsaw,
                                                          iFlag_antarctic_in=iFlag_antarctic,
                                                          iFlag_arctic_in=iFlag_arctic,

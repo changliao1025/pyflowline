@@ -8,7 +8,13 @@ from osgeo import ogr, gdal, osr
 from pyflowline.classes.vertex import pyvertex
 from pyflowline.classes.edge import pyedge
 from pyflowline.formats.export_vertex import export_vertex_as_polygon
-from pyflowline.algorithms.cython.kernel import calculate_distance_based_on_longitude_latitude_numpy
+import importlib.util
+iFlag_cython = importlib.util.find_spec("cython")
+if iFlag_cython is not None:
+    from pyflowline.algorithms.cython.kernel import calculate_distance_based_on_longitude_latitude_numpy
+else:
+    from pyearth.gis.geometry.calculate_distance_based_on_longitude_latitude import calculate_distance_based_on_longitude_latitude
+
 
 class FlowlineClassEncoder(JSONEncoder):
     def default(self, obj):
@@ -455,7 +461,7 @@ class pyflowline(object):
         lat2 = aVertex_b[:, 1]
 
         # Vectorized distance calculation
-        distances = calculate_distance_based_on_longitude_latitude_numpy(lon1, lat1, lon2, lat2)
+        distances = calculate_distance_based_on_longitude_latitude(lon1, lat1, lon2, lat2)
         return np.min(distances)
 
     def calculate_bearing_angle(self):
@@ -472,7 +478,7 @@ class pyflowline(object):
         lat1_rad = np.radians(dLat_start)
         lat2_rad = np.radians(dLat_end)
         dlon_rad = np.radians(dLon_end - dLon_start)
-    
+
         # Calculate bearing using the forward azimuth formula
         y = np.sin(dlon_rad) * np.cos(lat2_rad)
         x = np.cos(lat1_rad) * np.sin(lat2_rad) - np.sin(lat1_rad) * np.cos(lat2_rad) * np.cos(dlon_rad)

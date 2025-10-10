@@ -102,15 +102,15 @@ def convert_gcs_coordinates_to_cell(iMesh_type_in,
             pSquare = pysquare(dLongitude_center_in, dLatitude_center_in, aEdge, aVertex)
             return pSquare
         else:
-            if iMesh_type_in ==3: #latlon
+            if iMesh_type_in == 3: #latlon
                 pLatlon = pylatlon(dLongitude_center_in, dLatitude_center_in, aEdge, aVertex)
                 return pLatlon
             else:
-                if iMesh_type_in ==4: #mpas
-                    pMpas = pympas(  dLongitude_center_in, dLatitude_center_in, aEdge, aVertex)
+                if iMesh_type_in == 4: #mpas
+                    pMpas = pympas(dLongitude_center_in, dLatitude_center_in, aEdge, aVertex)
                     return pMpas
                 else:
-                    if iMesh_type_in ==5: #dggrid
+                    if iMesh_type_in == 5: #dggrid
                         pdggrid = pydggrid(dLongitude_center_in, dLatitude_center_in, aEdge, aVertex)
                         return pdggrid
 

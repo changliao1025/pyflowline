@@ -200,8 +200,8 @@ class JigsawConfigManager:
             "iFlag_opts": False,         # Enable custom options
 
             # Environment type flags
-            "iFlag_ocean": False,        # Apply ocean-specific spacing
-            "iFlag_land": False,         # Apply land-specific spacing
+            "iFlag_spac_ocean": False,        # Apply ocean-specific spacing
+            "iFlag_spac_land": True,         # Apply land-specific spacing
 
             # Point feature geometry and spacing flags
             "iFlag_geom_dam": False,     # Include dam geometries

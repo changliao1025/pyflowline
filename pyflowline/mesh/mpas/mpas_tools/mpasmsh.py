@@ -256,10 +256,16 @@ def jigsaw_mesh_to_netcdf(mesh, output_name, on_sphere, sphere_radius=None):
         y3 = yCell_full[cell3 - 1]
         z3 = zCell_full[cell3 - 1]
 
-        pv = circumcenter(on_sphere, x1, y1, z1, x2, y2, z2, x3, y3, z3)
-        xVertex_full[iVertex] = pv.x
-        yVertex_full[iVertex] = pv.y
-        zVertex_full[iVertex] = pv.z
+        #pv = circumcenter(on_sphere, x1, y1, z1, x2, y2, z2, x3, y3, z3)
+        #xVertex_full[iVertex] = pv.x
+        #yVertex_full[iVertex] = pv.y
+        #zVertex_full[iVertex] = pv.z
+
+        #the mpas tool was updated, so this function is now updated
+        x, y, z = circumcenter(on_sphere, x1, y1, z1, x2, y2, z2, x3, y3, z3)
+        xVertex_full[iVertex] = x
+        yVertex_full[iVertex] = y
+        zVertex_full[iVertex] = z
 
     xCell = grid.createVariable('xCell', 'f8', ('nCells',))
     yCell = grid.createVariable('yCell', 'f8', ('nCells',))

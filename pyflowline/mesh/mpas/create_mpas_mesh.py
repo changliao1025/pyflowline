@@ -11,6 +11,8 @@ iFlag_cython = importlib.util.find_spec("cython")
 from pyearth.gis.geometry.convert_longitude_range import convert_360_to_180_np
 from pyearth.gis.geometry.convert_idl_polygon_to_valid_polygon import convert_idl_polygon_to_valid_polygon
 
+from pyearth.gis.geometry.reorder_idl_polygon import reorder_idl_polygon
+
 def create_mpas_mesh(sFilename_output_in,
         iFlag_global_in = None,
         iFlag_use_mesh_dem_in = None,
@@ -559,36 +561,55 @@ def create_mpas_mesh(sFilename_output_in,
                 dLon_min = np.min(aCoords_gcs[:,0])
                 dLon_max = np.max(aCoords_gcs[:,0])
                 iFlag_debug = 0
-                #if iFlag_debug == 1:
-                #    if dLongitude_center > -90 and dLongitude_center < -80 and dLatitude_center > 40 and dLatitude_center < 50:
-                #        print('test mesh cell')
-                #    else:
-                #        pass
                 if iFlag_global == 1:
                     if dLatitude_center >= -60:
                         if dLatitude_center>85: #exclude the north pole as well
                             iFlag = False
                             continue
                         else:
-                            if np.abs(dLon_min-dLon_max) > 100: #this polygon cross international date line
-                                #print('Warning: longitude > 180')
-                                #keep this but use an alternative way to check
-                                iFlag = True #do not check the polygon?
-                                pPolygon_new = convert_idl_polygon_to_valid_polygon(pPolygon)
-                                if pPolygon_new is not None:
-                                    if pPolygon_new.IsValid() == False:
-                                        print('Warning: invalid polygon')
-                                        continue
-                                    else:
-                                        pass
-                                else:
-                                    continue
+                            if nVertex > 4:
+                                if np.abs(dLon_min-dLon_max) > 100: #this polygon cross international date line
+                                    if pPolygon.IsValid() == False:
+                                        pPolygon.FlattenTo2D()
+                                        sWKT = pPolygon.ExportToWkt()
+                                        print('Warning: invalid polygon: ', sWKT)
+                                        #fix the polygon
+                                        #check which part has only 1 vertex
+                                        aCoords_gcs_new = reorder_idl_polygon(aCoords_gcs.tolist())
+                                        ring_new = ogr.Geometry(ogr.wkbLinearRing)
+                                        for j in range(nVertex):
+                                            x1 = aCoords_gcs_new[j][0]
+                                            y1 = aCoords_gcs_new[j][1]
+                                            ring_new.AddPoint(x1, y1)
+                                            pass
 
+                                        x1 = aCoords_gcs_new[0][0]
+                                        y1 = aCoords_gcs_new[0][1]
+                                        ring_new.AddPoint(x1, y1) #double check
+                                        pPolygon_new = ogr.Geometry(ogr.wkbPolygon)
+                                        pPolygon_new.AddGeometry(ring_new)
+                                        #pPolygon_new = convert_idl_polygon_to_valid_polygon(pPolygon)
+                                        if pPolygon_new is not None:
+                                            pPolygon_new.FlattenTo2D()
+                                            sWKT_new = pPolygon_new.ExportToWkt()
+                                            if pPolygon_new.IsValid():
+                                                print('The polygon is fixed: ', sWKT_new)
+                                                #deleta the old polygon and replace it with the new polygon
+                                                pPolygon = None
+                                                pPolygon = pPolygon_new
+                                                iFlag = True
+                                            else:
+                                                print('The polygon cannot be fixed: ', sWKT_new)
+                                                pass
+                                        else:
+                                            continue
+                                    else:
+                                        iFlag = True
+
+                                else:
+                                    iFlag = True
                             else:
                                 iFlag = True
-                                if pPolygon.IsValid() == False:
-                                    print('Warning: invalid polygon')
-                                    continue
                     else:
                         iFlag = False  #remove antiarctic from global mesh for now
                         continue

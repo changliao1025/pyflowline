@@ -54,7 +54,9 @@ def read_flowline_shapefile(sFilename_shapefile_in):
         if (pGeometry_in.IsValid()):
             pass
         else:
-            print('Geometry issue')
+            print('Geometry issue 8')
+            print('Warning: invalid geometry found in ', sFilename_shapefile_in)
+            raise Exception(f"Invalid geometry found in {sFilename_shapefile_in}")
 
         if(sGeometry_type == 'MULTILINESTRING'):
             nLine = pGeometry_in.GetGeometryCount()
@@ -122,7 +124,9 @@ def read_flowline_shapefile_swat(sFilename_shapefile_in):
         if (pGeometry_in.IsValid()):
             pass
         else:
-            print('Geometry issue')
+            print('Geometry issue 9')
+            print('Warning: invalid geometry found in ', sFilename_shapefile_in)
+            raise Exception(f"Invalid geometry found in {sFilename_shapefile_in}")
 
         if(sGeometry_type == 'MULTILINESTRING'):
             nLine = pGeometry_in.GetGeometryCount()

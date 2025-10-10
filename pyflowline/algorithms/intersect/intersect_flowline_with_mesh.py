@@ -4,10 +4,11 @@ import importlib.util
 import numpy as np
 from osgeo import ogr, osr
 #from shapely.wkt import loads
+from pyearth.gis.location.get_geometry_coordinates import get_geometry_coordinates
+from pyearth.gis.geometry.convert_idl_polygon_to_valid_polygon import convert_idl_polygon_to_valid_polygon
 
 from pyflowline.formats.convert_coordinates import convert_gcs_coordinates_to_cell
 from pyflowline.formats.convert_coordinates import convert_gcs_coordinates_to_flowline
-from pyearth.gis.location.get_geometry_coordinates import get_geometry_coordinates
 
 iFlag_cython = importlib.util.find_spec("cython")
 if iFlag_cython is not None:
@@ -85,11 +86,10 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh_in, sFilename_flo
             dLongitude_center = pFeature_mesh.GetField("longitude")
             dLatitude_center = pFeature_mesh.GetField("latitude")
             dArea = pFeature_mesh.GetField("area")
-            if (pGeometry_mesh.IsValid()):
-                pass
-            else:
-                print('Geometry issue')
-
+            dLongitude_min= np.min(aCoords_gcs[:,0])
+            dLongitude_max = np.max(aCoords_gcs[:,0])
+            dArea = pFeature_mesh.GetField("area")
+            left_orig, right_orig, bottom, top = pGeometry_mesh.GetEnvelope()
             pGeometrytype_mesh = pGeometry_mesh.GetGeometryName()
             if(pGeometrytype_mesh == 'POLYGON'):
                 pCell = convert_gcs_coordinates_to_cell(iMesh_type_in, dLongitude_center, dLatitude_center, aCoords_gcs)
@@ -99,10 +99,8 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh_in, sFilename_flo
                 pCell.dLength_flowline = pCell.dLength
                 aFlowline_intersect = list()
                 iFlag_intersected = 0
-
-                left, right, bottom, top= pGeometry_mesh.GetEnvelope()
-                pBound= (left, bottom, right, top)
-
+                #left, right, bottom, top= pGeometry_mesh.GetEnvelope()
+                pBound= (left_orig, bottom, right_orig, top)
                 aIntersect = list(index_flowline.search(pBound))
                 for k in aIntersect:
                     pFeature_flowline = pLayer_flowline.GetFeature(k)
@@ -187,20 +185,35 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh_in, sFilename_flo
                     #aCell.append(pCell)
                     pass
     else:
-
         for pFeature_mesh in pLayer_mesh:
             pGeometry_mesh = pFeature_mesh.GetGeometryRef()
             aCoords_gcs = get_geometry_coordinates(pGeometry_mesh)
             lCellID = pFeature_mesh.GetField("cellid")
             dLongitude_center = pFeature_mesh.GetField("longitude")
             dLatitude_center = pFeature_mesh.GetField("latitude")
+            dLongitude_min= np.min(aCoords_gcs[:,0])
+            dLongitude_max = np.max(aCoords_gcs[:,0])
             dArea = pFeature_mesh.GetField("area")
-            if (iFlag_transform ==1):
-                pGeometry_mesh.Transform(transform)
-            if (pGeometry_mesh.IsValid()):
-                pass
+            if np.abs(dLongitude_min - dLongitude_max) > 100:
+                #idl mesh cell
+                pGeometry_mesh = convert_idl_polygon_to_valid_polygon(pGeometry_mesh)
+                if pGeometry_mesh is not None:
+                    if pGeometry_mesh.IsValid() == False:
+                        print('Warning: invalid polygon')
+                        continue
+                    else:
+                        pass
+                else:
+                    continue
             else:
-                print('Geometry issue')
+                if (iFlag_transform ==1):
+                    pGeometry_mesh.Transform(transform)
+                if (pGeometry_mesh.IsValid()):
+                    pass
+                else:
+                    print('Geometry issue 4')
+                    print('Warning: invalid geometry found in ', sFilename_flowline_in)
+                    raise Exception(f"Invalid geometry found in {sFilename_flowline_in}")
 
             pGeometrytype_mesh = pGeometry_mesh.GetGeometryName()
             if(pGeometrytype_mesh == 'POLYGON'):
@@ -219,7 +232,9 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh_in, sFilename_flo
                     if (pGeometry_flowline.IsValid()):
                         pass
                     else:
-                        print('Geometry issue')
+                        print('Geometry issue 5')
+                        print('Warning: invalid polygon detected at cell ', j, ', cellID: ', int(lCellID) )
+                        raise Exception(f"Invalid polygon detected at cell {j}, cellID: {int(lCellID)}")
 
                     iFlag_intersect = pGeometry_flowline.Intersects( pGeometry_mesh )
                     if( iFlag_intersect == True):
@@ -301,8 +316,6 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh_in, sFilename_flo
 
             else:
                 pass
-
-
 
     #quality control
     #find the flowline that has the largest stream segment index

@@ -205,28 +205,21 @@ def create_latlon_mesh(dLongitude_left_in,
 
     pDataset = pLayer = pFeature  = None
 
-    #update neighbor, this will not change the dictionary index
-    iFlag_fill_hole = 0
+
     aLatlon_out = list()
-
-    if iFlag_fill_hole == 1:
-        #follow the map or hexagon method
-        pass
-    else:
-        for pCell in aLatlon:
-            aNeighbor = pCell.aNeighbor
-            aNeighbor_land_update = list()
-            for lNeighbor in aNeighbor:
-                if lNeighbor in aLatlon_dict:
-                    aNeighbor_land_update.append(lNeighbor)
-
-            #for latlon, there is no ocean concept
-            pCell.aNeighbor = aNeighbor_land_update
-            pCell.nNeighbor= len(aNeighbor_land_update)
-            pCell.aNeighbor_land = aNeighbor_land_update
-            pCell.nNeighbor_land= len(aNeighbor_land_update)
-            pCell.nNeighbor_ocean = pCell.nVertex - pCell.nNeighbor_land
-            aLatlon_out.append(pCell)
+    for pCell in aLatlon:
+        aNeighbor = pCell.aNeighbor
+        aNeighbor_land_update = list()
+        for lNeighbor in aNeighbor:
+            if lNeighbor in aLatlon_dict:
+                aNeighbor_land_update.append(lNeighbor)
+        #for latlon, there is no ocean concept
+        pCell.aNeighbor = aNeighbor_land_update
+        pCell.nNeighbor= len(aNeighbor_land_update)
+        pCell.aNeighbor_land = aNeighbor_land_update
+        pCell.nNeighbor_land= len(aNeighbor_land_update)
+        pCell.nNeighbor_ocean = pCell.nVertex - pCell.nNeighbor_land
+        aLatlon_out.append(pCell)
 
     #calculate neighbor distance
     for pLatlon in aLatlon_out:
@@ -241,8 +234,3 @@ def create_latlon_mesh(dLongitude_left_in,
 
 
     return aLatlon_out
-
-
-
-
-

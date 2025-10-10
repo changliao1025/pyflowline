@@ -68,7 +68,7 @@ def _pyflowline_create_hpc_job(self, sSlurm_in=None, hours_in = 10):
     ofs = open(sFilename_job, 'w')
     sLine = '#!/bin/bash\n'
     ofs.write(sLine)
-    sLine = '#SBATCH -A ESMD\n'
+    sLine = '#SBATCH -A E3SM\n'
     ofs.write(sLine)
     sLine = '#SBATCH --job-name=' + self.sCase + '\n'
     ofs.write(sLine)

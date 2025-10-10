@@ -75,7 +75,10 @@ def intersect_flowline_with_flowline( sFilename_flowline_a_in, sFilename_flowlin
         if (pGeometry_flowline_a.IsValid()):
             pass
         else:
-            print('Geometry issue')
+            print('Geometry issue 6')
+            print('Warning: invalid geometry found in ', sFilename_flowline_a_in)
+            raise Exception(f"Invalid geometry found in {sFilename_flowline_a_in}")
+
 
         #convert geometry to edge
         pGeometrytype_flowline_a = pGeometry_flowline_a.GetGeometryName()
@@ -94,7 +97,9 @@ def intersect_flowline_with_flowline( sFilename_flowline_a_in, sFilename_flowlin
                 if (pGeometry_flowline_b.IsValid()):
                     pass
                 else:
-                    print('Geometry issue')
+                    print('Geometry issue 7')
+                    print('Warning: invalid polygon detected in ', sFilename_flowline_b_in)
+                    raise Exception(f"Invalid geometry found in {sFilename_flowline_b_in}")
 
                 iFlag_intersect = pGeometry_flowline_b.Intersects( pGeometry_flowline_a )
                 if( iFlag_intersect == True):

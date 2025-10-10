@@ -68,31 +68,37 @@ def saveesm(sWorkspace_jigsaw_out, geom, mesh,
     dummy = convert(xr.open_dataset( sFilename_triangles), dir = sWorkspace_jigsaw_out)
     write_netcdf(dummy, fileName=sFilename_base_mesh, format= netcdfFormat)
 
-    sFilename_executable = 'paraview_vtk_field_extractor.py'
-    #find the full path to the python executable
-    for folder in os.environ['PATH'].split(os.pathsep):
-        sFilename_dummy = os.path.join(folder, sFilename_executable)
-        if os.path.isfile(sFilename_dummy):
-            iFlag_found_binary = 1
-            sPath_executable = sFilename_dummy
-            break
-
-    sFilename_base_mesh_vtk = os.path.join(sWorkspace_jigsaw_out, "out", "base_mesh_vtk")
-    args = [sPath_executable,
-            "--ignore_time",
-            "-l",
-            "-d", "maxEdges=0",
-            "-v", "allOnCells",
-            "-f", sFilename_base_mesh,
-            "-o", sFilename_base_mesh_vtk]
-    print("")
-    print("running:", " ".join(args))
-
     sConda_env_path , sConda_env_name = get_python_environment()
     sPython = sConda_env_path + "/bin/python3"
-    args = [sPython] + args
     sEnv = os.environ.copy()
-    subprocess.check_call(args, env=sEnv)
+
+    iFlag_vtk = 0 #not sure whether the MPAS tools update broke this feature or not, so we turn it off for now
+
+    if iFlag_vtk == 1:
+
+        sFilename_executable = 'paraview_vtk_field_extractor.py'
+        sPath_executable = None
+        #find the full path to the python executable
+        for folder in os.environ['PATH'].split(os.pathsep):
+            sFilename_dummy = os.path.join(folder, sFilename_executable)
+            if os.path.isfile(sFilename_dummy):
+                iFlag_found_binary = 1
+                sPath_executable = sFilename_dummy
+                break
+
+        sFilename_base_mesh_vtk = os.path.join(sWorkspace_jigsaw_out, "out", "base_mesh_vtk")
+        args = [sPath_executable,
+                "--ignore_time",
+                "-l",
+                "-d", "maxEdges=0",
+                "-v", "allOnCells",
+                "-f", sFilename_base_mesh,
+                "-o", sFilename_base_mesh_vtk]
+        print("")
+        args = [sPython] + args
+        print("running", " ".join(args))
+
+        subprocess.check_call(args, env=sEnv)
 
     # Create the land mask based on the land coverage,
     # i.e. coastline data.
@@ -138,32 +144,30 @@ def saveesm(sWorkspace_jigsaw_out, geom, mesh,
     write_netcdf(
             dsInvertMesh, sFilename_invert_mesh, format= netcdfFormat)
 
-    sFilename_culled_mesh_vtk = os.path.join(sWorkspace_jigsaw_out, "out", "culled_mesh_vtk")
+    if iFlag_vtk == 1:
+        sFilename_culled_mesh_vtk = os.path.join(sWorkspace_jigsaw_out, "out", "culled_mesh_vtk")
+        args = [sPath_executable,
+                "--ignore_time",
+                "-d", "maxEdges=",
+                "-v", "allOnCells",
+                "-f", sFilename_culled_mesh,
+                "-o", sFilename_culled_mesh_vtk]
 
-    args = [sPath_executable,
-            "--ignore_time",
-            "-d", "maxEdges=",
-            "-v", "allOnCells",
-            "-f", sFilename_culled_mesh,
-            "-o", sFilename_culled_mesh_vtk]
+        print("")
+        print("running", " ".join(args))
+        args = [sPython] + args
+        subprocess.check_call(args, env=os.environ.copy())
 
-    print("")
-    print("running", " ".join(args))
-    args = [sPython] + args
-    #skip vtk?
-    #subprocess.check_call(args, env=os.environ.copy())
-
-    sFilename_invert_mesh_vtk = os.path.join(sWorkspace_jigsaw_out, "out", "invert_mesh_vtk")
-    args = [sPath_executable,
-            "--ignore_time",
-            "-d", "maxEdges=",
-            "-v", "allOnCells",
-            "-f", sFilename_invert_mesh,
-            "-o", sFilename_invert_mesh_vtk]
-    print("running", " ".join(args))
-    args = [sPython] + args
-    #skip vtk?
-    #subprocess.check_call(args, env=os.environ.copy())
+        sFilename_invert_mesh_vtk = os.path.join(sWorkspace_jigsaw_out, "out", "invert_mesh_vtk")
+        args = [sPath_executable,
+                "--ignore_time",
+                "-d", "maxEdges=",
+                "-v", "allOnCells",
+                "-f", sFilename_invert_mesh,
+                "-o", sFilename_invert_mesh_vtk]
+        print("running", " ".join(args))
+        args = [sPython] + args
+        subprocess.check_call(args, env=os.environ.copy())
 
     ttoc = time.time()
 

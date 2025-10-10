@@ -179,15 +179,15 @@ def run_jigsaw(sWorkspace_jigsaw_in, projector,
         else:
             iFlag_opts = False
 
-        if "iFlag_ocean" in aConfig_in:
-            iFlag_ocean = aConfig_in["iFlag_ocean"]
+        if "iFlag_spac_ocean" in aConfig_in:
+            iFlag_spac_ocean = aConfig_in["iFlag_spac_ocean"]
         else:
-            iFlag_ocean = False
+            iFlag_spac_ocean = False
 
-        if "iFlag_land" in aConfig_in:
-            iFlag_land = aConfig_in["iFlag_land"]
+        if "iFlag_spac_land" in aConfig_in:
+            iFlag_spac_land = aConfig_in["iFlag_spac_land"]
         else:
-            iFlag_land = False
+            iFlag_spac_land = False
 
         if "iFlag_geom_dam" in aConfig_in:
             iFlag_geom_dam = aConfig_in["iFlag_geom_dam"]
@@ -352,8 +352,8 @@ def run_jigsaw(sWorkspace_jigsaw_in, projector,
         iFlag_spac = False
         iFlag_init = False
         iFlag_opts = False
-        iFlag_ocean = False
-        iFlag_land = False
+        iFlag_spac_ocean = False
+        iFlag_spac_land = True
         #point
         iFlag_geom_dam = False
         iFlag_geom_city = False
@@ -522,7 +522,7 @@ def run_jigsaw(sWorkspace_jigsaw_in, projector,
         spac.ygrid = ygrid_high
         spac.value = np.full( (nrow_space, ncolumn_space), dSpac_value, dtype=spac.REALS_t)
 
-        if iFlag_ocean : #this requires the coastline
+        if iFlag_spac_ocean : #this requires the coastline
             if iFlag_spac_coastline:
                 print("Compute global ocean h(x)...")
                 vals = mdt.EC_CellWidthVsLat(spac.ygrid * 180. / np.pi)
@@ -540,7 +540,7 @@ def run_jigsaw(sWorkspace_jigsaw_in, projector,
             spac.value[aCoastline_mask] =  np.minimum(dResolution_coastline, spac.value[aCoastline_mask])
             pass
 
-        if iFlag_land : #land feature, maybe mountain, etc
+        if iFlag_spac_land : #land feature, maybe mountain, etc
             print("Compute global h(x)... for land")
             aLand_mask = compute_mask(aLand_ocean_mask, 2, dOriginX, dOriginY, pixelWidth, pixelHeight, ncolumn_space, nrow_space)
             spac.value[aLand_mask] =  np.minimum(dResolution_land, spac.value[aLand_mask])
@@ -582,17 +582,6 @@ def run_jigsaw(sWorkspace_jigsaw_in, projector,
 
         if iFlag_spac_river_network:
             print("Compute global h(x)... for river network")
-            #sFilename_river_network_raster = aConfig_in["sFilename_river_network_raster"]
-            #if not os.path.exists(sFilename_river_network_raster):
-            #    pass
-            #else:
-            #    dummy = gdal_read_geotiff_file(sFilename_river_network_raster)
-            #aData_river_network = dummy['dataOut']
-            #dOriginX = dummy['originX']
-            #dOriginY = dummy['originY']
-            #pixelHeight = dummy['pixelHeight'] #30/3600.0
-            #pixelWidth = dummy['pixelWidth']
-            #aRiver_network_mask = compute_mask(aData_river_network, 1, dOriginX, dOriginY, pixelWidth, pixelHeight, ncolumn_space, nrow_space)
             spac.value[aRiver_network_mask] = np.minimum(dResolution_river_network, spac.value[aRiver_network_mask])
             pass
 

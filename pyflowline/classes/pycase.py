@@ -612,6 +612,16 @@ class flowlinecase(object):
         if self.iFlag_mesh_boundary == 1:
             self.pyflowline_convert_mesh_boundary_to_geojson()
             pass
+        else:
+            if self.iFlag_land_ocean_mask == 1:
+                sFilename_raw = self.sFilename_coastal_boundary
+                sFilename_out = self.sFilename_coastal_boundary_geojson
+                # check whether the file exists
+                if os.path.isfile(sFilename_raw):
+                    convert_boundary_to_geojson(sFilename_raw, sFilename_out)
+                else:
+                    print('The coastal boundary file does not exist!')
+                pass
 
         if self.iFlag_run_jigsaw == 1:
             # create dggrid output folder
@@ -1143,16 +1153,15 @@ class flowlinecase(object):
                                                          sWorkspace_jigsaw_in=self.sWorkspace_jigsaw)
                                 pass
                             else:
+                                # if user wants to use the coastal boundary, then we can replace the default land ocean mask
+                                if self.iFlag_land_ocean_mask == 1:
+                                    sFilename_land_ocean_mask_in = self.sFilename_coastal_boundary_geojson
+                                else:
+                                    sFilename_land_ocean_mask_in = None
+                                    pass
                                 if iFlag_mesh_boundary == 1:
                                     # create a polygon based on
                                     pBoundary_wkt, aExtent = gdal_read_geojson_boundary(self.sFilename_mesh_boundary_geojson)
-                                    print(sFilename_mpas_mesh_netcdf)
-                                    # if user wants to use the coastal boundary, then we can replace the default land ocean mask
-                                    if self.iFlag_land_ocean_mask == 1:
-                                        sFilename_land_ocean_mask_in = self.sFilename_coastal_boundary_geojson
-                                    else:
-                                        sFilename_land_ocean_mask_in = None
-                                        pass
                                     aMpas = create_mpas_mesh(sFilename_mesh,
                                                              iFlag_global_in=iFlag_global,
                                                              iFlag_use_mesh_dem_in=iFlag_use_mesh_dem,
@@ -1193,6 +1202,7 @@ class flowlinecase(object):
                                                              sWorkspace_jigsaw_in=self.sWorkspace_jigsaw,
                                                              sFilename_mpas_mesh_netcdf_in=sFilename_mpas_mesh_netcdf,
                                                              sFilename_jigsaw_mesh_netcdf_in=sFilename_jigsaw_mesh_netcdf,
+                                                             sFilename_land_ocean_mask_in=sFilename_land_ocean_mask_in,
                                                              aConfig_jigsaw_in=self.aConfig_jigsaw,
                                                              pBoundary_in=pBoundary_wkt)
                                     pass

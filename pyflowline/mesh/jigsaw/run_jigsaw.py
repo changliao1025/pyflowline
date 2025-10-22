@@ -13,7 +13,7 @@ import mpas_tools.mesh.creation.mesh_definition_tools as mdt
 from pyflowline.mesh.jigsaw.inpoly2 import inpoly2
 from pyflowline.mesh.jigsaw.loadgeo import loadgeo
 from pyflowline.mesh.jigsaw.utility import addpoint, addline, addpoly, innerto
-#from pyflowline.classes.vertex import pyvertex
+
 
 def compute_mask(aData, value, dLongitude_upper_left, dLatitude_upper_left, pixelWidth, pixelHeight, ncolumn_space, nrow_space):
     dummy_index = np.where(aData == value)

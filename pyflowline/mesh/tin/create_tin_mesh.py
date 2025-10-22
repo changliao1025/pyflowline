@@ -3,7 +3,7 @@ import math
 import importlib.util
 import numpy as np
 from osgeo import ogr, osr, gdal
-from pyearth.gis.location.xyz_to_lonlat import xyz_to_lonlat
+from pyearth.gis.location.convert_between_longitude_latitude_and_sphere_3d import convert_sphere_3d_to_longitude_latitude
 from pyflowline.formats.convert_coordinates import convert_gcs_coordinates_to_cell
 from pyflowline.formats.convert_attributes import convert_gcs_attributes_to_cell
 from pyflowline.mesh.jigsaw.run_jigsaw import run_jigsaw
@@ -213,13 +213,13 @@ def create_tin_mesh(   sFilename_output_in,
                 for j in range(nVertex1):
                     dummy1 = dummy[j]
                     x, y, z = aX0[dummy1 - 1], aY0[dummy1 - 1], aZ0[dummy1 - 1]
-                    x1, y1 = xyz_to_lonlat(x, y, z)
+                    x1, y1 = convert_sphere_3d_to_longitude_latitude(x, y, z)
                     ring.AddPoint(x1, y1)
                     aCoords_gcs[j] = [x1, y1]
 
                 # Close the polygon by adding the first point again
                 x, y, z = aX0[dummy[0] - 1], aY0[dummy[0] - 1], aZ0[dummy[0] - 1]
-                x1, y1 = xyz_to_lonlat(x, y, z)
+                x1, y1 = convert_sphere_3d_to_longitude_latitude(x, y, z)
                 aCoords_gcs[nVertex1] = [x1, y1]
                 ring.AddPoint(x1, y1)
 

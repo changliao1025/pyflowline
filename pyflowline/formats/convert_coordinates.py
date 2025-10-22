@@ -16,7 +16,7 @@ if iFlag_cython is not None:
     from pyflowline.algorithms.cython.kernel import calculate_angle_betwen_vertex
     from pyflowline.algorithms.cython.kernel import calculate_distance_to_plane
 else:
-    from pyearth.gis.geometry.calculate_angle_betwen_vertex import calculate_angle_betwen_vertex
+    from pyearth.gis.geometry.calculate_angle_between_vertex import calculate_angle_between_vertex
     from pyearth.gis.geometry.calculate_distance_to_plane import calculate_distance_to_plane
 
 def convert_gcs_coordinates_to_cell(iMesh_type_in,

@@ -6,7 +6,7 @@ def _pyflowline_create_hpc_job(self, sSlurm_in=None, hours_in = 10):
     """create a HPC job for this simulation
     """
     os.chdir(self.sWorkspace_output)
-    sConda_env_path , sConda_env_name = get_python_environment()
+    sConda_env_path, sConda_env_name, env_type = get_python_environment()
     # part 1 python script
 
     sFilename_pyflowline = os.path.join(

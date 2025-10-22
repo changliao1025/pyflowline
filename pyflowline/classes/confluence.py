@@ -5,11 +5,11 @@ import numpy as np
 from pyflowline.classes.vertex import pyvertex
 from pyflowline.classes.flowline import pyflowline
 
-iFlag_cython = importlib.util.find_spec("cython") 
+iFlag_cython = importlib.util.find_spec("cython")
 if iFlag_cython is not None:
     from pyflowline.algorithms.cython.kernel import calculate_angle_betwen_vertex
 else:
-    from pyearth.gis.geometry.calculate_angle_betwen_vertex import  calculate_angle_betwen_vertex
+    from pyearth.gis.geometry.calculate_angle_between_vertex import  calculate_angle_between_vertex
 
 class ConfluenceClassEncoder(JSONEncoder):
     """Confluence Class Encoder
@@ -21,16 +21,16 @@ class ConfluenceClassEncoder(JSONEncoder):
         if isinstance(obj, np.integer):
             return int(obj)
         if isinstance(obj, np.ndarray):
-            return obj.tolist()        
+            return obj.tolist()
         if isinstance(obj, np.float32):
-            return float(obj)        
+            return float(obj)
         if isinstance(obj, list):
-            pass  
+            pass
         if isinstance(obj, pyvertex):
-            return json.loads(obj.tojson())       
+            return json.loads(obj.tojson())
         if isinstance(obj, pyflowline):
             return obj.lFlowlineID
-        
+
         return JSONEncoder.default(self, obj)
 
 class pyconfluence():
@@ -40,12 +40,12 @@ class pyconfluence():
         object: A confluence object
     """
 
-    lIndex=-1 
-    lConfluenceID=-1    
-    pVertex_confluence=None    
+    lIndex=-1
+    lConfluenceID=-1
+    pVertex_confluence=None
     pFlowline_downstream=None
     aFlowline_upstream=list()
-    dAngle_upstream=0.0    
+    dAngle_upstream=0.0
 
     def __init__(self, pVertex_center, aFlowline_upstream_in, pFlowline_downstream_in):
         """
@@ -56,16 +56,16 @@ class pyconfluence():
             aFlowline_upstream_in (list [pyflowline]): A list of upstream flowlines
             pFlowline_downstream_in (pyflowline): The downstream flowline
         """
-        try:     
-            self.pVertex_confluence      = pVertex_center       
-            self.aFlowline_upstream      = aFlowline_upstream_in  
-            self.pFlowline_downstream    = pFlowline_downstream_in  
-            
+        try:
+            self.pVertex_confluence      = pVertex_center
+            self.aFlowline_upstream      = aFlowline_upstream_in
+            self.pFlowline_downstream    = pFlowline_downstream_in
+
         except:
             print('Initialization of confluence failed!')
-        
+
         return
-    
+
     def calculate_branching_angle(self):
         """
         Calcualte the confluence branching angle (https://www.pnas.org/doi/10.1073/pnas.1215218109)
@@ -73,12 +73,12 @@ class pyconfluence():
         Returns:
             float: The branching angle in degree
         """
-        #normally there are 2 edges meet at confluence        
+        #normally there are 2 edges meet at confluence
         if len(self.aFlowline_upstream)==2:
             pFlowline1 = self.aFlowline_upstream[0]
             pFlowline2 = self.aFlowline_upstream[1]
             nedge1 = pFlowline1.nEdge
-            nedge2 = pFlowline2.nEdge                
+            nedge2 = pFlowline2.nEdge
             x1 = pFlowline1.aEdge[nedge1-1].pVertex_start.dLongitude_degree
             y1 = pFlowline1.aEdge[nedge1-1].pVertex_start.dLatitude_degree
             x2 = self.pVertex_confluence.dLongitude_degree
@@ -91,8 +91,8 @@ class pyconfluence():
             print(len(self.aFlowline_upstream))
             self.dAngle_upstream=0.0
 
-        return self.dAngle_upstream    
-    
+        return self.dAngle_upstream
+
     def tojson(self):
         """
         Convert a pyconfluence object to json

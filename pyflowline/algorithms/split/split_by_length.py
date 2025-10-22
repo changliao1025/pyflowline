@@ -22,16 +22,6 @@ def split_edge_by_length(pEdge_in, dLength_in):
     else:
         pVertex_start = pEdge_in.pVertex_start
         pVertex_end = pEdge_in.pVertex_end
-        #nBreak = 1
-        #for i in range(1,10):
-        #    if np.power(2, i) * dLength_in > dLength_total:
-        #        nBreak = i
-        #        break
-        #    else:
-        #        pass
-        ##now we have the break count
-        #nPoint = np.power(2, nBreak) + 1
-        #nEdge = nPoint-1
 
         n1 = pVertex_start.toNvector()
         n2 = pVertex_end.toNvector()

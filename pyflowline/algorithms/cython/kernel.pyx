@@ -137,7 +137,7 @@ cpdef  convert_360_to_180(double dLongitude_in):
     return dLongitude_out
 
 @cython.boundscheck(False)  # deactivate bnds checking
-cpdef  find_vertex_in_list(list aVertex_in, pVertex_in, double dThreshold_in = 1.0E-6):
+cpdef find_vertex_in_list(list aVertex_in, pVertex_in, double dThreshold_in = 1.0E-6):
     """[find the index of a vertex in a list]
 
     Args:

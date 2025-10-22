@@ -18,7 +18,7 @@ if iFlag_cython is not None:
     from pyflowline.algorithms.cython.kernel import calculate_distance_to_plane
 else:
     from pyearth.gis.geometry.calculate_distance_based_on_longitude_latitude import calculate_distance_based_on_longitude_latitude
-    from pyearth.gis.geometry.calculate_angle_betwen_vertex import calculate_angle_betwen_vertex
+    from pyearth.gis.geometry.calculate_angle_between_vertex import calculate_angle_between_vertex
     from pyearth.gis.geometry.calculate_distance_to_plane import calculate_distance_to_plane
 
 class EdgeClassEncoder(JSONEncoder):

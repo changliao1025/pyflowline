@@ -68,14 +68,13 @@ def saveesm(sWorkspace_jigsaw_out, geom, mesh,
     dummy = convert(xr.open_dataset( sFilename_triangles), dir = sWorkspace_jigsaw_out)
     write_netcdf(dummy, fileName=sFilename_base_mesh, format= netcdfFormat)
 
-    sConda_env_path , sConda_env_name = get_python_environment()
+    sConda_env_path , sConda_env_name, _ = get_python_environment()
     sPython = sConda_env_path + "/bin/python3"
     sEnv = os.environ.copy()
 
     iFlag_vtk = 0 #not sure whether the MPAS tools update broke this feature or not, so we turn it off for now
 
     if iFlag_vtk == 1:
-
         sFilename_executable = 'paraview_vtk_field_extractor.py'
         sPath_executable = None
         #find the full path to the python executable

@@ -4,6 +4,8 @@ import json
 from json import JSONEncoder
 import importlib.util
 import numpy as np
+from rtree.index import Index as RTreeindex
+from pyearth.toolbox.reader.text_reader_string import text_reader_string
 
 from pyflowline.classes.timer import pytimer
 from pyflowline.classes.vertex import pyvertex
@@ -18,8 +20,6 @@ from pyflowline.formats.convert_flowline_to_geojson import convert_flowline_to_g
 from pyflowline.formats.convert_boundary_to_geojson import convert_boundary_to_geojson
 from pyflowline.formats.export_flowline import export_flowline_to_geojson
 from pyflowline.formats.export_vertex import export_vertex_to_geojson
-from pyearth.toolbox.reader.text_reader_string import text_reader_string
-
 from pyflowline.algorithms.split.find_flowline_vertex import find_flowline_vertex
 from pyflowline.algorithms.split.find_flowline_confluence import find_flowline_confluence
 from pyflowline.algorithms.split.split_flowline import split_flowline
@@ -42,11 +42,9 @@ from pyflowline.algorithms.auxiliary.calculate_area_of_difference import calcula
 iFlag_cython = importlib.util.find_spec("cython")
 if iFlag_cython is not None:
     from pyflowline.algorithms.cython.kernel import find_vertex_in_list
-    from tinyr import RTree
-    iFlag_use_rtree = 1
 else:
     from pyflowline.algorithms.auxiliary.find_vertex_in_list import find_vertex_in_list
-    iFlag_use_rtree = 0
+
 
 #kml support for google earth visualization
 iFlag_kml = importlib.util.find_spec("simplekml")
@@ -919,18 +917,17 @@ class pybasin(object):
 
         print('Finish topology reconstruction:',  self.sBasinID)
         sys.stdout.flush()
-        if iFlag_use_rtree ==1:
-            interleaved = True
-            self.pRTree_flowline = RTree(interleaved=interleaved, max_cap=5, min_cap=2)
-            for lFlowlineIndex in range(len(self.aFlowline_basin_conceptual)):
-                pBound = self.aFlowline_basin_conceptual[lFlowlineIndex].pBound
-                self.pRTree_flowline.insert(lFlowlineIndex, pBound)
 
-            self.pRTree_edge = RTree(interleaved=interleaved, max_cap=5, min_cap=2)
-            for lEdgeIndex in range(len(self.aFlowline_basin_edge)):
-                pBound = self.aFlowline_basin_edge[lEdgeIndex].pBound
-                self.pRTree_edge.insert(lEdgeIndex, pBound)
-            pass
+        interleaved = True
+        self.pRTree_flowline = RTreeindex()
+        for lFlowlineIndex in range(len(self.aFlowline_basin_conceptual)):
+            pBound = self.aFlowline_basin_conceptual[lFlowlineIndex].pBound
+            self.pRTree_flowline.insert(lFlowlineIndex, pBound)
+        self.pRTree_edge = RTreeindex()
+        for lEdgeIndex in range(len(self.aFlowline_basin_edge)):
+            pBound = self.aFlowline_basin_edge[lEdgeIndex].pBound
+            self.pRTree_edge.insert(lEdgeIndex, pBound)
+        pass
         return aCell_intersect_basin
 
     def basin_build_confluence(self, aFlowline_basin_in, aVertex_confluence_in):

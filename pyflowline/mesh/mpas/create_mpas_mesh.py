@@ -8,7 +8,7 @@ from pyflowline.mesh.jigsaw.run_jigsaw import run_jigsaw #_mpas_workflow import 
 from pyflowline.algorithms.potentiometric.calculate_potentiometric import calculate_potentiometric
 gdal.UseExceptions()
 iFlag_cython = importlib.util.find_spec("cython")
-from pyearth.gis.geometry.convert_longitude_range import convert_360_to_180_np
+from pyearth.gis.geometry.convert_longitude_range import convert_360_to_180
 from pyearth.gis.geometry.convert_idl_polygon_to_valid_polygon import convert_idl_polygon_to_valid_polygon
 
 from pyearth.gis.geometry.reorder_idl_polygon import reorder_idl_polygon
@@ -283,10 +283,10 @@ def create_mpas_mesh(sFilename_output_in,
     aMpas_dict = dict()
     lCellIndex=0
 
-    aLongitudeCell_180 = convert_360_to_180_np(aLongitudeCell)
-    aLongitudeVertex_180 = convert_360_to_180_np(aLongitudeVertex)
+    aLongitudeCell_180 = convert_360_to_180(aLongitudeCell)
+    aLongitudeVertex_180 = convert_360_to_180(aLongitudeVertex)
     #add a mpas cell into a list
-    def add_cell_into_list(aList, i, lCellID, dArea, dElevation_mean, dElevation_profile0, aCoords_gcs  ):
+    def add_cell_into_list(aList, i, lCellID, dArea, dElevation_mean, dElevation_profile0, aCoords_gcs):
         iFlag_success = 1
         dLongitude_center =  float(aLongitudeCell_180[i])
         dLatitude_center =  float(aLatitudeCell[i])
@@ -387,9 +387,8 @@ def create_mpas_mesh(sFilename_output_in,
                 aCoords_gcs[j,1] = y1
                 pass
 
-            x1 = aLonVertex[0]
-            y1 = aLatVertex[0]
-            ring.AddPoint(x1, y1) #double check
+            #close the ring
+            ring.CloseRings()
             pPolygon = ogr.Geometry(ogr.wkbPolygon)
             pPolygon.AddGeometry(ring)
 
@@ -404,6 +403,7 @@ def create_mpas_mesh(sFilename_output_in,
                 if pPolygon.IsValid() == False:
                     print('Warning: invalid polygon')
                     continue
+
                 lCellID = int(aIndexToCellID[i])
                 if iFlag_bed_elevation == 1:
                     dElevation_mean = float(aBed_elevation[i])
@@ -433,6 +433,7 @@ def create_mpas_mesh(sFilename_output_in,
                     lCellIndex = lCellIndex + 1
                 #save mesh cell
                 if iFlag_save_mesh ==1:
+                    pPolygon.FlattenTo2D()
                     pFeature.SetGeometry(pPolygon)
                     pFeature.SetField("cellid", int(lCellID) )
                     pFeature.SetField("longitude", dLongitude_center )
@@ -470,9 +471,7 @@ def create_mpas_mesh(sFilename_output_in,
                     aCoords_gcs[j,1] = y1
                     pass
 
-                x1 = aLonVertex[0]
-                y1 = aLatVertex[0]
-                ring.AddPoint(x1, y1) #double check
+                ring.CloseRings()
                 pPolygon = ogr.Geometry(ogr.wkbPolygon)
                 pPolygon.AddGeometry(ring)
 
@@ -486,6 +485,7 @@ def create_mpas_mesh(sFilename_output_in,
                     if pPolygon.IsValid() == False:
                         print('Warning: invalid polygon')
                         continue
+
                     lCellID = int(aIndexToCellID[i])
                     if iFlag_bed_elevation == 1:
                         dElevation_mean = float(aBed_elevation[i])
@@ -500,13 +500,11 @@ def create_mpas_mesh(sFilename_output_in,
                     else:
                         dThickness_ice = 0.0 #-9999
                     dArea = float(aCellArea[i])
-
                     #then check if it is ice free
                     if dThickness_ice > 0 :
                         #use potentiometric
                         dElevation_mean = calculate_potentiometric(dElevation_mean , dThickness_ice)
                         dElevation_profile0 = calculate_potentiometric(dElevation_profile0 , dThickness_ice)
-
 
                     #call fuction to add the cell
                     iFlag_success, aMpas = add_cell_into_list(aMpas, i, lCellID, dArea, dElevation_mean, dElevation_profile0, aCoords_gcs )
@@ -515,6 +513,7 @@ def create_mpas_mesh(sFilename_output_in,
                         lCellIndex = lCellIndex + 1
                     #save mesh cell
                     if iFlag_save_mesh ==1:
+                        pPolygon.FlattenTo2D()
                         pFeature.SetGeometry(pPolygon)
                         pFeature.SetField("cellid", int(lCellID) )
                         pFeature.SetField("longitude", dLongitude_center )
@@ -574,29 +573,27 @@ def create_mpas_mesh(sFilename_output_in,
                                         sWKT = pPolygon.ExportToWkt()
                                         print('Warning: invalid polygon: ', sWKT)
                                         #fix the polygon
-                                        #check which part has only 1 vertex
                                         aCoords_gcs_new = reorder_idl_polygon(aCoords_gcs.tolist())
+                                        #convert to numpy array
+                                        aCoords_gcs_new = np.array(aCoords_gcs_new)
                                         ring_new = ogr.Geometry(ogr.wkbLinearRing)
                                         for j in range(nVertex):
-                                            x1 = aCoords_gcs_new[j][0]
-                                            y1 = aCoords_gcs_new[j][1]
+                                            x1 = aCoords_gcs_new[j,0]
+                                            y1 = aCoords_gcs_new[j,1]
                                             ring_new.AddPoint(x1, y1)
                                             pass
 
-                                        x1 = aCoords_gcs_new[0][0]
-                                        y1 = aCoords_gcs_new[0][1]
-                                        ring_new.AddPoint(x1, y1) #double check
+                                        ring_new.CloseRings()
                                         pPolygon_new = ogr.Geometry(ogr.wkbPolygon)
                                         pPolygon_new.AddGeometry(ring_new)
-                                        #pPolygon_new = convert_idl_polygon_to_valid_polygon(pPolygon)
                                         if pPolygon_new is not None:
-                                            pPolygon_new.FlattenTo2D()
-                                            sWKT_new = pPolygon_new.ExportToWkt()
                                             if pPolygon_new.IsValid():
-                                                print('The polygon is fixed: ', sWKT_new)
-                                                #deleta the old polygon and replace it with the new polygon
                                                 pPolygon = None
                                                 pPolygon = pPolygon_new
+                                                pPolygon_new.FlattenTo2D()
+                                                sWKT_new = pPolygon_new.ExportToWkt()
+                                                print('The polygon is fixed: ', sWKT_new)
+                                                aCoords_gcs = aCoords_gcs_new
                                                 iFlag = True
                                             else:
                                                 print('The polygon cannot be fixed: ', sWKT_new)
@@ -670,6 +667,7 @@ def create_mpas_mesh(sFilename_output_in,
                         lCellIndex = lCellIndex + 1
                     #save mesh cell
                     if iFlag_save_mesh == 1:
+                        pPolygon.FlattenTo2D()
                         dLongitude_center = float(aLongitudeCell_180[i])
                         dLatitude_center = float(aLatitudeCell[i])
                         pFeature.SetGeometry(pPolygon)

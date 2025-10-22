@@ -18,16 +18,16 @@ import importlib.util
 from shutil import copy2
 import numpy as np
 from osgeo import ogr, osr, gdal
-
+from rtree.index import Index as RTreeindex
 from pyearth.system.define_global_variables import *
 from pyearth.gis.gdal.gdal_check_file_type import gdal_check_file_type
 from pyearth.gis.spatialref.convert_between_degree_and_meter import degree_to_meter
 from pyearth.gis.spatialref.convert_between_degree_and_meter import meter_to_degree
-from pyearth.gis.gdal.read.vector.gdal_read_geojson_boundary import gdal_read_geojson_boundary
-from pyearth.toolbox.data.geoparquet.convert_geojson_to_geoparquet import convert_geojson_to_geoparquet
+from pyearth.gis.gdal.read.vector.gdal_get_vector_boundary import gdal_get_vector_boundary
+from pyearth.toolbox.conversion.convert_vector_format import convert_vector_format
 from pyearth.gis.gdal.read.raster.gdal_read_geotiff_file import gdal_read_geotiff_file
 from pyearth.gis.gdal.read.raster.gdal_get_raster_extent import gdal_get_raster_extent
-from pyearth.gis.spatialref.get_utm_spatial_reference import get_utm_spatial_reference_wkt
+from pyearth.gis.spatialref.utm_utility import get_utm_spatial_reference_wkt
 from pyearth.gis.spatialref.reproject_coordinates import reproject_coordinates
 from pyearth.gis.gdal.read.vector.gdal_get_vector_spatial_reference import gdal_get_vector_spatial_reference_wkt
 from pyearth.gis.gdal.read.raster.gdal_get_raster_spatial_reference import gdal_get_raster_spatial_reference_wkt
@@ -48,13 +48,7 @@ from pyflowline.formats.convert_boundary_to_geojson import convert_boundary_to_g
 
 iFlag_kml = importlib.util.find_spec("simplekml")
 
-iFlag_cython = importlib.util.find_spec("cython")
-if iFlag_cython is not None:
-    from tinyr import RTree
-    iFlag_use_rtree = 1
-else:
-    iFlag_use_rtree = 0
-    pass
+
 
 
 gdal.UseExceptions()
@@ -162,8 +156,8 @@ class flowlinecase(object):
     sFilename_watershed_boundary_geojson = ''
     sFilename_mesh_boundary = ''
     sFilename_mesh_boundary_geojson = ''
-    sFilename_coastal_boundary = ''
-    sFilename_coastal_boundary_geojson = ''
+    sFilename_coastline_boundary = ''
+    sFilename_coastline_boundary_geojson = ''
     sWorkspace_input = ''
     sWorkspace_output = ''
     sWorkspace_jigsaw = ''
@@ -394,8 +388,8 @@ class flowlinecase(object):
         if 'sFilename_mesh_boundary' in aConfig_in:
             self.sFilename_mesh_boundary = aConfig_in['sFilename_mesh_boundary']
 
-        if 'sFilename_coastal_boundary' in aConfig_in:
-            self.sFilename_coastal_boundary = aConfig_in['sFilename_coastal_boundary']
+        if 'sFilename_coastline_boundary' in aConfig_in:
+            self.sFilename_coastline_boundary = aConfig_in['sFilename_coastline_boundary']
             self.iFlag_land_ocean_mask = 1
         else:
             self.iFlag_land_ocean_mask = 0
@@ -527,8 +521,8 @@ class flowlinecase(object):
             str(Path(self.sWorkspace_output)), 'watershed_boundary.geojson')
         self.sFilename_mesh_boundary_geojson = os.path.join(
             str(Path(self.sWorkspace_output)), 'mesh_boundary.geojson')
-        self.sFilename_coastal_boundary_geojson = os.path.join(
-            str(Path(self.sWorkspace_output)), 'coastal_boundary.geojson')
+        self.sFilename_coastline_boundary_geojson = os.path.join(
+            str(Path(self.sWorkspace_output)), 'coastline_boundary.geojson')
         # model generated files
         self.sFilename_mesh = os.path.join(
             str(Path(self.sWorkspace_output)), sMesh_type + ".geojson")
@@ -614,8 +608,8 @@ class flowlinecase(object):
             pass
         else:
             if self.iFlag_land_ocean_mask == 1:
-                sFilename_raw = self.sFilename_coastal_boundary
-                sFilename_out = self.sFilename_coastal_boundary_geojson
+                sFilename_raw = self.sFilename_coastline_boundary
+                sFilename_out = self.sFilename_coastline_boundary_geojson
                 # check whether the file exists
                 if os.path.isfile(sFilename_raw):
                     convert_boundary_to_geojson(sFilename_raw, sFilename_out)
@@ -745,10 +739,10 @@ class flowlinecase(object):
                     print(
                         "The mesh boundary file does not exist, you should update this parameter before running the model!")
                 else:
-                    if not os.path.isfile(self.sFilename_coastal_boundary):
+                    if not os.path.isfile(self.sFilename_coastline_boundary):
                         print(
                             "The coastal boundary file does not exist, the mesh boundary will be used instead!")
-                        self.sFilename_coastal_boundary = self.sFilename_mesh_boundary
+                        self.sFilename_coastline_boundary = self.sFilename_mesh_boundary
                     pass
 
             if sMesh_type == 'hexagon':  # hexagon #need spatial referece
@@ -970,15 +964,15 @@ class flowlinecase(object):
             return
 
         # get mean location
-        pBoundary_wkt, aExtent = gdal_read_geojson_boundary(
+        pBoundary_wkt, aExtent = gdal_get_vector_boundary(
             self.sFilename_mesh_boundary_geojson)
         self.dLongitude_mean = 0.5 * (aExtent[0] + aExtent[2])
         self.dLatitude_mean = 0.5 * (aExtent[1] + aExtent[3])
 
         #now do the coastal boundary
         if self.iFlag_land_ocean_mask == 1:
-            sFilename_raw = self.sFilename_coastal_boundary
-            sFilename_out = self.sFilename_coastal_boundary_geojson
+            sFilename_raw = self.sFilename_coastline_boundary
+            sFilename_out = self.sFilename_coastline_boundary_geojson
             # check whether the file exists
             if os.path.isfile(sFilename_raw):
                 convert_boundary_to_geojson(sFilename_raw, sFilename_out)
@@ -1052,7 +1046,7 @@ class flowlinecase(object):
                         (self.dY_upperleft - self.dY_lowerleft) / dY_spacing)
 
                 if iFlag_mesh_boundary == 1:
-                    pBoundary_wkt, aExtent = gdal_read_geojson_boundary(self.sFilename_mesh_boundary_geojson)
+                    pBoundary_wkt, aExtent = gdal_get_vector_boundary(self.sFilename_mesh_boundary_geojson)
                     aHexagon = create_hexagon_mesh(iFlag_rotation, self.dX_lowerleft, self.dY_lowerleft, dResolution_meter, ncolumn, nrow,
                                                    sFilename_mesh, self.pProjection_reference, pBoundary_wkt)
                     pass
@@ -1078,7 +1072,7 @@ class flowlinecase(object):
                     nrow = int(
                         (self.dY_upperleft - self.dY_lowerleft) / dResolution_meter)
                     if iFlag_mesh_boundary == 1:
-                        pBoundary_wkt, aExtent = gdal_read_geojson_boundary(self.sFilename_mesh_boundary_geojson)
+                        pBoundary_wkt, aExtent = gdal_get_vector_boundary(self.sFilename_mesh_boundary_geojson)
                         aSquare = create_square_mesh(self.dX_lowerleft, self.dY_lowerleft, dResolution_meter,
                                                      ncolumn, nrow,
                                                      sFilename_mesh, self.pProjection_reference, pBoundary_wkt)
@@ -1111,7 +1105,7 @@ class flowlinecase(object):
                         if iFlag_mesh_boundary == 1:
                             # create a polygon based on real boundary
                             # already produced
-                            pBoundary_wkt, aExtent = gdal_read_geojson_boundary(self.sFilename_mesh_boundary_geojson)
+                            pBoundary_wkt, aExtent = gdal_get_vector_boundary(self.sFilename_mesh_boundary_geojson)
                             aLatlon = create_latlon_mesh(dLongitude_left, dLatitude_bot, dResolution_degree,
                                                          ncolumn, nrow,
                                                          sFilename_mesh, pBoundary_wkt)
@@ -1155,13 +1149,13 @@ class flowlinecase(object):
                             else:
                                 # if user wants to use the coastal boundary, then we can replace the default land ocean mask
                                 if self.iFlag_land_ocean_mask == 1:
-                                    sFilename_land_ocean_mask_in = self.sFilename_coastal_boundary_geojson
+                                    sFilename_land_ocean_mask_in = self.sFilename_coastline_boundary_geojson
                                 else:
                                     sFilename_land_ocean_mask_in = None
                                     pass
                                 if iFlag_mesh_boundary == 1:
                                     # create a polygon based on
-                                    pBoundary_wkt, aExtent = gdal_read_geojson_boundary(self.sFilename_mesh_boundary_geojson)
+                                    pBoundary_wkt, aExtent = gdal_get_vector_boundary(self.sFilename_mesh_boundary_geojson)
                                     aMpas = create_mpas_mesh(sFilename_mesh,
                                                              iFlag_global_in=iFlag_global,
                                                              iFlag_use_mesh_dem_in=iFlag_use_mesh_dem,
@@ -1289,7 +1283,7 @@ class flowlinecase(object):
                                             if iFlag_mesh_boundary == 1:
                                                 # create a polygon based on
                                                 # read boundary
-                                                pBoundary_wkt, aExtent = gdal_read_geojson_boundary(self.sFilename_mesh_boundary_geojson)
+                                                pBoundary_wkt, aExtent = gdal_get_vector_boundary(self.sFilename_mesh_boundary_geojson)
                                                 print(sFilename_jigsaw_mesh_netcdf)
                                                 aMpas = create_tin_mesh(iFlag_global, iFlag_use_mesh_dem, iFlag_save_mesh,
                                                                         sFilename_jigsaw_mesh_netcdf,  sFilename_mesh,
@@ -1373,19 +1367,16 @@ class flowlinecase(object):
                                 return
 
             # no matter what type of mesh, we will convert it to geoparquet for easy visualization
-            convert_geojson_to_geoparquet(sFilename_mesh, self.sFilename_mesh_parquet)
+            convert_vector_format(sFilename_mesh, self.sFilename_mesh_parquet)
         else:
             # this means the mesh is already generated, we need a function that can read an existing pyflowline compatible mesh
             pass
 
         # build rtree
-        if iFlag_use_rtree == 1:
-            interleaved = True
-            self.pRTree_mesh = RTree(
-                interleaved=interleaved, max_cap=5, min_cap=2)
-            for lCellIndex in range(len(self.aCell)):
-                pBound = self.aCell[lCellIndex].pBound
-                self.pRTree_mesh.insert(lCellIndex, pBound)  #
+        self.pRTree_mesh = RTreeindex()
+        for lCellIndex in range(len(self.aCell)):
+            pBound = self.aCell[lCellIndex].pBound
+            self.pRTree_mesh.insert(lCellIndex, pBound)  #
 
         print('Finish mesh generation.')
         return self.aCell
@@ -1419,84 +1410,35 @@ class flowlinecase(object):
                 aBasin.append(pBasin)
                 aCellID_outlet.append(pBasin.lCellID_outlet)
                 aCell_intersect = aCell_intersect + aCell_intersect_basin
-                if iFlag_use_rtree == 1:
-                    # use rtree to update topology and length
-                    for pFlowline in pBasin.aFlowline_basin_conceptual:
-                        iStream_segment = pFlowline.iStream_segment
-                        iStream_order = pFlowline.iStream_order
-                        for pEdge in pFlowline.aEdge:
-                            pVertex_start = pEdge.pVertex_start
-                            pVertex_end = pEdge.pVertex_end
-                            pBound = pEdge.pBound
-                            aIntersect = list(self.pRTree_mesh.search(pBound))
-                            for k in aIntersect:
-                                pCell = self.aCell[k]
-                                if pVertex_start.calculate_distance(pCell.pVertex_center) < 1.0E-6:
-                                    self.aCell[k].iStream_segment_burned = iStream_segment
-                                    self.aCell[k].iStream_order_burned = iStream_order
-                                    lCellIndex_upstream = k
 
-                                if pVertex_end.calculate_distance(pCell.pVertex_center) < 1.0E-6:
-                                    self.aCell[k].iStream_segment_burned = iStream_segment
-                                    self.aCell[k].iStream_order_burned = iStream_order
-                                    lCellIndex_downstream = k
-
-                            self.aCell[lCellIndex_upstream].lCellID_downstream_burned = self.aCell[lCellIndex_downstream].lCellID
-
-                    for pCell2 in aCell_intersect_basin:
-                        pBound = pCell2.pBound
-                        aIntersect = list(self.pRTree_mesh.search(pBound))
+                # use rtree to update topology and length
+                for pFlowline in pBasin.aFlowline_basin_conceptual:
+                    iStream_segment = pFlowline.iStream_segment
+                    iStream_order = pFlowline.iStream_order
+                    for pEdge in pFlowline.aEdge:
+                        pVertex_start = pEdge.pVertex_start
+                        pVertex_end = pEdge.pVertex_end
+                        pBound = pEdge.pBound
+                        aIntersect = list(self.pRTree_mesh.intersection(pBound))
                         for k in aIntersect:
                             pCell = self.aCell[k]
-                            if pCell2.lCellID == pCell.lCellID:
-                                pCell.dLength_flowline = pCell2.dLength_flowline
-                        pass
-                else:
-                    # set topology here
-                    for pFlowline in pBasin.aFlowline_basin_conceptual:
-                        iStream_segment = pFlowline.iStream_segment
-                        iStream_order = pFlowline.iStream_order
-                        for pEdge in pFlowline.aEdge:
-                            try:
-                                pVertex_start = pEdge.pVertex_start
-                                pVertex_end = pEdge.pVertex_end
-                                iFlag_found_start = 0
-                                for k in range(ncell):
-                                    pVertex_center = self.aCell[k].pVertex_center
-                                    if pVertex_center == pVertex_start:
-                                        iFlag_found_start = 1
-                                        self.aCell[k].iStream_segment_burned = iStream_segment
-                                        self.aCell[k].iStream_order_burned = iStream_order
-                                        iFlag_found_end = 0
-                                        for l in range(ncell):
-                                            pVertex_center2 = self.aCell[l].pVertex_center
-                                            lCellID = self.aCell[l].lCellID
-                                            if pVertex_center2 == pVertex_end:
-                                                iFlag_found_end = 1
-                                                self.aCell[k].lCellID_downstream_burned = lCellID
-                                                if lCellID == pBasin.lCellID_outlet:
-                                                    self.aCell[l].iStream_segment_burned = iStream_segment
-                                                    self.aCell[l].iStream_order_burned = iStream_order
-                                                break
-                                        if iFlag_found_end == 0:
-                                            print('End not found')
-                                            pass
-                                if iFlag_found_start == 0:
-                                    print('Start not found')
-                                    pass
-                            except:
-                                print("error in step")
-                                print(pFlowline.tojson())
-                                print(pEdge.tojson())
-                                print(pVertex_start.tojson())
-                                print(pVertex_end.tojson())
-                                pass
-
-                    # update length using rtree
-                    for pCell in self.aCell:
-                        for pCell2 in aCell_intersect_basin:
-                            if pCell2.lCellID == pCell.lCellID:
-                                pCell.dLength_flowline = pCell2.dLength_flowline
+                            if pVertex_start.calculate_distance(pCell.pVertex_center) < 1.0E-6:
+                                self.aCell[k].iStream_segment_burned = iStream_segment
+                                self.aCell[k].iStream_order_burned = iStream_order
+                                lCellIndex_upstream = k
+                            if pVertex_end.calculate_distance(pCell.pVertex_center) < 1.0E-6:
+                                self.aCell[k].iStream_segment_burned = iStream_segment
+                                self.aCell[k].iStream_order_burned = iStream_order
+                                lCellIndex_downstream = k
+                        self.aCell[lCellIndex_upstream].lCellID_downstream_burned = self.aCell[lCellIndex_downstream].lCellID
+                for pCell2 in aCell_intersect_basin:
+                    pBound = pCell2.pBound
+                    aIntersect = list(self.pRTree_mesh.intersection(pBound))
+                    for k in aIntersect:
+                        pCell = self.aCell[k]
+                        if pCell2.lCellID == pCell.lCellID:
+                            pCell.dLength_flowline = pCell2.dLength_flowline
+                    pass
 
             self.aFlowline_conceptual = aFlowline_conceptual
             self.aCellID_outlet = aCellID_outlet
@@ -1592,13 +1534,13 @@ class flowlinecase(object):
                         aBoundary_geometry.append(pGeometry.Clone())
 
             print(f'Found {len(aBoundary_geometry)} boundary features')
-            if iFlag_use_rtree == 1 and self.pRTree_mesh is not None:
+            if self.pRTree_mesh is not None:
                 for pBoundary in aBoundary_geometry:
                     # Convert boundary to a bounding box
                     left, right, bottom, top= pBoundary.GetEnvelope()
                     pBound= (left, bottom, right, top)
                     # Search for intersecting cells
-                    aIntersect = list(self.pRTree_mesh.search(pBound))
+                    aIntersect = list(self.pRTree_mesh.intersection(pBound))
                     for k in aIntersect:
                         pCell = self.aCell[k]
                         pRing = ogr.Geometry(ogr.wkbLinearRing)
@@ -1612,8 +1554,7 @@ class flowlinecase(object):
                             # Burn the boundary into the cell
                             self.aCell[k].iFlag_watershed_boundary_burned = 1
 
-                pass
-            pass
+
 
         ptimer.stop()
         return

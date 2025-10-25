@@ -4,13 +4,11 @@ import importlib.util
 import numpy as np
 from osgeo import ogr, osr, gdal
 from pyflowline.formats.convert_attributes import convert_gcs_attributes_to_cell
-from pyflowline.mesh.jigsaw.run_jigsaw import run_jigsaw #_mpas_workflow import run_jigsaw_mpas_workflow
+from pyflowline.mesh.jigsaw.run_jigsaw import run_jigsaw
 from pyflowline.algorithms.potentiometric.calculate_potentiometric import calculate_potentiometric
 gdal.UseExceptions()
 iFlag_cython = importlib.util.find_spec("cython")
 from pyearth.gis.geometry.convert_longitude_range import convert_360_to_180
-from pyearth.gis.geometry.convert_idl_polygon_to_valid_polygon import convert_idl_polygon_to_valid_polygon
-
 from pyearth.gis.geometry.reorder_idl_polygon import reorder_idl_polygon
 
 def create_mpas_mesh(sFilename_output_in,

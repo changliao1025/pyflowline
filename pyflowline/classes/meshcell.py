@@ -210,6 +210,8 @@ class pymeshcell(pypolygon):
                 aPoint.append(vertex)
 
         # Initialize parent class with converted types
+        #we need to add the closing point, this is different from the mesh vertex list
+        aPoint.append(aPoint[0])
         super().__init__(dLon, dLat, aLine, aPoint)
 
         # Basic cell identification
@@ -217,7 +219,7 @@ class pymeshcell(pypolygon):
 
         # Flowline and geometry counts
         self.nFlowline: int = 0
-        self.nPoint: int = len(aVertex)
+        self.nVertex: int = len(aVertex)
         self.nEdge: int = len(aEdge)
 
         # Geometric properties

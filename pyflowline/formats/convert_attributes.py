@@ -1,5 +1,6 @@
 
 import numpy as np
+
 from pyflowline.classes.edge import pyedge
 from pyflowline.classes.vertex import pyvertex
 from pyflowline.classes.hexagon import pyhexagon

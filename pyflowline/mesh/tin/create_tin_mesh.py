@@ -1,5 +1,4 @@
 import os
-import math
 import importlib.util
 import numpy as np
 from osgeo import ogr, osr, gdal

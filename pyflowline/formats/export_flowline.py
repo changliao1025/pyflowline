@@ -1,7 +1,6 @@
 import os
 import json
 from osgeo import ogr, osr
-#from shapely.geometry import Point, LineString
 from pyflowline.classes.edge import pyedge
 from pyflowline.classes.link import pycelllink
 

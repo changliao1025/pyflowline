@@ -1,22 +1,31 @@
 
-import os
+"""
+PyFlowline class for representing flowlines in river network models.
+
+This module extends the pypolyline class from pyearth to add flowline-specific
+attributes and functionality. A flowline represents a connected sequence of edges
+forming a continuous path in a stream network, with associated hydrological properties.
+"""
+
 import copy
 import json
 from json import JSONEncoder
+from typing import List, Dict, Any, Optional, Union
 import numpy as np
-from osgeo import ogr, gdal, osr
+
+from pyearth.toolbox.mesh.point import pypoint
+from pyearth.toolbox.mesh.line import pyline
+from pyearth.toolbox.mesh.polyline import pypolyline
 from pyflowline.classes.vertex import pyvertex
 from pyflowline.classes.edge import pyedge
-from pyflowline.formats.export_vertex import export_vertex_as_polygon
-import importlib.util
-iFlag_cython = importlib.util.find_spec("cython")
-if iFlag_cython is not None:
-    from pyflowline.algorithms.cython.kernel import calculate_distance_based_on_longitude_latitude_numpy
-else:
-    from pyearth.gis.geometry.calculate_distance_based_on_longitude_latitude import calculate_distance_based_on_longitude_latitude
-
 
 class FlowlineClassEncoder(JSONEncoder):
+    """
+    Custom JSON encoder for pyflowline objects.
+
+    Handles numpy data types, pyvertex, and pyedge objects, converting them to
+    native Python types for JSON serialization.
+    """
     def default(self, obj):
         if isinstance(obj, np.integer):
             return int(obj)
@@ -25,7 +34,7 @@ class FlowlineClassEncoder(JSONEncoder):
         if isinstance(obj, np.ndarray):
             return obj.tolist()
         if isinstance(obj, list):
-            pass
+            return obj
         if isinstance(obj, pyvertex):
             return json.loads(obj.tojson())
         if isinstance(obj, pyedge):
@@ -33,212 +42,376 @@ class FlowlineClassEncoder(JSONEncoder):
 
         return JSONEncoder.default(self, obj)
 
-class pyflowline(object):
-    """The pyflowline class
+
+class pyflowline(pypolyline):
+    """
+    Flowline class for river network representation.
+
+    Extends the pypolyline class to represent a connected sequence of edges
+    forming a continuous path in a stream network. A flowline has hydrological
+    attributes such as drainage area, stream order, and connectivity information
+    with upstream and downstream flowlines.
+
+    Attributes:
+        lFlowlineID (int): Unique identifier for the flowline (default: -1)
+        lFlowlineID_downstream (int): ID of the downstream flowline (default: -1)
+        lFlowlineIndex (int): Array index for the flowline (default: -1)
+        lIndex_upstream (int): Index of upstream connection (default: -1)
+        lIndex_downstream (int): Index of downstream connection (default: -1)
+        iFlag_keep (int): Flag for simplification algorithm (1=keep, 0=remove, default: 1)
+        iFlag_dam (int): Flag indicating if flowline has a dam (0=no, 1=yes, default: 0)
+        iFlag_endorheic (int): Flag for endorheic basin (0=no, 1=yes, default: 0)
+        iFlag_right (int): Right side flag (default: 0)
+        iFlag_left (int): Left side flag (default: 0)
+        lNHDPlusID (int): NHDPlus dataset ID if applicable (default: -1)
+        dSinuosity (float): Sinuosity ratio (flowline length / straight distance, default: 0.0)
+        dDrainage_area (float): Drainage area in square meters (default: 0.0)
+        iStream_segment (int): Stream segment identifier (default: -1)
+        iStream_order (int): Strahler stream order (default: -1)
+        nEdge (int): Number of edges in the flowline
+        nVertex (int): Number of vertices in the flowline
+        pVertex_start (pyvertex): Starting vertex of the flowline
+        pVertex_end (pyvertex): Ending vertex of the flowline
+        aEdge (List[pyedge]): List of edges forming the flowline
+        aVertex (List[pyvertex]): List of vertices along the flowline
+        lFlowlineIndex_downstream (int): Index of downstream flowline (default: None)
+        aFlowline_upstream (List): List of upstream flowlines (default: None)
+        aFlowlineID_start_start (List): IDs of flowlines starting at start (default: None)
+        aFlowlineID_start_end (List): IDs of flowlines ending at start (default: None)
+        aFlowlineID_end_start (List): IDs of flowlines starting at end (default: None)
+        aFlowlineID_end_end (List): IDs of flowlines ending at end (default: None)
 
     Args:
-        object (object): None
+        aEdge (List[pyedge]): A list of edge objects forming the flowline
 
-    Returns:
-        pyflowline: The flowline object
+    Raises:
+        TypeError: If aEdge is not a list
+        ValueError: If aEdge is empty or contains invalid edges
+
+    Example:
+        >>> v1 = pyvertex({'dLongitude_degree': -77.0, 'dLatitude_degree': 38.0})
+        >>> v2 = pyvertex({'dLongitude_degree': -77.1, 'dLatitude_degree': 38.1})
+        >>> v3 = pyvertex({'dLongitude_degree': -77.2, 'dLatitude_degree': 38.2})
+        >>> e1 = pyedge(v1, v2)
+        >>> e2 = pyedge(v2, v3)
+        >>> flowline = pyflowline([e1, e2])
+        >>> flowline.set_flowline_id(100)
+        >>> print(flowline)
+        pyflowline(ID=100, Edges=2, Length=31176.90m)
     """
 
-    lFlowlineID=-1
-    lFlowlineID_downstream=-1 #if braided, then we need a list
-    lFlowlineIndex=-1
-    lIndex_upstream=-1
-    lIndex_downstream=-1
-
-    iFlag_keep = 1 #used for simplification algorithm
-
-    iFlag_dam = 0
-    iFlag_endorheic = 0 #used for endorheic basin
-    lNHDPlusID=-1
-
-    pVertex_start=None
-    pVertex_end=None
-    aEdge=None
-    aVertex=None
-
-    dLength=0.0
-    dSinuosity=0.0
-    dDrainage_area=0.0
-
-    iStream_segment=-1
-    iStream_order = -1
-
-    nEdge=0
-    nVertex=0
-    iFlag_right = 0
-    iFlag_left = 0
-    aFlowlineID_start_start = None
-    aFlowlineID_start_end = None
-    aFlowlineID_end_start = None
-    aFlowlineID_end_end = None
-
-    #for stream topology
-    lFlowlineIndex_downstream = None #only store the index, not the actual objects
-    aFlowline_upstream = None
-
-    pBound=None
-
-    def __init__(self, aEdge):
+    def __init__(self, aEdge: List[Union[pyedge, pyline]]) -> None:
         """
-        Initilize a flowline object
+        Initialize a flowline object.
+
+        Converts edge inputs to pyline objects for the parent class and stores
+        them as pyedge objects. Initializes all flowline-specific attributes.
 
         Args:
-            aEdge (list [pyedge]): A list of edge objects
+            aEdge (List[pyedge]): A list of edge objects forming the flowline
+
+        Raises:
+            TypeError: If aEdge is not a list
+            ValueError: If aEdge is empty or contains invalid edges
         """
-        self.aEdge = aEdge
-        nEdge = len(aEdge)
-        self.nEdge = nEdge
-        self.pVertex_start = aEdge[0].pVertex_start
-        self.pVertex_end =  aEdge[ nEdge-1  ].pVertex_end
-        nVertex = nEdge +1
-        self.aVertex=list()
-        for i in range(nEdge):
-            self.aVertex.append( aEdge[i].pVertex_start )
-            pass
+        # Validate input
+        if not isinstance(aEdge, list):
+            raise TypeError(f"aEdge must be a list, got {type(aEdge)}")
 
-        self.aVertex.append( aEdge[nEdge-1].pVertex_end )
-        self.nVertex = nVertex
-        self.dLength= self.calculate_length()
-        self.aFlowlineID_start_start = list()
-        self.aFlowlineID_start_end = list()
-        self.aFlowlineID_end_start = list()
-        self.aFlowlineID_end_end = list()
-        self.iFlag_keep = 1
+        if len(aEdge) == 0:
+            raise ValueError("aEdge cannot be empty - flowline must have at least one edge")
 
-        self.towkt()
-        self.calculate_flowline_bound()
+        # Convert all elements to pyline for parent class
+        aLine = []
+        for i, edge in enumerate(aEdge):
+            if edge is None:
+                raise ValueError(f"Edge at index {i} cannot be None")
 
-        return
+            if not isinstance(edge, pyline):
+                # Convert to pyline using vertex attributes
+                if hasattr(edge, 'pVertex_start') and hasattr(edge, 'pVertex_end'):
+                    point_start = pypoint(edge.pVertex_start.__dict__)
+                    point_end = pypoint(edge.pVertex_end.__dict__)
+                    line = pyline(point_start, point_end)
+                    aLine.append(line)
+                else:
+                    raise ValueError(f"Edge at index {i} must have pVertex_start and pVertex_end attributes")
+            else:
+                aLine.append(edge)
 
-    def __hash__(self):
-        return hash((self.pVertex_start, self.pVertex_end))
+        # Initialize parent class
+        super().__init__(aLine)
 
-    def calculate_length(self):
+        # Flowline identification attributes
+        self.lFlowlineID: int = -1
+        self.lFlowlineID_downstream: int = -1  # if braided, then we need a list
+        self.lFlowlineIndex: int = -1
+        self.lIndex_upstream: int = -1
+        self.lIndex_downstream: int = -1
+
+        # Flowline status flags
+        self.iFlag_keep: int = 1  # used for simplification algorithm
+        self.iFlag_dam: int = 0
+        self.iFlag_endorheic: int = 0  # used for endorheic basin
+        self.iFlag_right: int = 0
+        self.iFlag_left: int = 0
+
+        # External dataset attributes
+        self.lNHDPlusID: int = -1
+
+        # Geometric and hydrological attributes
+        self.dSinuosity: float = 0.0
+        self.dDrainage_area: float = 0.0
+        self.iStream_segment: int = -1
+        self.iStream_order: int = -1
+
+        # Store vertices and edges
+        self.pVertex_start: pyvertex = pyvertex(super().pPoint_start.__dict__)
+        self.pVertex_end: pyvertex = pyvertex(super().pPoint_end.__dict__)
+        self.aEdge: List[pyedge] = [pyedge(e.__dict__) if not isinstance(e, pyedge) else e for e in super().aLine]
+        self.aVertex: List[pyvertex] = [pyvertex(v.__dict__) if not isinstance(v, pyvertex) else v for v in super().aPoint]
+
+        # Counts
+        self.nEdge: int = super().nLine
+        self.nVertex: int = super().nPoint
+
+        # Connection lists (initialized as None, populated during network topology analysis)
+        self.lFlowlineIndex_downstream: Optional[int] = None
+        self.aFlowline_upstream: Optional[List] = None
+        self.aFlowlineID_start_start: Optional[List[int]] = None
+        self.aFlowlineID_start_end: Optional[List[int]] = None
+        self.aFlowlineID_end_start: Optional[List[int]] = None
+        self.aFlowlineID_end_end: Optional[List[int]] = None
+
+    def __repr__(self) -> str:
         """
-        Calcualte the length
+        Return a detailed string representation of the flowline.
 
         Returns:
-            float: The length of the flowline
+            str: Detailed representation including ID, indices, edge count, and length
         """
-        #dLength =0.0
-        #loop though
-        #for i in range(self.nEdge):
-        #for edge in self.aEdge:
-        #    self.aEdge[i].calculate_length()
-        #    dLength = dLength + self.aEdge[i].dLength
+        return (f"pyflowline(ID={self.lFlowlineID}, Index={self.lFlowlineIndex}, "
+                f"Edges={self.nEdge}, Vertices={self.nVertex}, "
+                f"Length={self.dLength:.2f}m, StreamOrder={self.iStream_order}, "
+                f"Sinuosity={self.dSinuosity:.3f})")
 
-        #assing
-        #self.dLength= dLength
-
-
-        self.dLength = sum(edge.dLength for edge in self.aEdge)
-        return self.dLength
-
-    def calculate_flowline_bound(self):
-
-        #use wkt to get bound
-
-        pGeometry = ogr.CreateGeometryFromWkt(self.wkt)
-
-        if pGeometry is None:
-            raise ValueError("Invalid geometry in flowline")
-        (minX, maxX, minY, maxY) = pGeometry.GetEnvelope()  # (minX, maxX, minY, maxY)
-        self.pBound = (float(minX), float(minY), float(maxX), float(maxY))
-        #dLat_min = 90
-        #dLat_max = -90
-        #dLon_min = 180
-        #dLon_max = -180
-        #for i in range(self.nVertex):
-        #    dLon_max = np.max( [dLon_max, self.aVertex[i].dLongitude_degree] )
-        #    dLon_min = np.min( [dLon_min, self.aVertex[i].dLongitude_degree] )
-        #    dLat_max = np.max( [dLat_max, self.aVertex[i].dLatitude_degree] )
-        #    dLat_min = np.min( [dLat_min, self.aVertex[i].dLatitude_degree] )
-        #self.pBound = (float(dLon_min), float(dLat_min), float(dLon_max), float(dLat_max))
-        return self.pBound
-
-    def check_upstream(self, other):
+    def __str__(self) -> str:
         """
-        Check whether another flowline is upstream or not
+        Return a concise string representation of the flowline.
+
+        Returns:
+            str: Concise representation with ID, edge count, and length
+        """
+        return f"pyflowline(ID={self.lFlowlineID}, Edges={self.nEdge}, Length={self.dLength:.2f}m)"
+
+    def __hash__(self) -> int:
+        """
+        Return hash value for the flowline.
+
+        Uses flowline ID for hashing to allow flowlines to be used in sets
+        and as dictionary keys.
+
+        Returns:
+            int: Hash value based on flowline ID
+        """
+        return hash(self.lFlowlineID)
+
+    def __eq__(self, other: Any) -> bool:
+        """
+        Check if two flowlines are equal based on their IDs.
 
         Args:
-            other (pyflowline): The other flowline
+            other: Another object to compare with
 
         Returns:
-            int: 1 if it is, 0 if not
+            bool: True if flowlines have the same ID
         """
-        iFlag_upstream = -1
+        if not isinstance(other, pyflowline):
+            return NotImplemented
+        return self.lFlowlineID == other.lFlowlineID
+
+    def set_flowline_id(self, lFlowlineID: int) -> None:
+        """
+        Set the flowline ID.
+
+        Args:
+            lFlowlineID (int): New flowline ID
+
+        Raises:
+            TypeError: If lFlowlineID is not an integer
+        """
+        if not isinstance(lFlowlineID, (int, np.integer)):
+            raise TypeError(f"Flowline ID must be an integer, got {type(lFlowlineID)}")
+        self.lFlowlineID = int(lFlowlineID)
+
+    def set_flowline_index(self, lFlowlineIndex: int) -> None:
+        """
+        Set the flowline array index.
+
+        Args:
+            lFlowlineIndex (int): New flowline index
+
+        Raises:
+            TypeError: If lFlowlineIndex is not an integer
+        """
+        if not isinstance(lFlowlineIndex, (int, np.integer)):
+            raise TypeError(f"Flowline index must be an integer, got {type(lFlowlineIndex)}")
+        self.lFlowlineIndex = int(lFlowlineIndex)
+
+    def set_stream_order(self, iStream_order: int) -> None:
+        """
+        Set the Strahler stream order.
+
+        Args:
+            iStream_order (int): Stream order value
+
+        Raises:
+            TypeError: If iStream_order is not an integer
+            ValueError: If iStream_order is negative
+        """
+        if not isinstance(iStream_order, (int, np.integer)):
+            raise TypeError(f"Stream order must be an integer, got {type(iStream_order)}")
+        if iStream_order < 0:
+            raise ValueError(f"Stream order cannot be negative, got {iStream_order}")
+        self.iStream_order = int(iStream_order)
+
+    def set_drainage_area(self, dDrainage_area: float) -> None:
+        """
+        Set the drainage area.
+
+        Args:
+            dDrainage_area (float): Drainage area in square meters
+
+        Raises:
+            TypeError: If dDrainage_area is not numeric
+            ValueError: If dDrainage_area is negative
+        """
+        if not isinstance(dDrainage_area, (int, float, np.number)):
+            raise TypeError(f"Drainage area must be numeric, got {type(dDrainage_area)}")
+        if dDrainage_area < 0:
+            raise ValueError(f"Drainage area cannot be negative, got {dDrainage_area}")
+        self.dDrainage_area = float(dDrainage_area)
+
+    def is_valid(self) -> bool:
+        """
+        Check if the flowline has valid attributes.
+
+        A flowline is considered valid if:
+        - It has at least one edge
+        - All edges are valid
+        - All vertices are valid
+        - It has positive length
+        - It has a valid ID or index
+
+        Returns:
+            bool: True if flowline has valid attributes
+        """
+        if self.nEdge == 0:
+            return False
+
+        if self.dLength <= 0:
+            return False
+
+        # Check if all edges are valid
+        if not all(edge.is_valid() for edge in self.aEdge):
+            return False
+
+        # Check if all vertices are valid
+        if not all(vertex.is_valid() for vertex in self.aVertex):
+            return False
+
+        # Check if flowline has a valid ID or index
+        has_valid_id = self.lFlowlineID > 0 or self.lFlowlineIndex >= 0
+
+        return has_valid_id
+
+    def is_headwater(self) -> bool:
+        """
+        Check if this flowline is a headwater (no upstream flowlines).
+
+        Returns:
+            bool: True if flowline has no upstream connections
+        """
+        return (self.aFlowline_upstream is None or
+                len(self.aFlowline_upstream) == 0)
+
+    def is_outlet(self) -> bool:
+        """
+        Check if this flowline is an outlet (no downstream flowline).
+
+        Returns:
+            bool: True if flowline has no downstream connection
+        """
+        return (self.lFlowlineIndex_downstream is None or
+                self.lFlowlineIndex_downstream < 0)
+
+    def check_upstream(self, other: 'pyflowline') -> bool:
+        """
+        Check whether another flowline is directly upstream.
+
+        A flowline is upstream if its end vertex matches this flowline's start vertex.
+
+        Args:
+            other (pyflowline): The other flowline to check
+
+        Returns:
+            bool: True if other flowline is directly upstream, False otherwise
+
+        Raises:
+            TypeError: If other is not a pyflowline
+        """
+        if not isinstance(other, pyflowline):
+            raise TypeError(f"Expected pyflowline, got {type(other)}")
+
         v0 = self.pVertex_start
-        v1 = self.pVertex_end
-
-        v2 = other.pVertex_start
         v3 = other.pVertex_end
 
-        if v0 == v3:
-            iFlag_upstream =1
-        else:
-            iFlag_upstream=0
+        return v0 == v3
 
-        return iFlag_upstream
-
-    def check_downstream(self, other):
+    def check_downstream(self, other: 'pyflowline') -> bool:
         """
-        Check whether another flowline is downstream or not
+        Check whether another flowline is directly downstream.
+
+        A flowline is downstream if its start vertex matches this flowline's end vertex.
 
         Args:
-            other (pyflowline): The other flowline
+            other (pyflowline): The other flowline to check
 
         Returns:
-            int: 1 if it is, 0 if not
+            bool: True if other flowline is directly downstream, False otherwise
+
+        Raises:
+            TypeError: If other is not a pyflowline
         """
-        iFlag_downstream =-1
-        v0 = self.pVertex_start
+        if not isinstance(other, pyflowline):
+            raise TypeError(f"Expected pyflowline, got {type(other)}")
+
         v1 = self.pVertex_end
         v2 = other.pVertex_start
-        v3 = other.pVertex_end
-        if v1 == v2:
-            iFlag_downstream =1
-        else:
-            iFlag_downstream=0
 
-        return iFlag_downstream
+        return v1 == v2
 
-    def reverse(self):
+    def merge_upstream(self, other: 'pyflowline') -> 'pyflowline':
         """
-        Reverse a flowline
-        """
-        aVertex = self.aVertex
-        nVertex = self.nVertex
-        aVertex_new = list()
-        for i in range(nVertex-1,-1,-1) :
-            aVertex_new.append( aVertex[i] )
+        Merge with an upstream flowline to create a new combined flowline.
 
-        self.aVertex = aVertex_new
-        nVertex  = len(aVertex)
-        aEdge = list()
-        for i in range(nVertex-1):
-            pEdge = pyedge( self.aVertex[i], self.aVertex[i+1] )
-            aEdge.append(pEdge)
-            pass
-
-        self.aEdge = aEdge
-        nEdge = len(aEdge)
-        self.pVertex_start = aEdge[0].pVertex_start
-        self.pVertex_end =  aEdge[ nEdge-1  ].pVertex_end
-
-    def merge_upstream(self, other):
-        """
-        Merge two flowlines as one
+        The upstream flowline's end vertex must match this flowline's start vertex.
+        The resulting flowline inherits attributes from both flowlines, with the
+        dam flag taking the maximum value.
 
         Args:
-            other (pyflowline): The other flowline
+            other (pyflowline): The upstream flowline to merge with
 
         Returns:
-            pyflowline: The merged flowline
+            pyflowline: A new merged flowline
+
+        Raises:
+            TypeError: If other is not a pyflowline
+            ValueError: If flowlines are not properly connected
         """
+        if not isinstance(other, pyflowline):
+            raise TypeError(f"Expected pyflowline, got {type(other)}")
+
         pFlowline_out = copy.deepcopy(other)
 
         iFlag_dam1 = other.iFlag_dam
@@ -253,22 +426,22 @@ class pyflowline(object):
         nEdge2 = self.nEdge
         iFlag_dam2 = self.iFlag_dam
 
-
         if pVertex_end1 == pVertex_start2:
-            #this is the supposed operation because they should connect
-
+            # This is the expected connection - merge the flowlines
             nVertex = nVertex1 + nVertex2 - 1
-            nEdge = nVertex -1
-            aEdge = copy.deepcopy(other.aEdge )
-            for i in range(nEdge2):
-                aEdge.append( self.aEdge[i] )
-                pass
+            nEdge = nVertex - 1
 
+            # Combine edges
+            aEdge = copy.deepcopy(other.aEdge)
+            for i in range(nEdge2):
+                aEdge.append(self.aEdge[i])
+
+            # Combine vertices (skip duplicate connection point)
             aVertex = copy.deepcopy(other.aVertex)
             for i in range(1, nVertex2):
-                aVertex.append( self.aVertex[i] )
-                pass
+                aVertex.append(self.aVertex[i])
 
+            # Update merged flowline attributes
             pFlowline_out.iFlag_dam = max(iFlag_dam1, iFlag_dam2)
             pFlowline_out.aEdge = aEdge
             pFlowline_out.aVertex = aVertex
@@ -277,78 +450,28 @@ class pyflowline(object):
             pFlowline_out.dLength = self.dLength + other.dLength
             pFlowline_out.pVertex_start = pVertex_start1
             pFlowline_out.pVertex_end = pVertex_end2
-            pass
         else:
-            pass
-
-        #is this necessary
-        #pFlowline_out.iStream_segment = self.iStream_segment
+            raise ValueError("Flowlines are not properly connected for merging. "
+                           f"Upstream end ({pVertex_end1}) must match downstream start ({pVertex_start2})")
 
         return pFlowline_out
 
-    def split_edge_by_length(self, dDistance):
+    def copy_attributes(self, other: 'pyflowline') -> None:
         """
-        Split a flowline using the length threshold
+        Copy attributes from another flowline.
+
+        Copies identification, status, and hydrological attributes but not
+        the geometric data (edges and vertices).
 
         Args:
-            dDistance (float): The length threshold for each edge
+            other (pyflowline): The source flowline to copy attributes from
 
-        Returns:
-            pyflowline: The updated flowline
+        Raises:
+            TypeError: If other is not a pyflowline
         """
-        aEdge=list()
-        pFlowline_out=None
-        for edge in self.aEdge:
-            #edge.calculate_length()
-            if edge.dLength > dDistance:
-                #break it
-                aEdge0=edge.split_by_length(dDistance)
-                for edge0 in aEdge0:
-                    aEdge.append(edge0)
-                pass
-            else:
-                aEdge.append(edge)
-                pass
-        pFlowline_out=pyflowline(aEdge)
-        #copy the attributes
-        pFlowline_out.copy_attributes(self)
+        if not isinstance(other, pyflowline):
+            raise TypeError(f"Expected pyflowline, got {type(other)}")
 
-        return pFlowline_out
-
-    def split_by_length(self, dDistance):
-        aFlowline = list()
-        if self.dLength<=dDistance:
-            aFlowline.append(self)
-        else:
-            #split using the half of the edge
-            nEdge = len(self.aEdge)
-            first_leg = [0, int(nEdge/2)]
-            second_leg = [int(nEdge/2), nEdge]
-            aEdge0 = self.aEdge[first_leg[0]:first_leg[1]]
-            aEdge1 = self.aEdge[second_leg[0]:second_leg[1]]
-            pFlowline0 = pyflowline(aEdge0)
-            pFlowline1 = pyflowline(aEdge1)
-            pFlowline0.copy_attributes(self)
-            pFlowline1.copy_attributes(self)
-            if pFlowline0.dLength > dDistance:
-                aFlowline.extend(pFlowline0.split_by_length(dDistance))
-            else:
-                aFlowline.append(pFlowline0)
-            if pFlowline1.dLength > dDistance:
-                aFlowline.extend(pFlowline1.split_by_length(dDistance))
-            else:
-                aFlowline.append(pFlowline1)
-            pass
-
-        return aFlowline
-
-    def copy_attributes(self, other):
-        """
-        Copy the attributes from another flowline
-
-        Args:
-            other (pyflowline): The other flowline
-        """
         self.lFlowlineID = other.lFlowlineID
         self.lFlowlineID_downstream = other.lFlowlineID_downstream
         self.lFlowlineIndex = other.lFlowlineIndex
@@ -361,208 +484,198 @@ class pyflowline(object):
         self.iFlag_left = other.iFlag_left
         self.iFlag_keep = other.iFlag_keep
         self.lFlowlineIndex_downstream = other.lFlowlineIndex_downstream
-        return
 
-    def calculate_flowline_sinuosity(self):
+    def calculate_flowline_sinuosity(self) -> float:
         """
-        Calculate the sinuosoty of a flowline
+        Calculate the sinuosity of the flowline.
+
+        Sinuosity is the ratio of the flowline length to the straight-line
+        distance between start and end points. A value of 1.0 indicates a
+        perfectly straight flowline, while higher values indicate more sinuous paths.
+
+        Returns:
+            float: Sinuosity ratio (>= 1.0)
+
+        Raises:
+            ValueError: If straight-line distance is zero (identical endpoints)
         """
         pVertex_start = self.pVertex_start
         pVertex_end = self.pVertex_end
         dDistance = pVertex_start.calculate_distance(pVertex_end)
+
+        if dDistance == 0:
+            raise ValueError("Cannot calculate sinuosity: start and end vertices are identical")
+
         self.dSinuosity = self.dLength / dDistance
-        return
+        return self.dSinuosity
 
-    def calculate_distance_to_vertex(self, pVertex):
-        dDistance_min_vertex = 1.0E10
-        pVertex_min_vertex = None
-        for i in range(self.nVertex):
-            dDistance = pVertex.calculate_distance(self.aVertex[i])
-            if dDistance < dDistance_min_vertex:
-                dDistance_min_vertex = dDistance
-                pVertex_min_vertex = self.aVertex[i]
-            pass
-
-        dDistance_min_edge = 1.0E10
-        pVertex_min_edge = None
-        for i in range(self.nEdge):
-            dDistance, pVertex_out_edge = self.aEdge[i].calculate_distance_to_vertex(pVertex)
-            if dDistance < dDistance_min_edge:
-                dDistance_min_edge = dDistance
-                pVertex_min_edge = pVertex_out_edge
-            pass
-
-        if dDistance_min_vertex < dDistance_min_edge:
-            dDistance_min = dDistance_min_vertex
-            pVertex_out = pVertex_min_vertex
-        else:
-            dDistance_min = dDistance_min_edge
-            pVertex_out = pVertex_min_edge
-            pass
-
-        return dDistance_min, pVertex_out
-
-    def calculate_buffer_zone_polygon(self, dRadius,sFilename_out = None, sFolder_out=None):
+    def get_sinuosity(self) -> float:
         """
-        Calculate the buffer zone polygon
-
-        Args:
-            dRadius (float): The buffer zone distance
+        Get the sinuosity value, calculating it if not already computed.
 
         Returns:
-            list: A list of buffer zone points
+            float: Sinuosity ratio
         """
-        pMultiPolygon = ogr.Geometry(ogr.wkbMultiPolygon)
-        aVertex_out = list()
-        aCircle_out = list()
-        for i in range(self.nEdge):
-            edge = self.aEdge[i]
-            aVertex, aVertex_center, aVertex_circle, aCircle = edge.calculate_buffer_zone_polygon(dRadius)
+        if self.dSinuosity == 0.0:
+            self.calculate_flowline_sinuosity()
+        return self.dSinuosity
 
-            aCircle_out.append(aCircle)
-            #create a polygon feature for each edge
-            ring = ogr.Geometry(ogr.wkbLinearRing)
-            for pVertex in aVertex:
-                ring.AddPoint(pVertex.dLongitude_degree, pVertex.dLatitude_degree)
-
-            ring.AddPoint(aVertex[0].dLongitude_degree, aVertex[0].dLatitude_degree) #close the ring
-            # Create a polygon and add the ring to it
-            pPolygon = ogr.Geometry(ogr.wkbPolygon)
-            pPolygon.AddGeometry(ring)
-            # Add the polygon to the MultiPolygon
-            pMultiPolygon.AddGeometry(pPolygon)
-            #save out for debug
-            if sFolder_out is not None:
-                sFilename_dummy= os.path.join(sFolder_out, 'buffer_zone_edge_%d.geojson' % i)
-                export_vertex_as_polygon(aVertex, sFilename_dummy)
-
-        pUnionPolygon = pMultiPolygon.UnionCascaded()
-        for i in range(pUnionPolygon.GetGeometryRef(0).GetPointCount()):
-            lon, lat, _ = pUnionPolygon.GetGeometryRef(0).GetPoint(i)
-            point2= dict()
-            point2['dLongitude_degree'] = lon
-            point2['dLatitude_degree'] =  lat
-            pVertex2 = pyvertex(point2)
-            aVertex_out.append(pVertex2)
-
-        if sFilename_out is not None:
-            export_vertex_as_polygon(aVertex_out, sFilename_out)
-
-        return aVertex_out, aCircle_out
-
-    def calculate_distance_to_flowline(self, pFlowline_other):
-        aVertex_a = np.array([[v.dLongitude_degree, v.dLatitude_degree] for v in self.aVertex])
-        aVertex_b = np.array([[v.dLongitude_degree, v.dLatitude_degree] for v in pFlowline_other.aVertex])
-
-        # Use broadcasting to calculate all pairwise distances at once
-        lon1 = aVertex_a[:, 0:1]  # Convert to column vector
-        lat1 = aVertex_a[:, 1:2]
-        lon2 = aVertex_b[:, 0]    # Keep as row vector
-        lat2 = aVertex_b[:, 1]
-
-        # Vectorized distance calculation
-        distances = calculate_distance_based_on_longitude_latitude(lon1, lat1, lon2, lat2)
-        return np.min(distances)
-
-    def calculate_bearing_angle(self):
-        #calculate the bearing angle of the flowline using its start and end vertex
-        if self.nVertex < 2:
-            return None
-        pVertex_start = self.pVertex_start
-        pVertex_end = self.pVertex_end
-        dLon_start = pVertex_start.dLongitude_degree
-        dLat_start = pVertex_start.dLatitude_degree
-        dLon_end = pVertex_end.dLongitude_degree
-        dLat_end = pVertex_end.dLatitude_degree
-        # Convert to radians
-        lat1_rad = np.radians(dLat_start)
-        lat2_rad = np.radians(dLat_end)
-        dlon_rad = np.radians(dLon_end - dLon_start)
-
-        # Calculate bearing using the forward azimuth formula
-        y = np.sin(dlon_rad) * np.cos(lat2_rad)
-        x = np.cos(lat1_rad) * np.sin(lat2_rad) - np.sin(lat1_rad) * np.cos(lat2_rad) * np.cos(dlon_rad)
-
-        # Calculate bearing in radians
-        bearing_rad = np.arctan2(y, x)
-
-        # Convert to degrees and normalize to 0-360°
-        bearing_deg = np.degrees(bearing_rad)
-        bearing_deg = (bearing_deg + 360) % 360
-
-        return bearing_deg
-
-
-    def __eq__(self, other):
+    def copy(self) -> 'pyflowline':
         """
-        Check whether two flowline are equivalent
-
-        Args:
-            other (pyflowline): The other flowline
+        Create a deep copy of the flowline.
 
         Returns:
-            int: 1 if equivalent, 0 if not
+            pyflowline: A new flowline object with the same attributes
         """
-        if len(self.aEdge) != len(other.aEdge):
+        # Copy edges
+        aEdge_copy = [edge.copy() for edge in self.aEdge]
+
+        # Create new flowline
+        new_flowline = pyflowline(aEdge_copy)
+
+        # Copy all attributes
+        new_flowline.copy_attributes(self)
+        new_flowline.dSinuosity = self.dSinuosity
+        new_flowline.iFlag_endorheic = self.iFlag_endorheic
+        new_flowline.lIndex_upstream = self.lIndex_upstream
+        new_flowline.lIndex_downstream = self.lIndex_downstream
+
+        return new_flowline
+
+    def reverse(self) -> 'pyflowline':
+        """
+        Create a reversed copy of the flowline.
+
+        Returns a new flowline with all edges reversed and vertices in
+
+        reverse order.
+
+        Returns:
+            pyflowline: A new flowline with reversed direction
+
+        Raises:
+            ValueError: If flowline cannot be reversed
+        """
+        # Reverse edges
+        aEdge_reversed = [edge.reverse() for edge in reversed(self.aEdge)]
+
+        # Create new flowline
+        reversed_flowline = pyflowline(aEdge_reversed)
+
+        # Copy attributes
+        reversed_flowline.copy_attributes(self)
+        reversed_flowline.pVertex_start = self.pVertex_end.copy()
+        reversed_flowline.pVertex_end = self.pVertex_start.copy()
+        reversed_flowline.dSinuosity = self.dSinuosity
+
+        # Swap upstream/downstream indices
+        reversed_flowline.lIndex_upstream = self.lIndex_downstream
+        reversed_flowline.lIndex_downstream = self.lIndex_upstream
+
+        return reversed_flowline
+
+    def get_length(self) -> float:
+        """
+        Get the total length of the flowline in meters.
+
+        Returns:
+            float: Total length in meters
+        """
+        return self.dLength
+
+    def get_edge_count(self) -> int:
+        """
+        Get the number of edges in the flowline.
+
+        Returns:
+            int: Number of edges
+        """
+        return self.nEdge
+
+    def get_vertex_count(self) -> int:
+        """
+        Get the number of vertices in the flowline.
+
+        Returns:
+            int: Number of vertices
+        """
+        return self.nVertex
+
+    def get_upstream_count(self) -> int:
+        """
+        Get the number of upstream flowlines.
+
+        Returns:
+            int: Number of upstream flowlines
+        """
+        if self.aFlowline_upstream is None:
             return 0
+        return len(self.aFlowline_upstream)
 
-        return int(all(edge1 == edge2 for edge1, edge2 in zip(self.aEdge, other.aEdge)))
-
-    def __ne__(self, other):
+    def has_dam(self) -> bool:
         """
-        Check whether two flowline are equivalent
-
-        Args:
-            other (pyflowline): The other flowline
+        Check if the flowline has a dam.
 
         Returns:
-            int: 0 if equivalent, 1 if not
+            bool: True if flowline has a dam
         """
-        return not self.__eq__(other)
+        return self.iFlag_dam == 1
 
-    def tojson(self):
+    def is_endorheic(self) -> bool:
         """
-        Convert a pyflowline object to a json string
+        Check if the flowline is in an endorheic basin.
 
         Returns:
-            json str: A json string
+            bool: True if flowline is in an endorheic basin
         """
-        aSkip = ['aEdge',
-                'aVertex','aFlowlineID_start_start','aFlowlineID_start_end',
-                'aFlowlineID_end_start','aFlowlineID_end_end']
+        return self.iFlag_endorheic == 1
+
+    def should_keep(self) -> bool:
+        """
+        Check if the flowline should be kept during simplification.
+
+        Returns:
+            bool: True if flowline should be kept
+        """
+        return self.iFlag_keep == 1
+
+    def mark_for_removal(self) -> None:
+        """
+        Mark the flowline for removal during simplification.
+        """
+        self.iFlag_keep = 0
+
+    def mark_for_keeping(self) -> None:
+        """
+        Mark the flowline to be kept during simplification.
+        """
+        self.iFlag_keep = 1
+
+    def tojson(self) -> str:
+        """
+        Convert pyflowline object to a JSON string.
+
+        Serializes most flowline attributes while excluding internal arrays
+        and complex objects that are better serialized separately.
+
+        Returns:
+            str: JSON string representation of the flowline
+
+        Example:
+            >>> flowline = pyflowline([edge1, edge2])
+            >>> json_str = flowline.tojson()
+        """
+        aSkip = ['aEdge', 'aVertex', 'aFlowlineID_start_start',
+                 'aFlowlineID_start_end', 'aFlowlineID_end_start',
+                 'aFlowlineID_end_end', 'aFlowline_upstream']
 
         obj = self.__dict__.copy()
         for sKey in aSkip:
             obj.pop(sKey, None)
-            pass
-
 
         sJson = json.dumps(obj,
-            sort_keys=True,
-                indent = 4,
-                    ensure_ascii=True,
-                        cls=FlowlineClassEncoder)
+                          sort_keys=True,
+                          indent=4,
+                          ensure_ascii=True,
+                          cls=FlowlineClassEncoder)
         return sJson
-
-    def towkt(self):
-        """
-        Convert a pyflowline object to a wkt string
-
-        Returns:
-            str: A wkt string
-        """
-        pGeometry = ogr.Geometry(ogr.wkbLineString)
-        for i in range(self.nVertex):
-            pGeometry.AddPoint(self.aVertex[i].dLongitude_degree, self.aVertex[i].dLatitude_degree)
-
-        sWKT = pGeometry.ExportToWkt()
-        pGeometry = None
-        self.wkt = sWKT
-        return sWKT
-
-    def update_wkt(self):
-        """
-        Update the wkt string of the flowline
-        """
-        self.towkt()
-        return self.wkt

@@ -1,332 +1,252 @@
+"""
+PyVertex class for representing vertices in flowline networks.
+
+This module extends the pypoint class from pyearth to add flowline-specific
+vertex attributes and functionality.
+"""
 
 import json
 from json import JSONEncoder
-import importlib.util
+from typing import Dict, Any, Optional
 import numpy as np
-from geographiclib.geodesic import Geodesic
-from pyflowline.formats.export_vertex import export_vertex_as_polygon
-
-iFlag_cython = importlib.util.find_spec("cython")
-if iFlag_cython is not None:
-    from pyflowline.algorithms.cython.kernel import calculate_distance_based_on_longitude_latitude
-else:
-    from pyearth.gis.geometry.calculate_distance_based_on_longitude_latitude import calculate_distance_based_on_longitude_latitude
-
-iPrecision_default = 12 #used for comparison
+from pyearth.toolbox.mesh.point import pypoint
 
 class VertexClassEncoder(JSONEncoder):
+    """
+    Custom JSON encoder for pyvertex objects.
+
+    Handles numpy data types and converts them to native Python types
+    for JSON serialization.
+    """
     def default(self, obj):
         if isinstance(obj, np.integer):
             return int(obj)
         if isinstance(obj, np.ndarray):
             return obj.tolist()
+        if isinstance(obj, pyvertex):
+            return json.loads(obj.tojson())
         return JSONEncoder.default(self, obj)
 
-class pyvertex(object):
+
+class pyvertex(pypoint):
     """
-    The vertex class
+    Vertex class for flowline network representation.
+
+    Extends the pypoint class to include vertex-specific attributes used
+    in flowline topology and stream network analysis. A vertex represents
+    a point in the flowline network that may be shared between multiple
+    flowlines or serve as a confluence point.
+
+    Attributes:
+        lVertexIndex (int): Array index for the vertex (default: -1)
+        lVertexID (int): Unique identifier for the vertex (default: 1)
+        lFlowlineID (int): Associated flowline ID, primarily used for
+                          intersection operations (default: -1)
+
+    Inherits from pypoint:
+        dLongitude_degree (float): Longitude in degrees
+        dLatitude_degree (float): Latitude in degrees
+        dX_meter (float): X coordinate in meters
+        dY_meter (float): Y coordinate in meters
+        dZ_meter (float): Z coordinate in meters
+        dElevation (float): Elevation value
 
     Args:
-        object (_type_): None
+        aParameter (dict): Dictionary containing vertex parameters.
+                          Required keys: 'dLongitude_degree', 'dLatitude_degree'
+                          Optional keys: 'lVertexIndex', 'lVertexID', 'lFlowlineID',
+                                       'x', 'y', 'z', 'dElevation'
 
-    Returns:
-        pyvertex: A vertex object
+    Example:
+        >>> vertex_params = {
+        ...     'dLongitude_degree': -77.0,
+        ...     'dLatitude_degree': 38.0,
+        ...     'lVertexID': 5
+        ... }
+        >>> vertex = pyvertex(vertex_params)
+        >>> print(vertex)
+        pyvertex(ID=5, Lon=-77.0, Lat=38.0)
     """
-    lVerterIndex=-1 #this index will be used for array - class variable
-    lVertexID= 1
-    lFlowlineID = -1  #we use this id only for intersect
-    dX_meter=-9999
-    dY_meter=-9999
-    dZ_meter=-9999
-    dLongitude_degree=0.0
-    dLatitude_degree=0.0
-    dLongitude_radian=0.0
-    dLatitude_radian=0.0
-    dElevation=0.0
 
-    wkt = None
-
-    def __init__(self, aParameter):
+    def __init__(self, aParameter: Dict[str, Any]) -> None:
         """
-        Initilize a vertex object
+        Initialize a vertex object.
 
         Args:
-            aParameter (dict): A dictionary parameters
+            aParameter (dict): Dictionary containing vertex parameters.
+                             Must include 'dLongitude_degree' and 'dLatitude_degree'.
+
+        Raises:
+            ValueError: If required parameters are missing
+            TypeError: If aParameter is not a dictionary
         """
+        if not isinstance(aParameter, dict):
+            raise TypeError(f"aParameter must be a dictionary, got {type(aParameter)}")
 
-        if 'x' in aParameter:
-            self.dX_meter             = float(aParameter['x'])
+        # Initialize parent class (pypoint)
+        super().__init__(aParameter)
 
-        if 'y' in aParameter:
-            self.dY_meter             = float(aParameter['y'])
+        # Vertex-specific attributes with defaults
+        # lVertexIndex: Used for array indexing in computational operations
+        self.lVertexIndex = int(aParameter.get('lVertexIndex', -1))
 
-        if 'z' in aParameter:
-            self.dZ_meter             = float(aParameter['z'])
+        # lVertexID: Unique identifier for the vertex in the network
+        self.lVertexID = int(aParameter.get('lVertexID', 1))
 
-        #dLongitude and dLatitude are always required
-        try:
-            self.dLongitude_degree      = float(aParameter['dLongitude_degree'])
-            """dLongitude_degree - object variable"""
-            self.dLatitude_degree       = float(aParameter['dLatitude_degree'])
-            """dLatitude_degree - object variable"""
+        # lFlowlineID: Associated flowline ID (used during intersection operations)
+        self.lFlowlineID = int(aParameter.get('lFlowlineID', -1))
 
-            self.dLongitude_radian = np.radians(self.dLongitude_degree)
-            self.dLatitude_radian = np.radians(self.dLatitude_degree)
-
-        except:
-            print('Initialization of vertex failed!')
-
-        #calcualte x y z based on dLongitude and dLatitude and earth radius
-        self.dX_meter, self.dY_meter, self.dZ_meter = self.calculate_xyz()
-
-        self.towkt()
-
-        return
-
-    def toNvector(self):
+    def __repr__(self) -> str:
         """
-        Note: replicated in LatLon_NvectorEllipsoidal
+        Return a detailed string representation of the vertex.
 
         Returns:
-            pynvector: A nvector object
+            str: Detailed representation including vertex ID and coordinates
         """
+        return (f"pyvertex(ID={self.lVertexID}, Index={self.lVertexIndex}, "
+                f"Lon={self.dLongitude_degree:.6f}, Lat={self.dLatitude_degree:.6f}, "
+                f"FlowlineID={self.lFlowlineID})")
 
-        a = self.dLatitude_radian
-        b = self.dLongitude_radian
-        c = np.sin(a)
-        e = np.cos(a)
-        d = np.sin(b)
-        f = np.cos(b)
-        #// right-handed vector: x -> 0°E,0°N; y -> 90°E,0°N, z -> 90°N
-        x = e * f
-        y = e * d
-        z = c
-        point =dict()
-        point['x'] = x
-        point['y'] = y
-        point['z'] = z
-        pNvector = pynvector(point)
-        return pNvector
-
-    def __hash__(self, precision=iPrecision_default):
-
-        #design a hash function that uses both dLongitude and dLatitude
-
-        # Scale the dLatitude and dLongitude to a suitable range
-        dLongitude = self.dLongitude_degree
-        dLatitude = self.dLatitude_degree
-
-        scale_factor = 10 ** precision
-        scaled_latitude = int((dLatitude + 90)* scale_factor)
-        scaled_longitude = int((dLongitude + 180)* scale_factor)
-
-        # Combine the scaled values into a single hash code
-        hash_code = (scaled_latitude << 32) | scaled_longitude
-
-
-        return hash_code
-
-    def __eq__(self, other):
+    def __str__(self) -> str:
         """
-        Check whether two vertices are equivalent
+        Return a concise string representation of the vertex.
+
+        Returns:
+            str: Concise representation with ID and coordinates
+        """
+        return f"pyvertex(ID={self.lVertexID}, Lon={self.dLongitude_degree:.6f}, Lat={self.dLatitude_degree:.6f})"
+
+    def __hash__(self) -> int:
+        """
+        Return hash value for the vertex.
+
+        Uses parent class hash which is based on rounded coordinates.
+        This allows vertices to be used in sets and as dictionary keys.
+
+        Returns:
+            int: Hash value based on coordinates
+        """
+        return super().__hash__()
+
+    def __eq__(self, other: Any) -> bool:
+        """
+        Check if two vertices are equal based on their coordinates.
+
+        Vertices are considered equal if their coordinates match within
+        a precision threshold, regardless of their IDs or indices.
 
         Args:
-            other (pyvertex): The other vertex
+            other: Another object to compare with
 
         Returns:
-            int: 1 if equivalent, 0 if not
+            bool: True if vertices have the same coordinates
         """
-        iFlag = False
-        dThreshold_in = 10 ** (-1 * iPrecision_default)
-        if isinstance(other, pyvertex):
-            if (self.dLongitude_degree == other.dLongitude_degree) and \
-                (self.dLatitude_degree == other.dLatitude_degree):
-                iFlag = True
-            else:
-                #use absolute difference to check whether two vertices are the same
-                if (abs(self.dLongitude_degree - other.dLongitude_degree) < dThreshold_in) and \
-                    (abs(self.dLatitude_degree - other.dLatitude_degree) < dThreshold_in):
-                    iFlag = True
-                else:
-                    iFlag = False
+        if not isinstance(other, pyvertex):
+            return NotImplemented
+        return super().__eq__(other)
 
-        else:
-            iFlag = False
-
-        return iFlag
-
-    def __ne__(self, other):
+    def tojson(self) -> str:
         """
-        Check whether two vertices are equivalent
+        Convert vertex object to a JSON string.
 
-        Args:
-            other (pyvertex): The other vertex
+        Serializes all vertex attributes except internal computed values
+        like radians. Uses the custom VertexClassEncoder to handle
+        numpy data types.
 
         Returns:
-            int: 0 if equivalent, 1 if not
+            str: JSON string representation of the vertex
+
+        Example:
+            >>> vertex = pyvertex({'dLongitude_degree': -77.0, 'dLatitude_degree': 38.0})
+            >>> json_str = vertex.tojson()
         """
-        return not self.__eq__(other)
-
-    def calculate_distance(self, other):
-        """
-        Calculate the distance between two vertices
-
-        Args:
-            other (pyvertex): The other vertex
-
-        Returns:
-            float: The great circle distance
-        """
-        dDistance = 0.0
-        lon1 = self.dLongitude_degree
-        lat1 = self.dLatitude_degree
-        lon2 = other.dLongitude_degree
-        lat2 = other.dLatitude_degree
-        dDistance = calculate_distance_based_on_longitude_latitude(lon1, lat1, lon2, lat2)
-        return dDistance
-
-    def calculate_buffer_zone_vertex(self, dRadius, dBearing=90):
-        # Create a geodesic object
-        geod = Geodesic.WGS84 #the default is WGS84
-        # Calculate the geodesic buffer
-        pVertex_buffer = geod.Direct(self.dLatitude_degree, self.dLongitude_degree, dBearing, dRadius)
-        # Extract the latitude and longitude of the buffer point
-        #create a vertex object using the buffer point
-        point0= dict()
-        point0['dLongitude_degree'] = pVertex_buffer['lon2']
-        point0['dLatitude_degree'] = pVertex_buffer['lat2']
-        pVertex_out = pyvertex(point0)
-        return pVertex_out
-
-    def calculate_buffer_zone_circle(self, dRadius, nPoint = 360, sFilename_out=None):
-        # Create a geodesic object
-        geod = Geodesic.WGS84 #the default is WGS84
-        aVertex = []
-        # Calculate the geodesic buffer
-        for i in range(0, 360, 360//nPoint):
-            pVertex_buffer = geod.Direct(self.dLatitude_degree, self.dLongitude_degree, i, dRadius)
-            point0= dict()
-            point0['dLongitude_degree'] = pVertex_buffer['lon2']
-            point0['dLatitude_degree'] = pVertex_buffer['lat2']
-            pVertex_out = pyvertex(point0)
-            aVertex.append(pVertex_out)
-
-        if sFilename_out is not None:
-            #save as a geojson file
-            export_vertex_as_polygon(aVertex, sFilename_out)
-
-        return aVertex
-
-    def calculate_xyz(self):
-        """
-        Calculate the x, y, z based on dLongitude and dLatitude
-
-        Returns:
-            tuple: The x, y, z
-        """
-        dX_meter = 0.0
-        dY_meter = 0.0
-        dZ_meter = 0.0
-        dRadius = 6371000.0 #earth radius in meter
-        dX_meter = dRadius * np.cos(self.dLatitude_radian) * np.cos(self.dLongitude_radian)
-        dY_meter = dRadius * np.cos(self.dLatitude_radian) * np.sin(self.dLongitude_radian)
-        dZ_meter = dRadius * np.sin(self.dLatitude_radian)
-        return dX_meter, dY_meter, dZ_meter
-
-    def tojson(self):
-        """
-        Convert a vecter object to a json string
-
-        Returns:
-            json str: A json string
-        """
-        aSkip = ['dLongitude_radian', \
-                'dLatitude_radian']
+        aSkip = ['dLongitude_radian', 'dLatitude_radian', 'wkt']
 
         obj = self.__dict__.copy()
         for sKey in aSkip:
             obj.pop(sKey, None)
 
-        #sJson = json.dumps(self.__dict__, \
-        sJson = json.dumps(obj, \
-                sort_keys=True, \
-                indent = 4, \
-                ensure_ascii=True, \
-                cls=VertexClassEncoder)
+        sJson = json.dumps(obj,
+                          sort_keys=True,
+                          indent=4,
+                          ensure_ascii=True,
+                          cls=VertexClassEncoder)
         return sJson
-    
-    def towkt(self):
+
+    def set_vertex_id(self, lVertexID: int) -> None:
         """
-        Convert a vertex object to a WKT string
+        Set the vertex ID.
+
+        Args:
+            lVertexID (int): New vertex ID
+
+        Raises:
+            TypeError: If lVertexID is not an integer
+        """
+        if not isinstance(lVertexID, (int, np.integer)):
+            raise TypeError(f"Vertex ID must be an integer, got {type(lVertexID)}")
+        self.lVertexID = int(lVertexID)
+
+    def set_vertex_index(self, lVertexIndex: int) -> None:
+        """
+        Set the vertex array index.
+
+        Args:
+            lVertexIndex (int): New vertex index
+
+        Raises:
+            TypeError: If lVertexIndex is not an integer
+        """
+        if not isinstance(lVertexIndex, (int, np.integer)):
+            raise TypeError(f"Vertex index must be an integer, got {type(lVertexIndex)}")
+        self.lVertexIndex = int(lVertexIndex)
+
+    def set_flowline_id(self, lFlowlineID: int) -> None:
+        """
+        Set the associated flowline ID.
+
+        Args:
+            lFlowlineID (int): New flowline ID
+
+        Raises:
+            TypeError: If lFlowlineID is not an integer
+        """
+        if not isinstance(lFlowlineID, (int, np.integer)):
+            raise TypeError(f"Flowline ID must be an integer, got {type(lFlowlineID)}")
+        self.lFlowlineID = int(lFlowlineID)
+
+    def is_valid(self) -> bool:
+        """
+        Check if the vertex has valid attributes.
 
         Returns:
-            str: A WKT string
+            bool: True if vertex has valid coordinates and at least one valid ID
         """
-        sWKT = 'POINT ('
-        sWKT += str(self.dLongitude_degree) + ' '
-        sWKT += str(self.dLatitude_degree) + ')'
-        self.wkt = sWKT
-        return sWKT
+        has_valid_coords = (-180 <= self.dLongitude_degree <= 180 and
+                           -90 <= self.dLatitude_degree <= 90)
+        has_valid_id = self.lVertexID > 0 or self.lVertexIndex >= 0
+        return has_valid_coords and has_valid_id
+
+    def copy(self) -> 'pyvertex':
+        """
+        Create a deep copy of the vertex.
+
+        Returns:
+            pyvertex: A new vertex object with the same attributes
+        """
+        param = {
+            'dLongitude_degree': self.dLongitude_degree,
+            'dLatitude_degree': self.dLatitude_degree,
+            'x': self.dX_meter,
+            'y': self.dY_meter,
+            'z': self.dZ_meter,
+            'dElevation': self.dElevation,
+            'lVertexIndex': self.lVertexIndex,
+            'lVertexID': self.lVertexID,
+            'lFlowlineID': self.lFlowlineID
+        }
+        return pyvertex(param)
 
 
-
-class pynvector(object):
-    """
-    The vector class
-
-    Args:
-        object (_type_): _description_
-
-    Returns:
-        _type_: _description_
-    """
-    dX=-9999
-    dY=-9999
-    dZ=-9999
-
-    def __init__(self, aParameter):
-        if 'x' in aParameter:
-            self.dX           = float(aParameter['x'])
-
-        if 'y' in aParameter:
-            self.dY            = float(aParameter['y'])
-
-        if 'z' in aParameter:
-            self.dZ             = float(aParameter['z'])
-        self.dLength = self.calculate_length()
-        self.dX = self.dX/self.dLength
-        self.dY = self.dY /self.dLength
-        self.dZ= self.dZ /self.dLength
-
-        return
-    def calculate_length(self):
-        self.dLength = np.sqrt( self.dX * self.dX + self.dY * self.dY + self.dZ * self.dZ )
-        return self.dLength
-
-    def plus(self, other):
-        point =dict()
-        point['x'] = self.dX + other.dX
-        point['y'] = self.dY + other.dY
-        point['z'] = self.dZ + other.dZ
-
-        pnv = pynvector( point )
-
-        return pnv
-
-    def toLatLon(self):
-
-        x = self.dX
-        y = self.dY
-        z = self.dZ
-
-        a = np.arctan2(z, np.sqrt(x*x + y*y))
-        b = np.arctan2(y, x)
-
-        point0= dict()
-        point0['dLongitude_degree'] = np.degrees(b)
-        point0['dLatitude_degree'] = np.degrees(a)
-
-        pv = pyvertex(point0)
-        return pv
 
 

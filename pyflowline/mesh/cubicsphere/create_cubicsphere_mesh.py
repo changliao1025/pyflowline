@@ -3,10 +3,10 @@ import numpy as np
 from osgeo import ogr, osr
 import subprocess
 import netCDF4 as nc
-from pyearth.system.define_global_variables import *
-from pyflowline.classes.vertex import pyvertex
+
 from pyflowline.formats.convert_coordinates import convert_gcs_coordinates_to_cell
 
+slash = os.sep
 def cube_to_sphere(x, y, z):
     # Normalize the coordinates
     norm = np.sqrt(x**2 + y**2 + z**2)

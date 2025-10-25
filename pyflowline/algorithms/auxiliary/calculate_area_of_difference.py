@@ -4,15 +4,13 @@ from osgeo import ogr, osr
 import importlib.util
 from pyflowline.algorithms.auxiliary.find_index_in_list import find_list_in_list
 from pyearth.gis.geometry.calculate_polygon_area import calculate_polygon_area
-from pyearth.gis.geometry.calculate_angle_between_vertex_normal import calculate_angle_between_vertex_normal
+from pyearth.gis.geometry.calculate_angle_between_point_normal import calculate_angle_between_point_normal
 
 iFlag_cython = importlib.util.find_spec("cython")
 if iFlag_cython is not None:
     from pyflowline.algorithms.cython.kernel import find_vertex_in_list
 else:
     from pyflowline.algorithms.auxiliary.find_vertex_in_list import find_vertex_in_list
-
-
 
 def calculate_area_of_difference_raw(sFilename_a, sFilename_b):
     #not yet supported
@@ -107,7 +105,7 @@ def calculate_area_of_difference_simplified(aFlowline_in, aVertex_all_in, sFilen
                     #calculate angle
                     x3 = pVertex_dummy.dLongitude_degree
                     y3 = pVertex_dummy.dLatitude_degree
-                    angle_dummy = calculate_angle_between_vertex_normal( x1, y1, x2, y2, x3, y3  )
+                    angle_dummy = calculate_angle_between_point_normal( x1, y1, x2, y2, x3, y3  )
                     aAngle.append(angle_dummy)
                 for i in pFlowline_in.aFlowlineID_end_end:
                     pFlowline_dummy = aFlowline_in[i]
@@ -123,7 +121,7 @@ def calculate_area_of_difference_simplified(aFlowline_in, aVertex_all_in, sFilen
                     #calculate angle
                     x3 = pVertex_dummy.dLongitude_degree
                     y3 = pVertex_dummy.dLatitude_degree
-                    angle_dummy = calculate_angle_between_vertex_normal( x1, y1, x2, y2, x3, y3  )
+                    angle_dummy = calculate_angle_between_point_normal( x1, y1, x2, y2, x3, y3  )
                     aAngle.append(angle_dummy)
 
                 #mini
@@ -181,7 +179,7 @@ def calculate_area_of_difference_simplified(aFlowline_in, aVertex_all_in, sFilen
 
                     x3 = pVertex_dummy.dLongitude_degree
                     y3 = pVertex_dummy.dLatitude_degree
-                    angle_dummy = calculate_angle_between_vertex_normal( x1, y1, x2, y2, x3, y3  )
+                    angle_dummy = calculate_angle_between_point_normal( x1, y1, x2, y2, x3, y3  )
                     aAngle.append(angle_dummy)
                 for i in pFlowline_in.aFlowlineID_start_end:
                     pFlowline_dummy = aFlowline_in[i]
@@ -196,7 +194,7 @@ def calculate_area_of_difference_simplified(aFlowline_in, aVertex_all_in, sFilen
 
                     x3 = pVertex_dummy.dLongitude_degree
                     y3 = pVertex_dummy.dLatitude_degree
-                    angle_dummy = calculate_angle_between_vertex_normal( x1, y1, x2, y2, x3, y3  )
+                    angle_dummy = calculate_angle_between_point_normal( x1, y1, x2, y2, x3, y3  )
                     aAngle.append(angle_dummy)
 
                 #mini

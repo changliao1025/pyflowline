@@ -136,7 +136,7 @@ dmypy.json
 .pyre/
 
 #unused for development testing
-retired
+retired/
 core.*
 *.nc
 *.tif

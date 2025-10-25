@@ -1,13 +1,4 @@
-from pyflowline.mesh.cubicsphere.create_cubicsphere_mesh import create_cubicsphere_mesh
-from pyflowline.mesh.triangular.create_triangular_mesh import create_triangular_mesh
-from pyflowline.mesh.tin.create_tin_mesh import create_tin_mesh
-from pyflowline.mesh.dggrid.create_dggrid_mesh import dggrid_find_resolution_by_index
-from pyflowline.mesh.dggrid.create_dggrid_mesh import create_dggrid_mesh
-from pyflowline.mesh.mpas.create_mpas_mesh import create_mpas_mesh
-from pyflowline.mesh.square.create_square_mesh import create_square_mesh
-from pyflowline.mesh.latlon.create_latlon_mesh import create_latlon_mesh
-from pyflowline.mesh.hexagon.create_hexagon_mesh import create_hexagon_mesh
-import os
+import os, platform
 import shutil
 import stat
 from pathlib import Path
@@ -19,12 +10,11 @@ from shutil import copy2
 import numpy as np
 from osgeo import ogr, osr, gdal
 from rtree.index import Index as RTreeindex
-from pyearth.system.define_global_variables import *
+
 from pyearth.gis.gdal.gdal_check_file_type import gdal_check_file_type
 from pyearth.gis.spatialref.convert_between_degree_and_meter import degree_to_meter
 from pyearth.gis.spatialref.convert_between_degree_and_meter import meter_to_degree
 from pyearth.gis.gdal.read.vector.gdal_get_vector_boundary import gdal_get_vector_boundary
-from pyearth.toolbox.conversion.convert_vector_format import convert_vector_format
 from pyearth.gis.gdal.read.raster.gdal_read_geotiff_file import gdal_read_geotiff_file
 from pyearth.gis.gdal.read.raster.gdal_get_raster_extent import gdal_get_raster_extent
 from pyearth.gis.spatialref.utm_utility import get_utm_spatial_reference_wkt
@@ -32,6 +22,20 @@ from pyearth.gis.spatialref.reproject_coordinates import reproject_coordinates
 from pyearth.gis.gdal.read.vector.gdal_get_vector_spatial_reference import gdal_get_vector_spatial_reference_wkt
 from pyearth.gis.gdal.read.raster.gdal_get_raster_spatial_reference import gdal_get_raster_spatial_reference_wkt
 
+from pyearth.toolbox.conversion.convert_vector_format import convert_vector_format
+
+from pyflowline.classes.vertex import pyvertex
+from pyflowline.classes.edge import pyedge
+
+from pyflowline.mesh.cubicsphere.create_cubicsphere_mesh import create_cubicsphere_mesh
+from pyflowline.mesh.triangular.create_triangular_mesh import create_triangular_mesh
+from pyflowline.mesh.tin.create_tin_mesh import create_tin_mesh
+from pyflowline.mesh.dggrid.create_dggrid_mesh import dggrid_find_resolution_by_index
+from pyflowline.mesh.dggrid.create_dggrid_mesh import create_dggrid_mesh
+from pyflowline.mesh.mpas.create_mpas_mesh import create_mpas_mesh
+from pyflowline.mesh.square.create_square_mesh import create_square_mesh
+from pyflowline.mesh.latlon.create_latlon_mesh import create_latlon_mesh
+from pyflowline.mesh.hexagon.create_hexagon_mesh import create_hexagon_mesh
 
 from pyflowline.classes.timer import pytimer
 from pyflowline.classes.mpas import pympas
@@ -39,23 +43,18 @@ from pyflowline.classes.hexagon import pyhexagon
 from pyflowline.classes.latlon import pylatlon
 from pyflowline.classes.square import pysquare
 from pyflowline.classes.dggrid import pydggrid
-from pyflowline.classes.vertex import pyvertex
 from pyflowline.classes.basin import pybasin
 from pyflowline.classes.flowline import pyflowline
-from pyflowline.classes.edge import pyedge
+
 from pyflowline.formats.read_mesh import read_mesh_json, read_mesh_json_w_topology
 from pyflowline.formats.convert_boundary_to_geojson import convert_boundary_to_geojson
 
 iFlag_kml = importlib.util.find_spec("simplekml")
 
-
-
-
 gdal.UseExceptions()
 pDate = datetime.datetime.today()
 sDate_default = "{:04d}".format(
     pDate.year) + "{:02d}".format(pDate.month) + "{:02d}".format(pDate.day)
-
 
 class CaseClassEncoder(JSONEncoder):
     def default(self, obj):
@@ -99,106 +98,6 @@ class flowlinecase(object):
     Returns:
         flowlinecase: A flowlinecase object
     """
-    iCase_index = 0
-
-    sMesh_type = 1
-    iFlag_standalone = 1
-    iFlag_flowline = 1
-
-    iFlag_global = 0
-    iFlag_antarctic = 0
-    iFlag_arctic = 0
-    iFlag_multiple_outlet = 0
-    iFlag_mesh_boundary = 0
-    iFlag_land_ocean_mask = 0
-    iFlag_run_jigsaw = 0
-    iFlag_user_provided_binary = 0
-    # iFlag_use_shapefile_extent=1
-    iFlag_force_watershed_boundary = 0
-    iFlag_use_mesh_dem = 0
-    iFlag_save_mesh = 0
-    iFlag_simplification = 1  # user can turn on/off
-    iFlag_create_mesh = 1
-    iFlag_intersect = 1
-    iFlag_rotation = 0
-    iFlag_break_by_distance = 0  # if the distance between two vertice are far,
-    iFlag_analysis = 0
-    iFlag_evaluation = 0  # run evaluation or not
-    iFlag_fill_hole = 0  # fill holes in the mesh
-    iResolution_index = 10
-    iFlag_run_dggrid = 0
-    nOutlet = 1  # by default , there shoule ne only one ouelet
-    dResolution_degree = 0.0
-    dResolution_meter = 0.0
-    dThreshold_small_river = 0.0
-    dThreshold_break_by_distance = 5000.0
-    dLongitude_left = -180
-    dLongitude_right = 180
-    dLatitude_bot = -90
-    dLatitude_top = 90
-
-    dLongitude_mean = 0.0  # the average location of the domain
-    dLatitude_mean = 0.0
-
-    dX_lowerleft = 0.0  # these coordinate only used for projection based meshes, and should be set during the parameter check function
-    dY_lowerleft = 0.0
-
-    dX_upperleft = 0.0
-    dY_upperleft = 0.0
-
-    dX_lowerright = 0.0
-    dY_lowerright = 0.0
-
-    dElevation_mean = -9999.0
-    sFilename_model_configuration = ''
-
-    sFilename_watershed_boundary = ''
-    sFilename_watershed_boundary_geojson = ''
-    sFilename_mesh_boundary = ''
-    sFilename_mesh_boundary_geojson = ''
-    sFilename_coastline_boundary = ''
-    sFilename_coastline_boundary_geojson = ''
-    sWorkspace_input = ''
-    sWorkspace_output = ''
-    sWorkspace_jigsaw = ''
-    sWorkspace_dggrid = ''
-    # sWorkspace_output_case=''
-    sRegion = ''
-    sModel = ''
-    sMesh_type = 'hexagon'
-    sDggrid_type = 'ISEA3H'
-
-    sCase = ''
-    sDate = ''
-
-    sFilename_dggrid = ''
-
-    sFilename_spatial_reference = ''
-    sFilename_dem = ''
-    # target mesh desired projection, can be any projection for local simulation
-    pProjection_reference = ''
-    # pyflowline internal projection, alwasy wgs84, all data will be re-projected to this projection
-    pProjection_model = ''
-
-    sFilename_mesh = ''
-    sFilename_mesh_info = ''
-    sFilename_mpas_mesh_netcdf = ''
-    sFilename_jigsaw_mesh_netcdf = ''
-    sFilename_mesh_kml = ''
-    sFilename_mesh_parquet = ''
-
-    sFilename_basins = ''
-    sFilename_jigsaw_configuration = ''
-    sFilename_dggrid_configuration = ''
-    aConfig_jigsaw = None
-
-    aBasin = list()
-    aFlowline_simplified = list()
-    aFlowline_conceptual = list()
-    aCellID_outlet = list()
-    aCell = list()
-
-    pRTree_mesh = None  # only when rtree is used
 
     iFlag_visual = importlib.util.find_spec("cartopy")
     if iFlag_visual is not None:
@@ -228,6 +127,93 @@ class flowlinecase(object):
             sDate_in (str, optional): The case date. Defaults to None.
             sWorkspace_output_in (str, optional): The output workspace. Defaults to None.
         """
+        # Initialize all instance attributes with default values
+        self.iCase_index = 0
+        self.sMesh_type = 1
+        self.iFlag_standalone = 1
+        self.iFlag_flowline = 1
+        self.iFlag_global = 0
+        self.iFlag_antarctic = 0
+        self.iFlag_arctic = 0
+        self.iFlag_multiple_outlet = 0
+        self.iFlag_mesh_boundary = 0
+        self.iFlag_land_ocean_mask = 0
+        self.iFlag_run_jigsaw = 0
+        self.iFlag_user_provided_binary = 0
+        # self.iFlag_use_shapefile_extent = 1
+        self.iFlag_force_watershed_boundary = 0
+        self.iFlag_use_mesh_dem = 0
+        self.iFlag_save_mesh = 0
+        self.iFlag_simplification = 1  # user can turn on/off
+        self.iFlag_create_mesh = 1
+        self.iFlag_intersect = 1
+        self.iFlag_rotation = 0
+        self.iFlag_break_by_distance = 0  # if the distance between two vertice are far,
+        self.iFlag_analysis = 0
+        self.iFlag_evaluation = 0  # run evaluation or not
+        self.iFlag_fill_hole = 0  # fill holes in the mesh
+        self.iResolution_index = 10
+        self.iFlag_run_dggrid = 0
+        self.nOutlet = 1  # by default , there shoule ne only one ouelet
+        self.dResolution_degree = 0.0
+        self.dResolution_meter = 0.0
+        self.dThreshold_small_river = 0.0
+        self.dThreshold_break_by_distance = 5000.0
+        self.dLongitude_left = -180
+        self.dLongitude_right = 180
+        self.dLatitude_bot = -90
+        self.dLatitude_top = 90
+        self.dLongitude_mean = 0.0  # the average location of the domain
+        self.dLatitude_mean = 0.0
+        self.dX_lowerleft = 0.0  # these coordinate only used for projection based meshes, and should be set during the parameter check function
+        self.dY_lowerleft = 0.0
+        self.dX_upperleft = 0.0
+        self.dY_upperleft = 0.0
+        self.dX_lowerright = 0.0
+        self.dY_lowerright = 0.0
+        self.dElevation_mean = -9999.0
+        self.sFilename_model_configuration = ''
+        self.sFilename_watershed_boundary = ''
+        self.sFilename_watershed_boundary_geojson = ''
+        self.sFilename_mesh_boundary = ''
+        self.sFilename_mesh_boundary_geojson = ''
+        self.sFilename_coastline_boundary = ''
+        self.sFilename_coastline_boundary_geojson = ''
+        self.sWorkspace_input = ''
+        self.sWorkspace_output = ''
+        self.sWorkspace_jigsaw = ''
+        self.sWorkspace_dggrid = ''
+        # self.sWorkspace_output_case = ''
+        self.sRegion = ''
+        self.sModel = ''
+        self.sMesh_type = 'hexagon'
+        self.sDggrid_type = 'ISEA3H'
+        self.sCase = ''
+        self.sDate = ''
+        self.sFilename_dggrid = ''
+        self.sFilename_spatial_reference = ''
+        self.sFilename_dem = ''
+        # target mesh desired projection, can be any projection for local simulation
+        self.pProjection_reference = ''
+        # pyflowline internal projection, alwasy wgs84, all data will be re-projected to this projection
+        self.pProjection_model = ''
+        self.sFilename_mesh = ''
+        self.sFilename_mesh_info = ''
+        self.sFilename_mpas_mesh_netcdf = ''
+        self.sFilename_jigsaw_mesh_netcdf = ''
+        self.sFilename_mesh_kml = ''
+        self.sFilename_mesh_parquet = ''
+        self.sFilename_basins = ''
+        self.sFilename_jigsaw_configuration = ''
+        self.sFilename_dggrid_configuration = ''
+        self.aConfig_jigsaw = None
+        self.aBasin = list()
+        self.aFlowline_simplified = list()
+        self.aFlowline_conceptual = list()
+        self.aCellID_outlet = list()
+        self.aCell = list()
+        self.pRTree_mesh = None  # only when rtree is used
+
         # flags
         if iFlag_standalone_in is not None:
             self.iFlag_standalone = iFlag_standalone_in

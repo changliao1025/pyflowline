@@ -7,9 +7,9 @@ from pyflowline.classes.flowline import pyflowline
 
 iFlag_cython = importlib.util.find_spec("cython")
 if iFlag_cython is not None:
-    from pyflowline.algorithms.cython.kernel import calculate_angle_betwen_vertex
+    from pyearth.gis.geometry.kernel import calculate_angle_between_point
 else:
-    from pyearth.gis.geometry.calculate_angle_between_vertex import  calculate_angle_between_vertex
+    from pyearth.gis.geometry.calculate_angle_between_point import  calculate_angle_between_point
 
 class ConfluenceClassEncoder(JSONEncoder):
     """Confluence Class Encoder
@@ -40,13 +40,6 @@ class pyconfluence():
         object: A confluence object
     """
 
-    lIndex=-1
-    lConfluenceID=-1
-    pVertex_confluence=None
-    pFlowline_downstream=None
-    aFlowline_upstream=list()
-    dAngle_upstream=0.0
-
     def __init__(self, pVertex_center, aFlowline_upstream_in, pFlowline_downstream_in):
         """
         Initialize a pyconfluence object
@@ -56,6 +49,11 @@ class pyconfluence():
             aFlowline_upstream_in (list [pyflowline]): A list of upstream flowlines
             pFlowline_downstream_in (pyflowline): The downstream flowline
         """
+        # Initialize instance attributes with default values
+        self.lIndex = -1
+        self.lConfluenceID = -1
+        self.dAngle_upstream = 0.0
+
         try:
             self.pVertex_confluence      = pVertex_center
             self.aFlowline_upstream      = aFlowline_upstream_in
@@ -85,7 +83,7 @@ class pyconfluence():
             y2 = self.pVertex_confluence.dLatitude_degree
             x3 = pFlowline2.aEdge[nedge2-1].pVertex_start.dLongitude_degree
             y3 = pFlowline2.aEdge[nedge2-1].pVertex_start.dLatitude_degree
-            self.dAngle_upstream = calculate_angle_betwen_vertex(x1, y1, x2, y2, x3, y3)
+            self.dAngle_upstream = calculate_angle_between_point(x1, y1, x2, y2, x3, y3)
         else:
             print('multiple upstream')
             print(len(self.aFlowline_upstream))

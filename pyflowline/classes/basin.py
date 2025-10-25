@@ -6,10 +6,10 @@ import importlib.util
 import numpy as np
 from rtree.index import Index as RTreeindex
 from pyearth.toolbox.reader.text_reader_string import text_reader_string
-
-from pyflowline.classes.timer import pytimer
 from pyflowline.classes.vertex import pyvertex
 from pyflowline.classes.edge import pyedge
+
+from pyflowline.classes.timer import pytimer
 from pyflowline.classes.flowline import pyflowline
 from pyflowline.classes.confluence import pyconfluence
 from pyflowline.formats.read_flowline import read_flowline_geojson
@@ -44,7 +44,6 @@ if iFlag_cython is not None:
     from pyflowline.algorithms.cython.kernel import find_vertex_in_list
 else:
     from pyflowline.algorithms.auxiliary.find_vertex_in_list import find_vertex_in_list
-
 
 #kml support for google earth visualization
 iFlag_kml = importlib.util.find_spec("simplekml")
@@ -90,94 +89,6 @@ class pybasin(object):
     Returns:
         None: A basin object
     """
-    lBasinID =1
-    sBasinID=''
-    lCellID_outlet=-1
-    iFlag_debug = 0
-    iFlag_simplification_done = 0
-    iFlag_disconnected =0
-    iFlag_remove_small_river = 0
-    iFlag_remove_low_order_river = 0
-    iFlag_correct_flowline_direction = 0
-    iFlag_dam=0
-
-    iFlag_break_by_distance = 0
-    dLongitude_outlet_degree = -9999.
-    dLatitude_outlet_degree = -9999.
-    dAccumulation_threshold= 100000.0
-    dThreshold_small_river = 10000
-    dLength_flowline_filtered = 0.0
-    dLength_flowline_simplified = 0.0
-    dLength_flowline_conceptual = 0.0
-
-    dArea_of_difference=0.0
-    dDistance_displace = 0.0
-    dThreshold_break_by_distance = 5000.0
-    sWorkspace_output_basin=''
-    sFilename_flowline_raw=''
-    sFilename_flowline_filter=''
-    sFilename_flowline_filter_geojson=''
-    sFilename_watershed_boundary=''
-    sFilename_watershed_boundary_geojson=''
-    sFilename_dam=''
-    sFilename_flowline_topo=''
-    #before intersect
-    sFilename_flowline_simplified=''
-    sFilename_flowline_segment_index_before_intersect=''
-    sFilename_flowline_conceptual=''
-    sFilename_flowline_edge=''
-    sFilename_basin_info=''
-    sFilename_flowline_simplified_info=''
-    sFilename_flowline_conceptual_info=''
-    sFilename_confluence_simplified_info=''
-    sFilename_confluence_conceptual_info=''
-
-    aFlowline_basin_filtered=None
-    aFlowline_basin_simplified=None
-    aFlowline_basin_conceptual=None
-    aFlowline_basin_edge = None
-    pVertex_outlet=None
-    aConfluence_basin_simplified= None
-    aConfluence_basin_conceptual= None
-
-
-    #
-    sFilename_mesh = ''
-    iMesh_type = 0
-    sMesh_type = ''
-    #json
-    sFilename_watershed_json=''
-    sFilename_stream_edge_json =''
-
-    #geojson for hexwatershed compatibility
-    #parquet for integer
-    sFilename_subbasin_parquet=''
-    sFilename_hillslope_parquet=''
-
-    #real data type
-    sFilename_elevation=''
-    sFilename_slope=''
-    sFilename_drainage_area=''
-    sFilename_flow_direction =''
-    sFilename_distance_to_outlet = ''
-    sFilename_stream_segment=''
-    sFilename_stream_edge=''
-
-
-
-    sFilename_variable_polygon=''
-    sFilename_variable_polyline=''
-
-    #txt for characteristics
-    sFilename_watershed_characteristics_txt = ''
-    sFilename_segment_characteristics_txt = ''
-    sFilename_subbasin_characteristics_txt = ''
-    sFilename_hillslope_characteristics_txt = ''
-
-    pRTree_flowline = None
-    pRTree_edge = None
-
-
     iFlag_visual = importlib.util.find_spec("cartopy")
     if iFlag_visual is not None:
         from ._visual_basin import basin_plot
@@ -196,6 +107,92 @@ class pybasin(object):
             aConfig_in (dict): Dictionary for parameters
         """
 
+        # Initialize all instance attributes with default values
+        self.lBasinID = 1
+        self.sBasinID = ''
+        self.lCellID_outlet = -1
+        self.iFlag_debug = 0
+        self.iFlag_simplification_done = 0
+        self.iFlag_disconnected = 0
+        self.iFlag_remove_small_river = 0
+        self.iFlag_remove_low_order_river = 0
+        self.iFlag_correct_flowline_direction = 0
+        self.iFlag_dam = 0
+
+        self.iFlag_break_by_distance = 0
+        self.dLongitude_outlet_degree = -9999.
+        self.dLatitude_outlet_degree = -9999.
+        self.dAccumulation_threshold = 100000.0
+        self.dThreshold_small_river = 10000
+        self.dLength_flowline_filtered = 0.0
+        self.dLength_flowline_simplified = 0.0
+        self.dLength_flowline_conceptual = 0.0
+
+        self.dArea_of_difference = 0.0
+        self.dDistance_displace = 0.0
+        self.dThreshold_break_by_distance = 5000.0
+        self.sWorkspace_output_basin = ''
+        self.sFilename_flowline_raw = ''
+        self.sFilename_flowline_filter = ''
+        self.sFilename_flowline_filter_geojson = ''
+        self.sFilename_watershed_boundary = ''
+        self.sFilename_watershed_boundary_geojson = ''
+        self.sFilename_dam = ''
+        self.sFilename_flowline_topo = ''
+        # before intersect
+        self.sFilename_flowline_simplified = ''
+        self.sFilename_flowline_segment_index_before_intersect = ''
+        self.sFilename_flowline_conceptual = ''
+        self.sFilename_flowline_edge = ''
+        self.sFilename_basin_info = ''
+        self.sFilename_flowline_simplified_info = ''
+        self.sFilename_flowline_conceptual_info = ''
+        self.sFilename_confluence_simplified_info = ''
+        self.sFilename_confluence_conceptual_info = ''
+
+        self.aFlowline_basin_filtered = None
+        self.aFlowline_basin_simplified = None
+        self.aFlowline_basin_conceptual = None
+        self.aFlowline_basin_edge = None
+        self.pVertex_outlet = None
+        self.aConfluence_basin_simplified = None
+        self.aConfluence_basin_conceptual = None
+
+        # mesh related
+        self.sFilename_mesh = ''
+        self.iMesh_type = 0
+        self.sMesh_type = ''
+        # json
+        self.sFilename_watershed_json = ''
+        self.sFilename_stream_edge_json = ''
+
+        # geojson for hexwatershed compatibility
+        # parquet for integer
+        self.sFilename_subbasin_parquet = ''
+        self.sFilename_hillslope_parquet = ''
+
+        # real data type
+        self.sFilename_elevation = ''
+        self.sFilename_slope = ''
+        self.sFilename_drainage_area = ''
+        self.sFilename_flow_direction = ''
+        self.sFilename_distance_to_outlet = ''
+        self.sFilename_stream_segment = ''
+        self.sFilename_stream_edge = ''
+
+        self.sFilename_variable_polygon = ''
+        self.sFilename_variable_polyline = ''
+
+        # txt for characteristics
+        self.sFilename_watershed_characteristics_txt = ''
+        self.sFilename_segment_characteristics_txt = ''
+        self.sFilename_subbasin_characteristics_txt = ''
+        self.sFilename_hillslope_characteristics_txt = ''
+
+        self.pRTree_flowline = None
+        self.pRTree_edge = None
+
+        # Process configuration parameters (override defaults with config values)
         if 'lBasinID' in aConfig_in:
             self.lBasinID             = int(aConfig_in['lBasinID'])
         else:

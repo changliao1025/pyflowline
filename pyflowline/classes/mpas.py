@@ -152,16 +152,6 @@ class pympas(pymeshcell):
         self.iFlag_watershed_boundary_burned: int = 0
         self.dElevation_profile0: float = -9999.0
 
-        # Create center vertex if pyvertex is available
-        if pyvertex:
-            pVertex_params = {
-                'dLongitude_degree': self.dLongitude_center_degree,
-                'dLatitude_degree': self.dLatitude_center_degree
-            }
-            self.pVertex_center = pyvertex(pVertex_params)
-        else:
-            self.pVertex_center = None
-
         # Calculate initial properties
         self.calculate_cell_area()
         if self.dArea > 0:
@@ -611,8 +601,8 @@ class pympas(pymeshcell):
             >>> mpas_cell = pympas(-77.0, 38.0, edges, vertices)
             >>> json_str = mpas_cell.tojson()
         """
-        aSkip = ['aEdge', 'aFlowline', 'dLongitude_radian', 'dLatitude_radian',
-                 'wkt', 'pPoint_start', 'pPoint_end', 'pBound']
+        aSkip = ['aLine', 'aPoint', 'aEdge', 'aFlowline', 'pPoint_center', 'dLongitude_radian', 'dLatitude_radian',
+                 'wkt', 'pVertex_start', 'pVertex_end', 'pBound']
 
         obj = self.__dict__.copy()
         for sKey in aSkip:

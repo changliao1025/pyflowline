@@ -34,7 +34,7 @@ from pyflowline.algorithms.simplification.remove_duplicate_flowline import remov
 from pyflowline.algorithms.index.define_stream_segment_index import define_stream_segment_index
 from pyflowline.algorithms.index.define_stream_topology import define_stream_topology
 from pyflowline.algorithms.index.define_stream_order import define_stream_order, update_head_water_stream_order
-from pyflowline.algorithms.intersect.intersect_flowline_with_mesh import intersect_flowline_with_mesh
+from pyflowline.algorithms.intersect.intersect_flowline_with_mesh import intersect_flowline_with_mesh, intersect_flowline_with_mesh_optimized, intersect_flowline_with_mesh_cached
 from pyflowline.algorithms.intersect.intersect_flowline_with_flowline import intersect_flowline_with_flowline
 from pyflowline.algorithms.auxiliary.calculate_area_of_difference import calculate_area_of_difference_simplified
 
@@ -718,13 +718,14 @@ class pybasin(object):
         self.iFlag_simplification_done = 1
         return aFlowline_basin_simplified
 
-    def basin_reconstruct_topological_relationship(self, iMesh_type, sFilename_mesh):
+    def basin_reconstruct_topological_relationship(self, iMesh_type, sFilename_mesh, mesh_cache=None):
         """
         Run the basin topologic relationship reconstruction
 
         Args:
             iMesh_type (int): Mesh type
             sFilename_mesh (str): Filename of the geojson mesh
+            mesh_cache (MeshRTreeCache, optional): Mesh R-tree cache for reuse across basins
 
         Returns:
             list [pyflowline]: A list of intersected cells
@@ -739,8 +740,15 @@ class pybasin(object):
             print('Basin ',  self.sBasinID, 'Start flowline and mesh intersection')
             sys.stdout.flush()
             ptimer.start()
-            aCell_intersect_basin, aFlowline_intersect_all, pVertex_outlet_checked = intersect_flowline_with_mesh(iMesh_type, sFilename_mesh, \
-                sFilename_flowline_in, sFilename_flowline_intersect_out)
+            if mesh_cache is not None:
+                # Use cached version for better performance with multiple basins
+                aCell_intersect_basin, aFlowline_intersect_all, pVertex_outlet_checked = intersect_flowline_with_mesh_cached(
+                    iMesh_type, sFilename_mesh, sFilename_flowline_in, sFilename_flowline_intersect_out,
+                    mesh_cache=mesh_cache, optimization_method='auto')
+            else:
+                # Fallback to optimized version
+                aCell_intersect_basin, aFlowline_intersect_all, pVertex_outlet_checked = intersect_flowline_with_mesh_optimized(
+                    iMesh_type, sFilename_mesh, sFilename_flowline_in, sFilename_flowline_intersect_out)
             ptimer.stop()
 
             if self.iFlag_debug ==1:

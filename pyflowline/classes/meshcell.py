@@ -15,13 +15,8 @@ from pyearth.toolbox.mesh.polygon import pypolygon
 from pyearth.toolbox.mesh.point import pypoint
 from pyearth.toolbox.mesh.line import pyline
 
-# Import local classes - these need to be available for the pymeshcell class
-try:
-    from .vertex import pyvertex
-except ImportError:
-    # Fallback for when vertex.py is in the same directory
-    from vertex import pyvertex
 
+from .vertex import pyvertex
 
 class CellClassEncoder(JSONEncoder):
     """
@@ -180,34 +175,27 @@ class pymeshcell(pypolygon):
         for i, edge in enumerate(aEdge):
             if edge is None:
                 raise ValueError(f"Edge at index {i} cannot be None")
-
-            if not isinstance(edge, pyline):
-                # Convert to pyline using vertex attributes
-                if hasattr(edge, 'pVertex_start') and hasattr(edge, 'pVertex_end'):
-                    point_start = pypoint(edge.pVertex_start.__dict__)
-                    point_end = pypoint(edge.pVertex_end.__dict__)
-                    line = pyline(point_start, point_end)
-                    aLine.append(line)
-                else:
-                    raise ValueError(f"Edge at index {i} must have pVertex_start and pVertex_end attributes")
+            # Convert to pyline using vertex attributes
+            if hasattr(edge, 'pVertex_start') and hasattr(edge, 'pVertex_end'):
+                point_start = pypoint(edge.pVertex_start.__dict__)
+                point_end = pypoint(edge.pVertex_end.__dict__)
+                line = pyline(point_start, point_end)
+                aLine.append(line)
             else:
-                aLine.append(edge)
+                raise ValueError(f"Edge at index {i} must have pVertex_start and pVertex_end attributes")
+
 
         # Convert aVertex to aPoint with proper type handling
         aPoint = []
         for i, vertex in enumerate(aVertex):
             if vertex is None:
                 raise ValueError(f"Vertex at index {i} cannot be None")
-
-            if not isinstance(vertex, pypoint):
-                # Convert to pypoint using vertex attributes
-                if hasattr(vertex, '__dict__'):
-                    point = pypoint(vertex.__dict__)
-                    aPoint.append(point)
-                else:
-                    raise ValueError(f"Vertex at index {i} must be convertible to pypoint")
+            # Convert to pypoint using vertex attributes
+            if hasattr(vertex, '__dict__'):
+                point = pypoint(vertex.__dict__)
+                aPoint.append(point)
             else:
-                aPoint.append(vertex)
+                raise ValueError(f"Vertex at index {i} must be convertible to pypoint")
 
         # Initialize parent class with converted types
         #we need to add the closing point, this is different from the mesh vertex list
@@ -272,7 +260,7 @@ class pymeshcell(pypolygon):
             'dLongitude_degree': self.dLongitude_center_degree,
             'dLatitude_degree': self.dLatitude_center_degree
         }
-        self.pPoint_center: pypoint = pypoint(center_params)
+        self.pVertex_center: pyvertex = pyvertex(center_params)
 
         # Calculate cell boundary for spatial indexing
         self.calculate_cell_bound()

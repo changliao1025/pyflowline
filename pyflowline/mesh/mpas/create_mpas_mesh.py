@@ -321,7 +321,7 @@ def create_mpas_mesh(sFilename_output_in,
                 return iFlag_success, aList
             pmpas.dArea = dArea
             pmpas.calculate_edge_length()
-            pmpas.dLength_flowline = pmpas.dLength_edge #Default
+            pmpas.dLength_flowline = pmpas.dLength #Default
             pmpas.lCellID = lCellID
             pmpas.dElevation_mean  = dElevation_mean
             pmpas.dElevation_profile0 = dElevation_profile0

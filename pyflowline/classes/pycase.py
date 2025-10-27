@@ -48,6 +48,8 @@ from pyflowline.classes.flowline import pyflowline
 
 from pyflowline.formats.read_mesh import read_mesh_json, read_mesh_json_w_topology
 from pyflowline.formats.convert_boundary_to_geojson import convert_boundary_to_geojson
+from pyflowline.algorithms.intersect.intersect_flowline_with_mesh import intersect_flowline_with_mesh_multi_basin
+from pyflowline.algorithms.intersect.intersect_flowline_with_mesh import get_mesh_cache
 
 iFlag_kml = importlib.util.find_spec("simplekml")
 
@@ -1386,12 +1388,12 @@ class flowlinecase(object):
             aCellID_outlet = list()
             aBasin = list()
             aCell_intersect = list()
-            ncell = len(self.aCell)
-            # there is a one-to-one match between cell id and cell center because each cell has only one center
-
+            # Prepare lists of flowline and output files for all basins
+            mesh_cache = get_mesh_cache()
             for pBasin in self.aBasin:
                 aCell_intersect_basin = pBasin.basin_reconstruct_topological_relationship(
-                    iMesh_type, sFilename_mesh)
+                    iMesh_type, sFilename_mesh, mesh_cache=mesh_cache)
+
                 aFlowline_conceptual = aFlowline_conceptual + pBasin.aFlowline_basin_conceptual
                 aBasin.append(pBasin)
                 aCellID_outlet.append(pBasin.lCellID_outlet)
@@ -1595,6 +1597,10 @@ class flowlinecase(object):
         ptimer.stop()
         return
 
+    def pyflowline_cleanup(self):
+        self.pyflowline_clear_mesh_cache()
+        return
+
     def pyflowline_export_mesh_info_to_json(self):
         """
         Export the mesh information to a json file
@@ -1766,4 +1772,16 @@ class flowlinecase(object):
                 # update for pyhexwatershed
             self.sFilename_basins = sFilename_output
 
+        return
+
+    def pyflowline_clear_mesh_cache(self):
+        """
+        Clear the mesh R-tree cache to free memory
+
+        This method should be called when switching to different mesh files
+        or when memory management is needed.
+        """
+        from pyflowline.algorithms.intersect.intersect_flowline_with_mesh import clear_mesh_cache
+        clear_mesh_cache()
+        print("Mesh R-tree cache cleared")
         return

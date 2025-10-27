@@ -127,17 +127,13 @@ class pyflowline(pypolyline):
             if edge is None:
                 raise ValueError(f"Edge at index {i} cannot be None")
 
-            if not isinstance(edge, pyline):
-                # Convert to pyline using vertex attributes
-                if hasattr(edge, 'pVertex_start') and hasattr(edge, 'pVertex_end'):
-                    point_start = pypoint(edge.pVertex_start.__dict__)
-                    point_end = pypoint(edge.pVertex_end.__dict__)
-                    line = pyline(point_start, point_end)
-                    aLine.append(line)
-                else:
-                    raise ValueError(f"Edge at index {i} must have pVertex_start and pVertex_end attributes")
+            if hasattr(edge.pVertex_start, '__dict__') and hasattr(edge.pVertex_end, '__dict__'):
+                point_start = pypoint(edge.pVertex_start.__dict__)
+                point_end = pypoint(edge.pVertex_end.__dict__)
+                line = pyline(point_start, point_end)
+                aLine.append(line)
             else:
-                aLine.append(edge)
+                raise TypeError(f"Edge at index {i} must be a pyedge object with valid vertices")
 
         # Initialize parent class
         super().__init__(aLine)
@@ -166,14 +162,15 @@ class pyflowline(pypolyline):
         self.iStream_order: int = -1
 
         # Store vertices and edges
-        self.pVertex_start: pyvertex = pyvertex(super().pPoint_start.__dict__)
-        self.pVertex_end: pyvertex = pyvertex(super().pPoint_end.__dict__)
-        self.aEdge: List[pyedge] = [pyedge(e.__dict__) if not isinstance(e, pyedge) else e for e in super().aLine]
-        self.aVertex: List[pyvertex] = [pyvertex(v.__dict__) if not isinstance(v, pyvertex) else v for v in super().aPoint]
+        self.pVertex_start: pyvertex = pyvertex(self.pPoint_start.__dict__)
+        self.pVertex_end: pyvertex = pyvertex(self.pPoint_end.__dict__)
+        # Convert lines to edges properly
+        self.aEdge = aEdge
+        self.aVertex: List[pyvertex] = [pyvertex(v.__dict__) if not isinstance(v, pyvertex) else v for v in self.aPoint]
 
         # Counts
-        self.nEdge: int = super().nLine
-        self.nVertex: int = super().nPoint
+        self.nEdge: int = len(self.aEdge)
+        self.nVertex: int = len(self.aVertex)
 
         # Connection lists (initialized as None, populated during network topology analysis)
         self.lFlowlineIndex_downstream: Optional[int] = None
@@ -214,7 +211,7 @@ class pyflowline(pypolyline):
         Returns:
             int: Hash value based on flowline ID
         """
-        return hash(self.lFlowlineID)
+        return hash((self.pVertex_start, self.pVertex_end))
 
     def __eq__(self, other: Any) -> bool:
         """
@@ -665,7 +662,7 @@ class pyflowline(pypolyline):
             >>> flowline = pyflowline([edge1, edge2])
             >>> json_str = flowline.tojson()
         """
-        aSkip = ['aEdge', 'aVertex', 'aFlowlineID_start_start',
+        aSkip = ['aEdge', 'aVertex', 'aFlowlineID_start_start','aLine', 'aPoint', 'pPoint_start', 'pPoint_end',
                  'aFlowlineID_start_end', 'aFlowlineID_end_start',
                  'aFlowlineID_end_end', 'aFlowline_upstream']
 

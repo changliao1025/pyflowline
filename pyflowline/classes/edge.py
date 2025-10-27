@@ -95,21 +95,11 @@ class pyedge(pyline):
             raise ValueError("Start and end vertices cannot be None")
 
         # Convert pVertex_start_in and pVertex_end_in to pypoint if they are not
-        if not isinstance(pVertex_start_in, pypoint):
-            if hasattr(pVertex_start_in, '__dict__'):
-                pPoint_start_in = pypoint(pVertex_start_in.__dict__)
-            else:
-                raise TypeError(f"Start vertex must be pypoint or pyvertex, got {type(pVertex_start_in)}")
+        if hasattr(pVertex_start_in, '__dict__') and hasattr(pVertex_end_in, '__dict__'):
+            pPoint_start_in = pypoint(pVertex_start_in.__dict__)
+            pPoint_end_in = pypoint(pVertex_end_in.__dict__)
         else:
-            pPoint_start_in = pVertex_start_in
-
-        if not isinstance(pVertex_end_in, pypoint):
-            if hasattr(pVertex_end_in, '__dict__'):
-                pPoint_end_in = pypoint(pVertex_end_in.__dict__)
-            else:
-                raise TypeError(f"End vertex must be pypoint or pyvertex, got {type(pVertex_end_in)}")
-        else:
-            pPoint_end_in = pVertex_end_in
+            raise TypeError("Start and end vertices must be pyvertex objects")
 
         # Check if vertices are identical
         if pPoint_start_in == pPoint_end_in:
@@ -132,8 +122,8 @@ class pyedge(pyline):
         self.lIndex_downstream: int = -1
 
         # Store the original vertex objects for later use
-        self.pVertex_start = pVertex_start_in if isinstance(pVertex_start_in, pyvertex) else pyvertex(pVertex_start_in.__dict__)
-        self.pVertex_end = pVertex_end_in if isinstance(pVertex_end_in, pyvertex) else pyvertex(pVertex_end_in.__dict__)
+        self.pVertex_start = pVertex_start_in
+        self.pVertex_end = pVertex_end_in
 
     def __repr__(self) -> str:
         """

@@ -13,10 +13,10 @@ from pyflowline.classes.dggrid import pydggrid
 from pyearth.gis.spatialref.reproject_coordinates import reproject_coordinates
 iFlag_cython = importlib.util.find_spec("cython")
 if iFlag_cython is not None:
-    from pyflowline.algorithms.cython.kernel import calculate_angle_betwen_vertex
-    from pyflowline.algorithms.cython.kernel import calculate_distance_to_plane
+    from pyearth.gis.geometry.kernel import calculate_angle_between_point
+    from pyearth.gis.geometry.kernel import calculate_distance_to_plane
 else:
-    from pyearth.gis.geometry.calculate_angle_between_vertex import calculate_angle_between_vertex
+    from pyearth.gis.geometry.calculate_angle_between_point import calculate_angle_between_point
     from pyearth.gis.geometry.calculate_distance_to_plane import calculate_distance_to_plane
 
 def convert_gcs_coordinates_to_cell(iMesh_type_in,
@@ -71,7 +71,7 @@ def convert_gcs_coordinates_to_cell(iMesh_type_in,
             y2 = pv_middle.dLatitude_degree
             x3 = pv_end.dLongitude_degree
             y3 = pv_end.dLatitude_degree
-            angle3deg = calculate_angle_betwen_vertex(x1,y1, x2,y2, x3,y3)
+            angle3deg = calculate_angle_between_point(x1,y1, x2,y2, x3,y3)
             if  angle3deg > 175: #care
                 pass
             else:

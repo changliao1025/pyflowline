@@ -48,7 +48,7 @@ from pyflowline.classes.flowline import pyflowline
 
 from pyflowline.formats.read_mesh import read_mesh_json, read_mesh_json_w_topology
 from pyflowline.formats.convert_boundary_to_geojson import convert_boundary_to_geojson
-from pyflowline.algorithms.intersect.intersect_flowline_with_mesh import intersect_flowline_with_mesh_multi_basin
+
 from pyflowline.algorithms.intersect.intersect_flowline_with_mesh import get_mesh_cache
 
 iFlag_kml = importlib.util.find_spec("simplekml")

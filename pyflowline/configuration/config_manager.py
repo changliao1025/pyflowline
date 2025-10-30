@@ -339,7 +339,7 @@ class JigsawConfigManager:
             return json.load(f)
 
 # Update the original create_template_basin_configuration_file function to use the new manager
-def create_template_basin_configuration_file(
+def create_basin_template_configuration_file(
         sFilename_basins_json,
         nBasin):
     """Generate basin configuration using the BasinConfigManager
@@ -358,7 +358,7 @@ def create_template_basin_configuration_file(
         nBasin
     )
 # Then you can simplify your create_template_configuration_file function
-def create_template_configuration_file(sFilename_json, **kwargs):
+def create_pyflowline_template_configuration_file(sFilename_json, **kwargs):
     """Generate pyflowline config template file using parameter keywords"""
 
     # Create the configuration
@@ -372,7 +372,7 @@ def create_template_configuration_file(sFilename_json, **kwargs):
     sFilename = Path(sFilename_json).stem + '_basins.json'
     sFilename_basins_json = os.path.join(sDirname, sFilename)
 
-    aBasin = create_template_basin_configuration_file(
+    aBasin = create_basin_template_configuration_file(
         sFilename_basins_json,
         config.get("nOutlet", 1))
 
@@ -382,7 +382,7 @@ def create_template_configuration_file(sFilename_json, **kwargs):
 
     return oModel
 
-def create_template_jigsaw_configuration_file(sFilename_json, **kwargs):
+def create_jigsaw_template_configuration_file(sFilename_json, **kwargs):
     """Generate JIGSAW config template file using parameter keywords"""
 
     # Create the configuration

@@ -6,10 +6,9 @@ from osgeo import ogr, osr, gdal
 from pyflowline.formats.convert_attributes import convert_gcs_attributes_to_cell
 from pyflowline.mesh.jigsaw.run_jigsaw import run_jigsaw
 from pyflowline.algorithms.potentiometric.calculate_potentiometric import calculate_potentiometric
-gdal.UseExceptions()
-iFlag_cython = importlib.util.find_spec("cython")
 from pyearth.gis.geometry.convert_longitude_range import convert_360_to_180
-from pyearth.gis.geometry.reorder_idl_polygon import reorder_idl_polygon
+from pyearth.gis.geometry.international_date_line_utility import split_international_date_line_polygon_coordinates
+gdal.UseExceptions()
 
 def create_mpas_mesh(sFilename_output_in,
         iFlag_global_in = None,
@@ -560,49 +559,34 @@ def create_mpas_mesh(sFilename_output_in,
                 iFlag_debug = 0
                 if iFlag_global == 1:
                     if dLatitude_center >= -60:
-                        if dLatitude_center>85: #exclude the north pole as well
+                        if dLatitude_center > 85: #exclude the north pole as well
                             iFlag = False
                             continue
                         else:
-                            if nVertex > 4:
-                                if np.abs(dLon_min-dLon_max) > 100: #this polygon cross international date line
-                                    if pPolygon.IsValid() == False:
-                                        pPolygon.FlattenTo2D()
-                                        sWKT = pPolygon.ExportToWkt()
-                                        print('Warning: invalid polygon: ', sWKT)
-                                        #fix the polygon
-                                        aCoords_gcs_new = reorder_idl_polygon(aCoords_gcs.tolist())
-                                        #convert to numpy array
-                                        aCoords_gcs_new = np.array(aCoords_gcs_new)
-                                        ring_new = ogr.Geometry(ogr.wkbLinearRing)
-                                        for j in range(nVertex):
-                                            x1 = aCoords_gcs_new[j,0]
-                                            y1 = aCoords_gcs_new[j,1]
-                                            ring_new.AddPoint(x1, y1)
-                                            pass
-
-                                        ring_new.CloseRings()
-                                        pPolygon_new = ogr.Geometry(ogr.wkbPolygon)
-                                        pPolygon_new.AddGeometry(ring_new)
-                                        if pPolygon_new is not None:
-                                            if pPolygon_new.IsValid():
-                                                pPolygon = None
-                                                pPolygon = pPolygon_new
-                                                pPolygon_new.FlattenTo2D()
-                                                sWKT_new = pPolygon_new.ExportToWkt()
-                                                print('The polygon is fixed: ', sWKT_new)
-                                                aCoords_gcs = aCoords_gcs_new
-                                                iFlag = True
-                                            else:
-                                                print('The polygon cannot be fixed: ', sWKT_new)
-                                                pass
-                                        else:
-                                            continue
-                                    else:
-                                        iFlag = True
-
+                            if np.abs(dLon_min-dLon_max) > 100: #this polygon cross international date line
+                                #now split this polygon into two parts and check separately
+                                aCoords_gcs_split = split_international_date_line_polygon_coordinates(aCoords_gcs)
+                                #create a multiple polygon to replace the original one
+                                pMultiPolygon = ogr.Geometry(ogr.wkbMultiPolygon)
+                                for aCoords_gcs_part in aCoords_gcs_split:
+                                    nVertex_part = aCoords_gcs_part.shape[0]
+                                    ring_part = ogr.Geometry(ogr.wkbLinearRing)
+                                    for j in range(nVertex_part):
+                                        x1 = aCoords_gcs_part[j,0]
+                                        y1 = aCoords_gcs_part[j,1]
+                                        ring_part.AddPoint(x1, y1)
+                                    ring_part.CloseRings()
+                                    pPolygon_part = ogr.Geometry(ogr.wkbPolygon)
+                                    pPolygon_part.AddGeometry(ring_part)
+                                    pMultiPolygon.AddGeometry(pPolygon_part)
+                                #then check within
+                                if pMultiPolygon.IsValid() == False:
+                                    print('Warning: invalid multipolygon')
+                                    continue
                                 else:
-                                    iFlag = True
+                                    #replace original polygon
+                                    pPolygon = pMultiPolygon
+                                    pass
                             else:
                                 iFlag = True
                     else:
@@ -611,8 +595,8 @@ def create_mpas_mesh(sFilename_output_in,
                 else:
                     iFlag = False
                     if np.abs(dLon_min-dLon_max) > 100: #this polygon cross international date line
-                        #print('Warning: longitude > 180')
-                        continue
+                        # need some attention here
+                        pass
                     else:
                         if pPolygon.IsValid() == False:
                             print('Warning: invalid polygon')
@@ -624,7 +608,6 @@ def create_mpas_mesh(sFilename_output_in,
                                 #then check intersection
                                 if pPolygon.Intersects(pBoundary):
                                     iFlag = True
-
 
                 if ( iFlag == True ):
                     lCellID = int(aIndexToCellID[i])
@@ -658,7 +641,6 @@ def create_mpas_mesh(sFilename_output_in,
                     #else:
                     #    pass
                     #call fuction to add the cell
-
                     iFlag_success, aMpas = add_cell_into_list(aMpas, i, lCellID, dArea, dElevation_mean, dElevation_profile0, aCoords_gcs )
                     if iFlag_success == 1:
                         aMpas_dict[lCellID] = lCellIndex

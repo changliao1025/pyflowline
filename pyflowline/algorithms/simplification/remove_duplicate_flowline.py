@@ -1,13 +1,22 @@
 
-#from pyflowline.algorithms.auxiliary.find_index_in_list import find_flowline_in_list
+"""
+Improved duplicate removal for pyflowline objects based on geometry only.
+"""
+
+from pyflowline.algorithms.simplification.fast_remove_duplicates import remove_duplicate_flowlines_fast
 
 def remove_duplicate_flowline(aFlowline_in):
+    """
+    Remove duplicate flowlines based purely on vertex geometry.
 
-    aFlowline_out = set(aFlowline_in)
-    return list(aFlowline_out)
-    #aFlowline_out = []
-    #for pFlowline in aFlowline_in:
-    #    iFlag_exist, _ = find_flowline_in_list(aFlowline_out, pFlowline)
-    #    if iFlag_exist == 0:
-    #        aFlowline_out.append(pFlowline)
-    #return aFlowline_out
+    This function ignores all IDs and focuses only on the geometric properties
+    of flowlines by comparing all vertices in the flowline path.
+
+    Args:
+        aFlowline_in: List of pyflowline objects
+
+    Returns:
+        List of unique pyflowline objects (based on geometry only)
+    """
+    return remove_duplicate_flowlines_fast(aFlowline_in)
+

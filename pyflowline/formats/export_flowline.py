@@ -33,20 +33,6 @@ def export_flowline_to_geojson( aFlowline_in,
 
     iFlag_attribute = int(all([aAttribute_field, aAttribute_data, aAttribute_dtype]))
 
-    #if aAttribute_field is not None and aAttribute_data is not None and aAttribute_dtype is not None:
-    #    iFlag_attribute = 1
-    #    nAttribute1 = len(aAttribute_field)
-    #    nAttribute2 = len(aAttribute_data)
-    #    nAttribute3 = len(aAttribute_dtype)
-    #    nAttribute4 = len(aAttribute_data[0])
-    #    if nAttribute3 != nAttribute1 or nAttribute1 != nAttribute2 or nFlowline!= nAttribute4:
-    #        print('The attribute is not correct, please check!')
-    #        return
-    #    else:
-    #        iFlag_attribute = 1
-    #else:
-    #    iFlag_attribute=0
-    #    pass
 
     if iFlag_attribute:
         nAttribute1, nAttribute2, nAttribute3 = map(len, [aAttribute_field, aAttribute_data, aAttribute_dtype])
@@ -89,20 +75,8 @@ def export_flowline_to_geojson( aFlowline_in,
             pLine.AddPoint(*(getattr(vertex, attr) for attr in flag_to_attr[iFlag_projected_in]))
 
         pLine.FlattenTo2D()
-        #dummy1= LineString( aPoint )
-        #pGeometry_out = ogr.CreateGeometryFromWkb(pLine.ExportToWkb())
         pFeature_out.SetGeometry(pLine)
         pFeature_out.SetField("lineid", lID + 1)
-
-        #if iFlag_attribute == 1:
-        #    for k in range(nAttribute1):
-        #        sField = aAttribute_field[k]
-        #        dtype = aAttribute_dtype[k]
-        #        dummy = aAttribute_data[k]
-        #        if dtype == 'int':
-        #            pFeature_out.SetField(sField, int(dummy[lID]))
-        #        else:
-        #            pFeature_out.SetField(sField, float(dummy[lID]))
 
         if iFlag_attribute == 1:
             for sField, dtype, dummy in zip(aAttribute_field, aAttribute_dtype, aAttribute_data):

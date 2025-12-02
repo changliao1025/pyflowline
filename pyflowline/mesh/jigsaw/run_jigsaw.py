@@ -184,6 +184,11 @@ def run_jigsaw(sWorkspace_jigsaw_in, projector,
         else:
             iFlag_spac_ocean = False
 
+        if "iFlag_RRS18to6_ocean" in aConfig_in:
+            iFlag_RRS18to6_ocean = aConfig_in["iFlag_RRS18to6_ocean"]
+        else:
+            iFlag_RRS18to6_ocean = False
+
         if "iFlag_spac_land" in aConfig_in:
             iFlag_spac_land = aConfig_in["iFlag_spac_land"]
         else:
@@ -372,6 +377,8 @@ def run_jigsaw(sWorkspace_jigsaw_in, projector,
         iFlag_spac_watershed_boundary = False
         iFlag_spac_lake_boundary = False
 
+        iFlag_RRS18to6_ocean = False
+
         hfun_scal = "absolute"
         hfun_hmax = float("inf")       # null spacing lim
         hfun_hmin = float(+0.00)
@@ -488,6 +495,25 @@ def run_jigsaw(sWorkspace_jigsaw_in, projector,
                 aRiver_network_mask = coarsen_mask(aRiver_network_mask, down=4)
                 nrow_space = aRiver_network_mask.shape[0]
                 ncolumn_space = aRiver_network_mask.shape[1]
+
+            if iFlag_spac_coastline:
+                sFilename_coastline_raster = aConfig_in["sFilename_coastline_raster"]
+                #check if it exists
+                if not os.path.exists(sFilename_coastline_raster):
+                    print("The file does not exist")
+                    print("The vector file will be converted to raster file")
+                else:
+                    #check spatial reference, reproject if needed
+                    #sProjection =
+                    dummy = gdal_read_geotiff_file(sFilename_coastline_raster) #1km, 30/3600.0
+                aLand_ocean_mask = dummy['dataOut']
+                dOriginX = dummy['originX']
+                dOriginY = dummy['originY']
+                pixelHeight = dummy['pixelHeight'] #30/3600.0
+                pixelWidth = dummy['pixelWidth']
+                missingValue = dummy['missingValue']
+                aCoastline_mask = compute_mask(aLand_ocean_mask, 1, dOriginX, dOriginY, pixelWidth, pixelHeight, ncolumn_space, nrow_space)
+                #we need to downsample the mask if the resolution is too high
         else:
             if iFlag_spac_coastline:
                 sFilename_coastline_raster = aConfig_in["sFilename_coastline_raster"]
@@ -524,12 +550,34 @@ def run_jigsaw(sWorkspace_jigsaw_in, projector,
 
         if iFlag_spac_ocean : #this requires the coastline
             if iFlag_spac_coastline:
+                sFilename_coastline_raster = aConfig_in["sFilename_coastline_raster"]
+                #check if it exists
+                if not os.path.exists(sFilename_coastline_raster):
+                    print("The file does not exist")
+                    print("The vector file will be converted to raster file")
+                else:
+                    #check spatial reference, reproject if needed
+                    #sProjection =
+                    dummy = gdal_read_geotiff_file(sFilename_coastline_raster) #1km, 30/3600.0
+                aLand_ocean_mask = dummy['dataOut']
+                dOriginX = dummy['originX']
+                dOriginY = dummy['originY']
+                pixelHeight = dummy['pixelHeight'] #30/3600.0
+                pixelWidth = dummy['pixelWidth']
+                missingValue = dummy['missingValue']
                 print("Compute global ocean h(x)...")
-                vals = mdt.EC_CellWidthVsLat(spac.ygrid * 180. / np.pi)
-                vals = np.reshape(vals, (spac.ygrid.size, 1))
-                aOcean_value = np.array(np.tile( vals, (1, spac.xgrid.size)), dtype=spac.REALS_t)
-                aOcean_mask = compute_mask(aLand_ocean_mask, missingValue, dOriginX, dOriginY, pixelWidth, pixelHeight, ncolumn_space, nrow_space)
-                spac.value[aOcean_mask] =  np.minimum(aOcean_value[aOcean_mask], spac.value[aOcean_mask])
+                if iFlag_RRS18to6_ocean:
+                    vals = mdt.RRS_CellWidthVsLat(spac.ygrid * 180. / np.pi, cellWidthEq=18., cellWidthPole=6.)
+                    vals = np.reshape(vals, (spac.ygrid.size, 1))
+                    aOcean_value = np.array(np.tile( vals, (1, spac.xgrid.size)), dtype=spac.REALS_t)
+                    aOcean_mask = compute_mask(aLand_ocean_mask, missingValue, dOriginX, dOriginY, pixelWidth, pixelHeight, ncolumn_space, nrow_space)
+                    spac.value[aOcean_mask] =  np.minimum(aOcean_value[aOcean_mask], spac.value[aOcean_mask])
+                else:
+                    vals = mdt.EC_CellWidthVsLat(spac.ygrid * 180. / np.pi)
+                    vals = np.reshape(vals, (spac.ygrid.size, 1))
+                    aOcean_value = np.array(np.tile( vals, (1, spac.xgrid.size)), dtype=spac.REALS_t)
+                    aOcean_mask = compute_mask(aLand_ocean_mask, missingValue, dOriginX, dOriginY, pixelWidth, pixelHeight, ncolumn_space, nrow_space)
+                    spac.value[aOcean_mask] =  np.minimum(aOcean_value[aOcean_mask], spac.value[aOcean_mask])
             else:
                 print("You need to provide coastline to set the ocean spacing")
                 pass

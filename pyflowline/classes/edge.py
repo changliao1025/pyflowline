@@ -103,6 +103,8 @@ class pyedge(pyline):
 
         # Check if vertices are identical
         if pPoint_start_in == pPoint_end_in:
+            #if pPoint_start_in == pPoint_end_in:
+            #    print("Warning: Start and end vertices are identical.")
             raise ValueError("Start and end vertices cannot be identical (zero-length edge)")
 
         # Initialize parent class

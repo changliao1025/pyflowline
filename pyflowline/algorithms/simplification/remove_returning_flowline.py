@@ -23,7 +23,7 @@ def remove_returning_flowline(iMesh_type_in, aCell_intersect_in, pVertex_outlet_
                     break
 
             aCell_flowline_out = simplify_list(aCell_flowline_out)
-        return   aCell_flowline_out
+        return aCell_flowline_out
 
     def retrieve_flowline_intersect_index(iSegment_in, iStream_order_in, pVertex_end_in):
         lCellID =-1

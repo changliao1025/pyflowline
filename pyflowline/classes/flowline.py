@@ -74,8 +74,8 @@ class pyflowline(pypolyline):
         pVertex_end (pyvertex): Ending vertex of the flowline
         aEdge (List[pyedge]): List of edges forming the flowline
         aVertex (List[pyvertex]): List of vertices along the flowline
-        lFlowlineIndex_downstream (int): Index of downstream flowline (default: None)
         aFlowline_upstream (List): List of upstream flowlines (default: None)
+        aFlowline_downstream (List): List of downstream flowlines (default: None)
         aFlowlineID_start_start (List): IDs of flowlines starting at start (default: None)
         aFlowlineID_start_end (List): IDs of flowlines ending at start (default: None)
         aFlowlineID_end_start (List): IDs of flowlines starting at end (default: None)
@@ -173,8 +173,9 @@ class pyflowline(pypolyline):
         self.nVertex: int = len(self.aVertex)
 
         # Connection lists (initialized as None, populated during network topology analysis)
-        self.lFlowlineIndex_downstream: Optional[int] = None
+        #self.lFlowlineIndex_downstream: Optional[int] = None #this will be removed when braided flowlines are supported
         self.aFlowline_upstream: Optional[List] = None
+        self.aFlowline_downstream: Optional[List] = None #this will support braided flowlines in the future
         self.aFlowlineID_start_start: Optional[List[int]] = None
         self.aFlowlineID_start_end: Optional[List[int]] = None
         self.aFlowlineID_end_start: Optional[List[int]] = None
@@ -203,29 +204,18 @@ class pyflowline(pypolyline):
 
     def __hash__(self) -> int:
         """
-        Return hash value for the flowline.
-
-        Uses flowline ID for hashing to allow flowlines to be used in sets
-        and as dictionary keys.
-
-        Returns:
-            int: Hash value based on flowline ID
+        hash using the base class hash function.
         """
-        return hash((self.pVertex_start, self.pVertex_end))
+        return super().__hash__()
+
 
     def __eq__(self, other: Any) -> bool:
         """
-        Check if two flowlines are equal based on their IDs.
-
-        Args:
-            other: Another object to compare with
-
-        Returns:
-            bool: True if flowlines have the same ID
+        use the base class equality function.
         """
         if not isinstance(other, pyflowline):
             return NotImplemented
-        return self.lFlowlineID == other.lFlowlineID
+        return super().__eq__(other)
 
     def set_flowline_id(self, lFlowlineID: int) -> None:
         """
@@ -339,8 +329,8 @@ class pyflowline(pypolyline):
         Returns:
             bool: True if flowline has no downstream connection
         """
-        return (self.lFlowlineIndex_downstream is None or
-                self.lFlowlineIndex_downstream < 0)
+        return (self.aFlowline_downstream is None or
+                len(self.aFlowline_downstream) == 0)
 
     def check_upstream(self, other: 'pyflowline') -> bool:
         """
@@ -480,7 +470,7 @@ class pyflowline(pypolyline):
         self.iFlag_right = other.iFlag_right
         self.iFlag_left = other.iFlag_left
         self.iFlag_keep = other.iFlag_keep
-        self.lFlowlineIndex_downstream = other.lFlowlineIndex_downstream
+        #self.lFlowlineIndex_downstream = other.lFlowlineIndex_downstream
 
     def calculate_flowline_sinuosity(self) -> float:
         """

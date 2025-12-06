@@ -40,7 +40,7 @@ class pyconfluence():
         object: A confluence object
     """
 
-    def __init__(self, pVertex_center, aFlowline_upstream_in, pFlowline_downstream_in):
+    def __init__(self, pVertex_center, aFlowline_upstream_in, aFlowline_downstream_in):
         """
         Initialize a pyconfluence object
 
@@ -53,12 +53,14 @@ class pyconfluence():
         self.lIndex = -1
         self.lConfluenceID = -1
         self.dAngle_upstream = 0.0
+        self.nUpstream = len(aFlowline_upstream_in)
+        self.nDownstream = len(aFlowline_downstream_in)
 
         try:
             self.pVertex_confluence      = pVertex_center
             self.aFlowline_upstream      = aFlowline_upstream_in
-            self.pFlowline_downstream    = pFlowline_downstream_in
-
+            #self.pFlowline_downstream    = pFlowline_downstream_in
+            self.aFlowline_downstream    = aFlowline_downstream_in #to support braided flowlines in the future
         except:
             print('Initialization of confluence failed!')
 

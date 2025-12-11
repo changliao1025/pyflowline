@@ -1440,8 +1440,19 @@ class pyrivergraph:
         sorted_flowlines = []
         queue = deque()
 
-        # Start from outlet vertex
+        # Start from outlet vertex - ensure it's valid after graph modifications
         outlet_id = self.pVertex_outlet_id
+
+        # Safety check: if outlet_id is invalid, try to refresh it
+        if outlet_id is None or outlet_id not in self.id_to_vertex:
+            logger.warning("Outlet vertex ID is invalid, attempting to refresh")
+            if hasattr(self, 'pVertex_outlet') and self.pVertex_outlet is not None:
+                self._set_outlet_vertex_id()
+                outlet_id = self.pVertex_outlet_id
+
+            if outlet_id is None or outlet_id not in self.id_to_vertex:
+                logger.error("Cannot find valid outlet vertex after refresh, returning original flowline order")
+                return self.aFlowline
 
         # Find all flowlines that end at the outlet (these are the most downstream)
         outlet_flowlines = []
@@ -1673,6 +1684,12 @@ class pyrivergraph:
         start_time = time.time()
         self.aFlowline = new_flowlines
         self._build_graph()
+
+        # Critical: Update outlet vertex ID after graph rebuild
+        # The outlet vertex ID can become invalid after graph modifications
+        if hasattr(self, 'pVertex_outlet') and self.pVertex_outlet is not None:
+            self._set_outlet_vertex_id()
+            logger.debug(f"Updated outlet vertex ID after graph rebuild: {self.pVertex_outlet_id}")
 
         return
 
@@ -1937,10 +1954,14 @@ class pyrivergraph:
             List of indices of upstream flowlines
         """
         upstream_indices = []
-        for start_id, neighbors in self.adjacency_list.items():
-            for end_id, flowline_idx in neighbors:
-                if end_id == flowline.lVertexID and flowline_idx < len(self.aFlowline):
-                    upstream_indices.append(flowline_idx)
+        # Get the start vertex ID of the given flowline
+        start_vertex_id = self.vertex_to_id.get(flowline.pVertex_start)
+        if start_vertex_id is not None:
+            # Find flowlines that end at this flowline's start vertex
+            for start_id, neighbors in self.adjacency_list.items():
+                for end_id, flowline_idx in neighbors:
+                    if end_id == start_vertex_id and flowline_idx < len(self.aFlowline):
+                        upstream_indices.append(flowline_idx)
         return upstream_indices
 
     def get_downstream_indices(self, flowline: pyflowline) -> List[int]:
@@ -1954,8 +1975,11 @@ class pyrivergraph:
             List of indices of downstream flowlines
         """
         downstream_indices = []
-        for start_id, neighbors in self.adjacency_list.items():
-            for end_id, flowline_idx in neighbors:
-                if start_id == flowline.lVertexID and flowline_idx < len(self.aFlowline):
+        # Get the end vertex ID of the given flowline
+        end_vertex_id = self.vertex_to_id.get(flowline.pVertex_end)
+        if end_vertex_id is not None:
+            # Find flowlines that start at this flowline's end vertex
+            for neighbor_id, flowline_idx in self.adjacency_list[end_vertex_id]:
+                if flowline_idx < len(self.aFlowline):
                     downstream_indices.append(flowline_idx)
         return downstream_indices

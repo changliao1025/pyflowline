@@ -12,7 +12,7 @@ def split_flowline_by_length(aFlowline_in, dDistance):
     return aFlowline_out
 
 def split_edge_by_length(pEdge_in, dLength_in):
-    from pyearth.toolbox.mesh.edge import pyedge
+    from pyearth.toolbox.mesh.line import pyline as pyedge
     aEdge_out=list()
 
     dLength_total = pEdge_in.dLength

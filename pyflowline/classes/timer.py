@@ -24,3 +24,13 @@ class pytimer:
         elapsed_time = time.perf_counter() - self._start_time
         self._start_time = None
         print(f"Elapsed time: {elapsed_time:0.4f} seconds")
+
+    def now(self, iFlag_with_seconds=1):
+        """Get the current time as a string
+        """
+        t_struct = time.localtime()
+        if iFlag_with_seconds==1:
+            sTime = time.strftime("%Y%m%d_%H%M%S", t_struct)
+        else:
+            sTime = time.strftime("%Y%m%d_%H%M", t_struct)
+        return sTime

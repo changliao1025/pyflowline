@@ -654,7 +654,7 @@ class pyflowline(pypolyline):
         """
         aSkip = ['aEdge', 'aVertex', 'aFlowlineID_start_start','aLine', 'aPoint', 'pPoint_start', 'pPoint_end',
                  'aFlowlineID_start_end', 'aFlowlineID_end_start',
-                 'aFlowlineID_end_end', 'aFlowline_upstream']
+                 'aFlowlineID_end_end', 'aFlowline_upstream', 'aFlowline_downstream']
 
         obj = self.__dict__.copy()
         for sKey in aSkip:

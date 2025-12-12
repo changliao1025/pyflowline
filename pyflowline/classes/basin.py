@@ -18,15 +18,11 @@ from pyflowline.formats.convert_flowline_to_geojson import convert_flowline_to_g
 from pyflowline.formats.convert_boundary_to_geojson import convert_boundary_to_geojson
 from pyflowline.formats.export_flowline import export_flowline_to_geojson
 from pyflowline.formats.export_vertex import export_vertex_to_geojson
-
-from pyflowline.algorithms.split.split_flowline import split_flowline
 from pyflowline.algorithms.split.split_flowline_to_edge import split_flowline_to_edge
-
 from pyflowline.classes.rivergraph import pyrivergraph
 from pyflowline.algorithms.simplification.find_outlet import find_outlet
 from pyflowline.algorithms.simplification.remove_returning_flowline import remove_returning_flowline
 from pyflowline.algorithms.process_flowline import process_flowline
-from pyflowline.algorithms.index.define_stream_order import update_head_water_stream_order
 from pyflowline.algorithms.intersect.intersect_flowline_with_mesh import intersect_flowline_with_mesh
 from pyflowline.algorithms.intersect.intersect_flowline_with_flowline import intersect_flowline_with_flowline
 from pyflowline.algorithms.auxiliary.calculate_area_of_difference import calculate_area_of_difference_simplified
@@ -1004,8 +1000,8 @@ class pybasin(object):
             export_vertex_to_geojson(aVertex_all_conceptual, sFilename_output)
 
         # split
-        aFlowline_simplified_split = split_flowline(
-            aFlowline_simplified, aVertex_all_simplified, iFlag_intersect=1)
+        pRivergraph = pyrivergraph(aFlowline_simplified)
+        aFlowline_simplified_split = pRivergraph.split_flowline(aVertex_in= aVertex_all_simplified, iFlag_intersect=1)
         self.iFlag_debug = 1
         if self.iFlag_debug == 1:
             sFilename_out = 'flowline_split_simplified.json'
@@ -1014,7 +1010,8 @@ class pybasin(object):
             export_flowline_to_geojson(
                 aFlowline_simplified_split, sFilename_out)
 
-        aFlowline_conceptual_split = split_flowline(aFlowline_conceptual, aVertex_all_conceptual,
+        pRivergraph = pyrivergraph(aFlowline_conceptual)
+        aFlowline_conceptual_split = pRivergraph.split_flowline(aVertex_in= aVertex_all_conceptual,
                                                     iFlag_intersect=1, iFlag_use_id=1)
         self.iFlag_debug = 1
         if self.iFlag_debug == 1:

@@ -309,6 +309,11 @@ def run_jigsaw(sWorkspace_jigsaw_in, projector,
         else:
             optm_qtol = +1.0E-05
 
+        if "dResolution_ocean" in aConfig_in:
+            dResolution_ocean = float(aConfig_in["dResolution_ocean"])
+        else:
+            dResolution_ocean = 100.0
+
         if "dResolution_land" in aConfig_in:
             dResolution_land = float(aConfig_in["dResolution_land"])
         else:
@@ -388,6 +393,8 @@ def run_jigsaw(sWorkspace_jigsaw_in, projector,
         optm_iter = +32
         optm_qtol = +1.0E-05
         dhdx_lim = 0.25                   # |dH/dx| thresh smaller values will make h(x) more smooth
+
+        dResolution_ocean= 100.0
 
     geom = jigsawpy.jigsaw_msh_t()
     if iFlag_geom:
@@ -573,7 +580,7 @@ def run_jigsaw(sWorkspace_jigsaw_in, projector,
                     aOcean_mask = compute_mask(aLand_ocean_mask, missingValue, dOriginX, dOriginY, pixelWidth, pixelHeight, ncolumn_space, nrow_space)
                     spac.value[aOcean_mask] =  np.minimum(aOcean_value[aOcean_mask], spac.value[aOcean_mask])
                 else:
-                    vals = mdt.EC_CellWidthVsLat(spac.ygrid * 180. / np.pi)
+                    vals = mdt.EC_CellWidthVsLat(spac.ygrid * 180. / np.pi, cellWidthEq=dResolution_ocean)
                     vals = np.reshape(vals, (spac.ygrid.size, 1))
                     aOcean_value = np.array(np.tile( vals, (1, spac.xgrid.size)), dtype=spac.REALS_t)
                     aOcean_mask = compute_mask(aLand_ocean_mask, missingValue, dOriginX, dOriginY, pixelWidth, pixelHeight, ncolumn_space, nrow_space)

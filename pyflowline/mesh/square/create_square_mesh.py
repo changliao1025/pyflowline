@@ -1,13 +1,14 @@
-#create a rectangle latitude/longitude based mesh
-#we will use some GIS way to define it
-#longitude left and latitude bottom and nrow and ncolumn and resolution is used to define the rectangle
-#because it is mesh, it represent the edge instead of center
-#we will use gdal api for most operations
+# create a rectangle latitude/longitude based mesh
+# we will use some GIS way to define it
+# longitude left and latitude bottom and nrow and ncolumn and resolution is used to define the rectangle
+# because it is mesh, it represent the edge instead of center
+# we will use gdal api for most operations
 import os
 from osgeo import ogr, osr
 import numpy as np
 from pyflowline.formats.convert_coordinates import convert_gcs_coordinates_to_cell
-from pyearth.gis.spatialref.reproject_coordinates import  reproject_coordinates_batch
+from pyearth.gis.spatialref.reproject_coordinates import reproject_coordinates_batch
+
 
 def index_to_row_col(index, num_columns):
     index -= 1  # Adjust for 1-based indexing
@@ -15,12 +16,17 @@ def index_to_row_col(index, num_columns):
     col = index % num_columns + 1
     return row, col
 
-def create_square_mesh(dX_left_in, dY_bot_in,
-                        dResolution_meter_in,
-                        ncolumn_in, nrow_in,
+
+def create_square_mesh(
+    dX_left_in,
+    dY_bot_in,
+    dResolution_meter_in,
+    ncolumn_in,
+    nrow_in,
     sFilename_output_in,
     pProjection_reference_in,
-    pBoundary_in):
+    pBoundary_in,
+):
     """
     _summary_
 
@@ -36,28 +42,33 @@ def create_square_mesh(dX_left_in, dY_bot_in,
     Returns:
         _type_: _description_
     """
-    #for the reason that a geometry object will be crash if the associated dataset is closed, we must pass wkt string
-    #https://gdal.org/api/python_gotchas.html
+    # for the reason that a geometry object will be crash if the associated dataset is closed, we must pass wkt string
+    # https://gdal.org/api/python_gotchas.html
 
     pSpatial_reference_gcs = osr.SpatialReference()
-    pSpatial_reference_gcs.ImportFromEPSG(4326)    # WGS84 lat/lon
+    pSpatial_reference_gcs.ImportFromEPSG(4326)  # WGS84 lat/lon
     pSpatial_reference_gcs.SetAxisMappingStrategy(osr.OAMS_TRADITIONAL_GIS_ORDER)
     pProjection_target = pSpatial_reference_gcs.ExportToWkt()
-
 
     pBoundary = ogr.CreateGeometryFromWkt(pBoundary_in)
     if os.path.exists(sFilename_output_in):
         os.remove(sFilename_output_in)
 
-    pDriver_geojson = ogr.GetDriverByName('GeoJSON')
+    pDriver_geojson = ogr.GetDriverByName("GeoJSON")
     pDataset = pDriver_geojson.CreateDataSource(sFilename_output_in)
 
-    pLayer = pDataset.CreateLayer('cell', pSpatial_reference_gcs, ogr.wkbPolygon)
+    pLayer = pDataset.CreateLayer("cell", pSpatial_reference_gcs, ogr.wkbPolygon)
     # Add one attribute
-    pLayer.CreateField(ogr.FieldDefn('cellid', ogr.OFTInteger64)) #long type for high resolution
-    pLayer.CreateField(ogr.FieldDefn('longitude', ogr.OFTReal)) #long type for high resolution
-    pLayer.CreateField(ogr.FieldDefn('latitude', ogr.OFTReal)) #long type for high resolution
-    pArea_field = ogr.FieldDefn('area', ogr.OFTReal)
+    pLayer.CreateField(
+        ogr.FieldDefn("cellid", ogr.OFTInteger64)
+    )  # long type for high resolution
+    pLayer.CreateField(
+        ogr.FieldDefn("longitude", ogr.OFTReal)
+    )  # long type for high resolution
+    pLayer.CreateField(
+        ogr.FieldDefn("latitude", ogr.OFTReal)
+    )  # long type for high resolution
+    pArea_field = ogr.FieldDefn("area", ogr.OFTReal)
     pArea_field.SetWidth(20)
     pArea_field.SetPrecision(2)
     pLayer.CreateField(pArea_field)
@@ -66,106 +77,117 @@ def create_square_mesh(dX_left_in, dY_bot_in,
     pFeature = ogr.Feature(pLayerDefn)
 
     xleft = dX_left_in
-    xspacing= dResolution_meter_in
+    xspacing = dResolution_meter_in
     ybottom = dY_bot_in
     yspacing = dResolution_meter_in
 
     aSquare = list()
     aSquare_dict = dict()
     lCellIndex = 0
-    def add_cell_into_list(aList, lCellID, iRow, iColumn, dLongitude_center, dLatitude_center, aCoords ):
 
-        pSquare = convert_gcs_coordinates_to_cell(2, dLongitude_center, dLatitude_center, aCoords)
+    def add_cell_into_list(
+        aList, lCellID, iRow, iColumn, dLongitude_center, dLatitude_center, aCoords
+    ):
+
+        pSquare = convert_gcs_coordinates_to_cell(
+            2, dLongitude_center, dLatitude_center, aCoords
+        )
         pSquare.lCellID = lCellID
         dArea = pSquare.calculate_cell_area()
         pSquare.calculate_edge_length()
-        #build topoloy
-        aNeighbor=list()
+        # build topoloy
+        aNeighbor = list()
 
-        #lCellID_center = lCellID
-        #counter-clock wise direction to add the neighbor
-        if iRow > 1:#under
+        # lCellID_center = lCellID
+        # counter-clock wise direction to add the neighbor
+        if iRow > 1:  # under
             iRow_dummy = iRow - 1
             if iColumn > 1:
                 iColumn_dummy = iColumn - 1
-                lCellID2 = (iRow_dummy-1) * ncolumn_in + iColumn_dummy #lCellID0 - nrow_in
+                lCellID2 = (
+                    iRow_dummy - 1
+                ) * ncolumn_in + iColumn_dummy  # lCellID0 - nrow_in
                 aNeighbor.append(lCellID2)
 
-            lCellID0 =  (iRow_dummy-1) * ncolumn_in + iColumn
+            lCellID0 = (iRow_dummy - 1) * ncolumn_in + iColumn
             aNeighbor.append(lCellID0)
-        if iColumn  < ncolumn_in  : #right
+        if iColumn < ncolumn_in:  # right
             iColumn_dummy = iColumn + 1
             if iRow > 1:
                 iRow_dummy = iRow - 1
-                lCellID7 = (iRow_dummy-1) * ncolumn_in + iColumn_dummy# lCellID5 -1
+                lCellID7 = (iRow_dummy - 1) * ncolumn_in + iColumn_dummy  # lCellID5 -1
                 aNeighbor.append(lCellID7)
-            lCellID5 = (iRow-1) * ncolumn_in + iColumn_dummy #nrow_in * iColumn + iRow
+            lCellID5 = (
+                iRow - 1
+            ) * ncolumn_in + iColumn_dummy  # nrow_in * iColumn + iRow
             aNeighbor.append(lCellID5)
-        if iRow < nrow_in:#top
+        if iRow < nrow_in:  # top
             iRow_dummy = iRow + 1
             if iColumn < ncolumn_in:
                 iColumn_dummy = iColumn + 1
-                lCellID6 = (iRow_dummy-1) * ncolumn_in + iColumn_dummy #lCellID3 + nrow_in
+                lCellID6 = (
+                    iRow_dummy - 1
+                ) * ncolumn_in + iColumn_dummy  # lCellID3 + nrow_in
                 aNeighbor.append(lCellID6)
-            lCellID3 = (iRow_dummy-1) * ncolumn_in + iColumn #lCellID_center + 1
+            lCellID3 = (iRow_dummy - 1) * ncolumn_in + iColumn  # lCellID_center + 1
             aNeighbor.append(lCellID3)
 
-        if iColumn> 1:#left
+        if iColumn > 1:  # left
             iColumn_dummy = iColumn - 1
             if iRow < nrow_in:
                 iRow_dummy = iRow + 1
-                lCellID4 = (iRow_dummy-1) * ncolumn_in + iColumn_dummy #lCellID1 + 1
+                lCellID4 = (iRow_dummy - 1) * ncolumn_in + iColumn_dummy  # lCellID1 + 1
                 aNeighbor.append(lCellID4)
-            lCellID1 = (iRow-1) * ncolumn_in + iColumn_dummy #nrow_in * (iColumn-2) + iRow
+            lCellID1 = (
+                iRow - 1
+            ) * ncolumn_in + iColumn_dummy  # nrow_in * (iColumn-2) + iRow
             aNeighbor.append(lCellID1)
 
         pSquare.aNeighbor = aNeighbor
         pSquare.nNeighbor = len(aNeighbor)
-        pSquare.aNeighbor_land= aNeighbor
-        pSquare.nNeighbor_land= pSquare.nNeighbor
+        pSquare.aNeighbor_land = aNeighbor
+        pSquare.nNeighbor_land = pSquare.nNeighbor
         aList.append(pSquare)
 
         return aList, dArea
 
-    #change the order because mpas uses counter-clock wise to store the vertices
-    #we will also start from the lower-left corner, and then go to the right and then go up
-    #so the final index will be like this
-    #3 4
-    #1 2
-    #lCellID = 1
-    #.........
-    #(x4,y4)-----(x3,y3)
+    # change the order because mpas uses counter-clock wise to store the vertices
+    # we will also start from the lower-left corner, and then go to the right and then go up
+    # so the final index will be like this
+    # 3 4
+    # 1 2
+    # lCellID = 1
+    # .........
+    # (x4,y4)-----(x3,y3)
     #   |           |
-    #(x1,y1)-----(x2,y2)
-    #...............
+    # (x1,y1)-----(x2,y2)
+    # ...............
 
+    for iRow in range(1, nrow_in + 1):
+        for iColumn in range(1, ncolumn_in + 1):
+            # global cell id for the mesh
+            lCellID = (iRow - 1) * ncolumn_in + iColumn
 
-    for iRow in range(1, nrow_in+1):
-        for iColumn in range(1, ncolumn_in+1):
-            #global cell id for the mesh
-            lCellID = (iRow-1) * ncolumn_in + iColumn
+            # define a polygon here
+            x1 = xleft + ((iColumn - 1) * xspacing)
+            y1 = ybottom + ((iRow - 1) * yspacing)
 
-            #define a polygon here
-            x1 = xleft + ((iColumn-1) * xspacing)
-            y1 = ybottom + ((iRow-1) * yspacing)
+            x2 = xleft + ((iColumn) * xspacing)
+            y2 = ybottom + ((iRow - 1) * yspacing)
 
-            x2 = xleft + ((iColumn ) * xspacing)
-            y2 = ybottom + ((iRow-1) * yspacing)
+            x3 = xleft + ((iColumn) * xspacing)
+            y3 = ybottom + ((iRow) * yspacing)
 
-            x3 = xleft + ((iColumn ) * xspacing)
-            y3 = ybottom + ((iRow ) * yspacing)
-
-            x4 = xleft + ((iColumn-1) * xspacing)
-            y4 = ybottom + ((iRow ) * yspacing)
+            x4 = xleft + ((iColumn - 1) * xspacing)
+            y4 = ybottom + ((iRow) * yspacing)
 
             x = [x1, x2, x3, x4]
             y = [y1, y2, y3, y4]
 
-            x_new , y_new = reproject_coordinates_batch(x, y, pProjection_reference_in)
+            x_new, y_new = reproject_coordinates_batch(x, y, pProjection_reference_in)
             x1, x2, x3, x4 = x_new
             y1, y2, y3, y4 = y_new
             coordinates = [(x1, y1), (x2, y2), (x3, y3), (x4, y4), (x1, y1)]
-
 
             ring = ogr.Geometry(ogr.wkbLinearRing)
             for x, y in coordinates:
@@ -174,40 +196,45 @@ def create_square_mesh(dX_left_in, dY_bot_in,
             pPolygon = ogr.Geometry(ogr.wkbPolygon)
             pPolygon.AddGeometry(ring)
 
-            aCoords_gcs = np.full((5,2), -9999.0, dtype=float)
+            aCoords_gcs = np.full((5, 2), -9999.0, dtype=float)
             for i, (x, y) in enumerate(coordinates):
                 aCoords_gcs[i, 0] = x
                 aCoords_gcs[i, 1] = y
 
-            dLongitude_center = np.mean(aCoords_gcs[0:4,0])
-            dLatitude_center = np.mean(aCoords_gcs[0:4,1])
+            dLongitude_center = np.mean(aCoords_gcs[0:4, 0])
+            dLatitude_center = np.mean(aCoords_gcs[0:4, 1])
 
             iFlag = False
             if pPolygon.Within(pBoundary):
                 iFlag = True
             else:
-                #then check intersection
+                # then check intersection
                 if pPolygon.Intersects(pBoundary):
                     iFlag = True
                 else:
                     pass
 
-
-            if ( iFlag == True ):
-                aSquare, dArea = add_cell_into_list(aSquare, lCellID, iRow, iColumn, dLongitude_center,dLatitude_center, aCoords_gcs )
-                #add to dictionary
+            if iFlag == True:
+                aSquare, dArea = add_cell_into_list(
+                    aSquare,
+                    lCellID,
+                    iRow,
+                    iColumn,
+                    dLongitude_center,
+                    dLatitude_center,
+                    aCoords_gcs,
+                )
+                # add to dictionary
                 aSquare_dict[lCellID] = lCellIndex
                 lCellIndex = lCellIndex + 1
-                #save feature
+                # save feature
                 pFeature.SetGeometry(pPolygon)
                 pFeature.SetField("cellid", lCellID)
-                pFeature.SetField("longitude", dLongitude_center )
-                pFeature.SetField("latitude", dLatitude_center )
-                pFeature.SetField("area", dArea )
+                pFeature.SetField("longitude", dLongitude_center)
+                pFeature.SetField("latitude", dLatitude_center)
+                pFeature.SetField("area", dArea)
                 pLayer.CreateFeature(pFeature)
                 pass
-
-
 
     aSquare_out = list()
 
@@ -217,26 +244,27 @@ def create_square_mesh(dX_left_in, dY_bot_in,
         for lNeighbor in aNeighbor:
             if lNeighbor in aSquare_dict:
                 aNeighbor_land_update.append(lNeighbor)
-        #for latlon, there is no ocean concept
+        # for latlon, there is no ocean concept
         pCell.aNeighbor = aNeighbor_land_update
         pCell.nNeighbor = len(aNeighbor_land_update)
         pCell.aNeighbor_land = aNeighbor_land_update
-        pCell.nNeighbor_land= len(aNeighbor_land_update)
+        pCell.nNeighbor_land = len(aNeighbor_land_update)
         pCell.nNeighbor_ocean = pCell.nVertex - pCell.nNeighbor_land
         aSquare_out.append(pCell)
     pass
 
-    #distance
+    # distance
     for pSquare in aSquare_out:
         aNeighbor = pSquare.aNeighbor
-        pSquare.aNeighbor_distance=list()
+        pSquare.aNeighbor_distance = list()
         for lCellID1 in aNeighbor:
-            #use dictionary to get index
+            # use dictionary to get index
             lIndex = aSquare_dict[lCellID1]
             pLatlon1 = aSquare_out[lIndex]
-            dDistance = pSquare.pVertex_center.calculate_distance( pLatlon1.pVertex_center )
+            dDistance = pSquare.pVertex_center.calculate_distance(
+                pLatlon1.pVertex_center
+            )
             pSquare.aNeighbor_distance.append(dDistance)
 
-    pDataset = pLayer = pFeature  = None
+    pDataset = pLayer = pFeature = None
     return aSquare_out
-

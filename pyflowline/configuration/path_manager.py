@@ -1,9 +1,11 @@
 from pathlib import Path
 from pkg_resources import resource_filename
+
 """
 path_manager
 All paths are created with Path and call resolve()
 """
+
 
 def join_project_path(*args: str) -> Path:
     """
@@ -18,6 +20,7 @@ def join_project_path(*args: str) -> Path:
     project_root = pyflowline_project_root()
     return project_root.joinpath(*args)
 
+
 def pyflowline_project_root() -> Path:
     """
     Attempt to find the root path of the project, first by looking for a 'setup.py' file, and then using pkg_resources to find the installation path.
@@ -27,11 +30,15 @@ def pyflowline_project_root() -> Path:
     except FileNotFoundError:
         return root_path_from_pyflowline_package_root()
     except Exception as e:
-        raise RuntimeError(f"An unexpected error occurred while locating the project root: {str(e)}")
+        raise RuntimeError(
+            f"An unexpected error occurred while locating the project root: {str(e)}"
+        )
 
-def pyflowline_package_root(package_name='pyflowline') -> Path:
+
+def pyflowline_package_root(package_name="pyflowline") -> Path:
     """Get the installation root directory of the package."""
-    return Path(resource_filename(package_name, '')).resolve()
+    return Path(resource_filename(package_name, "")).resolve()
+
 
 def root_path_from_setup_file() -> Path:
     """Return the top-level (root) path of the pyflowline project.
@@ -40,13 +47,15 @@ def root_path_from_setup_file() -> Path:
     """
     this_path = Path(__file__).resolve()
     for parent in this_path.parents:
-        if (parent / 'setup.py').exists():
+        if (parent / "setup.py").exists():
             return parent
     raise FileNotFoundError("setup.py not found. Is this the right project structure?")
+
 
 def root_path_from_pyflowline_package_root() -> Path:
     """Get the installation root directory of the package."""
     return pyflowline_package_root().parent
+
 
 # Example additional function for getting root from this module's location, adjusted for best practice
 def root_path_from_path_manager_location() -> Path:

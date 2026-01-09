@@ -5,24 +5,28 @@ import json
 from pyflowline.classes.pycase import flowlinecase
 
 pDate = datetime.datetime.today()
-sDate_default = "{:04d}".format(pDate.year) + \
-    "{:02d}".format(pDate.month) + "{:02d}".format(pDate.day)
+sDate_default = (
+    "{:04d}".format(pDate.year)
+    + "{:02d}".format(pDate.month)
+    + "{:02d}".format(pDate.day)
+)
 
 
-def pyflowline_read_configuration_file(sFilename_configuration_in,
-                                             iFlag_standalone_in=1,
-                                             iFlag_create_directory_in = None,
-                                             iFlag_use_mesh_dem_in=None,
-                                             iCase_index_in=None,
-                                             iResolution_index_in = None,
-                                             dResolution_degree_in=None,
-                                             dResolution_meter_in=None,
-                                             sMesh_type_in=None,
-                                             sModel_in='pyflowline',
-                                             sDate_in=None,
-                                             sDggrid_type_in = None,
-                                             sWorkspace_output_in=None):
-
+def pyflowline_read_configuration_file(
+    sFilename_configuration_in,
+    iFlag_standalone_in=1,
+    iFlag_create_directory_in=None,
+    iFlag_use_mesh_dem_in=None,
+    iCase_index_in=None,
+    iResolution_index_in=None,
+    dResolution_degree_in=None,
+    dResolution_meter_in=None,
+    sMesh_type_in=None,
+    sModel_in="pyflowline",
+    sDate_in=None,
+    sDggrid_type_in=None,
+    sWorkspace_output_in=None,
+):
     """read a model configuration
 
     Args:
@@ -47,7 +51,7 @@ def pyflowline_read_configuration_file(sFilename_configuration_in,
         sWorkspace_output_in = str(sWorkspace_output_in)
 
     if not os.path.isfile(sFilename_configuration_in):
-        print(sFilename_configuration_in + ' does not exist')
+        print(sFilename_configuration_in + " does not exist")
         return
 
     # Opening JSON file
@@ -57,13 +61,13 @@ def pyflowline_read_configuration_file(sFilename_configuration_in,
     if iCase_index_in is not None:
         iCase_index = iCase_index_in
     else:
-        iCase_index = int(aConfig['iCase_index'])
+        iCase_index = int(aConfig["iCase_index"])
 
     if iResolution_index_in is not None:
         iResolution_index = iResolution_index_in
     else:
         if "iResolution_index" in aConfig:
-            iResolution_index =  int( aConfig['iResolution_index'])
+            iResolution_index = int(aConfig["iResolution_index"])
         else:
             iResolution_index = 10
 
@@ -72,17 +76,17 @@ def pyflowline_read_configuration_file(sFilename_configuration_in,
     if iFlag_standalone_in is not None:
         iFlag_standalone = iFlag_standalone_in
     else:
-        iFlag_standalone = int(aConfig['iFlag_standalone'])
+        iFlag_standalone = int(aConfig["iFlag_standalone"])
 
     if iFlag_use_mesh_dem_in is not None:
         iFlag_use_mesh_dem = iFlag_use_mesh_dem_in
     else:
-        iFlag_use_mesh_dem = int(aConfig['iFlag_use_mesh_dem'])
+        iFlag_use_mesh_dem = int(aConfig["iFlag_use_mesh_dem"])
 
     if sMesh_type_in is not None:
         sMesh_type = sMesh_type_in
     else:
-        sMesh_type = aConfig['sMesh_type']
+        sMesh_type = aConfig["sMesh_type"]
         pass
 
     if sDggrid_type_in is not None:
@@ -91,58 +95,61 @@ def pyflowline_read_configuration_file(sFilename_configuration_in,
         if "sDggrid_type" in aConfig:
             sDggrid_type = aConfig["sDggrid_type"]
         else:
-            sDggrid_type = 'ISEA3H'
+            sDggrid_type = "ISEA3H"
 
     if sModel_in is not None:
         sModel = sModel_in
     else:
-        sModel = aConfig['sModel']
+        sModel = aConfig["sModel"]
         pass
 
     if sDate_in is not None:
         sDate = sDate_in
     else:
-        sDate = aConfig['sDate']
+        sDate = aConfig["sDate"]
         pass
 
     if dResolution_degree_in is not None:
         dResolution_degree = dResolution_degree_in
     else:
-        dResolution_degree = aConfig['dResolution_degree']
+        dResolution_degree = aConfig["dResolution_degree"]
         pass
 
     if dResolution_meter_in is not None:
         dResolution_meter = dResolution_meter_in
     else:
-        dResolution_meter = aConfig['dResolution_meter']
+        dResolution_meter = aConfig["dResolution_meter"]
         pass
 
     if sWorkspace_output_in is not None:
         sWorkspace_output = sWorkspace_output_in
     else:
-        sWorkspace_output = aConfig['sWorkspace_output']
+        sWorkspace_output = aConfig["sWorkspace_output"]
         # try to create this output folder first using
 
     try:
-        print("Creating the specified output workspace (if it does not exist): \n", sWorkspace_output)
+        print(
+            "Creating the specified output workspace (if it does not exist): \n",
+            sWorkspace_output,
+        )
         Path(sWorkspace_output).mkdir(parents=True, exist_ok=True)
         print("The specified output workspace is: \n", sWorkspace_output)
     except ValueError:
         print("The specified output workspace cannot be created!")
         exit
 
-    aConfig['iCase_index'] = iCase_index
-    aConfig['iFlag_standalone'] = iFlag_standalone
-    aConfig['iFlag_use_mesh_dem'] = iFlag_use_mesh_dem
+    aConfig["iCase_index"] = iCase_index
+    aConfig["iFlag_standalone"] = iFlag_standalone
+    aConfig["iFlag_use_mesh_dem"] = iFlag_use_mesh_dem
     aConfig["iResolution_index"] = iResolution_index
-    aConfig['dResolution_degree'] = dResolution_degree
-    aConfig['dResolution_meter'] = dResolution_meter
+    aConfig["dResolution_degree"] = dResolution_degree
+    aConfig["dResolution_meter"] = dResolution_meter
 
-    aConfig['sDate'] = sDate
-    aConfig['sModel'] = sModel
-    aConfig['sMesh_type'] = sMesh_type
+    aConfig["sDate"] = sDate
+    aConfig["sModel"] = sModel
+    aConfig["sMesh_type"] = sMesh_type
     aConfig["sDggrid_type"] = sDggrid_type
-    aConfig['sWorkspace_output'] = sWorkspace_output
+    aConfig["sWorkspace_output"] = sWorkspace_output
 
     aConfig["sFilename_model_configuration"] = sFilename_configuration_in
 
@@ -154,6 +161,8 @@ def pyflowline_read_configuration_file(sFilename_configuration_in,
 
     # simulation
 
-    oPyflowline = flowlinecase(aConfig, iFlag_create_directory_in= iFlag_create_directory_in)
+    oPyflowline = flowlinecase(
+        aConfig, iFlag_create_directory_in=iFlag_create_directory_in
+    )
 
     return oPyflowline

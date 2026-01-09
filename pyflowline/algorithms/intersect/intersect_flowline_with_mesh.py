@@ -5,10 +5,14 @@ from rtree.index import Index as RTreeindex
 from pyearth.gis.location.get_geometry_coordinates import get_geometry_coordinates
 from pyflowline.formats.convert_coordinates import convert_gcs_coordinates_to_cell
 from pyflowline.formats.convert_coordinates import convert_gcs_coordinates_to_flowline
-from pyearth.gis.geometry.international_date_line_utility import check_cross_international_date_line_geometry
+from pyearth.gis.geometry.international_date_line_utility import (
+    check_cross_international_date_line_geometry,
+)
 
 
-def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh_in, sFilename_flowline_in, sFilename_output_in):
+def intersect_flowline_with_mesh(
+    iMesh_type_in, sFilename_mesh_in, sFilename_flowline_in, sFilename_output_in
+):
     """
     Intersection function using cached mesh R-tree method for IDL-aware processing of MULTIPOLYGON geometries
 
@@ -28,20 +32,32 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh_in, sFilename_flo
     """
     # Input validation
     if not isinstance(iMesh_type_in, int) or iMesh_type_in < 1 or iMesh_type_in > 8:
-        raise ValueError(f"Invalid mesh type: {iMesh_type_in}. Must be integer between 1-8")
+        raise ValueError(
+            f"Invalid mesh type: {iMesh_type_in}. Must be integer between 1-8"
+        )
 
     if not os.path.exists(sFilename_mesh_in):
         raise FileNotFoundError(f"Mesh file does not exist: {sFilename_mesh_in}")
 
     if not os.path.exists(sFilename_flowline_in):
-        raise FileNotFoundError(f"Flowline file does not exist: {sFilename_flowline_in}")
+        raise FileNotFoundError(
+            f"Flowline file does not exist: {sFilename_flowline_in}"
+        )
 
     # Validate file extensions
-    if not (sFilename_mesh_in.lower().endswith('.geojson') or sFilename_mesh_in.lower().endswith('.json')):
+    if not (
+        sFilename_mesh_in.lower().endswith(".geojson")
+        or sFilename_mesh_in.lower().endswith(".json")
+    ):
         print(f"Warning: Mesh file may not be GeoJSON format: {sFilename_mesh_in}")
 
-    if not (sFilename_flowline_in.lower().endswith('.geojson') or sFilename_flowline_in.lower().endswith('.json')):
-        print(f"Warning: Flowline file may not be GeoJSON format: {sFilename_flowline_in}")
+    if not (
+        sFilename_flowline_in.lower().endswith(".geojson")
+        or sFilename_flowline_in.lower().endswith(".json")
+    ):
+        print(
+            f"Warning: Flowline file may not be GeoJSON format: {sFilename_flowline_in}"
+        )
 
     if os.path.exists(sFilename_output_in):
         os.remove(sFilename_output_in)
@@ -60,12 +76,24 @@ def intersect_flowline_with_mesh(iMesh_type_in, sFilename_mesh_in, sFilename_flo
     else:
         print(f"Caching mesh data for {sFilename_mesh_in}")
         return _cache_and_intersect(
-            iMesh_type_in, sFilename_mesh_in, sFilename_flowline_in, sFilename_output_in, mesh_cache
+            iMesh_type_in,
+            sFilename_mesh_in,
+            sFilename_flowline_in,
+            sFilename_output_in,
+            mesh_cache,
         )
 
 
-def _process_linestring_intersection(pGeometry_intersect, pFeatureOut, pLayerOut, lFlowlineID,
-                                   iStream_segment, iStream_order, pCell, aFlowline_intersect_all):
+def _process_linestring_intersection(
+    pGeometry_intersect,
+    pFeatureOut,
+    pLayerOut,
+    lFlowlineID,
+    iStream_segment,
+    iStream_order,
+    pCell,
+    aFlowline_intersect_all,
+):
     """Helper function to process LINESTRING intersections"""
     pFeatureOut.SetGeometry(pGeometry_intersect)
     pFeatureOut.SetField("lineid", lFlowlineID)
@@ -91,8 +119,16 @@ def _process_linestring_intersection(pGeometry_intersect, pFeatureOut, pLayerOut
     return lFlowlineID + 1
 
 
-def _process_multilinestring_intersection(pGeometry_intersect, pFeatureOut, pLayerOut, lFlowlineID,
-                                        iStream_segment, iStream_order, pCell, aFlowline_intersect_all):
+def _process_multilinestring_intersection(
+    pGeometry_intersect,
+    pFeatureOut,
+    pLayerOut,
+    lFlowlineID,
+    iStream_segment,
+    iStream_order,
+    pCell,
+    aFlowline_intersect_all,
+):
     """Helper function to process MULTILINESTRING intersections"""
     nLine = pGeometry_intersect.GetGeometryCount()
     for i in range(nLine):
@@ -122,7 +158,9 @@ def _process_multilinestring_intersection(pGeometry_intersect, pFeatureOut, pLay
     return lFlowlineID
 
 
-def _perform_quality_control(pLayer_flowline, aFlowline_intersect_all, nfeature_flowline):
+def _perform_quality_control(
+    pLayer_flowline, aFlowline_intersect_all, nfeature_flowline
+):
     """Perform quality control to find outlet vertex (same as original)"""
     pVertex_outlet = None
     iSegment_max = 0
@@ -210,7 +248,9 @@ class MeshRTreeCache:
             mesh_data: Dictionary containing mesh R-tree index and metadata
         """
         self.cache[sFilename_mesh] = mesh_data
-        print(f"Cached mesh data for {sFilename_mesh} ({len(mesh_data['mesh_features'])} cells)")
+        print(
+            f"Cached mesh data for {sFilename_mesh} ({len(mesh_data['mesh_features'])} cells)"
+        )
 
     def clear_cache(self):
         """Clear all cached mesh data"""
@@ -219,15 +259,19 @@ class MeshRTreeCache:
 
     def get_cache_info(self):
         """Get information about cached files"""
-        return {filename: len(data['mesh_features']) for filename, data in self.cache.items()}
+        return {
+            filename: len(data["mesh_features"])
+            for filename, data in self.cache.items()
+        }
 
 
 # Global cache instance
 _mesh_rtree_cache = MeshRTreeCache()
 
 
-def _intersect_cached_mesh_rtree_method(iMesh_type_in, cached_mesh_data, sFilename_flowline_in,
-                                       sFilename_output_in):
+def _intersect_cached_mesh_rtree_method(
+    iMesh_type_in, cached_mesh_data, sFilename_flowline_in, sFilename_output_in
+):
     """
     Intersection method using pre-cached mesh R-tree data
 
@@ -242,6 +286,7 @@ def _intersect_cached_mesh_rtree_method(iMesh_type_in, cached_mesh_data, sFilena
         tuple: (aCell_intersect, aFlowline_intersect_all, pVertex_outlet)
     """
     import time
+
     start_time = time.time()
 
     pDriver_geojson = ogr.GetDriverByName("GeoJSON")
@@ -258,28 +303,34 @@ def _intersect_cached_mesh_rtree_method(iMesh_type_in, cached_mesh_data, sFilena
         nfeature_flowline = pLayer_flowline.GetFeatureCount()
 
         # Get cached mesh data
-        index_mesh = cached_mesh_data['rtree_index']
-        mesh_features = cached_mesh_data['mesh_features']
-        pSpatial_reference_mesh = cached_mesh_data['spatial_reference']
+        index_mesh = cached_mesh_data["rtree_index"]
+        mesh_features = cached_mesh_data["mesh_features"]
+        pSpatial_reference_mesh = cached_mesh_data["spatial_reference"]
         nfeature_mesh = len(mesh_features)
 
-        print(f"Cached optimization analysis: {nfeature_mesh} mesh cells, {nfeature_flowline} flowlines")
+        print(
+            f"Cached optimization analysis: {nfeature_mesh} mesh cells, {nfeature_flowline} flowlines"
+        )
 
         # Handle coordinate transformations
         comparison = pSpatial_reference_mesh.IsSame(pSpatial_reference_flowline)
         if comparison != 1:
             iFlag_transform = 1
-            transform = osr.CoordinateTransformation(pSpatial_reference_flowline, pSpatial_reference_mesh)
+            transform = osr.CoordinateTransformation(
+                pSpatial_reference_flowline, pSpatial_reference_mesh
+            )
         else:
             iFlag_transform = 0
             transform = None
 
         # Setup output
         pDataset_out = pDriver_geojson.CreateDataSource(sFilename_output_in)
-        pLayerOut = pDataset_out.CreateLayer('flowline', pSpatial_reference_flowline, ogr.wkbMultiLineString)
-        pLayerOut.CreateField(ogr.FieldDefn('lineid', ogr.OFTInteger64))
-        pLayerOut.CreateField(ogr.FieldDefn('stream_segment', ogr.OFTInteger))
-        pLayerOut.CreateField(ogr.FieldDefn('stream_order', ogr.OFTInteger))
+        pLayerOut = pDataset_out.CreateLayer(
+            "flowline", pSpatial_reference_flowline, ogr.wkbMultiLineString
+        )
+        pLayerOut.CreateField(ogr.FieldDefn("lineid", ogr.OFTInteger64))
+        pLayerOut.CreateField(ogr.FieldDefn("stream_segment", ogr.OFTInteger))
+        pLayerOut.CreateField(ogr.FieldDefn("stream_order", ogr.OFTInteger))
         pLayerDefn = pLayerOut.GetLayerDefn()
         pFeatureOut = ogr.Feature(pLayerDefn)
 
@@ -301,31 +352,41 @@ def _intersect_cached_mesh_rtree_method(iMesh_type_in, cached_mesh_data, sFilena
             aIntersect_mesh = list(index_mesh.intersection(pBound_flowline))
             for mesh_idx in aIntersect_mesh:
                 data = mesh_features[mesh_idx]
-                pGeometry_mesh = data['geometry']
+                pGeometry_mesh = data["geometry"]
                 # Transform flowline geometry if needed before intersection check
                 if iFlag_transform == 1:
                     pGeometry_flowline_transformed = pGeometry_flowline.Clone()
                     pGeometry_flowline_transformed.Transform(transform)
-                    iFlag_intersect = pGeometry_flowline_transformed.Intersects(pGeometry_mesh)
+                    iFlag_intersect = pGeometry_flowline_transformed.Intersects(
+                        pGeometry_mesh
+                    )
                     # Use transformed geometry for intersection calculation
-                    pGeometry_intersect = pGeometry_flowline_transformed.Intersection(pGeometry_mesh)
+                    pGeometry_intersect = pGeometry_flowline_transformed.Intersection(
+                        pGeometry_mesh
+                    )
                 else:
                     iFlag_intersect = pGeometry_flowline.Intersects(pGeometry_mesh)
-                    pGeometry_intersect = pGeometry_flowline.Intersection(pGeometry_mesh)
+                    pGeometry_intersect = pGeometry_flowline.Intersection(
+                        pGeometry_mesh
+                    )
 
                 if iFlag_intersect:
                     # Get or create cell object - handle both POLYGON and MULTIPOLYGON parts
-                    lCellID = data['cell_id']
+                    lCellID = data["cell_id"]
                     if lCellID not in processed_cells:
                         pGeometrytype_mesh = pGeometry_mesh.GetGeometryName()
-                        if pGeometrytype_mesh in ['POLYGON', 'MULTIPOLYGON']:
+                        if pGeometrytype_mesh in ["POLYGON", "MULTIPOLYGON"]:
                             # For MULTIPOLYGON parts, use the original geometry coordinates if available
-                            coords_to_use = data['coords_gcs']
+                            coords_to_use = data["coords_gcs"]
                             # Ensure we're using the correct coordinates for cell creation
-                            pCell = convert_gcs_coordinates_to_cell(iMesh_type_in, data['longitude'],
-                                                                  data['latitude'], coords_to_use)
+                            pCell = convert_gcs_coordinates_to_cell(
+                                iMesh_type_in,
+                                data["longitude"],
+                                data["latitude"],
+                                coords_to_use,
+                            )
                             pCell.lCellID = lCellID
-                            pCell.dArea = data['area']
+                            pCell.dArea = data["area"]
                             pCell.dLength = pCell.calculate_edge_length()
                             pCell.dLength_flowline = pCell.dLength
                             pCell.aFlowline = list()
@@ -339,15 +400,27 @@ def _intersect_cached_mesh_rtree_method(iMesh_type_in, cached_mesh_data, sFilena
                     # Process intersection geometry (already calculated above)
                     pGeometrytype_intersect = pGeometry_intersect.GetGeometryName()
 
-                    if pGeometrytype_intersect == 'LINESTRING':
+                    if pGeometrytype_intersect == "LINESTRING":
                         lFlowlineID = _process_linestring_intersection(
-                            pGeometry_intersect, pFeatureOut, pLayerOut, lFlowlineID,
-                            iStream_segment, iStream_order, pCell, aFlowline_intersect_all
+                            pGeometry_intersect,
+                            pFeatureOut,
+                            pLayerOut,
+                            lFlowlineID,
+                            iStream_segment,
+                            iStream_order,
+                            pCell,
+                            aFlowline_intersect_all,
                         )
-                    elif pGeometrytype_intersect == 'MULTILINESTRING':
+                    elif pGeometrytype_intersect == "MULTILINESTRING":
                         lFlowlineID = _process_multilinestring_intersection(
-                            pGeometry_intersect, pFeatureOut, pLayerOut, lFlowlineID,
-                            iStream_segment, iStream_order, pCell, aFlowline_intersect_all
+                            pGeometry_intersect,
+                            pFeatureOut,
+                            pLayerOut,
+                            lFlowlineID,
+                            iStream_segment,
+                            iStream_order,
+                            pCell,
+                            aFlowline_intersect_all,
                         )
 
         # Update cell properties
@@ -361,7 +434,9 @@ def _intersect_cached_mesh_rtree_method(iMesh_type_in, cached_mesh_data, sFilena
                         pCell.dLength_flowline = pFlowline.dLength
 
         # Quality control
-        pVertex_outlet = _perform_quality_control(pLayer_flowline, aFlowline_intersect_all, nfeature_flowline)
+        pVertex_outlet = _perform_quality_control(
+            pLayer_flowline, aFlowline_intersect_all, nfeature_flowline
+        )
 
         end_time = time.time()
         print(f"Cached intersection completed in {end_time - start_time:.2f} seconds")
@@ -387,8 +462,13 @@ def clear_mesh_cache():
     _mesh_rtree_cache.clear_cache()
 
 
-def _cache_and_intersect(iMesh_type_in, sFilename_mesh_in, sFilename_flowline_in,
-                          sFilename_output_in, mesh_cache):
+def _cache_and_intersect(
+    iMesh_type_in,
+    sFilename_mesh_in,
+    sFilename_flowline_in,
+    sFilename_output_in,
+    mesh_cache,
+):
     """
     Cache mesh data and perform intersection
     """
@@ -415,22 +495,22 @@ def _cache_and_intersect(iMesh_type_in, sFilename_mesh_in, sFilename_flowline_in
             pGeometry_mesh = pFeature_mesh.GetGeometryRef()
             sGeometryname = pGeometry_mesh.GetGeometryName()
 
-            if sGeometryname == 'POLYGON':
+            if sGeometryname == "POLYGON":
                 left_orig, right_orig, bottom, top = pGeometry_mesh.GetEnvelope()
                 pBound = (left_orig, bottom, right_orig, top)
                 index_mesh.insert(j, pBound)
 
                 # Cache mesh feature data
                 mesh_features[j] = {
-                    'geometry': pGeometry_mesh.Clone(),
-                    'coords_gcs': get_geometry_coordinates(pGeometry_mesh),
-                    'cell_id': pFeature_mesh.GetField("cellid"),
-                    'longitude': pFeature_mesh.GetField("longitude"),
-                    'latitude': pFeature_mesh.GetField("latitude"),
-                    'area': pFeature_mesh.GetField("area")
+                    "geometry": pGeometry_mesh.Clone(),
+                    "coords_gcs": get_geometry_coordinates(pGeometry_mesh),
+                    "cell_id": pFeature_mesh.GetField("cellid"),
+                    "longitude": pFeature_mesh.GetField("longitude"),
+                    "latitude": pFeature_mesh.GetField("latitude"),
+                    "area": pFeature_mesh.GetField("area"),
                 }
 
-            elif sGeometryname == 'MULTIPOLYGON':
+            elif sGeometryname == "MULTIPOLYGON":
                 nPolygons = pGeometry_mesh.GetGeometryCount()
 
                 for k in range(nPolygons):
@@ -444,22 +524,22 @@ def _cache_and_intersect(iMesh_type_in, sFilename_mesh_in, sFilename_flowline_in
 
                     # Cache each polygon part separately
                     mesh_features[part_idx] = {
-                        'geometry': pPolygon.Clone(),
-                        'coords_gcs': get_geometry_coordinates(pPolygon),
-                        'cell_id': pFeature_mesh.GetField("cellid"),
-                        'longitude': pFeature_mesh.GetField("longitude"),
-                        'latitude': pFeature_mesh.GetField("latitude"),
-                        'area': pFeature_mesh.GetField("area"),
-                        'original_index': j,  # Track original feature index
-                        'part_number': k      # Track which part this is
+                        "geometry": pPolygon.Clone(),
+                        "coords_gcs": get_geometry_coordinates(pPolygon),
+                        "cell_id": pFeature_mesh.GetField("cellid"),
+                        "longitude": pFeature_mesh.GetField("longitude"),
+                        "latitude": pFeature_mesh.GetField("latitude"),
+                        "area": pFeature_mesh.GetField("area"),
+                        "original_index": j,  # Track original feature index
+                        "part_number": k,  # Track which part this is
                     }
 
         # Store in cache
         cached_data = {
-            'rtree_index': index_mesh,
-            'mesh_features': mesh_features,
-            'spatial_reference': pSpatial_reference_mesh,
-            'feature_count': nfeature_mesh
+            "rtree_index": index_mesh,
+            "mesh_features": mesh_features,
+            "spatial_reference": pSpatial_reference_mesh,
+            "feature_count": nfeature_mesh,
         }
         mesh_cache.store_mesh_data(sFilename_mesh_in, cached_data)
 
@@ -472,4 +552,3 @@ def _cache_and_intersect(iMesh_type_in, sFilename_mesh_in, sFilename_flowline_in
         # Ensure proper cleanup
         if pDataset_mesh is not None:
             pDataset_mesh = None
-

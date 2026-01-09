@@ -1,4 +1,3 @@
-
 """
 PyMPAS class for representing MPAS mesh cells in flowline networks.
 
@@ -33,6 +32,7 @@ class MpasClassEncoder(JSONEncoder):
     Handles numpy data types, pyvertex objects, and other complex types,
     converting them to native Python types for JSON serialization.
     """
+
     def default(self, obj):
         if isinstance(obj, np.integer):
             return int(obj)
@@ -45,9 +45,9 @@ class MpasClassEncoder(JSONEncoder):
         if pyvertex and isinstance(obj, pyvertex):
             return json.loads(obj.tojson())
         if pyedge and isinstance(obj, pyedge):
-            return getattr(obj, 'lEdgeID', str(obj))
+            return getattr(obj, "lEdgeID", str(obj))
         if pyflowline and isinstance(obj, pyflowline):
-            return getattr(obj, 'lFlowlineID', str(obj))
+            return getattr(obj, "lFlowlineID", str(obj))
         if isinstance(obj, pympas):
             return obj.lCellID
         return JSONEncoder.default(self, obj)
@@ -130,7 +130,9 @@ class pympas(pymeshcell):
         if not (3 <= nVertex <= 10):
             raise ValueError(f"MPAS cell must have 3-10 vertices, got {nVertex}")
         if nEdge != nVertex:
-            raise ValueError(f"Number of edges ({nEdge}) must equal number of vertices ({nVertex})")
+            raise ValueError(
+                f"Number of edges ({nEdge}) must equal number of vertices ({nVertex})"
+            )
 
         # Validate edges and vertices are not None
         for i, edge in enumerate(aEdge):
@@ -146,7 +148,9 @@ class pympas(pymeshcell):
 
         # MPAS-specific initialization
         self.nEdge = nEdge
-        self.nVertex = nVertex  # Note: Different from nPoint which includes closing vertex
+        self.nVertex = (
+            nVertex  # Note: Different from nPoint which includes closing vertex
+        )
 
         # MPAS-specific attributes
         self.iFlag_watershed_boundary_burned: int = 0
@@ -164,10 +168,12 @@ class pympas(pymeshcell):
         Returns:
             str: Detailed representation including cell ID, center coordinates, edges, and area
         """
-        return (f"pympas(ID={self.lCellID}, "
-                f"Center=({self.dLongitude_center_degree:.6f}, {self.dLatitude_center_degree:.6f}), "
-                f"Edges={self.nEdge}, Area={self.dArea:.2f}m², Resolution={self.dLength:.2f}m, "
-                f"Flowlines={self.nFlowline}, Neighbors={self.nNeighbor})")
+        return (
+            f"pympas(ID={self.lCellID}, "
+            f"Center=({self.dLongitude_center_degree:.6f}, {self.dLatitude_center_degree:.6f}), "
+            f"Edges={self.nEdge}, Area={self.dArea:.2f}m², Resolution={self.dLength:.2f}m, "
+            f"Flowlines={self.nFlowline}, Neighbors={self.nNeighbor})"
+        )
 
     def __str__(self) -> str:
         """
@@ -176,9 +182,11 @@ class pympas(pymeshcell):
         Returns:
             str: Concise representation with ID, center coordinates, edges, and area
         """
-        return (f"pympas(ID={self.lCellID}, "
-                f"Center=({self.dLongitude_center_degree:.6f}, {self.dLatitude_center_degree:.6f}), "
-                f"Edges={self.nEdge}, Area={self.dArea:.2f}m²)")
+        return (
+            f"pympas(ID={self.lCellID}, "
+            f"Center=({self.dLongitude_center_degree:.6f}, {self.dLatitude_center_degree:.6f}), "
+            f"Edges={self.nEdge}, Area={self.dArea:.2f}m²)"
+        )
 
     def calculate_cell_bound(self) -> Tuple[float, float, float, float]:
         """
@@ -203,13 +211,17 @@ class pympas(pymeshcell):
         dLon_max = -180.0
 
         for vertex in self.aVertex:
-            if hasattr(vertex, 'dLongitude_degree') and hasattr(vertex, 'dLatitude_degree'):
+            if hasattr(vertex, "dLongitude_degree") and hasattr(
+                vertex, "dLatitude_degree"
+            ):
                 dLon_max = max(dLon_max, vertex.dLongitude_degree)
                 dLon_min = min(dLon_min, vertex.dLongitude_degree)
                 dLat_max = max(dLat_max, vertex.dLatitude_degree)
                 dLat_min = min(dLat_min, vertex.dLatitude_degree)
             else:
-                raise ValueError("Vertex must have dLongitude_degree and dLatitude_degree attributes")
+                raise ValueError(
+                    "Vertex must have dLongitude_degree and dLatitude_degree attributes"
+                )
 
         # Handle International Date Line crossing
         if dLon_max - dLon_min > 180:
@@ -241,7 +253,7 @@ class pympas(pymeshcell):
 
         iFlag_found = 0
         for pEdge in self.aEdge:
-            if hasattr(pEdge, 'is_overlap') and pEdge.is_overlap(pEdge_in):
+            if hasattr(pEdge, "is_overlap") and pEdge.is_overlap(pEdge_in):
                 iFlag_found = 1
                 break
 
@@ -270,7 +282,7 @@ class pympas(pymeshcell):
         pEdge_out = None
 
         for pEdge in self.aEdge:
-            if hasattr(pEdge, 'check_vertex_on_edge'):
+            if hasattr(pEdge, "check_vertex_on_edge"):
                 iFlag, dummy, diff = pEdge.check_vertex_on_edge(pVertex_in)
                 if iFlag == 1:
                     iFlag_found = 1
@@ -299,11 +311,15 @@ class pympas(pymeshcell):
         lats = []
 
         for vertex in self.aVertex:
-            if hasattr(vertex, 'dLongitude_degree') and hasattr(vertex, 'dLatitude_degree'):
+            if hasattr(vertex, "dLongitude_degree") and hasattr(
+                vertex, "dLatitude_degree"
+            ):
                 lons.append(vertex.dLongitude_degree)
                 lats.append(vertex.dLatitude_degree)
             else:
-                raise ValueError("Vertex must have dLongitude_degree and dLatitude_degree attributes")
+                raise ValueError(
+                    "Vertex must have dLongitude_degree and dLatitude_degree attributes"
+                )
 
         if not (3 <= len(lons) <= 10):
             raise ValueError(f"MPAS cell must have 3-10 vertices, got {len(lons)}")
@@ -336,7 +352,7 @@ class pympas(pymeshcell):
         self.dLength = np.sqrt(self.dArea)
         return self.dLength
 
-    def share_edge(self, other: 'pympas') -> int:
+    def share_edge(self, other: "pympas") -> int:
         """
         Check whether this MPAS cell shares an edge with another MPAS cell.
 
@@ -361,7 +377,7 @@ class pympas(pymeshcell):
         iFlag_share = 0
         for pEdge in self.aEdge:
             for pEdge2 in other.aEdge:
-                if hasattr(pEdge, 'is_overlap') and hasattr(pEdge2, 'is_overlap'):
+                if hasattr(pEdge, "is_overlap") and hasattr(pEdge2, "is_overlap"):
                     if pEdge.is_overlap(pEdge2) == 1:
                         iFlag_share = 1
                         break
@@ -384,14 +400,14 @@ class pympas(pymeshcell):
         """
         # Determine shape type based on edge count
         shape_names = {
-            3: 'triangle',
-            4: 'quadrilateral',
-            5: 'pentagon',
-            6: 'hexagon',
-            7: 'heptagon',
-            8: 'octagon',
-            9: 'nonagon',
-            10: 'decagon'
+            3: "triangle",
+            4: "quadrilateral",
+            5: "pentagon",
+            6: "hexagon",
+            7: "heptagon",
+            8: "octagon",
+            9: "nonagon",
+            10: "decagon",
         }
 
         # Check if crosses dateline
@@ -401,13 +417,13 @@ class pympas(pymeshcell):
             crosses_dateline = dLon_max > 180 or dLon_max - dLon_min > 180
 
         properties = {
-            'edge_count': self.nEdge,
-            'vertex_count': self.nVertex,
-            'resolution': self.dLength,
-            'area': self.dArea,
-            'shape_type': shape_names.get(self.nEdge, f'{self.nEdge}-gon'),
-            'crosses_dateline': crosses_dateline,
-            'watershed_boundary': self.iFlag_watershed_boundary_burned == 1
+            "edge_count": self.nEdge,
+            "vertex_count": self.nVertex,
+            "resolution": self.dLength,
+            "area": self.dArea,
+            "shape_type": shape_names.get(self.nEdge, f"{self.nEdge}-gon"),
+            "crosses_dateline": crosses_dateline,
+            "watershed_boundary": self.iFlag_watershed_boundary_burned == 1,
         }
         return properties
 
@@ -419,16 +435,16 @@ class pympas(pymeshcell):
             str: Description of the polygon type (triangle, quadrilateral, etc.)
         """
         type_map = {
-            3: 'triangle',
-            4: 'quadrilateral',
-            5: 'pentagon',
-            6: 'hexagon',
-            7: 'heptagon',
-            8: 'octagon',
-            9: 'nonagon',
-            10: 'decagon'
+            3: "triangle",
+            4: "quadrilateral",
+            5: "pentagon",
+            6: "hexagon",
+            7: "heptagon",
+            8: "octagon",
+            9: "nonagon",
+            10: "decagon",
         }
-        return type_map.get(self.nEdge, f'{self.nEdge}-sided polygon')
+        return type_map.get(self.nEdge, f"{self.nEdge}-sided polygon")
 
     def crosses_international_dateline(self) -> bool:
         """
@@ -452,10 +468,14 @@ class pympas(pymeshcell):
         """
         corners = []
         for vertex in self.aVertex:
-            if hasattr(vertex, 'dLongitude_degree') and hasattr(vertex, 'dLatitude_degree'):
+            if hasattr(vertex, "dLongitude_degree") and hasattr(
+                vertex, "dLatitude_degree"
+            ):
                 corners.append((vertex.dLongitude_degree, vertex.dLatitude_degree))
             else:
-                raise ValueError("Vertex must have dLongitude_degree and dLatitude_degree attributes")
+                raise ValueError(
+                    "Vertex must have dLongitude_degree and dLatitude_degree attributes"
+                )
 
         return corners
 
@@ -497,14 +517,14 @@ class pympas(pymeshcell):
                 - compactness: Area to perimeter ratio
         """
         if len(self.aEdge) < 3:
-            return {'aspect_ratio': 0, 'regularity': 0, 'compactness': 0}
+            return {"aspect_ratio": 0, "regularity": 0, "compactness": 0}
 
         # Calculate edge lengths if available
         edge_lengths = []
         for edge in self.aEdge:
-            if hasattr(edge, 'calculate_length'):
+            if hasattr(edge, "calculate_length"):
                 edge_lengths.append(edge.calculate_length())
-            elif hasattr(edge, 'dLength'):
+            elif hasattr(edge, "dLength"):
                 edge_lengths.append(edge.dLength)
 
         metrics = {}
@@ -513,18 +533,22 @@ class pympas(pymeshcell):
             # Aspect ratio
             min_length = min(edge_lengths)
             max_length = max(edge_lengths)
-            metrics['aspect_ratio'] = max_length / min_length if min_length > 0 else float('inf')
+            metrics["aspect_ratio"] = (
+                max_length / min_length if min_length > 0 else float("inf")
+            )
 
             # Regularity (coefficient of variation of edge lengths)
             mean_length = np.mean(edge_lengths)
             std_length = np.std(edge_lengths)
-            metrics['regularity'] = 1.0 - (std_length / mean_length) if mean_length > 0 else 0.0
+            metrics["regularity"] = (
+                1.0 - (std_length / mean_length) if mean_length > 0 else 0.0
+            )
 
             # Compactness (area to perimeter ratio)
             perimeter = sum(edge_lengths)
-            metrics['compactness'] = self.dArea / perimeter if perimeter > 0 else 0.0
+            metrics["compactness"] = self.dArea / perimeter if perimeter > 0 else 0.0
         else:
-            metrics = {'aspect_ratio': 1.0, 'regularity': 1.0, 'compactness': 1.0}
+            metrics = {"aspect_ratio": 1.0, "regularity": 1.0, "compactness": 1.0}
 
         return metrics
 
@@ -555,15 +579,22 @@ class pympas(pymeshcell):
         # Check that all vertices have required attributes
         vertices_valid = True
         for vertex in self.aVertex:
-            if not (hasattr(vertex, 'dLongitude_degree') and
-                   hasattr(vertex, 'dLatitude_degree')):
+            if not (
+                hasattr(vertex, "dLongitude_degree")
+                and hasattr(vertex, "dLatitude_degree")
+            ):
                 vertices_valid = False
                 break
 
-        return (has_valid_edge_count and has_valid_vertex_count and
-                has_matching_counts and has_positive_resolution and vertices_valid)
+        return (
+            has_valid_edge_count
+            and has_valid_vertex_count
+            and has_matching_counts
+            and has_positive_resolution
+            and vertices_valid
+        )
 
-    def copy(self) -> 'pympas':
+    def copy(self) -> "pympas":
         """
         Create a deep copy of the MPAS cell.
 
@@ -571,10 +602,12 @@ class pympas(pymeshcell):
             pympas: A new MPAS cell object with the same attributes
         """
         # Create new MPAS cell with same basic parameters
-        new_mpas = pympas(self.dLongitude_center_degree,
-                         self.dLatitude_center_degree,
-                         self.aEdge.copy(),
-                         self.aVertex.copy())
+        new_mpas = pympas(
+            self.dLongitude_center_degree,
+            self.dLatitude_center_degree,
+            self.aEdge.copy(),
+            self.aVertex.copy(),
+        )
 
         # Copy all attributes from parent and this class
         for attr_name, attr_value in self.__dict__.items():
@@ -601,16 +634,25 @@ class pympas(pymeshcell):
             >>> mpas_cell = pympas(-77.0, 38.0, edges, vertices)
             >>> json_str = mpas_cell.tojson()
         """
-        aSkip = ['aLine', 'aPoint', 'aEdge', 'aFlowline', 'pPoint_center', 'dLongitude_radian', 'dLatitude_radian',
-                 'wkt', 'pVertex_start', 'pVertex_end', 'pBound']
+        aSkip = [
+            "aLine",
+            "aPoint",
+            "aEdge",
+            "aFlowline",
+            "pPoint_center",
+            "dLongitude_radian",
+            "dLatitude_radian",
+            "wkt",
+            "pVertex_start",
+            "pVertex_end",
+            "pBound",
+        ]
 
         obj = self.__dict__.copy()
         for sKey in aSkip:
             obj.pop(sKey, None)
 
-        sJson = json.dumps(obj,
-                          sort_keys=True,
-                          indent=4,
-                          ensure_ascii=True,
-                          cls=MpasClassEncoder)
+        sJson = json.dumps(
+            obj, sort_keys=True, indent=4, ensure_ascii=True, cls=MpasClassEncoder
+        )
         return sJson

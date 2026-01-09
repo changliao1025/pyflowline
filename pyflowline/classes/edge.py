@@ -13,6 +13,8 @@ import numpy as np
 from pyearth.toolbox.mesh.point import pypoint
 from pyearth.toolbox.mesh.line import pyline
 from pyflowline.classes.vertex import pyvertex
+
+
 class EdgeClassEncoder(JSONEncoder):
     """
     Custom JSON encoder for pyedge objects.
@@ -20,6 +22,7 @@ class EdgeClassEncoder(JSONEncoder):
     Handles numpy data types and pyvertex objects, converting them to
     native Python types for JSON serialization.
     """
+
     def default(self, obj):
         if isinstance(obj, np.integer):
             return int(obj)
@@ -95,7 +98,9 @@ class pyedge(pyline):
             raise ValueError("Start and end vertices cannot be None")
 
         # Convert pVertex_start_in and pVertex_end_in to pypoint if they are not
-        if hasattr(pVertex_start_in, '__dict__') and hasattr(pVertex_end_in, '__dict__'):
+        if hasattr(pVertex_start_in, "__dict__") and hasattr(
+            pVertex_end_in, "__dict__"
+        ):
             pPoint_start_in = pypoint(pVertex_start_in.__dict__)
             pPoint_end_in = pypoint(pVertex_end_in.__dict__)
         else:
@@ -103,9 +108,11 @@ class pyedge(pyline):
 
         # Check if vertices are identical
         if pPoint_start_in == pPoint_end_in:
-            #if pPoint_start_in == pPoint_end_in:
+            # if pPoint_start_in == pPoint_end_in:
             #    print("Warning: Start and end vertices are identical.")
-            raise ValueError("Start and end vertices cannot be identical (zero-length edge)")
+            raise ValueError(
+                "Start and end vertices cannot be identical (zero-length edge)"
+            )
 
         # Initialize parent class
         super().__init__(pPoint_start_in, pPoint_end_in)
@@ -134,9 +141,11 @@ class pyedge(pyline):
         Returns:
             str: Detailed representation including edge ID, index, and length
         """
-        return (f"pyedge(ID={self.lEdgeID}, Index={self.lEdgeIndex}, "
-                f"Length={self.dLength:.2f}m, "
-                f"Upstream={self.lIndex_upstream}, Downstream={self.lIndex_downstream})")
+        return (
+            f"pyedge(ID={self.lEdgeID}, Index={self.lEdgeIndex}, "
+            f"Length={self.dLength:.2f}m, "
+            f"Upstream={self.lIndex_upstream}, Downstream={self.lIndex_downstream})"
+        )
 
     def __str__(self) -> str:
         """
@@ -191,18 +200,21 @@ class pyedge(pyline):
             >>> edge = pyedge(v1, v2)
             >>> json_str = edge.tojson()
         """
-        aSkip = ['dLongitude_radian', 'dLatitude_radian', 'wkt',
-                 'pPoint_start', 'pPoint_end']
+        aSkip = [
+            "dLongitude_radian",
+            "dLatitude_radian",
+            "wkt",
+            "pPoint_start",
+            "pPoint_end",
+        ]
 
         obj = self.__dict__.copy()
         for sKey in aSkip:
             obj.pop(sKey, None)
 
-        sJson = json.dumps(obj,
-                          sort_keys=True,
-                          indent=4,
-                          ensure_ascii=True,
-                          cls=EdgeClassEncoder)
+        sJson = json.dumps(
+            obj, sort_keys=True, indent=4, ensure_ascii=True, cls=EdgeClassEncoder
+        )
         return sJson
 
     def set_edge_id(self, lEdgeID: int) -> None:
@@ -244,7 +256,9 @@ class pyedge(pyline):
             TypeError: If lIndex_upstream is not an integer
         """
         if not isinstance(lIndex_upstream, (int, np.integer)):
-            raise TypeError(f"Upstream index must be an integer, got {type(lIndex_upstream)}")
+            raise TypeError(
+                f"Upstream index must be an integer, got {type(lIndex_upstream)}"
+            )
         self.lIndex_upstream = int(lIndex_upstream)
 
     def set_downstream_index(self, lIndex_downstream: int) -> None:
@@ -258,7 +272,9 @@ class pyedge(pyline):
             TypeError: If lIndex_downstream is not an integer
         """
         if not isinstance(lIndex_downstream, (int, np.integer)):
-            raise TypeError(f"Downstream index must be an integer, got {type(lIndex_downstream)}")
+            raise TypeError(
+                f"Downstream index must be an integer, got {type(lIndex_downstream)}"
+            )
         self.lIndex_downstream = int(lIndex_downstream)
 
     def is_valid(self) -> bool:
@@ -274,14 +290,16 @@ class pyedge(pyline):
             bool: True if edge has valid attributes
         """
         has_valid_length = self.dLength > 0
-        has_valid_vertices = (hasattr(self, 'pVertex_start') and
-                            hasattr(self, 'pVertex_end') and
-                            self.pVertex_start.is_valid() and
-                            self.pVertex_end.is_valid())
+        has_valid_vertices = (
+            hasattr(self, "pVertex_start")
+            and hasattr(self, "pVertex_end")
+            and self.pVertex_start.is_valid()
+            and self.pVertex_end.is_valid()
+        )
         has_valid_id = self.lEdgeID > 0 or self.lEdgeIndex >= 0
         return has_valid_length and has_valid_vertices and has_valid_id
 
-    def copy(self) -> 'pyedge':
+    def copy(self) -> "pyedge":
         """
         Create a deep copy of the edge.
 
@@ -295,7 +313,7 @@ class pyedge(pyline):
         new_edge.lIndex_downstream = self.lIndex_downstream
         return new_edge
 
-    def reverse(self) -> 'pyedge':
+    def reverse(self) -> "pyedge":
         """
         Create a reversed copy of the edge.
 
@@ -319,16 +337,17 @@ class pyedge(pyline):
         Returns:
             pyvertex: A new vertex at the midpoint of the edge
         """
-        mid_lon = (self.pVertex_start.dLongitude_degree + self.pVertex_end.dLongitude_degree) / 2.0
-        mid_lat = (self.pVertex_start.dLatitude_degree + self.pVertex_end.dLatitude_degree) / 2.0
+        mid_lon = (
+            self.pVertex_start.dLongitude_degree + self.pVertex_end.dLongitude_degree
+        ) / 2.0
+        mid_lat = (
+            self.pVertex_start.dLatitude_degree + self.pVertex_end.dLatitude_degree
+        ) / 2.0
 
-        param = {
-            'dLongitude_degree': mid_lon,
-            'dLatitude_degree': mid_lat
-        }
+        param = {"dLongitude_degree": mid_lon, "dLatitude_degree": mid_lat}
         return pyvertex(param)
 
-    def is_connected_to(self, other: 'pyedge') -> bool:
+    def is_connected_to(self, other: "pyedge") -> bool:
         """
         Check if this edge is connected to another edge.
 
@@ -343,12 +362,14 @@ class pyedge(pyline):
         if not isinstance(other, pyedge):
             return False
 
-        return (self.pVertex_end == other.pVertex_start or
-                self.pVertex_end == other.pVertex_end or
-                self.pVertex_start == other.pVertex_start or
-                self.pVertex_start == other.pVertex_end)
+        return (
+            self.pVertex_end == other.pVertex_start
+            or self.pVertex_end == other.pVertex_end
+            or self.pVertex_start == other.pVertex_start
+            or self.pVertex_start == other.pVertex_end
+        )
 
-    def is_upstream_of(self, other: 'pyedge') -> bool:
+    def is_upstream_of(self, other: "pyedge") -> bool:
         """
         Check if this edge is directly upstream of another edge.
 
@@ -362,7 +383,7 @@ class pyedge(pyline):
             return False
         return self.pVertex_end == other.pVertex_start
 
-    def is_downstream_of(self, other: 'pyedge') -> bool:
+    def is_downstream_of(self, other: "pyedge") -> bool:
         """
         Check if this edge is directly downstream of another edge.
 

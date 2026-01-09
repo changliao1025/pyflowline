@@ -1,4 +1,3 @@
-
 import io
 import os
 import subprocess
@@ -7,8 +6,7 @@ import shutil
 from setuptools import setup, find_packages, Command
 
 NAME = "pyflowline"
-DESCRIPTION = \
-    "A mesh-independent river network generator for hydrologic models"
+DESCRIPTION = "A mesh-independent river network generator for hydrologic models"
 AUTHOR = "Chang Liao"
 AUTHOR_EMAIL = "chang.liao@pnnl.gov"
 URL = "https://github.com/changliao1025/pyflowline"
@@ -16,11 +14,7 @@ VERSION = "0.3.10"
 REQUIRES_PYTHON = ">=3.8.0"
 KEYWORDS = "Earth Science"
 
-REQUIRED = [
-    "numpy",
-    "gdal",
-    "netCDF4"
-]
+REQUIRED = ["numpy", "gdal", "netCDF4"]
 
 CLASSIFY = [
     "Development Status :: 4 - Beta",
@@ -31,14 +25,13 @@ CLASSIFY = [
     "Topic :: Scientific/Engineering",
     "Topic :: Scientific/Engineering :: Hydrology",
     "Topic :: Scientific/Engineering :: GIS",
-    "Topic :: Scientific/Engineering :: Visualization"
+    "Topic :: Scientific/Engineering :: Visualization",
 ]
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 
 try:
-    with io.open(os.path.join(
-            HERE, "README.md"), encoding="utf-8") as f:
+    with io.open(os.path.join(HERE, "README.md"), encoding="utf-8") as f:
         LONG_DESCRIPTION = "\n" + f.read()
 
 except FileNotFoundError:
@@ -60,6 +53,6 @@ setup(
     install_requires=REQUIRED,
     classifiers=CLASSIFY,
     extras_require={
-        'visualization': ['cython', 'matplotlib', 'cartopy>=0.21.0','simplekml']
-    }
+        "visualization": ["cython", "matplotlib", "cartopy>=0.21.0", "simplekml"]
+    },
 )

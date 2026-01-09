@@ -1,4 +1,3 @@
-
 import geojson
 import numpy as np
 from osgeo import ogr
@@ -14,13 +13,11 @@ def linegeo(line, nset, eset, nobj, last):
 
     npts = len(line) - 0
 
-    if (npts > 0):
-#----------------------------------------- read LINE dataset
+    if npts > 0:
+        # ----------------------------------------- read LINE dataset
         temp = jigsaw_msh_t()
-        temp.vert2 = np.zeros(
-            (npts + 0), dtype=temp.VERT2_t)
-        temp.edge2 = np.zeros(
-            (npts - 1), dtype=temp.EDGE2_t)
+        temp.vert2 = np.zeros((npts + 0), dtype=temp.VERT2_t)
+        temp.edge2 = np.zeros((npts - 1), dtype=temp.EDGE2_t)
 
         temp.edge2["IDtag"][:] = nobj
 
@@ -50,13 +47,11 @@ def polygeo(loop, nset, eset, nobj, last):
 
     npts = len(loop) - 1
 
-    if (npts > +0):
-#----------------------------------------- read LOOP dataset
+    if npts > +0:
+        # ----------------------------------------- read LOOP dataset
         temp = jigsaw_msh_t()
-        temp.vert2 = np.zeros(
-            (npts + 0), dtype=temp.VERT2_t)
-        temp.edge2 = np.zeros(
-            (npts - 0), dtype=temp.EDGE2_t)
+        temp.vert2 = np.zeros((npts + 0), dtype=temp.VERT2_t)
+        temp.edge2 = np.zeros((npts - 0), dtype=temp.EDGE2_t)
 
         temp.edge2["IDtag"][:] = nobj
 
@@ -66,12 +61,10 @@ def polygeo(loop, nset, eset, nobj, last):
 
         itop = last + npts - 1
 
-        idx1 = np.full(
-            npts, itop, dtype=np.int32)
+        idx1 = np.full(npts, itop, dtype=np.int32)
         idx1[:-1] = indx + 0
 
-        idx2 = np.full(
-            npts, last, dtype=np.int32)
+        idx2 = np.full(npts, last, dtype=np.int32)
         idx2[:-1] = indx + 1
 
         last = last + npts
@@ -87,16 +80,16 @@ def polygeo(loop, nset, eset, nobj, last):
     return nobj, last
 
 
-
-
-
 def loadgeo(name, mesh):
     """
     LOADGEO: read a geoJSON file into a jigsaw msh_t object using GDAL.
 
     """
 
-    nobj = +0; last = +0; nset = []; eset = []
+    nobj = +0
+    last = +0
+    nset = []
+    eset = []
     # Open the GeoJSON file
     driver = ogr.GetDriverByName("GeoJSON")
     datasource = driver.Open(name, 0)  # 0 means read-only
@@ -131,24 +124,19 @@ def loadgeo(name, mesh):
                     loop = poly.GetGeometryRef(j).GetPoints()
                     nobj, last = polygeo(loop, nset, eset, nobj, last)
 
-
-
     mesh.vert2 = np.concatenate(nset, axis=0)
     mesh.edge2 = np.concatenate(eset, axis=0)
 
     return
 
-if (__name__ == "__main__"):
 
+if __name__ == "__main__":
 
     mesh = jigsaw_msh_t()
     sFilename = "/qfs/people/liao313/data/hexwatershed/susquehanna/vector/hydrology/boundary_wgs.geojson"
 
     loadgeo(name=sFilename, mesh=mesh)
 
-
     sFilename = "test_new.msh"
 
     savemsh(name=sFilename, mesh=mesh)
-
-

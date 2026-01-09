@@ -1,8 +1,9 @@
 import numpy as np
 
+
 def split_flowline_by_length(aFlowline_in, dDistance):
 
-    aFlowline_out=list()
+    aFlowline_out = list()
     nFlowline = len(aFlowline_in)
     for i in range(nFlowline):
         pFlowline = aFlowline_in[i]
@@ -11,13 +12,15 @@ def split_flowline_by_length(aFlowline_in, dDistance):
 
     return aFlowline_out
 
+
 def split_edge_by_length(pEdge_in, dLength_in):
     from pyearth.toolbox.mesh.line import pyline as pyedge
-    aEdge_out=list()
+
+    aEdge_out = list()
 
     dLength_total = pEdge_in.dLength
 
-    if dLength_total<= dLength_in:
+    if dLength_total <= dLength_in:
         aEdge_out.append(pEdge_in)
     else:
         pVertex_start = pEdge_in.pVertex_start
@@ -33,22 +36,18 @@ def split_edge_by_length(pEdge_in, dLength_in):
         pEdge1 = pyedge(pVertex_start, pVertex_mid)
 
         pEdge2 = pyedge(pVertex_mid, pVertex_end)
-        if pEdge1.dLength<=dLength_in:
+        if pEdge1.dLength <= dLength_in:
             aEdge_out.append(pEdge1)
         else:
             aEdge_out_dummy1 = split_edge_by_length(pEdge1, dLength_in)
             for pe in aEdge_out_dummy1:
                 aEdge_out.append(pe)
 
-
-
-        if pEdge2.dLength<=dLength_in:
+        if pEdge2.dLength <= dLength_in:
             aEdge_out.append(pEdge2)
         else:
             aEdge_out_dummy2 = split_edge_by_length(pEdge2, dLength_in)
             for pe in aEdge_out_dummy2:
                 aEdge_out.append(pe)
 
-
     return aEdge_out
-

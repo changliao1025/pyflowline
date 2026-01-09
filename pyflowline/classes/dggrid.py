@@ -1,4 +1,3 @@
-
 """
 PyDGGRID class for representing Discrete Global Grid mesh cells in flowline networks.
 
@@ -28,6 +27,7 @@ class DggridClassEncoder(JSONEncoder):
     Handles numpy data types, pyvertex objects, and other complex types,
     converting them to native Python types for JSON serialization.
     """
+
     def default(self, obj):
         if isinstance(obj, np.integer):
             return int(obj)
@@ -40,9 +40,9 @@ class DggridClassEncoder(JSONEncoder):
         if pyvertex and isinstance(obj, pyvertex):
             return json.loads(obj.tojson())
         if pyedge and isinstance(obj, pyedge):
-            return getattr(obj, 'lEdgeID', str(obj))
+            return getattr(obj, "lEdgeID", str(obj))
         if pyflowline and isinstance(obj, pyflowline):
-            return getattr(obj, 'lFlowlineID', str(obj))
+            return getattr(obj, "lFlowlineID", str(obj))
         if isinstance(obj, pydggrid):
             return obj.lCellID
         return JSONEncoder.default(self, obj)
@@ -127,7 +127,9 @@ class pydggrid(pymeshcell):
         if nEdge < 3:
             raise ValueError(f"DGGRID cell must have at least 3 edges, got {nEdge}")
         if nVertex < 3:
-            raise ValueError(f"DGGRID cell must have at least 3 vertices, got {nVertex}")
+            raise ValueError(
+                f"DGGRID cell must have at least 3 vertices, got {nVertex}"
+            )
 
         # Validate edges and vertices are not None
         for i, edge in enumerate(aEdge):
@@ -154,8 +156,8 @@ class pydggrid(pymeshcell):
         # Create center vertex if pyvertex is available
         if pyvertex:
             pVertex_params = {
-                'dLongitude_degree': self.dLongitude_center_degree,
-                'dLatitude_degree': self.dLatitude_center_degree
+                "dLongitude_degree": self.dLongitude_center_degree,
+                "dLatitude_degree": self.dLatitude_center_degree,
             }
             self.pVertex_center = pyvertex(pVertex_params)
         else:
@@ -176,11 +178,13 @@ class pydggrid(pymeshcell):
         Returns:
             str: Detailed representation including cell ID, center coordinates, level, and area
         """
-        return (f"pydggrid(ID={self.lCellID}, "
-                f"Center=({self.dLongitude_center_degree:.6f}, {self.dLatitude_center_degree:.6f}), "
-                f"Level={self.dggrid_level}, Edges={self.nEdge}, Shape={self.dggrid_shape_type}, "
-                f"Area={self.dArea:.2f}m², Resolution={self.dLength:.2f}m, "
-                f"Flowlines={self.nFlowline}, Neighbors={self.nNeighbor})")
+        return (
+            f"pydggrid(ID={self.lCellID}, "
+            f"Center=({self.dLongitude_center_degree:.6f}, {self.dLatitude_center_degree:.6f}), "
+            f"Level={self.dggrid_level}, Edges={self.nEdge}, Shape={self.dggrid_shape_type}, "
+            f"Area={self.dArea:.2f}m², Resolution={self.dLength:.2f}m, "
+            f"Flowlines={self.nFlowline}, Neighbors={self.nNeighbor})"
+        )
 
     def __str__(self) -> str:
         """
@@ -189,9 +193,11 @@ class pydggrid(pymeshcell):
         Returns:
             str: Concise representation with ID, center coordinates, level, and area
         """
-        return (f"pydggrid(ID={self.lCellID}, "
-                f"Center=({self.dLongitude_center_degree:.6f}, {self.dLatitude_center_degree:.6f}), "
-                f"Level={self.dggrid_level}, Shape={self.dggrid_shape_type}, Area={self.dArea:.2f}m²)")
+        return (
+            f"pydggrid(ID={self.lCellID}, "
+            f"Center=({self.dLongitude_center_degree:.6f}, {self.dLatitude_center_degree:.6f}), "
+            f"Level={self.dggrid_level}, Shape={self.dggrid_shape_type}, Area={self.dArea:.2f}m²)"
+        )
 
     def _determine_shape_type(self) -> None:
         """
@@ -200,17 +206,20 @@ class pydggrid(pymeshcell):
         Sets the dggrid_shape_type attribute based on edge count.
         """
         shape_map = {
-            3: 'triangle',
-            4: 'quadrilateral',
-            5: 'pentagon',
-            6: 'hexagon',
-            7: 'heptagon',
-            8: 'octagon'
+            3: "triangle",
+            4: "quadrilateral",
+            5: "pentagon",
+            6: "hexagon",
+            7: "heptagon",
+            8: "octagon",
         }
-        self.dggrid_shape_type = shape_map.get(self.nEdge, f'{self.nEdge}-sided polygon')
+        self.dggrid_shape_type = shape_map.get(
+            self.nEdge, f"{self.nEdge}-sided polygon"
+        )
 
-    def set_dggrid_properties(self, level: int = -1, grid_id: str = "",
-                             resolution: float = -1.0) -> None:
+    def set_dggrid_properties(
+        self, level: int = -1, grid_id: str = "", resolution: float = -1.0
+    ) -> None:
         """
         Set DGGRID-specific properties for the cell.
 
@@ -233,7 +242,9 @@ class pydggrid(pymeshcell):
         if level < -1:
             raise ValueError(f"Level must be -1 (unset) or positive, got {level}")
         if resolution < -1.0:
-            raise ValueError(f"Resolution must be -1.0 (unset) or positive, got {resolution}")
+            raise ValueError(
+                f"Resolution must be -1.0 (unset) or positive, got {resolution}"
+            )
 
         self.dggrid_level = int(level)
         self.dggrid_id = str(grid_id)
@@ -258,13 +269,17 @@ class pydggrid(pymeshcell):
         dLon_max = -180.0
 
         for vertex in self.aVertex:
-            if hasattr(vertex, 'dLongitude_degree') and hasattr(vertex, 'dLatitude_degree'):
+            if hasattr(vertex, "dLongitude_degree") and hasattr(
+                vertex, "dLatitude_degree"
+            ):
                 dLon_max = max(dLon_max, vertex.dLongitude_degree)
                 dLon_min = min(dLon_min, vertex.dLongitude_degree)
                 dLat_max = max(dLat_max, vertex.dLatitude_degree)
                 dLat_min = min(dLat_min, vertex.dLatitude_degree)
             else:
-                raise ValueError("Vertex must have dLongitude_degree and dLatitude_degree attributes")
+                raise ValueError(
+                    "Vertex must have dLongitude_degree and dLatitude_degree attributes"
+                )
 
         self.pBound = (dLon_min, dLat_min, dLon_max, dLat_max)
         return self.pBound
@@ -287,7 +302,7 @@ class pydggrid(pymeshcell):
 
         iFlag_found = 0
         for pEdge in self.aEdge:
-            if hasattr(pEdge, 'is_overlap') and pEdge.is_overlap(pEdge_in):
+            if hasattr(pEdge, "is_overlap") and pEdge.is_overlap(pEdge_in):
                 iFlag_found = 1
                 break
 
@@ -313,7 +328,7 @@ class pydggrid(pymeshcell):
         pEdge_out = None
 
         for pEdge in self.aEdge:
-            if hasattr(pEdge, 'check_vertex_on_edge'):
+            if hasattr(pEdge, "check_vertex_on_edge"):
                 iFlag, dummy, diff = pEdge.check_vertex_on_edge(pVertex_in)
                 if iFlag == 1:
                     iFlag_found = 1
@@ -342,14 +357,20 @@ class pydggrid(pymeshcell):
         lats = []
 
         for vertex in self.aVertex:
-            if hasattr(vertex, 'dLongitude_degree') and hasattr(vertex, 'dLatitude_degree'):
+            if hasattr(vertex, "dLongitude_degree") and hasattr(
+                vertex, "dLatitude_degree"
+            ):
                 lons.append(vertex.dLongitude_degree)
                 lats.append(vertex.dLatitude_degree)
             else:
-                raise ValueError("Vertex must have dLongitude_degree and dLatitude_degree attributes")
+                raise ValueError(
+                    "Vertex must have dLongitude_degree and dLatitude_degree attributes"
+                )
 
         if len(lons) < 3:
-            raise ValueError(f"DGGRID cell must have at least 3 vertices, got {len(lons)}")
+            raise ValueError(
+                f"DGGRID cell must have at least 3 vertices, got {len(lons)}"
+            )
 
         self.dArea = calculate_polygon_area(lons, lats)
         return self.dArea
@@ -374,7 +395,7 @@ class pydggrid(pymeshcell):
             # Calculate area first if not done
             self.calculate_cell_area()
 
-        if self.dggrid_shape_type == 'hexagon':
+        if self.dggrid_shape_type == "hexagon":
             # Formula for regular hexagon: A = (3√3/2) * s²
             # Solving for s: s = √(2A / (3√3))
             dLength_edge = np.sqrt(2.0 * self.dArea / (3.0 * np.sqrt(3.0)))
@@ -385,7 +406,7 @@ class pydggrid(pymeshcell):
         self.dLength = dLength_edge
         return dLength_edge
 
-    def share_edge(self, other: 'pydggrid') -> int:
+    def share_edge(self, other: "pydggrid") -> int:
         """
         Check whether this DGGRID cell shares an edge with another DGGRID cell.
 
@@ -405,12 +426,14 @@ class pydggrid(pymeshcell):
         if other is None:
             raise ValueError("Other cell cannot be None")
         if not isinstance(other, pydggrid):
-            raise TypeError(f"Other cell must be a pydggrid instance, got {type(other)}")
+            raise TypeError(
+                f"Other cell must be a pydggrid instance, got {type(other)}"
+            )
 
         iFlag_share = 0
         for pEdge in self.aEdge:
             for pEdge2 in other.aEdge:
-                if hasattr(pEdge, 'is_overlap') and hasattr(pEdge2, 'is_overlap'):
+                if hasattr(pEdge, "is_overlap") and hasattr(pEdge2, "is_overlap"):
                     if pEdge.is_overlap(pEdge2) == 1:
                         iFlag_share = 1
                         break
@@ -434,14 +457,14 @@ class pydggrid(pymeshcell):
                 - characteristic_length: Effective cell size
         """
         properties = {
-            'level': self.dggrid_level,
-            'grid_id': self.dggrid_id,
-            'resolution': self.dggrid_resolution,
-            'shape_type': self.dggrid_shape_type,
-            'edge_count': self.nEdge,
-            'vertex_count': self.nVertex,
-            'area': self.dArea,
-            'characteristic_length': self.dLength
+            "level": self.dggrid_level,
+            "grid_id": self.dggrid_id,
+            "resolution": self.dggrid_resolution,
+            "shape_type": self.dggrid_shape_type,
+            "edge_count": self.nEdge,
+            "vertex_count": self.nVertex,
+            "area": self.dArea,
+            "characteristic_length": self.dLength,
         }
         return properties
 
@@ -478,8 +501,10 @@ class pydggrid(pymeshcell):
         Returns:
             bool: True if cell is within tolerance of north or south pole
         """
-        return (abs(self.dLatitude_center_degree - 90.0) < tolerance or
-                abs(self.dLatitude_center_degree + 90.0) < tolerance)
+        return (
+            abs(self.dLatitude_center_degree - 90.0) < tolerance
+            or abs(self.dLatitude_center_degree + 90.0) < tolerance
+        )
 
     def get_corner_coordinates(self) -> List[Tuple[float, float]]:
         """
@@ -490,10 +515,14 @@ class pydggrid(pymeshcell):
         """
         corners = []
         for vertex in self.aVertex:
-            if hasattr(vertex, 'dLongitude_degree') and hasattr(vertex, 'dLatitude_degree'):
+            if hasattr(vertex, "dLongitude_degree") and hasattr(
+                vertex, "dLatitude_degree"
+            ):
                 corners.append((vertex.dLongitude_degree, vertex.dLatitude_degree))
             else:
-                raise ValueError("Vertex must have dLongitude_degree and dLatitude_degree attributes")
+                raise ValueError(
+                    "Vertex must have dLongitude_degree and dLatitude_degree attributes"
+                )
 
         return corners
 
@@ -525,15 +554,22 @@ class pydggrid(pymeshcell):
         # Check that all vertices have required attributes
         vertices_valid = True
         for vertex in self.aVertex:
-            if not (hasattr(vertex, 'dLongitude_degree') and
-                   hasattr(vertex, 'dLatitude_degree')):
+            if not (
+                hasattr(vertex, "dLongitude_degree")
+                and hasattr(vertex, "dLatitude_degree")
+            ):
                 vertices_valid = False
                 break
 
-        return (has_min_edges and has_min_vertices and
-                has_positive_length and has_valid_level and vertices_valid)
+        return (
+            has_min_edges
+            and has_min_vertices
+            and has_positive_length
+            and has_valid_level
+            and vertices_valid
+        )
 
-    def copy(self) -> 'pydggrid':
+    def copy(self) -> "pydggrid":
         """
         Create a deep copy of the DGGRID cell.
 
@@ -541,10 +577,12 @@ class pydggrid(pymeshcell):
             pydggrid: A new DGGRID cell object with the same attributes
         """
         # Create new DGGRID cell with same basic parameters
-        new_dggrid = pydggrid(self.dLongitude_center_degree,
-                             self.dLatitude_center_degree,
-                             self.aEdge.copy(),
-                             self.aVertex.copy())
+        new_dggrid = pydggrid(
+            self.dLongitude_center_degree,
+            self.dLatitude_center_degree,
+            self.aEdge.copy(),
+            self.aVertex.copy(),
+        )
 
         # Copy all attributes from parent and this class
         for attr_name, attr_value in self.__dict__.items():
@@ -571,16 +609,22 @@ class pydggrid(pymeshcell):
             >>> dggrid_cell = pydggrid(-77.0, 38.0, edges, vertices)
             >>> json_str = dggrid_cell.tojson()
         """
-        aSkip = ['aEdge', 'aFlowline', 'dLongitude_radian', 'dLatitude_radian',
-                 'wkt', 'pPoint_start', 'pPoint_end', 'pBound']
+        aSkip = [
+            "aEdge",
+            "aFlowline",
+            "dLongitude_radian",
+            "dLatitude_radian",
+            "wkt",
+            "pPoint_start",
+            "pPoint_end",
+            "pBound",
+        ]
 
         obj = self.__dict__.copy()
         for sKey in aSkip:
             obj.pop(sKey, None)
 
-        sJson = json.dumps(obj,
-                          sort_keys=True,
-                          indent=4,
-                          ensure_ascii=True,
-                          cls=DggridClassEncoder)
+        sJson = json.dumps(
+            obj, sort_keys=True, indent=4, ensure_ascii=True, cls=DggridClassEncoder
+        )
         return sJson

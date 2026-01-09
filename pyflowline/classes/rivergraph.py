@@ -12,17 +12,20 @@ from collections import defaultdict, deque
 import numpy as np
 from enum import Enum
 import time
+
 # Set up logger
 logger = logging.getLogger(__name__)
 # Import for spatial indexing (R-tree)
 try:
     from rtree.index import Index as RTreeindex
+
     HAS_RTREE = True
 except ImportError:
     HAS_RTREE = False
     logger.warning("R-tree not available - using fallback spatial indexing")
 
 import importlib.util
+
 iFlag_cython = importlib.util.find_spec("cython")
 if iFlag_cython is not None:
     from pyflowline.algorithms.cython.kernel import find_vertex_on_edge
@@ -61,7 +64,9 @@ class pyrivergraph:
     # INITIALIZATION & BASIC GRAPH OPERATIONS
     # ========================================================================
 
-    def __init__(self, flowlines: List[pyflowline], pVertex_outlet: Optional[pyvertex] = None):
+    def __init__(
+        self, flowlines: List[pyflowline], pVertex_outlet: Optional[pyvertex] = None
+    ):
         """
         Initialize the river network graph from flowlines.
 
@@ -90,18 +95,26 @@ class pyrivergraph:
         self._build_graph()
         # Set outlet vertex ID if outlet was provided
         if pVertex_outlet is not None:
-            #only preserve flowlines that can flow out to the outlet
+            # only preserve flowlines that can flow out to the outlet
             self.pVertex_outlet = pVertex_outlet
             self.aFlowline = self.remove_disconnected_flowlines()
             self._set_outlet_vertex_id()
 
     def get_sources(self) -> List[int]:
         """Get source nodes (headwaters) with no incoming edges."""
-        return [node_id for node_id in self.id_to_vertex.keys() if self.in_degree[node_id] == 0]
+        return [
+            node_id
+            for node_id in self.id_to_vertex.keys()
+            if self.in_degree[node_id] == 0
+        ]
 
     def get_sinks(self) -> List[int]:
         """Get sink nodes (outlets) with no outgoing edges."""
-        return [node_id for node_id in self.id_to_vertex.keys() if self.out_degree[node_id] == 0]
+        return [
+            node_id
+            for node_id in self.id_to_vertex.keys()
+            if self.out_degree[node_id] == 0
+        ]
 
     def get_vertices(self) -> List[pyvertex]:
         """
@@ -160,7 +173,9 @@ class pyrivergraph:
     # NETWORK SIMPLIFICATION OPERATIONS
     # ========================================================================
 
-    def remove_disconnected_flowlines(self, pVertex_outlet: Optional[pyvertex] = None) -> List[pyflowline]:
+    def remove_disconnected_flowlines(
+        self, pVertex_outlet: Optional[pyvertex] = None
+    ) -> List[pyflowline]:
         """
         Remove flowlines that don't flow out to the specified outlet vertex.
 
@@ -179,10 +194,14 @@ class pyrivergraph:
         flowlines = self.aFlowline
 
         # Use provided outlet vertex or fall back to stored one
-        pVertex_target = pVertex_outlet if pVertex_outlet is not None else self.pVertex_outlet
+        pVertex_target = (
+            pVertex_outlet if pVertex_outlet is not None else self.pVertex_outlet
+        )
 
         if pVertex_target is None:
-            logger.warning("No outlet vertex provided and none stored during initialization")
+            logger.warning(
+                "No outlet vertex provided and none stored during initialization"
+            )
             return flowlines
 
         # Use stored outlet vertex ID if it matches, otherwise find it
@@ -200,11 +219,15 @@ class pyrivergraph:
             logger.warning("Outlet vertex not found in network graph")
             return flowlines
 
-        logger.info(f"Removing disconnected flowlines using outlet vertex {outlet_vertex_id}")
+        logger.info(
+            f"Removing disconnected flowlines using outlet vertex {outlet_vertex_id}"
+        )
 
         # Use a more robust approach: forward traversal to validate complete drainage paths
         # Step 1: Find all vertices that can reach the outlet (backward traversal)
-        outlet_reachable_vertices = self._find_outlet_reachable_vertices(outlet_vertex_id)
+        outlet_reachable_vertices = self._find_outlet_reachable_vertices(
+            outlet_vertex_id
+        )
 
         # Step 2: For each flowline, check if it contributes to the drainage network
         # A flowline contributes if:
@@ -215,7 +238,10 @@ class pyrivergraph:
 
         for flowline_idx, (start_id, end_id) in self.aFlowline_edges.items():
             # Check if both vertices are in the outlet-reachable set
-            if start_id in outlet_reachable_vertices and end_id in outlet_reachable_vertices:
+            if (
+                start_id in outlet_reachable_vertices
+                and end_id in outlet_reachable_vertices
+            ):
                 # Additional check: ensure this flowline is on a path to outlet
                 reachable_flowlines.add(flowline_idx)
 
@@ -228,9 +254,13 @@ class pyrivergraph:
                 connected_flowlines.append(flowline)
             else:
                 disconnected_count += 1
-                logger.debug(f"Removing disconnected flowline {i}: {flowline.pVertex_start} -> {flowline.pVertex_end}")
+                logger.debug(
+                    f"Removing disconnected flowline {i}: {flowline.pVertex_start} -> {flowline.pVertex_end}"
+                )
 
-        logger.info(f"Removed {disconnected_count} disconnected flowlines, kept {len(connected_flowlines)} connected flowlines")
+        logger.info(
+            f"Removed {disconnected_count} disconnected flowlines, kept {len(connected_flowlines)} connected flowlines"
+        )
 
         self._update_graph_flowlines(connected_flowlines)
         return connected_flowlines
@@ -264,7 +294,9 @@ class pyrivergraph:
                 continue
 
             # Find the shortest flowline in this region (keep it)
-            shortest_flowline = min(region_flowlines, key=lambda fl: getattr(fl, 'dLength', float('inf')))
+            shortest_flowline = min(
+                region_flowlines, key=lambda fl: getattr(fl, "dLength", float("inf"))
+            )
 
             # Mark all other flowlines in this region for removal
             for flowline in region_flowlines:
@@ -272,16 +304,21 @@ class pyrivergraph:
                     # Find the index of this flowline in self.aFlowline
                     flowline_idx = self.aFlowline.index(flowline)
                     flowlines_to_remove.add(flowline_idx)
-                    logger.debug(f"Marking flowline {flowline_idx} for removal (braided channel, length={getattr(flowline, 'dLength', 'unknown')})")
+                    logger.debug(
+                        f"Marking flowline {flowline_idx} for removal (braided channel, length={getattr(flowline, 'dLength', 'unknown')})"
+                    )
 
         # Create new list of flowlines excluding those marked for removal
         simplified_flowlines = [
-            flowline for idx, flowline in enumerate(self.aFlowline)
+            flowline
+            for idx, flowline in enumerate(self.aFlowline)
             if idx not in flowlines_to_remove
         ]
 
-        logger.info(f"Removed {len(flowlines_to_remove)} braided flowlines, "
-                    f"resulting in {len(simplified_flowlines)} flowlines")
+        logger.info(
+            f"Removed {len(flowlines_to_remove)} braided flowlines, "
+            f"resulting in {len(simplified_flowlines)} flowlines"
+        )
 
         # Update the network using smart update system
         self._update_graph_flowlines(simplified_flowlines)
@@ -309,15 +346,19 @@ class pyrivergraph:
             >>> resolved_flowlines = river_graph.remove_parallel_river()
             >>> print(f"Resolved parallel paths: {len(flowlines)} -> {len(resolved_flowlines)} flowlines")
         """
-        if not hasattr(self, 'aFlowline') or not self.aFlowline:
-            logger.warning('No flowlines available in class instance for parallel river removal')
+        if not hasattr(self, "aFlowline") or not self.aFlowline:
+            logger.warning(
+                "No flowlines available in class instance for parallel river removal"
+            )
             return []
 
         if len(self.aFlowline) <= 1:
             logger.debug("Skipping parallel path resolution: insufficient flowlines")
             return self.aFlowline.copy()
 
-        logger.info(f"Removing parallel rivers from {len(self.aFlowline)} flowlines using graph-based approach")
+        logger.info(
+            f"Removing parallel rivers from {len(self.aFlowline)} flowlines using graph-based approach"
+        )
 
         try:
             parallel_groups = self.find_parallel_paths()
@@ -334,7 +375,7 @@ class pyrivergraph:
         flowlines_to_remove = set()
 
         for group in parallel_groups:
-            paths = group['paths']
+            paths = group["paths"]
 
             if len(paths) <= 1:
                 continue
@@ -348,14 +389,16 @@ class pyrivergraph:
 
                 for flowline_idx in path_flowlines:
                     if flowline_idx >= len(self.aFlowline):
-                        logger.warning(f"Invalid flowline index {flowline_idx}, skipping")
+                        logger.warning(
+                            f"Invalid flowline index {flowline_idx}, skipping"
+                        )
                         continue
 
                     flowline = self.aFlowline[flowline_idx]
                     valid_flowlines += 1
 
                     # Only use length attributes if they have valid values (> 0)
-                    length = getattr(flowline, 'dLength', 0.0)
+                    length = getattr(flowline, "dLength", 0.0)
                     length = length if length > 0 else 0.0
 
                     path_length += length
@@ -375,27 +418,39 @@ class pyrivergraph:
 
             # Keep the highest scoring path, remove others
             path_scores.sort(reverse=True)
-            #loop through and remove safe flowlines
+            # loop through and remove safe flowlines
             for _, path_idx, path_flowlines in path_scores:
                 # Reverse the flowlines in the path
                 path_flowlines = list(path_flowlines)
-                for flowline_idx in path_flowlines[:-1]:# Exclude the last flowline in the path
+                for flowline_idx in path_flowlines[
+                    :-1
+                ]:  # Exclude the last flowline in the path
                     # Check if the flowline has confluence points
                     flowline = self.aFlowline[flowline_idx]
                     # Check if the end point of the flowline is a confluence
                     end_vertex_id = self.vertex_to_id.get(flowline.pVertex_end)
                     if end_vertex_id is not None and self.in_degree[end_vertex_id] > 1:
                         flowlines_to_remove.add(flowline_idx)
-                        logger.debug(f"Removing flowline {flowline_idx} as its end point is a confluence")
+                        logger.debug(
+                            f"Removing flowline {flowline_idx} as its end point is a confluence"
+                        )
                         break
 
         # Return flowlines with parallel paths removed (filter by index)
         try:
-            result = [self.aFlowline[i] for i in range(len(self.aFlowline)) if i not in flowlines_to_remove]
-            logger.info(f"Removed {len(flowlines_to_remove)} flowlines to resolve parallel paths")
+            result = [
+                self.aFlowline[i]
+                for i in range(len(self.aFlowline))
+                if i not in flowlines_to_remove
+            ]
+            logger.info(
+                f"Removed {len(flowlines_to_remove)} flowlines to resolve parallel paths"
+            )
             # Validate result
             if len(result) == 0 and len(self.aFlowline) > 0:
-                logger.warning("All flowlines were removed during parallel path resolution, returning original")
+                logger.warning(
+                    "All flowlines were removed during parallel path resolution, returning original"
+                )
                 return self.aFlowline.copy()
 
             # Update the network using smart update system
@@ -404,7 +459,9 @@ class pyrivergraph:
 
             return result
         except Exception as e:
-            logger.error(f"Error filtering flowlines during parallel path resolution: {e}")
+            logger.error(
+                f"Error filtering flowlines during parallel path resolution: {e}"
+            )
             return self.aFlowline.copy()
 
     def remove_cycle(self) -> List[pyflowline]:
@@ -427,16 +484,17 @@ class pyrivergraph:
             >>> acyclic_flowlines = river_graph.remove_cycle()
             >>> print(f"Removed cycles: {len(flowlines) - len(acyclic_flowlines)} flowlines removed")
         """
-        if not hasattr(self, 'aFlowline') or not self.aFlowline:
-            logger.warning('No flowlines available in class instance for cycle removal')
+        if not hasattr(self, "aFlowline") or not self.aFlowline:
+            logger.warning("No flowlines available in class instance for cycle removal")
             return []
 
         if len(self.aFlowline) <= 1:
             logger.debug("Skipping cycle removal: insufficient flowlines")
             return self.aFlowline.copy()
 
-
-        logger.info(f"Removing cycles from {len(self.aFlowline)} flowlines using graph-based approach")
+        logger.info(
+            f"Removing cycles from {len(self.aFlowline)} flowlines using graph-based approach"
+        )
 
         try:
             cycles = self.detect_cycles()
@@ -453,7 +511,9 @@ class pyrivergraph:
         flowlines_to_remove = set()
 
         for cycle_vertices in cycles:
-            if len(cycle_vertices) < 3:  # Need at least 3 vertices for a meaningful cycle
+            if (
+                len(cycle_vertices) < 3
+            ):  # Need at least 3 vertices for a meaningful cycle
                 continue
 
             # Find flowlines involved in this cycle
@@ -466,37 +526,49 @@ class pyrivergraph:
                 for flowline_idx, (s_id, e_id) in self.aFlowline_edges.items():
                     if s_id == start_vertex_id and e_id == end_vertex_id:
                         if flowline_idx < len(self.aFlowline):
-                            cycle_flowlines.append((flowline_idx, self.aFlowline[flowline_idx]))
+                            cycle_flowlines.append(
+                                (flowline_idx, self.aFlowline[flowline_idx])
+                            )
 
             if cycle_flowlines:
                 # Remove the lowest priority flowline from the cycle
                 def cycle_priority(flowline_data) -> Tuple:
                     flowline_idx, flowline = flowline_data
                     # Only use attributes if they have valid values (> 0)
-                    stream_order = getattr(flowline, 'iStream_order', -1)
+                    stream_order = getattr(flowline, "iStream_order", -1)
                     stream_order = stream_order if stream_order > 0 else 1
 
-                    drainage_area = getattr(flowline, 'dDrainage_area', 0.0)
+                    drainage_area = getattr(flowline, "dDrainage_area", 0.0)
                     drainage_area = drainage_area if drainage_area > 0 else 0.0
 
-                    length = getattr(flowline, 'dLength', 0.0)
+                    length = getattr(flowline, "dLength", 0.0)
                     length = length if length > 0 else 0.0
 
                     return (stream_order, drainage_area, length)
 
-                worst_flowline_idx, worst_flowline = min(cycle_flowlines, key=cycle_priority)
+                worst_flowline_idx, worst_flowline = min(
+                    cycle_flowlines, key=cycle_priority
+                )
                 flowlines_to_remove.add(worst_flowline_idx)
 
-                logger.debug(f"Removing flowline {worst_flowline_idx} (order={worst_flowline.iStream_order}) to break cycle")
+                logger.debug(
+                    f"Removing flowline {worst_flowline_idx} (order={worst_flowline.iStream_order}) to break cycle"
+                )
 
         # Return flowlines with cycle-causing ones removed (filter by index)
         try:
-            result = [self.aFlowline[i] for i in range(len(self.aFlowline)) if i not in flowlines_to_remove]
+            result = [
+                self.aFlowline[i]
+                for i in range(len(self.aFlowline))
+                if i not in flowlines_to_remove
+            ]
             logger.info(f"Removed {len(flowlines_to_remove)} flowlines to break cycles")
 
             # Validate result
             if len(result) == 0 and len(self.aFlowline) > 0:
-                logger.warning("All flowlines were removed during cycle removal, returning original")
+                logger.warning(
+                    "All flowlines were removed during cycle removal, returning original"
+                )
                 return self.aFlowline.copy()
 
             # Update the network using smart update system
@@ -507,7 +579,13 @@ class pyrivergraph:
             logger.error(f"Error filtering flowlines during cycle removal: {e}")
             return self.aFlowline.copy()
 
-    def remove_small_river(self, dThreshold_small_river, nIterations=3, iFlag_debug=0, sWorkspace_output_basin=None):
+    def remove_small_river(
+        self,
+        dThreshold_small_river,
+        nIterations=3,
+        iFlag_debug=0,
+        sWorkspace_output_basin=None,
+    ):
         """
         Remove small rivers iteratively using graph-based approach with graph updates at each step.
         This method replaces the standalone function loop in basin.py for small river removal.
@@ -522,25 +600,28 @@ class pyrivergraph:
             list: Updated flowlines after iterative small river removal
         """
 
-
         # Start with current flowlines
         aFlowline_current = self.aFlowline.copy()
 
         for i in range(nIterations):
-            sStep = "{:02d}".format(i+1)
-            print(f'Iteration {sStep}: removing small rivers with threshold {dThreshold_small_river}')
+            sStep = "{:02d}".format(i + 1)
+            print(
+                f"Iteration {sStep}: removing small rivers with threshold {dThreshold_small_river}"
+            )
 
             # Step 1: Remove small rivers using graph-based approach
-            aFlowline_filtered = self._remove_small_river_step(aFlowline_current, dThreshold_small_river)
+            aFlowline_filtered = self._remove_small_river_step(
+                aFlowline_current, dThreshold_small_river
+            )
 
             if iFlag_debug == 1 and sWorkspace_output_basin is not None:
-                sFilename_out = f'flowline_large_{sStep}_before_intersect.geojson'
+                sFilename_out = f"flowline_large_{sStep}_before_intersect.geojson"
                 sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
                 export_flowline_to_geojson(aFlowline_filtered, sFilename_out)
 
-            #check if whether any flowlinw is actually removed
+            # check if whether any flowlinw is actually removed
             if len(aFlowline_filtered) == len(aFlowline_current):
-                print(f'No small rivers found in iteration {sStep}, stopping early.')
+                print(f"No small rivers found in iteration {sStep}, stopping early.")
                 break
             else:
                 # Step 2: Update the graph with filtered flowlines
@@ -554,7 +635,7 @@ class pyrivergraph:
                 aFlowline_merged = self.merge_flowline()
 
                 if iFlag_debug == 1 and sWorkspace_output_basin is not None:
-                    sFilename_out = f'flowline_merge_{sStep}_before_intersect.geojson'
+                    sFilename_out = f"flowline_merge_{sStep}_before_intersect.geojson"
                     sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
                     export_flowline_to_geojson(aFlowline_merged, sFilename_out)
 
@@ -567,7 +648,9 @@ class pyrivergraph:
 
         return aFlowline_current
 
-    def remove_duplicate_flowlines(self, iFlag_direction_insensitive: bool = False) -> List[pyflowline]:
+    def remove_duplicate_flowlines(
+        self, iFlag_direction_insensitive: bool = False
+    ) -> List[pyflowline]:
         """
         Remove duplicate flowlines from the network.
         Enhanced with state management and change tracking.
@@ -612,7 +695,9 @@ class pyrivergraph:
             end_id = self.vertex_to_id.get(flowline.pVertex_end)
 
             if start_id is None or end_id is None:
-                logger.warning(f"Flowline {idx} has unknown vertices, skipping duplicate check")
+                logger.warning(
+                    f"Flowline {idx} has unknown vertices, skipping duplicate check"
+                )
                 unique_flowlines.append(flowline)
                 continue
 
@@ -624,11 +709,15 @@ class pyrivergraph:
                 unique_flowlines.append(flowline)
             else:
                 duplicates_count += 1
-                logger.debug(f"Removing duplicate flowline {idx} (direction-sensitive): "
-                           f"{flowline.pVertex_start} -> {flowline.pVertex_end}")
+                logger.debug(
+                    f"Removing duplicate flowline {idx} (direction-sensitive): "
+                    f"{flowline.pVertex_start} -> {flowline.pVertex_end}"
+                )
 
-        logger.info(f"Removed {duplicates_count} duplicate flowlines (direction-sensitive), "
-                    f"resulting in {len(unique_flowlines)} unique flowlines")
+        logger.info(
+            f"Removed {duplicates_count} duplicate flowlines (direction-sensitive), "
+            f"resulting in {len(unique_flowlines)} unique flowlines"
+        )
 
         # Update the network using smart update system
         self._update_graph_flowlines(unique_flowlines)
@@ -650,7 +739,9 @@ class pyrivergraph:
             end_id = self.vertex_to_id.get(flowline.pVertex_end)
 
             if start_id is None or end_id is None:
-                logger.warning(f"Flowline {idx} has unknown vertices, skipping duplicate check")
+                logger.warning(
+                    f"Flowline {idx} has unknown vertices, skipping duplicate check"
+                )
                 continue
 
             # Normalize edge key: always use (smaller_id, larger_id) for direction-insensitive comparison
@@ -693,41 +784,67 @@ class pyrivergraph:
                         flowline_path_lengths = []
                         for idx, flowline, (start_id, end_id) in flowline_group:
                             # Find path from end vertex to outlet
-                            paths_to_outlet = self._find_all_paths(end_id, self.pVertex_outlet_id, max_depth=1000)
+                            paths_to_outlet = self._find_all_paths(
+                                end_id, self.pVertex_outlet_id, max_depth=1000
+                            )
                             if paths_to_outlet:
                                 # Use the shortest path length
-                                shortest_path_length = min(len(path) for path in paths_to_outlet)
-                                flowline_path_lengths.append((shortest_path_length, idx, flowline, (start_id, end_id)))
+                                shortest_path_length = min(
+                                    len(path) for path in paths_to_outlet
+                                )
+                                flowline_path_lengths.append(
+                                    (
+                                        shortest_path_length,
+                                        idx,
+                                        flowline,
+                                        (start_id, end_id),
+                                    )
+                                )
                             else:
                                 # If no path to outlet, assign very large length
-                                flowline_path_lengths.append((float('inf'), idx, flowline, (start_id, end_id)))
+                                flowline_path_lengths.append(
+                                    (float("inf"), idx, flowline, (start_id, end_id))
+                                )
 
                         # Sort by path length (ascending - shorter path first)
                         flowline_path_lengths.sort(key=lambda x: x[0])
 
                         # Keep the one with shortest path, remove the rest
-                        shortest_path_length, closest_idx, closest_flowline, _ = flowline_path_lengths[0]
+                        shortest_path_length, closest_idx, closest_flowline, _ = (
+                            flowline_path_lengths[0]
+                        )
                         unique_flowlines.append(closest_flowline)
 
                         # Remove the ones with longer paths
-                        for path_length, idx, flowline, (start_id, end_id) in flowline_path_lengths[1:]:
+                        for (
+                            path_length,
+                            idx,
+                            flowline,
+                            (start_id, end_id),
+                        ) in flowline_path_lengths[1:]:
                             opposite_pairs_count += 1
-                            logger.debug(f"Removing flowline {idx} (longer path to outlet, path_length={path_length}): "
-                                       f"{flowline.pVertex_start} -> {flowline.pVertex_end}")
+                            logger.debug(
+                                f"Removing flowline {idx} (longer path to outlet, path_length={path_length}): "
+                                f"{flowline.pVertex_start} -> {flowline.pVertex_end}"
+                            )
                     else:
                         # No outlet defined, remove all as before
                         opposite_pairs_count += len(flowline_group)
                         for idx, flowline, (start_id, end_id) in flowline_group:
-                            logger.debug(f"Removing flowline {idx} (opposite direction pair, no outlet): "
-                                       f"{flowline.pVertex_start} -> {flowline.pVertex_end}")
+                            logger.debug(
+                                f"Removing flowline {idx} (opposite direction pair, no outlet): "
+                                f"{flowline.pVertex_start} -> {flowline.pVertex_end}"
+                            )
                 else:
                     # Same direction duplicates - keep only the first one
                     _, first_flowline, _ = flowline_group[0]
                     unique_flowlines.append(first_flowline)
                     duplicates_count += len(flowline_group) - 1
                     for idx, flowline, _ in flowline_group[1:]:
-                        logger.debug(f"Removing duplicate flowline {idx} (same direction): "
-                                   f"{flowline.pVertex_start} -> {flowline.pVertex_end}")
+                        logger.debug(
+                            f"Removing duplicate flowline {idx} (same direction): "
+                            f"{flowline.pVertex_start} -> {flowline.pVertex_end}"
+                        )
 
         # Add flowlines with unknown vertices (they were skipped in the grouping)
         for idx, flowline in enumerate(self.aFlowline):
@@ -737,10 +854,12 @@ class pyrivergraph:
                 unique_flowlines.append(flowline)
 
         total_removed = duplicates_count + opposite_pairs_count
-        logger.info(f"Removed {total_removed} flowlines (direction-insensitive): "
-                    f"{duplicates_count} same-direction duplicates, "
-                    f"{opposite_pairs_count} opposite-direction pairs, "
-                    f"resulting in {len(unique_flowlines)} unique flowlines")
+        logger.info(
+            f"Removed {total_removed} flowlines (direction-insensitive): "
+            f"{duplicates_count} same-direction duplicates, "
+            f"{opposite_pairs_count} opposite-direction pairs, "
+            f"resulting in {len(unique_flowlines)} unique flowlines"
+        )
 
         # Update the network using smart update system
         self._update_graph_flowlines(unique_flowlines)
@@ -770,7 +889,9 @@ class pyrivergraph:
         # Return only groups with multiple channels (braided) as separate regions
         braided_groups = []
         for (start_id, end_id), indices in channel_groups.items():
-            if len(indices) > 1:  # Only braided channels (multiple flowlines between same vertices)
+            if (
+                len(indices) > 1
+            ):  # Only braided channels (multiple flowlines between same vertices)
                 region_flowlines = [self.aFlowline[idx] for idx in indices]
                 braided_groups.append(region_flowlines)
 
@@ -823,7 +944,9 @@ class pyrivergraph:
 
             if reconvergence_id is not None:
                 # Find all paths between divergence and reconvergence points
-                divergent_paths = self._find_all_paths(divergence_id, reconvergence_id, max_depth=8)
+                divergent_paths = self._find_all_paths(
+                    divergence_id, reconvergence_id, max_depth=8
+                )
 
                 if len(divergent_paths) > 1:
                     # Convert paths to flowline indices
@@ -839,21 +962,29 @@ class pyrivergraph:
                         unique_paths = []
                         for path_flowlines in path_flowline_groups:
                             path_signature = tuple(sorted(path_flowlines))
-                            if path_signature not in [tuple(sorted(up)) for up in unique_paths]:
+                            if path_signature not in [
+                                tuple(sorted(up)) for up in unique_paths
+                            ]:
                                 unique_paths.append(path_flowlines)
 
                         # Only add if we have multiple unique divergent paths
                         if len(unique_paths) > 1:
-                            logger.debug(f"Found {len(unique_paths)} partial parallel paths between vertices {divergence_id} -> {reconvergence_id}")
-                            parallel_sections.append({
-                                'paths': unique_paths,
-                                'start_vertex': divergence_id,
-                                'end_vertex': reconvergence_id
-                            })
+                            logger.debug(
+                                f"Found {len(unique_paths)} partial parallel paths between vertices {divergence_id} -> {reconvergence_id}"
+                            )
+                            parallel_sections.append(
+                                {
+                                    "paths": unique_paths,
+                                    "start_vertex": divergence_id,
+                                    "end_vertex": reconvergence_id,
+                                }
+                            )
 
         return parallel_sections
 
-    def _find_reconvergence_points(self, divergence_id: int, max_depth: int = 8) -> List[int]:
+    def _find_reconvergence_points(
+        self, divergence_id: int, max_depth: int = 8
+    ) -> List[int]:
         """
         Find vertices where paths from a divergence point reconverge.
 
@@ -865,9 +996,10 @@ class pyrivergraph:
             List of vertex IDs where paths reconverge
         """
 
-
         # Get all immediate downstream vertices from the divergence point
-        downstream_vertices = [neighbor_id for neighbor_id, _ in self.adjacency_list[divergence_id]]
+        downstream_vertices = [
+            neighbor_id for neighbor_id, _ in self.adjacency_list[divergence_id]
+        ]
 
         if len(downstream_vertices) < 2:
             return None  # Need at least 2 paths to have reconvergence
@@ -882,8 +1014,10 @@ class pyrivergraph:
                 path1_reachable = self._get_reachable_vertices(path1_start, max_depth)
                 path2_reachable = self._get_reachable_vertices(path2_start, max_depth)
 
-                #find the first identical vertex in both reachable lists
-                common_vertex = self.find_first_common_vertex(path1_reachable, path2_reachable)
+                # find the first identical vertex in both reachable lists
+                common_vertex = self.find_first_common_vertex(
+                    path1_reachable, path2_reachable
+                )
 
         return common_vertex
 
@@ -961,9 +1095,13 @@ class pyrivergraph:
                             except ValueError:
                                 cycle = [node_id, neighbor_id]
                                 cycles.append(cycle)
-                                logger.debug(f"Detected simple back-edge cycle: {cycle}")
+                                logger.debug(
+                                    f"Detected simple back-edge cycle: {cycle}"
+                                )
                             except Exception as e:
-                                logger.warning(f"Error processing cycle from {node_id} to {neighbor_id}: {e}")
+                                logger.warning(
+                                    f"Error processing cycle from {node_id} to {neighbor_id}: {e}"
+                                )
                                 cycles.append([node_id, neighbor_id])
                             return True
                         elif neighbor_id not in visited:
@@ -972,25 +1110,35 @@ class pyrivergraph:
                                 if dfs_cycle_detection(neighbor_id, new_path):
                                     return True
                             except RecursionError:
-                                logger.error(f"Recursion limit reached during cycle detection at node {neighbor_id}")
+                                logger.error(
+                                    f"Recursion limit reached during cycle detection at node {neighbor_id}"
+                                )
                                 if len(path) > 1:
                                     cycles.append(path + [neighbor_id])
                                 return False
                             except Exception as e:
-                                logger.error(f"Error in recursive cycle detection for neighbor {neighbor_id}: {e}")
+                                logger.error(
+                                    f"Error in recursive cycle detection for neighbor {neighbor_id}: {e}"
+                                )
                                 return False
                     except Exception as e:
-                        logger.error(f"Error processing neighbor {neighbor_id} from node {node_id}: {e}")
+                        logger.error(
+                            f"Error processing neighbor {neighbor_id} from node {node_id}: {e}"
+                        )
                         continue
 
                 try:
                     rec_stack.remove(node_id)
                 except KeyError:
-                    logger.warning(f"Node {node_id} not found in recursion stack during removal")
+                    logger.warning(
+                        f"Node {node_id} not found in recursion stack during removal"
+                    )
                 return False
 
             except Exception as e:
-                logger.error(f"Critical error in cycle detection for node {node_id}: {e}")
+                logger.error(
+                    f"Critical error in cycle detection for node {node_id}: {e}"
+                )
                 try:
                     rec_stack.discard(node_id)
                 except Exception:
@@ -1006,7 +1154,9 @@ class pyrivergraph:
                     try:
                         dfs_cycle_detection(node_id, [node_id])
                     except Exception as e:
-                        logger.error(f"Error starting cycle detection from node {node_id}: {e}")
+                        logger.error(
+                            f"Error starting cycle detection from node {node_id}: {e}"
+                        )
                         continue
         except Exception as e:
             logger.error(f"Critical error during cycle detection initialization: {e}")
@@ -1042,7 +1192,9 @@ class pyrivergraph:
             if self.in_degree[vertex_id] == 1 and self.out_degree[vertex_id] == 1:
                 merge_vertices.add(vertex_id)
 
-        logger.debug(f"Found {len(merge_vertices)} degree-2 vertices for potential merging")
+        logger.debug(
+            f"Found {len(merge_vertices)} degree-2 vertices for potential merging"
+        )
 
         # For each flowline, try to build a complete linear segment using bidirectional search
         for flowline_idx, (start_id, end_id) in self.aFlowline_edges.items():
@@ -1050,21 +1202,32 @@ class pyrivergraph:
                 continue
 
             # Build segment by extending both upstream and downstream
-            segment = self._build_bidirectional_segment(flowline_idx, start_id, end_id, merge_vertices, processed_flowlines)
+            segment = self._build_bidirectional_segment(
+                flowline_idx, start_id, end_id, merge_vertices, processed_flowlines
+            )
 
             # Only consider segments with multiple flowlines
             if len(segment) > 1:
                 linear_segments.append(segment)
                 processed_flowlines.update(segment)
-                logger.debug(f"Found linear segment with {len(segment)} flowlines: {segment}")
+                logger.debug(
+                    f"Found linear segment with {len(segment)} flowlines: {segment}"
+                )
 
-        logger.info(f"Found {len(linear_segments)} linear segments for potential merging")
+        logger.info(
+            f"Found {len(linear_segments)} linear segments for potential merging"
+        )
 
         return linear_segments
 
-    def _build_bidirectional_segment(self, start_flowline_idx: int, start_vertex_id: int,
-                                   end_vertex_id: int, merge_vertices: set,
-                                   processed_flowlines: set) -> List[int]:
+    def _build_bidirectional_segment(
+        self,
+        start_flowline_idx: int,
+        start_vertex_id: int,
+        end_vertex_id: int,
+        merge_vertices: set,
+        processed_flowlines: set,
+    ) -> List[int]:
         """
         Build a complete linear segment by extending both upstream and downstream
         from the starting flowline.
@@ -1104,7 +1267,9 @@ class pyrivergraph:
         current_end = end_vertex_id
         while current_end in merge_vertices:
             # Find downstream flowlines that start at this vertex
-            downstream_flowlines = [fl_idx for neighbor_id, fl_idx in self.adjacency_list[current_end]]
+            downstream_flowlines = [
+                fl_idx for neighbor_id, fl_idx in self.adjacency_list[current_end]
+            ]
 
             if len(downstream_flowlines) == 1:
                 downstream_flowline_idx = downstream_flowlines[0]
@@ -1129,8 +1294,12 @@ class pyrivergraph:
     # NETWORK MODIFICATION & PROCESSING
     # ========================================================================
 
-    def split_flowline(self, aVertex_in: Optional[List[pyvertex]] = None,
-                        iFlag_intersect = None, iFlag_use_id=None) -> List[pyflowline]:
+    def split_flowline(
+        self,
+        aVertex_in: Optional[List[pyvertex]] = None,
+        iFlag_intersect=None,
+        iFlag_use_id=None,
+    ) -> List[pyflowline]:
         """
         Split flowline based on the intersection with a list of vertex
         Input:
@@ -1154,15 +1323,17 @@ class pyrivergraph:
         for i in range(nFlowline):
             pFlowline = aFlowline_in[i]
             iStream_order = pFlowline.iStream_order
-            #iStream_segment = pFlowline.iStream_segment
+            # iStream_segment = pFlowline.iStream_segment
             iFlag_dam = pFlowline.iFlag_dam
-            #nVertex = pFlowline.nVertex
-            nEdge= pFlowline.nEdge
+            # nVertex = pFlowline.nVertex
+            nEdge = pFlowline.nEdge
             iPart = 0
-            aVertex  = list() #the actual vertex of ROI
-            aVertex_all = list() #include vertex that is not ROI, but we need them to subset
+            aVertex = list()  # the actual vertex of ROI
+            aVertex_all = (
+                list()
+            )  # include vertex that is not ROI, but we need them to subset
             for j in range(nEdge):
-                pEdge=pFlowline.aEdge[j]
+                pEdge = pFlowline.aEdge[j]
                 pVertex = pEdge.pVertex_start
                 aVertex_all.append(pVertex)
 
@@ -1173,22 +1344,24 @@ class pyrivergraph:
                 if iFlag_intersect is not None:
                     if iFlag_use_id is not None:
                         aDistance = list()
-                        iFlag_exist=0
-                        aVertex_dummy=list()
-                        aIndex=list()
+                        iFlag_exist = 0
+                        aVertex_dummy = list()
+                        aIndex = list()
                         npoint = 0
                         for k in range(len(aVertex_in)) if aVertex_in else []:
                             pVertex0 = aVertex_in[k]
                             if pVertex0.lFlowlineID == pFlowline.lFlowlineID:
-                                iFlag_exist =1
-                                distance  = pEdge.pVertex_start.calculate_distance(pVertex0)
+                                iFlag_exist = 1
+                                distance = pEdge.pVertex_start.calculate_distance(
+                                    pVertex0
+                                )
                                 if distance == 0:
                                     continue
                                 iPart = iPart + 1
                                 aDistance.append(distance)
                                 aVertex_dummy.append(pVertex0)
                                 aIndex.append(k)
-                                npoint= npoint+ 1
+                                npoint = npoint + 1
                             else:
                                 pass
 
@@ -1200,40 +1373,51 @@ class pyrivergraph:
                                 aVertex_all.append(pVertex_dummy)
 
                     else:
-                        iFlag_exist, npoint, aIndex = find_vertex_on_edge(aVertex_in, pEdge) if aVertex_in else (0, 0, [])
-                        #they must be ordered
-                        if iFlag_exist==1:
+                        iFlag_exist, npoint, aIndex = (
+                            find_vertex_on_edge(aVertex_in, pEdge)
+                            if aVertex_in
+                            else (0, 0, [])
+                        )
+                        # they must be ordered
+                        if iFlag_exist == 1:
                             for m in range(npoint):
                                 pVertex_dummy = aVertex_in[aIndex[m]]
                                 iPart = iPart + 1
                                 aVertex.append(pVertex_dummy)
                                 aVertex_all.append(pVertex_dummy)
 
-            #the last ending vertex
+            # the last ending vertex
             pVertex = pFlowline.pVertex_end
             aVertex_all.append(pVertex)
 
             if aVertex_in and pVertex in aVertex_in_set:
                 iPart = iPart + 1
                 aVertex.append(pVertex)
-            if iPart == 0 :
-                print('Something is wrong')
+            if iPart == 0:
+                print("Something is wrong")
             else:
-                if iPart ==1:
+                if iPart == 1:
                     if iFlag_use_id is not None:
                         pass
                     pass
                 else:
-                    if iPart >=2:
-                        nLine = iPart-1
-                        aVertex_index = [aVertex_all.index(pVertex) for pVertex in aVertex if pVertex in aVertex_all]
+                    if iPart >= 2:
+                        nLine = iPart - 1
+                        aVertex_index = [
+                            aVertex_all.index(pVertex)
+                            for pVertex in aVertex
+                            if pVertex in aVertex_all
+                        ]
 
-                        #find duplicate
+                        # find duplicate
                         for k in range(nLine):
                             t = aVertex_index[k]
-                            s = aVertex_index[k+1]
-                            if s!=t:
-                                aEdge = [pyedge.create(aVertex_all[l], aVertex_all[l+1]) for l in range(t, s)]
+                            s = aVertex_index[k + 1]
+                            if s != t:
+                                aEdge = [
+                                    pyedge.create(aVertex_all[l], aVertex_all[l + 1])
+                                    for l in range(t, s)
+                                ]
                                 # Remove None from the aEdge list
                                 aEdge = [edge for edge in aEdge if edge is not None]
                                 pFlowline1 = pyflowline(aEdge)
@@ -1247,11 +1431,10 @@ class pyrivergraph:
                         pass
                     pass
 
-        #should we update the graph here?
+        # should we update the graph here?
         if iFlag_graph_update == 1:
             self._update_graph_flowlines(aFlowline_out)
         return aFlowline_out
-
 
     def merge_flowline(self) -> List[pyflowline]:
         """
@@ -1290,7 +1473,9 @@ class pyrivergraph:
 
                 try:
                     # Get flowlines in the segment
-                    segment_flowlines = [flowlines[idx] for idx in segment if idx < len(flowlines)]
+                    segment_flowlines = [
+                        flowlines[idx] for idx in segment if idx < len(flowlines)
+                    ]
 
                     if len(segment_flowlines) < 2:
                         continue
@@ -1300,7 +1485,9 @@ class pyrivergraph:
                     if merged_flowline is not None:
                         merged_flowlines.append(merged_flowline)
                         processed_indices.update(segment)
-                        logger.debug(f"Merged {len(segment_flowlines)} flowlines into single flowline")
+                        logger.debug(
+                            f"Merged {len(segment_flowlines)} flowlines into single flowline"
+                        )
 
                 except Exception as e:
                     logger.error(f"Error merging segment {segment}: {e}")
@@ -1311,9 +1498,11 @@ class pyrivergraph:
                 if i not in processed_indices:
                     merged_flowlines.append(flowline)
 
-            logger.info(f"Merged {len(linear_segments)} segments, "
-                       f"resulting in {len(merged_flowlines)} flowlines "
-                       f"(reduced from {len(flowlines)})")
+            logger.info(
+                f"Merged {len(linear_segments)} segments, "
+                f"resulting in {len(merged_flowlines)} flowlines "
+                f"(reduced from {len(flowlines)})"
+            )
 
             self._update_graph_flowlines(merged_flowlines)
             return merged_flowlines
@@ -1321,7 +1510,6 @@ class pyrivergraph:
         except Exception as e:
             logger.error(f"Error during linear segment merging: {e}")
             return flowlines
-
 
     # ========================================================================
     # STREAM ANALYSIS & TOPOLOGY
@@ -1339,20 +1527,26 @@ class pyrivergraph:
         Returns:
             List[pyflowline]: Updated flowlines with corrected stream orders
         """
-        if not hasattr(self, 'aFlowline') or not self.aFlowline:
-            logger.warning('No flowlines available in class instance for stream order update')
+        if not hasattr(self, "aFlowline") or not self.aFlowline:
+            logger.warning(
+                "No flowlines available in class instance for stream order update"
+            )
             return []
 
-        logger.info(f"Updating stream order for {len(self.aFlowline)} flowlines using graph-based approach")
+        logger.info(
+            f"Updating stream order for {len(self.aFlowline)} flowlines using graph-based approach"
+        )
 
         try:
             # Step 1: Identify headwater flowlines (sources in the graph)
             aFlowline_headwater = self.identify_headwater_flowlines()
             if not aFlowline_headwater:
-                logger.warning("No headwater flowlines identified for stream order update")
+                logger.warning(
+                    "No headwater flowlines identified for stream order update"
+                )
                 return self.aFlowline.copy()
             else:
-                #set the stream order of headwater to 1
+                # set the stream order of headwater to 1
                 for pFlowline in aFlowline_headwater:
                     pFlowline.iStream_order = 1
 
@@ -1395,7 +1589,7 @@ class pyrivergraph:
         nFlowline = len(self.aFlowline)
 
         if nFlowline == 0:
-            print('data incomplete')
+            print("data incomplete")
             return [], []
 
         try:
@@ -1413,9 +1607,13 @@ class pyrivergraph:
             self._update_graph_flowlines(sorted_flowlines)
 
             # Step 4: Create segment index list
-            aStream_segment = [flowline.iStream_segment for flowline in sorted_flowlines]
+            aStream_segment = [
+                flowline.iStream_segment for flowline in sorted_flowlines
+            ]
 
-            logger.info(f"Topologically sorted {len(sorted_flowlines)} flowlines from outlet to headwater")
+            logger.info(
+                f"Topologically sorted {len(sorted_flowlines)} flowlines from outlet to headwater"
+            )
 
             return sorted_flowlines, aStream_segment
 
@@ -1424,7 +1622,9 @@ class pyrivergraph:
             # Fallback to simple enumeration on error
             for i, pFlowline in enumerate(self.aFlowline, start=1):
                 pFlowline.iStream_segment = nFlowline - i + 1
-            aStream_segment = [pFlowline.iStream_segment for pFlowline in self.aFlowline]
+            aStream_segment = [
+                pFlowline.iStream_segment for pFlowline in self.aFlowline
+            ]
             return self.aFlowline, aStream_segment
 
     def _sort_flowlines_from_outlet(self):
@@ -1446,12 +1646,14 @@ class pyrivergraph:
         # Safety check: if outlet_id is invalid, try to refresh it
         if outlet_id is None or outlet_id not in self.id_to_vertex:
             logger.warning("Outlet vertex ID is invalid, attempting to refresh")
-            if hasattr(self, 'pVertex_outlet') and self.pVertex_outlet is not None:
+            if hasattr(self, "pVertex_outlet") and self.pVertex_outlet is not None:
                 self._set_outlet_vertex_id()
                 outlet_id = self.pVertex_outlet_id
 
             if outlet_id is None or outlet_id not in self.id_to_vertex:
-                logger.error("Cannot find valid outlet vertex after refresh, returning original flowline order")
+                logger.error(
+                    "Cannot find valid outlet vertex after refresh, returning original flowline order"
+                )
                 return self.aFlowline
 
         # Find all flowlines that end at the outlet (these are the most downstream)
@@ -1497,14 +1699,20 @@ class pyrivergraph:
         # Log any disconnected flowlines that were excluded
         excluded_count = len(self.aFlowline) - len(sorted_flowlines)
         if excluded_count > 0:
-            logger.info(f"Excluded {excluded_count} disconnected flowlines that do not flow to outlet")
+            logger.info(
+                f"Excluded {excluded_count} disconnected flowlines that do not flow to outlet"
+            )
 
             # Log details of excluded flowlines for debugging
             for i, flowline in enumerate(self.aFlowline):
                 if i not in visited_flowlines:
-                    logger.debug(f"Excluded disconnected flowline {i} (ID: {getattr(flowline, 'lFlowlineID', 'unknown')})")
+                    logger.debug(
+                        f"Excluded disconnected flowline {i} (ID: {getattr(flowline, 'lFlowlineID', 'unknown')})"
+                    )
 
-        logger.info(f"Sorted {len(sorted_flowlines)} connected flowlines using BFS from outlet")
+        logger.info(
+            f"Sorted {len(sorted_flowlines)} connected flowlines using BFS from outlet"
+        )
         return sorted_flowlines
 
     def define_river_confluence(self):
@@ -1518,7 +1726,7 @@ class pyrivergraph:
         Returns:
             list [pyconfluence]: A list of confluences in this basin
         """
-        #this can only be calculated for confluence
+        # this can only be calculated for confluence
         # Create a dictionary to map each vertex to its upstream and downstream flowlines
         aConfluence = []
         try:
@@ -1548,11 +1756,15 @@ class pyrivergraph:
         """
         aFlowline = self.aFlowline
         try:
-            #use the connectivity information to set up the topology
+            # use the connectivity information to set up the topology
             for flowline in aFlowline:
-                #get upstream and downstream flowlines
-                upstream_flowlines = [self.aFlowline[i] for i in self.get_upstream_indices(flowline)]
-                downstream_flowlines = [self.aFlowline[i] for i in self.get_downstream_indices(flowline)]
+                # get upstream and downstream flowlines
+                upstream_flowlines = [
+                    self.aFlowline[i] for i in self.get_upstream_indices(flowline)
+                ]
+                downstream_flowlines = [
+                    self.aFlowline[i] for i in self.get_downstream_indices(flowline)
+                ]
                 flowline.aFlowline_upstream = upstream_flowlines
                 flowline.aFlowline_downstream = downstream_flowlines
             pass
@@ -1581,12 +1793,14 @@ class pyrivergraph:
             - 'method': Stream ordering method used
             - 'statistics': Statistics about stream order distribution
         """
-        if not hasattr(self, 'aFlowline') or not self.aFlowline:
-            logger.warning('No flowlines available for stream order calculation')
+        if not hasattr(self, "aFlowline") or not self.aFlowline:
+            logger.warning("No flowlines available for stream order calculation")
             return None
 
-        logger.info(f"Defining stream order for {len(self.aFlowline)} flowlines using "
-                   f"{'Strahler' if iFlag_so_method_in == 1 else 'Shreve'} method")
+        logger.info(
+            f"Defining stream order for {len(self.aFlowline)} flowlines using "
+            f"{'Strahler' if iFlag_so_method_in == 1 else 'Shreve'} method"
+        )
 
         try:
             # Step 1: Initialize headwater flowlines (stream order = 1)
@@ -1662,7 +1876,9 @@ class pyrivergraph:
             self.out_degree[start_id] += 1
             self.in_degree[end_id] += 1
 
-        logger.debug(f"Built graph with {len(self.id_to_vertex)} vertices and {len(self.aFlowline_edges)} edges")
+        logger.debug(
+            f"Built graph with {len(self.id_to_vertex)} vertices and {len(self.aFlowline_edges)} edges"
+        )
 
     def _set_outlet_vertex_id(self):
         """Set the outlet vertex ID if outlet vertex is provided."""
@@ -1687,9 +1903,11 @@ class pyrivergraph:
 
         # Critical: Update outlet vertex ID after graph rebuild
         # The outlet vertex ID can become invalid after graph modifications
-        if hasattr(self, 'pVertex_outlet') and self.pVertex_outlet is not None:
+        if hasattr(self, "pVertex_outlet") and self.pVertex_outlet is not None:
             self._set_outlet_vertex_id()
-            logger.debug(f"Updated outlet vertex ID after graph rebuild: {self.pVertex_outlet_id}")
+            logger.debug(
+                f"Updated outlet vertex ID after graph rebuild: {self.pVertex_outlet_id}"
+            )
 
         return
 
@@ -1697,7 +1915,9 @@ class pyrivergraph:
     # PRIVATE METHODS - PATH FINDING & ANALYSIS
     # ========================================================================
 
-    def _find_all_paths(self, start_id: int, target_id: int, max_depth: int = 10) -> List[List[int]]:
+    def _find_all_paths(
+        self, start_id: int, target_id: int, max_depth: int = 10
+    ) -> List[List[int]]:
         """
         Find all paths from start to target vertex using DFS.
 
@@ -1711,7 +1931,13 @@ class pyrivergraph:
         """
         paths = []
 
-        def dfs_paths(current_id: int, target_id: int, path: List[int], visited: Set[int], depth: int):
+        def dfs_paths(
+            current_id: int,
+            target_id: int,
+            path: List[int],
+            visited: Set[int],
+            depth: int,
+        ):
             if depth > max_depth:
                 return
 
@@ -1794,7 +2020,9 @@ class pyrivergraph:
 
         return reachable
 
-    def _remove_small_river_step(self, flowlines: List[pyflowline], threshold: float) -> List[pyflowline]:
+    def _remove_small_river_step(
+        self, flowlines: List[pyflowline], threshold: float
+    ) -> List[pyflowline]:
         """
         Remove small rivers based on length threshold.
 
@@ -1808,7 +2036,7 @@ class pyrivergraph:
         filtered_flowlines = []
 
         for flowline in flowlines:
-            length = getattr(flowline, 'dLength', 0.0)
+            length = getattr(flowline, "dLength", 0.0)
             if length >= threshold:
                 filtered_flowlines.append(flowline)
             else:
@@ -1817,7 +2045,9 @@ class pyrivergraph:
         logger.info(f"Removed {len(flowlines) - len(filtered_flowlines)} small rivers")
         return filtered_flowlines
 
-    def _merge_flowline_segment(self, segment_flowlines: List[pyflowline]) -> Optional[pyflowline]:
+    def _merge_flowline_segment(
+        self, segment_flowlines: List[pyflowline]
+    ) -> Optional[pyflowline]:
         """
         Merge a segment of flowlines into a single flowline.
 
@@ -1832,8 +2062,8 @@ class pyrivergraph:
 
         try:
             # Use first flowline as base
-            #assume that they are connected in order
-            #merge using the built-in api in the reverse order
+            # assume that they are connected in order
+            # merge using the built-in api in the reverse order
             merged_flowline = segment_flowlines[-1]
             for flowline in segment_flowlines[-2::-1]:
                 flowline_up = flowline
@@ -1849,7 +2079,9 @@ class pyrivergraph:
     # PRIVATE METHODS - VERTEX & CONFLUENCE MANAGEMENT
     # ========================================================================
 
-    def _create_confluence_object(self, vertex_id: int, vertex: pyvertex) -> Optional[pyconfluence]:
+    def _create_confluence_object(
+        self, vertex_id: int, vertex: pyvertex
+    ) -> Optional[pyconfluence]:
         """
         Create a confluence object for a vertex.
         Using the right constructor pConfluence = pyconfluence(pVertex, aFlowline_upstream, aFlowline_downstream)
@@ -1906,15 +2138,20 @@ class pyrivergraph:
 
         while unresolved_confluences:
             iteration += 1
-            logger.debug(f"Stream order iteration {iteration}, "
-                         f"{len(unresolved_confluences)} confluences remaining")
+            logger.debug(
+                f"Stream order iteration {iteration}, "
+                f"{len(unresolved_confluences)} confluences remaining"
+            )
 
             resolved_this_iteration = set()
 
             for idx in unresolved_confluences:
                 confluence = self.aConfluence[idx]
-                upstream_orders = [fl.iStream_order for fl in confluence.aFlowline_upstream
-                                   if fl.iStream_order > 0]
+                upstream_orders = [
+                    fl.iStream_order
+                    for fl in confluence.aFlowline_upstream
+                    if fl.iStream_order > 0
+                ]
 
                 if len(upstream_orders) == len(confluence.aFlowline_upstream):
                     # All upstream orders are known, calculate downstream order
@@ -1926,7 +2163,9 @@ class pyrivergraph:
                     elif iFlag_so_method_in == 2:  # Shreve
                         downstream_order = sum(upstream_orders)
                     else:
-                        logger.warning(f"Unknown stream order method: {iFlag_so_method_in}")
+                        logger.warning(
+                            f"Unknown stream order method: {iFlag_so_method_in}"
+                        )
                         continue
 
                     # Update downstream flowlines
@@ -1936,7 +2175,9 @@ class pyrivergraph:
                     resolved_this_iteration.add(idx)
 
             if not resolved_this_iteration:
-                logger.warning("No confluences resolved in this iteration, stopping to avoid infinite loop")
+                logger.warning(
+                    "No confluences resolved in this iteration, stopping to avoid infinite loop"
+                )
                 break
 
             unresolved_confluences -= resolved_this_iteration

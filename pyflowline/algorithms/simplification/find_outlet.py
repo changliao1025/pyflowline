@@ -1,6 +1,6 @@
 def find_outlet(aFlowline_in, pVertex_outlet_in):
     nFlowline = len(aFlowline_in)
-    dDistance_min = float('inf')
+    dDistance_min = float("inf")
     for i in range(nFlowline):
         pFlowline = aFlowline_in[i]
         pVertex_end = pFlowline.pVertex_end

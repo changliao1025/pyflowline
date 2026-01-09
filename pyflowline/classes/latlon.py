@@ -17,7 +17,6 @@ from pyflowline.classes.flowline import pyflowline
 from pyflowline.classes.meshcell import pymeshcell
 
 
-
 class LatlonClassEncoder(JSONEncoder):
     """
     Custom JSON encoder for pylatlon objects.
@@ -25,6 +24,7 @@ class LatlonClassEncoder(JSONEncoder):
     Handles numpy data types, pyvertex, and pyedge objects, converting them to
     native Python types for JSON serialization.
     """
+
     def default(self, obj):
         if isinstance(obj, np.integer):
             return int(obj)
@@ -120,7 +120,9 @@ class pylatlon(pymeshcell):
         pylatlon(ID=100, Center=(-76.95, 38.05), Area=123.45m²)
     """
 
-    def __init__(self, dLon: float, dLat: float, aEdge: List[pyedge], aVertex: List[pyvertex]) -> None:
+    def __init__(
+        self, dLon: float, dLat: float, aEdge: List[pyedge], aVertex: List[pyvertex]
+    ) -> None:
         """
         Initialize a lat-lon cell object.
 
@@ -146,21 +148,27 @@ class pylatlon(pymeshcell):
 
         # Validate coordinate ranges
         if not (-180 <= dLon <= 180):
-            raise ValueError(f"Longitude must be between -180 and 180 degrees, got {dLon}")
+            raise ValueError(
+                f"Longitude must be between -180 and 180 degrees, got {dLon}"
+            )
         if not (-90 <= dLat <= 90):
             raise ValueError(f"Latitude must be between -90 and 90 degrees, got {dLat}")
 
         # Validate lat-lon cell requirements (must be rectangular)
         if len(aEdge) != 4:
-            raise ValueError(f"Lat-lon cell must have exactly 4 edges, got {len(aEdge)}")
+            raise ValueError(
+                f"Lat-lon cell must have exactly 4 edges, got {len(aEdge)}"
+            )
         if len(aVertex) < 4:
-            raise ValueError(f"Lat-lon cell must have at least 4 vertices, got {len(aVertex)}")
+            raise ValueError(
+                f"Lat-lon cell must have at least 4 vertices, got {len(aVertex)}"
+            )
 
         # Validate edges are not None
         for i, edge in enumerate(aEdge):
             if edge is None:
                 raise ValueError(f"Edge at index {i} cannot be None")
-            if not hasattr(edge, 'pVertex_start') or not hasattr(edge, 'pVertex_end'):
+            if not hasattr(edge, "pVertex_start") or not hasattr(edge, "pVertex_end"):
                 raise ValueError(f"Edge at index {i} must be a valid pyedge object")
 
         # Validate vertices are not None
@@ -187,8 +195,8 @@ class pylatlon(pymeshcell):
 
         # Create center vertex
         pVertex_params = {
-            'dLongitude_degree': self.dLongitude_center_degree,
-            'dLatitude_degree': self.dLatitude_center_degree
+            "dLongitude_degree": self.dLongitude_center_degree,
+            "dLatitude_degree": self.dLatitude_center_degree,
         }
         self.pVertex_center: pyvertex = pyvertex(pVertex_params)
 
@@ -205,10 +213,12 @@ class pylatlon(pymeshcell):
         Returns:
             str: Detailed representation including cell ID, center coordinates, and area
         """
-        return (f"pylatlon(ID={self.lCellID}, "
-                f"Center=({self.dLongitude_center_degree:.6f}, {self.dLatitude_center_degree:.6f}), "
-                f"Area={self.dArea:.2f}m², Flowlines={self.nFlowline}, "
-                f"StreamOrder={self.iStream_order_burned})")
+        return (
+            f"pylatlon(ID={self.lCellID}, "
+            f"Center=({self.dLongitude_center_degree:.6f}, {self.dLatitude_center_degree:.6f}), "
+            f"Area={self.dArea:.2f}m², Flowlines={self.nFlowline}, "
+            f"StreamOrder={self.iStream_order_burned})"
+        )
 
     def __str__(self) -> str:
         """
@@ -217,9 +227,11 @@ class pylatlon(pymeshcell):
         Returns:
             str: Concise representation with ID, center coordinates, and area
         """
-        return (f"pylatlon(ID={self.lCellID}, "
-                f"Center=({self.dLongitude_center_degree:.6f}, {self.dLatitude_center_degree:.6f}), "
-                f"Area={self.dArea:.2f}m²)")
+        return (
+            f"pylatlon(ID={self.lCellID}, "
+            f"Center=({self.dLongitude_center_degree:.6f}, {self.dLatitude_center_degree:.6f}), "
+            f"Area={self.dArea:.2f}m²)"
+        )
 
     def __eq__(self, other: Any) -> bool:
         """
@@ -235,8 +247,10 @@ class pylatlon(pymeshcell):
             return NotImplemented
 
         # Check center coordinates
-        coord_match = (abs(self.dLongitude_center_degree - other.dLongitude_center_degree) < 1e-9 and
-                      abs(self.dLatitude_center_degree - other.dLatitude_center_degree) < 1e-9)
+        coord_match = (
+            abs(self.dLongitude_center_degree - other.dLongitude_center_degree) < 1e-9
+            and abs(self.dLatitude_center_degree - other.dLatitude_center_degree) < 1e-9
+        )
 
         # Use parent class geometry comparison
         return coord_match and super().__eq__(other)
@@ -248,7 +262,12 @@ class pylatlon(pymeshcell):
         Returns:
             int: Hash value based on center coordinates
         """
-        return hash((round(self.dLongitude_center_degree, 9), round(self.dLatitude_center_degree, 9)))
+        return hash(
+            (
+                round(self.dLongitude_center_degree, 9),
+                round(self.dLatitude_center_degree, 9),
+            )
+        )
 
     def calculate_cell_bound(self) -> Tuple[float, float, float, float]:
         """
@@ -270,7 +289,9 @@ class pylatlon(pymeshcell):
 
         for i in range(self.nVertex):
             vertex = self.aVertex[i]
-            if not hasattr(vertex, 'dLongitude_degree') or not hasattr(vertex, 'dLatitude_degree'):
+            if not hasattr(vertex, "dLongitude_degree") or not hasattr(
+                vertex, "dLatitude_degree"
+            ):
                 raise ValueError(f"Vertex at index {i} missing coordinate attributes")
 
             dLon_max = max(dLon_max, vertex.dLongitude_degree)
@@ -302,12 +323,14 @@ class pylatlon(pymeshcell):
             raise ValueError("Cell has no edges to check against")
 
         for pEdge in self.aEdge:
-            if hasattr(pEdge, 'is_overlap') and pEdge.is_overlap(pEdge_in):
+            if hasattr(pEdge, "is_overlap") and pEdge.is_overlap(pEdge_in):
                 return True
 
         return False
 
-    def which_edge_crosses_vertex(self, pVertex_in: pyvertex) -> Tuple[bool, Optional[pyedge]]:
+    def which_edge_crosses_vertex(
+        self, pVertex_in: pyvertex
+    ) -> Tuple[bool, Optional[pyedge]]:
         """
         Find which edge crosses or contains a specific vertex.
 
@@ -328,7 +351,7 @@ class pylatlon(pymeshcell):
             raise ValueError("Cell has no edges to check against")
 
         for pEdge in self.aEdge:
-            if hasattr(pEdge, 'check_vertex_on_edge'):
+            if hasattr(pEdge, "check_vertex_on_edge"):
                 try:
                     iFlag, _, _ = pEdge.check_vertex_on_edge(pVertex_in)
                     if iFlag == 1:
@@ -350,11 +373,13 @@ class pylatlon(pymeshcell):
             ValueError: If the cell has insufficient vertices for area calculation
         """
         if not self.aVertex or self.nVertex < 3:
-            raise ValueError("Cannot calculate area: cell must have at least 3 vertices")
+            raise ValueError(
+                "Cannot calculate area: cell must have at least 3 vertices"
+            )
 
         try:
-            lons = [vertex.dLongitude_degree for vertex in self.aVertex[:self.nVertex]]
-            lats = [vertex.dLatitude_degree for vertex in self.aVertex[:self.nVertex]]
+            lons = [vertex.dLongitude_degree for vertex in self.aVertex[: self.nVertex]]
+            lats = [vertex.dLatitude_degree for vertex in self.aVertex[: self.nVertex]]
 
             self.dArea = calculate_polygon_area(lons, lats)
             return self.dArea
@@ -379,12 +404,14 @@ class pylatlon(pymeshcell):
             self.calculate_cell_area()
 
         if self.dArea <= 0:
-            raise ValueError("Cannot calculate effective length: cell area is zero or negative")
+            raise ValueError(
+                "Cannot calculate effective length: cell area is zero or negative"
+            )
 
         self.dLength = np.sqrt(self.dArea)
         return self.dLength
 
-    def shares_edge_with(self, other: 'pylatlon') -> bool:
+    def shares_edge_with(self, other: "pylatlon") -> bool:
         """
         Check whether this lat-lon cell shares an edge with another lat-lon cell.
 
@@ -406,7 +433,7 @@ class pylatlon(pymeshcell):
 
         for pEdge1 in self.aEdge:
             for pEdge2 in other.aEdge:
-                if hasattr(pEdge1, 'is_overlap') and pEdge1.is_overlap(pEdge2):
+                if hasattr(pEdge1, "is_overlap") and pEdge1.is_overlap(pEdge2):
                     return True
 
         return False
@@ -474,7 +501,7 @@ class pylatlon(pymeshcell):
             raise TypeError(f"Cell ID must be an integer, got {type(lCellID)}")
         self.lCellID = int(lCellID)
 
-    def copy(self) -> 'pylatlon':
+    def copy(self) -> "pylatlon":
         """
         Create a deep copy of the lat-lon cell.
 
@@ -482,15 +509,24 @@ class pylatlon(pymeshcell):
             pylatlon: A new lat-lon cell object with the same attributes
         """
         # Create copies of edges and vertices
-        aEdge_copy = [edge.copy() if hasattr(edge, 'copy') else edge for edge in self.aEdge]
-        aVertex_copy = [vertex.copy() if hasattr(vertex, 'copy') else vertex for vertex in self.aVertex]
+        aEdge_copy = [
+            edge.copy() if hasattr(edge, "copy") else edge for edge in self.aEdge
+        ]
+        aVertex_copy = [
+            vertex.copy() if hasattr(vertex, "copy") else vertex
+            for vertex in self.aVertex
+        ]
 
         # Create new cell
-        new_cell = pylatlon(self.dLongitude_center_degree, self.dLatitude_center_degree,
-                           aEdge_copy, aVertex_copy)
+        new_cell = pylatlon(
+            self.dLongitude_center_degree,
+            self.dLatitude_center_degree,
+            aEdge_copy,
+            aVertex_copy,
+        )
 
         # Copy all attributes from parent
-        if hasattr(super(), 'copy'):
+        if hasattr(super(), "copy"):
             parent_copy = super().copy()
             for attr in parent_copy.__dict__:
                 if hasattr(new_cell, attr):
@@ -512,15 +548,13 @@ class pylatlon(pymeshcell):
             >>> cell = pylatlon(-77.0, 38.0, edges, vertices)
             >>> json_str = cell.tojson()
         """
-        aSkip = ['aEdge', 'aFlowline', 'dLongitude_radian', 'dLatitude_radian', 'wkt']
+        aSkip = ["aEdge", "aFlowline", "dLongitude_radian", "dLatitude_radian", "wkt"]
 
         obj = self.__dict__.copy()
         for sKey in aSkip:
             obj.pop(sKey, None)
 
-        sJson = json.dumps(obj,
-                          sort_keys=True,
-                          indent=4,
-                          ensure_ascii=True,
-                          cls=LatlonClassEncoder)
+        sJson = json.dumps(
+            obj, sort_keys=True, indent=4, ensure_ascii=True, cls=LatlonClassEncoder
+        )
         return sJson

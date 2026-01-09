@@ -1,23 +1,24 @@
-
-
 import os
 from osgeo import ogr, osr
-#from shapely.wkt import loads
 
-def intersect_flowline_with_vertex( sFilename_flowline_in, sFilename_vertex_in, sFilename_output_in):
+# from shapely.wkt import loads
 
-    if  os.path.exists(sFilename_flowline_in) and  os.path.exists(sFilename_vertex_in) :
+
+def intersect_flowline_with_vertex(
+    sFilename_flowline_in, sFilename_vertex_in, sFilename_output_in
+):
+
+    if os.path.exists(sFilename_flowline_in) and os.path.exists(sFilename_vertex_in):
         pass
     else:
-        print('The input file does not exist')
+        print("The input file does not exist")
         return
 
     if os.path.exists(sFilename_output_in):
 
         os.remove(sFilename_output_in)
 
-
-    pDriver_geojson = ogr.GetDriverByName( "GeoJSON")
+    pDriver_geojson = ogr.GetDriverByName("GeoJSON")
 
     pDataset_flowline = pDriver_geojson.Open(sFilename_flowline_in, 0)
     pDataset_vertex = pDriver_geojson.Open(sFilename_vertex_in, 0)
@@ -32,81 +33,85 @@ def intersect_flowline_with_vertex( sFilename_flowline_in, sFilename_vertex_in, 
     pLayerDefinition = pLayer_vertex.GetLayerDefn()
 
     comparison = pSpatial_reference_a.IsSame(pSpatial_reference_b)
-    if(comparison != 1):
+    if comparison != 1:
         iFlag_transform = 1
-        transform = osr.CoordinateTransformation(pSpatial_reference_a, pSpatial_reference_b)
+        transform = osr.CoordinateTransformation(
+            pSpatial_reference_a, pSpatial_reference_b
+        )
     else:
         iFlag_transform = 0
 
     pDataset_out = pDriver_geojson.CreateDataSource(sFilename_output_in)
 
-    pLayerOut = pDataset_out.CreateLayer('intersect', pSpatial_reference_b, ogr.wkbMultiPoint)
+    pLayerOut = pDataset_out.CreateLayer(
+        "intersect", pSpatial_reference_b, ogr.wkbMultiPoint
+    )
     # Add one attribute
-    pLayerOut.CreateField(ogr.FieldDefn('pointid', ogr.OFTInteger64)) #long type for high resolution
+    pLayerOut.CreateField(
+        ogr.FieldDefn("pointid", ogr.OFTInteger64)
+    )  # long type for high resolution
 
     pLayerDefn = pLayerOut.GetLayerDefn()
     pFeatureOut = ogr.Feature(pLayerDefn)
 
     lID_flowline = 0
 
-    aVertex_intersect=list()
-    #for i in range (nfeature_mesh):
+    aVertex_intersect = list()
+    # for i in range (nfeature_mesh):
     for pFeature_flowline in pLayer_flowline:
 
-        #pFeature_mesh= pLayer_mesh.GetFeature(i)
+        # pFeature_mesh= pLayer_mesh.GetFeature(i)
         pGeometry_flowline = pFeature_flowline.GetGeometryRef()
 
-
-        if (iFlag_transform ==1): #projections are different
+        if iFlag_transform == 1:  # projections are different
             pGeometry_flowline.Transform(transform)
 
-        if (pGeometry_flowline.IsValid()):
+        if pGeometry_flowline.IsValid():
             pass
         else:
-            print('Geometry issue 1')
-            print('Warning: invalid geometry found in ', sFilename_flowline_in)
+            print("Geometry issue 1")
+            print("Warning: invalid geometry found in ", sFilename_flowline_in)
             raise Exception(f"Invalid geometry found in {sFilename_flowline_in}")
 
-
-        #convert geometry to edge
+        # convert geometry to edge
         pGeometrytype_flowline = pGeometry_flowline.GetGeometryName()
-        if(pGeometrytype_flowline == 'LINESTRING'):
+        if pGeometrytype_flowline == "LINESTRING":
 
             aFlowline_intersect = list()
             iFlag_intersected = 0
-            for j in range (nfeature_vertex):
-            #for pFeature_flowline in pLayer_flowline:
+            for j in range(nfeature_vertex):
+                # for pFeature_flowline in pLayer_flowline:
                 pFeature_vertex = pLayer_vertex.GetFeature(j)
                 pGeometry_vertex = pFeature_vertex.GetGeometryRef()
-                if (pGeometry_vertex.IsValid()):
+                if pGeometry_vertex.IsValid():
                     pass
                 else:
-                    print('Geometry issue 2')
-                    print('Warning: invalid point detected in ', sFilename_vertex_in)
+                    print("Geometry issue 2")
+                    print("Warning: invalid point detected in ", sFilename_vertex_in)
                     raise Exception(f"Invalid point found in {sFilename_vertex_in}")
 
-                iFlag_intersect = pGeometry_vertex.Intersects( pGeometry_flowline )
-                if( iFlag_intersect == True):
+                iFlag_intersect = pGeometry_vertex.Intersects(pGeometry_flowline)
+                if iFlag_intersect == True:
                     iFlag_intersected = 1
-                    pGeometry_intersect = pGeometry_vertex.Intersection(pGeometry_flowline)
-                    #add more process here to
+                    pGeometry_intersect = pGeometry_vertex.Intersection(
+                        pGeometry_flowline
+                    )
+                    # add more process here to
                     pGeometrytype_intersect = pGeometry_intersect.GetGeometryName()
-                    if pGeometrytype_intersect == 'LINESTRING':
+                    if pGeometrytype_intersect == "LINESTRING":
                         npoint = pGeometry_intersect.GetGeometryCount()
-                        for i  in range(npoint):
+                        for i in range(npoint):
                             point = pGeometry_intersect.GetGeometryRef(i)
 
                     else:
                         pass
 
-
                 else:
                     pass
-
 
         else:
             pass
 
     pDataset_out = pLayerOut = None
 
-    return   aVertex_intersect
+    return aVertex_intersect

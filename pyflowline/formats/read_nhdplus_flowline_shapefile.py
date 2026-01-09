@@ -3,6 +3,7 @@ import numpy as np
 from osgeo import ogr, osr, gdal
 from pyflowline.formats.convert_coordinates import convert_gcs_coordinates_to_flowline
 
+
 def read_nhdplus_flowline_shapefile_attribute(sFilename_shapefile_in):
     """
     convert a shpefile to json format.
@@ -13,14 +14,16 @@ def read_nhdplus_flowline_shapefile_attribute(sFilename_shapefile_in):
     if os.path.isfile(sFilename_shapefile_in):
         pass
     else:
-        print('This shapefile does not exist: ', sFilename_shapefile_in )
+        print("This shapefile does not exist: ", sFilename_shapefile_in)
         iReturn_code = 0
         return iReturn_code
 
-    aNHDPlusID=list()
-    pDriver_shapefile = ogr.GetDriverByName('ESRI Shapefile')
+    aNHDPlusID = list()
+    pDriver_shapefile = ogr.GetDriverByName("ESRI Shapefile")
 
-    pDataset_shapefile = pDriver_shapefile.Open(sFilename_shapefile_in, gdal.GA_ReadOnly)
+    pDataset_shapefile = pDriver_shapefile.Open(
+        sFilename_shapefile_in, gdal.GA_ReadOnly
+    )
     pLayer_shapefile = pDataset_shapefile.GetLayer(0)
     pSpatialRef_shapefile = pLayer_shapefile.GetSpatialRef()
     for pFeature_shapefile in pLayer_shapefile:
@@ -29,9 +32,10 @@ def read_nhdplus_flowline_shapefile_attribute(sFilename_shapefile_in):
         lNHDPlusID = int(pFeature_shapefile.GetField("NHDPlusID"))
         aNHDPlusID.append(lNHDPlusID)
 
-    #we also need to spatial reference
-    #aFromNode, aToNode,
+    # we also need to spatial reference
+    # aFromNode, aToNode,
     return aNHDPlusID
+
 
 def read_nhdplus_flowline_geojson_attribute(sFilename_geojson_in):
     """
@@ -43,12 +47,12 @@ def read_nhdplus_flowline_geojson_attribute(sFilename_geojson_in):
     if os.path.isfile(sFilename_geojson_in):
         pass
     else:
-        print('This geojson does not exist: ', sFilename_geojson_in )
+        print("This geojson does not exist: ", sFilename_geojson_in)
         iReturn_code = 0
         return iReturn_code
 
-    aNHDPlusID=list()
-    pDriver_shapefile = ogr.GetDriverByName('GeoJSON')
+    aNHDPlusID = list()
+    pDriver_shapefile = ogr.GetDriverByName("GeoJSON")
 
     pDataset_shapefile = pDriver_shapefile.Open(sFilename_geojson_in, gdal.GA_ReadOnly)
     pLayer_shapefile = pDataset_shapefile.GetLayer(0)
@@ -59,11 +63,14 @@ def read_nhdplus_flowline_geojson_attribute(sFilename_geojson_in):
         lNHDPlusID = int(pFeature_shapefile.GetField("NHDPlusID"))
         aNHDPlusID.append(lNHDPlusID)
 
-    #we also need to spatial reference
-    #aFromNode, aToNode,
+    # we also need to spatial reference
+    # aFromNode, aToNode,
     return aNHDPlusID
 
-def extract_nhdplus_flowline_shapefile_by_attribute(sFilename_shapefile_in, aAttribute_in):
+
+def extract_nhdplus_flowline_shapefile_by_attribute(
+    sFilename_shapefile_in, aAttribute_in
+):
     """_summary_
 
     Args:
@@ -79,15 +86,17 @@ def extract_nhdplus_flowline_shapefile_by_attribute(sFilename_shapefile_in, aAtt
     if os.path.isfile(sFilename_shapefile_in):
         pass
     else:
-        print('This shapefile does not exist: ', sFilename_shapefile_in )
+        print("This shapefile does not exist: ", sFilename_shapefile_in)
         iReturn_code = 0
         return iReturn_code
 
-    aFlowline =list()
+    aFlowline = list()
 
-    pDriver_shapefile = ogr.GetDriverByName('ESRI Shapefile')
+    pDriver_shapefile = ogr.GetDriverByName("ESRI Shapefile")
 
-    pDataset_shapefile = pDriver_shapefile.Open(sFilename_shapefile_in, gdal.GA_ReadOnly)
+    pDataset_shapefile = pDriver_shapefile.Open(
+        sFilename_shapefile_in, gdal.GA_ReadOnly
+    )
     pLayer_shapefile = pDataset_shapefile.GetLayer(0)
     pSpatialRef_shapefile = pLayer_shapefile.GetSpatialRef()
 
@@ -96,11 +105,13 @@ def extract_nhdplus_flowline_shapefile_by_attribute(sFilename_shapefile_in, aAtt
     pSpatial_reference_gcs.SetAxisMappingStrategy(osr.OAMS_TRADITIONAL_GIS_ORDER)
 
     comparison = pSpatialRef_shapefile.IsSame(pSpatial_reference_gcs)
-    if(comparison != 1):
-        iFlag_transform =1
-        pTransform = osr.CoordinateTransformation(pSpatialRef_shapefile, pSpatial_reference_gcs)
+    if comparison != 1:
+        iFlag_transform = 1
+        pTransform = osr.CoordinateTransformation(
+            pSpatialRef_shapefile, pSpatial_reference_gcs
+        )
     else:
-        iFlag_transform =0
+        iFlag_transform = 0
 
     lFlowlineIndex = 0
     for pFeature_shapefile in pLayer_shapefile:
@@ -108,34 +119,34 @@ def extract_nhdplus_flowline_shapefile_by_attribute(sFilename_shapefile_in, aAtt
         sGeometry_type = pGeometry_in.GetGeometryName()
         lNHDPlusID = int(pFeature_shapefile.GetField("NHDPlusID"))
 
-        if (iFlag_transform ==1):
+        if iFlag_transform == 1:
             pGeometry_in.Transform(pTransform)
-        if (pGeometry_in.IsValid()):
-            print('Warning: invalid geometry found in ', sFilename_shapefile_in)
+        if pGeometry_in.IsValid():
+            print("Warning: invalid geometry found in ", sFilename_shapefile_in)
             raise Exception(f"Invalid geometry found in {sFilename_shapefile_in}")
         else:
-            print('Geometry issue 10')
+            print("Geometry issue 10")
         if lNHDPlusID in aAttribute_in:
-            if(sGeometry_type == 'MULTILINESTRING'):
+            if sGeometry_type == "MULTILINESTRING":
                 nLine = pGeometry_in.GetGeometryCount()
                 for i in range(nLine):
                     Line = pGeometry_in.GetGeometryRef(i)
                     aCoords = list()
-                    for i in range(0,  Line.GetPointCount()):
+                    for i in range(0, Line.GetPointCount()):
                         pt = Line.GetPoint(i)
-                        aCoords.append( [ pt[0], pt[1]])
-                    dummy1= np.array(aCoords)
+                        aCoords.append([pt[0], pt[1]])
+                    dummy1 = np.array(aCoords)
                     pFlowline = convert_gcs_coordinates_to_flowline(dummy1)
                     pFlowline.lFlowlineIndex = lFlowlineIndex
                     aFlowline.append(pFlowline)
                     lFlowlineIndex = lFlowlineIndex + 1
             else:
-                if sGeometry_type =='LINESTRING':
+                if sGeometry_type == "LINESTRING":
                     aCoords = list()
                     for i in range(0, pGeometry_in.GetPointCount()):
                         pt = pGeometry_in.GetPoint(i)
-                        aCoords.append( [ pt[0], pt[1]])
-                    dummy1= np.array(aCoords)
+                        aCoords.append([pt[0], pt[1]])
+                    dummy1 = np.array(aCoords)
                     pFlowline = convert_gcs_coordinates_to_flowline(dummy1)
                     pFlowline.lFlowlineIndex = lFlowlineIndex
                     aFlowline.append(pFlowline)
@@ -148,8 +159,12 @@ def extract_nhdplus_flowline_shapefile_by_attribute(sFilename_shapefile_in, aAtt
 
     return aFlowline
 
-def track_nhdplus_flowline(aNHDPlusID_filter_in, aFromFlowline_in, aToFlowline_in, lNHDPlusID_in):
+
+def track_nhdplus_flowline(
+    aNHDPlusID_filter_in, aFromFlowline_in, aToFlowline_in, lNHDPlusID_in
+):
     aNHDPlusID_dam_nonheadwater = list()
+
     def tag_downstream(lNHDPlusID_from):
         if lNHDPlusID_from in aNHDPlusID_filter_in:
             dummy_index = aNHDPlusID_filter_in.index(lNHDPlusID_from)
@@ -161,11 +176,11 @@ def track_nhdplus_flowline(aNHDPlusID_filter_in, aFromFlowline_in, aToFlowline_i
                     pass
                 else:
                     aNHDPlusID_dam_nonheadwater.append(lNHDPlusID_from)
-                    dummy_index = np.where(aFromFlowline_in == lNHDPlusID_from )
+                    dummy_index = np.where(aFromFlowline_in == lNHDPlusID_from)
                     nDownstream = dummy_index[0].size
                     for i in range(nDownstream):
-                        lNHDPlusID_to = aToFlowline_in[dummy_index[0][i]   ]
-                        if lNHDPlusID_to==0:
+                        lNHDPlusID_to = aToFlowline_in[dummy_index[0][i]]
+                        if lNHDPlusID_to == 0:
                             pass
                         else:
                             tag_downstream(lNHDPlusID_to)
@@ -178,5 +193,4 @@ def track_nhdplus_flowline(aNHDPlusID_filter_in, aFromFlowline_in, aToFlowline_i
         tag_downstream(lNHDPlusID_in)
         aNHDPlusID_dam_nonheadwater.pop(0)
 
-
-    return  aNHDPlusID_dam_nonheadwater
+    return aNHDPlusID_dam_nonheadwater

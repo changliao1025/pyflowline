@@ -16,6 +16,7 @@ from pyflowline.classes.edge import pyedge
 from pyflowline.classes.flowline import pyflowline
 from pyflowline.classes.meshcell import pymeshcell
 
+
 class LinkClassEncoder(JSONEncoder):
     """
     Custom JSON encoder for pycelllink objects.
@@ -23,6 +24,7 @@ class LinkClassEncoder(JSONEncoder):
     Handles numpy data types, mesh cell objects, and other complex types,
     converting them to native Python types for JSON serialization.
     """
+
     def default(self, obj):
         if isinstance(obj, (np.integer, np.int32, np.int64)):
             return int(obj)
@@ -33,13 +35,13 @@ class LinkClassEncoder(JSONEncoder):
         if isinstance(obj, list):
             return obj
         if pyedge and isinstance(obj, pyedge):
-            return getattr(obj, 'lEdgeID', str(obj))
+            return getattr(obj, "lEdgeID", str(obj))
         if pyvertex and isinstance(obj, pyvertex):
-            return getattr(obj, 'lVertexID', str(obj))
+            return getattr(obj, "lVertexID", str(obj))
         if pyflowline and isinstance(obj, pyflowline):
-            return getattr(obj, 'lFlowlineID', str(obj))
+            return getattr(obj, "lFlowlineID", str(obj))
         if pymeshcell and isinstance(obj, pymeshcell):
-            return getattr(obj, 'lCellID', str(obj))
+            return getattr(obj, "lCellID", str(obj))
         if isinstance(obj, pycelllink):
             return obj.lLinkID
         return JSONEncoder.default(self, obj)
@@ -117,17 +119,24 @@ class pycelllink:
             raise ValueError("Linking edge cannot be None")
 
         # Check that cells are different (a cell shouldn't link to itself)
-        if (hasattr(pCell_start_in, 'lCellID') and hasattr(pCell_end_in, 'lCellID') and
-            pCell_start_in.lCellID == pCell_end_in.lCellID and
-            pCell_start_in.lCellID != -1):
+        if (
+            hasattr(pCell_start_in, "lCellID")
+            and hasattr(pCell_end_in, "lCellID")
+            and pCell_start_in.lCellID == pCell_end_in.lCellID
+            and pCell_start_in.lCellID != -1
+        ):
             raise ValueError("Cannot create link: start and end cells are the same")
 
         # Validate cell types if possible
         if pymeshcell:
             if not isinstance(pCell_start_in, pymeshcell):
-                raise TypeError(f"Starting cell must be a mesh cell type, got {type(pCell_start_in)}")
+                raise TypeError(
+                    f"Starting cell must be a mesh cell type, got {type(pCell_start_in)}"
+                )
             if not isinstance(pCell_end_in, pymeshcell):
-                raise TypeError(f"Ending cell must be a mesh cell type, got {type(pCell_end_in)}")
+                raise TypeError(
+                    f"Ending cell must be a mesh cell type, got {type(pCell_end_in)}"
+                )
 
         # Initialize link attributes
         self.lLinkIndex: int = 0
@@ -140,9 +149,9 @@ class pycelllink:
 
         # Additional link properties
         self.dLink_length: float = -1.0  # Length of the connecting edge
-        self.dLink_width: float = -1.0   # Width of the connection
-        self.iLink_type: int = 0         # Type of link (0=internal, 1=boundary, etc.)
-        self.bLink_active: bool = True   # Whether the link is active
+        self.dLink_width: float = -1.0  # Width of the connection
+        self.iLink_type: int = 0  # Type of link (0=internal, 1=boundary, etc.)
+        self.bLink_active: bool = True  # Whether the link is active
 
         # Calculate link properties if possible
         self._calculate_link_properties()
@@ -154,12 +163,20 @@ class pycelllink:
         Returns:
             str: Detailed representation including link ID, cell IDs, and properties
         """
-        start_id = getattr(self.pCell_start, 'lCellID', 'Unknown') if self.pCell_start else 'None'
-        end_id = getattr(self.pCell_end, 'lCellID', 'Unknown') if self.pCell_end else 'None'
+        start_id = (
+            getattr(self.pCell_start, "lCellID", "Unknown")
+            if self.pCell_start
+            else "None"
+        )
+        end_id = (
+            getattr(self.pCell_end, "lCellID", "Unknown") if self.pCell_end else "None"
+        )
 
-        return (f"pycelllink(ID={self.lLinkID}, Index={self.lLinkIndex}, "
-                f"Start={start_id}, End={end_id}, Length={self.dLink_length:.2f}m, "
-                f"Type={self.iLink_type}, Active={self.bLink_active})")
+        return (
+            f"pycelllink(ID={self.lLinkID}, Index={self.lLinkIndex}, "
+            f"Start={start_id}, End={end_id}, Length={self.dLink_length:.2f}m, "
+            f"Type={self.iLink_type}, Active={self.bLink_active})"
+        )
 
     def __str__(self) -> str:
         """
@@ -168,11 +185,19 @@ class pycelllink:
         Returns:
             str: Concise representation with link ID and connected cell IDs
         """
-        start_id = getattr(self.pCell_start, 'lCellID', 'Unknown') if self.pCell_start else 'None'
-        end_id = getattr(self.pCell_end, 'lCellID', 'Unknown') if self.pCell_end else 'None'
+        start_id = (
+            getattr(self.pCell_start, "lCellID", "Unknown")
+            if self.pCell_start
+            else "None"
+        )
+        end_id = (
+            getattr(self.pCell_end, "lCellID", "Unknown") if self.pCell_end else "None"
+        )
 
-        return (f"pycelllink(ID={self.lLinkID}, Start={start_id}, End={end_id}, "
-                f"Length={self.dLink_length:.2f}m)")
+        return (
+            f"pycelllink(ID={self.lLinkID}, Start={start_id}, End={end_id}, "
+            f"Length={self.dLink_length:.2f}m)"
+        )
 
     def __hash__(self) -> int:
         """
@@ -207,14 +232,18 @@ class pycelllink:
             return NotImplemented
 
         # Check if same cells and edge (forward direction)
-        same_forward = (self.pCell_start == other.pCell_start and
-                       self.pCell_end == other.pCell_end and
-                       self.pEdge_link == other.pEdge_link)
+        same_forward = (
+            self.pCell_start == other.pCell_start
+            and self.pCell_end == other.pCell_end
+            and self.pEdge_link == other.pEdge_link
+        )
 
         # Check if same cells and edge (reverse direction)
-        same_reverse = (self.pCell_start == other.pCell_end and
-                       self.pCell_end == other.pCell_start and
-                       self.pEdge_link == other.pEdge_link)
+        same_reverse = (
+            self.pCell_start == other.pCell_end
+            and self.pCell_end == other.pCell_start
+            and self.pEdge_link == other.pEdge_link
+        )
 
         return same_forward or same_reverse
 
@@ -227,18 +256,21 @@ class pycelllink:
         """
         try:
             # Calculate link length from edge
-            if self.pEdge_link and hasattr(self.pEdge_link, 'calculate_length'):
+            if self.pEdge_link and hasattr(self.pEdge_link, "calculate_length"):
                 self.dLink_length = self.pEdge_link.calculate_length()
-            elif self.pEdge_link and hasattr(self.pEdge_link, 'dLength'):
+            elif self.pEdge_link and hasattr(self.pEdge_link, "dLength"):
                 self.dLink_length = self.pEdge_link.dLength
 
             # Try to determine link type based on cell properties
-            if (self.pCell_start and self.pCell_end and
-                hasattr(self.pCell_start, 'iFlag_coast') and
-                hasattr(self.pCell_end, 'iFlag_coast')):
+            if (
+                self.pCell_start
+                and self.pCell_end
+                and hasattr(self.pCell_start, "iFlag_coast")
+                and hasattr(self.pCell_end, "iFlag_coast")
+            ):
 
                 # Check if this is a boundary link (connects to coast/boundary)
-                if (self.pCell_start.iFlag_coast == 1 or self.pCell_end.iFlag_coast == 1):
+                if self.pCell_start.iFlag_coast == 1 or self.pCell_end.iFlag_coast == 1:
                     self.iLink_type = 1  # Boundary link
                 else:
                     self.iLink_type = 0  # Internal link
@@ -379,15 +411,21 @@ class pycelllink:
             dict: Dictionary containing all link properties
         """
         properties = {
-            'link_id': self.lLinkID,
-            'link_index': self.lLinkIndex,
-            'link_type': self.iLink_type,
-            'active': self.bLink_active,
-            'length': self.dLink_length,
-            'width': self.dLink_width,
-            'start_cell_id': getattr(self.pCell_start, 'lCellID', None) if self.pCell_start else None,
-            'end_cell_id': getattr(self.pCell_end, 'lCellID', None) if self.pCell_end else None,
-            'edge_id': getattr(self.pEdge_link, 'lEdgeID', None) if self.pEdge_link else None
+            "link_id": self.lLinkID,
+            "link_index": self.lLinkIndex,
+            "link_type": self.iLink_type,
+            "active": self.bLink_active,
+            "length": self.dLink_length,
+            "width": self.dLink_width,
+            "start_cell_id": (
+                getattr(self.pCell_start, "lCellID", None) if self.pCell_start else None
+            ),
+            "end_cell_id": (
+                getattr(self.pCell_end, "lCellID", None) if self.pCell_end else None
+            ),
+            "edge_id": (
+                getattr(self.pEdge_link, "lEdgeID", None) if self.pEdge_link else None
+            ),
         }
 
         return properties
@@ -417,12 +455,16 @@ class pycelllink:
         Returns:
             bool: True if link is valid
         """
-        has_valid_cells = (self.pCell_start is not None and
-                          self.pCell_end is not None)
+        has_valid_cells = self.pCell_start is not None and self.pCell_end is not None
         has_valid_edge = self.pEdge_link is not None
         has_reasonable_length = self.dLink_length >= 0
 
-        return has_valid_cells and has_valid_edge and has_reasonable_length and self.bLink_active
+        return (
+            has_valid_cells
+            and has_valid_edge
+            and has_reasonable_length
+            and self.bLink_active
+        )
 
     def calculate_flow_direction(self) -> int:
         """
@@ -436,28 +478,30 @@ class pycelllink:
         """
         try:
             # Try to use elevation data if available
-            if (hasattr(self.pCell_start, 'dElevation_mean') and
-                hasattr(self.pCell_end, 'dElevation_mean')):
+            if hasattr(self.pCell_start, "dElevation_mean") and hasattr(
+                self.pCell_end, "dElevation_mean"
+            ):
 
                 elev_start = self.pCell_start.dElevation_mean
                 elev_end = self.pCell_end.dElevation_mean
 
                 if elev_start > elev_end + 1e-6:  # Small tolerance
-                    return 1   # Flow from start to end (downhill)
+                    return 1  # Flow from start to end (downhill)
                 elif elev_end > elev_start + 1e-6:
                     return -1  # Flow from end to start (downhill)
                 else:
-                    return 0   # Same elevation or unknown
+                    return 0  # Same elevation or unknown
 
             # Try to use stream order if available
-            if (hasattr(self.pCell_start, 'iStream_order_burned') and
-                hasattr(self.pCell_end, 'iStream_order_burned')):
+            if hasattr(self.pCell_start, "iStream_order_burned") and hasattr(
+                self.pCell_end, "iStream_order_burned"
+            ):
 
                 order_start = self.pCell_start.iStream_order_burned
                 order_end = self.pCell_end.iStream_order_burned
 
                 if order_start < order_end:
-                    return 1   # Flow from lower to higher order
+                    return 1  # Flow from lower to higher order
                 elif order_end < order_start:
                     return -1  # Flow from lower to higher order
 
@@ -466,7 +510,7 @@ class pycelllink:
 
         return 0  # Unknown direction
 
-    def copy(self) -> 'pycelllink':
+    def copy(self) -> "pycelllink":
         """
         Create a deep copy of the cell link.
 
@@ -504,20 +548,18 @@ class pycelllink:
         # Create a clean copy for serialization
         obj_clean = {}
         for key, value in obj.items():
-            if key in ['pCell_start', 'pCell_end', 'pEdge_link']:
+            if key in ["pCell_start", "pCell_end", "pEdge_link"]:
                 # Replace with IDs for serialization
-                if hasattr(value, 'lCellID'):
-                    obj_clean[key + '_id'] = value.lCellID
-                elif hasattr(value, 'lEdgeID'):
-                    obj_clean[key + '_id'] = value.lEdgeID
+                if hasattr(value, "lCellID"):
+                    obj_clean[key + "_id"] = value.lCellID
+                elif hasattr(value, "lEdgeID"):
+                    obj_clean[key + "_id"] = value.lEdgeID
                 else:
-                    obj_clean[key + '_id'] = str(value) if value else None
+                    obj_clean[key + "_id"] = str(value) if value else None
             else:
                 obj_clean[key] = value
 
-        sJson = json.dumps(obj_clean,
-                          sort_keys=True,
-                          indent=4,
-                          ensure_ascii=True,
-                          cls=LinkClassEncoder)
+        sJson = json.dumps(
+            obj_clean, sort_keys=True, indent=4, ensure_ascii=True, cls=LinkClassEncoder
+        )
         return sJson

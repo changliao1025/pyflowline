@@ -1,4 +1,3 @@
-
 """
 PyTIN class for representing Triangulated Irregular Network mesh cells in flowline networks.
 
@@ -14,7 +13,9 @@ from typing import List, Optional, Any, Tuple, Dict
 import numpy as np
 
 from pyearth.gis.geometry.calculate_polygon_area import calculate_polygon_area
-from pyearth.gis.geometry.calculate_spherical_triangle_area import calculate_spherical_triangle_area
+from pyearth.gis.geometry.calculate_spherical_triangle_area import (
+    calculate_spherical_triangle_area,
+)
 
 from pyflowline.classes.vertex import pyvertex
 from pyflowline.classes.edge import pyedge
@@ -29,6 +30,7 @@ class TINClassEncoder(JSONEncoder):
     Handles numpy data types, pyvertex objects, and other complex types,
     converting them to native Python types for JSON serialization.
     """
+
     def default(self, obj):
         if isinstance(obj, np.integer):
             return int(obj)
@@ -41,9 +43,9 @@ class TINClassEncoder(JSONEncoder):
         if pyvertex and isinstance(obj, pyvertex):
             return json.loads(obj.tojson())
         if pyedge and isinstance(obj, pyedge):
-            return getattr(obj, 'lEdgeID', str(obj))
+            return getattr(obj, "lEdgeID", str(obj))
         if pyflowline and isinstance(obj, pyflowline):
-            return getattr(obj, 'lFlowlineID', str(obj))
+            return getattr(obj, "lFlowlineID", str(obj))
         if isinstance(obj, pytin):
             return obj.lCellID
         return JSONEncoder.default(self, obj)
@@ -150,8 +152,8 @@ class pytin(pymeshcell):
         # Create center vertex if pyvertex is available
         if pyvertex:
             pVertex_params = {
-                'dLongitude_degree': self.dLongitude_center_degree,
-                'dLatitude_degree': self.dLatitude_center_degree
+                "dLongitude_degree": self.dLongitude_center_degree,
+                "dLatitude_degree": self.dLatitude_center_degree,
             }
             self.pVertex_center = pyvertex(pVertex_params)
         else:
@@ -170,11 +172,13 @@ class pytin(pymeshcell):
         Returns:
             str: Detailed representation including cell ID, center coordinates, and area
         """
-        return (f"pytin(ID={self.lCellID}, "
-                f"Center=({self.dLongitude_center_degree:.6f}, {self.dLatitude_center_degree:.6f}), "
-                f"Area={self.dArea:.2f}m², Quality={self.triangle_quality:.3f}, "
-                f"EdgeLength={self.dLength:.2f}m, Flowlines={self.nFlowline}, "
-                f"Neighbors={self.nNeighbor})")
+        return (
+            f"pytin(ID={self.lCellID}, "
+            f"Center=({self.dLongitude_center_degree:.6f}, {self.dLatitude_center_degree:.6f}), "
+            f"Area={self.dArea:.2f}m², Quality={self.triangle_quality:.3f}, "
+            f"EdgeLength={self.dLength:.2f}m, Flowlines={self.nFlowline}, "
+            f"Neighbors={self.nNeighbor})"
+        )
 
     def __str__(self) -> str:
         """
@@ -183,9 +187,11 @@ class pytin(pymeshcell):
         Returns:
             str: Concise representation with ID, center coordinates, and area
         """
-        return (f"pytin(ID={self.lCellID}, "
-                f"Center=({self.dLongitude_center_degree:.6f}, {self.dLatitude_center_degree:.6f}), "
-                f"Area={self.dArea:.2f}m², Quality={self.triangle_quality:.3f})")
+        return (
+            f"pytin(ID={self.lCellID}, "
+            f"Center=({self.dLongitude_center_degree:.6f}, {self.dLatitude_center_degree:.6f}), "
+            f"Area={self.dArea:.2f}m², Quality={self.triangle_quality:.3f})"
+        )
 
     def set_spherical_calculation(self, use_spherical: bool) -> None:
         """
@@ -198,7 +204,9 @@ class pytin(pymeshcell):
             TypeError: If use_spherical is not a boolean
         """
         if not isinstance(use_spherical, bool):
-            raise TypeError(f"use_spherical must be a boolean, got {type(use_spherical)}")
+            raise TypeError(
+                f"use_spherical must be a boolean, got {type(use_spherical)}"
+            )
 
         self.use_spherical_calculation = use_spherical
         # Recalculate area with new method
@@ -215,7 +223,9 @@ class pytin(pymeshcell):
             Tuple[float, float, float, float]: Bounding box as (min_lon, min_lat, max_lon, max_lat)
         """
         if not self.aVertex or len(self.aVertex) != 3:
-            raise ValueError("Cannot calculate bounds: triangle must have exactly 3 vertices")
+            raise ValueError(
+                "Cannot calculate bounds: triangle must have exactly 3 vertices"
+            )
 
         dLat_min = 90.0
         dLat_max = -90.0
@@ -223,13 +233,17 @@ class pytin(pymeshcell):
         dLon_max = -180.0
 
         for vertex in self.aVertex:
-            if hasattr(vertex, 'dLongitude_degree') and hasattr(vertex, 'dLatitude_degree'):
+            if hasattr(vertex, "dLongitude_degree") and hasattr(
+                vertex, "dLatitude_degree"
+            ):
                 dLon_max = max(dLon_max, vertex.dLongitude_degree)
                 dLon_min = min(dLon_min, vertex.dLongitude_degree)
                 dLat_max = max(dLat_max, vertex.dLatitude_degree)
                 dLat_min = min(dLat_min, vertex.dLatitude_degree)
             else:
-                raise ValueError("Vertex must have dLongitude_degree and dLatitude_degree attributes")
+                raise ValueError(
+                    "Vertex must have dLongitude_degree and dLatitude_degree attributes"
+                )
 
         self.pBound = (dLon_min, dLat_min, dLon_max, dLat_max)
         return self.pBound
@@ -252,7 +266,7 @@ class pytin(pymeshcell):
 
         iFlag_found = 0
         for pEdge in self.aEdge:
-            if hasattr(pEdge, 'is_overlap') and pEdge.is_overlap(pEdge_in):
+            if hasattr(pEdge, "is_overlap") and pEdge.is_overlap(pEdge_in):
                 iFlag_found = 1
                 break
 
@@ -278,7 +292,7 @@ class pytin(pymeshcell):
         pEdge_out = None
 
         for pEdge in self.aEdge:
-            if hasattr(pEdge, 'check_vertex_on_edge'):
+            if hasattr(pEdge, "check_vertex_on_edge"):
                 iFlag, dummy, diff = pEdge.check_vertex_on_edge(pVertex_in)
                 if iFlag == 1:
                     iFlag_found = 1
@@ -302,17 +316,23 @@ class pytin(pymeshcell):
             ValueError: If vertices are not properly defined
         """
         if not self.aVertex or len(self.aVertex) != 3:
-            raise ValueError("Cannot calculate area: triangle must have exactly 3 vertices")
+            raise ValueError(
+                "Cannot calculate area: triangle must have exactly 3 vertices"
+            )
 
         lons = []
         lats = []
 
         for vertex in self.aVertex:
-            if hasattr(vertex, 'dLongitude_degree') and hasattr(vertex, 'dLatitude_degree'):
+            if hasattr(vertex, "dLongitude_degree") and hasattr(
+                vertex, "dLatitude_degree"
+            ):
                 lons.append(vertex.dLongitude_degree)
                 lats.append(vertex.dLatitude_degree)
             else:
-                raise ValueError("Vertex must have dLongitude_degree and dLatitude_degree attributes")
+                raise ValueError(
+                    "Vertex must have dLongitude_degree and dLatitude_degree attributes"
+                )
 
         if self.use_spherical_calculation:
             self.dArea = calculate_spherical_triangle_area(lons, lats)
@@ -361,9 +381,9 @@ class pytin(pymeshcell):
             # Calculate edge lengths if available
             edge_lengths = []
             for edge in self.aEdge:
-                if hasattr(edge, 'calculate_length'):
+                if hasattr(edge, "calculate_length"):
                     edge_lengths.append(edge.calculate_length())
-                elif hasattr(edge, 'dLength'):
+                elif hasattr(edge, "dLength"):
                     edge_lengths.append(edge.dLength)
 
             if len(edge_lengths) == 3:
@@ -372,7 +392,7 @@ class pytin(pymeshcell):
 
                 # Area of equilateral triangle with same perimeter
                 side_length = perimeter / 3.0
-                equilateral_area = (np.sqrt(3.0) / 4.0) * side_length ** 2
+                equilateral_area = (np.sqrt(3.0) / 4.0) * side_length**2
 
                 # Quality metric
                 if equilateral_area > 0:
@@ -404,8 +424,9 @@ class pytin(pymeshcell):
 
         return self.triangle_quality
 
-    def _calculate_distance(self, point1: Tuple[float, float],
-                          point2: Tuple[float, float]) -> float:
+    def _calculate_distance(
+        self, point1: Tuple[float, float], point2: Tuple[float, float]
+    ) -> float:
         """
         Calculate approximate distance between two points in degrees.
 
@@ -418,9 +439,9 @@ class pytin(pymeshcell):
         """
         lon1, lat1 = point1
         lon2, lat2 = point2
-        return np.sqrt((lon2 - lon1)**2 + (lat2 - lat1)**2)
+        return np.sqrt((lon2 - lon1) ** 2 + (lat2 - lat1) ** 2)
 
-    def share_edge(self, other: 'pytin') -> int:
+    def share_edge(self, other: "pytin") -> int:
         """
         Check whether this TIN triangle shares an edge with another TIN triangle.
 
@@ -445,7 +466,7 @@ class pytin(pymeshcell):
         iFlag_share = 0
         for pEdge in self.aEdge:
             for pEdge2 in other.aEdge:
-                if hasattr(pEdge, 'is_overlap') and hasattr(pEdge2, 'is_overlap'):
+                if hasattr(pEdge, "is_overlap") and hasattr(pEdge2, "is_overlap"):
                     if pEdge.is_overlap(pEdge2) == 1:
                         iFlag_share = 1
                         break
@@ -468,10 +489,10 @@ class pytin(pymeshcell):
                 - centroid: Triangle centroid coordinates
         """
         properties = {
-            'area': self.dArea,
-            'quality': self.triangle_quality,
-            'use_spherical': self.use_spherical_calculation,
-            'characteristic_length': self.dLength
+            "area": self.dArea,
+            "quality": self.triangle_quality,
+            "use_spherical": self.use_spherical_calculation,
+            "characteristic_length": self.dLength,
         }
 
         # Calculate additional properties if possible
@@ -481,26 +502,31 @@ class pytin(pymeshcell):
                 # Calculate centroid
                 centroid_lon = sum(corner[0] for corner in corners) / 3.0
                 centroid_lat = sum(corner[1] for corner in corners) / 3.0
-                properties['centroid'] = (centroid_lon, centroid_lat)
+                properties["centroid"] = (centroid_lon, centroid_lat)
 
                 # Calculate edge lengths and perimeter
                 d1 = self._calculate_distance(corners[0], corners[1])
                 d2 = self._calculate_distance(corners[1], corners[2])
                 d3 = self._calculate_distance(corners[2], corners[0])
 
-                properties['perimeter'] = d1 + d2 + d3
-                properties['edge_lengths'] = [d1, d2, d3]
+                properties["perimeter"] = d1 + d2 + d3
+                properties["edge_lengths"] = [d1, d2, d3]
 
                 # Aspect ratio
                 max_side = max(d1, d2, d3)
                 min_side = min(d1, d2, d3)
-                properties['aspect_ratio'] = max_side / min_side if min_side > 0 else float('inf')
+                properties["aspect_ratio"] = (
+                    max_side / min_side if min_side > 0 else float("inf")
+                )
 
         except Exception:
             # If calculation fails, use defaults
-            properties['centroid'] = (self.dLongitude_center_degree, self.dLatitude_center_degree)
-            properties['perimeter'] = 0.0
-            properties['aspect_ratio'] = 1.0
+            properties["centroid"] = (
+                self.dLongitude_center_degree,
+                self.dLatitude_center_degree,
+            )
+            properties["perimeter"] = 0.0
+            properties["aspect_ratio"] = 1.0
 
         return properties
 
@@ -540,10 +566,14 @@ class pytin(pymeshcell):
         """
         corners = []
         for vertex in self.aVertex:
-            if hasattr(vertex, 'dLongitude_degree') and hasattr(vertex, 'dLatitude_degree'):
+            if hasattr(vertex, "dLongitude_degree") and hasattr(
+                vertex, "dLatitude_degree"
+            ):
                 corners.append((vertex.dLongitude_degree, vertex.dLatitude_degree))
             else:
-                raise ValueError("Vertex must have dLongitude_degree and dLatitude_degree attributes")
+                raise ValueError(
+                    "Vertex must have dLongitude_degree and dLatitude_degree attributes"
+                )
 
         return corners
 
@@ -576,7 +606,7 @@ class pytin(pymeshcell):
 
                 # Law of cosines: cos(angle) = (b² + c² - a²) / (2bc)
                 if b > 0 and c > 0:
-                    cos_angle = (b*b + c*c - a*a) / (2*b*c)
+                    cos_angle = (b * b + c * c - a * a) / (2 * b * c)
                     # Clamp to valid range for acos
                     cos_angle = max(-1.0, min(1.0, cos_angle))
                     angle_rad = np.arccos(cos_angle)
@@ -618,15 +648,22 @@ class pytin(pymeshcell):
         # Check that all vertices have required attributes
         vertices_valid = True
         for vertex in self.aVertex:
-            if not (hasattr(vertex, 'dLongitude_degree') and
-                   hasattr(vertex, 'dLatitude_degree')):
+            if not (
+                hasattr(vertex, "dLongitude_degree")
+                and hasattr(vertex, "dLatitude_degree")
+            ):
                 vertices_valid = False
                 break
 
-        return (has_three_edges and has_three_vertices and
-                has_positive_area and is_not_degenerate and vertices_valid)
+        return (
+            has_three_edges
+            and has_three_vertices
+            and has_positive_area
+            and is_not_degenerate
+            and vertices_valid
+        )
 
-    def copy(self) -> 'pytin':
+    def copy(self) -> "pytin":
         """
         Create a deep copy of the TIN triangle.
 
@@ -634,10 +671,12 @@ class pytin(pymeshcell):
             pytin: A new TIN triangle object with the same attributes
         """
         # Create new TIN triangle with same basic parameters
-        new_tin = pytin(self.dLongitude_center_degree,
-                       self.dLatitude_center_degree,
-                       self.aEdge.copy(),
-                       self.aVertex.copy())
+        new_tin = pytin(
+            self.dLongitude_center_degree,
+            self.dLatitude_center_degree,
+            self.aEdge.copy(),
+            self.aVertex.copy(),
+        )
 
         # Copy all attributes from parent and this class
         for attr_name, attr_value in self.__dict__.items():
@@ -664,16 +703,22 @@ class pytin(pymeshcell):
             >>> tin_cell = pytin(-77.0, 38.0, edges, vertices)
             >>> json_str = tin_cell.tojson()
         """
-        aSkip = ['aEdge', 'aFlowline', 'dLongitude_radian', 'dLatitude_radian',
-                 'wkt', 'pPoint_start', 'pPoint_end', 'pBound']
+        aSkip = [
+            "aEdge",
+            "aFlowline",
+            "dLongitude_radian",
+            "dLatitude_radian",
+            "wkt",
+            "pPoint_start",
+            "pPoint_end",
+            "pBound",
+        ]
 
         obj = self.__dict__.copy()
         for sKey in aSkip:
             obj.pop(sKey, None)
 
-        sJson = json.dumps(obj,
-                          sort_keys=True,
-                          indent=4,
-                          ensure_ascii=True,
-                          cls=TINClassEncoder)
+        sJson = json.dumps(
+            obj, sort_keys=True, indent=4, ensure_ascii=True, cls=TINClassEncoder
+        )
         return sJson

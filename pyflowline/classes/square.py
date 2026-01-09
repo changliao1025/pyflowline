@@ -24,6 +24,7 @@ class SquareClassEncoder(JSONEncoder):
     Handles numpy data types, pyvertex objects, and other complex types,
     converting them to native Python types for JSON serialization.
     """
+
     def default(self, obj):
         if isinstance(obj, np.integer):
             return int(obj)
@@ -36,9 +37,9 @@ class SquareClassEncoder(JSONEncoder):
         if isinstance(obj, pyvertex):
             return json.loads(obj.tojson())
         if pyedge and isinstance(obj, pyedge):
-            return getattr(obj, 'lEdgeID', str(obj))
+            return getattr(obj, "lEdgeID", str(obj))
         if pyflowline and isinstance(obj, pyflowline):
-            return getattr(obj, 'lFlowlineID', str(obj))
+            return getattr(obj, "lFlowlineID", str(obj))
         if isinstance(obj, pysquare):
             return obj.lCellID
         return JSONEncoder.default(self, obj)
@@ -147,10 +148,12 @@ class pysquare(pymeshcell):
         Returns:
             str: Detailed representation including cell ID, center coordinates, and area
         """
-        return (f"pysquare(ID={self.lCellID}, "
-                f"Center=({self.dLongitude_center_degree:.6f}, {self.dLatitude_center_degree:.6f}), "
-                f"Area={self.dArea:.2f}m², Side={self.dLength:.2f}m, "
-                f"Flowlines={self.nFlowline}, Neighbors={self.nNeighbor})")
+        return (
+            f"pysquare(ID={self.lCellID}, "
+            f"Center=({self.dLongitude_center_degree:.6f}, {self.dLatitude_center_degree:.6f}), "
+            f"Area={self.dArea:.2f}m², Side={self.dLength:.2f}m, "
+            f"Flowlines={self.nFlowline}, Neighbors={self.nNeighbor})"
+        )
 
     def __str__(self) -> str:
         """
@@ -159,9 +162,11 @@ class pysquare(pymeshcell):
         Returns:
             str: Concise representation with ID, center coordinates, and area
         """
-        return (f"pysquare(ID={self.lCellID}, "
-                f"Center=({self.dLongitude_center_degree:.6f}, {self.dLatitude_center_degree:.6f}), "
-                f"Area={self.dArea:.2f}m²)")
+        return (
+            f"pysquare(ID={self.lCellID}, "
+            f"Center=({self.dLongitude_center_degree:.6f}, {self.dLatitude_center_degree:.6f}), "
+            f"Area={self.dArea:.2f}m²)"
+        )
 
     def calculate_cell_bound(self) -> Tuple[float, float, float, float]:
         """
@@ -182,13 +187,17 @@ class pysquare(pymeshcell):
         dLon_max = -180.0
 
         for vertex in self.aVertex:
-            if hasattr(vertex, 'dLongitude_degree') and hasattr(vertex, 'dLatitude_degree'):
+            if hasattr(vertex, "dLongitude_degree") and hasattr(
+                vertex, "dLatitude_degree"
+            ):
                 dLon_max = max(dLon_max, vertex.dLongitude_degree)
                 dLon_min = min(dLon_min, vertex.dLongitude_degree)
                 dLat_max = max(dLat_max, vertex.dLatitude_degree)
                 dLat_min = min(dLat_min, vertex.dLatitude_degree)
             else:
-                raise ValueError("Vertex must have dLongitude_degree and dLatitude_degree attributes")
+                raise ValueError(
+                    "Vertex must have dLongitude_degree and dLatitude_degree attributes"
+                )
 
         self.pBound = (dLon_min, dLat_min, dLon_max, dLat_max)
         return self.pBound
@@ -211,7 +220,7 @@ class pysquare(pymeshcell):
 
         iFlag_found = 0
         for pEdge in self.aEdge:
-            if hasattr(pEdge, 'is_overlap') and pEdge.is_overlap(pEdge_in):
+            if hasattr(pEdge, "is_overlap") and pEdge.is_overlap(pEdge_in):
                 iFlag_found = 1
                 break
 
@@ -237,7 +246,7 @@ class pysquare(pymeshcell):
         pEdge_out = None
 
         for pEdge in self.aEdge:
-            if hasattr(pEdge, 'check_vertex_on_edge'):
+            if hasattr(pEdge, "check_vertex_on_edge"):
                 iFlag, dummy, diff = pEdge.check_vertex_on_edge(pVertex_in)
                 if iFlag == 1:
                     iFlag_found = 1
@@ -266,11 +275,15 @@ class pysquare(pymeshcell):
         lats = []
 
         for vertex in self.aVertex:
-            if hasattr(vertex, 'dLongitude_degree') and hasattr(vertex, 'dLatitude_degree'):
+            if hasattr(vertex, "dLongitude_degree") and hasattr(
+                vertex, "dLatitude_degree"
+            ):
                 lons.append(vertex.dLongitude_degree)
                 lats.append(vertex.dLatitude_degree)
             else:
-                raise ValueError("Vertex must have dLongitude_degree and dLatitude_degree attributes")
+                raise ValueError(
+                    "Vertex must have dLongitude_degree and dLatitude_degree attributes"
+                )
 
         if len(lons) != 4 or len(lats) != 4:
             raise ValueError(f"Square must have exactly 4 vertices, got {len(lons)}")
@@ -301,7 +314,7 @@ class pysquare(pymeshcell):
         self.dLength = dLength_edge
         return dLength_edge
 
-    def share_edge(self, other: 'pysquare') -> int:
+    def share_edge(self, other: "pysquare") -> int:
         """
         Check whether this square cell shares an edge with another square cell.
 
@@ -321,12 +334,14 @@ class pysquare(pymeshcell):
         if other is None:
             raise ValueError("Other cell cannot be None")
         if not isinstance(other, pysquare):
-            raise TypeError(f"Other cell must be a pysquare instance, got {type(other)}")
+            raise TypeError(
+                f"Other cell must be a pysquare instance, got {type(other)}"
+            )
 
         iFlag_share = 0
         for pEdge in self.aEdge:
             for pEdge2 in other.aEdge:
-                if hasattr(pEdge, 'is_overlap') and hasattr(pEdge2, 'is_overlap'):
+                if hasattr(pEdge, "is_overlap") and hasattr(pEdge2, "is_overlap"):
                     if pEdge.is_overlap(pEdge2) == 1:
                         iFlag_share = 1
                         break
@@ -357,7 +372,9 @@ class pysquare(pymeshcell):
         dHeight_degrees = dLat_max - dLat_min
 
         # Approximate conversion (111 km per degree)
-        dWidth_meters = dWidth_degrees * 111000 * np.cos(np.radians(self.dLatitude_center_degree))
+        dWidth_meters = (
+            dWidth_degrees * 111000 * np.cos(np.radians(self.dLatitude_center_degree))
+        )
         dHeight_meters = dHeight_degrees * 111000
 
         return (dWidth_meters, dHeight_meters)
@@ -378,9 +395,9 @@ class pysquare(pymeshcell):
         # Check if all edges have similar length
         edge_lengths = []
         for edge in self.aEdge:
-            if hasattr(edge, 'calculate_length'):
+            if hasattr(edge, "calculate_length"):
                 edge_lengths.append(edge.calculate_length())
-            elif hasattr(edge, 'dLength'):
+            elif hasattr(edge, "dLength"):
                 edge_lengths.append(edge.dLength)
             else:
                 # Cannot determine edge lengths
@@ -406,10 +423,14 @@ class pysquare(pymeshcell):
         """
         corners = []
         for vertex in self.aVertex:
-            if hasattr(vertex, 'dLongitude_degree') and hasattr(vertex, 'dLatitude_degree'):
+            if hasattr(vertex, "dLongitude_degree") and hasattr(
+                vertex, "dLatitude_degree"
+            ):
                 corners.append((vertex.dLongitude_degree, vertex.dLatitude_degree))
             else:
-                raise ValueError("Vertex must have dLongitude_degree and dLatitude_degree attributes")
+                raise ValueError(
+                    "Vertex must have dLongitude_degree and dLatitude_degree attributes"
+                )
 
         return corners
 
@@ -439,15 +460,21 @@ class pysquare(pymeshcell):
         # Check that all vertices have required attributes
         vertices_valid = True
         for vertex in self.aVertex:
-            if not (hasattr(vertex, 'dLongitude_degree') and
-                   hasattr(vertex, 'dLatitude_degree')):
+            if not (
+                hasattr(vertex, "dLongitude_degree")
+                and hasattr(vertex, "dLatitude_degree")
+            ):
                 vertices_valid = False
                 break
 
-        return (has_four_edges and has_four_vertices and
-                has_positive_side_length and vertices_valid)
+        return (
+            has_four_edges
+            and has_four_vertices
+            and has_positive_side_length
+            and vertices_valid
+        )
 
-    def copy(self) -> 'pysquare':
+    def copy(self) -> "pysquare":
         """
         Create a deep copy of the square cell.
 
@@ -455,10 +482,12 @@ class pysquare(pymeshcell):
             pysquare: A new square cell object with the same attributes
         """
         # Create new square with same basic parameters
-        new_square = pysquare(self.dLongitude_center_degree,
-                             self.dLatitude_center_degree,
-                             self.aEdge.copy(),
-                             self.aVertex.copy())
+        new_square = pysquare(
+            self.dLongitude_center_degree,
+            self.dLatitude_center_degree,
+            self.aEdge.copy(),
+            self.aVertex.copy(),
+        )
 
         # Copy all attributes from parent
         for attr_name, attr_value in self.__dict__.items():
@@ -485,16 +514,22 @@ class pysquare(pymeshcell):
             >>> square = pysquare(-77.0, 38.0, edges, vertices)
             >>> json_str = square.tojson()
         """
-        aSkip = ['aEdge', 'aFlowline', 'dLongitude_radian', 'dLatitude_radian',
-                 'wkt', 'pPoint_start', 'pPoint_end', 'pBound']
+        aSkip = [
+            "aEdge",
+            "aFlowline",
+            "dLongitude_radian",
+            "dLatitude_radian",
+            "wkt",
+            "pPoint_start",
+            "pPoint_end",
+            "pBound",
+        ]
 
         obj = self.__dict__.copy()
         for sKey in aSkip:
             obj.pop(sKey, None)
 
-        sJson = json.dumps(obj,
-                          sort_keys=True,
-                          indent=4,
-                          ensure_ascii=True,
-                          cls=SquareClassEncoder)
+        sJson = json.dumps(
+            obj, sort_keys=True, indent=4, ensure_ascii=True, cls=SquareClassEncoder
+        )
         return sJson

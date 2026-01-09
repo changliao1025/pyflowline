@@ -1,4 +1,3 @@
-
 import numpy as np
 from scipy import spatial
 from scipy import interpolate
@@ -15,13 +14,16 @@ def sphdist(rsph, xone, yone, xtwo, ytwo):
     """
     # Authors: Darren Engwirda
 
-    dlon = .5 * (xone - xtwo)
-    dlat = .5 * (yone - ytwo)
+    dlon = 0.5 * (xone - xtwo)
+    dlat = 0.5 * (yone - ytwo)
 
-    dist = 2. * rsph * np.arcsin(np.sqrt(
-        np.sin(dlat) ** 2 +
-        np.sin(dlon) ** 2 * np.cos(yone) * np.cos(ytwo)
-    ))
+    dist = (
+        2.0
+        * rsph
+        * np.arcsin(
+            np.sqrt(np.sin(dlat) ** 2 + np.sin(dlon) ** 2 * np.cos(yone) * np.cos(ytwo))
+        )
+    )
 
     return dist
 
@@ -34,8 +36,7 @@ def rd_dist(xone, xtwo):
     """
     # Authors: Darren Engwirda
 
-    return np.sqrt(np.sum((xtwo - xone) ** 2, axis=1,
-                          keepdims=True))
+    return np.sqrt(np.sum((xtwo - xone) ** 2, axis=1, keepdims=True))
 
 
 def blender(val1, val2, dist, blen, bgap):
@@ -49,8 +50,7 @@ def blender(val1, val2, dist, blen, bgap):
     """
     # Authors: Darren Engwirda
 
-    beta = .5 + .5 * np.tanh(
-        np.pi * (dist - blen) / bgap)
+    beta = 0.5 + 0.5 * np.tanh(np.pi * (dist - blen) / bgap)
 
     return (+0.0 + beta) * val2 + (+1.0 - beta) * val1
 
@@ -66,32 +66,35 @@ def R3toS2(radii, E3):
     """
     # Authors: Darren Engwirda
 
-    PP = .5 * E3
+    PP = 0.5 * E3
 
     ax = PP[:, 0] ** 1 / radii[0] ** 1
     ay = PP[:, 1] ** 1 / radii[1] ** 1
     az = PP[:, 2] ** 1 / radii[2] ** 1
 
-    aa = ax ** 2 + ay ** 2 + az ** 2
+    aa = ax**2 + ay**2 + az**2
 
     bx = PP[:, 0] ** 2 / radii[0] ** 2
     by = PP[:, 1] ** 2 / radii[1] ** 2
     bz = PP[:, 2] ** 2 / radii[2] ** 2
 
-    bb = bx * 2. + by * 2. + bz * 2.
+    bb = bx * 2.0 + by * 2.0 + bz * 2.0
 
     cx = PP[:, 0] ** 1 / radii[0] ** 1
     cy = PP[:, 1] ** 1 / radii[1] ** 1
     cz = PP[:, 2] ** 1 / radii[2] ** 1
 
-    cc = cx ** 2 + cy ** 2 + cz ** 2
+    cc = cx**2 + cy**2 + cz**2
     cc = cc - 1.0
 
-    ts = bb * bb - 4. * aa * cc
+    ts = bb * bb - 4.0 * aa * cc
 
-    ok = ts >= .0
+    ok = ts >= 0.0
 
-    AA = aa[ok]; BB = bb[ok]; CC = cc[ok]; TS = ts[ok]
+    AA = aa[ok]
+    BB = bb[ok]
+    CC = cc[ok]
+    TS = ts[ok]
 
     t1 = (-BB + np.sqrt(TS)) / AA / 2.0
     t2 = (-BB - np.sqrt(TS)) / AA / 2.0
@@ -99,9 +102,9 @@ def R3toS2(radii, E3):
     tt = np.maximum(t1, t2)
 
     P3 = np.zeros(E3.shape, dtype=float)
-    P3[ok, 0] = (1. + tt) * PP[ok, 0]
-    P3[ok, 1] = (1. + tt) * PP[ok, 1]
-    P3[ok, 2] = (1. + tt) * PP[ok, 2]
+    P3[ok, 0] = (1.0 + tt) * PP[ok, 0]
+    P3[ok, 1] = (1.0 + tt) * PP[ok, 1]
+    P3[ok, 2] = (1.0 + tt) * PP[ok, 2]
 
     return jigsawpy.R3toS2(radii, P3)
 
@@ -118,55 +121,47 @@ def zipnear(init, geom, spac, near=10.0):
     """
     # Authors: Darren Engwirda
 
-#------------------------------------ subdiv. geom. for H(x)
+    # ------------------------------------ subdiv. geom. for H(x)
 
     divgeom(geom, spac)
 
-#------------------------------------ find dist. to geometry
+    # ------------------------------------ find dist. to geometry
 
-    tree = spatial.cKDTree(
-        jigsawpy.S2toR3(
-            geom.radii, geom.point["coord"]))
+    tree = spatial.cKDTree(jigsawpy.S2toR3(geom.radii, geom.point["coord"]))
 
     dmax = np.max(spac.value) * near
 
-    dist, _ = tree.query(
-        init.point["coord"],
-        eps=0.0, distance_upper_bound=dmax)
+    dist, _ = tree.query(init.point["coord"], eps=0.0, distance_upper_bound=dmax)
 
-    apos = jigsawpy.R3toS2(
-        geom.radii, init.point["coord"][:])
+    apos = jigsawpy.R3toS2(geom.radii, init.point["coord"][:])
 
-#------------------------------------ zip init. if too close
+    # ------------------------------------ zip init. if too close
 
-    hfun = interpolate.RectBivariateSpline(
-        spac.ygrid, spac.xgrid, spac.value)
+    hfun = interpolate.RectBivariateSpline(spac.ygrid, spac.xgrid, spac.value)
 
-    hval = hfun(
-        apos[:, 1], apos[:, 0], grid=False)
+    hval = hfun(apos[:, 1], apos[:, 0], grid=False)
 
     keep = dist >= hval * near
 
-#------------------------------------ re-index init. for zip
+    # ------------------------------------ re-index init. for zip
 
-    if (init.edge2 is not None and
-            init.edge2.size > +0):
+    if init.edge2 is not None and init.edge2.size > +0:
 
-        mask = np.logical_and.reduce((
-            keep[init.edge2["index"][:, 0]],
-            keep[init.edge2["index"][:, 1]]
-        ))
+        mask = np.logical_and.reduce(
+            (keep[init.edge2["index"][:, 0]], keep[init.edge2["index"][:, 1]])
+        )
 
         init.edge2 = init.edge2[mask]
 
-    if (init.tria3 is not None and
-            init.tria3.size > +0):
+    if init.tria3 is not None and init.tria3.size > +0:
 
-        mask = np.logical_and.reduce((
-            keep[init.tria3["index"][:, 0]],
-            keep[init.tria3["index"][:, 1]],
-            keep[init.tria3["index"][:, 2]]
-        ))
+        mask = np.logical_and.reduce(
+            (
+                keep[init.tria3["index"][:, 0]],
+                keep[init.tria3["index"][:, 1]],
+                keep[init.tria3["index"][:, 2]],
+            )
+        )
 
         init.tria3 = init.tria3[mask]
 
@@ -187,101 +182,82 @@ def divgeom(geom, spac):
 
     kind = geom.mshID.lower()
 
-    hfun = interpolate.RectBivariateSpline(
-        spac.ygrid, spac.xgrid, spac.value)
+    hfun = interpolate.RectBivariateSpline(spac.ygrid, spac.xgrid, spac.value)
 
-    while True:                             # while too long
+    while True:  # while too long
 
         vert = geom.point["coord"]
         cell = geom.edge2["index"]
 
-    #-------------------------------- eval. spacing at nodes
+        # -------------------------------- eval. spacing at nodes
 
-        hval = hfun(
-            vert[:, 1], vert[:, 0], grid=False)
+        hval = hfun(vert[:, 1], vert[:, 0], grid=False)
 
-    #-------------------------------- eval. edge length, x^d
+        # -------------------------------- eval. edge length, x^d
 
-        if (kind == "ellipsoid-mesh"):
+        if kind == "ellipsoid-mesh":
 
-            xpos = jigsawpy.S2toR3(
-                geom.radii, geom.point["coord"])
+            xpos = jigsawpy.S2toR3(geom.radii, geom.point["coord"])
 
             elen = sphdist(
                 np.mean(geom.radii),
                 vert[cell[:, 0], 0],
                 vert[cell[:, 0], 1],
                 vert[cell[:, 1], 0],
-                vert[cell[:, 1], 1])
+                vert[cell[:, 1], 1],
+            )
 
-        if (kind == "euclidean-mesh"):
+        if kind == "euclidean-mesh":
 
             xpos = np.array(vert[:], copy=True)
 
-            elen = rd_dist(
-                vert[cell[:, 0], :],
-                vert[cell[:, 1], :])
+            elen = rd_dist(vert[cell[:, 0], :], vert[cell[:, 1], :])
 
-        hmid = 0.5 * (
-            hval[cell[:, 0]] + hval[cell[:, 1]]
-        )
+        hmid = 0.5 * (hval[cell[:, 0]] + hval[cell[:, 1]])
 
-        mask = elen >= hmid * 4. / 3.       # TRUE to subdiv
+        mask = elen >= hmid * 4.0 / 3.0  # TRUE to subdiv
 
         ndiv = np.count_nonzero(mask)
 
-        if (not np.any(mask)): break
+        if not np.any(mask):
+            break
 
-        xmid = 0.5 * (
-            xpos[cell[:, 0]] + xpos[cell[:, 1]]
-        )
+        xmid = 0.5 * (xpos[cell[:, 0]] + xpos[cell[:, 1]])
 
-    #-------------------------------- subdiv. edge at middle
+        # -------------------------------- subdiv. edge at middle
 
-        if (kind == "ellipsoid-mesh"):
+        if kind == "ellipsoid-mesh":
 
-            newx = np.zeros(
-                (ndiv), dtype=geom.point.dtype)
+            newx = np.zeros((ndiv), dtype=geom.point.dtype)
 
-            newx["coord"] = R3toS2(
-                geom.radii, xmid[mask])
+            newx["coord"] = R3toS2(geom.radii, xmid[mask])
 
-        if (kind == "euclidean-mesh"):
+        if kind == "euclidean-mesh":
 
-            newx = np.zeros(
-                (ndiv), dtype=geom.point.dtype)
+            newx = np.zeros((ndiv), dtype=geom.point.dtype)
 
             newx["coord"] = xmid[mask]
 
-    #-------------------------------- re-index for new edges
+        # -------------------------------- re-index for new edges
 
-        inew = np.arange(
-            +0, ndiv) + geom.point.size
+        inew = np.arange(+0, ndiv) + geom.point.size
 
-        new1 = np.empty(
-            (ndiv), dtype=geom.EDGE2_t)
-        new2 = np.empty(
-            (ndiv), dtype=geom.EDGE2_t)
+        new1 = np.empty((ndiv), dtype=geom.EDGE2_t)
+        new2 = np.empty((ndiv), dtype=geom.EDGE2_t)
 
-        new1["index"][:, 0] = \
-            geom.edge2["index"][mask, 0]
+        new1["index"][:, 0] = geom.edge2["index"][mask, 0]
         new1["index"][:, 1] = inew
-        new1["IDtag"] = \
-            geom.edge2["IDtag"][mask]
+        new1["IDtag"] = geom.edge2["IDtag"][mask]
 
         new2["index"][:, 0] = inew
-        new2["index"][:, 1] = \
-            geom.edge2["index"][mask, 1]
-        new2["IDtag"] = \
-            geom.edge2["IDtag"][mask]
+        new2["index"][:, 1] = geom.edge2["index"][mask, 1]
+        new2["IDtag"] = geom.edge2["IDtag"][mask]
 
         geom.edge2[mask] = new1
 
-    #-------------------------------- add new cells to GEOM.
+        # -------------------------------- add new cells to GEOM.
 
-        geom.point = np.concatenate(
-            (geom.point, newx), axis=0)
-        geom.edge2 = np.concatenate(
-            (geom.edge2, new2), axis=0)
+        geom.point = np.concatenate((geom.point, newx), axis=0)
+        geom.edge2 = np.concatenate((geom.edge2, new2), axis=0)
 
     return

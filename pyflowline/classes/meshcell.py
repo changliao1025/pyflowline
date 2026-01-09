@@ -18,6 +18,7 @@ from pyearth.toolbox.mesh.line import pyline
 
 from .vertex import pyvertex
 
+
 class CellClassEncoder(JSONEncoder):
     """
     Custom JSON encoder for pymeshcell objects.
@@ -25,6 +26,7 @@ class CellClassEncoder(JSONEncoder):
     Handles numpy data types and pyvertex objects, converting them to
     native Python types for JSON serialization.
     """
+
     def default(self, obj):
         if isinstance(obj, np.integer):
             return int(obj)
@@ -54,6 +56,7 @@ class celltype(enum.Enum):
         dggrid (int): Discrete Global Grid cells (value: 5)
         tin (int): Triangulated Irregular Network cells (value: 6)
     """
+
     hexagon = 1
     square = 2
     latlon = 3
@@ -68,6 +71,7 @@ class celltype(enum.Enum):
     def __repr__(self) -> str:
         """Return detailed string representation of cell type."""
         return f"celltype.{self.name}"
+
 
 class pymeshcell(pypolygon):
     """
@@ -165,10 +169,14 @@ class pymeshcell(pypolygon):
         # Validate minimum polygon requirements
         nEdge = len(aEdge)
         if nEdge < 3:
-            raise ValueError(f"Cell must have at least 3 edges to form a valid polygon, got {nEdge}")
+            raise ValueError(
+                f"Cell must have at least 3 edges to form a valid polygon, got {nEdge}"
+            )
 
         if len(aVertex) < 4:  # Need at least 3 unique points + 1 closing point
-            raise ValueError(f"Cell must have at least 4 points (including closing point), got {len(aVertex)}")
+            raise ValueError(
+                f"Cell must have at least 4 points (including closing point), got {len(aVertex)}"
+            )
 
         # Convert aEdge to aLine with proper type handling
         aLine = []
@@ -176,14 +184,15 @@ class pymeshcell(pypolygon):
             if edge is None:
                 raise ValueError(f"Edge at index {i} cannot be None")
             # Convert to pyline using vertex attributes
-            if hasattr(edge, 'pVertex_start') and hasattr(edge, 'pVertex_end'):
+            if hasattr(edge, "pVertex_start") and hasattr(edge, "pVertex_end"):
                 point_start = pypoint(edge.pVertex_start.__dict__)
                 point_end = pypoint(edge.pVertex_end.__dict__)
                 line = pyline(point_start, point_end)
                 aLine.append(line)
             else:
-                raise ValueError(f"Edge at index {i} must have pVertex_start and pVertex_end attributes")
-
+                raise ValueError(
+                    f"Edge at index {i} must have pVertex_start and pVertex_end attributes"
+                )
 
         # Convert aVertex to aPoint with proper type handling
         aPoint = []
@@ -191,14 +200,14 @@ class pymeshcell(pypolygon):
             if vertex is None:
                 raise ValueError(f"Vertex at index {i} cannot be None")
             # Convert to pypoint using vertex attributes
-            if hasattr(vertex, '__dict__'):
+            if hasattr(vertex, "__dict__"):
                 point = pypoint(vertex.__dict__)
                 aPoint.append(point)
             else:
                 raise ValueError(f"Vertex at index {i} must be convertible to pypoint")
 
         # Initialize parent class with converted types
-        #we need to add the closing point, this is different from the mesh vertex list
+        # we need to add the closing point, this is different from the mesh vertex list
         aPoint.append(aPoint[0])
         super().__init__(dLon, dLat, aLine, aPoint)
 
@@ -257,8 +266,8 @@ class pymeshcell(pypolygon):
 
         # Create center point object
         center_params = {
-            'dLongitude_degree': self.dLongitude_center_degree,
-            'dLatitude_degree': self.dLatitude_center_degree
+            "dLongitude_degree": self.dLongitude_center_degree,
+            "dLatitude_degree": self.dLatitude_center_degree,
         }
         self.pVertex_center: pyvertex = pyvertex(center_params)
 
@@ -272,10 +281,12 @@ class pymeshcell(pypolygon):
         Returns:
             str: Detailed representation including cell ID, center coordinates, and area
         """
-        return (f"pymeshcell(ID={self.lCellID}, "
-                f"Center=({self.dLongitude_center_degree:.6f}, {self.dLatitude_center_degree:.6f}), "
-                f"Area={self.dArea:.2f}m², Flowlines={self.nFlowline}, "
-                f"Neighbors={self.nNeighbor})")
+        return (
+            f"pymeshcell(ID={self.lCellID}, "
+            f"Center=({self.dLongitude_center_degree:.6f}, {self.dLatitude_center_degree:.6f}), "
+            f"Area={self.dArea:.2f}m², Flowlines={self.nFlowline}, "
+            f"Neighbors={self.nNeighbor})"
+        )
 
     def __str__(self) -> str:
         """
@@ -284,9 +295,11 @@ class pymeshcell(pypolygon):
         Returns:
             str: Concise representation with ID, center coordinates, and area
         """
-        return (f"pymeshcell(ID={self.lCellID}, "
-                f"Center=({self.dLongitude_center_degree:.6f}, {self.dLatitude_center_degree:.6f}), "
-                f"Area={self.dArea:.2f}m²)")
+        return (
+            f"pymeshcell(ID={self.lCellID}, "
+            f"Center=({self.dLongitude_center_degree:.6f}, {self.dLatitude_center_degree:.6f}), "
+            f"Area={self.dArea:.2f}m²)"
+        )
 
     def __hash__(self) -> int:
         """
@@ -332,18 +345,22 @@ class pymeshcell(pypolygon):
             >>> cell = pymeshcell(-77.0, 38.0, edges, points)
             >>> json_str = cell.tojson()
         """
-        aSkip = ['dLongitude_radian', 'dLatitude_radian', 'wkt',
-                 'pPoint_start', 'pPoint_end', 'pBound']
+        aSkip = [
+            "dLongitude_radian",
+            "dLatitude_radian",
+            "wkt",
+            "pPoint_start",
+            "pPoint_end",
+            "pBound",
+        ]
 
         obj = self.__dict__.copy()
         for sKey in aSkip:
             obj.pop(sKey, None)
 
-        sJson = json.dumps(obj,
-                          sort_keys=True,
-                          indent=4,
-                          ensure_ascii=True,
-                          cls=CellClassEncoder)
+        sJson = json.dumps(
+            obj, sort_keys=True, indent=4, ensure_ascii=True, cls=CellClassEncoder
+        )
         return sJson
 
     def set_cell_id(self, lCellID: int) -> None:
@@ -371,7 +388,9 @@ class pymeshcell(pypolygon):
             TypeError: If lCellID_downstream is not an integer
         """
         if not isinstance(lCellID_downstream, (int, np.integer)):
-            raise TypeError(f"Downstream cell ID must be an integer, got {type(lCellID_downstream)}")
+            raise TypeError(
+                f"Downstream cell ID must be an integer, got {type(lCellID_downstream)}"
+            )
         self.lCellID_downstream_burned = int(lCellID_downstream)
 
     def set_stream_properties(self, iStream_order: int, iStream_segment: int) -> None:
@@ -386,14 +405,23 @@ class pymeshcell(pypolygon):
             TypeError: If parameters are not integers
         """
         if not isinstance(iStream_order, (int, np.integer)):
-            raise TypeError(f"Stream order must be an integer, got {type(iStream_order)}")
+            raise TypeError(
+                f"Stream order must be an integer, got {type(iStream_order)}"
+            )
         if not isinstance(iStream_segment, (int, np.integer)):
-            raise TypeError(f"Stream segment must be an integer, got {type(iStream_segment)}")
+            raise TypeError(
+                f"Stream segment must be an integer, got {type(iStream_segment)}"
+            )
 
         self.iStream_order_burned = int(iStream_order)
         self.iStream_segment_burned = int(iStream_segment)
 
-    def add_neighbor(self, lNeighborID: int, neighbor_type: str = 'land', distance: Optional[float] = None) -> None:
+    def add_neighbor(
+        self,
+        lNeighborID: int,
+        neighbor_type: str = "land",
+        distance: Optional[float] = None,
+    ) -> None:
         """
         Add a neighboring cell to the appropriate neighbor list.
 
@@ -409,9 +437,11 @@ class pymeshcell(pypolygon):
         if not isinstance(lNeighborID, (int, np.integer)):
             raise TypeError(f"Neighbor ID must be an integer, got {type(lNeighborID)}")
 
-        valid_types = ['land', 'ocean', 'virtual']
+        valid_types = ["land", "ocean", "virtual"]
         if neighbor_type not in valid_types:
-            raise ValueError(f"neighbor_type must be one of {valid_types}, got {neighbor_type}")
+            raise ValueError(
+                f"neighbor_type must be one of {valid_types}, got {neighbor_type}"
+            )
 
         # Initialize neighbor lists if they don't exist
         if self.aNeighbor is None:
@@ -426,21 +456,21 @@ class pymeshcell(pypolygon):
             self.nNeighbor = len(self.aNeighbor)
 
         # Add to specific type lists
-        if neighbor_type == 'land':
+        if neighbor_type == "land":
             if self.aNeighbor_land is None:
                 self.aNeighbor_land = []
             if lNeighborID not in self.aNeighbor_land:
                 self.aNeighbor_land.append(lNeighborID)
                 self.nNeighbor_land = len(self.aNeighbor_land)
 
-        elif neighbor_type == 'ocean':
+        elif neighbor_type == "ocean":
             if self.aNeighbor_ocean is None:
                 self.aNeighbor_ocean = []
             if lNeighborID not in self.aNeighbor_ocean:
                 self.aNeighbor_ocean.append(lNeighborID)
                 self.nNeighbor_ocean = len(self.aNeighbor_ocean)
 
-        elif neighbor_type == 'virtual':
+        elif neighbor_type == "virtual":
             if self.aNeighbor_land_virtual is None:
                 self.aNeighbor_land_virtual = []
             if lNeighborID not in self.aNeighbor_land_virtual:
@@ -460,15 +490,19 @@ class pymeshcell(pypolygon):
         Returns:
             bool: True if cell has valid attributes
         """
-        has_valid_coords = (-180 <= self.dLongitude_center_degree <= 180 and
-                           -90 <= self.dLatitude_center_degree <= 90)
-        has_valid_geometry = (len(self.aVertex) >= 4 and len(self.aEdge) >= 3)
+        has_valid_coords = (
+            -180 <= self.dLongitude_center_degree <= 180
+            and -90 <= self.dLatitude_center_degree <= 90
+        )
+        has_valid_geometry = len(self.aVertex) >= 4 and len(self.aEdge) >= 3
         has_valid_id = self.lCellID > 0
         has_valid_area = self.dArea >= 0  # Area should be non-negative
 
-        return has_valid_coords and has_valid_geometry and has_valid_id and has_valid_area
+        return (
+            has_valid_coords and has_valid_geometry and has_valid_id and has_valid_area
+        )
 
-    def copy(self) -> 'pymeshcell':
+    def copy(self) -> "pymeshcell":
         """
         Create a deep copy of the mesh cell.
 
@@ -476,10 +510,12 @@ class pymeshcell(pypolygon):
             pymeshcell: A new mesh cell object with the same attributes
         """
         # Create new cell with same basic parameters
-        new_cell = pymeshcell(self.dLongitude_center_degree,
-                             self.dLatitude_center_degree,
-                             self.aEdge.copy(),
-                             self.aVertex.copy())
+        new_cell = pymeshcell(
+            self.dLongitude_center_degree,
+            self.dLatitude_center_degree,
+            self.aEdge.copy(),
+            self.aVertex.copy(),
+        )
 
         # Copy all attributes
         new_cell.lCellID = self.lCellID
@@ -505,11 +541,25 @@ class pymeshcell(pypolygon):
         new_cell.nNeighbor_land_virtual = self.nNeighbor_land_virtual
 
         # Deep copy neighbor lists
-        new_cell.aNeighbor = self.aNeighbor.copy() if self.aNeighbor is not None else None
-        new_cell.aNeighbor_land = self.aNeighbor_land.copy() if self.aNeighbor_land is not None else None
-        new_cell.aNeighbor_ocean = self.aNeighbor_ocean.copy() if self.aNeighbor_ocean is not None else None
-        new_cell.aNeighbor_land_virtual = self.aNeighbor_land_virtual.copy() if self.aNeighbor_land_virtual is not None else None
-        new_cell.aNeighbor_distance = self.aNeighbor_distance.copy() if self.aNeighbor_distance is not None else None
+        new_cell.aNeighbor = (
+            self.aNeighbor.copy() if self.aNeighbor is not None else None
+        )
+        new_cell.aNeighbor_land = (
+            self.aNeighbor_land.copy() if self.aNeighbor_land is not None else None
+        )
+        new_cell.aNeighbor_ocean = (
+            self.aNeighbor_ocean.copy() if self.aNeighbor_ocean is not None else None
+        )
+        new_cell.aNeighbor_land_virtual = (
+            self.aNeighbor_land_virtual.copy()
+            if self.aNeighbor_land_virtual is not None
+            else None
+        )
+        new_cell.aNeighbor_distance = (
+            self.aNeighbor_distance.copy()
+            if self.aNeighbor_distance is not None
+            else None
+        )
 
         return new_cell
 
@@ -520,7 +570,9 @@ class pymeshcell(pypolygon):
         Returns:
             bool: True if cell has ocean neighbors or is flagged as coastal
         """
-        return self.iFlag_coast == 1 or (self.nNeighbor_ocean is not None and self.nNeighbor_ocean > 0)
+        return self.iFlag_coast == 1 or (
+            self.nNeighbor_ocean is not None and self.nNeighbor_ocean > 0
+        )
 
     def has_flowlines(self) -> bool:
         """
@@ -531,7 +583,7 @@ class pymeshcell(pypolygon):
         """
         return self.nFlowline > 0 and self.iFlag_intersected > 0
 
-    def get_neighbor_count(self, neighbor_type: str = 'all') -> int:
+    def get_neighbor_count(self, neighbor_type: str = "all") -> int:
         """
         Get the count of neighbors of a specific type.
 
@@ -544,18 +596,22 @@ class pymeshcell(pypolygon):
         Raises:
             ValueError: If neighbor_type is not recognized
         """
-        valid_types = ['all', 'land', 'ocean', 'virtual']
+        valid_types = ["all", "land", "ocean", "virtual"]
         if neighbor_type not in valid_types:
-            raise ValueError(f"neighbor_type must be one of {valid_types}, got {neighbor_type}")
+            raise ValueError(
+                f"neighbor_type must be one of {valid_types}, got {neighbor_type}"
+            )
 
-        if neighbor_type == 'all':
+        if neighbor_type == "all":
             return self.nNeighbor if self.nNeighbor >= 0 else 0
-        elif neighbor_type == 'land':
+        elif neighbor_type == "land":
             return self.nNeighbor_land if self.nNeighbor_land >= 0 else 0
-        elif neighbor_type == 'ocean':
+        elif neighbor_type == "ocean":
             return self.nNeighbor_ocean if self.nNeighbor_ocean >= 0 else 0
-        elif neighbor_type == 'virtual':
-            return self.nNeighbor_land_virtual if self.nNeighbor_land_virtual >= 0 else 0
+        elif neighbor_type == "virtual":
+            return (
+                self.nNeighbor_land_virtual if self.nNeighbor_land_virtual >= 0 else 0
+            )
 
     def get_center_coordinates(self) -> tuple:
         """
@@ -581,7 +637,9 @@ class pymeshcell(pypolygon):
         if not isinstance(nFlowlines, (int, np.integer)):
             raise TypeError(f"nFlowlines must be an integer, got {type(nFlowlines)}")
         if not isinstance(dLength_total, (int, float, np.number)):
-            raise TypeError(f"dLength_total must be a number, got {type(dLength_total)}")
+            raise TypeError(
+                f"dLength_total must be a number, got {type(dLength_total)}"
+            )
 
         if nFlowlines < 0:
             raise ValueError(f"nFlowlines must be non-negative, got {nFlowlines}")

@@ -2,44 +2,46 @@ import copy
 import numpy as np
 import importlib.util
 from rtree.index import Index as RTreeindex
+
 iFlag_cython = importlib.util.find_spec("cython")
 if iFlag_cython is not None:
     from pyflowline.algorithms.cython.kernel import find_vertex_in_list
 else:
     from pyflowline.algorithms.auxiliary.find_vertex_in_list import find_vertex_in_list
 
+
 def find_vertex_on_edge(aVertex_in, pEdge_in):
     iFlag_exist = 0
-    aIndex= list()
-    aIndex_order=list()
-    aDistance=list()
-    nVertex= len(aVertex_in)
+    aIndex = list()
+    aIndex_order = list()
+    aDistance = list()
+    nVertex = len(aVertex_in)
     npoint = 0
-    if nVertex > 0 :
+    if nVertex > 0:
         index_vertex = RTreeindex()
         for i in range(nVertex):
             lID = i
             x = aVertex_in[i].dLongitude_degree
             y = aVertex_in[i].dLatitude_degree
-            left =   x - 1E-5
-            right =  x + 1E-5
-            bottom = y - 1E-5
-            top =    y + 1E-5
-            pBound= (left, bottom, right, top)
+            left = x - 1e-5
+            right = x + 1e-5
+            bottom = y - 1e-5
+            top = y + 1e-5
+            pBound = (left, bottom, right, top)
             index_vertex.insert(lID, pBound)  #
             pass
-        #now the new vertex
+        # now the new vertex
         pVertex_start = pEdge_in.pVertex_start
         pVertex_end = pEdge_in.pVertex_end
-        x1=pVertex_start.dLongitude_degree
-        y1=pVertex_start.dLatitude_degree
-        x2=pVertex_end.dLongitude_degree
-        y2=pVertex_end.dLatitude_degree
-        left   = np.min([x1, x2])
-        right  = np.max([x1, x2])
+        x1 = pVertex_start.dLongitude_degree
+        y1 = pVertex_start.dLatitude_degree
+        x2 = pVertex_end.dLongitude_degree
+        y2 = pVertex_end.dLatitude_degree
+        left = np.min([x1, x2])
+        right = np.max([x1, x2])
         bottom = np.min([y1, y2])
-        top    = np.max([y1, y2])
-        pBound= (left, bottom, right, top)
+        top = np.max([y1, y2])
+        pBound = (left, bottom, right, top)
         aIntersect = list(index_vertex.intersection(pBound))
         for k in aIntersect:
             pVertex = aVertex_in[k]
@@ -53,17 +55,18 @@ def find_vertex_on_edge(aVertex_in, pEdge_in):
                 if diff < 1.0:
                     iFlag_overlap = pEdge_in.check_vertex_on_edge(pVertex)
 
-        #re-order, regardless of using rtree or not
-        if iFlag_exist == 1 :
+        # re-order, regardless of using rtree or not
+        if iFlag_exist == 1:
             x = np.array(aDistance)
             b = np.argsort(x)
             c = np.array(aIndex)
-            d= c[b]
+            d = c[b]
             aIndex_order = list(d)
     else:
         pass
 
     return iFlag_exist, npoint, aIndex_order
+
 
 def find_edge_in_list(aEdge_in, pEdge_in):
     """[find the index of an edge in a list]
@@ -76,19 +79,19 @@ def find_edge_in_list(aEdge_in, pEdge_in):
         [type]: [description]
     """
     iFlag_exist = 0
-    lIndex= -1
-    nEdge= len(aEdge_in)
+    lIndex = -1
+    nEdge = len(aEdge_in)
 
-    if nEdge > 0 :
-        for i in np.arange( nEdge):
+    if nEdge > 0:
+        for i in np.arange(nEdge):
             pEdge = aEdge_in[i]
             if pEdge == pEdge_in:
                 iFlag_exist = 1
                 lIndex = i
                 break
 
-
     return iFlag_exist, lIndex
+
 
 def find_flowline_in_list(aFlowline_in, pFlowline_in):
     """[find the index of a flowline in a list]
@@ -101,11 +104,11 @@ def find_flowline_in_list(aFlowline_in, pFlowline_in):
         [type]: [description]
     """
     iFlag_exist = 0
-    lIndex= -1
-    nFlowline= len(aFlowline_in)
+    lIndex = -1
+    nFlowline = len(aFlowline_in)
 
-    if nFlowline > 0 :
-        for i in np.arange( nFlowline):
+    if nFlowline > 0:
+        for i in np.arange(nFlowline):
             pFlowline = aFlowline_in[i]
             if pFlowline == pFlowline_in:
                 iFlag_exist = 1
@@ -113,6 +116,7 @@ def find_flowline_in_list(aFlowline_in, pFlowline_in):
                 break
 
     return iFlag_exist, lIndex
+
 
 def find_hexagon_through_edge(aHexagon_in, pEdge_in):
     """find the hexagons which contain an edge
@@ -129,10 +133,11 @@ def find_hexagon_through_edge(aHexagon_in, pEdge_in):
     aHexagon_out = list()
     for i in range(nHexagon):
         pHexagon = aHexagon_in[i]
-        if pHexagon.has_this_edge(pEdge_in) ==1:
+        if pHexagon.has_this_edge(pEdge_in) == 1:
             aHexagon_out.append(pHexagon)
 
     return aHexagon_out
+
 
 def check_if_duplicates(aList_in):
     """[Check if given list contains any duplicates]
@@ -140,17 +145,18 @@ def check_if_duplicates(aList_in):
     Returns:
         [type]: [description]
     """
-    #iFlag_unique = 1
-    #for elem in aList_in:
+    # iFlag_unique = 1
+    # for elem in aList_in:
     #    if aList_in.count(elem) > 1:
     #        iFlag_unique = 0
     #        break
     #    else:
     #        pass
-    #return iFlag_unique
+    # return iFlag_unique
     return int(len(aList_in) == len(set(aList_in)))
 
-def add_unique_vertex(aVertex_in, pVertex_in, dThreshold_in = 1.0E-6):
+
+def add_unique_vertex(aVertex_in, pVertex_in, dThreshold_in=1.0e-6):
     """[add a vertex to a list if it is not already included]
 
     Args:
@@ -163,7 +169,7 @@ def add_unique_vertex(aVertex_in, pVertex_in, dThreshold_in = 1.0E-6):
     iFlag_exist = 0
     nVertex = len(aVertex_in)
 
-    iFlag_exist, dummy =  find_vertex_in_list(aVertex_in, pVertex_in, dThreshold_in)
+    iFlag_exist, dummy = find_vertex_in_list(aVertex_in, pVertex_in, dThreshold_in)
 
     if iFlag_exist == 1:
         pass
@@ -172,6 +178,7 @@ def add_unique_vertex(aVertex_in, pVertex_in, dThreshold_in = 1.0E-6):
         pass
 
     return aVertex_in, iFlag_exist
+
 
 def find_list_in_list(aList_in, pList_in):
     c = copy.deepcopy(pList_in)
@@ -182,8 +189,8 @@ def find_list_in_list(aList_in, pList_in):
         a = aList_in[i]
         b = copy.deepcopy(a)
         b.sort()
-        if (b == c ):
-            iFlag =1
+        if b == c:
+            iFlag = 1
             break
         else:
             iFlag = 0

@@ -1,8 +1,8 @@
-
 import numpy as np
 import jigsawpy
 
 from pyflowline.mesh.jigsaw.inpoly2 import inpoly2
+
 
 def addpoint(geom, point, itag):
     """
@@ -16,10 +16,10 @@ def addpoint(geom, point, itag):
 
     temp.point = point.point
     temp.point["IDtag"] = itag
-    geom.point = np.concatenate(
-        (geom.vert2, temp.vert2), axis=0)
+    geom.point = np.concatenate((geom.vert2, temp.vert2), axis=0)
 
     return
+
 
 def addline(geom, line, itag):
     """
@@ -38,16 +38,15 @@ def addline(geom, line, itag):
 
     temp.edge2["IDtag"] = itag
 
-    zipmesh(temp)                       # ensure compressed
+    zipmesh(temp)  # ensure compressed
 
     temp.edge2["index"] += geom.vert2.size
 
-    geom.point = np.concatenate(
-        (geom.vert2, temp.vert2), axis=0)
-    geom.edge2 = np.concatenate(
-        (geom.edge2, temp.edge2), axis=0)
+    geom.point = np.concatenate((geom.vert2, temp.vert2), axis=0)
+    geom.edge2 = np.concatenate((geom.edge2, temp.edge2), axis=0)
 
     return
+
 
 def addpoly(geom, poly, itag):
     """
@@ -65,27 +64,22 @@ def addpoly(geom, poly, itag):
     temp.point = poly.point
     temp.edge2 = poly.edge2
 
-    zipmesh(temp)                       # ensure compressed
+    zipmesh(temp)  # ensure compressed
 
-    temp.bound = np.empty(
-        (poly.edge2.size), dtype=geom.BOUND_t)
-    temp.bound["index"] = \
-        np.arange(0, poly.edge2.size)
-    temp.bound["cells"] = \
-        jigsawpy.jigsaw_def_t.JIGSAW_EDGE2_TAG
+    temp.bound = np.empty((poly.edge2.size), dtype=geom.BOUND_t)
+    temp.bound["index"] = np.arange(0, poly.edge2.size)
+    temp.bound["cells"] = jigsawpy.jigsaw_def_t.JIGSAW_EDGE2_TAG
     temp.bound["IDtag"] = itag
 
     temp.edge2["index"] += geom.vert2.size
     temp.bound["index"] += geom.edge2.size
 
-    geom.point = np.concatenate(
-        (geom.vert2, temp.vert2), axis=0)
-    geom.edge2 = np.concatenate(
-        (geom.edge2, temp.edge2), axis=0)
-    geom.bound = np.concatenate(
-        (geom.bound, temp.bound), axis=0)
+    geom.point = np.concatenate((geom.vert2, temp.vert2), axis=0)
+    geom.edge2 = np.concatenate((geom.edge2, temp.edge2), axis=0)
+    geom.bound = np.concatenate((geom.bound, temp.bound), axis=0)
 
     return
+
 
 def zipmesh(mesh):
     """
@@ -95,57 +89,43 @@ def zipmesh(mesh):
     """
     # Authors: Darren Engwirda
 
-    used = np.full(
-        mesh.point.size, False, dtype=bool)
+    used = np.full(mesh.point.size, False, dtype=bool)
 
-#---------------------------------- flag nodes used in cells
-    if (mesh.edge2 is not None and
-            mesh.edge2.size > +0):
+    # ---------------------------------- flag nodes used in cells
+    if mesh.edge2 is not None and mesh.edge2.size > +0:
 
-        used[mesh.edge2[
-            "index"].reshape(-1)] = True
+        used[mesh.edge2["index"].reshape(-1)] = True
 
-    if (mesh.tria3 is not None and
-            mesh.tria3.size > +0):
+    if mesh.tria3 is not None and mesh.tria3.size > +0:
 
-        used[mesh.tria3[
-            "index"].reshape(-1)] = True
+        used[mesh.tria3["index"].reshape(-1)] = True
 
-    if (mesh.quad4 is not None and
-            mesh.quad4.size > +0):
+    if mesh.quad4 is not None and mesh.quad4.size > +0:
 
-        used[mesh.quad4[
-            "index"].reshape(-1)] = True
+        used[mesh.quad4["index"].reshape(-1)] = True
 
-#---------------------------------- re-index cells, compress
-    redo = np.full(
-        mesh.point.size, 0, dtype=np.int32)
+    # ---------------------------------- re-index cells, compress
+    redo = np.full(mesh.point.size, 0, dtype=np.int32)
 
-    redo[used] = np.arange(
-        0, np.count_nonzero(used))
+    redo[used] = np.arange(0, np.count_nonzero(used))
 
-    if (mesh.edge2 is not None and
-            mesh.edge2.size > +0):
+    if mesh.edge2 is not None and mesh.edge2.size > +0:
 
-        mesh.edge2["index"] = \
-            redo[mesh.edge2["index"]]
+        mesh.edge2["index"] = redo[mesh.edge2["index"]]
 
-    if (mesh.tria3 is not None and
-            mesh.tria3.size > +0):
+    if mesh.tria3 is not None and mesh.tria3.size > +0:
 
-        mesh.tria3["index"] = \
-            redo[mesh.tria3["index"]]
+        mesh.tria3["index"] = redo[mesh.tria3["index"]]
 
-    if (mesh.quad4 is not None and
-            mesh.quad4.size > +0):
+    if mesh.quad4 is not None and mesh.quad4.size > +0:
 
-        mesh.quad4["index"] = \
-            redo[mesh.quad4["index"]]
+        mesh.quad4["index"] = redo[mesh.quad4["index"]]
 
-#---------------------------------- prune any un-used points
+    # ---------------------------------- prune any un-used points
     mesh.point = mesh.point[used]
 
     return
+
 
 def innerto(vert, geom):
     """
@@ -155,17 +135,15 @@ def innerto(vert, geom):
     """
     # Authors: Darren Engwirda
 
-    itag = np.full(
-        vert.shape[+0], -1, dtype=np.int32)
+    itag = np.full(vert.shape[+0], -1, dtype=np.int32)
 
     imin = np.min(geom.bound["IDtag"])
     imax = np.max(geom.bound["IDtag"])
 
     for ipos in range(imin, imax + 1):
 
-#---------------------------------- inpolygon for POLY=ITAG
-        indx = geom.bound["index"][
-            geom.bound["IDtag"] == ipos]
+        # ---------------------------------- inpolygon for POLY=ITAG
+        indx = geom.bound["index"][geom.bound["IDtag"] == ipos]
 
         xpts = geom.vert2["coord"]
         edge = geom.edge2["index"][indx]

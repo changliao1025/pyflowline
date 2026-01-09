@@ -11,6 +11,7 @@ from typing import Dict, Any, Optional
 import numpy as np
 from pyearth.toolbox.mesh.point import pypoint
 
+
 class VertexClassEncoder(JSONEncoder):
     """
     Custom JSON encoder for pyvertex objects.
@@ -18,6 +19,7 @@ class VertexClassEncoder(JSONEncoder):
     Handles numpy data types and converts them to native Python types
     for JSON serialization.
     """
+
     def default(self, obj):
         if isinstance(obj, np.integer):
             return int(obj)
@@ -88,13 +90,13 @@ class pyvertex(pypoint):
 
         # Vertex-specific attributes with defaults
         # lVertexIndex: Used for array indexing in computational operations
-        self.lVertexIndex = int(aParameter.get('lVertexIndex', -1))
+        self.lVertexIndex = int(aParameter.get("lVertexIndex", -1))
 
         # lVertexID: Unique identifier for the vertex in the network
-        self.lVertexID = int(aParameter.get('lVertexID', 1))
+        self.lVertexID = int(aParameter.get("lVertexID", 1))
 
         # lFlowlineID: Associated flowline ID (used during intersection operations)
-        self.lFlowlineID = int(aParameter.get('lFlowlineID', -1))
+        self.lFlowlineID = int(aParameter.get("lFlowlineID", -1))
 
     def __repr__(self) -> str:
         """
@@ -103,9 +105,11 @@ class pyvertex(pypoint):
         Returns:
             str: Detailed representation including vertex ID and coordinates
         """
-        return (f"pyvertex(ID={self.lVertexID}, Index={self.lVertexIndex}, "
-                f"Lon={self.dLongitude_degree:.6f}, Lat={self.dLatitude_degree:.6f}, "
-                f"FlowlineID={self.lFlowlineID})")
+        return (
+            f"pyvertex(ID={self.lVertexID}, Index={self.lVertexIndex}, "
+            f"Lon={self.dLongitude_degree:.6f}, Lat={self.dLatitude_degree:.6f}, "
+            f"FlowlineID={self.lFlowlineID})"
+        )
 
     def __str__(self) -> str:
         """
@@ -160,17 +164,15 @@ class pyvertex(pypoint):
             >>> vertex = pyvertex({'dLongitude_degree': -77.0, 'dLatitude_degree': 38.0})
             >>> json_str = vertex.tojson()
         """
-        aSkip = ['dLongitude_radian', 'dLatitude_radian', 'wkt']
+        aSkip = ["dLongitude_radian", "dLatitude_radian", "wkt"]
 
         obj = self.__dict__.copy()
         for sKey in aSkip:
             obj.pop(sKey, None)
 
-        sJson = json.dumps(obj,
-                          sort_keys=True,
-                          indent=4,
-                          ensure_ascii=True,
-                          cls=VertexClassEncoder)
+        sJson = json.dumps(
+            obj, sort_keys=True, indent=4, ensure_ascii=True, cls=VertexClassEncoder
+        )
         return sJson
 
     def set_vertex_id(self, lVertexID: int) -> None:
@@ -198,7 +200,9 @@ class pyvertex(pypoint):
             TypeError: If lVertexIndex is not an integer
         """
         if not isinstance(lVertexIndex, (int, np.integer)):
-            raise TypeError(f"Vertex index must be an integer, got {type(lVertexIndex)}")
+            raise TypeError(
+                f"Vertex index must be an integer, got {type(lVertexIndex)}"
+            )
         self.lVertexIndex = int(lVertexIndex)
 
     def set_flowline_id(self, lFlowlineID: int) -> None:
@@ -222,12 +226,13 @@ class pyvertex(pypoint):
         Returns:
             bool: True if vertex has valid coordinates and at least one valid ID
         """
-        has_valid_coords = (-180 <= self.dLongitude_degree <= 180 and
-                           -90 <= self.dLatitude_degree <= 90)
+        has_valid_coords = (
+            -180 <= self.dLongitude_degree <= 180 and -90 <= self.dLatitude_degree <= 90
+        )
         has_valid_id = self.lVertexID > 0 or self.lVertexIndex >= 0
         return has_valid_coords and has_valid_id
 
-    def copy(self) -> 'pyvertex':
+    def copy(self) -> "pyvertex":
         """
         Create a deep copy of the vertex.
 
@@ -235,18 +240,14 @@ class pyvertex(pypoint):
             pyvertex: A new vertex object with the same attributes
         """
         param = {
-            'dLongitude_degree': self.dLongitude_degree,
-            'dLatitude_degree': self.dLatitude_degree,
-            'x': self.dX_meter,
-            'y': self.dY_meter,
-            'z': self.dZ_meter,
-            'dElevation': self.dElevation,
-            'lVertexIndex': self.lVertexIndex,
-            'lVertexID': self.lVertexID,
-            'lFlowlineID': self.lFlowlineID
+            "dLongitude_degree": self.dLongitude_degree,
+            "dLatitude_degree": self.dLatitude_degree,
+            "x": self.dX_meter,
+            "y": self.dY_meter,
+            "z": self.dZ_meter,
+            "dElevation": self.dElevation,
+            "lVertexIndex": self.lVertexIndex,
+            "lVertexID": self.lVertexID,
+            "lFlowlineID": self.lFlowlineID,
         }
         return pyvertex(param)
-
-
-
-

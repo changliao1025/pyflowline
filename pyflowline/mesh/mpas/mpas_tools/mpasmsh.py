@@ -1,4 +1,3 @@
-
 import numpy as np
 import numpy
 import xarray
@@ -33,7 +32,7 @@ def subtract_critical_passages(dsMask, dsPassages):
 
     dsMask = dsMask.copy()
 
-    nTransects = dsPassages.sizes['nTransects']
+    nTransects = dsPassages.sizes["nTransects"]
     for transectIndex in range(nTransects):
         index = dsPassages.transectCellMasks[:, transectIndex] > 0
         dsMask.regionCellMasks[index, 0] = 0
@@ -71,15 +70,13 @@ def mask_reachable_ocean(dsMesh, dsMask, fcSeed):
 
     cellMasks = numpy.array(dsMask.regionCellMasks[:, 0])
 
-    nCells = dsMesh.sizes['nCells']
+    nCells = dsMesh.sizes["nCells"]
 
     # a sparse matrix representation of masked cell-to-cell connectivity
     iNext = +0
     iPtrs = numpy.zeros(nCells + 1, dtype=int)
-    xData = numpy.zeros(
-        nCells * dsMesh.sizes['maxEdges'], dtype=int)
-    iCols = numpy.zeros(
-        nCells * dsMesh.sizes['maxEdges'], dtype=int)
+    xData = numpy.zeros(nCells * dsMesh.sizes["maxEdges"], dtype=int)
+    iCols = numpy.zeros(nCells * dsMesh.sizes["maxEdges"], dtype=int)
 
     countOnCell = numpy.array(dsMesh.nEdgesOnCell)
     cellsOnCell = numpy.array(dsMesh.cellsOnCell)
@@ -89,7 +86,7 @@ def mask_reachable_ocean(dsMesh, dsMask, fcSeed):
     for iCell in range(nCells):
         for iEdge in range(countOnCell[iCell]):
             iPair = cellsOnCell[iCell, iEdge] - 1
-            if (cellMasks[iCell] == cellMasks[iPair]):
+            if cellMasks[iCell] == cellMasks[iPair]:
                 xData[iNext] = +1
                 iCols[iNext] = iPair
                 iNext = iNext + 1
@@ -104,14 +101,14 @@ def mask_reachable_ocean(dsMesh, dsMask, fcSeed):
     # find "connected" parts of masked mesh, as the connected components of
     # the masked cell-to-cell matrix
     nLabel, labels = connected_components(
-        csgraph=spMesh, directed=False, return_labels=True)
+        csgraph=spMesh, directed=False, return_labels=True
+    )
 
     # set seedMasks = +1 for the cells closest to any "seed" points defined
     # for the ocean
     seedMasks = numpy.zeros(nCells, dtype=int)
 
-    x, y, z = lonlat2xyz(
-        dsMesh.lonCell, dsMesh.latCell, R=1.E+0)
+    x, y, z = lonlat2xyz(dsMesh.lonCell, dsMesh.latCell, R=1.0e0)
 
     xyzCell = numpy.empty((nCells, 3), dtype=float)
     xyzCell[:, 0] = x
@@ -119,13 +116,13 @@ def mask_reachable_ocean(dsMesh, dsMask, fcSeed):
     xyzCell[:, 2] = z
 
     for feature in fcSeed.features:
-        point = feature['geometry']['coordinates']
+        point = feature["geometry"]["coordinates"]
 
-        x, y, z = lonlat2xyz(point[0], point[1], R=1.E+0)
+        x, y, z = lonlat2xyz(point[0], point[1], R=1.0e0)
 
         index = distance.cdist([[x, y, z]], xyzCell).argmin()
 
-        if (cellMasks[index] == 0):
+        if cellMasks[index] == 0:
             seedMasks[index] = +1
 
     # reset the land mask: mark all cells in any "connected" component that
@@ -134,7 +131,7 @@ def mask_reachable_ocean(dsMesh, dsMask, fcSeed):
 
     for iLabel in range(nLabel):
         labelMasks = seedMasks[labels == iLabel]
-        if (numpy.any(labelMasks > +0)):
+        if numpy.any(labelMasks > +0):
             dsMask.regionCellMasks[labels == iLabel, 0] = 0
 
     return dsMask
@@ -153,18 +150,16 @@ def inject_edge_tags(mesh):
     """
     # Authors: Darren Engwirda
 
-    if (mesh.edge2 is not None):
+    if mesh.edge2 is not None:
         for epos in range(mesh.edge2.size):
 
             inod = mesh.edge2["index"][epos, 0]
             jnod = mesh.edge2["index"][epos, 1]
             itag = mesh.edge2["IDtag"][epos]
 
-            mesh.point["IDtag"][inod] = max(
-                itag, mesh.point["IDtag"][inod])
+            mesh.point["IDtag"][inod] = max(itag, mesh.point["IDtag"][inod])
 
-            mesh.point["IDtag"][jnod] = max(
-                itag, mesh.point["IDtag"][jnod])
+            mesh.point["IDtag"][jnod] = max(itag, mesh.point["IDtag"][jnod])
 
     return
 
@@ -188,8 +183,8 @@ def jigsaw_mesh_to_netcdf(mesh, output_name, on_sphere, sphere_radius=None):
     # Authors: Phillip J. Wolfram, Matthew Hoffman, Xylar Asay-Davis
     #          and Darren Engwirda
 
-    grid = NetCDFFile(output_name, 'w', format='NETCDF3_CLASSIC')
-    #grid = NetCDFFile(output_name, 'w', format='NETCDF4')
+    grid = NetCDFFile(output_name, "w", format="NETCDF3_CLASSIC")
+    # grid = NetCDFFile(output_name, 'w', format='NETCDF4')
 
     # Get dimensions
     # Get nCells
@@ -200,26 +195,29 @@ def jigsaw_mesh_to_netcdf(mesh, output_name, on_sphere, sphere_radius=None):
     nVertices = mesh.tria3.shape[0]
 
     if vertexDegree != 3:
-        ValueError('This script can only compute vertices with triangular '
-                   'dual meshes currently.')
+        ValueError(
+            "This script can only compute vertices with triangular "
+            "dual meshes currently."
+        )
 
-    grid.createDimension('nCells', nCells)
-    grid.createDimension('nVertices', nVertices)
-    grid.createDimension('vertexDegree', vertexDegree)
+    grid.createDimension("nCells", nCells)
+    grid.createDimension("nVertices", nVertices)
+    grid.createDimension("vertexDegree", vertexDegree)
 
     # Create cell variables and sphere_radius
     if mesh.vert3.size > 0:
-        xCell_full = mesh.vert3['coord'][:, 0]
-        yCell_full = mesh.vert3['coord'][:, 1]
-        zCell_full = mesh.vert3['coord'][:, 2]
+        xCell_full = mesh.vert3["coord"][:, 0]
+        yCell_full = mesh.vert3["coord"][:, 1]
+        zCell_full = mesh.vert3["coord"][:, 2]
     else:
-        xCell_full = mesh.vert2['coord'][:, 0]
-        yCell_full = mesh.vert2['coord'][:, 1]
+        xCell_full = mesh.vert2["coord"][:, 0]
+        yCell_full = mesh.vert2["coord"][:, 1]
         zCell_full = np.zeros(nCells, dtype=float)
 
     for cells in [xCell_full, yCell_full, zCell_full]:
-        assert cells.shape[0] == nCells, 'Number of anticipated nodes is ' \
-                                         'not correct!'
+        assert cells.shape[0] == nCells, (
+            "Number of anticipated nodes is " "not correct!"
+        )
     if on_sphere:
         grid.on_a_sphere = "YES"
         grid.sphere_radius = sphere_radius
@@ -232,9 +230,11 @@ def jigsaw_mesh_to_netcdf(mesh, output_name, on_sphere, sphere_radius=None):
         grid.sphere_radius = 0.0
 
     # Create cellsOnVertex
-    cellsOnVertex_full = mesh.tria3['index'] + 1
-    assert cellsOnVertex_full.shape == (nVertices, vertexDegree), \
-        'cellsOnVertex_full is not the right shape!'
+    cellsOnVertex_full = mesh.tria3["index"] + 1
+    assert cellsOnVertex_full.shape == (
+        nVertices,
+        vertexDegree,
+    ), "cellsOnVertex_full is not the right shape!"
 
     # Create vertex variables
     xVertex_full = np.zeros((nVertices,))
@@ -256,37 +256,43 @@ def jigsaw_mesh_to_netcdf(mesh, output_name, on_sphere, sphere_radius=None):
         y3 = yCell_full[cell3 - 1]
         z3 = zCell_full[cell3 - 1]
 
-        #pv = circumcenter(on_sphere, x1, y1, z1, x2, y2, z2, x3, y3, z3)
-        #xVertex_full[iVertex] = pv.x
-        #yVertex_full[iVertex] = pv.y
-        #zVertex_full[iVertex] = pv.z
+        # pv = circumcenter(on_sphere, x1, y1, z1, x2, y2, z2, x3, y3, z3)
+        # xVertex_full[iVertex] = pv.x
+        # yVertex_full[iVertex] = pv.y
+        # zVertex_full[iVertex] = pv.z
 
-        #the mpas tool was updated, so this function is now updated
+        # the mpas tool was updated, so this function is now updated
         x, y, z = circumcenter(on_sphere, x1, y1, z1, x2, y2, z2, x3, y3, z3)
         xVertex_full[iVertex] = x
         yVertex_full[iVertex] = y
         zVertex_full[iVertex] = z
 
-    xCell = grid.createVariable('xCell', 'f8', ('nCells',))
-    yCell = grid.createVariable('yCell', 'f8', ('nCells',))
-    zCell = grid.createVariable('zCell', 'f8', ('nCells',))
-    featureTagCell = grid.createVariable('featureTagCell', 'i4', ('nCells',))
-    xVertex = grid.createVariable('xVertex', 'f8', ('nVertices',))
-    yVertex = grid.createVariable('yVertex', 'f8', ('nVertices',))
-    zVertex = grid.createVariable('zVertex', 'f8', ('nVertices',))
-    featureTagVertex = grid.createVariable('featureTagVertex', 'i4', ('nVertices',))
+    xCell = grid.createVariable("xCell", "f8", ("nCells",))
+    yCell = grid.createVariable("yCell", "f8", ("nCells",))
+    zCell = grid.createVariable("zCell", "f8", ("nCells",))
+    featureTagCell = grid.createVariable("featureTagCell", "i4", ("nCells",))
+    xVertex = grid.createVariable("xVertex", "f8", ("nVertices",))
+    yVertex = grid.createVariable("yVertex", "f8", ("nVertices",))
+    zVertex = grid.createVariable("zVertex", "f8", ("nVertices",))
+    featureTagVertex = grid.createVariable("featureTagVertex", "i4", ("nVertices",))
     cellsOnVertex = grid.createVariable(
-        'cellsOnVertex', 'i4', ('nVertices', 'vertexDegree',))
-    #grid.enddef()
+        "cellsOnVertex",
+        "i4",
+        (
+            "nVertices",
+            "vertexDegree",
+        ),
+    )
+    # grid.enddef()
 
     xCell[:] = xCell_full
     yCell[:] = yCell_full
     zCell[:] = zCell_full
-    featureTagCell[:] = mesh.point['IDtag']
+    featureTagCell[:] = mesh.point["IDtag"]
     xVertex[:] = xVertex_full
     yVertex[:] = yVertex_full
     zVertex[:] = zVertex_full
-    featureTagVertex[:] = mesh.tria3['IDtag']
+    featureTagVertex[:] = mesh.tria3["IDtag"]
     cellsOnVertex[:] = cellsOnVertex_full
 
     grid.close()

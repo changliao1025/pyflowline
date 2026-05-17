@@ -1,12 +1,12 @@
 import os
 
 # dependency packages
-from pyearth.visual.map.vector.map_vector_polygon_file import map_vector_polygon_file
-from pyearth.visual.map.vector.map_vector_polyline_file import map_vector_polyline_file
-from pyearth.visual.map.vector.map_multiple_vector_files import (
+from pyearthviz.map.vector.map_vector_polygon_file import map_vector_polygon_file
+from pyearthviz.map.vector.map_vector_polyline_file import map_vector_polyline_file
+from pyearthviz.map.vector.map_multiple_vector_files import (
     map_multiple_vector_files,
 )
-from pyearth.visual.color.pick_colormap import pick_colormap_terrain
+from pyearthviz.color.pick_colormap import pick_colormap_terrain
 
 
 def replace_last_occurrence(sFilename_path_in, sSubstring_in, sSubstring_out):

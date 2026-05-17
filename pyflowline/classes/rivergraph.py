@@ -18,7 +18,6 @@ logger = logging.getLogger(__name__)
 # Import for spatial indexing (R-tree)
 try:
     from rtree.index import Index as RTreeindex
-
     HAS_RTREE = True
 except ImportError:
     HAS_RTREE = False
@@ -29,12 +28,9 @@ import importlib.util
 iFlag_cython = importlib.util.find_spec("cython")
 if iFlag_cython is not None:
     from pyflowline.algorithms.cython.kernel import find_vertex_on_edge
-    from pyflowline.algorithms.cython.kernel import add_unique_vertex
-    from pyflowline.algorithms.cython.kernel import find_vertex_in_list
 else:
     from pyflowline.algorithms.auxiliary.find_index_in_list import find_vertex_on_edge
-    from pyflowline.algorithms.auxiliary.find_index_in_list import add_unique_vertex
-    from pyflowline.algorithms.auxiliary.find_vertex_in_list import find_vertex_in_list
+
 
 from pyflowline.classes.flowline import pyflowline
 from pyflowline.classes.vertex import pyvertex

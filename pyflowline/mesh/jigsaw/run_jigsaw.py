@@ -27,17 +27,35 @@ def compute_mask(
 ):
     dummy_index = np.where(aData == value)
     irows, icols = dummy_index
-    dLon = dLongitude_upper_left + icols * pixelWidth
-    dLat = dLatitude_upper_left + irows * pixelHeight
-    iX = ((dLon + 180.0) / (360.0 / ncolumn_space)).astype(int)
-    iY = ((dLat + 90) / (180.0 / nrow_space)).astype(int)
-    # Ensure indices are within range
-    iX = np.clip(iX, 0, ncolumn_space - 1)
-    iY = np.clip(iY, 0, nrow_space - 1)
-    # Create a mask with the same shape as the grid
-    mask = np.full((nrow_space, ncolumn_space), False, dtype=bool)
-    # Use 2D indexing to set the mask
-    mask[iY, iX] = True
+
+    # If input data dimensions match output grid, use direct indexing
+    if aData.shape[0] == nrow_space and aData.shape[1] == ncolumn_space:
+        mask = np.full((nrow_space, ncolumn_space), False, dtype=bool)
+        mask[irows, icols] = True
+    else:
+        # Otherwise, do coordinate transformation
+        # Precompute cell sizes to reduce precision loss
+        dlon_cell = 360.0 / ncolumn_space
+        dlat_cell = 180.0 / nrow_space
+
+        # Compute coordinates with reduced accumulation error
+        dLon = dLongitude_upper_left + icols * pixelWidth
+        dLat = dLatitude_upper_left + irows * pixelHeight
+
+        # Convert to grid indices using rounding for better precision
+        # North is at iY=0, so latitude inverted
+        iX = np.round((dLon + 180.0) / dlon_cell).astype(int)
+        iY = np.round((90.0 - dLat) / dlat_cell).astype(int)
+
+        # Ensure indices are within range
+        iX = np.clip(iX, 0, ncolumn_space - 1)
+        iY = np.clip(iY, 0, nrow_space - 1)
+
+        # Create a mask with the same shape as the grid
+        mask = np.full((nrow_space, ncolumn_space), False, dtype=bool)
+        # Use 2D indexing to set the mask
+        mask[iY, iX] = True
+
     return mask
 
 
@@ -198,6 +216,11 @@ def run_jigsaw(
         else:
             iFlag_spac_ocean = False
 
+        if "iFlag_CellWidthVsLat" in aConfig_in:
+            iFlag_CellWidthVsLat = aConfig_in["iFlag_CellWidthVsLat"]
+        else:
+            iFlag_CellWidthVsLat = False
+
         if "iFlag_RRS18to6_ocean" in aConfig_in:
             iFlag_RRS18to6_ocean = aConfig_in["iFlag_RRS18to6_ocean"]
         else:
@@ -346,7 +369,14 @@ def run_jigsaw(
         if "dResolution_river_network" in aConfig_in:
             dResolution_river_network = float(aConfig_in["dResolution_river_network"])
         else:
-            dResolution_river_network = 3.0
+            dResolution_river_network = 6.0
+
+        if "dResolution_river_outlet" in aConfig_in:
+            dResolution_river_outlet = float(
+                aConfig_in["dResolution_river_outlet"]
+            )
+        else:
+            dResolution_river_outlet = 12.0
 
         if "dResolution_coastline" in aConfig_in:
             dResolution_coastline = float(aConfig_in["dResolution_coastline"])
@@ -398,6 +428,7 @@ def run_jigsaw(
         iFlag_spac_lake_boundary = False
 
         iFlag_RRS18to6_ocean = False
+        iFlag_CellWidthVsLat = False
 
         hfun_scal = "absolute"
         hfun_hmax = float("inf")  # null spacing lim
@@ -410,6 +441,9 @@ def run_jigsaw(
         dhdx_lim = 0.25  # |dH/dx| thresh smaller values will make h(x) more smooth
 
         dResolution_ocean = 100.0
+        dResolution_land = 45.0
+        dResolution_river_network = 6.0
+        dResolution_river_outlet = 12.0
 
     geom = jigsawpy.jigsaw_msh_t()
     if iFlag_geom:
@@ -641,6 +675,7 @@ def run_jigsaw(
                     vals = mdt.RRS_CellWidthVsLat(
                         spac.ygrid * 180.0 / np.pi, cellWidthEq=18.0, cellWidthPole=6.0
                     )
+                    vals = np.flipud(vals)  # Add this line to reverse the order
                     vals = np.reshape(vals, (spac.ygrid.size, 1))
                     aOcean_value = np.array(
                         np.tile(vals, (1, spac.xgrid.size)), dtype=spac.REALS_t
@@ -655,30 +690,43 @@ def run_jigsaw(
                         ncolumn_space,
                         nrow_space,
                     )
-                    spac.value[aOcean_mask] = np.minimum(
-                        aOcean_value[aOcean_mask], spac.value[aOcean_mask]
-                    )
+                    spac.value[aOcean_mask] = aOcean_value[aOcean_mask]
                 else:
-                    vals = mdt.EC_CellWidthVsLat(
-                        spac.ygrid * 180.0 / np.pi, cellWidthEq=dResolution_ocean
-                    )
-                    vals = np.reshape(vals, (spac.ygrid.size, 1))
-                    aOcean_value = np.array(
-                        np.tile(vals, (1, spac.xgrid.size)), dtype=spac.REALS_t
-                    )
-                    aOcean_mask = compute_mask(
-                        aLand_ocean_mask,
-                        missingValue,
-                        dOriginX,
-                        dOriginY,
-                        pixelWidth,
-                        pixelHeight,
-                        ncolumn_space,
-                        nrow_space,
-                    )
-                    spac.value[aOcean_mask] = np.minimum(
-                        aOcean_value[aOcean_mask], spac.value[aOcean_mask]
-                    )
+                    if iFlag_CellWidthVsLat:
+                        vals = mdt.EC_CellWidthVsLat(
+                            spac.ygrid * 180.0 / np.pi, cellWidthEq=dResolution_ocean
+                        )
+                        vals = np.flipud(vals)  # Add this line to reverse the order
+                        vals = np.reshape(vals, (spac.ygrid.size, 1))
+                        aOcean_value = np.array(
+                            np.tile(vals, (1, spac.xgrid.size)), dtype=spac.REALS_t
+                        )
+                        aOcean_mask = compute_mask(
+                            aLand_ocean_mask,
+                            missingValue,
+                            dOriginX,
+                            dOriginY,
+                            pixelWidth,
+                            pixelHeight,
+                            ncolumn_space,
+                            nrow_space,
+                        )
+                        spac.value[aOcean_mask] = aOcean_value[aOcean_mask]
+                    else:
+                        #use the same resolution for the ocean everywhere
+                        aOcean_mask = compute_mask(
+                            aLand_ocean_mask,
+                            missingValue,
+                            dOriginX,
+                            dOriginY,
+                            pixelWidth,
+                            pixelHeight,
+                            ncolumn_space,
+                            nrow_space,
+                        )
+                        spac.value[aOcean_mask] = dResolution_ocean
+                        pass
+
             else:
                 print("You need to provide coastline to set the ocean spacing")
                 pass
@@ -686,10 +734,20 @@ def run_jigsaw(
 
         if iFlag_spac_coastline:
             print("Compute global h(x)... for coastline")
-            spac.value[aCoastline_mask] = np.minimum(
-                dResolution_coastline, spac.value[aCoastline_mask]
-            )
-            pass
+            if iFlag_RRS18to6_ocean:
+                #this is a special case when we have RRS18to6 for ocean, we want to set the coastline to the same as ocean so ocean stability is ensured
+                vals = mdt.RRS_CellWidthVsLat(
+                        spac.ygrid * 180.0 / np.pi, cellWidthEq=18.0, cellWidthPole=6.0
+                    )
+                vals = np.flipud(vals)  # Add this line to reverse the order
+                vals = np.reshape(vals, (spac.ygrid.size, 1))
+                aCoastal_value = np.array(
+                    np.tile(vals, (1, spac.xgrid.size)), dtype=spac.REALS_t
+                )
+                spac.value[aCoastline_mask] =  aCoastal_value[aCoastline_mask]
+            else:
+                spac.value[aCoastline_mask] = dResolution_coastline
+
 
         if iFlag_spac_land:  # land feature, maybe mountain, etc
             print("Compute global h(x)... for land")
@@ -703,9 +761,7 @@ def run_jigsaw(
                 ncolumn_space,
                 nrow_space,
             )
-            spac.value[aLand_mask] = np.minimum(
-                dResolution_land, spac.value[aLand_mask]
-            )
+            spac.value[aLand_mask] = dResolution_land
             pass
 
         if iFlag_spac_dam:
@@ -732,7 +788,7 @@ def run_jigsaw(
                 ncolumn_space,
                 nrow_space,
             )
-            spac.value[aDam_mask] = np.minimum(dResolution_dam, spac.value[aDam_mask])
+            spac.value[aDam_mask] = dResolution_dam
 
         if iFlag_spac_city:
             print("Compute global h(x)... for city")
@@ -758,15 +814,50 @@ def run_jigsaw(
                 ncolumn_space,
                 nrow_space,
             )
-            spac.value[aCity_mask] = np.minimum(
-                dResolution_city, spac.value[aCity_mask]
-            )
+            spac.value[aCity_mask] = dResolution_city
 
         if iFlag_spac_river_network:
             print("Compute global h(x)... for river network")
-            spac.value[aRiver_network_mask] = np.minimum(
-                dResolution_river_network, spac.value[aRiver_network_mask]
-            )
+            spac.value[aRiver_network_mask] = spac.value[aRiver_network_mask]
+            if iFlag_RRS18to6_ocean:
+                #the river outlet spacing will the same as the coastline spacing
+                #more improvement can be made here
+                vals = mdt.RRS_CellWidthVsLat(
+                        spac.ygrid * 180.0 / np.pi, cellWidthEq=18.0, cellWidthPole=6.0
+                    )
+                vals = np.flipud(vals)  # Add this line to reverse the order
+                vals = np.reshape(vals, (spac.ygrid.size, 1))
+                aRiver_outlet_value = np.array(
+                    np.tile(vals, (1, spac.xgrid.size)), dtype=spac.REALS_t
+                )
+                #river outlet mask
+                sFilename_river_network_raster = aConfig_in[
+                "sFilename_river_network_raster"
+                ]
+                if not os.path.exists(sFilename_river_network_raster):
+                    pass
+                else:
+                    dummy = gdal_read_geotiff_file(sFilename_river_network_raster)
+                aData_river_network = dummy["dataOut"]
+                dOriginX = dummy["originX"]
+                dOriginY = dummy["originY"]
+                pixelHeight = dummy["pixelHeight"]  # 30/3600.0
+                pixelWidth = dummy["pixelWidth"]
+                missingValue = dummy["missingValue"]
+                aRiver_outlet_mask = compute_mask(
+                    aData_river_network,
+                    255,
+                    dOriginX,
+                    dOriginY,
+                    pixelWidth,
+                    pixelHeight,
+                    ncolumn_space,
+                    nrow_space,
+                )
+                spac.value[aRiver_outlet_mask] =  aRiver_outlet_value[aRiver_outlet_mask]
+                pass
+            pass
+        else:
             pass
 
         if iFlag_spac_watershed_boundary:
@@ -793,9 +884,7 @@ def run_jigsaw(
                 ncolumn_space,
                 nrow_space,
             )
-            spac.value[aWatershed_mask] = np.minimum(
-                dResolution_watershed_boundary, spac.value[aWatershed_mask]
-            )
+            spac.value[aWatershed_mask] = dResolution_watershed_boundary
             pass
 
         if iFlag_spac_lake_boundary:
@@ -822,9 +911,7 @@ def run_jigsaw(
                 ncolumn_space,
                 nrow_space,
             )
-            spac.value[aLake_mask] = np.minimum(
-                dResolution_lake_boundary, spac.value[aLake_mask]
-            )
+            spac.value[aLake_mask] = dResolution_lake_boundary
             pass
 
         spac.slope = np.full(spac.value.shape, dhdx_lim, dtype=spac.REALS_t)
@@ -879,6 +966,11 @@ def run_jigsaw(
     opts.hfun_tags = "precision = 9"  # less float prec.
 
     jigsawpy.savemsh(opts.geom_file, geom, opts.geom_tags)
+
+    # Flip spac.value and spac.slope upside down to match increasing ygrid order
+    # (ygrid goes south to north, but array rows naturally go north to south in GDAL convention)
+    spac.value = np.flipud(spac.value)
+    spac.slope = np.flipud(spac.slope)
 
     jigsawpy.savemsh(opts.hfun_file, spac, opts.hfun_tags)
 

@@ -1,9 +1,9 @@
 import os
 
 # dependency packages
-from pyearth.visual.map.vector.map_vector_polygon_file import map_vector_polygon_file
-from pyearth.visual.map.vector.map_vector_polyline_file import map_vector_polyline_file
-from pyearth.visual.map.vector.map_multiple_vector_files import (
+from pyearthviz.map.vector.map_vector_polygon_file import map_vector_polygon_file
+from pyearthviz.map.vector.map_vector_polyline_file import map_vector_polyline_file
+from pyearthviz.map.vector.map_multiple_vector_files import (
     map_multiple_vector_files,
 )
 

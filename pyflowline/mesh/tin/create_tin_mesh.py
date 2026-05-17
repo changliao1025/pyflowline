@@ -15,11 +15,6 @@ from pyflowline.algorithms.potentiometric.calculate_potentiometric import (
 
 gdal.UseExceptions()
 iFlag_cython = importlib.util.find_spec("cython")
-if iFlag_cython is not None:
-    from pyflowline.algorithms.cython.kernel import convert_360_to_180
-else:
-    from pyearth.gis.geometry.convert_longitude_range import convert_360_to_180
-
 
 def update_vertices_on_cell(nCell, nVertex, cellsOnVertex):
     # Initialize verticesOnCell with empty lists for each cell

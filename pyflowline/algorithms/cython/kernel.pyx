@@ -3,7 +3,7 @@ from libcpp.vector cimport vector
 from libcpp.algorithm cimport sort
 from libcpp.utility cimport pair
 from libc.math cimport M_PI, sin, cos, asin,acos, sqrt, abs
-from tinyr import RTree
+from rtree.index import Index as RTreeindex
 from cython.operator cimport dereference as deref
 
 """ Low-level function for pyflowline
@@ -32,7 +32,7 @@ cpdef find_vertex_in_list(list aVertex_in, pVertex_in, double dThreshold_in = 1.
     nVertex= len(aVertex_in)
 
     if nVertex > 0 :
-        index_vertex = RTree( max_cap=5, min_cap=2)
+        index_vertex = RTreeindex()
         for i in range(nVertex):
             x = aVertex_in[i].dLongitude_degree
             y = aVertex_in[i].dLatitude_degree
@@ -75,7 +75,7 @@ cpdef find_vertex_on_edge(list aVertex_in, pEdge_in):
     nVertex= len(aVertex_in)
     npoint = 0
     if nVertex > 0 :
-        index_vertex = RTree(max_cap=5, min_cap=2)
+        index_vertex = RTreeindex()
         for i in range(nVertex):
             lID = i
             x = aVertex_in[i].dLongitude_degree

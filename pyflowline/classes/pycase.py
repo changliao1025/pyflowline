@@ -1719,7 +1719,7 @@ class flowlinecase(object):
             aCell_out = self.aCell
             pass
         else:
-            # may be read mesh
+            # read mesh, this must support checkpoint feature
             iMesh_type = self.iMesh_type
             # there must be some auxiliary file associated with the mesh file
             # self.aCell = read_mesh_json_w_topology(iMesh_type, self.sFilename_mesh)

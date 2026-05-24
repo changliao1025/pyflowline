@@ -462,23 +462,50 @@ class pyrivergraph:
 
     def remove_cycle(self) -> List[pyflowline]:
         """
-        Detect and break cycles in the network by removing lowest priority flowlines.
-        Enhanced with state management and change tracking.
+        Remove cycles from the directed flow network using a single-pass
+        **reverse-BFS from the outlet**.
 
-        This method replaces the standalone break_network_cycles function by leveraging
-        the graph structure to detect cycles and remove the flowline with the lowest
-        hydrological significance from each cycle.
+        Algorithm
+        ---------
+        A valid flow network is a DAG where every flowline points toward the
+        outlet.  We exploit this by growing a set ``known`` of vertices that
+        are confirmed to have a path to the outlet, starting from the outlet
+        itself and expanding upstream one flowline at a time.
 
-        Uses depth-first search to detect cycles and removes the flowline with
-        the lowest hydrological significance from each cycle.
+        For each flowline ``start → end``:
+        - If ``end ∈ known`` and ``start ∉ known``:
+            The flowline correctly flows toward the outlet.
+            Add ``start`` to ``known`` and enqueue it for further expansion.
+        - If ``end ∈ known`` and ``start ∈ known``:
+            Both endpoints are already confirmed outlet-reachable, but this
+            flowline creates a redundant/cyclic connection — it flows from a
+            vertex that is already upstream-reachable back toward a vertex
+            that is also already known.  **Remove this flowline.**
+        - If ``end ∉ known``:
+            This flowline's end is not yet confirmed; skip for now (it will
+            be processed when its end vertex is added to ``known``).
 
-        Returns:
-            List[pyflowline]: Flowlines with cycles broken (acyclic network)
+        This is O(V + E) — a single BFS pass — and requires no separate cycle
+        detection step.  It naturally preserves all flowlines that contribute
+        to the outlet-connected network and removes only those that create
+        directed cycles.
 
-        Example:
-            >>> river_graph = pyrivergraph(flowlines, outlet_vertex)
-            >>> acyclic_flowlines = river_graph.remove_cycle()
-            >>> print(f"Removed cycles: {len(flowlines) - len(acyclic_flowlines)} flowlines removed")
+        Fallback
+        --------
+        If no outlet vertex is available (``pVertex_outlet_id`` is None), cycle
+        removal is skipped and the original flowlines are returned unchanged,
+        because flow direction cannot be determined without an outlet reference.
+
+        Returns
+        -------
+        List[pyflowline]
+            Flowlines with all directed cycles removed.
+
+        Example
+        -------
+        >>> river_graph = pyrivergraph(flowlines, outlet_vertex)
+        >>> acyclic_flowlines = river_graph.remove_cycle()
+        >>> print(f"Removed: {len(flowlines) - len(acyclic_flowlines)} flowlines")
         """
         if not hasattr(self, "aFlowline") or not self.aFlowline:
             logger.warning("No flowlines available in class instance for cycle removal")
@@ -489,87 +516,99 @@ class pyrivergraph:
             return self.aFlowline.copy()
 
         logger.info(
-            f"Removing cycles from {len(self.aFlowline)} flowlines using graph-based approach"
+            f"Removing cycles from {len(self.aFlowline)} flowlines using reverse-BFS approach"
         )
 
-        try:
-            cycles = self.detect_cycles()
+        outlet_id = getattr(self, "pVertex_outlet_id", None)
 
-            if not cycles:
-                logger.debug("No cycles detected in network")
-                return self.aFlowline.copy()
-
-            logger.info(f"Detected {len(cycles)} cycles in network")
-        except Exception as e:
-            logger.error(f"Error detecting cycles: {e}")
+        if outlet_id is None:
+            # Cycle removal requires an outlet vertex to determine flow direction.
+            # Without it we cannot reliably identify which edge in a cycle flows
+            # away from the outlet, so we skip removal and return unchanged.
+            logger.warning(
+                "remove_cycle: no outlet vertex available — "
+                "cycle removal skipped (outlet is required to determine flow direction)"
+            )
             return self.aFlowline.copy()
 
-        flowlines_to_remove = set()
+        # ----------------------------------------------------------------
+        # Main path: reverse-BFS from the outlet.
+        #
+        # known_vertices: set of vertex IDs confirmed to have a path to the
+        #                 outlet (either the outlet itself, or a start-vertex
+        #                 of a flowline whose end is already in known_vertices).
+        #
+        # reverse_adj: maps end_vertex_id → list of (start_vertex_id, flowline_idx)
+        #              so we can efficiently find all flowlines that flow INTO
+        #              a given vertex (i.e. whose end == that vertex).
+        # ----------------------------------------------------------------
+        from collections import deque
 
-        for cycle_vertices in cycles:
-            if (
-                len(cycle_vertices) < 3
-            ):  # Need at least 3 vertices for a meaningful cycle
-                continue
+        # Build reverse adjacency: end_id → [(start_id, flowline_idx), ...]
+        reverse_adj: Dict[int, List[Tuple[int, int]]] = {}
+        for fl_idx, (s_id, e_id) in self.aFlowline_edges.items():
+            reverse_adj.setdefault(e_id, []).append((s_id, fl_idx))
 
-            # Find flowlines involved in this cycle
-            cycle_flowlines = []
-            for i in range(len(cycle_vertices) - 1):
-                start_vertex_id = cycle_vertices[i]
-                end_vertex_id = cycle_vertices[i + 1]
+        # known_vertices: vertex IDs that are confirmed outlet-reachable
+        known_vertices: set = {outlet_id}
+        flowlines_to_remove: set = set()
 
-                # Find flowlines connecting these vertices
-                for flowline_idx, (s_id, e_id) in self.aFlowline_edges.items():
-                    if s_id == start_vertex_id and e_id == end_vertex_id:
-                        if flowline_idx < len(self.aFlowline):
-                            cycle_flowlines.append(
-                                (flowline_idx, self.aFlowline[flowline_idx])
-                            )
+        queue = deque([outlet_id])
 
-            if cycle_flowlines:
-                # Remove the lowest priority flowline from the cycle
-                def cycle_priority(flowline_data) -> Tuple:
-                    flowline_idx, flowline = flowline_data
-                    # Only use attributes if they have valid values (> 0)
-                    stream_order = getattr(flowline, "iStream_order", -1)
-                    stream_order = stream_order if stream_order > 0 else 1
+        while queue:
+            current_end = queue.popleft()
 
-                    drainage_area = getattr(flowline, "dDrainage_area", 0.0)
-                    drainage_area = drainage_area if drainage_area > 0 else 0.0
+            # Find all flowlines whose end vertex == current_end
+            for start_id, fl_idx in reverse_adj.get(current_end, []):
+                if fl_idx >= len(self.aFlowline):
+                    continue  # guard against stale indices
 
-                    length = getattr(flowline, "dLength", 0.0)
-                    length = length if length > 0 else 0.0
+                fl = self.aFlowline[fl_idx]
 
-                    return (stream_order, drainage_area, length)
+                if start_id not in known_vertices:
+                    # Normal case: this flowline correctly flows toward outlet.
+                    # Mark start_id as outlet-reachable and expand upstream.
+                    known_vertices.add(start_id)
+                    queue.append(start_id)
+                    logger.debug(
+                        f"  [remove_cycle] Accepted flowline idx={fl_idx} "
+                        f"({start_id} → {current_end})"
+                    )
+                else:
+                    # start_id is already in known_vertices — this flowline
+                    # creates a cycle (flows from an already-known vertex back
+                    # toward another already-known vertex).  Remove it.
+                    flowlines_to_remove.add(fl_idx)
+                    print(
+                        f"  [remove_cycle] Cycle detected — removing flowline idx={fl_idx} "
+                        f"start=({fl.pVertex_start.dLongitude_degree:.4f},"
+                        f"{fl.pVertex_start.dLatitude_degree:.4f}) "
+                        f"end=({fl.pVertex_end.dLongitude_degree:.4f},"
+                        f"{fl.pVertex_end.dLatitude_degree:.4f}) "
+                        f"order={fl.iStream_order} "
+                        f"length={getattr(fl,'dLength',0):.1f}"
+                    )
 
-                worst_flowline_idx, worst_flowline = min(
-                    cycle_flowlines, key=cycle_priority
-                )
-                flowlines_to_remove.add(worst_flowline_idx)
+        print(
+            f"  [remove_cycle] Reverse-BFS complete: "
+            f"known={len(known_vertices)} vertices, "
+            f"removing {len(flowlines_to_remove)} cyclic flowline(s)"
+        )
+        print(f"  [remove_cycle] Total flowlines before removal: {len(self.aFlowline)}")
 
-                logger.debug(
-                    f"Removing flowline {worst_flowline_idx} (order={worst_flowline.iStream_order}) to break cycle"
-                )
-
-        # Return flowlines with cycle-causing ones removed (filter by index)
         try:
             result = [
                 self.aFlowline[i]
                 for i in range(len(self.aFlowline))
                 if i not in flowlines_to_remove
             ]
-            logger.info(f"Removed {len(flowlines_to_remove)} flowlines to break cycles")
+            print(f"  [remove_cycle] Total flowlines after removal: {len(result)}")
 
-            # Validate result
             if len(result) == 0 and len(self.aFlowline) > 0:
-                logger.warning(
-                    "All flowlines were removed during cycle removal, returning original"
-                )
+                print("  [remove_cycle] WARNING: all flowlines removed, returning original")
                 return self.aFlowline.copy()
 
-            # Update the network using smart update system
             self._update_graph_flowlines(result)
-
             return result
         except Exception as e:
             logger.error(f"Error filtering flowlines during cycle removal: {e}")
@@ -1061,105 +1100,6 @@ class pyrivergraph:
                     queue.append((neighbor_id, depth + 1))
 
         return reachable
-
-    def detect_cycles(self) -> List[List[int]]:
-        """
-        Custom cycle detection using DFS with recursion stack.
-        Uses caching for performance optimization.
-        """
-        visited = set()
-        rec_stack = set()
-        cycles = []
-
-        def dfs_cycle_detection(node_id: int, path: List[int]) -> bool:
-            try:
-                visited.add(node_id)
-                rec_stack.add(node_id)
-
-                # Get neighbors from adjacency list
-                neighbors = list(self.adjacency_list[node_id])
-
-                for neighbor_id, _ in neighbors:
-                    try:
-                        if neighbor_id in rec_stack:
-                            # Found a cycle - back edge to a node in recursion stack
-                            try:
-                                cycle_start_idx = path.index(neighbor_id)
-                                cycle = path[cycle_start_idx:] + [neighbor_id]
-                                cycles.append(cycle)
-                                logger.debug(f"Detected cycle: {cycle}")
-                            except ValueError:
-                                cycle = [node_id, neighbor_id]
-                                cycles.append(cycle)
-                                logger.debug(
-                                    f"Detected simple back-edge cycle: {cycle}"
-                                )
-                            except Exception as e:
-                                logger.warning(
-                                    f"Error processing cycle from {node_id} to {neighbor_id}: {e}"
-                                )
-                                cycles.append([node_id, neighbor_id])
-                            return True
-                        elif neighbor_id not in visited:
-                            try:
-                                new_path = path + [neighbor_id]
-                                if dfs_cycle_detection(neighbor_id, new_path):
-                                    return True
-                            except RecursionError:
-                                logger.error(
-                                    f"Recursion limit reached during cycle detection at node {neighbor_id}"
-                                )
-                                if len(path) > 1:
-                                    cycles.append(path + [neighbor_id])
-                                return False
-                            except Exception as e:
-                                logger.error(
-                                    f"Error in recursive cycle detection for neighbor {neighbor_id}: {e}"
-                                )
-                                return False
-                    except Exception as e:
-                        logger.error(
-                            f"Error processing neighbor {neighbor_id} from node {node_id}: {e}"
-                        )
-                        continue
-
-                try:
-                    rec_stack.remove(node_id)
-                except KeyError:
-                    logger.warning(
-                        f"Node {node_id} not found in recursion stack during removal"
-                    )
-                return False
-
-            except Exception as e:
-                logger.error(
-                    f"Critical error in cycle detection for node {node_id}: {e}"
-                )
-                try:
-                    rec_stack.discard(node_id)
-                except Exception:
-                    pass
-                return False
-
-        try:
-            # Get node list from adjacency list
-            node_ids = list(self.adjacency_list.keys())
-
-            for node_id in node_ids:
-                if node_id not in visited:
-                    try:
-                        dfs_cycle_detection(node_id, [node_id])
-                    except Exception as e:
-                        logger.error(
-                            f"Error starting cycle detection from node {node_id}: {e}"
-                        )
-                        continue
-        except Exception as e:
-            logger.error(f"Critical error during cycle detection initialization: {e}")
-
-        logger.info(f"Custom cycle detection completed. Found {len(cycles)} cycles.")
-
-        return cycles
 
     def _find_linear_segments(self) -> List[List[int]]:
         """

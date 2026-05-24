@@ -629,6 +629,7 @@ class pybasin(object):
             aFlowline_basin_conceptual,
             pVertex_outlet,
             sWorkspace_output_basin,
+            iFlag_remove_cycle=1,
             iFlag_debug=self.iFlag_debug,
         )
 

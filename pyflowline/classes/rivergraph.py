@@ -1973,10 +1973,13 @@ class pyrivergraph:
 
         for flowline in flowlines:
             length = getattr(flowline, "dLength", 0.0)
-            if length >= threshold:
+            stream_order = getattr(flowline, "iStream_order", None)
+            if stream_order != 1 or length >= threshold:
                 filtered_flowlines.append(flowline)
             else:
-                logger.debug(f"Removing small river with length {length}")
+                logger.debug(
+                    f"Removing small first-order river with length {length}"
+                )
 
         logger.info(f"Removed {len(flowlines) - len(filtered_flowlines)} small rivers")
         return filtered_flowlines

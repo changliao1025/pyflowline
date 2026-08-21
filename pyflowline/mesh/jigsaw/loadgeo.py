@@ -1,7 +1,7 @@
-import geojson
+
 import numpy as np
 from osgeo import ogr
-from jigsawpy import jigsaw_msh_t, savemsh
+
 
 
 def pointgeo(point, nset, eset, nobj, last):
@@ -10,6 +10,7 @@ def pointgeo(point, nset, eset, nobj, last):
 
     """
     # Authors: Darren Engwirda
+    from jigsawpy import jigsaw_msh_t, savemsh
 
     # ----------------------------------------- read POINT dataset
     temp = jigsaw_msh_t()
@@ -28,6 +29,7 @@ def linegeo(line, nset, eset, nobj, last):
 
     """
     # Authors: Darren Engwirda
+    from jigsawpy import jigsaw_msh_t, savemsh
 
     npts = len(line) - 0
 
@@ -62,6 +64,7 @@ def polygeo(loop, nset, eset, nobj, last):
 
     """
     # Authors: Darren Engwirda
+    from jigsawpy import jigsaw_msh_t, savemsh
 
     npts = len(loop) - 1
 
@@ -151,6 +154,7 @@ def loadgeo(name, mesh):
 
     """
     # Authors: Darren Engwirda
+    import geojson
 
     if not isinstance(name, str):
         raise Exception("Incorrect type: NAME.")

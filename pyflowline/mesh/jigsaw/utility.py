@@ -1,5 +1,5 @@
 import numpy as np
-import jigsawpy
+
 
 from pyflowline.mesh.jigsaw.inpoly2 import inpoly2
 
@@ -12,6 +12,7 @@ def addpoint(geom, point, itag):
 
     """
     # Authors: Chang Liao
+    import jigsawpy
     temp = jigsawpy.jigsaw_msh_t()
 
     temp.point = point.point
@@ -30,6 +31,7 @@ def addline(geom, line, itag):
 
     """
     # Authors: Darren Engwirda
+    import jigsawpy
 
     temp = jigsawpy.jigsaw_msh_t()
 

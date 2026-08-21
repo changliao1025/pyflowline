@@ -6,12 +6,12 @@ import copy
 import time
 import numpy as np
 from osgeo import gdal
-import jigsawpy
+
 from pyearth.gis.gdal.read.raster.gdal_read_geotiff_file import gdal_read_geotiff_file
 
-import mpas_tools.mesh.creation.mesh_definition_tools as mdt
+
 from pyflowline.mesh.jigsaw.inpoly2 import inpoly2
-from pyflowline.mesh.jigsaw.loadgeo import loadgeo
+
 from pyflowline.mesh.jigsaw.utility import addpoint, addline, addpoly, innerto
 
 
@@ -168,6 +168,9 @@ def run_jigsaw(
 
     """
     # Authors: Darren Engwirda
+    import jigsawpy
+    import mpas_tools.mesh.creation.mesh_definition_tools as mdt
+    from pyflowline.mesh.jigsaw.loadgeo import loadgeo
 
     mesh = jigsawpy.jigsaw_msh_t()
     mprj = jigsawpy.jigsaw_msh_t()

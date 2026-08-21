@@ -7,8 +7,8 @@ from pyearth.gis.location.convert_between_longitude_latitude_and_sphere_3d impor
 )
 from pyflowline.formats.convert_coordinates import convert_gcs_coordinates_to_cell
 from pyflowline.formats.convert_attributes import convert_gcs_attributes_to_cell
-from pyflowline.mesh.jigsaw.run_jigsaw import run_jigsaw
-from pyflowline.mesh.jigsaw.savetin import savetin
+
+
 from pyflowline.algorithms.potentiometric.calculate_potentiometric import (
     calculate_potentiometric,
 )
@@ -68,6 +68,8 @@ def create_tin_mesh(
         _type_: _description_
     """
     import netCDF4 as nc
+    from pyflowline.mesh.jigsaw.run_jigsaw import run_jigsaw
+    from pyflowline.mesh.jigsaw.savetin import savetin
 
     if iFlag_global_in is None:
         iFlag_global = 0

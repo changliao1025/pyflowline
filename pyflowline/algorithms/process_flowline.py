@@ -156,6 +156,8 @@ def process_flowline(
         print("Started update stream order initial")
         ptimer.start()
         aFlowline_basin_simplified = pRivergraph.update_headwater_stream_order()
+        pRivergraph.define_river_confluence()
+        pRivergraph.define_stream_order(iFlag_so_method_in=1)
         ptimer.stop()
     except:
         print("Error in update stream order initial")

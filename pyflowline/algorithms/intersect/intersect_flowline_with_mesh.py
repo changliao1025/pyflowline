@@ -5,9 +5,8 @@ from rtree.index import Index as RTreeindex
 from pyearth.gis.location.get_geometry_coordinates import get_geometry_coordinates
 from pyflowline.formats.convert_coordinates import convert_gcs_coordinates_to_cell
 from pyflowline.formats.convert_coordinates import convert_gcs_coordinates_to_flowline
-from pyearth.gis.geometry.international_date_line_utility import (
-    check_cross_international_date_line_geometry,
-)
+
+from pyearth.gis.idl_handler import IdlStrategy, IdlHandler
 
 
 def intersect_flowline_with_mesh(

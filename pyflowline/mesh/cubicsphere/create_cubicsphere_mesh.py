@@ -2,7 +2,7 @@ import os, stat
 import numpy as np
 from osgeo import ogr, osr
 import subprocess
-import netCDF4 as nc
+
 
 from pyflowline.formats.convert_coordinates import convert_gcs_coordinates_to_cell
 
@@ -89,6 +89,7 @@ def generate_bash_script(sWorkspace_output, sFilename_mesh_in, sResolution_in):
 def convert_cubicspheremesh_to_pyflowline_mesh(
     iFlag_global_in, sFilename_csmesh_in, sFilename_mesh_pyflowline, pBoundary_in=None
 ):
+    import netCDF4 as nc
 
     if pBoundary_in is None:
         pBoundary = None

@@ -9,9 +9,8 @@ from pyflowline.algorithms.potentiometric.calculate_potentiometric import (
     calculate_potentiometric,
 )
 from pyearth.gis.geometry.convert_longitude_range import convert_360_to_180
-from pyearth.gis.geometry.international_date_line_utility import (
-    split_international_date_line_polygon_coordinates,
-)
+from pyearth.gis.idl_handler import IdlStrategy, IdlHandler
+
 
 gdal.UseExceptions()
 
@@ -636,11 +635,14 @@ def create_mpas_mesh(
                                 np.abs(dLon_min - dLon_max) > 100
                             ):  # this polygon cross international date line
                                 # now split this polygon into two parts and check separately
-                                aCoords_gcs_split = (
-                                    split_international_date_line_polygon_coordinates(
-                                        aCoords_gcs
-                                    )
-                                )
+                                #aCoords_gcs_split = (
+                                #    split_international_date_line_polygon_coordinates(
+                                #        aCoords_gcs
+                                #    )
+                                #)
+                                split_result = IdlHandler(IdlStrategy.SPLIT).detect(aCoords_gcs)
+                                aCoords_gcs_split = split_result.sub_polygons
+
                                 # create a multiple polygon to replace the original one
                                 pMultiPolygon = ogr.Geometry(ogr.wkbMultiPolygon)
                                 for aCoords_gcs_part in aCoords_gcs_split:

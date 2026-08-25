@@ -1,6 +1,60 @@
 [build-system]
-requires = [
-    "setuptools>=42",
-    "wheel"
-]
+requires = ["setuptools>=64", "wheel", "Cython>=0.29.0", "numpy>=1.20.0"]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "pyflowline"
+version = "0.3.10"
+description = "A mesh-independent river network generator for hydrologic models"
+readme = "README.md"
+requires-python = ">=3.8"
+license = {text = "custom"}
+authors = [
+    {name = "Chang Liao", email = "chang.liao@pnnl.gov"}
+]
+keywords = ["Earth Science"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Operating System :: OS Independent",
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Scientific/Engineering :: Hydrology",
+    "Topic :: Scientific/Engineering :: GIS",
+    "Topic :: Scientific/Engineering :: Visualization",
+]
+dependencies = [
+    "numpy",
+    "gdal",
+    "netCDF4",
+    "rtree",
+]
+
+[project.urls]
+Homepage = "https://github.com/changliao1025/pyflowline"
+Repository = "https://github.com/changliao1025/pyflowline"
+"Bug Tracker" = "https://github.com/changliao1025/pyflowline/issues"
+
+[project.optional-dependencies]
+visualization = [
+    "matplotlib",
+    "cartopy>=0.21.0",
+    "simplekml",
+]
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["pyflowline*"]
+exclude = ["tests*", "docs*", "notebooks*", "examples*"]
+
+[tool.setuptools.package-data]
+"pyflowline.algorithms.cython" = ["*.pyx", "*.pxd", "*.cpp"]

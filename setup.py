@@ -1,58 +1,70 @@
-import io
-import os
-import subprocess
-import shutil
+"""Minimal setup.py for building Cython extensions.
 
-from setuptools import setup, find_packages, Command
+This file is used by pyproject.toml to build Cython extensions.
+All metadata is now in pyproject.toml, this is only for extension building.
+"""
+from setuptools import setup, Extension
 
-NAME = "pyflowline"
-DESCRIPTION = "A mesh-independent river network generator for hydrologic models"
-AUTHOR = "Chang Liao"
-AUTHOR_EMAIL = "chang.liao@pnnl.gov"
-URL = "https://github.com/changliao1025/pyflowline"
-VERSION = "0.3.10"
-REQUIRES_PYTHON = ">=3.8.0"
-KEYWORDS = "Earth Science"
 
-REQUIRED = ["numpy", "gdal", "netCDF4"]
+def get_extensions():
+    """Build list of extension modules with proper numpy include paths.
 
-CLASSIFY = [
-    "Development Status :: 4 - Beta",
-    "Operating System :: OS Independent",
-    "Intended Audience :: Science/Research",
-    "Programming Language :: Python",
-    "Programming Language :: Python :: 3",
-    "Topic :: Scientific/Engineering",
-    "Topic :: Scientific/Engineering :: Hydrology",
-    "Topic :: Scientific/Engineering :: GIS",
-    "Topic :: Scientific/Engineering :: Visualization",
-]
+    Returns:
+        list: List of Extension objects for Cython modules
+    """
+    import numpy
 
-HERE = os.path.abspath(os.path.dirname(__file__))
+    # Try to import Cython, but don't fail if it's not available
+    try:
+        from Cython.Build import cythonize
+        HAVE_CYTHON = True
+    except ImportError:
+        HAVE_CYTHON = False
+        cythonize = None
 
-try:
-    with io.open(os.path.join(HERE, "README.md"), encoding="utf-8") as f:
-        LONG_DESCRIPTION = "\n" + f.read()
+    # Define Cython extension sources
+    # The kernel module uses C++ (libcpp), so it builds with language="c++"
+    if HAVE_CYTHON:
+        ext_sources = {
+            "pyflowline.algorithms.cython.kernel": [
+                "pyflowline/algorithms/cython/kernel.pyx"
+            ],
+        }
+    else:
+        ext_sources = {
+            "pyflowline.algorithms.cython.kernel": [
+                "pyflowline/algorithms/cython/kernel.cpp"
+            ],
+        }
 
-except FileNotFoundError:
-    LONG_DESCRIPTION = DESCRIPTION
+    # Build extensions list
+    extensions = [
+        Extension(
+            name,
+            sources,
+            include_dirs=[numpy.get_include()],
+            language="c++",
+            libraries=[],
+            library_dirs=[],
+        )
+        for name, sources in ext_sources.items()
+    ]
 
+    # Cythonize if Cython is available
+    if HAVE_CYTHON:
+        extensions = cythonize(
+            extensions,
+            compiler_directives={'language_level': "3"},
+            force=False  # Only rebuild if source changed
+        )
+
+    return extensions
+
+
+# Build Cython extensions
+extensions = get_extensions()
+
+# Minimal setup call - all metadata comes from pyproject.toml
 setup(
-    name=NAME,
-    version=VERSION,
-    description=DESCRIPTION,
-    long_description=LONG_DESCRIPTION,
-    long_description_content_type="text/markdown",
-    license="custom",
-    author=AUTHOR,
-    author_email=AUTHOR_EMAIL,
-    python_requires=REQUIRES_PYTHON,
-    keywords=KEYWORDS,
-    url=URL,
-    packages=find_packages(),
-    install_requires=REQUIRED,
-    classifiers=CLASSIFY,
-    extras_require={
-        "visualization": ["cython", "matplotlib", "cartopy>=0.21.0", "simplekml"]
-    },
+    ext_modules=extensions,
 )

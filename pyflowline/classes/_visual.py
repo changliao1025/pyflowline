@@ -1,11 +1,9 @@
 import os
 
 # dependency packages
-from pyearthviz.map.vector.map_vector_polygon_file import map_vector_polygon_file
-from pyearthviz.map.vector.map_vector_polyline_file import map_vector_polyline_file
-from pyearthviz.map.vector.map_multiple_vector_files import (
-    map_multiple_vector_files,
-)
+
+
+
 
 # plot function
 
@@ -95,6 +93,7 @@ def plot(self, iFlag_type_in=None, iFlag_title_in=None, sVariable_in=None, **kwa
 
 
 def _plot_mesh(self, sTitle_in=None, **kwargs):
+    from pyearthviz.map.vector.map_vector_polygon_file import map_vector_polygon_file
 
     sFilename_in = self.sFilename_mesh
     if self.iMesh_type == 4:
@@ -128,6 +127,8 @@ def _plot_mesh_with_flowline(
     aExtent_in=None,
     pProjection_map_in=None,
 ):
+    from pyearthviz.map.vector.map_multiple_vector_files import map_multiple_vector_files
+
 
     aFiletype_in = list()
     aFilename_in = list()

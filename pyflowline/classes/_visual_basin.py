@@ -1,13 +1,6 @@
 import os
 
 # dependency packages
-from pyearthviz.map.vector.map_vector_polygon_file import map_vector_polygon_file
-from pyearthviz.map.vector.map_vector_polyline_file import map_vector_polyline_file
-from pyearthviz.map.vector.map_multiple_vector_files import (
-    map_multiple_vector_files,
-)
-from pyearthviz.color.pick_colormap import pick_colormap_terrain
-
 
 def replace_last_occurrence(sFilename_path_in, sSubstring_in, sSubstring_out):
     last_occurrence_index = sFilename_path_in.rfind(sSubstring_in)
@@ -41,6 +34,7 @@ def basin_plot(
         aExtent_in (_type_, optional): _description_. Defaults to None.
         pProjection_map_in (_type_, optional): _description_. Defaults to None.
     """
+    from pyearthviz.map.vector.map_multiple_vector_files import  map_multiple_vector_files
 
     if sFilename_mesh_in is None:
         sFilename_mesh = self.sFilename_mesh
@@ -230,6 +224,7 @@ def _plot_polyline_variable(
     iFont_size_in=None,
     **kwargs
 ):
+    from pyearthviz.map.vector.map_vector_polyline_file import map_vector_polyline_file
 
     iFlag_label = 0
     iFlag_discrete = 0
@@ -349,6 +344,10 @@ def _plot_polygon_variable(
         dData_min_in (_type_, optional): _description_. Defaults to None.
         dData_max_in (_type_, optional): _description_. Defaults to None.
     """
+
+    from pyearthviz.map.vector.map_vector_polygon_file import map_vector_polygon_file
+    from pyearthviz.map.vector.map_multiple_vector_files import  map_multiple_vector_files
+    from pyearthviz.color.pick_colormap import pick_colormap_terrain
 
     sMesh_type = self.sMesh_type
     iFiletype = 1  # most file are geojson, but some are parquet
@@ -579,6 +578,7 @@ def _plot_polygon_variable(
 
 
 def _plot_mesh_with_flowline(self, sFilename_output_in=None, aExtent_in=None, **kwargs):
+    from pyearthviz.map.vector.map_multiple_vector_files import  map_multiple_vector_files
 
     aFiletype_in = list()
     aFilename_in = list()
@@ -608,6 +608,7 @@ def _plot_mesh_with_flowline(self, sFilename_output_in=None, aExtent_in=None, **
 def _plot_mesh_with_flow_direction(
     self, sMesh_type_in=None, sFilename_mesh_in=None, sFilename_output_in=None, **kwargs
 ):
+    from pyearthviz.map.vector.map_multiple_vector_files import  map_multiple_vector_files
     if sMesh_type_in is None:
         sMesh_type = self.sMesh_type
     else:

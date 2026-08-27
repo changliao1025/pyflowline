@@ -30,8 +30,9 @@ from pyearth.gis.gdal.read.raster.gdal_get_raster_spatial_reference import (
 
 from pyearth.toolbox.conversion.convert_vector_format import convert_vector_format
 
-from pyflowline.classes.vertex import pyvertex
-from pyflowline.classes.edge import pyedge
+from pyearthriver.classes.vertex import pyvertex
+from pyearthriver.classes.edge import pyedge
+from pyearthriver.classes.flowline import pyflowline
 
 from pyflowline.mesh.cubicsphere.create_cubicsphere_mesh import create_cubicsphere_mesh
 from pyflowline.mesh.triangular.create_triangular_mesh import create_triangular_mesh
@@ -50,7 +51,7 @@ from pyflowline.classes.latlon import pylatlon
 from pyflowline.classes.square import pysquare
 from pyflowline.classes.dggrid import pydggrid
 from pyflowline.classes.basin import pybasin
-from pyflowline.classes.flowline import pyflowline
+
 
 from pyflowline.formats.read_mesh import read_mesh_json, read_mesh_json_w_topology
 from pyflowline.formats.convert_boundary_to_geojson import convert_boundary_to_geojson

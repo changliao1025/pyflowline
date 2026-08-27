@@ -1,7 +1,7 @@
 import numpy as np
 
-from pyflowline.classes.edge import pyedge
-from pyflowline.classes.vertex import pyvertex
+from pyearthriver.classes.edge import pyedge
+from pyearthriver.classes.vertex import pyvertex
 from pyflowline.classes.hexagon import pyhexagon
 from pyflowline.classes.square import pysquare
 from pyflowline.classes.latlon import pylatlon

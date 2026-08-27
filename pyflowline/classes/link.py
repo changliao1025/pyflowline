@@ -11,9 +11,9 @@ from json import JSONEncoder
 from typing import Optional, Any, Tuple
 import numpy as np
 
-from pyflowline.classes.vertex import pyvertex
-from pyflowline.classes.edge import pyedge
-from pyflowline.classes.flowline import pyflowline
+from pyearthriver.classes.vertex import pyvertex
+from pyearthriver.classes.edge import pyedge
+from pyearthriver.classes.flowline import pyflowline
 from pyflowline.classes.meshcell import pymeshcell
 
 

@@ -11,9 +11,9 @@ from json import JSONEncoder
 from typing import List, Dict, Any, Optional, Union, Tuple
 import numpy as np
 from pyearth.gis.geometry.calculate_polygon_area import calculate_polygon_area
-from pyflowline.classes.vertex import pyvertex
-from pyflowline.classes.edge import pyedge
-from pyflowline.classes.flowline import pyflowline
+from pyearthriver.classes.vertex import pyvertex
+from pyearthriver.classes.edge import pyedge
+from pyearthriver.classes.flowline import pyflowline
 from pyflowline.classes.meshcell import pymeshcell
 
 

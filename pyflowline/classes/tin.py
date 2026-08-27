@@ -17,9 +17,9 @@ from pyearth.gis.geometry.calculate_spherical_triangle_area import (
     calculate_spherical_triangle_area,
 )
 
-from pyflowline.classes.vertex import pyvertex
-from pyflowline.classes.edge import pyedge
-from pyflowline.classes.flowline import pyflowline
+from pyearthriver.classes.vertex import pyvertex
+from pyearthriver.classes.edge import pyedge
+from pyearthriver.classes.flowline import pyflowline
 from pyflowline.classes.meshcell import pymeshcell
 
 

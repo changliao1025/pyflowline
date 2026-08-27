@@ -1,7 +1,7 @@
 import importlib.util
-from pyflowline.classes.vertex import pyvertex
-from pyflowline.classes.edge import pyedge
-from pyflowline.classes.flowline import pyflowline
+from pyearthriver.classes.vertex import pyvertex
+from pyearthriver.classes.edge import pyedge
+from pyearthriver.classes.flowline import pyflowline
 
 from pyflowline.classes.hexagon import pyhexagon
 from pyflowline.classes.square import pysquare

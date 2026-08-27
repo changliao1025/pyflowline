@@ -7,19 +7,21 @@ import importlib.util
 import numpy as np
 from rtree.index import Index as RTreeindex
 from pyearth.toolbox.reader.text_reader_string import text_reader_string
-from pyflowline.classes.vertex import pyvertex
-from pyflowline.classes.edge import pyedge
+
+from pyearthriver.classes.vertex import pyvertex
+from pyearthriver.classes.edge import pyedge
+from pyearthriver.classes.flowline import pyflowline
+from pyearthriver.classes.confluence import pyconfluence
+from pyearthriver.classes.rivergraph import pyrivergraph
 
 from pyflowline.classes.timer import pytimer
-from pyflowline.classes.flowline import pyflowline
-from pyflowline.classes.confluence import pyconfluence
 from pyflowline.formats.read_flowline import read_flowline_geojson
 from pyflowline.formats.convert_flowline_to_geojson import convert_flowline_to_geojson
 from pyflowline.formats.convert_boundary_to_geojson import convert_boundary_to_geojson
 from pyflowline.formats.export_flowline import export_flowline_to_geojson
 from pyflowline.formats.export_vertex import export_vertex_to_geojson
 from pyflowline.algorithms.split.split_flowline_to_edge import split_flowline_to_edge
-from pyflowline.classes.rivergraph import pyrivergraph
+
 from pyflowline.algorithms.simplification.find_outlet import find_outlet
 from pyflowline.algorithms.simplification.remove_returning_flowline import (
     remove_returning_flowline,

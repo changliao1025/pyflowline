@@ -16,7 +16,7 @@ from pyearth.toolbox.mesh.point import pypoint
 from pyearth.toolbox.mesh.line import pyline
 
 
-from .vertex import pyvertex
+from pyearthriver.classes.vertex import pyvertex
 
 
 class CellClassEncoder(JSONEncoder):

@@ -1,7 +1,7 @@
 import os
 import json
 from osgeo import ogr, osr
-from pyflowline.classes.edge import pyedge
+from pyearthriver.classes.edge import pyedge
 from pyflowline.classes.link import pycelllink
 
 

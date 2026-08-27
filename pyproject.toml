@@ -34,6 +34,8 @@ dependencies = [
     "gdal",
     "netCDF4",
     "rtree",
+    "pyearth",
+    "pyearthriver>=0.1.1",
 ]
 
 [project.urls]

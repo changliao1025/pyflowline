@@ -1,4 +1,4 @@
-from pyflowline.classes.flowline import pyflowline
+from pyearthriver.classes.flowline import pyflowline
 
 
 def split_flowline_to_edge(aFlowline_in):

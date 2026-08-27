@@ -1,7 +1,7 @@
 import os
 import numpy as np
 from osgeo import ogr, osr
-from pyflowline.classes.vertex import pyvertex
+from pyearthriver.classes.vertex import pyvertex
 
 import importlib.util
 

@@ -5,7 +5,7 @@ from pyflowline.formats.export_flowline import export_flowline_to_geojson
 from pyflowline.formats.export_vertex import export_vertex_to_geojson
 from pyflowline.algorithms.split.split_by_length import split_flowline_by_length
 from pyflowline.classes.timer import pytimer
-from pyflowline.classes.rivergraph import pyrivergraph
+from pyearthriver.classes.rivergraph import pyrivergraph
 
 
 def process_flowline(

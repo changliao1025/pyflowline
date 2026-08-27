@@ -77,6 +77,7 @@ class pyrivergraph:
         self.id_to_vertex: Dict[int, pyvertex] = {}
         self.aFlowline_edges: Dict[int, Tuple[int, int]] = {}
         self.aVertex: List[pyvertex] = []  # Will be populated during graph building
+        self.aVertex_outlet: List[pyvertex] = []  # all the outlet vertices
 
         # Always use custom implementation
         self.adjacency_list: DefaultDict[int, List[Tuple[int, int]]] = defaultdict(list)
@@ -93,6 +94,7 @@ class pyrivergraph:
         if pVertex_outlet is not None:
             # only preserve flowlines that can flow out to the outlet
             self.pVertex_outlet = pVertex_outlet
+            self.aVertex_outlet = [pVertex_outlet]
             self.aFlowline = self.remove_disconnected_flowlines()
             self._set_outlet_vertex_id()
 
@@ -164,6 +166,139 @@ class pyrivergraph:
             int: Number of unique vertices
         """
         return len(self.id_to_vertex)
+
+    def find_outlet_vertices(self) -> List[pyvertex]:
+        """
+        Detect outlet vertices: one per independent river network.
+
+        An outlet is a sink vertex with no outgoing edges. When the graph
+        contains several disconnected river networks, each network contributes
+        one sink. The detected outlets are stored in aVertex_outlet.
+
+        Note: a network that contains a directed cycle has no sink and will not
+        be detected here; remove cycles first or provide the outlet vertices
+        explicitly.
+
+        Returns:
+            List[pyvertex]: One outlet vertex per detected river network
+        """
+        self.aVertex_outlet = [
+            self.id_to_vertex[iVertex] for iVertex in self.get_sinks()
+        ]
+        logger.info(
+            f"Detected {len(self.aVertex_outlet)} outlet vertices (river networks)"
+        )
+        return self.aVertex_outlet
+
+    def split_graph(self) -> List["pyrivergraph"]:
+        """
+        Split the graph into independent river networks, one per outlet vertex.
+
+        For each outlet vertex in aVertex_outlet, a backward traversal collects
+        all vertices and flowlines that drain to that outlet, and a new
+        pyrivergraph is built from them. Because each subgraph is constructed
+        with its own outlet vertex, flowlines that do not drain to that outlet
+        are pruned automatically.
+
+        Flowlines shared by more than one network (e.g. braided channels with
+        two outlets) are assigned to the first outlet that claims them.
+
+        Returns:
+            List[pyrivergraph]: One river graph per independent network
+        """
+        if not self.aVertex_outlet:
+            self.find_outlet_vertices()
+
+        if len(self.aVertex_outlet) <= 1:
+            return [self]
+
+        aRivergraph: List[pyrivergraph] = []
+        aFlowline_assigned: Set[int] = set()
+        for pVertex_outlet in self.aVertex_outlet:
+            iVertex_outlet = self.vertex_to_id.get(pVertex_outlet)
+            if iVertex_outlet is None:
+                logger.warning("Outlet vertex not found in graph, skipping")
+                continue
+
+            # Backward traversal from this outlet to collect its drainage network
+            aVertex_reachable = self._find_outlet_reachable_vertices(iVertex_outlet)
+
+            aFlowline_sub = []
+            for iFlowline, (iVertex_start, iVertex_end) in self.aFlowline_edges.items():
+                if iFlowline in aFlowline_assigned:
+                    continue
+                if (
+                    iVertex_start in aVertex_reachable
+                    and iVertex_end in aVertex_reachable
+                ):
+                    aFlowline_sub.append(self.aFlowline[iFlowline])
+                    aFlowline_assigned.add(iFlowline)
+
+            if len(aFlowline_sub) == 0:
+                logger.warning("Outlet vertex has no connected flowlines, skipping")
+                continue
+
+            logger.info(
+                f"Split network draining to outlet vertex {iVertex_outlet}: "
+                f"{len(aFlowline_sub)} flowlines"
+            )
+            aRivergraph.append(pyrivergraph(aFlowline_sub, pVertex_outlet))
+
+        return aRivergraph
+
+    def export_graph(
+        self,
+        sFilename_flowline_in: str = None,
+        sFilename_vertex_in: str = None,
+    ):
+        """
+        Export the graph to GeoJSON files.
+
+        Use the optional filename arguments to control what to export:
+        a file is exported only when its filename is provided.
+
+        Args:
+            sFilename_flowline_in (str, optional): Output filename for the
+                flowlines. Defaults to None (skip flowline export).
+            sFilename_vertex_in (str, optional): Output filename for the
+                vertices. Defaults to None (skip vertex export).
+
+        Returns:
+            List[str]: Paths of the exported files
+        """
+        aFilename_out = list()
+
+        if sFilename_flowline_in is None and sFilename_vertex_in is None:
+            logger.warning("No output filename provided, nothing to export")
+            return aFilename_out
+
+        if sFilename_flowline_in is not None:
+            if self.aFlowline:
+                sFolder_output = os.path.dirname(sFilename_flowline_in)
+                if sFolder_output and not os.path.exists(sFolder_output):
+                    os.makedirs(sFolder_output)
+                export_flowline_to_geojson(self.aFlowline, sFilename_flowline_in)
+                aFilename_out.append(sFilename_flowline_in)
+                logger.info(
+                    f"Exported {len(self.aFlowline)} flowlines to {sFilename_flowline_in}"
+                )
+            else:
+                logger.warning("No flowlines available to export")
+
+        if sFilename_vertex_in is not None:
+            if self.aVertex:
+                sFolder_output = os.path.dirname(sFilename_vertex_in)
+                if sFolder_output and not os.path.exists(sFolder_output):
+                    os.makedirs(sFolder_output)
+                export_vertex_to_geojson(self.aVertex, sFilename_vertex_in)
+                aFilename_out.append(sFilename_vertex_in)
+                logger.info(
+                    f"Exported {len(self.aVertex)} vertices to {sFilename_vertex_in}"
+                )
+            else:
+                logger.warning("No vertices available to export")
+
+        return aFilename_out
 
     # ========================================================================
     # NETWORK SIMPLIFICATION OPERATIONS

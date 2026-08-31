@@ -73,7 +73,6 @@ def coarsen_mask(mask, down):
 
     return mtmp
 
-
 def retrieve_coordinates_from_array(aData_in, dValue_in, pixelWidth, pixelHeight):
     dummy_index = np.where(aData_in == dValue_in)
     irows, icols = dummy_index
@@ -83,53 +82,6 @@ def retrieve_coordinates_from_array(aData_in, dValue_in, pixelWidth, pixelHeight
     dLon = np.clip(dLon, -180.0, 180.0)
     dLat = np.clip(dLat, -90.0, 90.0)
     return dLon, dLat
-
-
-# def run_jigsaw_mpas_workflow(sWorkspace_jigsaw_in,
-#                             aConfig_in = None,
-#                             projector=[0.0, 0.0],
-#                             aFilename_river_in=None,
-#                             aFilename_watershed_boundary_in= None,
-#                             aFilename_lake_boundary_in = None,
-#                             aFilename_coastline_in = None):
-#    """
-#    run_jigsaw_mpas_workflow: main call to the ICoM mesh-gen. infrastructure.
-#
-#    1. Call user-defined MESH-PATH/COMPOSE.py to assemble
-#       mesh geometry, spacing pattern, initial conditions
-#       and mesh-gen. parameters.
-#    2. Call JIGSAW to build the triangulation.
-#    4. Call MPAS meshtools to make the MPAS mesh data files.
-#
-#    """
-#    # Authors: Darren Engwirda and Chang Liao
-#
-#
-#
-##---------- call JIGSAW to build the initial triangular mesh
-#
-#    geom, gprj, mesh, mprj =  runjgsw(sWorkspace_jigsaw_in, projector,
-#                                      aConfig_in=aConfig_in,
-#                                      aFilename_river_in=aFilename_river_in,
-#                                      aFilename_watershed_boundary_in= aFilename_watershed_boundary_in,
-#                                      aFilename_lake_boundary_in = aFilename_lake_boundary_in,
-#                                      aFilename_coastline_in = aFilename_coastline_in)
-#
-#
-#
-##-------------------------------------- write output for ESM
-#
-#    iFlag_mpas_tool = 1
-#    if iFlag_mpas_tool ==1:
-#        from pyflowline.mesh.jigsaw.saveesm import saveesm
-#        sFilename_culled_mesh, sFilename_invert_mesh = saveesm(sWorkspace_jigsaw_in, geom, mesh)
-#    else:
-#        #we will a new function to convert jigsaw mesh to mpas mesh11
-#        print('The algorithm is not completed yet')
-#        pass
-#
-#    return sFilename_invert_mesh
-
 
 def run_jigsaw(
     sWorkspace_jigsaw_in,

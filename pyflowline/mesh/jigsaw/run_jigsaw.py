@@ -773,7 +773,7 @@ def run_jigsaw(
 
         if iFlag_spac_river_network:
             print("Compute global h(x)... for river network")
-            spac.value[aRiver_network_mask] = spac.value[aRiver_network_mask]
+            spac.value[aRiver_network_mask] = dResolution_river_network
             if iFlag_RRS18to6_ocean:
                 #the river outlet spacing will the same as the coastline spacing
                 #more improvement can be made here

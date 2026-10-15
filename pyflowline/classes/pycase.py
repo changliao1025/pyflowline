@@ -34,23 +34,33 @@ from pyearthriver.classes.vertex import pyvertex
 from pyearthriver.classes.edge import pyedge
 from pyearthriver.classes.flowline import pyflowline
 
-from pyflowline.mesh.cubicsphere.create_cubicsphere_mesh import create_cubicsphere_mesh
-from pyflowline.mesh.triangular.create_triangular_mesh import create_triangular_mesh
-from pyflowline.mesh.tin.create_tin_mesh import create_tin_mesh
-from pyflowline.mesh.dggrid.create_dggrid_mesh import dggrid_find_resolution_by_index
-from pyflowline.mesh.dggrid.create_dggrid_mesh import create_dggrid_mesh
-from pyflowline.mesh.mpas.create_mpas_mesh import create_mpas_mesh
-from pyflowline.mesh.square.create_square_mesh import create_square_mesh
-from pyflowline.mesh.latlon.create_latlon_mesh import create_latlon_mesh
-from pyflowline.mesh.hexagon.create_hexagon_mesh import create_hexagon_mesh
+from pyearthmesh.meshes.structured.cubicsphere.create_cubicsphere_mesh import (
+    create_cubicsphere_mesh,
+)
+from pyearthmesh.meshes.structured.triangular.create_triangular_mesh import (
+    create_triangular_mesh,
+)
+from pyearthmesh.meshes.unstructured.tin.create_tin_mesh import create_tin_mesh
+from pyearthmesh.meshes.structured.dggs.dggrid.create_dggrid_mesh import (
+    dggrid_find_resolution_by_index,
+    create_dggrid_mesh,
+)
+from pyearthmesh.meshes.unstructured.mpas.create_mpas_mesh import create_mpas_mesh
+from pyearthmesh.meshes.structured.square.create_square_mesh import create_square_mesh
+from pyearthmesh.meshes.structured.latlon.create_latlon_mesh import create_latlon_mesh
+from pyearthmesh.meshes.structured.hexagon.create_hexagon_mesh import (
+    create_hexagon_mesh,
+)
 
 from pyflowline.classes.timer import pytimer
-from pyflowline.classes.mpas import pympas
-from pyflowline.classes.hexagon import pyhexagon
-from pyflowline.classes.latlon import pylatlon
-from pyflowline.classes.square import pysquare
-from pyflowline.classes.dggrid import pydggrid
+from pyearthmesh.classes.mpas import pympas
+from pyearthmesh.classes.hexagon import pyhexagon
+from pyearthmesh.classes.latlon import pylatlon
+from pyearthmesh.classes.square import pysquare
+from pyearthmesh.classes.dggrid import pydggrid
+from pyearthmesh.classes.tin import pytin
 from pyflowline.classes.basin import pybasin
+
 
 
 from pyflowline.formats.read_mesh import read_mesh_json, read_mesh_json_w_topology
@@ -95,8 +105,11 @@ class CaseClassEncoder(JSONEncoder):
             return obj.lCellID
         if isinstance(obj, pydggrid):
             return obj.lCellID
+        if isinstance(obj, pytin):
+            return obj.lCellID
         if isinstance(obj, pybasin):
             return obj.lBasinID
+
 
         return JSONEncoder.default(self, obj)
 

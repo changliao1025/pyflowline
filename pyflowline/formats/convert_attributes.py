@@ -2,11 +2,12 @@ import numpy as np
 
 from pyearthriver.classes.edge import pyedge
 from pyearthriver.classes.vertex import pyvertex
-from pyflowline.classes.hexagon import pyhexagon
-from pyflowline.classes.square import pysquare
-from pyflowline.classes.latlon import pylatlon
-from pyflowline.classes.mpas import pympas
-from pyflowline.classes.tin import pytin
+from pyearthmesh.classes.hexagon import pyhexagon
+from pyearthmesh.classes.square import pysquare
+from pyearthmesh.classes.latlon import pylatlon
+from pyearthmesh.classes.mpas import pympas
+from pyearthmesh.classes.tin import pytin
+
 
 
 def convert_gcs_attributes_to_cell(

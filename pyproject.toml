@@ -36,7 +36,9 @@ dependencies = [
     "rtree",
     "pyearth",
     "pyearthriver>=0.1.1",
+    "pyearthmesh>=0.1.0",
 ]
+
 
 [project.urls]
 Homepage = "https://github.com/changliao1025/pyflowline"

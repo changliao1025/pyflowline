@@ -3,12 +3,13 @@ from pyearthriver.classes.vertex import pyvertex
 from pyearthriver.classes.edge import pyedge
 from pyearthriver.classes.flowline import pyflowline
 
-from pyflowline.classes.hexagon import pyhexagon
-from pyflowline.classes.square import pysquare
-from pyflowline.classes.latlon import pylatlon
-from pyflowline.classes.mpas import pympas
-from pyflowline.classes.tin import pytin
-from pyflowline.classes.dggrid import pydggrid
+from pyearthmesh.classes.hexagon import pyhexagon
+from pyearthmesh.classes.square import pysquare
+from pyearthmesh.classes.latlon import pylatlon
+from pyearthmesh.classes.mpas import pympas
+from pyearthmesh.classes.tin import pytin
+from pyearthmesh.classes.dggrid import pydggrid
+
 
 from pyearth.gis.spatialref.reproject_coordinates import reproject_coordinates
 

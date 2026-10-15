@@ -2,7 +2,8 @@ import os
 import json
 from osgeo import ogr, osr
 from pyearthriver.classes.edge import pyedge
-from pyflowline.classes.link import pycelllink
+from pyearthmesh.classes.link import pycelllink
+
 
 
 def export_flowline_to_geojson(

@@ -15,7 +15,7 @@ from pyearthriver.classes.confluence import pyconfluence
 from pyearthriver.classes.rivergraph import pyrivergraph
 
 from pyflowline.classes.timer import pytimer
-from pyflowline.formats.read_flowline import read_flowline_geojson
+from pyflowline.formats.read_flowline import read_flowline_vector
 from pyflowline.formats.convert_flowline_to_geojson import convert_flowline_to_geojson
 from pyflowline.formats.convert_boundary_to_geojson import convert_boundary_to_geojson
 from pyflowline.formats.export_flowline import export_flowline_to_geojson
@@ -456,7 +456,7 @@ class pybasin(object):
         ptimer = pytimer()
         # sFilename_flowline_filter = self.sFilename_flowline_filter
         sFilename_flowline_filter = self.sFilename_flowline_filter_geojson
-        aFlowline_basin_filtered, pProjection_geojson = read_flowline_geojson(
+        aFlowline_basin_filtered, pProjection_geojson = read_flowline_vector(
             sFilename_flowline_filter
         )
 
@@ -692,7 +692,7 @@ class pybasin(object):
         if self.aFlowline_basin_filtered is None:
             sFilename_flowline_filter = self.sFilename_flowline_filter
             sFilename_flowline_filter_geojson = self.sFilename_flowline_filter_geojson
-            self.aFlowline_basin_filtered, pProjection_geojson = read_flowline_geojson(
+            self.aFlowline_basin_filtered, pProjection_geojson = read_flowline_vector(
                 sFilename_flowline_filter_geojson
             )
             self.dLength_flowline_filtered = self.basin_calculate_flowline_length(
@@ -707,7 +707,7 @@ class pybasin(object):
 
         if self.aFlowline_basin_simplified is None:
             sFilename_flowline_in = self.sFilename_flowline_simplified
-            aFlowline_simplified, pProjection_geojson = read_flowline_geojson(
+            aFlowline_simplified, pProjection_geojson = read_flowline_vector(
                 sFilename_flowline_in
             )
 
@@ -743,7 +743,7 @@ class pybasin(object):
 
         if self.aFlowline_basin_conceptual is None:
             sFilename_flowline_in = self.sFilename_flowline_conceptual
-            aFlowline_conceptual, pProjection_geojson = read_flowline_geojson(
+            aFlowline_conceptual, pProjection_geojson = read_flowline_vector(
                 sFilename_flowline_in
             )
             self.aFlowline_basin_conceptual = aFlowline_conceptual
@@ -1081,7 +1081,7 @@ class pybasin(object):
         point["dLatitude_degree"] = self.dLatitude_outlet_degree
         pVertex_outlet = pyvertex(point)
 
-        aFlowline_simplified, pProjection_geojson = read_flowline_geojson(
+        aFlowline_simplified, pProjection_geojson = read_flowline_vector(
             sFilename_simplified
         )
         # Use   confluence finding for simplified flowlines
@@ -1096,7 +1096,7 @@ class pybasin(object):
             pVertex_outlet,
         ) = pRivergraph_simplified.find_confluence()
 
-        aFlowline_conceptual, pProjection_geojson = read_flowline_geojson(
+        aFlowline_conceptual, pProjection_geojson = read_flowline_vector(
             sFilename_flowline_edge
         )
         # Use   confluence finding for conceptual flowlines

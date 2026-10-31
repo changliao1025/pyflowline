@@ -1,6 +1,7 @@
 import os
 import stat
 from pathlib import Path
+
 from pyearth.system.python.get_python_environment import get_python_environment
 
 
@@ -10,31 +11,17 @@ def _pyflowline_create_hpc_job(self, sSlurm_in=None, hours_in=10):
     sConda_env_path, sConda_env_name, env_type = get_python_environment()
     # part 1 python script
 
-    sFilename_pyflowline = os.path.join(
-        str(Path(self.sWorkspace_output)), "run_pyflowline.py"
-    )
+    sFilename_pyflowline = os.path.join(str(Path(self.sWorkspace_output)), "run_pyflowline.py")
     ofs_pyflowline = open(sFilename_pyflowline, "w")
 
-    sLine = (
-        "#!/qfs/people/liao313/.conda/envs/"
-        + sConda_env_name
-        + "/bin/"
-        + "python3"
-        + "\n"
-    )
+    sLine = "#!/qfs/people/liao313/.conda/envs/" + sConda_env_name + "/bin/" + "python3" + "\n"
     ofs_pyflowline.write(sLine)
     sLine = "import os" + "\n"
     ofs_pyflowline.write(sLine)
-    sLine = (
-        "os.environ['PROJ_LIB']=" + '"' + sConda_env_path + "/share/proj" + '"' + "\n"
-    )
+    sLine = "os.environ['PROJ_LIB']=" + '"' + sConda_env_path + "/share/proj" + '"' + "\n"
     ofs_pyflowline.write(sLine)
     sLine = (
-        "os.environ['LD_LIBRARY_PATH']="
-        + '"'
-        + sConda_env_path
-        + '/lib:${LD_LIBRARY_PATH}"'
-        + "\n"
+        "os.environ['LD_LIBRARY_PATH']=" + '"' + sConda_env_path + '/lib:${LD_LIBRARY_PATH}"' + "\n"
     )
     ofs_pyflowline.write(sLine)
     sLine = (
@@ -42,12 +29,7 @@ def _pyflowline_create_hpc_job(self, sSlurm_in=None, hours_in=10):
         + "\n"
     )
     ofs_pyflowline.write(sLine)
-    sLine = (
-        "sFilename_configuration_in = "
-        + '"'
-        + self.sFilename_model_configuration
-        + '"\n'
-    )
+    sLine = "sFilename_configuration_in = " + '"' + self.sFilename_model_configuration + '"\n'
     ofs_pyflowline.write(sLine)
     sLine = (
         "oPyflowline = pyflowline_read_configuration_file(sFilename_configuration_in,"
@@ -58,7 +40,7 @@ def _pyflowline_create_hpc_job(self, sSlurm_in=None, hours_in=10):
         + str(self.iResolution_index)
         + ","
         + "dResolution_meter_in="
-        + "{:0f}".format(self.dResolution_meter)
+        + f"{self.dResolution_meter:0f}"
         + ","
         + 'sDggrid_type_in="'
         + str(self.sDggrid_type)
@@ -110,7 +92,7 @@ def _pyflowline_create_hpc_job(self, sSlurm_in=None, hours_in=10):
     ofs.write(sLine)
     sLine = "#SBATCH --job-name=" + self.sCase + "\n"
     ofs.write(sLine)
-    sHour = "{:02d}".format(hours_in)
+    sHour = f"{hours_in:02d}"
     sLine = "#SBATCH -t " + sHour + ":00:00" + "\n"
     ofs.write(sLine)
     sLine = "#SBATCH --nodes=1" + "\n"

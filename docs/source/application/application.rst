@@ -26,7 +26,7 @@ The example `run_simulation_mpas.py` script import a few packages and functions.
     from os.path import realpath
     from pyflowline.configuration.read_configuration_file import pyflowline_read_configuration_file
 
-The `pyflowline_read_configuration_file` function reads in a JSON configuration file and loads all the necessary model parameters. 
+The `pyflowline_read_configuration_file` function reads in a JSON configuration file and loads all the necessary model parameters.
 
 
 ================
@@ -35,8 +35,8 @@ Step 2
 
 The script sets up some paths, which should be adjusted based on a real case and your local directory structure.
 
-::   
-    
+::
+
     sPath_parent = str(Path(__file__).parents[2]) # data is located two dir's up
     sPath_data = realpath( sPath_parent +  '/data/susquehanna' )
     sWorkspace_input =  str(Path(sPath_data)  /  'input')
@@ -49,7 +49,7 @@ Step 3
 
 Check the configuration file:
 
-::   
+::
 
     sFilename_configuration_in = realpath( sPath_parent +  '/examples/susquehanna/pyflowline_susquehanna_mpas.json' )
     if os.path.isfile(sFilename_configuration_in):
@@ -63,7 +63,7 @@ Step 4
 
 Set up case information and read the configuration file.
 
-::   
+::
 
     iCase_index = 17
     Mesh = 'mpas'
@@ -81,7 +81,7 @@ Step 5
 
 Setup the model and run the three major steps.
 
-::   
+::
 
     oPyflowline.setup()
     oPyflowline.flowline_simplification()
@@ -93,7 +93,7 @@ Step 6
 ================
 Analyze and export the model outputs.
 
-::   
+::
 
     oPyflowline.analyze()
     oPyflowline.evaluate()
@@ -110,6 +110,6 @@ Optionally, the user can also visualize the model outputs using the following me
     aExtent_full = [-78.5,-75.5, 39.2,42.5]
     sFilename =  'filtered_flowline.png'
     oPyflowline._plot(sFilename, sVariable_in = 'flowline_filter', aExtent_in =aExtent_full  )
-    
+
     sFilename =  'conceptual_flowline_with_mesh.png'
-    oPyflowline._plot(sFilename,  iFlag_title=1 ,sVariable_in='overlap',   aExtent_in =aExtent_full )  
+    oPyflowline._plot(sFilename,  iFlag_title=1 ,sVariable_in='overlap',   aExtent_in =aExtent_full )

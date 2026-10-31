@@ -7,9 +7,9 @@ and any other vector format supported by pyearth and GDAL/OGR.
 import os
 from typing import List, Optional, Tuple
 
-from osgeo import osr
 from pyearthriver.classes.flowline import pyflowline
 from pyearthriver.formats.load_flowline import read_flowlines_from_vector
+
 from pyflowline.formats.export_flowline import export_flowline_to_geojson
 
 
@@ -34,9 +34,7 @@ def read_flowline_vector(
         RuntimeError: If GDAL/OGR cannot read the vector file.
     """
     if not os.path.exists(sFilename_vector_in):
-        raise FileNotFoundError(
-            f"This vector file does not exist: {sFilename_vector_in}"
-        )
+        raise FileNotFoundError(f"This vector file does not exist: {sFilename_vector_in}")
 
     aFlowline, pProjection_geojson = read_flowlines_from_vector(
         sFilename_vector_in, return_spatial_ref=True
@@ -53,5 +51,3 @@ def read_flowline_vector(
         )
 
     return aFlowline, pProjection_geojson
-
-

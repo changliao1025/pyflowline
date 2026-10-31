@@ -1,14 +1,13 @@
 import os
 from shutil import copy2
-from osgeo import ogr, gdal, osr
-from pyearth.toolbox.conversion.convert_vector_format import convert_vector_format
-from pyearth.gis.location.get_geometry_coordinates import get_geometry_coordinates
+
+from osgeo import gdal, ogr, osr
 from pyearth.gis.geometry.calculate_polygon_area import calculate_polygon_area
+from pyearth.gis.location.get_geometry_coordinates import get_geometry_coordinates
+from pyearth.toolbox.conversion.convert_vector_format import convert_vector_format
 
 
-def convert_boundary_to_geojson(
-    sFilename_in, sFilename_geojson_out, iFlag_largest_polygon_in=0
-):
+def convert_boundary_to_geojson(sFilename_in, sFilename_geojson_out, iFlag_largest_polygon_in=0):
     if os.path.isfile(sFilename_in):
         # check the file type of the input file
         sExtension = os.path.splitext(sFilename_in)[1]
@@ -99,9 +98,7 @@ def convert_boundary_to_geojson(
                 pDataset_geojson = None
     else:
         if iFile_type == 1:  # shapefile
-            convert_vector_format(
-                sFilename_in, sFilename_geojson_out, sLayername_in="boundary"
-            )
+            convert_vector_format(sFilename_in, sFilename_geojson_out, sLayername_in="boundary")
         else:
             if iFile_type == 2:
                 # should check whether this file is single polygon or multiple polygons

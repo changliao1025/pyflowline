@@ -1,9 +1,9 @@
-import os
 import json
-from osgeo import ogr, osr
-from pyearthriver.classes.edge import pyedge
-from pyearthmesh.classes.link import pycelllink
+import os
 
+from osgeo import ogr, osr
+from pyearthmesh.classes.link import pycelllink
+from pyearthriver.classes.edge import pyedge
 
 
 def export_flowline_to_geojson(
@@ -41,17 +41,13 @@ def export_flowline_to_geojson(
         nAttribute1, nAttribute2, nAttribute3 = map(
             len, [aAttribute_field, aAttribute_data, aAttribute_dtype]
         )
-        if not nAttribute1 == nAttribute2 == nAttribute3 and nFlowline != len(
-            aAttribute_data[0]
-        ):
+        if not nAttribute1 == nAttribute2 == nAttribute3 and nFlowline != len(aAttribute_data[0]):
             print("The attribute is not correct, please check!")
             return
 
     pDriver_json = ogr.GetDriverByName("GeoJSON")
     pDataset_json = pDriver_json.CreateDataSource(sFilename_json_in)
-    pLayer_json = pDataset_json.CreateLayer(
-        "flowline", pSpatial_reference_in, ogr.wkbLineString
-    )
+    pLayer_json = pDataset_json.CreateLayer("flowline", pSpatial_reference_in, ogr.wkbLineString)
     # Add one attribute
     pLayer_json.CreateField(
         ogr.FieldDefn("lineid", ogr.OFTInteger64)
@@ -83,18 +79,14 @@ def export_flowline_to_geojson(
         pFlowline = aFlowline_in[lID]
         pLine = ogr.Geometry(ogr.wkbLineString)
         for vertex in pFlowline.aVertex:
-            pLine.AddPoint(
-                *(getattr(vertex, attr) for attr in flag_to_attr[iFlag_projected_in])
-            )
+            pLine.AddPoint(*(getattr(vertex, attr) for attr in flag_to_attr[iFlag_projected_in]))
 
         pLine.FlattenTo2D()
         pFeature_out.SetGeometry(pLine)
         pFeature_out.SetField("lineid", lID + 1)
 
         if iFlag_attribute == 1:
-            for sField, dtype, dummy in zip(
-                aAttribute_field, aAttribute_dtype, aAttribute_data
-            ):
+            for sField, dtype, dummy in zip(aAttribute_field, aAttribute_dtype, aAttribute_data):
                 pFeature_out.SetField(
                     sField, int(dummy[lID]) if dtype == "int" else float(dummy[lID])
                 )
@@ -141,11 +133,7 @@ def export_flowline_to_shapefile(
         nAttribute2 = len(aAttribute_data)
         nAttribute3 = len(aAttribute_dtype)
         nAttribute4 = len(aAttribute_data[0])
-        if (
-            nAttribute3 != nAttribute1
-            or nAttribute1 != nAttribute2
-            or nFlowline != nAttribute4
-        ):
+        if nAttribute3 != nAttribute1 or nAttribute1 != nAttribute2 or nFlowline != nAttribute4:
             print("The attribute is not correct, please check!")
             return
         else:
@@ -221,9 +209,7 @@ def export_flowline_to_shapefile(
     return
 
 
-def export_flowline_info_to_json(
-    aCell, aCell_intersect_in, aFlowline_in, sFilename_json_out
-):
+def export_flowline_info_to_json(aCell, aCell_intersect_in, aFlowline_in, sFilename_json_out):
     # export the flowline topology to json
     ncell = len(aCell_intersect_in)
     nflowline = len(aFlowline_in)

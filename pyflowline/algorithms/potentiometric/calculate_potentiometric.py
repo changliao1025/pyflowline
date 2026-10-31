@@ -1,6 +1,4 @@
-def calculate_potentiometric(
-    dElevation_bedrock_in, dThickness_ice_in, dDensity_ice_in=None
-):
+def calculate_potentiometric(dElevation_bedrock_in, dThickness_ice_in, dDensity_ice_in=None):
     # calculate potentiometric surface
 
     # if both are missing value, keep it as missing
@@ -42,8 +40,6 @@ if __name__ == "__main__":
     dThickness_ice = 1000.0
     dDensity_ice = 917.0
 
-    dPotentiometric = calculate_potentiometric(
-        dElevation_bedrock, dThickness_ice, dDensity_ice
-    )
+    dPotentiometric = calculate_potentiometric(dElevation_bedrock, dThickness_ice, dDensity_ice)
 
     print(dPotentiometric)

@@ -1,13 +1,10 @@
-import os, sys
+import os
+import sys
 from pathlib import Path
 
-
-from pyflowline.configuration.read_configuration_file import (
-    pyflowline_read_configuration_file,
-)
-from pyflowline.configuration.change_json_key_value import change_json_key_value
 from pyflowline.configuration import path_manager as pyflowline_path_manager
-
+from pyflowline.configuration.change_json_key_value import change_json_key_value
+from pyflowline.configuration.read_configuration_file import pyflowline_read_configuration_file
 
 # %% Define the case information (configuration file parameters)
 sRegion = "susquehanna"
@@ -61,9 +58,7 @@ else:
 change_json_key_value(oFilename_domain_config, "sWorkspace_output", str(oFolder_output))
 
 # Set the path to the mpas mesh file
-change_json_key_value(
-    oFilename_domain_config, "sFilename_mesh_netcdf", str(oFilename_mesh_netcdf)
-)
+change_json_key_value(oFilename_domain_config, "sFilename_mesh_netcdf", str(oFilename_mesh_netcdf))
 
 # Set the path to the boundary file used to clip the mesh
 change_json_key_value(
@@ -71,9 +66,7 @@ change_json_key_value(
 )
 
 # Set the path to the basin ("child") configuration file
-change_json_key_value(
-    oFilename_domain_config, "sFilename_basins", str(oFilename_basins_config)
-)
+change_json_key_value(oFilename_domain_config, "sFilename_basins", str(oFilename_basins_config))
 
 # These parameters are not strictly necessary, but will reduce the potential for errors or confusion.
 change_json_key_value(
@@ -127,9 +120,7 @@ oPyflowline.pyflowline_setup()
 
 # %%
 if iFlag_visualization == 1:
-    oPyflowline.plot(
-        sVariable_in="flowline_filter", sFilename_output_in="filter_flowline.png"
-    )
+    oPyflowline.plot(sVariable_in="flowline_filter", sFilename_output_in="filter_flowline.png")
     pass
 
 # %%

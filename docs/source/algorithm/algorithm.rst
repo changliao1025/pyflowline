@@ -33,10 +33,10 @@ Currently, this algorithm does not include the upstream of a dam.
 Flowline vertex extraction
 ==============================
 
-The vertices that make up flowlines are used in several algorithms. Among them, a flowline's starting and ending vertices also define the flowline type. 
+The vertices that make up flowlines are used in several algorithms. Among them, a flowline's starting and ending vertices also define the flowline type.
 
 * If the starting vertex has no upstream, the flowline is a headwater.
-* If the starting or ending vertex has only one upstream or downstream, it is a middle flowline and can be merged with others. 
+* If the starting or ending vertex has only one upstream or downstream, it is a middle flowline and can be merged with others.
 * If a starting vertex has more than one upstream vertices, it is a river confluence.
 
 ==============================
@@ -53,7 +53,7 @@ With all the flowlines and vertices, the algorithm split the flowlines into a mi
 Flow direction correction
 ==============================
 
-Due to data quality issues, the existing flowlines may have incorrect flow directions, which lead to multiple downstream flow directions. 
+Due to data quality issues, the existing flowlines may have incorrect flow directions, which lead to multiple downstream flow directions.
 The corresponding node connection matrix has rows with multiple *1*s. This algorithm scans from the outlet vertex and searches reversely; once such a row is detected, the corresponding flow direction is reversed.
 
 .. image:: ../../figures/flow_direction_matrix.png
@@ -233,4 +233,4 @@ After the intersection, this algorithm rebuilds the topologic relationship using
 Remove returning flowline
 ==============================
 
-This algorithm simplifies the topology information for several unusual scenarios. For example, if a flowline leaves and reenters the same mesh cell through the same edge, this creates a loop in topology and will be simplified. 
+This algorithm simplifies the topology information for several unusual scenarios. For example, if a flowline leaves and reenters the same mesh cell through the same edge, this creates a loop in topology and will be simplified.

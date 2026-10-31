@@ -1,0 +1,41 @@
+# ==============================================================================
+# PyFlowline Case Specification: Variable-Resolution MPAS Mesh (YAML)
+# ==============================================================================
+workflow:
+  date: "20220110"                              # Simulation date (YYYYMMDD)
+  mesh_type: mpas                               # Target mesh: mpas
+  case_index: 1                                 # Simulation run index
+  model: pyflowline                             # Model engine
+  job: hex                                      # Job name
+  region: susquehanna                           # Study region
+  standalone: true                              # Standalone case execution
+  debug: false                                  # Diagnostic logging
+
+resolutions:
+  degree: 5000.0                                # Resolution in degrees/meters
+  meter: 5000.0                                 # High resolution spacing (5 km)
+
+region:
+  bbox:
+    left: -79.0                                 # Western bounding longitude
+    right: -74.5                                # Eastern bounding longitude
+    bottom: 39.20                               # Southern bounding latitude
+    top: 42.8                                   # Northern bounding latitude
+
+flags:
+  create_mesh: true                             # Generate mesh geometry
+  save_mesh: true                               # Export mesh to disk
+  simplification: true                          # Simplify river geometry
+  intersect: true                               # Intersect river reaches with mesh cells
+  flowline: true                                # Enable river flowline processing
+  use_mesh_dem: true                            # Sample elevation directly from mesh DEM
+  rotation: false                               # Grid orientation rotation
+
+paths:
+  workspace_input: .                            # Input directory (relative to this file)
+  workspace_output: ../output                   # Output directory
+  mesh_boundary: ./boundary_wgs.geojson         # Boundary mask to clip mesh
+  mesh_netcdf: ./lnd_cull_mesh.nc               # MPAS Voronoi netCDF mesh file
+  spatial_reference: ./boundary_proj_buff.shp   # Spatial coordinate reference geometry
+  dem: ./dem_buff_ext.tif                       # Digital Elevation Model raster
+  basins: ./pyflowline_susquehanna_basins.yaml  # Child basin specification file

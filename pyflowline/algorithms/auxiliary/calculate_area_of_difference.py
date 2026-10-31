@@ -1,18 +1,14 @@
+import importlib.util
 import os
+
 import numpy as np
 from osgeo import ogr, osr
-import importlib.util
-from pyflowline.algorithms.auxiliary.find_index_in_list import find_list_in_list
-from pyearth.gis.geometry.calculate_polygon_area import calculate_polygon_area
 from pyearth.gis.geometry.calculate_angle_between_point_normal import (
     calculate_angle_between_point_normal,
 )
-
-iFlag_cython = importlib.util.find_spec("cython")
-if iFlag_cython is not None:
-    from pyflowline.algorithms.cython.kernel import find_vertex_in_list
-else:
-    from pyflowline.algorithms.auxiliary.find_vertex_in_list import find_vertex_in_list
+from pyearth.gis.geometry.calculate_polygon_area import calculate_polygon_area
+from pyearthriver.algorithms.auxiliary.find_index_in_list import find_list_in_list
+from pyearthriver.algorithms.spatial import find_vertex_in_list
 
 
 def calculate_area_of_difference_raw(sFilename_a, sFilename_b):
@@ -20,13 +16,11 @@ def calculate_area_of_difference_raw(sFilename_a, sFilename_b):
     return
 
 
-def calculate_area_of_difference_simplified(
-    aFlowline_in, aVertex_all_in, sFilename_output_in
-):
+def calculate_area_of_difference_simplified(aFlowline_in, aVertex_all_in, sFilename_output_in):
     iFlag_shapely = importlib.util.find_spec("shapely")
     if iFlag_shapely is not None:
-        from shapely.ops import polygonize
         from shapely.geometry.polygon import orient
+        from shapely.ops import polygonize
     else:
         print("shapely is required for this function")
 
@@ -88,9 +82,7 @@ def calculate_area_of_difference_simplified(
             x2 = pEdge.pVertex_end.dLongitude_degree
             y2 = pEdge.pVertex_end.dLatitude_degree
             iIndex_right = -1
-            n = len(pFlowline_in.aFlowlineID_end_start) + len(
-                pFlowline_in.aFlowlineID_end_end
-            )
+            n = len(pFlowline_in.aFlowlineID_end_start) + len(pFlowline_in.aFlowlineID_end_end)
             if n == 0:
                 iFlag_exist = 0
                 iFlag_reverse_new = 0
@@ -105,7 +97,7 @@ def calculate_area_of_difference_simplified(
                         nEdge2 = pFlowline_dummy.nEdge
                         pEdge2 = pFlowline_dummy.aEdge[0]
                         pVertex_dummy = pEdge2.pVertex_end
-                    else:  # revered
+                    else:  # reversed
                         nEdge2 = pFlowline_dummy.nEdge
                         pEdge2 = pFlowline_dummy.aEdge[nEdge2 - 1]
                         pVertex_dummy = pEdge2.pVertex_start
@@ -113,9 +105,7 @@ def calculate_area_of_difference_simplified(
                     # calculate angle
                     x3 = pVertex_dummy.dLongitude_degree
                     y3 = pVertex_dummy.dLatitude_degree
-                    angle_dummy = calculate_angle_between_point_normal(
-                        x1, y1, x2, y2, x3, y3
-                    )
+                    angle_dummy = calculate_angle_between_point_normal(x1, y1, x2, y2, x3, y3)
                     aAngle.append(angle_dummy)
                 for i in pFlowline_in.aFlowlineID_end_end:
                     pFlowline_dummy = aFlowline_in[i]
@@ -123,7 +113,7 @@ def calculate_area_of_difference_simplified(
                         nEdge2 = pFlowline_dummy.nEdge
                         pEdge2 = pFlowline_dummy.aEdge[0]
                         pVertex_dummy = pEdge2.pVertex_end
-                    else:  # revered
+                    else:  # reversed
                         nEdge2 = pFlowline_dummy.nEdge
                         pEdge2 = pFlowline_dummy.aEdge[nEdge2 - 1]
                         pVertex_dummy = pEdge2.pVertex_start
@@ -131,16 +121,11 @@ def calculate_area_of_difference_simplified(
                     # calculate angle
                     x3 = pVertex_dummy.dLongitude_degree
                     y3 = pVertex_dummy.dLatitude_degree
-                    angle_dummy = calculate_angle_between_point_normal(
-                        x1, y1, x2, y2, x3, y3
-                    )
+                    angle_dummy = calculate_angle_between_point_normal(x1, y1, x2, y2, x3, y3)
                     aAngle.append(angle_dummy)
 
                 # mini
-                dummy = (
-                    pFlowline_in.aFlowlineID_end_start
-                    + pFlowline_in.aFlowlineID_end_end
-                )
+                dummy = pFlowline_in.aFlowlineID_end_start + pFlowline_in.aFlowlineID_end_end
                 if iFlag_rightleft == 0:
                     min_angle = min(aAngle)
                     iIndex_right = aAngle.index(min_angle)
@@ -163,7 +148,7 @@ def calculate_area_of_difference_simplified(
                 return iFlag_exist, iFlag_reverse_new, pFlowline_out, pVertex_stop_out
 
         else:
-            # rever direction
+            # reverse direction
             pVertex_stop = pFlowline_in.pVertex_start
             pEdge = pFlowline_in.aEdge[0]
             x1 = pEdge.pVertex_end.dLongitude_degree
@@ -172,9 +157,7 @@ def calculate_area_of_difference_simplified(
             y2 = pEdge.pVertex_start.dLatitude_degree
             angle_min = 360
             iIndex_right = -1
-            n = len(pFlowline_in.aFlowlineID_start_start) + len(
-                pFlowline_in.aFlowlineID_start_end
-            )
+            n = len(pFlowline_in.aFlowlineID_start_start) + len(pFlowline_in.aFlowlineID_start_end)
             if n == 0:
                 iFlag_exist = 0
                 iFlag_reverse_new = 0
@@ -196,9 +179,7 @@ def calculate_area_of_difference_simplified(
 
                     x3 = pVertex_dummy.dLongitude_degree
                     y3 = pVertex_dummy.dLatitude_degree
-                    angle_dummy = calculate_angle_between_point_normal(
-                        x1, y1, x2, y2, x3, y3
-                    )
+                    angle_dummy = calculate_angle_between_point_normal(x1, y1, x2, y2, x3, y3)
                     aAngle.append(angle_dummy)
                 for i in pFlowline_in.aFlowlineID_start_end:
                     pFlowline_dummy = aFlowline_in[i]
@@ -213,16 +194,11 @@ def calculate_area_of_difference_simplified(
 
                     x3 = pVertex_dummy.dLongitude_degree
                     y3 = pVertex_dummy.dLatitude_degree
-                    angle_dummy = calculate_angle_between_point_normal(
-                        x1, y1, x2, y2, x3, y3
-                    )
+                    angle_dummy = calculate_angle_between_point_normal(x1, y1, x2, y2, x3, y3)
                     aAngle.append(angle_dummy)
 
                 # mini
-                dummy = (
-                    pFlowline_in.aFlowlineID_start_start
-                    + pFlowline_in.aFlowlineID_start_end
-                )
+                dummy = pFlowline_in.aFlowlineID_start_start + pFlowline_in.aFlowlineID_start_end
                 if iFlag_rightleft == 0:
                     min_angle = min(aAngle)
                     iIndex_right = aAngle.index(min_angle)
@@ -259,8 +235,8 @@ def calculate_area_of_difference_simplified(
                 iFlag_loop = 0
                 return iFlag_loop, aFlowline_list
             else:
-                iFlag_exist, iFlag_reverse_new, pFlowline_next, pVertex_stop = (
-                    get_next_branch(iFlag_rightleft, 0, pFlowline_in)
+                iFlag_exist, iFlag_reverse_new, pFlowline_next, pVertex_stop = get_next_branch(
+                    iFlag_rightleft, 0, pFlowline_in
                 )
                 if iFlag_exist == 1:
                     aFlowline_list.append(pFlowline_next.lFlowlineID - 1)
@@ -298,8 +274,8 @@ def calculate_area_of_difference_simplified(
                 iFlag_loop = 0
                 return iFlag_loop, aFlowline_list
             else:
-                iFlag_exist, iFlag_reverse_new, pFlowline_next, pVertex_stop = (
-                    get_next_branch(iFlag_rightleft, 1, pFlowline_in)
+                iFlag_exist, iFlag_reverse_new, pFlowline_next, pVertex_stop = get_next_branch(
+                    iFlag_rightleft, 1, pFlowline_in
                 )
                 if iFlag_exist == 1:
                     aFlowline_list.append(pFlowline_next.lFlowlineID - 1)
@@ -355,9 +331,7 @@ def calculate_area_of_difference_simplified(
     pSpatial_reference_gcs.SetAxisMappingStrategy(osr.OAMS_TRADITIONAL_GIS_ORDER)
     pLayer = pDataset.CreateLayer("aod", pSpatial_reference_gcs, ogr.wkbPolygon)
     # Add one attribute
-    pLayer.CreateField(
-        ogr.FieldDefn("id", ogr.OFTInteger64)
-    )  # long type for high resolution
+    pLayer.CreateField(ogr.FieldDefn("id", ogr.OFTInteger64))  # long type for high resolution
     pLayerDefn = pLayer.GetLayerDefn()
     pFeature = ogr.Feature(pLayerDefn)
     lCellID = 0

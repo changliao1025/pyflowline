@@ -1,23 +1,15 @@
 import os
+
 import numpy as np
 from osgeo import ogr, osr
+from pyearthriver.algorithms.spatial import find_vertex_in_list
 from pyearthriver.classes.vertex import pyvertex
-
-import importlib.util
-
-iFlag_cython = importlib.util.find_spec("cython")
-if iFlag_cython is not None:
-    from pyflowline.algorithms.cython.kernel import find_vertex_in_list
-else:
-    from pyflowline.algorithms.auxiliary.find_vertex_in_list import find_vertex_in_list
 
 
 def intersect_flowline_with_flowline(
     sFilename_flowline_a_in, sFilename_flowline_b_in, sFilename_output_in
 ):
-    if os.path.exists(sFilename_flowline_a_in) and os.path.exists(
-        sFilename_flowline_b_in
-    ):
+    if os.path.exists(sFilename_flowline_a_in) and os.path.exists(sFilename_flowline_b_in):
         pass
     else:
         print("The input file does not exist")
@@ -48,17 +40,13 @@ def intersect_flowline_with_flowline(
     comparison = pSpatial_reference_a.IsSame(pSpatial_reference_b)
     if comparison != 1:
         iFlag_transform = 1
-        transform = osr.CoordinateTransformation(
-            pSpatial_reference_a, pSpatial_reference_b
-        )
+        transform = osr.CoordinateTransformation(pSpatial_reference_a, pSpatial_reference_b)
     else:
         iFlag_transform = 0
 
     pDataset_out = pDriver_geojson.CreateDataSource(sFilename_output_in)
 
-    pLayerOut = pDataset_out.CreateLayer(
-        "intersect", pSpatial_reference_b, ogr.wkbMultiPoint
-    )
+    pLayerOut = pDataset_out.CreateLayer("intersect", pSpatial_reference_b, ogr.wkbMultiPoint)
     # Add one attribute
     pLayerOut.CreateField(
         ogr.FieldDefn("pointid", ogr.OFTInteger64)
@@ -109,19 +97,13 @@ def intersect_flowline_with_flowline(
                     pass
                 else:
                     print("Geometry issue 7")
-                    print(
-                        "Warning: invalid polygon detected in ", sFilename_flowline_b_in
-                    )
-                    raise Exception(
-                        f"Invalid geometry found in {sFilename_flowline_b_in}"
-                    )
+                    print("Warning: invalid polygon detected in ", sFilename_flowline_b_in)
+                    raise Exception(f"Invalid geometry found in {sFilename_flowline_b_in}")
 
                 iFlag_intersect = pGeometry_flowline_b.Intersects(pGeometry_flowline_a)
                 if iFlag_intersect == True:
                     iFlag_intersected = 1
-                    pGeometry_intersect = pGeometry_flowline_b.Intersection(
-                        pGeometry_flowline_a
-                    )
+                    pGeometry_intersect = pGeometry_flowline_b.Intersection(pGeometry_flowline_a)
                     # add more process here to
                     pGeometrytype_intersect = pGeometry_intersect.GetGeometryName()
 
@@ -134,9 +116,7 @@ def intersect_flowline_with_flowline(
                             point0["dLatitude_degree"] = point.GetY()
                             pVertex = pyvertex(point0)
                             pVertex.lFlowlineID = lFlowlineID
-                            iFlag_exist, lIndex = find_vertex_in_list(
-                                aVertex_intersect, pVertex
-                            )
+                            iFlag_exist, lIndex = find_vertex_in_list(aVertex_intersect, pVertex)
                             if iFlag_exist == 1:
                                 pass
                             else:
@@ -153,9 +133,7 @@ def intersect_flowline_with_flowline(
                         point["dLatitude_degree"] = pGeometry_intersect.GetY()
                         pVertex = pyvertex(point)
                         pVertex.lFlowlineID = lFlowlineID
-                        iFlag_exist, lIndex = find_vertex_in_list(
-                            aVertex_intersect, pVertex
-                        )
+                        iFlag_exist, lIndex = find_vertex_in_list(aVertex_intersect, pVertex)
                         if iFlag_exist == 1:
                             pass
                         else:

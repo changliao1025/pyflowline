@@ -1,7 +1,7 @@
-import sys
-from pathlib import Path
-from os.path import realpath
 import argparse
+import sys
+from os.path import realpath
+from pathlib import Path
 
 from pyflowline.configuration.pyflowline_create_template_configuration_file import (
     pyflowline_create_template_configuration_file,

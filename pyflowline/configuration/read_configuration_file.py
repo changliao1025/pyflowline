@@ -1,15 +1,7 @@
-import os
 from pathlib import Path
-import datetime
-import json
-from pyflowline.classes.pycase import flowlinecase
 
-pDate = datetime.datetime.today()
-sDate_default = (
-    "{:04d}".format(pDate.year)
-    + "{:02d}".format(pDate.month)
-    + "{:02d}".format(pDate.day)
-)
+from pyflowline.classes.pycase import flowlinecase
+from pyflowline.configuration.config_manager import _resolve_config_path, load_pyflowline_config
 
 
 def pyflowline_read_configuration_file(
@@ -27,142 +19,84 @@ def pyflowline_read_configuration_file(
     sDggrid_type_in=None,
     sWorkspace_output_in=None,
 ):
-    """read a model configuration
+    """Read a PyFlowline model configuration from YAML or JSON.
+
+    Supports:
+        - YAML (.yaml / .yml) with comments (#)
+        - JSON (.json) for backward compatibility
+        - Extensionless file paths and directory paths
+        - Two-tier sectioned specification or legacy flat dictionary
+        - Runtime parameter overrides
 
     Args:
-        sFilename_configuration_in (str or Path): _description_
-        iFlag_standalone_in (int, optional): _description_. Defaults to None.
-        iFlag_use_mesh_dem_in (int, optional): _description_. Defaults to None.
-        iCase_index_in (int, optional): _description_. Defaults to None.
-        dResolution_degree_in (float, optional): _description_. Defaults to None.
-        dResolution_meter_in (float, optional): _description_. Defaults to None.
-        sMesh_type_in (str, optional): _description_. Defaults to None.
-        sModel_in (str, optional): _description_. Defaults to None.
-        sDate_in (str, optional): _description_. Defaults to None.
-        sWorkspace_output_in (str or Path, optional): _description_. Defaults to None.
+        sFilename_configuration_in (str or Path): Path to configuration file or directory
+        iFlag_standalone_in (int, optional): Standalone mode flag. Defaults to 1.
+        iFlag_create_directory_in (int, optional): Directory creation flag.
+        iFlag_use_mesh_dem_in (int, optional): Use mesh DEM flag.
+        iCase_index_in (int, optional): Case index override.
+        iResolution_index_in (int, optional): Resolution index override.
+        dResolution_degree_in (float, optional): Resolution in degrees override.
+        dResolution_meter_in (float, optional): Resolution in meters override.
+        sMesh_type_in (str, optional): Mesh type override.
+        sModel_in (str, optional): Model name override.
+        sDate_in (str, optional): Simulation date override.
+        sDggrid_type_in (str, optional): DGGRID type override.
+        sWorkspace_output_in (str or Path, optional): Output workspace override.
 
     Returns:
-        _type_: _description_
+        flowlinecase: Configured flowlinecase object ready for simulation.
     """
-    # Ensure input filenames are strings
-    if isinstance(sFilename_configuration_in, Path):
-        sFilename_configuration_in = str(sFilename_configuration_in)
-    if isinstance(sWorkspace_output_in, Path):
-        sWorkspace_output_in = str(sWorkspace_output_in)
+    resolved_path = _resolve_config_path(sFilename_configuration_in)
 
-    if not os.path.isfile(sFilename_configuration_in):
-        print(sFilename_configuration_in + " does not exist")
-        return
+    if not resolved_path.is_file():
+        print(f"{sFilename_configuration_in} does not exist")
+        return None
 
-    # Opening JSON file
-    with open(sFilename_configuration_in) as json_file:
-        aConfig = json.load(json_file)
+    # Load configuration (handles YAML comments, relative paths, platform paths)
+    aConfig = load_pyflowline_config(resolved_path)
 
+    # Apply runtime argument overrides
     if iCase_index_in is not None:
-        iCase_index = iCase_index_in
-    else:
-        iCase_index = int(aConfig["iCase_index"])
+        aConfig["iCase_index"] = int(iCase_index_in)
 
     if iResolution_index_in is not None:
-        iResolution_index = iResolution_index_in
-    else:
-        if "iResolution_index" in aConfig:
-            iResolution_index = int(aConfig["iResolution_index"])
-        else:
-            iResolution_index = 10
-
-        pass
+        aConfig["iResolution_index"] = int(iResolution_index_in)
 
     if iFlag_standalone_in is not None:
-        iFlag_standalone = iFlag_standalone_in
-    else:
-        iFlag_standalone = int(aConfig["iFlag_standalone"])
+        aConfig["iFlag_standalone"] = int(iFlag_standalone_in)
 
     if iFlag_use_mesh_dem_in is not None:
-        iFlag_use_mesh_dem = iFlag_use_mesh_dem_in
-    else:
-        iFlag_use_mesh_dem = int(aConfig["iFlag_use_mesh_dem"])
+        aConfig["iFlag_use_mesh_dem"] = int(iFlag_use_mesh_dem_in)
 
     if sMesh_type_in is not None:
-        sMesh_type = sMesh_type_in
-    else:
-        sMesh_type = aConfig["sMesh_type"]
-        pass
+        aConfig["sMesh_type"] = str(sMesh_type_in).lower()
 
     if sDggrid_type_in is not None:
-        sDggrid_type = sDggrid_type_in
-    else:
-        if "sDggrid_type" in aConfig:
-            sDggrid_type = aConfig["sDggrid_type"]
-        else:
-            sDggrid_type = "ISEA3H"
+        aConfig["sDggrid_type"] = str(sDggrid_type_in)
 
     if sModel_in is not None:
-        sModel = sModel_in
-    else:
-        sModel = aConfig["sModel"]
-        pass
+        aConfig["sModel"] = str(sModel_in)
 
     if sDate_in is not None:
-        sDate = sDate_in
-    else:
-        sDate = aConfig["sDate"]
-        pass
+        aConfig["sDate"] = str(sDate_in)
 
     if dResolution_degree_in is not None:
-        dResolution_degree = dResolution_degree_in
-    else:
-        dResolution_degree = aConfig["dResolution_degree"]
-        pass
+        aConfig["dResolution_degree"] = float(dResolution_degree_in)
 
     if dResolution_meter_in is not None:
-        dResolution_meter = dResolution_meter_in
-    else:
-        dResolution_meter = aConfig["dResolution_meter"]
-        pass
+        aConfig["dResolution_meter"] = float(dResolution_meter_in)
 
     if sWorkspace_output_in is not None:
-        sWorkspace_output = sWorkspace_output_in
-    else:
-        sWorkspace_output = aConfig["sWorkspace_output"]
-        # try to create this output folder first using
+        aConfig["sWorkspace_output"] = str(sWorkspace_output_in)
 
+    sWorkspace_output = aConfig.get("sWorkspace_output", "./output")
     try:
-        print(
-            "Creating the specified output workspace (if it does not exist): \n",
-            sWorkspace_output,
-        )
         Path(sWorkspace_output).mkdir(parents=True, exist_ok=True)
-        print("The specified output workspace is: \n", sWorkspace_output)
-    except ValueError:
-        print("The specified output workspace cannot be created!")
-        exit
+    except Exception as exc:
+        print(f"Warning: Could not create output workspace {sWorkspace_output}: {exc}")
 
-    aConfig["iCase_index"] = iCase_index
-    aConfig["iFlag_standalone"] = iFlag_standalone
-    aConfig["iFlag_use_mesh_dem"] = iFlag_use_mesh_dem
-    aConfig["iResolution_index"] = iResolution_index
-    aConfig["dResolution_degree"] = dResolution_degree
-    aConfig["dResolution_meter"] = dResolution_meter
+    aConfig["sFilename_model_configuration"] = str(resolved_path)
 
-    aConfig["sDate"] = sDate
-    aConfig["sModel"] = sModel
-    aConfig["sMesh_type"] = sMesh_type
-    aConfig["sDggrid_type"] = sDggrid_type
-    aConfig["sWorkspace_output"] = sWorkspace_output
-
-    aConfig["sFilename_model_configuration"] = sFilename_configuration_in
-
-    # based on global variable, a few variables are calculate once
-    # calculate the modflow simulation period
-    # https://docs.python.org/3/library/datetime.html#datetime-objects
-
-    # aConfig
-
-    # simulation
-
-    oPyflowline = flowlinecase(
-        aConfig, iFlag_create_directory_in=iFlag_create_directory_in
-    )
+    oPyflowline = flowlinecase(aConfig, iFlag_create_directory_in=iFlag_create_directory_in)
 
     return oPyflowline

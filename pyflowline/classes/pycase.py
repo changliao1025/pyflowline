@@ -1,82 +1,63 @@
-import os, platform
-import shutil
-import stat
-from pathlib import Path
-import json
-from json import JSONEncoder
 import datetime
 import importlib.util
+import json
+import os
+import platform
+import shutil
+import stat
+from json import JSONEncoder
+from pathlib import Path
 from shutil import copy2
-import numpy as np
-from osgeo import ogr, osr, gdal
-from rtree.index import Index as RTreeindex
 
+import numpy as np
+from osgeo import gdal, ogr, osr
 from pyearth.gis.gdal.gdal_check_file_type import gdal_check_file_type
-from pyearth.gis.spatialref.convert_between_degree_and_meter import degree_to_meter
-from pyearth.gis.spatialref.convert_between_degree_and_meter import meter_to_degree
-from pyearth.gis.gdal.read.vector.gdal_get_vector_boundary import (
-    gdal_get_vector_boundary,
-)
-from pyearth.gis.gdal.read.raster.gdal_read_geotiff_file import gdal_read_geotiff_file
-from pyearth.gis.gdal.read.raster.gdal_get_raster_extent import gdal_get_raster_extent
-from pyearth.gis.spatialref.utm_utility import get_utm_spatial_reference_wkt
-from pyearth.gis.spatialref.reproject_coordinates import reproject_coordinates
-from pyearth.gis.gdal.read.vector.gdal_get_vector_spatial_reference import (
-    gdal_get_vector_spatial_reference_wkt,
-)
 from pyearth.gis.gdal.read.raster.gdal_get_raster_spatial_reference import (
     gdal_get_raster_spatial_reference_wkt,
 )
-
+from pyearth.gis.gdal.read.raster.gdal_read_geotiff_file import gdal_read_geotiff_file
+from pyearth.gis.gdal.read.vector.gdal_get_vector_boundary import gdal_get_vector_boundary
+from pyearth.gis.gdal.read.vector.gdal_get_vector_spatial_reference import (
+    gdal_get_vector_spatial_reference_wkt,
+)
+from pyearth.gis.spatialref.convert_between_degree_and_meter import degree_to_meter, meter_to_degree
+from pyearth.gis.spatialref.reproject_coordinates import reproject_coordinates
 from pyearth.toolbox.conversion.convert_vector_format import convert_vector_format
-
-from pyearthriver.classes.vertex import pyvertex
-from pyearthriver.classes.edge import pyedge
-from pyearthriver.classes.flowline import pyflowline
-
+from pyearthmesh.classes.dggrid import pydggrid
+from pyearthmesh.classes.hexagon import pyhexagon
+from pyearthmesh.classes.latlon import pylatlon
+from pyearthmesh.classes.mpas import pympas
+from pyearthmesh.classes.square import pysquare
+from pyearthmesh.classes.tin import pytin
 from pyearthmesh.meshes.structured.cubicsphere.create_cubicsphere_mesh import (
     create_cubicsphere_mesh,
 )
-from pyearthmesh.meshes.structured.triangular.create_triangular_mesh import (
-    create_triangular_mesh,
-)
-from pyearthmesh.meshes.unstructured.tin.create_tin_mesh import create_tin_mesh
 from pyearthmesh.meshes.structured.dggs.dggrid.create_dggrid_mesh import (
-    dggrid_find_resolution_by_index,
     create_dggrid_mesh,
+    dggrid_find_resolution_by_index,
 )
-from pyearthmesh.meshes.unstructured.mpas.create_mpas_mesh import create_mpas_mesh
-from pyearthmesh.meshes.structured.square.create_square_mesh import create_square_mesh
+from pyearthmesh.meshes.structured.hexagon.create_hexagon_mesh import create_hexagon_mesh
 from pyearthmesh.meshes.structured.latlon.create_latlon_mesh import create_latlon_mesh
-from pyearthmesh.meshes.structured.hexagon.create_hexagon_mesh import (
-    create_hexagon_mesh,
-)
-
-from pyflowline.classes.timer import pytimer
-from pyearthmesh.classes.mpas import pympas
-from pyearthmesh.classes.hexagon import pyhexagon
-from pyearthmesh.classes.latlon import pylatlon
-from pyearthmesh.classes.square import pysquare
-from pyearthmesh.classes.dggrid import pydggrid
-from pyearthmesh.classes.tin import pytin
-from pyflowline.classes.basin import pybasin
-
-
-
-from pyflowline.formats.read_mesh import read_mesh_json, read_mesh_json_w_topology
-from pyflowline.formats.convert_boundary_to_geojson import convert_boundary_to_geojson
+from pyearthmesh.meshes.structured.square.create_square_mesh import create_square_mesh
+from pyearthmesh.meshes.structured.triangular.create_triangular_mesh import create_triangular_mesh
+from pyearthmesh.meshes.unstructured.mpas.create_mpas_mesh import create_mpas_mesh
+from pyearthmesh.meshes.unstructured.tin.create_tin_mesh import create_tin_mesh
+from pyearthriver.classes.edge import pyedge
+from pyearthriver.classes.flowline import pyflowline
+from pyearthriver.classes.vertex import pyvertex
+from rtree.index import Index as RTreeindex
 
 from pyflowline.algorithms.intersect.intersect_flowline_with_mesh import get_mesh_cache
+from pyflowline.classes._hpc import _pyflowline_create_hpc_job
+from pyflowline.classes.basin import pybasin
+from pyflowline.classes.timer import pytimer
+from pyflowline.formats.convert_boundary_to_geojson import convert_boundary_to_geojson
 
 iFlag_kml = importlib.util.find_spec("simplekml")
 
 gdal.UseExceptions()
 pDate = datetime.datetime.today()
-sDate_default = (
-    "{:04d}".format(pDate.year)
-    + "{:02d}".format(pDate.month)
-    + "{:02d}".format(pDate.day)
-)
+sDate_default = f"{pDate.year:04d}" + f"{pDate.month:02d}" + f"{pDate.day:02d}"
 
 
 class CaseClassEncoder(JSONEncoder):
@@ -110,11 +91,21 @@ class CaseClassEncoder(JSONEncoder):
         if isinstance(obj, pybasin):
             return obj.lBasinID
 
-
         return JSONEncoder.default(self, obj)
 
 
-class flowlinecase(object):
+iFlag_visual = importlib.util.find_spec("cartopy")
+if iFlag_visual is not None:
+    from ._visual import (
+        _compare_with_raster_dem_method,
+        _plot_mesh,
+        _plot_mesh_with_flowline,
+        _plot_study_area,
+        plot,
+    )
+
+
+class flowlinecase:
     """
     The flowline case class
 
@@ -125,17 +116,15 @@ class flowlinecase(object):
         flowlinecase: A flowlinecase object
     """
 
-    iFlag_visual = importlib.util.find_spec("cartopy")
+    iFlag_visual = iFlag_visual
     if iFlag_visual is not None:
-        from ._visual import plot
-        from ._visual import _plot_study_area
-        from ._visual import _plot_mesh
-        from ._visual import _plot_mesh_with_flowline
-        from ._visual import _compare_with_raster_dem_method
-    else:
-        pass
+        _compare_with_raster_dem_method = _compare_with_raster_dem_method
+        _plot_mesh = _plot_mesh
+        _plot_mesh_with_flowline = _plot_mesh_with_flowline
+        _plot_study_area = _plot_study_area
+        plot = plot
 
-    from ._hpc import _pyflowline_create_hpc_job
+    _pyflowline_create_hpc_job = _pyflowline_create_hpc_job
 
     def __init__(
         self,
@@ -183,7 +172,7 @@ class flowlinecase(object):
         self.iFlag_fill_hole = 0  # fill holes in the mesh
         self.iResolution_index = 10
         self.iFlag_run_dggrid = 0
-        self.nOutlet = 1  # by default , there shoule ne only one ouelet
+        self.nOutlet = 1  # by default , there should ne only one ouelet
         self.dResolution_degree = 0.0
         self.dResolution_meter = 0.0
         self.dThreshold_small_river = 0.0
@@ -224,7 +213,7 @@ class flowlinecase(object):
         self.sFilename_dem = ""
         # target mesh desired projection, can be any projection for local simulation
         self.pProjection_reference = ""
-        # pyflowline internal projection, alwasy wgs84, all data will be re-projected to this projection
+        # pyflowline internal projection, always wgs84, all data will be re-projected to this projection
         self.pProjection_model = ""
         self.sFilename_mesh = ""
         self.sFilename_mesh_info = ""
@@ -282,9 +271,7 @@ class flowlinecase(object):
             self.iFlag_multiple_outlet = int(aConfig_in["iFlag_multiple_outlet"])
 
         if "iFlag_force_watershed_boundary" in aConfig_in:
-            self.iFlag_force_watershed_boundary = int(
-                aConfig_in["iFlag_force_watershed_boundary"]
-            )
+            self.iFlag_force_watershed_boundary = int(aConfig_in["iFlag_force_watershed_boundary"])
         else:
             self.iFlag_force_watershed_boundary = 0
 
@@ -317,9 +304,7 @@ class flowlinecase(object):
         #    self.iFlag_use_shapefile_extent = int(aConfig_in['iFlag_use_shapefile_extent'])
 
         if "iFlag_user_provided_binary" in aConfig_in:
-            self.iFlag_user_provided_binary = int(
-                aConfig_in["iFlag_user_provided_binary"]
-            )
+            self.iFlag_user_provided_binary = int(aConfig_in["iFlag_user_provided_binary"])
         else:
             self.iFlag_user_provided_binary = 0
 
@@ -372,7 +357,7 @@ class flowlinecase(object):
         else:
             iCase_index = 1
 
-        sCase_index = "{:03d}".format(iCase_index)
+        sCase_index = f"{iCase_index:03d}"
         self.iCase_index = iCase_index
 
         if "dResolution_degree" in aConfig_in:
@@ -382,9 +367,7 @@ class flowlinecase(object):
             self.dResolution_meter = float(aConfig_in["dResolution_meter"])
 
         if "dThreshold_break_by_distance" in aConfig_in:
-            self.dThreshold_break_by_distance = float(
-                aConfig_in["dThreshold_break_by_distance"]
-            )
+            self.dThreshold_break_by_distance = float(aConfig_in["dThreshold_break_by_distance"])
 
         if "dLongitude_left" in aConfig_in:
             self.dLongitude_left = float(aConfig_in["dLongitude_left"])
@@ -399,17 +382,13 @@ class flowlinecase(object):
             self.dLatitude_top = float(aConfig_in["dLatitude_top"])
 
         if "sFilename_model_configuration" in aConfig_in:
-            self.sFilename_model_configuration = aConfig_in[
-                "sFilename_model_configuration"
-            ]
+            self.sFilename_model_configuration = aConfig_in["sFilename_model_configuration"]
 
         if "sFilename_mesh_boundary" in aConfig_in:
             self.sFilename_mesh_boundary = aConfig_in["sFilename_mesh_boundary"]
 
         if "sFilename_coastline_boundary" in aConfig_in:
-            self.sFilename_coastline_boundary = aConfig_in[
-                "sFilename_coastline_boundary"
-            ]
+            self.sFilename_coastline_boundary = aConfig_in["sFilename_coastline_boundary"]
             self.iFlag_land_ocean_mask = 1
         else:
             self.iFlag_land_ocean_mask = 0
@@ -424,9 +403,7 @@ class flowlinecase(object):
             self.sFilename_mpas_mesh_netcdf = aConfig_in["sFilename_mpas_mesh_netcdf"]
 
         if "sFilename_jigsaw_mesh_netcdf" in aConfig_in:
-            self.sFilename_jigsaw_mesh_netcdf = aConfig_in[
-                "sFilename_jigsaw_mesh_netcdf"
-            ]
+            self.sFilename_jigsaw_mesh_netcdf = aConfig_in["sFilename_jigsaw_mesh_netcdf"]
 
         if "sWorkspace_bin" in aConfig_in:
             self.sWorkspace_bin = aConfig_in["sWorkspace_bin"]
@@ -510,19 +487,71 @@ class flowlinecase(object):
 
         self.aBasin = list()
         if self.iFlag_flowline == 1:
-            if "sFilename_basins" in aConfig_in:
-                self.sFilename_basins = aConfig_in["sFilename_basins"]
-                if os.path.isfile(self.sFilename_basins):
-                    with open(self.sFilename_basins) as json_file:
-                        dummy_data = json.load(json_file)
-                        for i in range(self.nOutlet):
-                            sBasin = "{:08d}".format(i + 1)
-                            dummy_basin = dummy_data[i]
+            if (
+                "aBasin" in aConfig_in
+                and isinstance(aConfig_in["aBasin"], list)
+                and len(aConfig_in["aBasin"]) > 0
+            ):
+                from pyflowline.configuration.config_manager import _normalize_basin_dict
+
+                for i, item in enumerate(aConfig_in["aBasin"]):
+                    if isinstance(item, pybasin):
+                        self.aBasin.append(item)
+                    elif isinstance(item, dict):
+                        dummy_basin = _normalize_basin_dict(item)
+                        if not dummy_basin.get("sWorkspace_output_basin"):
+                            sBasin = f"{i + 1:08d}"
                             dummy_basin["sWorkspace_output_basin"] = str(
                                 Path(self.sWorkspace_output) / sBasin
                             )
-                            pBasin = pybasin(dummy_basin)
-                            self.aBasin.append(pBasin)
+                        pBasin = pybasin(dummy_basin)
+                        self.aBasin.append(pBasin)
+            elif "sFilename_basins" in aConfig_in:
+                self.sFilename_basins = aConfig_in["sFilename_basins"]
+                from pyflowline.configuration.config_manager import (
+                    BasinConfigManager,
+                    _resolve_config_path,
+                )
+
+                basin_candidate = self.sFilename_basins
+                if (
+                    not Path(basin_candidate).is_file()
+                    and hasattr(self, "sFilename_model_configuration")
+                    and self.sFilename_model_configuration
+                ):
+                    rel_candidate = (
+                        Path(self.sFilename_model_configuration).parent / basin_candidate
+                    )
+                    if (
+                        rel_candidate.is_file()
+                        or rel_candidate.with_suffix(".yaml").is_file()
+                        or rel_candidate.with_suffix(".json").is_file()
+                    ):
+                        basin_candidate = str(rel_candidate)
+                try:
+                    resolved_basin_file = _resolve_config_path(
+                        basin_candidate,
+                        candidates=("basins.yaml", "basins.yml", "basins.json"),
+                    )
+                except Exception:
+                    resolved_basin_file = Path(basin_candidate)
+
+                if resolved_basin_file.is_file():
+                    dummy_data = BasinConfigManager.load_config(resolved_basin_file)
+                    if isinstance(dummy_data, dict):
+                        dummy_data = [dummy_data]
+                    n_basins = (
+                        min(len(dummy_data), self.nOutlet) if self.nOutlet > 0 else len(dummy_data)
+                    )
+                    for i in range(n_basins):
+                        sBasin = f"{i + 1:08d}"
+                        dummy_basin = dummy_data[i]
+                        if not dummy_basin.get("sWorkspace_output_basin"):
+                            dummy_basin["sWorkspace_output_basin"] = str(
+                                Path(self.sWorkspace_output) / sBasin
+                            )
+                        pBasin = pybasin(dummy_basin)
+                        self.aBasin.append(pBasin)
                 else:
                     print(
                         "This basin configuration file does not exist: ",
@@ -534,12 +563,41 @@ class flowlinecase(object):
 
         if self.iFlag_run_jigsaw == 1:
             if "sFilename_jigsaw_configuration" in aConfig_in:
-                self.sFilename_jigsaw_configuration = aConfig_in[
-                    "sFilename_jigsaw_configuration"
-                ]
-                if os.path.isfile(self.sFilename_jigsaw_configuration):
-                    with open(self.sFilename_jigsaw_configuration) as json_file:
-                        self.aConfig_jigsaw = json.load(json_file)  # dict
+                self.sFilename_jigsaw_configuration = aConfig_in["sFilename_jigsaw_configuration"]
+                from pyflowline.configuration.config_manager import (
+                    JigsawConfigManager,
+                    _resolve_config_path,
+                )
+
+                jigsaw_candidate = self.sFilename_jigsaw_configuration
+                if (
+                    not Path(jigsaw_candidate).is_file()
+                    and hasattr(self, "sFilename_model_configuration")
+                    and self.sFilename_model_configuration
+                ):
+                    rel_candidate = (
+                        Path(self.sFilename_model_configuration).parent / jigsaw_candidate
+                    )
+                    if (
+                        rel_candidate.is_file()
+                        or rel_candidate.with_suffix(".yaml").is_file()
+                        or rel_candidate.with_suffix(".json").is_file()
+                    ):
+                        jigsaw_candidate = str(rel_candidate)
+                try:
+                    resolved_jigsaw = _resolve_config_path(
+                        jigsaw_candidate,
+                        candidates=("jigsaw.yaml", "jigsaw.yml", "jigsaw.json"),
+                    )
+                    if resolved_jigsaw.is_file():
+                        self.aConfig_jigsaw = JigsawConfigManager.load_config(resolved_jigsaw)
+                except Exception:
+                    if os.path.isfile(self.sFilename_jigsaw_configuration):
+                        self.aConfig_jigsaw = JigsawConfigManager.load_config(
+                            self.sFilename_jigsaw_configuration
+                        )
+            elif "jigsaw" in aConfig_in and isinstance(aConfig_in["jigsaw"], dict):
+                self.aConfig_jigsaw = aConfig_in["jigsaw"]
             else:
                 print("Please provide the jigsaw binary file!")
                 return
@@ -613,9 +671,7 @@ class flowlinecase(object):
             self.dY_upperleft = dY_upperleft
             self.dX_lowerright = dX_lowerright
             self.dY_lowerright = dY_lowerright
-            if (
-                self.dResolution_meter is not None
-            ):  # convert user provide meter to degree
+            if self.dResolution_meter is not None:  # convert user provide meter to degree
                 self.dResolution_degree = meter_to_degree(
                     self.dResolution_meter, self.dLatitude_mean
                 )
@@ -763,9 +819,7 @@ class flowlinecase(object):
             pass
         else:
             if self.iFlag_antarctic == 1 and self.iFlag_arctic == 1:
-                print(
-                    "Both antarctic and arctic flags are on, please check the parameters!"
-                )
+                print("Both antarctic and arctic flags are on, please check the parameters!")
 
             if self.iFlag_mesh_boundary == 1:
                 if not os.path.isfile(self.sFilename_mesh_boundary):
@@ -780,37 +834,25 @@ class flowlinecase(object):
                         self.sFilename_coastline_boundary = self.sFilename_mesh_boundary
                     pass
 
-            if sMesh_type == "hexagon":  # hexagon #need spatial referece
+            if sMesh_type == "hexagon":  # hexagon #need spatial reference
                 # check boundary
                 if self.iFlag_mesh_boundary == 1:
                     # still need spatial reference, no
                     if os.path.isfile(self.sFilename_spatial_reference):
                         # check vector or raster
-                        if (
-                            gdal_check_file_type(self.sFilename_spatial_reference)
-                            == "raster"
-                        ):
-                            self.pProjection_reference = (
-                                gdal_get_raster_spatial_reference_wkt(
-                                    self.sFilename_spatial_reference
-                                )
+                        if gdal_check_file_type(self.sFilename_spatial_reference) == "raster":
+                            self.pProjection_reference = gdal_get_raster_spatial_reference_wkt(
+                                self.sFilename_spatial_reference
                             )
                         else:
-                            if (
-                                gdal_check_file_type(self.sFilename_spatial_reference)
-                                == "vector"
-                            ):
-                                self.pProjection_reference = (
-                                    gdal_get_vector_spatial_reference_wkt(
-                                        self.sFilename_spatial_reference
-                                    )
+                            if gdal_check_file_type(self.sFilename_spatial_reference) == "vector":
+                                self.pProjection_reference = gdal_get_vector_spatial_reference_wkt(
+                                    self.sFilename_spatial_reference
                                 )
                     else:
                         if os.path.isfile(self.sFilename_dem):
-                            self.pProjection_reference = (
-                                gdal_get_raster_spatial_reference_wkt(
-                                    self.sFilename_dem
-                                )
+                            self.pProjection_reference = gdal_get_raster_spatial_reference_wkt(
+                                self.sFilename_dem
                             )
                         else:
                             # use utm in this case, will depeends on longitude
@@ -826,20 +868,13 @@ class flowlinecase(object):
                         # get the spatial reference file
                         if os.path.isfile(self.sFilename_spatial_reference):
                             # check vector or raster
-                            if (
-                                gdal_check_file_type(self.sFilename_spatial_reference)
-                                == "raster"
-                            ):
-                                self.pProjection_reference = (
-                                    gdal_get_raster_spatial_reference_wkt(
-                                        self.sFilename_spatial_reference
-                                    )
+                            if gdal_check_file_type(self.sFilename_spatial_reference) == "raster":
+                                self.pProjection_reference = gdal_get_raster_spatial_reference_wkt(
+                                    self.sFilename_spatial_reference
                                 )
                             else:
                                 if (
-                                    gdal_check_file_type(
-                                        self.sFilename_spatial_reference
-                                    )
+                                    gdal_check_file_type(self.sFilename_spatial_reference)
                                     == "vector"
                                 ):
                                     self.pProjection_reference = (
@@ -853,25 +888,18 @@ class flowlinecase(object):
                             )
 
             else:
-                if sMesh_type == "square":  # square #need spatial referece
+                if sMesh_type == "square":  # square #need spatial reference
                     if self.iFlag_mesh_boundary == 1:
                         # still need spatial reference, no
                         if os.path.isfile(self.sFilename_spatial_reference):
                             # check vector or raster
-                            if (
-                                gdal_check_file_type(self.sFilename_spatial_reference)
-                                == "raster"
-                            ):
-                                self.pProjection_reference = (
-                                    gdal_get_raster_spatial_reference_wkt(
-                                        self.sFilename_spatial_reference
-                                    )
+                            if gdal_check_file_type(self.sFilename_spatial_reference) == "raster":
+                                self.pProjection_reference = gdal_get_raster_spatial_reference_wkt(
+                                    self.sFilename_spatial_reference
                                 )
                             else:
                                 if (
-                                    gdal_check_file_type(
-                                        self.sFilename_spatial_reference
-                                    )
+                                    gdal_check_file_type(self.sFilename_spatial_reference)
                                     == "vector"
                                 ):
                                     self.pProjection_reference = (
@@ -881,10 +909,8 @@ class flowlinecase(object):
                                     )
                         else:
                             if os.path.isfile(self.sFilename_dem):
-                                self.pProjection_reference = (
-                                    gdal_get_raster_spatial_reference_wkt(
-                                        self.sFilename_dem
-                                    )
+                                self.pProjection_reference = gdal_get_raster_spatial_reference_wkt(
+                                    self.sFilename_dem
                                 )
                             else:
                                 # use utm in this case, will depeends on longitude
@@ -893,9 +919,7 @@ class flowlinecase(object):
                         # check DEM or spatial reference file
                         if os.path.isfile(self.sFilename_dem):
                             # get extent
-                            self.pyflowline_set_boundary_based_on_dem(
-                                self.sFilename_dem
-                            )
+                            self.pyflowline_set_boundary_based_on_dem(self.sFilename_dem)
 
                         else:
                             # use user provided extent
@@ -903,9 +927,7 @@ class flowlinecase(object):
                             if os.path.isfile(self.sFilename_spatial_reference):
                                 # check vector or raster
                                 if (
-                                    gdal_check_file_type(
-                                        self.sFilename_spatial_reference
-                                    )
+                                    gdal_check_file_type(self.sFilename_spatial_reference)
                                     == "raster"
                                 ):
                                     self.pProjection_reference = (
@@ -915,9 +937,7 @@ class flowlinecase(object):
                                     )
                                 else:
                                     if (
-                                        gdal_check_file_type(
-                                            self.sFilename_spatial_reference
-                                        )
+                                        gdal_check_file_type(self.sFilename_spatial_reference)
                                         == "vector"
                                     ):
                                         self.pProjection_reference = (
@@ -931,19 +951,17 @@ class flowlinecase(object):
                                 )
 
                 else:
-                    if sMesh_type == "latlon":  # latlon #do not need spatial referece
+                    if sMesh_type == "latlon":  # latlon #do not need spatial reference
                         if self.iFlag_mesh_boundary == 1:
                             pass
                         else:
                             if os.path.isfile(self.sFilename_dem):
-                                self.pyflowline_set_boundary_based_on_dem(
-                                    self.sFilename_dem
-                                )
+                                self.pyflowline_set_boundary_based_on_dem(self.sFilename_dem)
                             else:
                                 # use user provided extent
                                 pass
                     else:
-                        if sMesh_type == "mpas":  # mpas #do not need spatial referece
+                        if sMesh_type == "mpas":  # mpas #do not need spatial reference
                             if self.iFlag_run_jigsaw == 1:
                                 # if the mesh is generated by jigsaw, then we do not need to check the mesh file
                                 # but do we need the boundary file? yes
@@ -956,16 +974,12 @@ class flowlinecase(object):
                                 pass
                             else:
                                 if os.path.isfile(self.sFilename_dem):
-                                    self.pyflowline_set_boundary_based_on_dem(
-                                        self.sFilename_dem
-                                    )
+                                    self.pyflowline_set_boundary_based_on_dem(self.sFilename_dem)
 
                         else:
-                            if sMesh_type == "dggrid":  # do not need spatial referece
-                                self.dResolution_meter = (
-                                    dggrid_find_resolution_by_index(
-                                        self.sDggrid_type, self.iResolution_index
-                                    )
+                            if sMesh_type == "dggrid":  # do not need spatial reference
+                                self.dResolution_meter = dggrid_find_resolution_by_index(
+                                    self.sDggrid_type, self.iResolution_index
                                 )
                                 if self.iFlag_user_provided_binary == 1:
                                     if not os.path.isfile(self.sFilename_dggrid):
@@ -981,7 +995,7 @@ class flowlinecase(object):
                                             self.sFilename_dem
                                         )
                             else:
-                                if sMesh_type == "tin":  # need spatial referece
+                                if sMesh_type == "tin":  # need spatial reference
                                     if self.iFlag_mesh_boundary == 1:
                                         pass
                                     else:
@@ -995,9 +1009,7 @@ class flowlinecase(object):
 
         return
 
-    def pyflowline_change_model_parameter(
-        self, sVariable_in, dValue, iFlag_basin_in=None
-    ):
+    def pyflowline_change_model_parameter(self, sVariable_in, dValue, iFlag_basin_in=None):
         if iFlag_basin_in is None:
             if hasattr(self, sVariable_in):
                 # get default data type
@@ -1027,9 +1039,7 @@ class flowlinecase(object):
                     if sType_default == sType_input:
                         setattr(pBasin, sVariable_in, dValue)
                     else:
-                        print(
-                            "Incorrect data type for the input value: " + sVariable_in
-                        )
+                        print("Incorrect data type for the input value: " + sVariable_in)
                         return False
                 else:
                     print(
@@ -1072,17 +1082,13 @@ class flowlinecase(object):
         sFilename_out = self.sFilename_mesh_boundary_geojson
         # check whether the file exists
         if os.path.isfile(sFilename_raw):
-            convert_boundary_to_geojson(
-                sFilename_raw, sFilename_out, iFlag_largest_polygon_in=1
-            )
+            convert_boundary_to_geojson(sFilename_raw, sFilename_out, iFlag_largest_polygon_in=1)
         else:
             print("The mesh boundary file does not exist!")
             return
 
         # get mean location
-        pBoundary_wkt, aExtent = gdal_get_vector_boundary(
-            self.sFilename_mesh_boundary_geojson
-        )
+        pBoundary_wkt, aExtent = gdal_get_vector_boundary(self.sFilename_mesh_boundary_geojson)
         self.dLongitude_mean = 0.5 * (aExtent[0] + aExtent[2])
         self.dLatitude_mean = 0.5 * (aExtent[1] + aExtent[3])
 
@@ -1140,6 +1146,10 @@ class flowlinecase(object):
             dLatitude_mean = self.dLatitude_mean
             dResolution_degree = self.dResolution_degree
             dResolution_meter = self.dResolution_meter
+            dLongitude_left = self.dLongitude_left
+            dLongitude_right = self.dLongitude_right
+            dLatitude_bot = self.dLatitude_bot
+            dLatitude_top = self.dLatitude_top
             sFilename_mesh = self.sFilename_mesh
             if iMesh_type == 1:  # hexagon
                 # hexagon edge
@@ -1154,9 +1164,7 @@ class flowlinecase(object):
                 else:
                     dX_spacing = dLength_edge * 1.5
                     dY_spacing = dLength_edge * np.sqrt(3.0)
-                    ncolumn = (
-                        int((self.dX_lowerright - self.dX_lowerleft) / dX_spacing) + 1
-                    )
+                    ncolumn = int((self.dX_lowerright - self.dX_lowerleft) / dX_spacing) + 1
                     nrow = int((self.dY_upperleft - self.dY_lowerleft) / dY_spacing)
 
                 if iFlag_mesh_boundary == 1:
@@ -1199,13 +1207,9 @@ class flowlinecase(object):
                     pass
                 self.aCell = aHexagon
             else:
-                if iMesh_type == 2:  # sqaure
-                    ncolumn = int(
-                        (self.dX_lowerright - self.dX_lowerleft) / dResolution_meter
-                    )
-                    nrow = int(
-                        (self.dY_upperleft - self.dY_lowerleft) / dResolution_meter
-                    )
+                if iMesh_type == 2:  # square
+                    ncolumn = int((self.dX_lowerright - self.dX_lowerleft) / dResolution_meter)
+                    nrow = int((self.dY_upperleft - self.dY_lowerleft) / dResolution_meter)
                     if iFlag_mesh_boundary == 1:
                         pBoundary_wkt, aExtent = gdal_get_vector_boundary(
                             self.sFilename_mesh_boundary_geojson
@@ -1246,13 +1250,9 @@ class flowlinecase(object):
                     self.aCell = aSquare
                 else:
                     if iMesh_type == 3:  # latlon
-                        dResolution_meter = degree_to_meter(
-                            dResolution_degree, self.dLatitude_mean
-                        )
+                        dResolution_meter = degree_to_meter(dResolution_degree, self.dLatitude_mean)
                         dArea = np.power(dResolution_meter, 2.0)
-                        ncolumn = int(
-                            (dLongitude_right - dLongitude_left) / dResolution_degree
-                        )
+                        ncolumn = int((dLongitude_right - dLongitude_left) / dResolution_degree)
                         nrow = int((dLatitude_top - dLatitude_bot) / dResolution_degree)
                         if iFlag_mesh_boundary == 1:
                             # create a polygon based on real boundary
@@ -1294,9 +1294,7 @@ class flowlinecase(object):
                     else:
                         if iMesh_type == 4:  # mpas
                             sFilename_mpas_mesh_netcdf = self.sFilename_mpas_mesh_netcdf
-                            sFilename_jigsaw_mesh_netcdf = (
-                                self.sFilename_jigsaw_mesh_netcdf
-                            )
+                            sFilename_jigsaw_mesh_netcdf = self.sFilename_jigsaw_mesh_netcdf
                             iFlag_use_mesh_dem = self.iFlag_use_mesh_dem
                             dLatitude_top = self.dLatitude_top
                             dLatitude_bot = self.dLatitude_bot
@@ -1390,9 +1388,7 @@ class flowlinecase(object):
                                     sWorkspace_output = os.path.join(
                                         self.sWorkspace_output, "..", "dggrid"
                                     )
-                                    sWorkspace_output = os.path.abspath(
-                                        sWorkspace_output
-                                    )
+                                    sWorkspace_output = os.path.abspath(sWorkspace_output)
                                     pass
 
                                 if not os.path.exists(sWorkspace_output):
@@ -1438,13 +1434,9 @@ class flowlinecase(object):
                                     dX_spacing = dX_shift * 2
                                     dY_spacing = dY_shift
                                     ncolumn = int(
-                                        (self.dX_lowerright - self.dX_lowerleft)
-                                        / dX_shift
+                                        (self.dX_lowerright - self.dX_lowerleft) / dX_shift
                                     )
-                                    nrow = int(
-                                        (self.dY_upperleft - self.dY_lowerleft)
-                                        / dY_spacing
-                                    )
+                                    nrow = int((self.dY_upperleft - self.dY_lowerleft) / dY_spacing)
                                     aTriangular = create_triangular_mesh(
                                         self.dX_lowerleft,
                                         self.dY_lowerleft,
@@ -1484,10 +1476,8 @@ class flowlinecase(object):
                                             if iFlag_mesh_boundary == 1:
                                                 # create a polygon based on
                                                 # read boundary
-                                                pBoundary_wkt, aExtent = (
-                                                    gdal_get_vector_boundary(
-                                                        self.sFilename_mesh_boundary_geojson
-                                                    )
+                                                pBoundary_wkt, aExtent = gdal_get_vector_boundary(
+                                                    self.sFilename_mesh_boundary_geojson
                                                 )
                                                 print(sFilename_jigsaw_mesh_netcdf)
                                                 aMpas = create_tin_mesh(
@@ -1505,21 +1495,11 @@ class flowlinecase(object):
                                                 pass
                                             else:
                                                 pRing = ogr.Geometry(ogr.wkbLinearRing)
-                                                pRing.AddPoint(
-                                                    dLongitude_left, dLatitude_top
-                                                )
-                                                pRing.AddPoint(
-                                                    dLongitude_right, dLatitude_top
-                                                )
-                                                pRing.AddPoint(
-                                                    dLongitude_right, dLatitude_bot
-                                                )
-                                                pRing.AddPoint(
-                                                    dLongitude_left, dLatitude_bot
-                                                )
-                                                pRing.AddPoint(
-                                                    dLongitude_left, dLatitude_top
-                                                )
+                                                pRing.AddPoint(dLongitude_left, dLatitude_top)
+                                                pRing.AddPoint(dLongitude_right, dLatitude_top)
+                                                pRing.AddPoint(dLongitude_right, dLatitude_bot)
+                                                pRing.AddPoint(dLongitude_left, dLatitude_bot)
+                                                pRing.AddPoint(dLongitude_left, dLatitude_top)
                                                 pBoundary = ogr.Geometry(ogr.wkbPolygon)
                                                 pBoundary.AddGeometry(pRing)
                                                 pBoundary_wkt = pBoundary.ExportToWkt()
@@ -1546,9 +1526,7 @@ class flowlinecase(object):
                                             dLongitude_left = self.dLongitude_left
                                             dLongitude_right = self.dLongitude_right
                                             if self.iFlag_standalone == 1:
-                                                sWorkspace_output = (
-                                                    self.sWorkspace_output
-                                                )
+                                                sWorkspace_output = self.sWorkspace_output
                                                 pass
                                             else:
                                                 sWorkspace_output = os.path.join(
@@ -1631,15 +1609,11 @@ class flowlinecase(object):
             # Prepare lists of flowline and output files for all basins
             mesh_cache = get_mesh_cache()
             for pBasin in self.aBasin:
-                aCell_intersect_basin = (
-                    pBasin.basin_reconstruct_topological_relationship(
-                        iMesh_type, sFilename_mesh, mesh_cache=mesh_cache
-                    )
+                aCell_intersect_basin = pBasin.basin_reconstruct_topological_relationship(
+                    iMesh_type, sFilename_mesh, mesh_cache=mesh_cache
                 )
 
-                aFlowline_conceptual = (
-                    aFlowline_conceptual + pBasin.aFlowline_basin_conceptual
-                )
+                aFlowline_conceptual = aFlowline_conceptual + pBasin.aFlowline_basin_conceptual
                 aBasin.append(pBasin)
                 aCellID_outlet.append(pBasin.lCellID_outlet)
                 aCell_intersect = aCell_intersect + aCell_intersect_basin
@@ -1655,23 +1629,17 @@ class flowlinecase(object):
                         aIntersect = list(self.pRTree_mesh.intersection(pBound))
                         for k in aIntersect:
                             pCell = self.aCell[k]
-                            if (
-                                pVertex_start.calculate_distance(pCell.pVertex_center)
-                                < 1.0e-6
-                            ):
+                            if pVertex_start.calculate_distance(pCell.pVertex_center) < 1.0e-6:
                                 self.aCell[k].iStream_segment_burned = iStream_segment
                                 self.aCell[k].iStream_order_burned = iStream_order
                                 lCellIndex_upstream = k
-                            if (
-                                pVertex_end.calculate_distance(pCell.pVertex_center)
-                                < 1.0e-6
-                            ):
+                            if pVertex_end.calculate_distance(pCell.pVertex_center) < 1.0e-6:
                                 self.aCell[k].iStream_segment_burned = iStream_segment
                                 self.aCell[k].iStream_order_burned = iStream_order
                                 lCellIndex_downstream = k
-                        self.aCell[lCellIndex_upstream].lCellID_downstream_burned = (
-                            self.aCell[lCellIndex_downstream].lCellID
-                        )
+                        self.aCell[lCellIndex_upstream].lCellID_downstream_burned = self.aCell[
+                            lCellIndex_downstream
+                        ].lCellID
                 for pCell2 in aCell_intersect_basin:
                     pBound = pCell2.pBound
                     aIntersect = list(self.pRTree_mesh.intersection(pBound))
@@ -1788,9 +1756,7 @@ class flowlinecase(object):
                         pCell = self.aCell[k]
                         pRing = ogr.Geometry(ogr.wkbLinearRing)
                         for pVertex in pCell.aVertex:
-                            pRing.AddPoint(
-                                pVertex.dLongitude_degree, pVertex.dLatitude_degree
-                            )
+                            pRing.AddPoint(pVertex.dLongitude_degree, pVertex.dLatitude_degree)
                         pRing.CloseRings()  # Close the ring
                         pCell_geometry = ogr.Geometry(ogr.wkbPolygon)
                         pCell_geometry.AddGeometry(pRing)
@@ -1839,7 +1805,7 @@ class flowlinecase(object):
         ptimer.start()
         self.pyflowline_export_mesh_info_to_json()
         # convert the mesh into the kml format so it can be visualized in google earth and google map
-        # shoule move this to the export function
+        # should move this to the export function
         if iFlag_kml is not None:
             # convert_geojson_to_kml(self.sFilename_mesh, self.sFilename_mesh_kml)
             pass
@@ -1900,9 +1866,7 @@ class flowlinecase(object):
             obj.pop(sKey, None)
             pass
 
-        sJson = json.dumps(
-            obj, sort_keys=True, indent=4, ensure_ascii=True, cls=CaseClassEncoder
-        )
+        sJson = json.dumps(obj, sort_keys=True, indent=4, ensure_ascii=True, cls=CaseClassEncoder)
         return sJson
 
     def pyflowline_print(self):
@@ -1912,66 +1876,40 @@ class flowlinecase(object):
         print(self.tojson())
         return
 
-    def pyflowline_export_config_to_json(
-        self, sFilename_output_in=None, iFlag_export_basin_in=1
+    def pyflowline_export_config(
+        self, sFilename_output_in=None, fmt="yaml", iFlag_export_basin_in=1
     ):
-        """
-        Export the configuration to a json file
+        """Export the configuration to a YAML or JSON file.
 
         Args:
-            sFilename_output_in (str, optional): The json filename. Defaults to None.
+            sFilename_output_in (str or Path, optional): Output destination.
+            fmt (str, optional): Target format ('yaml' or 'json'). Defaults to 'yaml'.
+            iFlag_export_basin_in (int, optional): Whether to also export member basins.
         """
+        from pyflowline.configuration.config_manager import _dump_config_file
 
-        if self.iFlag_standalone == 1:
-            if sFilename_output_in is not None:
-                sFilename_output = sFilename_output_in
-                sPath_current = Path(sFilename_output).parent
-            else:
-                # use current output path
-                sFilename_output = os.path.join(
-                    self.sWorkspace_output, "configuration.json"
-                )
-                sPath_current = Path(self.sWorkspace_output)
-
-            # all basins
-            if iFlag_export_basin_in == 1:
-                sName = "configuration_basin.json"
-                sFilename_configuration = os.path.join(sPath_current, sName)
-                with open(sFilename_configuration, "w", encoding="utf-8") as f:
-                    sJson = json.dumps(
-                        [json.loads(ob.tojson()) for ob in self.aBasin],
-                        sort_keys=True,
-                        indent=4,
-                    )
-                    f.write(sJson)
-                    f.close()
-                    # update
-                self.sFilename_basins = sFilename_configuration
+        if sFilename_output_in is not None:
+            sFilename_output = str(sFilename_output_in)
+            sPath_current = Path(sFilename_output).parent
         else:
-            if sFilename_output_in is not None:
-                sFilename_output = sFilename_output_in
-                sPath_current = Path(sFilename_output).parent
-            else:
-                # use parent path
-                sPath_current = Path(self.sWorkspace_output)
-                sFilename_output = os.path.join(sPath_current, "configuration.json")
+            ext = ".json" if fmt == "json" else ".yaml"
+            sFilename_output = os.path.join(self.sWorkspace_output, f"configuration{ext}")
+            sPath_current = Path(self.sWorkspace_output)
 
-            # all basins
-            if iFlag_export_basin_in == 1:
-                sName = "configuration_basin.json"
-                sFilename_configuration = os.path.join(sPath_current, sName)
-                with open(sFilename_configuration, "w", encoding="utf-8") as f:
-                    sJson = json.dumps(
-                        [json.loads(ob.tojson()) for ob in self.aBasin],
-                        sort_keys=True,
-                        indent=4,
-                    )
-                    f.write(sJson)
-                    f.close()
-                    # update for pyhexwatershed
-                self.sFilename_basins = sFilename_configuration
+        out_path = Path(sFilename_output)
+        if fmt is None:
+            fmt = "json" if out_path.suffix.lower() == ".json" else "yaml"
+        ext = ".json" if fmt == "json" else ".yaml"
 
-            self.sWorkspace_output = sPath_current.parent.absolute()
+        if iFlag_export_basin_in == 1:
+            sName = f"configuration_basin{ext}"
+            sFilename_configuration = str(sPath_current / sName)
+            basin_dicts = [json.loads(ob.tojson()) for ob in self.aBasin]
+            _dump_config_file(basin_dicts, Path(sFilename_configuration), fmt=fmt)
+            self.sFilename_basins = sFilename_configuration
+
+        if self.iFlag_standalone != 1 and sFilename_output_in is None:
+            self.sWorkspace_output = str(sPath_current.parent.absolute())
 
         aSkip = [
             "aBasin",
@@ -1980,72 +1918,60 @@ class flowlinecase(object):
             "aCellID_outlet",
             "aCell",
             "pRTree_mesh",
+            "config_file",
         ]
-
         obj = self.__dict__.copy()
         for sKey in aSkip:
             obj.pop(sKey, None)
 
-        with open(sFilename_output, "w", encoding="utf-8") as f:
-            json.dump(
-                obj,
-                f,
-                sort_keys=True,
-                ensure_ascii=False,
-                indent=4,
-                cls=CaseClassEncoder,
-            )
+        clean_json_str = json.dumps(obj, cls=CaseClassEncoder)
+        clean_dict = json.loads(clean_json_str)
+        _dump_config_file(clean_dict, out_path, fmt=fmt)
         return
 
-    def pyflowline_export_basin_config_to_json(self, sFilename_output_in=None):
-        """
-        Export the member basin configuration to a json file
+    def pyflowline_export_config_to_yaml(self, sFilename_output_in=None, iFlag_export_basin_in=1):
+        """Export the configuration to a YAML file (primary format)."""
+        return self.pyflowline_export_config(
+            sFilename_output_in=sFilename_output_in,
+            fmt="yaml",
+            iFlag_export_basin_in=iFlag_export_basin_in,
+        )
+
+    def pyflowline_export_basin_config(self, sFilename_output_in=None, fmt="yaml"):
+        """Export the member basin configurations to a YAML or JSON file.
 
         Args:
-            sFilename_output_in (str, optional): The json filename. Defaults to None.
+            sFilename_output_in (str or Path, optional): Output destination path.
+            fmt (str, optional): Target format ('yaml' or 'json'). Defaults to 'yaml'.
         """
-        if self.iFlag_standalone == 1:
-            if sFilename_output_in is not None:
-                sFilename_output = sFilename_output_in
-            else:
-                # use current output path
-                sName = "configuration_basin.json"
-                sFilename_output = os.path.join(self.sWorkspace_output, sName)
+        from pyflowline.configuration.config_manager import _dump_config_file
 
-            # all basins
-            with open(sFilename_output, "w", encoding="utf-8") as f:
-                sJson = json.dumps(
-                    [json.loads(ob.tojson()) for ob in self.aBasin],
-                    sort_keys=True,
-                    indent=4,
-                )
-                f.write(sJson)
-                f.close()
-                # update
-            self.sFilename_basins = sFilename_output
-
+        if sFilename_output_in is not None:
+            sFilename_output = str(sFilename_output_in)
         else:
-            if sFilename_output_in is not None:
-                sFilename_output = sFilename_output_in
+            ext = ".json" if fmt == "json" else ".yaml"
+            if self.iFlag_standalone == 1:
+                sFilename_output = os.path.join(self.sWorkspace_output, f"configuration_basin{ext}")
             else:
-                # use current output path
-                sPath = Path(self.sWorkspace_output)
-                sName = "configuration_basin.json"
-                sFilename_output = os.path.join(sPath.parent.absolute(), sName)
-
-            # all basins
-            with open(sFilename_output, "w", encoding="utf-8") as f:
-                sJson = json.dumps(
-                    [json.loads(ob.tojson()) for ob in self.aBasin],
-                    sort_keys=True,
-                    indent=4,
+                sFilename_output = os.path.join(
+                    str(Path(self.sWorkspace_output).parent.absolute()),
+                    f"configuration_basin{ext}",
                 )
-                f.write(sJson)
-                f.close()
-                # update for pyhexwatershed
-            self.sFilename_basins = sFilename_output
 
+        out_path = Path(sFilename_output)
+        if fmt is None:
+            fmt = "json" if out_path.suffix.lower() == ".json" else "yaml"
+
+        basin_dicts = [json.loads(ob.tojson()) for ob in self.aBasin]
+        _dump_config_file(basin_dicts, out_path, fmt=fmt)
+        self.sFilename_basins = str(out_path)
         return
+
+    def pyflowline_export_basin_config_to_yaml(self, sFilename_output_in=None):
+        """Export the member basin configuration to a YAML file (primary format)."""
+        return self.pyflowline_export_basin_config(
+            sFilename_output_in=sFilename_output_in, fmt="yaml"
+        )
 
     def pyflowline_clear_mesh_cache(self):
         """
@@ -2054,9 +1980,7 @@ class flowlinecase(object):
         This method should be called when switching to different mesh files
         or when memory management is needed.
         """
-        from pyflowline.algorithms.intersect.intersect_flowline_with_mesh import (
-            clear_mesh_cache,
-        )
+        from pyflowline.algorithms.intersect.intersect_flowline_with_mesh import clear_mesh_cache
 
         clear_mesh_cache()
         print("Mesh R-tree cache cleared")

@@ -1,29 +1,21 @@
 import importlib.util
-from pyearthriver.classes.vertex import pyvertex
-from pyearthriver.classes.edge import pyedge
-from pyearthriver.classes.flowline import pyflowline
-
-from pyearthmesh.classes.hexagon import pyhexagon
-from pyearthmesh.classes.square import pysquare
-from pyearthmesh.classes.latlon import pylatlon
-from pyearthmesh.classes.mpas import pympas
-from pyearthmesh.classes.tin import pytin
-from pyearthmesh.classes.dggrid import pydggrid
-
 
 from pyearth.gis.spatialref.reproject_coordinates import reproject_coordinates
+from pyearthmesh.classes.dggrid import pydggrid
+from pyearthmesh.classes.hexagon import pyhexagon
+from pyearthmesh.classes.latlon import pylatlon
+from pyearthmesh.classes.mpas import pympas
+from pyearthmesh.classes.square import pysquare
+from pyearthmesh.classes.tin import pytin
+from pyearthriver.classes.edge import pyedge
+from pyearthriver.classes.flowline import pyflowline
+from pyearthriver.classes.vertex import pyvertex
 
 iFlag_cython = importlib.util.find_spec("cython")
 if iFlag_cython is not None:
     from pyearth.gis.geometry.kernel import calculate_angle_between_point
-    from pyearth.gis.geometry.kernel import calculate_distance_to_plane
 else:
-    from pyearth.gis.geometry.calculate_angle_between_point import (
-        calculate_angle_between_point,
-    )
-    from pyearth.gis.geometry.calculate_distance_to_plane import (
-        calculate_distance_to_plane,
-    )
+    from pyearth.gis.geometry.calculate_angle_between_point import calculate_angle_between_point
 
 
 def convert_gcs_coordinates_to_cell(
@@ -103,22 +95,16 @@ def convert_gcs_coordinates_to_cell(
         pHexagon = pyhexagon(dLongitude_center_in, dLatitude_center_in, aEdge, aVertex)
         return pHexagon
     else:
-        if iMesh_type_in == 2:  # sqaure
-            pSquare = pysquare(
-                dLongitude_center_in, dLatitude_center_in, aEdge, aVertex
-            )
+        if iMesh_type_in == 2:  # square
+            pSquare = pysquare(dLongitude_center_in, dLatitude_center_in, aEdge, aVertex)
             return pSquare
         else:
             if iMesh_type_in == 3:  # latlon
-                pLatlon = pylatlon(
-                    dLongitude_center_in, dLatitude_center_in, aEdge, aVertex
-                )
+                pLatlon = pylatlon(dLongitude_center_in, dLatitude_center_in, aEdge, aVertex)
                 return pLatlon
             else:
                 if iMesh_type_in == 4:  # mpas
-                    pMpas = pympas(
-                        dLongitude_center_in, dLatitude_center_in, aEdge, aVertex
-                    )
+                    pMpas = pympas(dLongitude_center_in, dLatitude_center_in, aEdge, aVertex)
                     return pMpas
                 else:
                     if iMesh_type_in == 5:  # dggrid
@@ -171,8 +157,7 @@ def convert_gcs_coordinates_to_flowline(aCoordinates_in):
 
     npoint = len(aCoordinates_in)
     aVertex = [
-        pyvertex({"dLongitude_degree": x, "dLatitude_degree": y})
-        for x, y in aCoordinates_in
+        pyvertex({"dLongitude_degree": x, "dLatitude_degree": y}) for x, y in aCoordinates_in
     ]
     aEdge = [
         pyedge(aVertex[j], aVertex[j + 1])

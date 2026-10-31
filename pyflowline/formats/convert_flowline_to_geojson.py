@@ -73,38 +73,27 @@ def convert_flowline_to_geojson(
     has_drainage_area = any(
         f.dDrainage_area is not None and f.dDrainage_area > 0 for f in aFlowline_basin
     )
-    has_nhdplus_id = any(
-        f.lNHDPlusID is not None and f.lNHDPlusID > 0 for f in aFlowline_basin
-    )
+    has_nhdplus_id = any(f.lNHDPlusID is not None and f.lNHDPlusID > 0 for f in aFlowline_basin)
 
     if has_stream_order:
         aAttribute_field.append("stream_order")
         aAttribute_dtype.append("int")
         aAttribute_data.append(
-            [
-                f.iStream_order if f.iStream_order is not None else 0
-                for f in aFlowline_basin
-            ]
+            [f.iStream_order if f.iStream_order is not None else 0 for f in aFlowline_basin]
         )
 
     if has_stream_segment:
         aAttribute_field.append("stream_segment")
         aAttribute_dtype.append("int")
         aAttribute_data.append(
-            [
-                f.iStream_segment if f.iStream_segment is not None else 0
-                for f in aFlowline_basin
-            ]
+            [f.iStream_segment if f.iStream_segment is not None else 0 for f in aFlowline_basin]
         )
 
     if has_drainage_area:
         aAttribute_field.append("drainage_area")
         aAttribute_dtype.append("float")
         aAttribute_data.append(
-            [
-                f.dDrainage_area if f.dDrainage_area is not None else 0.0
-                for f in aFlowline_basin
-            ]
+            [f.dDrainage_area if f.dDrainage_area is not None else 0.0 for f in aFlowline_basin]
         )
 
     if has_nhdplus_id:

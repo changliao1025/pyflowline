@@ -1,48 +1,39 @@
+import importlib.util
+import json
 import os
 import sys
-from pathlib import Path
-import json
 from json import JSONEncoder
-import importlib.util
-import numpy as np
-from rtree.index import Index as RTreeindex
-from pyearth.toolbox.reader.text_reader_string import text_reader_string
+from pathlib import Path
 
-from pyearthriver.classes.vertex import pyvertex
+import numpy as np
+
+# spatial query dispatcher from pyearthriver (Cython-accelerated with fallback)
+from pyearthriver.algorithms.spatial import find_vertex_in_list
+from pyearthriver.algorithms.topology.connectivity import find_nearest_outlet
+from pyearthriver.classes.confluence import pyconfluence
 from pyearthriver.classes.edge import pyedge
 from pyearthriver.classes.flowline import pyflowline
-from pyearthriver.classes.confluence import pyconfluence
 from pyearthriver.classes.rivergraph import pyrivergraph
+from pyearthriver.classes.vertex import pyvertex
+from rtree.index import Index as RTreeindex
 
-from pyflowline.classes.timer import pytimer
-from pyflowline.formats.read_flowline import read_flowline_vector
-from pyflowline.formats.convert_flowline_to_geojson import convert_flowline_to_geojson
-from pyflowline.formats.convert_boundary_to_geojson import convert_boundary_to_geojson
-from pyflowline.formats.export_flowline import export_flowline_to_geojson
-from pyflowline.formats.export_vertex import export_vertex_to_geojson
-from pyflowline.algorithms.split.split_flowline_to_edge import split_flowline_to_edge
-
-from pyflowline.algorithms.simplification.find_outlet import find_outlet
-from pyflowline.algorithms.simplification.remove_returning_flowline import (
-    remove_returning_flowline,
-)
-from pyflowline.algorithms.process_flowline import process_flowline
-from pyflowline.algorithms.intersect.intersect_flowline_with_mesh import (
-    intersect_flowline_with_mesh,
+from pyflowline.algorithms.auxiliary.calculate_area_of_difference import (
+    calculate_area_of_difference_simplified,
 )
 from pyflowline.algorithms.intersect.intersect_flowline_with_flowline import (
     intersect_flowline_with_flowline,
 )
-from pyflowline.algorithms.auxiliary.calculate_area_of_difference import (
-    calculate_area_of_difference_simplified,
+from pyflowline.algorithms.intersect.intersect_flowline_with_mesh import (
+    intersect_flowline_with_mesh,
 )
-
-# cython for performance improvement
-iFlag_cython = importlib.util.find_spec("cython")
-if iFlag_cython is not None:
-    from pyflowline.algorithms.cython.kernel import find_vertex_in_list
-else:
-    from pyflowline.algorithms.auxiliary.find_vertex_in_list import find_vertex_in_list
+from pyflowline.algorithms.process_flowline import process_flowline
+from pyflowline.algorithms.simplification.remove_returning_flowline import remove_returning_flowline
+from pyflowline.classes.timer import pytimer
+from pyflowline.formats.convert_boundary_to_geojson import convert_boundary_to_geojson
+from pyflowline.formats.convert_flowline_to_geojson import convert_flowline_to_geojson
+from pyflowline.formats.export_flowline import export_flowline_to_geojson
+from pyflowline.formats.export_vertex import export_vertex_to_geojson
+from pyflowline.formats.read_flowline import read_flowline_vector
 
 # kml support for google earth visualization
 iFlag_kml = importlib.util.find_spec("simplekml")
@@ -82,7 +73,12 @@ class BasinClassEncoder(JSONEncoder):
         return JSONEncoder.default(self, obj)
 
 
-class pybasin(object):
+iFlag_visual = importlib.util.find_spec("cartopy")
+if iFlag_visual is not None:
+    from ._visual_basin import _plot_polygon_variable, _plot_polyline_variable, basin_plot
+
+
+class pybasin:
     """Basin class
 
     Args:
@@ -92,15 +88,11 @@ class pybasin(object):
         None: A basin object
     """
 
-    iFlag_visual = importlib.util.find_spec("cartopy")
+    iFlag_visual = iFlag_visual
     if iFlag_visual is not None:
-        from ._visual_basin import basin_plot
-        from ._visual_basin import _plot_polyline_variable
-        from ._visual_basin import _plot_polygon_variable
-
-        # from ._visual_basin import _plot_area_of_difference
-    else:
-        pass
+        _plot_polygon_variable = _plot_polygon_variable
+        _plot_polyline_variable = _plot_polyline_variable
+        basin_plot = basin_plot
 
     def __init__(self, aConfig_in, iFlag_create_directory_in=1):
         """
@@ -217,9 +209,7 @@ class pybasin(object):
             self.iFlag_remove_small_river = 0
 
         if "iFlag_remove_low_order_river" in aConfig_in:
-            self.iFlag_remove_low_order_river = int(
-                aConfig_in["iFlag_remove_low_order_river"]
-            )
+            self.iFlag_remove_low_order_river = int(aConfig_in["iFlag_remove_low_order_river"])
         else:
             self.iFlag_remove_low_order_river = 0
 
@@ -234,9 +224,7 @@ class pybasin(object):
             self.iFlag_debug = 0
 
         if "dLongitude_outlet_degree" in aConfig_in:
-            self.dLongitude_outlet_degree = float(
-                aConfig_in["dLongitude_outlet_degree"]
-            )
+            self.dLongitude_outlet_degree = float(aConfig_in["dLongitude_outlet_degree"])
         else:
             self.dLongitude_outlet_degree = -9999.0
 
@@ -266,9 +254,7 @@ class pybasin(object):
             self.sFilename_flowline_filter = ""
 
         if "sFilename_watershed_boundary" in aConfig_in:
-            self.sFilename_watershed_boundary = aConfig_in[
-                "sFilename_watershed_boundary"
-            ]
+            self.sFilename_watershed_boundary = aConfig_in["sFilename_watershed_boundary"]
         else:
             self.sFilename_watershed_boundary = ""
 
@@ -323,7 +309,7 @@ class pybasin(object):
                             else:
                                 print("Unsupported mesh type?")
 
-        self.sBasinID = "{:08d}".format(self.lBasinID)
+        self.sBasinID = f"{self.lBasinID:08d}"
 
         if not os.path.isfile(self.sFilename_flowline_filter):
             print("The filtered flowline file does not exist!")
@@ -398,9 +384,7 @@ class pybasin(object):
         self.sFilename_elevation = os.path.join(
             str(self.sWorkspace_output_basin), "elevation.geojson"
         )
-        self.sFilename_slope = os.path.join(
-            str(self.sWorkspace_output_basin), "slope.geojson"
-        )
+        self.sFilename_slope = os.path.join(str(self.sWorkspace_output_basin), "slope.geojson")
         self.sFilename_drainage_area = os.path.join(
             str(self.sWorkspace_output_basin), "drainage_area.geojson"
         )
@@ -453,7 +437,6 @@ class pybasin(object):
         print("Start flowline simplification:", self.sBasinID)
         sWorkspace_output_basin = self.sWorkspace_output_basin
 
-        ptimer = pytimer()
         # sFilename_flowline_filter = self.sFilename_flowline_filter
         sFilename_flowline_filter = self.sFilename_flowline_filter_geojson
         aFlowline_basin_filtered, pProjection_geojson = read_flowline_vector(
@@ -480,9 +463,7 @@ class pybasin(object):
             point["dLongitude_degree"] = self.dLongitude_outlet_degree
             point["dLatitude_degree"] = self.dLatitude_outlet_degree
             pVertex_outlet_initial = pyvertex(point)
-            pVertex_outlet = find_outlet(
-                aFlowline_basin_filtered, pVertex_outlet_initial
-            )
+            pVertex_outlet = find_nearest_outlet(aFlowline_basin_filtered, pVertex_outlet_initial)
             print(pVertex_outlet.dLongitude_degree, pVertex_outlet.dLatitude_degree)
             self.pVertex_outlet = pVertex_outlet
         except:
@@ -490,7 +471,7 @@ class pybasin(object):
 
         sys.stdout.flush()
 
-        # call graph algorihm to process flowline
+        # call graph algorithm to process flowline
         (
             aFlowline_basin_simplified,
             aConfluence_basin_simplified,
@@ -583,10 +564,8 @@ class pybasin(object):
             print("Basin ", self.sBasinID, "Start return flowline removal")
 
             ptimer.start()
-            aFlowline_basin_conceptual, lCellID_outlet, pVertex_outlet = (
-                remove_returning_flowline(
-                    iMesh_type, aCell_intersect_basin, pVertex_outlet_initial
-                )
+            aFlowline_basin_conceptual, lCellID_outlet, pVertex_outlet = remove_returning_flowline(
+                iMesh_type, aCell_intersect_basin, pVertex_outlet_initial
             )
             print("Outlet ID", lCellID_outlet)
             # this outlet is the one intersect outlet cell, not cell center
@@ -608,9 +587,8 @@ class pybasin(object):
         try:
             print("Basin ", self.sBasinID, "Start split flowline to edge")
             ptimer.start()
-            aFlowline_basin_conceptual, aEdge = split_flowline_to_edge(
-                aFlowline_basin_conceptual
-            )
+            pRivergraph = pyrivergraph(aFlowline_basin_conceptual, pVertex_outlet)
+            aFlowline_basin_conceptual, aEdge = pRivergraph.split_flowline_to_edge()
             ptimer.stop()
             if self.iFlag_debug == 1:
                 sFilename_out = "flowline_edge_split_flowline_to_edge.geojson"
@@ -637,9 +615,8 @@ class pybasin(object):
 
         # convert back to edge based
         try:
-            aFlowline_basin_edge, aEdge = split_flowline_to_edge(
-                aFlowline_basin_conceptual
-            )
+            pRivergraph = pyrivergraph(aFlowline_basin_conceptual, pVertex_outlet)
+            aFlowline_basin_edge, aEdge = pRivergraph.split_flowline_to_edge()
             sFilename_out = self.sFilename_flowline_edge
             export_flowline_to_geojson(aFlowline_basin_edge, sFilename_out)
             sFilename_out = self.sFilename_flowline_conceptual
@@ -699,7 +676,7 @@ class pybasin(object):
                 self.aFlowline_basin_filtered
             )
 
-        # maybe we should use the exisitng result
+        # maybe we should use the existing result
         point = dict()
         point["dLongitude_degree"] = self.dLongitude_outlet_degree
         point["dLatitude_degree"] = self.dLatitude_outlet_degree
@@ -707,15 +684,11 @@ class pybasin(object):
 
         if self.aFlowline_basin_simplified is None:
             sFilename_flowline_in = self.sFilename_flowline_simplified
-            aFlowline_simplified, pProjection_geojson = read_flowline_vector(
-                sFilename_flowline_in
-            )
+            aFlowline_simplified, pProjection_geojson = read_flowline_vector(sFilename_flowline_in)
 
             self.aFlowline_basin_simplified = aFlowline_simplified
             # Use   confluence finding
-            pRivergraph = pyrivergraph(
-                self.aFlowline_basin_simplified, pVertex_outlet_initial
-            )
+            pRivergraph = pyrivergraph(self.aFlowline_basin_simplified, pVertex_outlet_initial)
             (
                 aVertex,
                 lIndex_outlet,
@@ -733,8 +706,8 @@ class pybasin(object):
                 pRivergraph_simplified = pyrivergraph(
                     self.aFlowline_basin_simplified, pVertex_outlet_initial
                 )
-                self.aConfluence_basin_simplified = (
-                    pRivergraph_simplified.build_confluence(aVertex_confluence)
+                self.aConfluence_basin_simplified = pRivergraph_simplified.build_confluence(
+                    aVertex_confluence
                 )
 
         self.dLength_flowline_simplified = self.basin_calculate_flowline_length(
@@ -743,15 +716,11 @@ class pybasin(object):
 
         if self.aFlowline_basin_conceptual is None:
             sFilename_flowline_in = self.sFilename_flowline_conceptual
-            aFlowline_conceptual, pProjection_geojson = read_flowline_vector(
-                sFilename_flowline_in
-            )
+            aFlowline_conceptual, pProjection_geojson = read_flowline_vector(sFilename_flowline_in)
             self.aFlowline_basin_conceptual = aFlowline_conceptual
 
             # Use   confluence finding
-            pRivergraph = pyrivergraph(
-                self.aFlowline_basin_conceptual, pVertex_outlet_initial
-            )
+            pRivergraph = pyrivergraph(self.aFlowline_basin_conceptual, pVertex_outlet_initial)
             (
                 aVertex,
                 lIndex_outlet,
@@ -769,8 +738,8 @@ class pybasin(object):
                 pRivergraph_conceptual = pyrivergraph(
                     self.aFlowline_basin_conceptual, pVertex_outlet_initial
                 )
-                self.aConfluence_basin_conceptual = (
-                    pRivergraph_conceptual.build_confluence(aVertex_confluence)
+                self.aConfluence_basin_conceptual = pRivergraph_conceptual.build_confluence(
+                    aVertex_confluence
                 )
 
         self.dLength_flowline_conceptual = self.basin_calculate_flowline_length(
@@ -891,10 +860,7 @@ class pybasin(object):
 
             with open(sFilename_json, "w", encoding="utf-8") as f:
                 sJson = json.dumps(
-                    [
-                        json.loads(ob.tojson())
-                        for ob in self.aConfluence_basin_simplified
-                    ],
+                    [json.loads(ob.tojson()) for ob in self.aConfluence_basin_simplified],
                     indent=4,
                 )
                 f.write(sJson)
@@ -905,10 +871,7 @@ class pybasin(object):
 
             with open(sFilename_json, "w", encoding="utf-8") as f:
                 sJson = json.dumps(
-                    [
-                        json.loads(ob.tojson())
-                        for ob in self.aConfluence_basin_conceptual
-                    ],
+                    [json.loads(ob.tojson()) for ob in self.aConfluence_basin_conceptual],
                     indent=4,
                 )
                 f.write(sJson)
@@ -939,25 +902,29 @@ class pybasin(object):
             obj.pop(sKey, None)
             pass
 
-        sJson = json.dumps(
-            obj, sort_keys=True, indent=4, ensure_ascii=True, cls=BasinClassEncoder
-        )
+        sJson = json.dumps(obj, sort_keys=True, indent=4, ensure_ascii=True, cls=BasinClassEncoder)
         return sJson
 
-    def basin_export_config_to_json(self, sFilename_output_in=None):
-        """
-        Export the basin object to json using the encoder
+    def basin_export_config(self, sFilename_output_in=None, fmt="yaml"):
+        """Export the basin configuration to a YAML or JSON file.
 
         Args:
-            sFilename_output_in (str, optional): The json filename. Defaults to None.
+            sFilename_output_in (str or Path, optional): Output destination path.
+            fmt (str, optional): Target format ('yaml' or 'json'). Defaults to 'yaml'.
         """
-        # single basin
+        from pyflowline.configuration.config_manager import _dump_config_file
+
         if sFilename_output_in is not None:
-            sFilename_output = sFilename_output_in
+            sFilename_output = str(sFilename_output_in)
         else:
+            ext = ".json" if fmt == "json" else ".yaml"
             sFilename_output = os.path.join(
-                self.sWorkspace_output_basin, "configuration_basin.json"
+                self.sWorkspace_output_basin, f"configuration_basin{ext}"
             )
+
+        out_path = Path(sFilename_output)
+        if fmt is None:
+            fmt = "json" if out_path.suffix.lower() == ".json" else "yaml"
 
         aSkip = [
             "aFlowline_basin_filtered",
@@ -966,20 +933,21 @@ class pybasin(object):
             "aConfluence_basin_simplified",
             "aConfluence_basin_conceptual",
             "aFlowline_basin_edge",
+            "pRTree_flowline",
+            "pRTree_edge",
         ]
         obj = self.__dict__.copy()
         for sKey in aSkip:
             obj.pop(sKey, None)
-        with open(sFilename_output, "w", encoding="utf-8") as f:
-            json.dump(
-                obj,
-                f,
-                sort_keys=True,
-                ensure_ascii=False,
-                indent=4,
-                cls=BasinClassEncoder,
-            )
+
+        clean_json_str = json.dumps(obj, cls=BasinClassEncoder)
+        clean_dict = json.loads(clean_json_str)
+        _dump_config_file(clean_dict, out_path, fmt=fmt)
         return
+
+    def basin_export_config_to_yaml(self, sFilename_output_in=None):
+        """Export the basin object to YAML (primary format)."""
+        return self.basin_export_config(sFilename_output_in=sFilename_output_in, fmt="yaml")
 
     def basin_convert_flowline_to_geojson(self):
         """
@@ -998,9 +966,7 @@ class pybasin(object):
         sFilename_raw = self.sFilename_watershed_boundary
         sFilename_out = self.sFilename_watershed_boundary_geojson
         print("Basin " + self.sBasinID + ": initial watershed boundary:", sFilename_raw)
-        convert_boundary_to_geojson(
-            sFilename_raw, sFilename_out, iFlag_largest_polygon_in=1
-        )
+        convert_boundary_to_geojson(sFilename_raw, sFilename_out, iFlag_largest_polygon_in=1)
         return
 
     def basin_calculate_flowline_length(self, aFlowline_in):
@@ -1024,7 +990,7 @@ class pybasin(object):
 
     def basin_calculate_river_sinuosity(self):
         """
-        Calcualte the the river sinuosity
+        Calculate the the river sinuosity
         """
         for pFlowline in self.aFlowline_basin_simplified:
             pFlowline.calculate_flowline_sinuosity()
@@ -1036,7 +1002,7 @@ class pybasin(object):
 
     def basin_calculate_confluence_branching_angle(self):
         """
-        Calcualte the the river confluence branching angle
+        Calculate the the river confluence branching angle
         """
         for pConfluence in self.aConfluence_basin_simplified:
             pConfluence.calculate_branching_angle()
@@ -1081,9 +1047,7 @@ class pybasin(object):
         point["dLatitude_degree"] = self.dLatitude_outlet_degree
         pVertex_outlet = pyvertex(point)
 
-        aFlowline_simplified, pProjection_geojson = read_flowline_vector(
-            sFilename_simplified
-        )
+        aFlowline_simplified, pProjection_geojson = read_flowline_vector(sFilename_simplified)
         # Use   confluence finding for simplified flowlines
         pRivergraph_simplified = pyrivergraph(aFlowline_simplified, pVertex_outlet)
         (
@@ -1096,9 +1060,7 @@ class pybasin(object):
             pVertex_outlet,
         ) = pRivergraph_simplified.find_confluence()
 
-        aFlowline_conceptual, pProjection_geojson = read_flowline_vector(
-            sFilename_flowline_edge
-        )
+        aFlowline_conceptual, pProjection_geojson = read_flowline_vector(sFilename_flowline_edge)
         # Use   confluence finding for conceptual flowlines
         pRivergraph_conceptual = pyrivergraph(aFlowline_conceptual, pVertex_outlet)
         (

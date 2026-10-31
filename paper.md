@@ -10,16 +10,16 @@ tags:
 
 authors:
   - name: Chang Liao
-    orcid: 0000-0002-7348-8858    
+    orcid: 0000-0002-7348-8858
     affiliation: 1
 
   - name: Matt G Cooper
-    orcid: 0000-0002-0165-209X 
+    orcid: 0000-0002-0165-209X
     affiliation: 1
 
 affiliations:
  - name: Atmospheric, Climate, and Earth Sciences, Pacific Northwest National Laboratory, Richland, WA, USA
-   index: 1 
+   index: 1
 date: 23 Mar 2023
 
 bibliography: paper.bib
@@ -31,8 +31,8 @@ River networks are crucial in hydrologic and Earth system models. Accurately rep
 
 # Statement of need
 
-For hydrologic modelers, river networks are a key input for hydrologic models. 
-While some hydrologic models accept vector-based river networks [@mizukami_2016_GMD; @Schwenk:2021], others only accept mesh cell-based representations, or require a generation method from a vector-based river network. 
+For hydrologic modelers, river networks are a key input for hydrologic models.
+While some hydrologic models accept vector-based river networks [@mizukami_2016_GMD; @Schwenk:2021], others only accept mesh cell-based representations, or require a generation method from a vector-based river network.
 Currently, generating a mesh cell-based river network from a given vector-based river network and arbitrary computational mesh is a major challenge.
 Existing methods are typically limited to structured rectangular meshes, such as 30m x 30m cartesian grids for high-resolution watershed-scale modeling or 0.5 degree x 0.5 degree geographic grids for global climate modeling. In PyFlowline, we define structured meshes (e.g., lat-lon, raster files with projections, and hexagon) as those with fixed cell sizes and shapes and unstructured meshes as those with variable cell sizes and shapes.
 
@@ -41,7 +41,7 @@ Thus, unstructured meshes are increasingly being adopted in hydrologic modeling.
 
 Although unstructured meshes offer these flexibilities, additional efforts are required to generate conceptual river networks that capture real-world river networks across different spatial scales.
 
-A mesh-independent river network representation method that preserves topological relationships across scales could address this limitation. 
+A mesh-independent river network representation method that preserves topological relationships across scales could address this limitation.
 PyFlowline is a Python package that provides a framework for generating river networks for hydrologic models, meeting the identified need. Using an object-oriented programming approach, PyFlowline represents river network elements and mesh cell relationships. It relies on open-source Python libraries like GDAL and Cython for data input/output and spatial data operations.
 
 The computational geometry algorithms used in PyFlowline are designed and implemented using a unified spherical framework, making it suitable for regional and global-scale simulations. PyFlowline uses topological relationships to capture the river networks so they are preserved even at coarse spatial resolutions.
@@ -70,9 +70,9 @@ Existing river network representation methods often fall into three categories, 
 
 PyFlowline is the only modeling software that provides these unique features:
 
-1. It can generate river networks on unstructured meshes; 
-2. It uses topological relationships to capture river networks precisely; 
-3. It can be applied at both high and coarse resolutions; 
+1. It can generate river networks on unstructured meshes;
+2. It uses topological relationships to capture river networks precisely;
+3. It can be applied at both high and coarse resolutions;
 4. It can provide global coverage, including Greenland and the Antarctic.
 
 Model documentation is hosted at https://pyflowline.readthedocs.io/en/latest/, including a case study for the Susquehanna River Basin in the Mid-Atlantic region of the United States.
@@ -85,11 +85,10 @@ The model described in this repository was supported by the following:
 
 * the Earth System Model Development and Regional and Global Model Analysis program areas of the U.S. Department of Energy, Office of Science, Biological and Environmental Research program as part of the multi-program, collaborative Interdisciplinary Research for Arctic Coastal Environments (InteRFACE) project.
 
-* the Next Generation Ecosystem Experiments-Tropics project, funded by the U.S. Department of Energy, Office of Science, Office of Biological and Environmental Research at Pacific Northwest National Laboratory. 
+* the Next Generation Ecosystem Experiments-Tropics project, funded by the U.S. Department of Energy, Office of Science, Office of Biological and Environmental Research at Pacific Northwest National Laboratory.
 
-A portion of this research was performed using PNNL Research Computing at Pacific Northwest National Laboratory. 
+A portion of this research was performed using PNNL Research Computing at Pacific Northwest National Laboratory.
 
 PNNL is operated for DOE by Battelle Memorial Institute under contract DE-AC05-76RL01830.
 
 # References
-

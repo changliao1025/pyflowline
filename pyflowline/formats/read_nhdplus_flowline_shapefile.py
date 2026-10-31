@@ -1,6 +1,8 @@
 import os
+
 import numpy as np
-from osgeo import ogr, osr, gdal
+from osgeo import gdal, ogr, osr
+
 from pyflowline.formats.convert_coordinates import convert_gcs_coordinates_to_flowline
 
 
@@ -21,9 +23,7 @@ def read_nhdplus_flowline_shapefile_attribute(sFilename_shapefile_in):
     aNHDPlusID = list()
     pDriver_shapefile = ogr.GetDriverByName("ESRI Shapefile")
 
-    pDataset_shapefile = pDriver_shapefile.Open(
-        sFilename_shapefile_in, gdal.GA_ReadOnly
-    )
+    pDataset_shapefile = pDriver_shapefile.Open(sFilename_shapefile_in, gdal.GA_ReadOnly)
     pLayer_shapefile = pDataset_shapefile.GetLayer(0)
     pSpatialRef_shapefile = pLayer_shapefile.GetSpatialRef()
     for pFeature_shapefile in pLayer_shapefile:
@@ -68,9 +68,7 @@ def read_nhdplus_flowline_geojson_attribute(sFilename_geojson_in):
     return aNHDPlusID
 
 
-def extract_nhdplus_flowline_shapefile_by_attribute(
-    sFilename_shapefile_in, aAttribute_in
-):
+def extract_nhdplus_flowline_shapefile_by_attribute(sFilename_shapefile_in, aAttribute_in):
     """_summary_
 
     Args:
@@ -94,9 +92,7 @@ def extract_nhdplus_flowline_shapefile_by_attribute(
 
     pDriver_shapefile = ogr.GetDriverByName("ESRI Shapefile")
 
-    pDataset_shapefile = pDriver_shapefile.Open(
-        sFilename_shapefile_in, gdal.GA_ReadOnly
-    )
+    pDataset_shapefile = pDriver_shapefile.Open(sFilename_shapefile_in, gdal.GA_ReadOnly)
     pLayer_shapefile = pDataset_shapefile.GetLayer(0)
     pSpatialRef_shapefile = pLayer_shapefile.GetSpatialRef()
 
@@ -107,9 +103,7 @@ def extract_nhdplus_flowline_shapefile_by_attribute(
     comparison = pSpatialRef_shapefile.IsSame(pSpatial_reference_gcs)
     if comparison != 1:
         iFlag_transform = 1
-        pTransform = osr.CoordinateTransformation(
-            pSpatialRef_shapefile, pSpatial_reference_gcs
-        )
+        pTransform = osr.CoordinateTransformation(pSpatialRef_shapefile, pSpatial_reference_gcs)
     else:
         iFlag_transform = 0
 
@@ -160,9 +154,7 @@ def extract_nhdplus_flowline_shapefile_by_attribute(
     return aFlowline
 
 
-def track_nhdplus_flowline(
-    aNHDPlusID_filter_in, aFromFlowline_in, aToFlowline_in, lNHDPlusID_in
-):
+def track_nhdplus_flowline(aNHDPlusID_filter_in, aFromFlowline_in, aToFlowline_in, lNHDPlusID_in):
     aNHDPlusID_dam_nonheadwater = list()
 
     def tag_downstream(lNHDPlusID_from):

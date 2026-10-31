@@ -1,0 +1,47 @@
+# ==============================================================================
+# PyFlowline Case Specification: Regular Lat-Lon Mesh (YAML)
+# ==============================================================================
+workflow:
+  date: "20220113"                              # Simulation date (YYYYMMDD)
+  mesh_type: latlon                             # Target mesh: latlon, hexagon, square, mpas, dggrid, tin
+  case_index: 1                                 # Simulation run index
+  model: pyflowline                             # Model engine
+  job: latlon                                   # Job name
+  region: susquehanna                           # Study region
+  standalone: true                              # Standalone case execution
+  debug: false                                  # Diagnostic logging
+
+resolutions:
+  degree: 0.5                                   # Grid cell size in degrees (~50 km)
+  meter: 50000.0                                # Target metric resolution (50 km)
+  accumulation_threshold: 100000.0              # Upstream drainage accumulation threshold
+  small_river_threshold: 10000.0                # Small river pruning threshold
+
+region:
+  bbox:
+    left: -79.44374                             # Western bounding longitude
+    right: -74.24774                            # Eastern bounding longitude
+    bottom: 39.00                               # Southern bounding latitude
+    top: 43.00334                               # Northern bounding latitude
+  outlet:
+    longitude: -76.0093                         # Main basin outlet longitude
+    latitude: 39.4620                           # Main basin outlet latitude
+
+flags:
+  create_mesh: true                             # Generate mesh geometry
+  save_mesh: true                               # Export mesh to GeoJSON/NetCDF
+  simplification: true                          # Simplify river vector geometry
+  intersect: true                               # Intersect river reaches with mesh cells
+  flowline: true                                # Enable river flowline processing
+  use_mesh_dem: false                           # Sample elevation directly from mesh DEM
+  rotation: false                               # Grid orientation rotation
+  stream_burning_topology: true                 # Stream burning topological constraint
+  resample_method: 2                            # Flowline resampling method
+
+paths:
+  workspace_input: .                            # Input directory (relative to this file)
+  workspace_output: ../output                   # Output directory
+  mesh_boundary: ./boundary_wgs.geojson         # Study area boundary mask
+  spatial_reference: ./boundary_proj_buff.shp   # Spatial coordinate reference geometry
+  dem: ./dem_buff_ext.tif                       # Digital Elevation Model raster
+  basins: ./pyflowline_susquehanna_basins.yaml  # Child basin specification file

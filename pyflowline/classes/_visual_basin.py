@@ -2,6 +2,7 @@ import os
 
 # dependency packages
 
+
 def replace_last_occurrence(sFilename_path_in, sSubstring_in, sSubstring_out):
     last_occurrence_index = sFilename_path_in.rfind(sSubstring_in)
     if last_occurrence_index == -1:
@@ -22,7 +23,7 @@ def basin_plot(
     sVariable_in,
     sFilename_mesh_in=None,
     sFilename_boundary_in=None,
-    **kwargs
+    **kwargs,
 ):
     """_summary_
 
@@ -34,7 +35,7 @@ def basin_plot(
         aExtent_in (_type_, optional): _description_. Defaults to None.
         pProjection_map_in (_type_, optional): _description_. Defaults to None.
     """
-    from pyearthviz.map.vector.map_multiple_vector_files import  map_multiple_vector_files
+    from pyearthviz.map.vector.map_multiple_vector_files import map_multiple_vector_files
 
     if sFilename_mesh_in is None:
         sFilename_mesh = self.sFilename_mesh
@@ -137,7 +138,7 @@ def basin_plot(
                                         aFlag_fill_in=[0, 0, 0, 0],
                                         aFlag_discrete_in=[0, 0, 0, 1],
                                         aColor_in=["red", None, None, None],
-                                        **kwargs
+                                        **kwargs,
                                     )
                                 else:
                                     aFiletype_in = [2, 2, 2]
@@ -156,7 +157,7 @@ def basin_plot(
                                         aFlag_color_in=[0, 0, 1],
                                         aFlag_fill_in=[0, 0, 0],
                                         aFlag_discrete_in=[0, 0, 1],
-                                        **kwargs
+                                        **kwargs,
                                     )
                             else:
                                 iFlag_flowline_exist = 0  # pure elevation based
@@ -173,7 +174,7 @@ def basin_plot(
                                         aFlag_color_in=[0, 1],
                                         aFlag_fill_in=[0, 0],
                                         aFlag_discrete_in=[0, 1],
-                                        **kwargs
+                                        **kwargs,
                                     )
                                 else:
                                     print(
@@ -197,7 +198,7 @@ def basin_plot(
                                     aVariable_in=["hillslope", "drainage_area"],
                                     aFlag_color_in=[1, 0],
                                     aFlag_fill_in=[1, 0],
-                                    **kwargs
+                                    **kwargs,
                                 )
 
                             else:
@@ -217,12 +218,7 @@ def basin_plot(
 
 
 def _plot_polyline_variable(
-    self,
-    sVariable_in,
-    aExtent_in=None,
-    iFlag_title_in=None,
-    iFont_size_in=None,
-    **kwargs
+    self, sVariable_in, aExtent_in=None, iFlag_title_in=None, iFont_size_in=None, **kwargs
 ):
     from pyearthviz.map.vector.map_vector_polyline_file import map_vector_polyline_file
 
@@ -317,7 +313,7 @@ def _plot_polyline_variable(
         sField_thickness_in=sField_thickness,
         sField_color_in=sField_color,
         aExtent_in=aExtent_in,
-        **kwargs
+        **kwargs,
     )
 
 
@@ -330,7 +326,7 @@ def _plot_polygon_variable(
     dData_max_in=None,
     sFilename_boundary_in=None,
     aExtent_in=None,
-    **kwargs
+    **kwargs,
 ):
     """_summary_
 
@@ -345,9 +341,9 @@ def _plot_polygon_variable(
         dData_max_in (_type_, optional): _description_. Defaults to None.
     """
 
-    from pyearthviz.map.vector.map_vector_polygon_file import map_vector_polygon_file
-    from pyearthviz.map.vector.map_multiple_vector_files import  map_multiple_vector_files
     from pyearthviz.color.pick_colormap import pick_colormap_terrain
+    from pyearthviz.map.vector.map_multiple_vector_files import map_multiple_vector_files
+    from pyearthviz.map.vector.map_vector_polygon_file import map_vector_polygon_file
 
     sMesh_type = self.sMesh_type
     iFiletype = 1  # most file are geojson, but some are parquet
@@ -497,9 +493,7 @@ def _plot_polygon_variable(
                                     if sVariable_in == "area_of_difference":
                                         sVariable = None
                                         iFiletype = 1
-                                        sFilename_dummy = (
-                                            self.sFilename_area_of_difference
-                                        )
+                                        sFilename_dummy = self.sFilename_area_of_difference
                                         # now replace the folder string
                                         sFilename = replace_last_occurrence(
                                             sFilename_dummy,
@@ -551,7 +545,7 @@ def _plot_polygon_variable(
             sUnit_in=sUnit,
             sColormap_in=sColormap,
             aExtent_in=aExtent_in,
-            **kwargs
+            **kwargs,
         )
     else:
 
@@ -571,14 +565,14 @@ def _plot_polygon_variable(
             sUnit_in=sUnit,
             sColormap_in=sColormap,
             aExtent_in=aExtent_in,
-            **kwargs
+            **kwargs,
         )
 
     return
 
 
 def _plot_mesh_with_flowline(self, sFilename_output_in=None, aExtent_in=None, **kwargs):
-    from pyearthviz.map.vector.map_multiple_vector_files import  map_multiple_vector_files
+    from pyearthviz.map.vector.map_multiple_vector_files import map_multiple_vector_files
 
     aFiletype_in = list()
     aFilename_in = list()
@@ -600,7 +594,7 @@ def _plot_mesh_with_flowline(self, sFilename_output_in=None, aExtent_in=None, **
         sTitle_in="Mesh with flowline",
         aFlag_color_in=aFlag_color,
         aExtent_in=aExtent_in,
-        **kwargs
+        **kwargs,
     )
     return
 
@@ -608,7 +602,8 @@ def _plot_mesh_with_flowline(self, sFilename_output_in=None, aExtent_in=None, **
 def _plot_mesh_with_flow_direction(
     self, sMesh_type_in=None, sFilename_mesh_in=None, sFilename_output_in=None, **kwargs
 ):
-    from pyearthviz.map.vector.map_multiple_vector_files import  map_multiple_vector_files
+    from pyearthviz.map.vector.map_multiple_vector_files import map_multiple_vector_files
+
     if sMesh_type_in is None:
         sMesh_type = self.sMesh_type
     else:
@@ -619,9 +614,7 @@ def _plot_mesh_with_flow_direction(
     else:
         sFilename_mesh = sFilename_mesh_in
 
-    sFilename = (
-        self.sFilename_flow_direction
-    )  # this can be either domain wide or subbasin level
+    sFilename = self.sFilename_flow_direction  # this can be either domain wide or subbasin level
 
     aFiletype_in = [3, 2]
 
@@ -632,7 +625,7 @@ def _plot_mesh_with_flow_direction(
         sFilename_output_in=sFilename_output_in,
         sTitle_in="Mesh with flowline",
         aFlag_color_in=[0, 1],
-        **kwargs
+        **kwargs,
     )
     return
 

@@ -9,10 +9,10 @@ Welcome to pyflowline's documentation!
 .. toctree::
    :maxdepth: 3
    :numbered:
-   
+
    readme
    quickstart
-   installation/installation   
+   installation/installation
    data/data
    algorithm/algorithm
    application/application
@@ -23,8 +23,8 @@ Welcome to pyflowline's documentation!
    support
    contribution
    faq
-   api/api   
-   
+   api/api
+
 
 Addendum
 --------

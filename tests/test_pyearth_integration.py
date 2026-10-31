@@ -10,20 +10,15 @@ from pyearthmesh.classes.latlon import pylatlon
 from pyearthmesh.classes.link import pycelllink
 from pyearthmesh.classes.mpas import pympas
 from pyearthmesh.classes.square import pysquare
-from pyearthmesh.meshes.structured.hexagon.create_hexagon_mesh import (
-    create_hexagon_mesh,
-)
-from pyearthmesh.meshes.structured.latlon.create_latlon_mesh import (
-    create_latlon_mesh,
-)
-from pyearthmesh.meshes.structured.square.create_square_mesh import (
-    create_square_mesh,
-)
+from pyearthmesh.meshes.structured.hexagon.create_hexagon_mesh import create_hexagon_mesh
+from pyearthmesh.meshes.structured.latlon.create_latlon_mesh import create_latlon_mesh
+from pyearthmesh.meshes.structured.square.create_square_mesh import create_square_mesh
 from pyearthriver.classes.edge import pyedge
 from pyearthriver.classes.flowline import pyflowline
 from pyearthriver.classes.rivergraph import pyrivergraph
 from pyearthriver.classes.vertex import pyvertex
 from pyearthriver.formats.load_flowline import read_flowlines_from_vector
+
 from pyflowline.classes.pycase import flowlinecase
 from pyflowline.formats.convert_attributes import convert_gcs_attributes_to_cell
 from pyflowline.formats.convert_coordinates import convert_gcs_coordinates_to_cell
@@ -46,6 +41,10 @@ class TestPyEarthIntegration(unittest.TestCase):
         self.assertIsNotNone(create_latlon_mesh)
         self.assertIsNotNone(pyrivergraph)
         self.assertIsNotNone(pyflowline)
+        self.assertIsNotNone(pyedge)
+        self.assertIsNotNone(pyvertex)
+        self.assertIsNotNone(flowlinecase)
+        self.assertIsNotNone(convert_gcs_attributes_to_cell)
         self.assertIsNotNone(read_flowline_vector)
 
     def test_convert_coordinates_to_square_cell(self):
@@ -191,9 +190,27 @@ class TestPyEarthIntegration(unittest.TestCase):
     def test_convert_flowline_to_geojson_file_not_found(self):
         """Test FileNotFoundError when input file does not exist."""
         with self.assertRaises(FileNotFoundError):
-            convert_flowline_to_geojson("/path/to/non_existent_flowline.geojson", "/path/to/out.geojson")
+            convert_flowline_to_geojson(
+                "/path/to/non_existent_flowline.geojson", "/path/to/out.geojson"
+            )
+
+    def test_find_nearest_outlet(self):
+        """Test snapping approximate coordinates to the nearest outlet vertex."""
+        from pyearthriver.algorithms.topology.connectivity import find_nearest_outlet
+
+        v1 = pyvertex({"dLongitude_degree": -77.0, "dLatitude_degree": 40.0})
+        v2 = pyvertex({"dLongitude_degree": -76.5, "dLatitude_degree": 40.0})
+        e = pyedge(v1, v2)
+        fl = pyflowline([e])
+
+        target = pyvertex({"dLongitude_degree": -76.49, "dLatitude_degree": 40.01})
+        snapped = find_nearest_outlet([fl], target)
+        self.assertEqual(snapped, v2)
+
+        rg = pyrivergraph([fl])
+        snapped_rg = rg.find_nearest_outlet(target)
+        self.assertEqual(snapped_rg, v2)
 
 
 if __name__ == "__main__":
     unittest.main()
-

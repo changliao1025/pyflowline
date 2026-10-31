@@ -1,11 +1,13 @@
-import os, sys
+import os
+import sys
+
+from pyearthriver.classes.rivergraph import pyrivergraph
+
+from pyflowline.classes.timer import pytimer
 
 # will use logger for better logging in the future
 from pyflowline.formats.export_flowline import export_flowline_to_geojson
 from pyflowline.formats.export_vertex import export_vertex_to_geojson
-from pyflowline.algorithms.split.split_by_length import split_flowline_by_length
-from pyflowline.classes.timer import pytimer
-from pyearthriver.classes.rivergraph import pyrivergraph
 
 
 def process_flowline(
@@ -34,9 +36,7 @@ def process_flowline(
         aVertex = pRivergraph.aVertex
         ptimer.stop()
         if iFlag_debug == 1:
-            sFilename_out = (
-                "flowline_vertex_without_confluence_before_intersect.geojson"
-            )
+            sFilename_out = "flowline_vertex_without_confluence_before_intersect.geojson"
             sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
             export_vertex_to_geojson(aVertex, sFilename_out)
     except:
@@ -196,9 +196,7 @@ def process_flowline(
     try:
         print("Started stream segment definition")
         ptimer.start()
-        aFlowline_basin_simplified, aStream_segment = (
-            pRivergraph.define_stream_segment()
-        )
+        aFlowline_basin_simplified, aStream_segment = pRivergraph.define_stream_segment()
         ptimer.stop()
         if iFlag_debug == 1:
             sTime = ptimer.now()
@@ -248,17 +246,15 @@ def process_flowline(
         try:
             print("Started flowline split by length")
             ptimer.start()
-            aFlowline_basin_simplified_split = split_flowline_by_length(
-                aFlowline_basin_simplified, dThreshold_break_by_distance
+            aFlowline_basin_simplified = pRivergraph.split_flowline_by_length(
+                dThreshold_break_by_distance
             )
             ptimer.stop()
             if iFlag_debug == 1:
                 sTime = ptimer.now()
                 sFilename_out = "flowline_split_by_length_" + sTime + ".geojson"
                 sFilename_out = os.path.join(sWorkspace_output_basin, sFilename_out)
-                export_flowline_to_geojson(
-                    aFlowline_basin_simplified_split, sFilename_out
-                )
+                export_flowline_to_geojson(aFlowline_basin_simplified, sFilename_out)
         except:
             print("Error in flowline split by length")
 

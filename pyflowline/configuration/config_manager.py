@@ -1,73 +1,692 @@
-import os
-from pathlib import Path
-
-# use this function to generate an initial json file for hexwatershed
+import datetime
 import json
+import os
+import platform
+from pathlib import Path
+from typing import Any
 
-# once it's generated, you can modify it and use it for different simulations
-from pyflowline.classes.pycase import flowlinecase
-from pyflowline.classes.basin import pybasin
+try:
+    import yaml
+
+    HAVE_YAML = True
+except ImportError:
+    HAVE_YAML = False
+
+# ==============================================================================
+# PyFlowline Workflow Configuration Manager
+#
+# Primary specification format is YAML (.yaml / .yml) to allow inline and block
+# comments (#), making workflow specifications transparent, readable, and
+# user-friendly for both case and basin configurations.
+#
+# JSON (.json) is fully supported for programmatic workflows and backward
+# compatibility.
+# ==============================================================================
+
+DEFAULT_BASIN_CONFIG: dict[str, Any] = {
+    "lBasinID": 1,
+    "dLatitude_outlet_degree": -180.0,
+    "dLongitude_outlet_degree": 180.0,
+    "dAccumulation_threshold": -90.0,
+    "dThreshold_small_river": 90.0,
+    "iFlag_dam": 0,
+    "iFlag_debug": 0,
+    "iFlag_disconnected": 0,
+    "sFilename_dam": "ICoM_dams.csv",
+    "sFilename_flowline_filter": "streamord7above.shp",
+    "sFilename_flowline_raw": "allflowline.shp",
+    "sFilename_flowline_topo": "flowline.csv",
+    "sWorkspace_output_basin": "",
+}
+
+DEFAULT_FLOWLINE_CONFIG: dict[str, Any] = {
+    "iFlag_use_mesh_dem": 0,
+    "iFlag_save_mesh": 1,
+    "iFlag_simplification": 1,
+    "iFlag_create_mesh": 1,
+    "iFlag_intersect": 1,
+    "iFlag_resample_method": 1,
+    "iFlag_global": 0,
+    "iFlag_multiple_outlet": 0,
+    "iFlag_elevation_profile": 1,
+    "iFlag_rotation": 0,
+    "iFlag_stream_burning_topology": 1,
+    "iFlag_save_elevation": 1,
+    "iFlag_standalone": 1,
+    "iFlag_flowline": 1,
+    "iFlag_run_jigsaw": 0,
+    "iFlag_run_dggrid": 0,
+    "iFlag_fill_hole": 0,
+    "iFlag_break_by_distance": 0,
+    "iFlag_user_provided_binary": 0,
+    "iResolution_index": 10,
+    "sDggrid_type": "ISEA3H",
+    "nOutlet": 1,
+    "dResolution_degree": 0.5,
+    "dResolution_meter": 50000.0,
+    "dLongitude_left": -180.0,
+    "dLongitude_right": 180.0,
+    "dLatitude_bot": -90.0,
+    "dLatitude_top": 90.0,
+    "dLongitude_outlet_degree": -180.0,
+    "dLatitude_outlet_degree": 90.0,
+    "dAccumulation_threshold": 100000.0,
+    "dThreshold_small_river": 10000.0,
+    "dThreshold_break_by_distance": 5000.0,
+    "sRegion": "susquehanna",
+    "sModel": "pyflowline",
+    "iCase_index": 1,
+    "sMesh_type": "hexagon",
+    "sJob": "pyflowline",
+    "sDate": "20220202",
+    "flowline_info": "flowline_info.json",
+    "sFilename_mesh_info": "mesh_info.json",
+    "sFilename_elevation": "elevation.json",
+    "sWorkspace_input": "",
+    "sWorkspace_output": "./output",
+    "sWorkspace_data": "",
+    "sWorkspace_project": "",
+    "sWorkspace_bin": "",
+    "sFilename_model_configuration": "",
+    "sFilename_spatial_reference": "",
+    "sFilename_dem": "",
+    "sFilename_mesh_netcdf": "",
+    "sFilename_mpas_mesh_netcdf": "",
+    "sFilename_jigsaw_mesh_netcdf": "",
+    "sFilename_mesh_boundary": "",
+    "sFilename_coastline_boundary": "",
+    "sFilename_basins": "",
+    "sFilename_jigsaw_configuration": "",
+    "sFilename_dggrid": "",
+}
+
+
+def _select_platform_path(value: Any) -> str:
+    """Resolve platform-specific dictionary or string path."""
+    if isinstance(value, Path):
+        return str(value)
+    if isinstance(value, str):
+        return value
+    if not isinstance(value, dict):
+        raise ValueError("Path values must be strings or platform-specific mappings")
+
+    current_platform = platform.system()
+    selected = value.get(current_platform, value.get("default", ""))
+    if not isinstance(selected, str):
+        raise ValueError(f"Path for {current_platform} must be a string")
+    return selected
+
+
+def _resolve_config_path(
+    filename: str | Path,
+    candidates: tuple[str, ...] = (
+        "pyflowline_config.yaml",
+        "pyflowline_config.yml",
+        "workflow_config.yaml",
+        "workflow_config.yml",
+        "configuration.yaml",
+        "configuration.yml",
+        "pyflowline_config.json",
+        "workflow_config.json",
+        "configuration.json",
+    ),
+) -> Path:
+    """Resolve configuration file path handling directories and missing extensions."""
+    path = Path(filename).expanduser().resolve()
+    if path.is_dir():
+        for candidate_name in candidates:
+            candidate = path / candidate_name
+            if candidate.is_file():
+                return candidate
+        raise FileNotFoundError(
+            f"No configuration file found in directory: {path}. Candidates checked: {candidates}"
+        )
+    if not path.is_file():
+        for ext in (".yaml", ".yml", ".json"):
+            candidate = path.with_suffix(ext)
+            if candidate.is_file():
+                return candidate
+    return path
+
+
+def _parse_config_file(path: Path) -> Any:
+    """Parse a YAML or JSON configuration file, seamlessly allowing comments."""
+    ext = path.suffix.lower()
+    if ext in (".yaml", ".yml"):
+        if not HAVE_YAML:
+            raise ImportError(
+                "PyYAML is required to parse YAML configuration files. "
+                "Please install pyyaml with `pip install pyyaml` or `conda install pyyaml`."
+            )
+        with path.open(encoding="utf-8") as f:
+            raw = yaml.safe_load(f)
+    elif ext == ".json":
+        with path.open(encoding="utf-8") as f:
+            raw = json.load(f)
+    else:
+        # Fallback: attempt YAML first (YAML accepts comments and JSON syntax), then JSON
+        try:
+            if HAVE_YAML:
+                with path.open(encoding="utf-8") as f:
+                    raw = yaml.safe_load(f)
+            else:
+                with path.open(encoding="utf-8") as f:
+                    raw = json.load(f)
+        except Exception:
+            with path.open(encoding="utf-8") as f:
+                raw = json.load(f)
+
+    if raw is None:
+        raw = {}
+    return raw
+
+
+def _dump_config_file(data: Any, path: Path, fmt: str | None = None) -> None:
+    """Dump data to a YAML or JSON file."""
+    path = Path(path).expanduser().resolve()
+    path.parent.mkdir(parents=True, exist_ok=True)
+
+    if fmt is None:
+        ext = path.suffix.lower()
+        if ext in (".yaml", ".yml"):
+            fmt = "yaml"
+        elif ext == ".json":
+            fmt = "json"
+        else:
+            fmt = "yaml"
+    else:
+        fmt = fmt.lower()
+
+    # Recursively convert Path objects to strings and exclude non-serializable fields
+    def _clean_for_export(obj: Any) -> Any:
+        if isinstance(obj, Path):
+            return str(obj)
+        if isinstance(obj, dict):
+            return {
+                k: _clean_for_export(v)
+                for k, v in obj.items()
+                if k not in ("config_file", "pRTree_mesh", "pRTree_flowline", "pRTree_edge")
+            }
+        if isinstance(obj, list):
+            return [_clean_for_export(v) for v in obj]
+        return obj
+
+    cleaned = _clean_for_export(data)
+
+    if fmt in ("yaml", "yml"):
+        if not HAVE_YAML:
+            raise ImportError(
+                "PyYAML is required to write YAML configuration files. "
+                "Please install pyyaml with `pip install pyyaml`."
+            )
+        with path.open("w", encoding="utf-8") as f:
+            yaml.safe_dump(cleaned, f, sort_keys=False, default_flow_style=False)
+    elif fmt == "json":
+        with path.open("w", encoding="utf-8") as f:
+            json.dump(cleaned, f, indent=4)
+    else:
+        raise ValueError(f"Unsupported configuration format {fmt!r}. Expected 'yaml' or 'json'.")
+
+
+def _normalize_basin_dict(basin: dict[str, Any]) -> dict[str, Any]:
+    """Normalize a basin dictionary from either sectioned YAML or flat keys."""
+    res = DEFAULT_BASIN_CONFIG.copy()
+
+    # Direct flat keys if provided
+    for key, val in basin.items():
+        if key in res:
+            res[key] = val
+
+    # Sectioned / friendly aliases
+    if "id" in basin:
+        res["lBasinID"] = int(basin["id"])
+    if "basin_id" in basin:
+        res["lBasinID"] = int(basin["basin_id"])
+
+    outlet = basin.get("outlet", {})
+    if isinstance(outlet, dict):
+        if "longitude" in outlet:
+            res["dLongitude_outlet_degree"] = float(outlet["longitude"])
+        if "latitude" in outlet:
+            res["dLatitude_outlet_degree"] = float(outlet["latitude"])
+
+    if "accumulation_threshold" in basin:
+        res["dAccumulation_threshold"] = float(basin["accumulation_threshold"])
+    if "small_river_threshold" in basin:
+        res["dThreshold_small_river"] = float(basin["small_river_threshold"])
+    if "small_river" in basin:
+        res["dThreshold_small_river"] = float(basin["small_river"])
+
+    flags = basin.get("flags", {})
+    if isinstance(flags, dict):
+        if "dam" in flags:
+            res["iFlag_dam"] = int(flags["dam"])
+        if "debug" in flags:
+            res["iFlag_debug"] = int(flags["debug"])
+        if "disconnected" in flags:
+            res["iFlag_disconnected"] = int(flags["disconnected"])
+
+    paths = basin.get("paths", {})
+    if isinstance(paths, dict):
+        if "dam" in paths:
+            res["sFilename_dam"] = _select_platform_path(paths["dam"])
+        if "flowline_filter" in paths:
+            res["sFilename_flowline_filter"] = _select_platform_path(paths["flowline_filter"])
+        if "flowline_raw" in paths:
+            res["sFilename_flowline_raw"] = _select_platform_path(paths["flowline_raw"])
+        if "flowline_topo" in paths:
+            res["sFilename_flowline_topo"] = _select_platform_path(paths["flowline_topo"])
+        if "output_basin" in paths:
+            res["sWorkspace_output_basin"] = _select_platform_path(paths["output_basin"])
+
+    return res
+
+
+class WorkflowSpec:
+    """Mesh-agnostic front-end specification for a pyflowline run.
+
+    Tier 1 of the Two-Tier Compiler Pattern: captures user intent in a clean,
+    human-readable structure without requiring backend-internal parameter names.
+    """
+
+    def __init__(
+        self,
+        mesh_type: str = "hexagon",
+        case_index: int = 1,
+        date: str | None = None,
+        model: str = "pyflowline",
+        job: str | None = None,
+        region: dict[str, Any] | None = None,
+        resolutions: dict[str, Any] | None = None,
+        paths: dict[str, Any] | None = None,
+        flags: dict[str, Any] | None = None,
+        basins: list[dict[str, Any]] | None = None,
+        jigsaw: dict[str, Any] | None = None,
+    ):
+        self.mesh_type = str(mesh_type).lower()
+        self.case_index = int(case_index)
+        self.date = date
+        self.model = model
+        self.job = job or self.mesh_type
+        self.region = dict(region or {})
+        self.resolutions = dict(resolutions or {})
+        self.paths = dict(paths or {})
+        self.flags = dict(flags or {})
+        self.basins = list(basins or [])
+        self.jigsaw = dict(jigsaw or {})
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> "WorkflowSpec":
+        workflow = data.get("workflow", {}) or {}
+        return cls(
+            mesh_type=workflow.get("mesh_type", data.get("sMesh_type", "hexagon")),
+            case_index=workflow.get("case_index", data.get("iCase_index", 1)),
+            date=workflow.get("date", data.get("sDate")),
+            model=workflow.get("model", data.get("sModel", "pyflowline")),
+            job=workflow.get("job", data.get("sJob")),
+            region=data.get("region", {}),
+            resolutions=data.get("resolutions", {}),
+            paths=data.get("paths", {}),
+            flags=data.get("flags", {}),
+            basins=data.get("basins", []),
+            jigsaw=data.get("jigsaw", {}),
+        )
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "workflow": {
+                "mesh_type": self.mesh_type,
+                "case_index": self.case_index,
+                "date": self.date,
+                "model": self.model,
+                "job": self.job,
+            },
+            "resolutions": self.resolutions,
+            "region": self.region,
+            "paths": self.paths,
+            "flags": self.flags,
+            "basins": self.basins,
+            "jigsaw": self.jigsaw,
+        }
+
+
+def compile_workflow(spec_or_config: dict[str, Any] | WorkflowSpec) -> dict[str, Any]:
+    """Compile Tier 1 workflow specification into backend-native pyflowline configuration.
+
+    Supports both sectioned Tier 1 configurations (with 'workflow', 'resolutions',
+    'region', 'paths', 'flags', 'basins', 'jigsaw' sections) and flat native dictionaries.
+    """
+    if isinstance(spec_or_config, WorkflowSpec):
+        raw = spec_or_config.to_dict()
+    elif isinstance(spec_or_config, dict):
+        raw = spec_or_config
+    else:
+        raise TypeError("spec_or_config must be a dictionary or WorkflowSpec")
+
+    # Start with default configuration
+    native = DEFAULT_FLOWLINE_CONFIG.copy()
+
+    # Pass through any existing top-level native keys (for backward compatibility)
+    for k, v in raw.items():
+        if k in native:
+            native[k] = v
+
+    # Section 1: workflow
+    workflow = raw.get("workflow", {})
+    if isinstance(workflow, dict) and workflow:
+        if "mesh_type" in workflow:
+            native["sMesh_type"] = str(workflow["mesh_type"]).lower()
+        if "case_index" in workflow:
+            native["iCase_index"] = int(workflow["case_index"])
+        if "date" in workflow and workflow["date"]:
+            native["sDate"] = str(workflow["date"])
+        if "model" in workflow:
+            native["sModel"] = str(workflow["model"])
+        if "job" in workflow:
+            native["sJob"] = str(workflow["job"])
+        elif "sJob" not in native or not native["sJob"]:
+            native["sJob"] = native["sMesh_type"]
+        if "region" in workflow:
+            native["sRegion"] = str(workflow["region"])
+        if "standalone" in workflow:
+            native["iFlag_standalone"] = 1 if workflow["standalone"] else 0
+        if "dggrid_type" in workflow:
+            native["sDggrid_type"] = str(workflow["dggrid_type"])
+        if "outlets" in workflow:
+            native["nOutlet"] = int(workflow["outlets"])
+        elif "nOutlet" in workflow:
+            native["nOutlet"] = int(workflow["nOutlet"])
+
+    # Section 2: resolutions
+    resolutions = raw.get("resolutions", {})
+    if isinstance(resolutions, dict) and resolutions:
+        if "degree" in resolutions and resolutions["degree"] is not None:
+            native["dResolution_degree"] = float(resolutions["degree"])
+        if "meter" in resolutions and resolutions["meter"] is not None:
+            native["dResolution_meter"] = float(resolutions["meter"])
+        if "resolution_index" in resolutions and resolutions["resolution_index"] is not None:
+            native["iResolution_index"] = int(resolutions["resolution_index"])
+        if (
+            "accumulation_threshold" in resolutions
+            and resolutions["accumulation_threshold"] is not None
+        ):
+            native["dAccumulation_threshold"] = float(resolutions["accumulation_threshold"])
+        if (
+            "small_river_threshold" in resolutions
+            and resolutions["small_river_threshold"] is not None
+        ):
+            native["dThreshold_small_river"] = float(resolutions["small_river_threshold"])
+        elif "small_river" in resolutions and resolutions["small_river"] is not None:
+            native["dThreshold_small_river"] = float(resolutions["small_river"])
+        if "break_by_distance" in resolutions and resolutions["break_by_distance"] is not None:
+            native["dThreshold_break_by_distance"] = float(resolutions["break_by_distance"])
+
+    # Section 3: region
+    region = raw.get("region", {})
+    if isinstance(region, dict) and region:
+        bbox = region.get("bbox", {})
+        if isinstance(bbox, dict):
+            if "left" in bbox:
+                native["dLongitude_left"] = float(bbox["left"])
+            if "right" in bbox:
+                native["dLongitude_right"] = float(bbox["right"])
+            if "bottom" in bbox:
+                native["dLatitude_bot"] = float(bbox["bottom"])
+            if "top" in bbox:
+                native["dLatitude_top"] = float(bbox["top"])
+
+        # Also support direct coordinates in region
+        for k_src, k_dst in (
+            ("longitude_left", "dLongitude_left"),
+            ("longitude_right", "dLongitude_right"),
+            ("latitude_bot", "dLatitude_bot"),
+            ("latitude_bottom", "dLatitude_bot"),
+            ("latitude_top", "dLatitude_top"),
+        ):
+            if k_src in region and region[k_src] is not None:
+                native[k_dst] = float(region[k_src])
+
+        outlet = region.get("outlet", {})
+        if isinstance(outlet, dict):
+            if "longitude" in outlet:
+                native["dLongitude_outlet_degree"] = float(outlet["longitude"])
+            if "latitude" in outlet:
+                native["dLatitude_outlet_degree"] = float(outlet["latitude"])
+        elif "dLongitude_outlet_degree" in region:
+            native["dLongitude_outlet_degree"] = float(region["dLongitude_outlet_degree"])
+            native["dLatitude_outlet_degree"] = float(region["dLatitude_outlet_degree"])
+
+        if "cellid_outlet" in region:
+            native["lCellID_outlet"] = int(region["cellid_outlet"])
+
+    # Section 4: flags
+    flags = raw.get("flags", {})
+    if isinstance(flags, dict) and flags:
+        flag_map = {
+            "create_mesh": "iFlag_create_mesh",
+            "save_mesh": "iFlag_save_mesh",
+            "simplification": "iFlag_simplification",
+            "intersect": "iFlag_intersect",
+            "flowline": "iFlag_flowline",
+            "use_mesh_dem": "iFlag_use_mesh_dem",
+            "rotation": "iFlag_rotation",
+            "stream_burning_topology": "iFlag_stream_burning_topology",
+            "resample_method": "iFlag_resample_method",
+            "global": "iFlag_global",
+            "multiple_outlet": "iFlag_multiple_outlet",
+            "run_jigsaw": "iFlag_run_jigsaw",
+            "run_dggrid": "iFlag_run_dggrid",
+            "fill_hole": "iFlag_fill_hole",
+            "break_by_distance": "iFlag_break_by_distance",
+            "user_provided_binary": "iFlag_user_provided_binary",
+            "elevation_profile": "iFlag_elevation_profile",
+            "save_elevation": "iFlag_save_elevation",
+            "disconnected": "iFlag_disconnected",
+            "land_ocean_mask": "iFlag_land_ocean_mask",
+            "standalone": "iFlag_standalone",
+        }
+        for flag_k, native_k in flag_map.items():
+            if flag_k in flags and flags[flag_k] is not None:
+                native[native_k] = int(flags[flag_k])
+
+    # Section 5: paths
+    paths = raw.get("paths", {})
+    if isinstance(paths, dict) and paths:
+        path_map = {
+            "workspace_input": "sWorkspace_input",
+            "workspace_output": "sWorkspace_output",
+            "workspace_data": "sWorkspace_data",
+            "workspace_project": "sWorkspace_project",
+            "workspace_bin": "sWorkspace_bin",
+            "mesh_boundary": "sFilename_mesh_boundary",
+            "mesh_netcdf": "sFilename_mesh_netcdf",
+            "mpas_mesh_netcdf": "sFilename_mpas_mesh_netcdf",
+            "jigsaw_mesh_netcdf": "sFilename_jigsaw_mesh_netcdf",
+            "coastline_boundary": "sFilename_coastline_boundary",
+            "spatial_reference": "sFilename_spatial_reference",
+            "dem": "sFilename_dem",
+            "basins": "sFilename_basins",
+            "jigsaw_configuration": "sFilename_jigsaw_configuration",
+            "dggrid": "sFilename_dggrid",
+            "flowline_info": "flowline_info",
+            "mesh_info": "sFilename_mesh_info",
+            "elevation": "sFilename_elevation",
+            "model_configuration": "sFilename_model_configuration",
+        }
+        for path_k, native_k in path_map.items():
+            if path_k in paths and paths[path_k] is not None:
+                native[native_k] = _select_platform_path(paths[path_k])
+
+        # Also support direct sFilename_ / sWorkspace_ in paths
+        for k, v in paths.items():
+            if k.startswith("sFilename_") or k.startswith("sWorkspace_"):
+                native[k] = _select_platform_path(v)
+
+    # Section 6: basins (inline list of basin specifications)
+    basins = raw.get("basins") or raw.get("aBasin")
+    if isinstance(basins, list) and basins:
+        compiled_basins = [_normalize_basin_dict(b) for b in basins if isinstance(b, dict)]
+        native["aBasin"] = compiled_basins
+        native["nOutlet"] = len(compiled_basins)
+        if len(compiled_basins) > 1:
+            native["iFlag_multiple_outlet"] = 1
+
+    # Section 7: jigsaw
+    jigsaw = raw.get("jigsaw")
+    if isinstance(jigsaw, dict) and jigsaw:
+        native["jigsaw"] = jigsaw
+        native["iFlag_run_jigsaw"] = 1
+
+    # Date normalization
+    if not native.get("sDate"):
+        pDate = datetime.datetime.today()
+        native["sDate"] = f"{pDate.year:04d}" + f"{pDate.month:02d}" + f"{pDate.day:02d}"
+
+    # Carry forward config_file reference if present
+    if "config_file" in raw:
+        native["config_file"] = raw["config_file"]
+        native["sFilename_model_configuration"] = str(raw["config_file"])
+
+    return native
+
+
+def load_pyflowline_config(filename: str | Path) -> dict[str, Any]:
+    """Load a workflow YAML or JSON file, apply defaults, and resolve paths.
+
+    Features:
+        - Primary format: YAML (.yaml, .yml) with inline/block comments (#)
+        - Full backward compatibility with JSON (.json)
+        - Directory discovery (checks for default configuration names)
+        - Extensionless stem resolution (.yaml -> .yml -> .json)
+        - Relative path resolution against config file location
+        - Platform-specific path mapping resolution (Linux, Darwin, Windows, default)
+    """
+    resolved_path = _resolve_config_path(filename)
+    raw_dict = _parse_config_file(resolved_path)
+
+    if not isinstance(raw_dict, dict):
+        raise ValueError(f"Configuration in {resolved_path} must be a dictionary / mapping object")
+
+    raw_dict["config_file"] = resolved_path
+
+    # Compile into native dictionary
+    config = compile_workflow(raw_dict)
+
+    # Resolve relative paths relative to the configuration file directory
+    base_dir = resolved_path.parent
+    path_keys = [
+        "sWorkspace_input",
+        "sWorkspace_output",
+        "sWorkspace_data",
+        "sWorkspace_project",
+        "sWorkspace_bin",
+        "sFilename_spatial_reference",
+        "sFilename_dem",
+        "sFilename_mesh_netcdf",
+        "sFilename_mpas_mesh_netcdf",
+        "sFilename_jigsaw_mesh_netcdf",
+        "sFilename_mesh_boundary",
+        "sFilename_coastline_boundary",
+        "sFilename_basins",
+        "sFilename_jigsaw_configuration",
+        "sFilename_dggrid",
+    ]
+
+    for key in path_keys:
+        val = config.get(key)
+        if val and isinstance(val, str) and not os.path.isabs(val):
+            # Only resolve if the path doesn't already start with an absolute root
+            resolved_file = (base_dir / val).resolve()
+            config[key] = str(resolved_file)
+
+    # If inline basins are present, resolve relative paths inside each basin
+    if "aBasin" in config and isinstance(config["aBasin"], list):
+        basin_path_keys = [
+            "sFilename_dam",
+            "sFilename_flowline_filter",
+            "sFilename_flowline_raw",
+            "sFilename_flowline_topo",
+            "sWorkspace_output_basin",
+        ]
+        for b in config["aBasin"]:
+            if isinstance(b, dict):
+                for bk in basin_path_keys:
+                    b_val = b.get(bk)
+                    if b_val and isinstance(b_val, str) and not os.path.isabs(b_val):
+                        b[bk] = str((base_dir / b_val).resolve())
+
+    return config
+
+
+# Alias for cross-project naming consistency with pyearthmesh
+load_workflow_config = load_pyflowline_config
+
+
+def dump_pyflowline_config(
+    config: dict[str, Any],
+    filename: str | Path,
+    fmt: str | None = None,
+) -> None:
+    """Dump a configuration dictionary to a YAML or JSON file."""
+    _dump_config_file(config, Path(filename), fmt=fmt)
+
+
+# Alias for cross-project naming consistency with pyearthmesh
+dump_workflow_config = dump_pyflowline_config
+
+
+def create_workflow(config_or_path: str | Path | dict[str, Any], **kwargs):
+    """Factory function: load configuration and return an instantiated flowlinecase."""
+    from pyflowline.classes.pycase import flowlinecase
+
+    if isinstance(config_or_path, (str, Path)):
+        config = load_pyflowline_config(config_or_path)
+    elif isinstance(config_or_path, dict):
+        if "workflow" in config_or_path or "resolutions" in config_or_path:
+            config = compile_workflow(config_or_path)
+        else:
+            config = config_or_path.copy()
+    elif isinstance(config_or_path, WorkflowSpec):
+        config = compile_workflow(config_or_path)
+    else:
+        raise TypeError("config_or_path must be a path string, Path, or dictionary")
+
+    # Apply any kwargs overrides
+    for k, v in kwargs.items():
+        config[k] = v
+
+    iFlag_create_directory = kwargs.get("iFlag_create_directory_in", None)
+    return flowlinecase(config, iFlag_create_directory_in=iFlag_create_directory)
 
 
 class BasinConfigManager:
-    """Configuration manager for basin objects that handles defaults and serialization"""
+    """Configuration manager for basin objects supporting YAML and JSON."""
 
     @staticmethod
     def get_default_config():
-        """Returns a dictionary with all default basin configuration values"""
-        return {
-            "iFlag_dam": 0,
-            "iFlag_disconnected": 0,
-            "lBasinID": 1,
-            "dLatitude_outlet_degree": -180,
-            "dLongitude_outlet_degree": 180,
-            "dAccumulation_threshold": -90,
-            "dThreshold_small_river": 90,
-            "sFilename_dam": "ICoM_dams.csv",
-            "sFilename_flowline_filter": "streamord7above.shp",
-            "sFilename_flowline_raw": "allflowline.shp",
-            "sFilename_flowline_topo": "flowline.csv",
-            "sWorkspace_output_basin": "",
-        }
+        """Returns a dictionary with all default basin configuration values."""
+        return DEFAULT_BASIN_CONFIG.copy()
 
     @staticmethod
     def create_template_config(basin_id=1, custom_values=None):
-        """Create a configuration dictionary for a basin with default values, optionally customized
-
-        Args:
-            basin_id (int): Basin identifier
-            custom_values (dict, optional): Dictionary of values to override defaults
-
-        Returns:
-            dict: The created configuration
-        """
-        from pathlib import Path
-
-        # Get defaults
+        """Create a configuration dictionary for a basin with default values."""
         config = BasinConfigManager.get_default_config()
-
-        # Update basin ID
         config["lBasinID"] = basin_id
 
-        # Handle workspace paths
         sWorkspace_input = Path.cwd()
-
         config["sFilename_dam"] = str(sWorkspace_input / config["sFilename_dam"])
         config["sFilename_flowline_filter"] = str(
             sWorkspace_input / config["sFilename_flowline_filter"]
         )
-        config["sFilename_flowline_raw"] = str(
-            sWorkspace_input / config["sFilename_flowline_raw"]
-        )
+        config["sFilename_flowline_raw"] = str(sWorkspace_input / config["sFilename_flowline_raw"])
         config["sFilename_flowline_topo"] = str(
             sWorkspace_input / config["sFilename_flowline_topo"]
         )
 
         sWorkspace_output = Path.cwd()
-        basin_folder = "{:09d}".format(basin_id)
+        basin_folder = f"{basin_id:09d}"
         config["sWorkspace_output_basin"] = str(sWorkspace_output / basin_folder)
 
-        # Apply customizations
         if custom_values:
             for key, value in custom_values.items():
                 if isinstance(value, Path):
@@ -77,315 +696,232 @@ class BasinConfigManager:
         return config
 
     @staticmethod
-    def create_multiple_basins(sFilename_basins_json, nBasin, custom_values=None):
-        """Generate configuration for multiple basins and save to JSON file
-
-        Args:
-            sFilename_basins_json (str or Path): Output filename for basin configurations
-            nBasin (int): Number of basins to create
-            sWorkspace_input (str or Path): Input workspace path
-            sWorkspace_output (str or Path): Output workspace path
-            custom_values (dict, optional): Dictionary with custom values to apply to all basins
-
-        Returns:
-            list: List of basin objects
-        """
+    def create_multiple_basins(sFilename_basins, nBasin, custom_values=None):
+        """Generate configuration for multiple basins and save to YAML or JSON file."""
         from pyflowline.classes.basin import pybasin
-        import json
-        import os
-        from pathlib import Path
 
-        # Ensure output directory exists
-        os.makedirs(
-            os.path.dirname(os.path.abspath(sFilename_basins_json)), exist_ok=True
-        )
+        sFilename_basins_path = Path(sFilename_basins).expanduser().resolve()
+        sFilename_basins_path.parent.mkdir(parents=True, exist_ok=True)
 
         aBasin_out = []
+        basin_dicts = []
         for i in range(nBasin):
-            # Create basin config with basin-specific ID
             aConfig_basin = BasinConfigManager.create_template_config(
                 basin_id=i + 1, custom_values=custom_values
             )
-
-            # Create basin object
             pBasin = pybasin(aConfig_basin, iFlag_create_directory_in=0)
             aBasin_out.append(pBasin)
+            basin_dicts.append(json.loads(pBasin.tojson()))
 
-        # Export basin config to a file
-        with open(sFilename_basins_json, "w", encoding="utf-8") as f:
-            sJson = json.dumps([json.loads(ob.tojson()) for ob in aBasin_out], indent=4)
-            f.write(sJson)
+        # Determine format from extension
+        ext = sFilename_basins_path.suffix.lower()
+        fmt = "json" if ext == ".json" else "yaml"
+        _dump_config_file(basin_dicts, sFilename_basins_path, fmt=fmt)
 
         return aBasin_out
 
+    @staticmethod
+    def load_config(filename: str | Path) -> list[dict[str, Any]] | dict[str, Any]:
+        """Load basin configuration from YAML or JSON file."""
+        resolved = _resolve_config_path(
+            filename,
+            candidates=("basins.yaml", "basins.yml", "basins.json"),
+        )
+        data = _parse_config_file(resolved)
+        if isinstance(data, list):
+            return [_normalize_basin_dict(b) for b in data]
+        if isinstance(data, dict):
+            return _normalize_basin_dict(data)
+        return data
+
+    @staticmethod
+    def dump_config(config: Any, filename: str | Path, fmt: str | None = None) -> None:
+        """Dump basin configuration to YAML or JSON file."""
+        _dump_config_file(config, Path(filename), fmt=fmt)
+
 
 class FlowlineConfigManager:
-    """Configuration manager for pyflowline that handles defaults and serialization"""
+    """Configuration manager for pyflowline supporting YAML and JSON."""
 
     @staticmethod
     def get_default_config():
-        """Returns a dictionary with all default configuration values"""
-        return {
-            "iFlag_use_mesh_dem": 0,
-            "iFlag_save_mesh": 1,
-            "iFlag_simplification": 1,
-            "iFlag_create_mesh": 1,
-            "iFlag_intersect": 1,
-            "iFlag_resample_method": 1,
-            "iFlag_global": 0,
-            "iFlag_multiple_outlet": 0,
-            "iFlag_elevation_profile": 1,
-            "iFlag_rotation": 0,
-            "iFlag_stream_burning_topology": 1,
-            "iFlag_save_elevation": 1,
-            "nOutlet": 1,
-            "dResolution_degree": 0.5,
-            "dResolution_meter": 50000,
-            "dLongitude_left": -180,
-            "dLongitude_right": 180,
-            "dLatitude_bot": -90,
-            "dLatitude_top": 90,
-            "sRegion": "susquehanna",
-            "sModel": "pyflowline",
-            "iCase_index": 1,
-            "sMesh_type": "hexagon",
-            "sJob": "pyflowline",
-            "sDate": "20220202",
-            "flowline_info": "flowline_info.json",
-            "sFilename_mesh_info": "mesh_info.json",
-            "sFilename_elevation": "elevation.json",
-        }
+        """Returns a dictionary with all default configuration values."""
+        return DEFAULT_FLOWLINE_CONFIG.copy()
 
     @staticmethod
     def create_template_config(output_filename, custom_values=None):
-        """Create a configuration file with default values, optionally customized
-
-        Args:
-            output_filename (str or Path): Path to save the configuration file
-            custom_values (dict, optional): Dictionary of values to override defaults
-
-        Returns:
-            dict: The created configuration
-        """
-        # Get defaults
+        """Create a configuration file with default values, optionally customized."""
         config = FlowlineConfigManager.get_default_config()
-
-        # Handle workspace paths
         config["sWorkspace_input"] = str(Path.cwd())
         config["sWorkspace_output"] = str(Path.cwd())
         config["sFilename_model_configuration"] = str(output_filename)
 
-        # Apply customizations
         if custom_values:
             for key, value in custom_values.items():
                 if isinstance(value, Path):
                     value = str(value)
                 config[key] = value
 
-        # Ensure directory exists
-        os.makedirs(os.path.dirname(os.path.abspath(output_filename)), exist_ok=True)
+        dest = Path(output_filename).expanduser().resolve()
+        dest.parent.mkdir(parents=True, exist_ok=True)
 
-        # Write to file
-        with open(output_filename, "w") as f:
-            json.dump(config, f, indent=4)
+        ext = dest.suffix.lower()
+        fmt = "json" if ext == ".json" else "yaml"
+        _dump_config_file(config, dest, fmt=fmt)
 
         return config
 
+    @staticmethod
+    def load_config(filename: str | Path) -> dict[str, Any]:
+        """Load pyflowline configuration from YAML or JSON file."""
+        return load_pyflowline_config(filename)
+
+    @staticmethod
+    def dump_config(config: dict[str, Any], filename: str | Path, fmt: str | None = None) -> None:
+        """Dump pyflowline configuration to YAML or JSON file."""
+        dump_pyflowline_config(config, filename, fmt=fmt)
+
 
 class JigsawConfigManager:
-    """Configuration manager for JIGSAW that handles defaults and serialization"""
+    """Configuration manager for JIGSAW that handles YAML and JSON serialization."""
 
     @staticmethod
     def get_default_config():
-        """Returns a dictionary with all default JIGSAW configuration values"""
+        """Returns a dictionary with all default JIGSAW configuration values."""
         return {
-            # Grid resolution parameters
-            "ncolumn_space": 360,  # Number of columns in spacing grid (longitude)
-            "nrow_space": 180,  # Number of rows in spacing grid (latitude)
-            "dSpac_value": 100.0,  # Default spacing value
-            # Feature flags for geometry generation
-            "iFlag_geom": False,  # Enable geometry generation
-            "iFlag_spac": False,  # Enable spacing function generation
-            "iFlag_init": False,  # Enable initialization mesh
-            "iFlag_opts": False,  # Enable custom options
-            # Environment type flags
-            "iFlag_spac_ocean": False,  # Apply ocean-specific spacing
-            "iFlag_spac_land": True,  # Apply land-specific spacing
-            # Point feature geometry and spacing flags
-            "iFlag_geom_dam": False,  # Include dam geometries
-            "iFlag_spac_dam": False,  # Apply dam-specific spacing
-            "iFlag_geom_city": False,  # Include city geometries
-            "iFlag_spac_city": False,  # Apply city-specific spacing
-            # Line feature geometry and spacing flags
-            "iFlag_geom_river_network": False,  # Include river network geometries
-            "iFlag_spac_river_network": False,  # Apply river network-specific spacing
-            "iFlag_geom_coastline": False,  # Include coastline geometries
-            "iFlag_spac_coastline": False,  # Apply coastline-specific spacing
-            # Polygon feature geometry and spacing flags
-            "iFlag_geom_watershed_boundary": False,  # Include watershed boundary geometries
-            "iFlag_spac_watershed_boundary": False,  # Apply watershed boundary-specific spacing
-            "iFlag_geom_lake_boundary": False,  # Include lake boundary geometries
-            "iFlag_spac_lake_boundary": False,  # Apply lake boundary-specific spacing
-            # Resolution parameters for different features (in degrees)
-            "dResolution_land": 45.0,  # Land feature spacing
-            "dResolution_dam": 4.0,  # Dam feature spacing
-            "dResolution_city": 4.0,  # City feature spacing
-            "dResolution_river_network": 4.0,  # River network feature spacing
-            "dResolution_coastline": 4.0,  # Coastline feature spacing
-            "dResolution_watershed_boundary": 4.0,  # Watershed boundary feature spacing
-            "dResolution_lake_boundary": 4.0,  # Lake boundary feature spacing
-            # Mesh type identifiers
-            "geom_mshID": "ellipsoid-mesh",  # Geometry mesh type
-            "spac_mshID": "ellipsoid-grid",  # Spacing grid type
-            # Earth/sphere parameters
-            "FULL_SPHERE_RADIUS": 6371.0,  # Earth radius in km
-            # Gradient limiting
-            "dhdx_lim": 0.25,  # Gradient limit for mesh sizing
-            # File paths for features
-            "sFilename_dam_vector": None,  # Dam vector file
-            "sFilename_dam_raster": None,  # Dam raster file
-            "sFilename_city_vector": None,  # City vector file
-            "sFilename_city_raster": None,  # City raster file
-            "sFilename_river_network_vector": None,  # River network vector file
-            "sFilename_river_network_raster": None,  # River network raster file
-            "sFilename_coastline_vector": None,  # Coastline vector file
-            "sFilename_coastline_raster": None,  # Coastline raster file
-            "sFilename_watershed_boundary_vector": None,  # Watershed boundary vector file
-            "sFilename_watershed_boundary_raster": None,  # Watershed boundary raster file
-            "sFilename_lake_boundary_vector": None,  # Lake boundary vector file
-            "sFilename_lake_boundary_raster": None,  # Lake boundary raster file
-            # Mesh sizing parameters
-            "hfun_hmax": "inf",  # Max. refinement function value
-            "hfun_hmin": 0.0,  # Min. refinement function value
-            "hfun_scal": "absolute",  # Scaling type: "relative" or "absolute"
-            "mesh_dims": 2,  # Mesh dimension (2 for surface)
-            "bisection": -1,  # Bisection method (-1 for heuristic)
-            # Optimization parameters
-            "optm_qlim": 0.95,  # Quality limit for optimization
-            "optm_iter": 32,  # Number of optimization iterations
-            "optm_qtol": 1.0e-05,  # Quality tolerance
-            # Core mesh sizing and quality parameters from JigsawConfigManager
-            "mesh_rad2": 1.5,  # Max. radius-edge ratio
-            "mesh_rad3": 2.0,  # Max. radius-circumsphere ratio for tetras
-            "mesh_eps1": 0.333,  # Min. mesh quality threshold
-            "mesh_eps2": 0.333,  # Min. mesh quality threshold for tetra
-            "mesh_top": 1,  # Mesh topology (1 for manifold surface)
-            "mesh_iter": 3,  # Mesh iteration limit
-            # Verbosity and iterations
-            "verbosity": 0,  # Verbosity level (0-3)
-            # File paths (will be populated based on workspace)
-            "geom_file": None,  # Input geometry file
-            "hfun_file": None,  # Input mesh-size file
-            "mesh_file": None,  # Output mesh file
-            # Algorithm selection
-            "mesh_kern": "delfront",  # Meshing kernel: "delfront" or "delaunay"
-            "optm_kern": "odt+dqdx",  # Optimisation kernel
-            # Region boundary
-            "geom_feat": True,  # Detect sharp features in geometry
-            # Output options
-            "mesh_type": "euclidean-mesh",  # Mesh type (euclidean-mesh or ellipsoid-mesh)
-            "output_formats": ["vtk", "gmsh"],  # Output formats to generate
+            "ncolumn_space": 360,
+            "nrow_space": 180,
+            "dSpac_value": 100.0,
+            "iFlag_geom": False,
+            "iFlag_spac": False,
+            "iFlag_init": False,
+            "iFlag_opts": False,
+            "iFlag_spac_ocean": False,
+            "iFlag_spac_land": True,
+            "iFlag_geom_dam": False,
+            "iFlag_spac_dam": False,
+            "iFlag_geom_city": False,
+            "iFlag_spac_city": False,
+            "iFlag_geom_river_network": False,
+            "iFlag_spac_river_network": False,
+            "iFlag_geom_coastline": False,
+            "iFlag_spac_coastline": False,
+            "iFlag_geom_watershed_boundary": False,
+            "iFlag_spac_watershed_boundary": False,
+            "iFlag_geom_lake_boundary": False,
+            "iFlag_spac_lake_boundary": False,
+            "dResolution_land": 45.0,
+            "dResolution_dam": 4.0,
+            "dResolution_city": 4.0,
+            "dResolution_river_network": 4.0,
+            "dResolution_coastline": 4.0,
+            "dResolution_watershed_boundary": 4.0,
+            "dResolution_lake_boundary": 4.0,
+            "geom_mshID": "ellipsoid-mesh",
+            "spac_mshID": "ellipsoid-grid",
+            "FULL_SPHERE_RADIUS": 6371.0,
+            "dhdx_lim": 0.25,
+            "sFilename_dam_vector": None,
+            "sFilename_dam_raster": None,
+            "sFilename_city_vector": None,
+            "sFilename_city_raster": None,
+            "sFilename_river_network_vector": None,
+            "sFilename_river_network_raster": None,
+            "sFilename_coastline_vector": None,
+            "sFilename_coastline_raster": None,
+            "sFilename_watershed_boundary_vector": None,
+            "sFilename_watershed_boundary_raster": None,
+            "sFilename_lake_boundary_vector": None,
+            "sFilename_lake_boundary_raster": None,
+            "hfun_hmax": "inf",
+            "hfun_hmin": 0.0,
+            "hfun_scal": "absolute",
+            "mesh_dims": 2,
+            "bisection": -1,
+            "optm_qlim": 0.95,
+            "optm_iter": 32,
+            "optm_qtol": 1.0e-05,
+            "mesh_rad2": 1.5,
+            "mesh_rad3": 2.0,
+            "mesh_eps1": 0.333,
+            "mesh_eps2": 0.333,
+            "mesh_top": 1,
+            "mesh_iter": 3,
+            "verbosity": 0,
+            "geom_file": None,
+            "hfun_file": None,
+            "mesh_file": None,
+            "mesh_kern": "delfront",
+            "optm_kern": "odt+dqdx",
+            "geom_feat": True,
+            "mesh_type": "euclidean-mesh",
+            "output_formats": ["vtk", "gmsh"],
         }
 
     @staticmethod
     def create_template_config(output_filename, custom_values=None):
-        """Create a JIGSAW configuration file with default values, optionally customized
-
-        Args:
-            output_filename (str or Path): Path to save the configuration file
-            custom_values (dict, optional): Dictionary of values to override defaults
-
-        Returns:
-            dict: The created configuration
-        """
-        # Get defaults
+        """Create a JIGSAW configuration file in YAML or JSON."""
         config = JigsawConfigManager.get_default_config()
-
-        # Apply customizations
         if custom_values:
             for key, value in custom_values.items():
                 if isinstance(value, Path):
                     value = str(value)
                 config[key] = value
 
-        # Ensure directory exists
-        os.makedirs(os.path.dirname(os.path.abspath(output_filename)), exist_ok=True)
+        dest = Path(output_filename).expanduser().resolve()
+        dest.parent.mkdir(parents=True, exist_ok=True)
 
-        # Write to file
-        with open(output_filename, "w") as f:
-            json.dump(config, f, indent=4)
-
+        ext = dest.suffix.lower()
+        fmt = "json" if ext == ".json" else "yaml"
+        _dump_config_file(config, dest, fmt=fmt)
         return config
 
     @staticmethod
-    def load_config(filename):
-        """Load a JIGSAW configuration from a JSON file
+    def load_config(filename: str | Path) -> dict[str, Any]:
+        """Load a JIGSAW configuration from a YAML or JSON file."""
+        resolved = _resolve_config_path(
+            filename,
+            candidates=("jigsaw.yaml", "jigsaw.yml", "jigsaw.json"),
+        )
+        return _parse_config_file(resolved)
 
-        Args:
-            filename (str or Path): Path to the configuration file
-
-        Returns:
-            dict: The loaded configuration
-        """
-        with open(filename, "r") as f:
-            return json.load(f)
-
-
-# Update the original create_template_basin_configuration_file function to use the new manager
-def create_basin_template_configuration_file(sFilename_basins_json, nBasin):
-    """Generate basin configuration using the BasinConfigManager
-
-    Args:
-        sFilename_basins_json (str or Path): the filename
-        nBasin (int): the total number of basin
-        sWorkspace_input_in (str or Path): the input data path
-        sWorkspace_output (str or Path): the output path
-
-    Returns:
-        list: a list of basin objects
-    """
-    return BasinConfigManager.create_multiple_basins(sFilename_basins_json, nBasin)
+    @staticmethod
+    def dump_config(config: dict[str, Any], filename: str | Path, fmt: str | None = None) -> None:
+        """Dump a JIGSAW configuration to a YAML or JSON file."""
+        _dump_config_file(config, Path(filename), fmt=fmt)
 
 
-# Then you can simplify your create_template_configuration_file function
-def create_pyflowline_template_configuration_file(sFilename_json, **kwargs):
-    """Generate pyflowline config template file using parameter keywords"""
+# Functions for backwards compatibility
+def create_basin_template_configuration_file(sFilename_basins, nBasin):
+    """Generate basin configuration using the BasinConfigManager."""
+    return BasinConfigManager.create_multiple_basins(sFilename_basins, nBasin)
 
-    # Create the configuration
-    config = FlowlineConfigManager.create_template_config(sFilename_json, kwargs)
 
-    # Initialize the model with the config
+def create_pyflowline_template_configuration_file(sFilename_config, **kwargs):
+    """Generate pyflowline config template file using parameter keywords."""
+    config = FlowlineConfigManager.create_template_config(sFilename_config, kwargs)
+
+    from pyflowline.classes.pycase import flowlinecase
+
     oModel = flowlinecase(config, iFlag_create_directory_in=0)
 
-    # Generate basin config
-    sDirname = os.path.dirname(sFilename_json)
-    sFilename = Path(sFilename_json).stem + "_basins.json"
-    sFilename_basins_json = os.path.join(sDirname, sFilename)
+    dest_path = Path(sFilename_config)
+    ext = dest_path.suffix.lower()
+    basin_ext = ext if ext in (".yaml", ".yml", ".json") else ".yaml"
+    sFilename_basins = str(dest_path.parent / (dest_path.stem + "_basins" + basin_ext))
 
-    aBasin = create_basin_template_configuration_file(
-        sFilename_basins_json, config.get("nOutlet", 1)
-    )
+    aBasin = create_basin_template_configuration_file(sFilename_basins, config.get("nOutlet", 1))
 
     oModel.aBasin = aBasin
-    oModel.sFilename_basins = sFilename_basins_json
-    oModel.pyflowline_export_config_to_json(sFilename_json, iFlag_export_basin_in=0)
+    oModel.sFilename_basins = sFilename_basins
+
+    # Export configuration in the target format
+    fmt = "json" if ext == ".json" else "yaml"
+    dump_pyflowline_config(config, sFilename_config, fmt=fmt)
 
     return oModel
 
 
-def create_jigsaw_template_configuration_file(sFilename_json, **kwargs):
-    """Generate JIGSAW config template file using parameter keywords"""
-
-    # Create the configuration
-    config = JigsawConfigManager.create_template_config(
-        sFilename_json, custom_values=kwargs
-    )
-
-    # Ensure the output directory exists
-    os.makedirs(os.path.dirname(sFilename_json), exist_ok=True)
-
-    # Write the configuration to the specified JSON file
-    with open(sFilename_json, "w") as f:
-        json.dump(config, f, indent=4)
-
-    return config
+def create_jigsaw_template_configuration_file(sFilename_config, **kwargs):
+    """Generate JIGSAW config template file using parameter keywords."""
+    return JigsawConfigManager.create_template_config(sFilename_config, custom_values=kwargs)

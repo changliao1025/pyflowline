@@ -1,12 +1,14 @@
 import os
+
 import numpy as np
 from osgeo import ogr, osr
-from rtree.index import Index as RTreeindex
 from pyearth.gis.location.get_geometry_coordinates import get_geometry_coordinates
-from pyflowline.formats.convert_coordinates import convert_gcs_coordinates_to_cell
-from pyflowline.formats.convert_coordinates import convert_gcs_coordinates_to_flowline
+from rtree.index import Index as RTreeindex
 
-from pyearth.gis.idl_handler import IdlStrategy, IdlHandler
+from pyflowline.formats.convert_coordinates import (
+    convert_gcs_coordinates_to_cell,
+    convert_gcs_coordinates_to_flowline,
+)
 
 
 def intersect_flowline_with_mesh(
@@ -31,17 +33,13 @@ def intersect_flowline_with_mesh(
     """
     # Input validation
     if not isinstance(iMesh_type_in, int) or iMesh_type_in < 1 or iMesh_type_in > 8:
-        raise ValueError(
-            f"Invalid mesh type: {iMesh_type_in}. Must be integer between 1-8"
-        )
+        raise ValueError(f"Invalid mesh type: {iMesh_type_in}. Must be integer between 1-8")
 
     if not os.path.exists(sFilename_mesh_in):
         raise FileNotFoundError(f"Mesh file does not exist: {sFilename_mesh_in}")
 
     if not os.path.exists(sFilename_flowline_in):
-        raise FileNotFoundError(
-            f"Flowline file does not exist: {sFilename_flowline_in}"
-        )
+        raise FileNotFoundError(f"Flowline file does not exist: {sFilename_flowline_in}")
 
     # Validate file extensions
     if not (
@@ -54,9 +52,7 @@ def intersect_flowline_with_mesh(
         sFilename_flowline_in.lower().endswith(".geojson")
         or sFilename_flowline_in.lower().endswith(".json")
     ):
-        print(
-            f"Warning: Flowline file may not be GeoJSON format: {sFilename_flowline_in}"
-        )
+        print(f"Warning: Flowline file may not be GeoJSON format: {sFilename_flowline_in}")
 
     if os.path.exists(sFilename_output_in):
         os.remove(sFilename_output_in)
@@ -157,9 +153,7 @@ def _process_multilinestring_intersection(
     return lFlowlineID
 
 
-def _perform_quality_control(
-    pLayer_flowline, aFlowline_intersect_all, nfeature_flowline
-):
+def _perform_quality_control(pLayer_flowline, aFlowline_intersect_all, nfeature_flowline):
     """Perform quality control to find outlet vertex (same as original)"""
     pVertex_outlet = None
     iSegment_max = 0
@@ -247,9 +241,7 @@ class MeshRTreeCache:
             mesh_data: Dictionary containing mesh R-tree index and metadata
         """
         self.cache[sFilename_mesh] = mesh_data
-        print(
-            f"Cached mesh data for {sFilename_mesh} ({len(mesh_data['mesh_features'])} cells)"
-        )
+        print(f"Cached mesh data for {sFilename_mesh} ({len(mesh_data['mesh_features'])} cells)")
 
     def clear_cache(self):
         """Clear all cached mesh data"""
@@ -258,10 +250,7 @@ class MeshRTreeCache:
 
     def get_cache_info(self):
         """Get information about cached files"""
-        return {
-            filename: len(data["mesh_features"])
-            for filename, data in self.cache.items()
-        }
+        return {filename: len(data["mesh_features"]) for filename, data in self.cache.items()}
 
 
 # Global cache instance
@@ -356,18 +345,14 @@ def _intersect_cached_mesh_rtree_method(
                 if iFlag_transform == 1:
                     pGeometry_flowline_transformed = pGeometry_flowline.Clone()
                     pGeometry_flowline_transformed.Transform(transform)
-                    iFlag_intersect = pGeometry_flowline_transformed.Intersects(
-                        pGeometry_mesh
-                    )
+                    iFlag_intersect = pGeometry_flowline_transformed.Intersects(pGeometry_mesh)
                     # Use transformed geometry for intersection calculation
                     pGeometry_intersect = pGeometry_flowline_transformed.Intersection(
                         pGeometry_mesh
                     )
                 else:
                     iFlag_intersect = pGeometry_flowline.Intersects(pGeometry_mesh)
-                    pGeometry_intersect = pGeometry_flowline.Intersection(
-                        pGeometry_mesh
-                    )
+                    pGeometry_intersect = pGeometry_flowline.Intersection(pGeometry_mesh)
 
                 if iFlag_intersect:
                     # Get or create cell object - handle both POLYGON and MULTIPOLYGON parts

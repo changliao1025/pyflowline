@@ -1,5 +1,7 @@
 import copy
+
 import numpy as np
+
 from pyflowline.formats.convert_coordinates import convert_gcs_coordinates_to_flowline
 
 
@@ -27,9 +29,7 @@ def remove_returning_flowline(iMesh_type_in, aCell_intersect_in, pVertex_outlet_
             aCell_flowline_out = simplify_list(aCell_flowline_out)
         return aCell_flowline_out
 
-    def retrieve_flowline_intersect_index(
-        iSegment_in, iStream_order_in, pVertex_end_in
-    ):
+    def retrieve_flowline_intersect_index(iSegment_in, iStream_order_in, pVertex_end_in):
         lCellID = -1
         iFlag_found = 1
         pVertex_end_current = pVertex_end_in
@@ -57,12 +57,8 @@ def remove_returning_flowline(iMesh_type_in, aCell_intersect_in, pVertex_outlet_
                     ):  # be careful because this function is strict
                         if iStream_segment == iSegment_in:
                             dLength = pFlowline.dLength
-                            iFlag_found2, dummy2 = pCell.which_edge_cross_this_vertex(
-                                pVertex_start
-                            )
-                            iFlag_found3, dummy3 = pCell.which_edge_cross_this_vertex(
-                                pVertex_end
-                            )
+                            iFlag_found2, dummy2 = pCell.which_edge_cross_this_vertex(pVertex_start)
+                            iFlag_found3, dummy3 = pCell.which_edge_cross_this_vertex(pVertex_end)
                             if iFlag_found2 == 1 and iFlag_found3 == 1:  # on the edge
                                 # same edge
                                 if dummy2.is_overlap(dummy3) == 1:
@@ -75,7 +71,7 @@ def remove_returning_flowline(iMesh_type_in, aCell_intersect_in, pVertex_outlet_
                                 else:
                                     if dLength < (
                                         0.1 * pCell.dLength
-                                    ):  # because it taks a short cut
+                                    ):  # because it takes a short cut
                                         pVertex_end_current = pVertex_start
                                         iFlag_found = 1
                                         if iFlag_previous_overlap == 1:
@@ -100,12 +96,8 @@ def remove_returning_flowline(iMesh_type_in, aCell_intersect_in, pVertex_outlet_
                             break
 
                         else:
-                            iFlag_found2, dummy2 = pCell.which_edge_cross_this_vertex(
-                                pVertex_start
-                            )
-                            iFlag_found3, dummy3 = pCell.which_edge_cross_this_vertex(
-                                pVertex_end
-                            )
+                            iFlag_found2, dummy2 = pCell.which_edge_cross_this_vertex(pVertex_start)
+                            iFlag_found3, dummy3 = pCell.which_edge_cross_this_vertex(pVertex_end)
                             if pVertex_end == pVertex_end_in:
                                 iFlag_found = 1
                                 pass

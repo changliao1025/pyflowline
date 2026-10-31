@@ -1,12 +1,9 @@
 import os
+
 from osgeo import ogr, osr
 
-# from shapely.wkt import loads
 
-
-def intersect_flowline_with_vertex(
-    sFilename_flowline_in, sFilename_vertex_in, sFilename_output_in
-):
+def intersect_flowline_with_vertex(sFilename_flowline_in, sFilename_vertex_in, sFilename_output_in):
 
     if os.path.exists(sFilename_flowline_in) and os.path.exists(sFilename_vertex_in):
         pass
@@ -35,17 +32,13 @@ def intersect_flowline_with_vertex(
     comparison = pSpatial_reference_a.IsSame(pSpatial_reference_b)
     if comparison != 1:
         iFlag_transform = 1
-        transform = osr.CoordinateTransformation(
-            pSpatial_reference_a, pSpatial_reference_b
-        )
+        transform = osr.CoordinateTransformation(pSpatial_reference_a, pSpatial_reference_b)
     else:
         iFlag_transform = 0
 
     pDataset_out = pDriver_geojson.CreateDataSource(sFilename_output_in)
 
-    pLayerOut = pDataset_out.CreateLayer(
-        "intersect", pSpatial_reference_b, ogr.wkbMultiPoint
-    )
+    pLayerOut = pDataset_out.CreateLayer("intersect", pSpatial_reference_b, ogr.wkbMultiPoint)
     # Add one attribute
     pLayerOut.CreateField(
         ogr.FieldDefn("pointid", ogr.OFTInteger64)
@@ -93,9 +86,7 @@ def intersect_flowline_with_vertex(
                 iFlag_intersect = pGeometry_vertex.Intersects(pGeometry_flowline)
                 if iFlag_intersect == True:
                     iFlag_intersected = 1
-                    pGeometry_intersect = pGeometry_vertex.Intersection(
-                        pGeometry_flowline
-                    )
+                    pGeometry_intersect = pGeometry_vertex.Intersection(pGeometry_flowline)
                     # add more process here to
                     pGeometrytype_intersect = pGeometry_intersect.GetGeometryName()
                     if pGeometrytype_intersect == "LINESTRING":

@@ -1,6 +1,7 @@
-import os, sys
-from pathlib import Path
+import os
+import sys
 from os.path import realpath
+from pathlib import Path
 
 # %% set up workspace path
 sPath_parent = str(Path(__file__).parents[2])  # data is located two dir's up
@@ -8,10 +9,7 @@ import sys
 
 sys.path.append(sPath_parent)
 
-from pyflowline.configuration.read_configuration_file import (
-    pyflowline_read_configuration_file,
-)
-
+from pyflowline.configuration.read_configuration_file import pyflowline_read_configuration_file
 
 sPath_data = realpath(sPath_parent + "/data/susquehanna")
 sWorkspace_input = str(Path(sPath_data) / "input")

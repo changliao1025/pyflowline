@@ -17,8 +17,8 @@ Requirements
 
 We recommend to use the Conda system to install the PyFlowline package.
 
-Conda can be installed on Linux, MacOS, and Windows systems. 
-Please refer to the conda website for details on how to install Conda: 
+Conda can be installed on Linux, MacOS, and Windows systems.
+Please refer to the conda website for details on how to install Conda:
 https://docs.conda.io/en/latest/
 
 After Conda is available on your system, you can create a conda environment for your application of PyFlowline.
@@ -68,12 +68,10 @@ Visualization
 
 PyFlowline only provides experimental support for visualization through the optional `matplotlib` and `cartopy` packages.
 
-You need to manually speicify these packages during the installation process
+You need to manually specify these packages during the installation process
 
     conda install -c conda-forge pyflowline matplotlib cartopy
 
 or install manually after the installation of PyFlowline:
 
     conda install -c conda-forge matplotlib cartopy
-
-

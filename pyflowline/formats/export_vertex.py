@@ -1,4 +1,5 @@
 import os
+
 from osgeo import ogr, osr
 from pyearth.gis.geometry.calculate_polygon_area import calculate_polygon_area
 
@@ -37,9 +38,7 @@ def export_vertex_to_geojson(
     # nVertex = len(aVertex_in)
     pDriver = ogr.GetDriverByName("GeoJSON")
     pDataset_json = pDriver.CreateDataSource(sFilename_json_in)
-    pLayer_json = pDataset_json.CreateLayer(
-        "vertex", pSpatial_reference_in, ogr.wkbPoint
-    )
+    pLayer_json = pDataset_json.CreateLayer("vertex", pSpatial_reference_in, ogr.wkbPoint)
     # Add one attribute
     pLayer_json.CreateField(
         ogr.FieldDefn("pointid", ogr.OFTInteger64)
@@ -119,13 +118,9 @@ def export_vertex_to_shapefile(
     nVertex = len(aVertex_in)
     pDriver = ogr.GetDriverByName("ESRI Shapefile")
     pDataset_json = pDriver.CreateDataSource(sFilename_shapefile_out)
-    pLayer_json = pDataset_json.CreateLayer(
-        "vertex", pSpatial_reference_in, ogr.wkbPoint
-    )
+    pLayer_json = pDataset_json.CreateLayer("vertex", pSpatial_reference_in, ogr.wkbPoint)
     # Add one attribute
-    pLayer_json.CreateField(
-        ogr.FieldDefn("id", ogr.OFTInteger64)
-    )  # long type for high resolution
+    pLayer_json.CreateField(ogr.FieldDefn("id", ogr.OFTInteger64))  # long type for high resolution
     if iFlag_attribute == 1:
         pLayer_json.CreateField(
             ogr.FieldDefn("con", ogr.OFTInteger64)
@@ -173,9 +168,7 @@ def export_vertex_as_polygon(aVertex_in, sFilename_out):
     pDataset = pDriver.CreateDataSource(sFilename_out)
     pSrcSpatialRef = osr.SpatialReference()
     pSrcSpatialRef.ImportFromEPSG(4326)
-    pLayer = pDataset.CreateLayer(
-        "buffer_ploygon", pSrcSpatialRef, geom_type=ogr.wkbPolygon
-    )
+    pLayer = pDataset.CreateLayer("buffer_ploygon", pSrcSpatialRef, geom_type=ogr.wkbPolygon)
     aLon = list()
     aLat = list()
     ring = ogr.Geometry(ogr.wkbLinearRing)

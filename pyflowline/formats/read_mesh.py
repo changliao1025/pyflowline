@@ -1,10 +1,10 @@
 import os
-import numpy as np
-from osgeo import ogr, gdal
+
+from osgeo import gdal, ogr
+from pyearth.gis.location.get_geometry_coordinates import get_geometry_coordinates
 
 # from shapely.wkt import loads
 from pyflowline.formats.convert_coordinates import convert_gcs_coordinates_to_cell
-from pyearth.gis.location.get_geometry_coordinates import get_geometry_coordinates
 
 
 def read_mesh_json(iMesh_type_in, sFilename_mesh_in):

@@ -1,0 +1,22 @@
+# ==============================================================================
+# PyFlowline Basin Specification (YAML)
+# ==============================================================================
+# This file defines the outlet location, flowline sources, dam flags, and
+# pruning thresholds for each watershed basin in the domain.
+# ==============================================================================
+
+- id: 1                                         # Basin unique identifier
+  outlet:
+    longitude: -76.0093                         # Outlet longitude in decimal degrees
+    latitude: 39.4620                           # Outlet latitude in decimal degrees
+  accumulation_threshold: 100000.0              # Upstream drainage area threshold
+  small_river_threshold: 10000.0                # River reach length threshold for pruning
+  flags:
+    dam: 0                                      # Include dam locations (0: disabled, 1: enabled)
+    debug: 1                                    # Diagnostic output flag
+    disconnected: 0                             # Preserve disconnected reaches
+  paths:
+    dam: ./ICoM_dams.csv                        # Dam points dataset
+    flowline_filter: ./flowline.geojson         # Filtered stream network vector
+    flowline_raw: ./allflowline.shp             # Raw stream network dataset
+    flowline_topo: ./flowline.csv               # River topology table

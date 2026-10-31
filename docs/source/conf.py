@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # Read the Docs Template documentation build configuration file, created by
 # sphinx-quickstart on Tue Aug 26 14:19:49 2014.
@@ -12,8 +11,9 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
-import sys
 import os
+import subprocess
+import sys
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -25,11 +25,9 @@ import os
 # If your documentation needs a minimal Sphinx version, state it here.
 # needs_sphinx = '1.0'
 
-import subprocess, os
-
 
 def configureDoxyfile(input_dir, output_dir):
-    with open("Doxyfile.in", "r") as file:
+    with open("Doxyfile.in") as file:
         filedata = file.read()
 
     filedata = filedata.replace("@DOXYGEN_INPUT_DIR@", input_dir)

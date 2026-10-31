@@ -53,4 +53,3 @@ Others
 
 .. doxygenclass:: pyflowline::classes::link::pycelllink
     :members:
-

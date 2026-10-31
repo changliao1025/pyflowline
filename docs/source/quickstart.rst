@@ -10,7 +10,7 @@ Users can run a PyFlowline simulation in the following steps:
 
 1. Create a new Python environment using Conda, and activate the new environment.
 2. Install the package using `conda install -c conda-forge pyflowline`. Conda will automatically install all the required dependencies.
-3. Clone the latest PyFlowline repository from https://github.com/changliao1025/pyflowline. 
+3. Clone the latest PyFlowline repository from https://github.com/changliao1025/pyflowline.
 4. Download the additional large MPAS mesh file `lnd_cull_mesh.nc` from https://github.com/changliao1025/pyflowline/releases/tag/0.2.0 and move it under the `data/susquehanna/input` folder.
 5. Open the `examples/susquehanna/pyflowline_susquehanna_mpas.json` file and make the following changes:
    - Change `sWorkspace_output` to the full path to the directory where you want to save the output (e.g. `/full/path/to/pyflowline/data/susquehanna/output`).

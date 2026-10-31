@@ -1,0 +1,12 @@
+# ==============================================================================
+# JIGSAW Mesh Generator Configuration (YAML)
+# ==============================================================================
+geom_mshID: ellipsoid-mesh                      # Geometry mesh type
+spac_mshID: ellipsoid-grid                      # Spacing grid type
+mesh_dims: 2                                    # Mesh dimension (2 for surface)
+hfun_scal: absolute                             # Scaling type: absolute / relative
+hfun_hmax: inf                                  # Maximum refinement function value
+bisection: -1                                   # Bisection method (-1 for heuristic)
+optm_qlim: 0.95                                 # Quality limit for optimization
+optm_iter: 32                                   # Number of optimization iterations
+optm_qtol: 1.0e-05                              # Quality convergence tolerance

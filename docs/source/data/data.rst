@@ -16,8 +16,8 @@ Within PyFlowline, these three elements are combined with several other data str
 
 .. image:: ../../figures/structure_pyflowline.png
   :width: 400
-  :alt: PyFlowline structure. 
-  
+  :alt: PyFlowline structure.
+
 This figure illustrates a domain containing two watersheds/basins. Each basin has an outlet. Within each basin, there are several subbasins and confluences. The lower right is a zoom-in view of a flowline.
 
 ****************************************************
@@ -70,8 +70,8 @@ An example parent JSON file for the Susquehanna River Basin domain (with <domain
         "sWorkspace_bin": "/full/path/to/bin",
         "sRegion": "susquehanna",
         "sModel": "pyflowline",
-        "sJob": "hex",   
-        "iFlag_standalone": 1,      
+        "sJob": "hex",
+        "iFlag_standalone": 1,
         "iFlag_create_mesh": 1,
         "iFlag_mesh_boundary": 1,
         "iFlag_save_mesh" :1 ,
@@ -81,20 +81,20 @@ An example parent JSON file for the Susquehanna River Basin domain (with <domain
         "iFlag_use_mesh_dem":1,
         "iFlag_global": 0,
         "iFlag_multiple_outlet": 0,
-        "iFlag_rotation": 0, 
+        "iFlag_rotation": 0,
         "iFlag_mesh_boundary": 0,
         "iCase_index": 1,
-        "iMesh_type": 4,    
+        "iMesh_type": 4,
         "dLongitude_left": -79,
         "dLongitude_right": -74.5,
         "dLatitude_bot": 39.20,
         "dLatitude_top": 42.8,
         "dResolution_degree": 5000,
-        "dResolution_meter": 5000,    
-        "sDate": "20220110",        
-        "sMesh_type": "mpas",       
+        "dResolution_meter": 5000,
+        "sDate": "20220110",
+        "sMesh_type": "mpas",
         "sFilename_spatial_reference": "/full/path/to/pyhexwatershed_icom/data/susquehanna/input/boundary_proj_buff.shp",
-        "sFilename_dem": "/full/path/to/pyhexwatershed_icom/data/susquehanna/input/dem_buff_ext.tif",     
+        "sFilename_dem": "/full/path/to/pyhexwatershed_icom/data/susquehanna/input/dem_buff_ext.tif",
         "sFilename_mesh_netcdf": "/full/path/to/lnd_cull_mesh.nc",
         "sFilename_mesh_boundary": "/full/path/to/pyflowline/data/susquehanna/input/boundary_wgs.geojson",
         "sFilename_basins": "/full/path/to/pyflowline/examples/susquehanna/pyflowline_susquehanna_basins.json"
@@ -180,7 +180,7 @@ An example child JSON file is provided below:
     [
     {
         "dLatitude_outlet_degree": 39.4620,
-        "dLongitude_outlet_degree": -76.0093,    
+        "dLongitude_outlet_degree": -76.0093,
         "dAccumulation_threshold": 100000,
         "dThreshold_small_river": 10000,
         "iFlag_dam": 0,
@@ -273,12 +273,12 @@ After running the PyFlowline simulation, the output workspace will be structured
 				│   └── ...
 		        ├── mpas.json
 		        ├── mpas_mesh_info.json
-			    ├── run_pyflowline.py          
+			    ├── run_pyflowline.py
 			    ├── submit.job
 			    ├── stdout.out
 			    └── stderr.err
 
-The sub-folders `00000001` et. al, are results for every watershed. Within each watershed sub-folder, there are both json and geojson model output files. The primary (and final) PyFlowline model-generated flowline is `flowline_conceptual.json`. This file is in the GEOJSON format, and can be viewed directly in QGIS or similar software. Other files that may be of particular interest to users include the model-generated mesh file `mpas_mesh_info.json` which contains a complete description of the model-generated mesh, and `mpas.json` which contains the same information in the GEOJSON format, and can be viewed directly in QGIS or similar software. In the <pyflowline_casename> root directory, three HPC-associated files `submit.job`, `stdout.out`, `stderr.err` are generated. The script `run_pyflowline.py` is the python script that was ran by the HPC job. If you are running on a local machine, you can run this script directly. The table below describes the output files. 
+The sub-folders `00000001` et. al, are results for every watershed. Within each watershed sub-folder, there are both json and geojson model output files. The primary (and final) PyFlowline model-generated flowline is `flowline_conceptual.json`. This file is in the GEOJSON format, and can be viewed directly in QGIS or similar software. Other files that may be of particular interest to users include the model-generated mesh file `mpas_mesh_info.json` which contains a complete description of the model-generated mesh, and `mpas.json` which contains the same information in the GEOJSON format, and can be viewed directly in QGIS or similar software. In the <pyflowline_casename> root directory, three HPC-associated files `submit.job`, `stdout.out`, `stderr.err` are generated. The script `run_pyflowline.py` is the python script that was ran by the HPC job. If you are running on a local machine, you can run this script directly. The table below describes the output files.
 
 +----------------------------------------+-------------------------------------------------------------------------------------------------------------------------+
 | Filename                               | Description                                                                                                             |

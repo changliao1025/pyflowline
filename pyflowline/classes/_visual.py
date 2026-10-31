@@ -3,8 +3,6 @@ import os
 # dependency packages
 
 
-
-
 # plot function
 
 
@@ -42,7 +40,7 @@ def plot(self, iFlag_type_in=None, iFlag_title_in=None, sVariable_in=None, **kwa
         if iFlag_type_in == 2:
             # polyline based, only flowline
             aLegend = list()
-            sText = "Case: " + "{:0d}".format(int(self.iCase_index))
+            sText = "Case: " + f"{int(self.iCase_index):0d}"
             aLegend.append(sText)
             sText = "Mesh type: " + self.sMesh_type.title()
             aLegend.append(sText)
@@ -52,16 +50,10 @@ def plot(self, iFlag_type_in=None, iFlag_title_in=None, sVariable_in=None, **kwa
             else:
                 if self.dResolution_meter > 1000:
                     sResolution = (
-                        "Resolution: "
-                        + "{:0d}".format(int(self.dResolution_meter / 1000))
-                        + " km"
+                        "Resolution: " + f"{int(self.dResolution_meter / 1000):0d}" + " km"
                     )
                 else:
-                    sResolution = (
-                        "Resolution: "
-                        + "{:0d}".format(int(self.dResolution_meter))
-                        + " m"
-                    )
+                    sResolution = "Resolution: " + f"{int(self.dResolution_meter):0d}" + " m"
 
             aLegend.append(sResolution)
             for pBasin in self.aBasin:
@@ -71,7 +63,7 @@ def plot(self, iFlag_type_in=None, iFlag_title_in=None, sVariable_in=None, **kwa
                     iFlag_title_in=iFlag_title_in,
                     sVariable_in=sVariable_in,
                     aLegend_in=aLegend,
-                    **kwargs
+                    **kwargs,
                 )
         else:
             if iFlag_type_in == 3:  # polygon based
@@ -81,9 +73,7 @@ def plot(self, iFlag_type_in=None, iFlag_title_in=None, sVariable_in=None, **kwa
             else:
                 if iFlag_type_in == 4:  # mixed based mesh + flowline
                     if sVariable_in == "overlap":
-                        self._plot_mesh_with_flowline(
-                            iFlag_title_in=iFlag_title_in, **kwargs
-                        )
+                        self._plot_mesh_with_flowline(iFlag_title_in=iFlag_title_in, **kwargs)
 
                     pass
                 else:
@@ -113,7 +103,7 @@ def _plot_mesh(self, sTitle_in=None, **kwargs):
         iFlag_color_in=0,
         iFlag_fill_in=False,
         iFlag_filter_in=0,  # for mesh alone, we need to filter out the boundary
-        **kwargs
+        **kwargs,
     )
 
     return
@@ -128,7 +118,6 @@ def _plot_mesh_with_flowline(
     pProjection_map_in=None,
 ):
     from pyearthviz.map.vector.map_multiple_vector_files import map_multiple_vector_files
-
 
     aFiletype_in = list()
     aFilename_in = list()

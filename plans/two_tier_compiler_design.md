@@ -79,7 +79,7 @@ By adopting **YAML** as the primary human-facing format:
   - `compile_workflow()` enforces strict type normalization: date values are explicitly string-formatted (`sDate`), case indices are converted to integers, coordinates and thresholds are validated as floats.
 
 ### 3.4 Challenge 4: Preserving Comments During Programmatic Modification
-- **Challenge:** Scripts frequently update workspace paths or parameters before execution using helper functions like `change_json_key_value`. Standard dumping re-writes files without original comments.
+- **Challenge:** Scripts frequently update workspace paths or parameters before execution using helper functions like `change_config_key_value`. Standard dumping re-writes files without original comments.
 - **Solution:**
   - Recommend modifying parameters in-memory via `oPyflowline.pyflowline_change_model_parameter(...)` or runtime overrides in `pyflowline_read_configuration_file(..., sWorkspace_output_in=...)`.
   - Upgraded `change_config_key_value` to support both YAML and JSON files safely.

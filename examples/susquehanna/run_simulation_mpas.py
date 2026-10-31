@@ -3,7 +3,7 @@ import sys
 from pathlib import Path
 
 from pyflowline.configuration import path_manager as pyflowline_path_manager
-from pyflowline.configuration.change_json_key_value import change_json_key_value
+from pyflowline.configuration.change_config_key_value import change_config_key_value
 from pyflowline.configuration.read_configuration_file import pyflowline_read_configuration_file
 
 # %% Define the case information (configuration file parameters)
@@ -55,34 +55,36 @@ else:
 
 # Set the path to the output folder
 # Pass the configuration filename followed by a single key-value pair.
-change_json_key_value(oFilename_domain_config, "sWorkspace_output", str(oFolder_output))
+change_config_key_value(oFilename_domain_config, "sWorkspace_output", str(oFolder_output))
 
 # Set the path to the mpas mesh file
-change_json_key_value(oFilename_domain_config, "sFilename_mesh_netcdf", str(oFilename_mesh_netcdf))
+change_config_key_value(
+    oFilename_domain_config, "sFilename_mesh_netcdf", str(oFilename_mesh_netcdf)
+)
 
 # Set the path to the boundary file used to clip the mesh
-change_json_key_value(
+change_config_key_value(
     oFilename_domain_config, "sFilename_mesh_boundary", str(oFilename_mesh_boundary)
 )
 
 # Set the path to the basin ("child") configuration file
-change_json_key_value(oFilename_domain_config, "sFilename_basins", str(oFilename_basins_config))
+change_config_key_value(oFilename_domain_config, "sFilename_basins", str(oFilename_basins_config))
 
 # These parameters are not strictly necessary, but will reduce the potential for errors or confusion.
-change_json_key_value(
+change_config_key_value(
     oFilename_domain_config,
     "sFilename_model_configuration",
     str(oFilename_domain_config),
 )
 
-change_json_key_value(
+change_config_key_value(
     oFilename_domain_config, "sWorkspace_data", str(oPath_parent.joinpath("data"))
 )
 
 # %% Update the basin ("child") configuration file
 
 # Set the path to the flowline file.
-change_json_key_value(
+change_config_key_value(
     oFilename_basins_config,
     "sFilename_flowline_filter",
     str(oFilename_flowline),

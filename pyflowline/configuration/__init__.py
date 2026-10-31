@@ -4,7 +4,7 @@ Supports YAML (primary, comment-enabled, user-friendly) and JSON (programmatic,
 backward-compatible) configuration files for case, basin, and jigsaw setups.
 """
 
-from pyflowline.configuration.change_json_key_value import (
+from pyflowline.configuration.change_config_key_value import (
     change_config_key_value,
     change_config_keys_values,
     change_json_key_value,

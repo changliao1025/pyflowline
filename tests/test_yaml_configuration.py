@@ -13,7 +13,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from pyflowline.configuration.change_json_key_value import change_config_key_value
+from pyflowline.configuration.change_config_key_value import change_config_key_value
 from pyflowline.configuration.config_manager import (
     BasinConfigManager,
     FlowlineConfigManager,

@@ -41,7 +41,7 @@ from pyflowline.algorithms.intersect.intersect_flowline_with_mesh import get_mes
 from pyflowline.classes._hpc import _pyflowline_create_hpc_job
 from pyflowline.classes.basin import pybasin
 from pyflowline.classes.timer import pytimer
-from pyflowline.formats.convert_boundary_to_geojson import convert_boundary_to_geojson
+from pyflowline.formats.convert_boundary_to_vector import convert_boundary_to_vector
 
 iFlag_kml = importlib.util.find_spec("simplekml")
 
@@ -728,7 +728,7 @@ class flowlinecase:
                 sFilename_out = self.sFilename_coastline_boundary_geojson
                 # check whether the file exists
                 if os.path.isfile(sFilename_raw):
-                    convert_boundary_to_geojson(sFilename_raw, sFilename_out)
+                    convert_boundary_to_vector(sFilename_raw, sFilename_out)
                 else:
                     print("The coastal boundary file does not exist!")
                 pass
@@ -1093,7 +1093,7 @@ class flowlinecase:
             # single watershed boundary
             sFilename_raw = self.sFilename_watershed_boundary
             sFilename_out = self.sFilename_watershed_boundary_geojson
-            convert_boundary_to_geojson(sFilename_raw, sFilename_out)
+            convert_boundary_to_vector(sFilename_raw, sFilename_out)
             pass
 
         return
@@ -1103,7 +1103,7 @@ class flowlinecase:
         sFilename_out = self.sFilename_mesh_boundary_geojson
         # check whether the file exists
         if os.path.isfile(sFilename_raw):
-            convert_boundary_to_geojson(sFilename_raw, sFilename_out, iFlag_largest_polygon_in=1)
+            convert_boundary_to_vector(sFilename_raw, sFilename_out, iFlag_largest_polygon_in=1)
         else:
             print("The mesh boundary file does not exist!")
             return
@@ -1119,7 +1119,7 @@ class flowlinecase:
             sFilename_out = self.sFilename_coastline_boundary_geojson
             # check whether the file exists
             if os.path.isfile(sFilename_raw):
-                convert_boundary_to_geojson(sFilename_raw, sFilename_out)
+                convert_boundary_to_vector(sFilename_raw, sFilename_out)
             else:
                 print("The coastal boundary file does not exist!")
         return
@@ -1592,3 +1592,6 @@ class flowlinecase:
     export = pyflowline_export
     run = pyflowline_run
     change_model_parameter = pyflowline_change_model_parameter
+    convert_flowline_to_vector = pyflowline_convert_flowline_to_geojson
+    convert_watershed_boundary_to_vector = pyflowline_convert_watershed_boundary_to_geojson
+    convert_mesh_boundary_to_vector = pyflowline_convert_mesh_boundary_to_geojson

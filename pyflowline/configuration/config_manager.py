@@ -1101,34 +1101,122 @@ class JigsawConfigManager:
 
 
 # Functions for backwards compatibility
-def create_basin_template_configuration_file(sFilename_basins, nBasin):
+def create_basin_template_configuration_file(sFilename_basins, nBasin=1):
     """Generate basin configuration using the BasinConfigManager."""
     return BasinConfigManager.create_multiple_basins(sFilename_basins, nBasin)
 
 
-def create_pyflowline_template_configuration_file(sFilename_config, **kwargs):
-    """Generate pyflowline config template file using parameter keywords."""
-    config = FlowlineConfigManager.create_template_config(sFilename_config, kwargs)
+def create_model_configuration(
+    filename: str | Path,
+    mesh_type: str = "hexagon",
+    case_index: int = 1,
+    date: str | None = None,
+    resolution_meter: float = 5000.0,
+    resolution_degree: float = 0.5,
+    region_name: str = "susquehanna",
+    workspace_input: str | Path | None = None,
+    workspace_output: str | Path | None = None,
+    n_outlets: int = 1,
+    fmt: str | None = None,
+    sectioned: bool = True,
+    **kwargs: Any,
+) -> dict[str, Any]:
+    """Generate a PyFlowline template configuration file in YAML or JSON.
 
-    from pyflowline.classes.pycase import flowlinecase
+    Supports:
+        - YAML (.yaml / .yml): human-friendly, sectioned format with comments
+        - JSON (.json): flat or sectioned format
+        - Automatic creation of accompanying basin configuration file
+    """
+    dest_path = Path(filename).expanduser().resolve()
+    dest_path.parent.mkdir(parents=True, exist_ok=True)
 
-    oModel = flowlinecase(config, iFlag_create_directory_in=0)
+    if fmt is None:
+        ext = dest_path.suffix.lower()
+        fmt = "json" if ext == ".json" else "yaml"
+    else:
+        fmt = fmt.lower()
 
-    dest_path = Path(sFilename_config)
-    ext = dest_path.suffix.lower()
-    basin_ext = ext if ext in (".yaml", ".yml", ".json") else ".yaml"
-    sFilename_basins = str(dest_path.parent / (dest_path.stem + "_basins" + basin_ext))
+    basin_ext = ".json" if fmt == "json" else ".yaml"
+    sFilename_basins = str(dest_path.parent / f"{dest_path.stem}_basins{basin_ext}")
+    create_basin_template_configuration_file(sFilename_basins, n_outlets)
 
-    aBasin = create_basin_template_configuration_file(sFilename_basins, config.get("nOutlet", 1))
+    date_str = date or datetime.datetime.today().strftime("%Y%m%d")
+    ws_in = str(workspace_input) if workspace_input else str(dest_path.parent / "input")
+    ws_out = str(workspace_output) if workspace_output else str(dest_path.parent / "output")
 
-    oModel.aBasin = aBasin
-    oModel.sFilename_basins = sFilename_basins
+    if fmt in ("yaml", "yml") and sectioned:
+        config_data: dict[str, Any] = {
+            "workflow": {
+                "model": "pyflowline",
+                "mesh_type": mesh_type.lower(),
+                "case_index": int(case_index),
+                "date": date_str,
+                "job": kwargs.get("sJob", "pyflowline"),
+            },
+            "resolutions": {
+                "degree": float(resolution_degree),
+                "meter": float(resolution_meter),
+                "accumulation_threshold": float(kwargs.get("dAccumulation_threshold", 100000.0)),
+                "small_river": float(kwargs.get("dThreshold_small_river", 10000.0)),
+            },
+            "region": {
+                "name": region_name,
+                "bbox": {
+                    "left": float(kwargs.get("dLongitude_left", -180.0)),
+                    "right": float(kwargs.get("dLongitude_right", 180.0)),
+                    "bottom": float(kwargs.get("dLatitude_bot", -90.0)),
+                    "top": float(kwargs.get("dLatitude_top", 90.0)),
+                },
+            },
+            "flags": {
+                "create_mesh": bool(kwargs.get("iFlag_create_mesh", 1)),
+                "save_mesh": bool(kwargs.get("iFlag_save_mesh", 1)),
+                "simplification": bool(kwargs.get("iFlag_simplification", 1)),
+                "intersect": bool(kwargs.get("iFlag_intersect", 1)),
+                "flowline": bool(kwargs.get("iFlag_flowline", 1)),
+                "resample_method": int(kwargs.get("iFlag_resample_method", 1)),
+                "global": bool(kwargs.get("iFlag_global", 0)),
+                "multiple_outlet": bool(kwargs.get("iFlag_multiple_outlet", 0)),
+                "elevation_profile": bool(kwargs.get("iFlag_elevation_profile", 1)),
+                "stream_burning_topology": bool(kwargs.get("iFlag_stream_burning_topology", 1)),
+                "save_elevation": bool(kwargs.get("iFlag_save_elevation", 1)),
+                "use_mesh_dem": bool(kwargs.get("iFlag_use_mesh_dem", 0)),
+            },
+            "paths": {
+                "workspace_input": ws_in,
+                "workspace_output": ws_out,
+                "dem": str(kwargs.get("sFilename_dem", ws_in + "/dem_ext.tif")),
+                "spatial_reference": str(
+                    kwargs.get("sFilename_spatial_reference", ws_in + "/boundary_proj.shp")
+                ),
+                "mesh_netcdf": str(
+                    kwargs.get("sFilename_mesh_netcdf", ws_in + "/lnd_cull_mesh.nc")
+                ),
+                "basins": sFilename_basins,
+            },
+        }
+    else:
+        config_data = FlowlineConfigManager.get_default_config()
+        config_data["sWorkspace_input"] = ws_in
+        config_data["sWorkspace_output"] = ws_out
+        config_data["sFilename_model_configuration"] = str(dest_path)
+        config_data["sFilename_basins"] = sFilename_basins
+        config_data["sMesh_type"] = mesh_type
+        config_data["iCase_index"] = case_index
+        config_data["sDate"] = date_str
+        config_data["dResolution_meter"] = resolution_meter
+        config_data["dResolution_degree"] = resolution_degree
+        config_data["sRegion"] = region_name
+        config_data["nOutlet"] = n_outlets
+        for k, v in kwargs.items():
+            config_data[k] = v
 
-    # Export configuration in the target format
-    fmt = "json" if ext == ".json" else "yaml"
-    dump_pyflowline_config(config, sFilename_config, fmt=fmt)
+    _dump_config_file(config_data, dest_path, fmt=fmt)
+    return config_data
 
-    return oModel
+
+create_pyflowline_template_configuration_file = create_model_configuration
 
 
 def create_jigsaw_template_configuration_file(sFilename_config, **kwargs):
@@ -1157,6 +1245,7 @@ __all__ = [
     "compile_workflow",
     "create_basin_template_configuration_file",
     "create_jigsaw_template_configuration_file",
+    "create_model_configuration",
     "create_pyflowline_template_configuration_file",
     "create_workflow",
     "dump_pyflowline_config",

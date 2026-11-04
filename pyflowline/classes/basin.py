@@ -29,8 +29,8 @@ from pyflowline.algorithms.intersect.intersect_flowline_with_mesh import (
 from pyflowline.algorithms.process_flowline import process_flowline
 from pyflowline.algorithms.simplification.remove_returning_flowline import remove_returning_flowline
 from pyflowline.classes.timer import pytimer
-from pyflowline.formats.convert_boundary_to_geojson import convert_boundary_to_geojson
-from pyflowline.formats.convert_flowline_to_geojson import convert_flowline_to_geojson
+from pyflowline.formats.convert_boundary_to_vector import convert_boundary_to_vector
+from pyflowline.formats.convert_flowline_to_vector import convert_flowline_to_vector
 from pyflowline.formats.export_flowline import export_flowline_to_geojson
 from pyflowline.formats.export_vertex import export_vertex_to_geojson
 from pyflowline.formats.read_flowline import read_flowline_vector
@@ -949,25 +949,29 @@ class pybasin:
         """Export the basin object to YAML (primary format)."""
         return self.basin_export_config(sFilename_output_in=sFilename_output_in, fmt="yaml")
 
-    def basin_convert_flowline_to_geojson(self):
+    def basin_convert_flowline_to_vector(self):
         """
-        Convert the flowline to geojson
+        Convert the flowline to vector
         """
         sFilename_raw = self.sFilename_flowline_filter
         sFilename_out = self.sFilename_flowline_filter_geojson
         print("Basin " + self.sBasinID + ": initial flowline:", sFilename_raw)
-        convert_flowline_to_geojson(sFilename_raw, sFilename_out)
+        convert_flowline_to_vector(sFilename_raw, sFilename_out)
         return
 
-    def basin_convert_watershed_boundary_to_geojson(self):
+    basin_convert_flowline_to_geojson = basin_convert_flowline_to_vector
+
+    def basin_convert_watershed_boundary_to_vector(self):
         """
-        Convert the boundary to geojson
+        Convert the boundary to vector
         """
         sFilename_raw = self.sFilename_watershed_boundary
         sFilename_out = self.sFilename_watershed_boundary_geojson
         print("Basin " + self.sBasinID + ": initial watershed boundary:", sFilename_raw)
-        convert_boundary_to_geojson(sFilename_raw, sFilename_out, iFlag_largest_polygon_in=1)
+        convert_boundary_to_vector(sFilename_raw, sFilename_out, iFlag_largest_polygon_in=1)
         return
+
+    basin_convert_watershed_boundary_to_geojson = basin_convert_watershed_boundary_to_vector
 
     def basin_calculate_flowline_length(self, aFlowline_in):
         """

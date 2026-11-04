@@ -238,6 +238,21 @@ case.run()
 
 ---
 
+### 4.5 Pillar 5: First-Class Template Generation (`create_model_configuration`)
+Rather than maintaining loose, ad-hoc template generator scripts in `examples/` that drift, suffer from typos, or get left unmaintained, template generation is an intrinsic capability of `config_manager.py`. It produces either human-readable, sectioned YAML with paired basins or flat/sectioned JSON based on the destination file extension or `fmt` argument:
+
+```python
+from my_package import create_model_configuration
+
+# 1. Generate YAML template (primary)
+create_model_configuration("workflow_config.yaml", mesh_type="hexagon")
+
+# 2. Generate JSON template (programmatic)
+create_model_configuration("workflow_config.json", mesh_type="mpas")
+```
+
+---
+
 ## 5. Reusable Implementation Blueprint
 
 Below is the template for [`config_manager.py`](file:///Users/changliao/workspace/python/pyflowline/pyflowline/configuration/config_manager.py) ready to be dropped into any project:
@@ -438,6 +453,69 @@ def load_configuration(filename: str | Path, **kwargs) -> Any:
     return CaseEngine(config)
 
 
+def create_model_configuration(
+    filename: str | Path,
+    mesh_type: str = "default",
+    case_index: int = 1,
+    date: str | None = None,
+    resolution_meter: float = 5000.0,
+    resolution_degree: float = 0.5,
+    region_name: str = "default",
+    workspace_input: str | Path | None = None,
+    workspace_output: str | Path | None = None,
+    n_outlets: int = 1,
+    fmt: str | None = None,
+    sectioned: bool = True,
+    **kwargs: Any,
+) -> dict[str, Any]:
+    """Generate a template workflow configuration file in YAML or JSON."""
+    dest_path = Path(filename).expanduser().resolve()
+    dest_path.parent.mkdir(parents=True, exist_ok=True)
+
+    if fmt is None:
+        ext = dest_path.suffix.lower()
+        fmt = "json" if ext == ".json" else "yaml"
+    else:
+        fmt = fmt.lower()
+
+    date_str = date or datetime.date.today().strftime("%Y%m%d")
+    ws_in = str(workspace_input) if workspace_input else str(dest_path.parent / "input")
+    ws_out = str(workspace_output) if workspace_output else str(dest_path.parent / "output")
+
+    if fmt in ("yaml", "yml") and sectioned:
+        config_data = {
+            "workflow": {
+                "mesh_type": mesh_type.lower(),
+                "case_index": int(case_index),
+                "date": date_str,
+            },
+            "resolutions": {
+                "degree": float(resolution_degree),
+                "meter": float(resolution_meter),
+            },
+            "region": {"name": region_name},
+            "flags": {"simulation": True, "visualization": False},
+            "paths": {
+                "workspace_input": ws_in,
+                "workspace_output": ws_out,
+            },
+        }
+    else:
+        config_data = {
+            "sMesh_type": mesh_type,
+            "iCase_index": case_index,
+            "sDate": date_str,
+            "dResolution_meter": resolution_meter,
+            "dResolution_degree": resolution_degree,
+            "sWorkspace_input": ws_in,
+            "sWorkspace_output": ws_out,
+        }
+        config_data.update(kwargs)
+
+    _dump_config_file(config_data, dest_path, fmt=fmt)
+    return config_data
+
+
 # Unified cross-project aliases
 create_workflow = load_configuration
 load_pyflowline_config = load_workflow_config
@@ -456,6 +534,7 @@ import sys
 from my_package.config import config_manager
 from my_package.config.config_manager import (
     compile_workflow,
+    create_model_configuration,
     create_workflow,
     dump_workflow_config,
     join_project_path,
@@ -472,6 +551,7 @@ sys.modules.setdefault("my_package.config.read_configuration_file", config_manag
 
 __all__ = [
     "compile_workflow",
+    "create_model_configuration",
     "create_workflow",
     "dump_workflow_config",
     "load_configuration",
@@ -497,3 +577,4 @@ When migrating a new project (e.g. `pyearthbuffer`, `pyearthriver`, `hexwatershe
 6. [ ] Delete legacy `path_manager.py`, `read_*.py`, and `change_*_key_value.py` files.
 7. [ ] Add `my_package.config` alias in `my_package/__init__.py`.
 8. [ ] Replace on-disk configuration mutations with clean `load_configuration(path, override_arg=val)`.
+9. [ ] Provide `create_model_configuration` supporting dual YAML/JSON template generation.

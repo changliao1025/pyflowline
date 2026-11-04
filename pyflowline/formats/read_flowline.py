@@ -8,9 +8,8 @@ import os
 from typing import List, Optional, Tuple
 
 from pyearthriver.classes.flowline import pyflowline
+from pyearthriver.formats.export_flowline import export_flowline_to_vector
 from pyearthriver.formats.load_flowline import read_flowlines_from_vector
-
-from pyflowline.formats.export_flowline import export_flowline_to_geojson
 
 
 def read_flowline_vector(
@@ -42,7 +41,7 @@ def read_flowline_vector(
 
     if sFilename_out is not None:
         aFlowlineID = [fl.lFlowlineID for fl in aFlowline]
-        export_flowline_to_geojson(
+        export_flowline_to_vector(
             aFlowline,
             sFilename_out,
             aAttribute_field=["lineid"],

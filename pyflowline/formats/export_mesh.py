@@ -3,9 +3,16 @@ import os
 
 
 def convert_mesh_to_kml(sFilename_geojson_in, sFilename_kml_out):
-    """
-    Convert the mesh to a kml file
-    """
+    """Convert the mesh vector file to a KML file."""
+    try:
+        from pyearth.toolbox.conversion.convert_vector_format import convert_vector_format
+
+        success = convert_vector_format(sFilename_geojson_in, sFilename_kml_out)
+        if success:
+            return
+    except Exception:
+        pass
+
     import simplekml
 
     with open(sFilename_geojson_in) as f:

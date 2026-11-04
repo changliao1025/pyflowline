@@ -21,8 +21,17 @@ from pyearthriver.formats.load_flowline import read_flowlines_from_vector
 
 from pyflowline.classes.pycase import flowlinecase
 from pyflowline.formats.convert_attributes import convert_gcs_attributes_to_cell
+from pyflowline.formats.convert_boundary_to_vector import (
+    convert_boundary_to_geojson,
+    convert_boundary_to_vector,
+)
 from pyflowline.formats.convert_coordinates import convert_gcs_coordinates_to_cell
-from pyflowline.formats.convert_flowline_to_geojson import convert_flowline_to_geojson
+from pyflowline.formats.convert_flowline_to_vector import (
+    convert_flowline_to_geojson,
+    convert_flowline_to_vector,
+)
+from pyflowline.formats.export_flowline import export_flowline_to_vector
+from pyflowline.formats.export_vertex import export_vertex_to_vector
 from pyflowline.formats.read_flowline import read_flowline_vector
 
 
@@ -210,6 +219,96 @@ class TestPyEarthIntegration(unittest.TestCase):
         rg = pyrivergraph([fl])
         snapped_rg = rg.find_nearest_outlet(target)
         self.assertEqual(snapped_rg, v2)
+
+    def test_convert_boundary_to_vector_and_geojson(self):
+        """Test converting boundary vector to geojson and extracting largest polygon."""
+        boundary_data = {
+            "type": "FeatureCollection",
+            "features": [
+                {
+                    "type": "Feature",
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [
+                            [
+                                [-77.0, 40.0],
+                                [-76.0, 40.0],
+                                [-76.0, 41.0],
+                                [-77.0, 41.0],
+                                [-77.0, 40.0],
+                            ]
+                        ],
+                    },
+                    "properties": {"id": 1, "name": "small"},
+                },
+                {
+                    "type": "Feature",
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [
+                            [
+                                [-78.0, 39.0],
+                                [-75.0, 39.0],
+                                [-75.0, 42.0],
+                                [-78.0, 42.0],
+                                [-78.0, 39.0],
+                            ]
+                        ],
+                    },
+                    "properties": {"id": 2, "name": "large"},
+                },
+            ],
+        }
+        with tempfile.TemporaryDirectory() as tmpdir:
+            input_path = os.path.join(tmpdir, "boundary_multi.geojson")
+            output_path = os.path.join(tmpdir, "boundary_out.geojson")
+            output_largest_path = os.path.join(tmpdir, "boundary_largest.geojson")
+            with open(input_path, "w", encoding="utf-8") as f:
+                json.dump(boundary_data, f)
+
+            # Test general vector conversion
+            success = convert_boundary_to_vector(input_path, output_path)
+            self.assertTrue(success)
+            self.assertTrue(os.path.isfile(output_path))
+
+            # Test largest polygon extraction
+            success_largest = convert_boundary_to_geojson(
+                input_path, output_largest_path, iFlag_largest_polygon_in=1
+            )
+            self.assertTrue(success_largest)
+            self.assertTrue(os.path.isfile(output_largest_path))
+
+            with open(output_largest_path, encoding="utf-8") as f:
+                largest_data = json.load(f)
+            self.assertEqual(len(largest_data["features"]), 1)
+            # Verify coordinates correspond to the larger polygon
+            coords = largest_data["features"][0]["geometry"]["coordinates"][0]
+            lons = [c[0] for c in coords]
+            self.assertIn(-78.0, lons)
+
+    def test_export_flowline_to_vector_and_vertex_to_vector(self):
+        """Test exporting flowlines and vertices to vector using generalized APIs."""
+        v1 = pyvertex({"dLongitude_degree": -77.0, "dLatitude_degree": 40.0})
+        v2 = pyvertex({"dLongitude_degree": -76.0, "dLatitude_degree": 40.5})
+        e = pyedge(v1, v2)
+        fl = pyflowline([e])
+        fl.lFlowlineID = 100
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            fl_out = os.path.join(tmpdir, "flowline.geojson")
+            vx_out = os.path.join(tmpdir, "vertex.geojson")
+
+            export_flowline_to_vector(
+                [fl],
+                fl_out,
+                aAttribute_field=["stream_order"],
+                aAttribute_dtype=["int"],
+                aAttribute_data=[[3]],
+            )
+            self.assertTrue(os.path.isfile(fl_out))
+
+            export_vertex_to_vector([v1, v2], vx_out)
+            self.assertTrue(os.path.isfile(vx_out))
 
 
 if __name__ == "__main__":

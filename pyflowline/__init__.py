@@ -5,6 +5,7 @@ import sys
 from pyflowline import configuration
 from pyflowline import configuration as config
 from pyflowline.configuration import (
+    create_model_configuration,
     create_workflow,
     load_configuration,
     load_pyflowline_config,
@@ -21,5 +22,6 @@ __all__ = [
     "load_configuration",
     "load_workflow_config",
     "load_pyflowline_config",
+    "create_model_configuration",
     "create_workflow",
 ]

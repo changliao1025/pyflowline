@@ -28,6 +28,8 @@ region:
     latitude: 39.4620                           # Main basin outlet latitude
 
 flags:
+  simulation: false                             # Run simulation steps
+  visualization: false                          # Generate visualization plots
   create_mesh: true                             # Generate mesh geometry
   save_mesh: true                               # Export mesh to disk
   simplification: true                          # Simplify river geometry

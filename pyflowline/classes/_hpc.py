@@ -24,10 +24,7 @@ def _pyflowline_create_hpc_job(self, sSlurm_in=None, hours_in=10):
         "os.environ['LD_LIBRARY_PATH']=" + '"' + sConda_env_path + '/lib:${LD_LIBRARY_PATH}"' + "\n"
     )
     ofs_pyflowline.write(sLine)
-    sLine = (
-        "from pyflowline.configuration.read_configuration_file import pyflowline_read_configuration_file"
-        + "\n"
-    )
+    sLine = "from pyflowline.configuration import pyflowline_read_configuration_file" + "\n"
     ofs_pyflowline.write(sLine)
     sLine = "sFilename_configuration_in = " + '"' + self.sFilename_model_configuration + '"\n'
     ofs_pyflowline.write(sLine)

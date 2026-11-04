@@ -97,7 +97,6 @@ def _plot_mesh(self, sTitle_in=None, **kwargs):
         sMesh_type = sTitle_in
 
     map_vector_polygon_file(
-        1,
         sFilename_in,
         iFlag_zebra_in=1,
         iFlag_color_in=0,

@@ -54,7 +54,11 @@ def read_mesh_json(iMesh_type_in, sFilename_mesh_in):
             )
             pCell.lCellID = lCellID
             pCell.dArea = dArea
-            pCell.dLength = pCell.calculate_edge_length()
+            pCell.dLength = (
+                pCell.calculate_edge_length()
+                if hasattr(pCell, "calculate_edge_length")
+                else pCell.calculate_effective_length()
+            )
             pCell.dLength_flowline = pCell.dLength
             if iMesh_type_in == 4:
                 pCell.dElevation_mean = dElevation_mean
@@ -112,7 +116,11 @@ def read_mesh_json_w_topology(iMesh_type_in, sFilename_mesh_in):
             )
             pCell.lCellID = lCellID
             pCell.dArea = dArea
-            pCell.dLength = pCell.calculate_edge_length()
+            pCell.dLength = (
+                pCell.calculate_edge_length()
+                if hasattr(pCell, "calculate_edge_length")
+                else pCell.calculate_effective_length()
+            )
             pCell.dLength_flowline = pCell.dLength
             if iMesh_type_in == 4:
                 pCell.dElevation_mean = dElevation_mean

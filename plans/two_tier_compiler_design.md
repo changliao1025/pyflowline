@@ -82,7 +82,7 @@ By adopting **YAML** as the primary human-facing format:
 - **Challenge:** Scripts frequently update workspace paths or parameters before execution using helper functions like `change_config_key_value`. Standard dumping re-writes files without original comments.
 - **Solution:**
   - Recommend modifying parameters in-memory via `oPyflowline.pyflowline_change_model_parameter(...)` or runtime overrides in `pyflowline_read_configuration_file(..., sWorkspace_output_in=...)`.
-  - Upgraded `change_config_key_value` to support both YAML and JSON files safely.
+  - Modernized `load_configuration` and `pycase.change_model_parameter` to eliminate physical disk rewrite steps.
 
 ---
 

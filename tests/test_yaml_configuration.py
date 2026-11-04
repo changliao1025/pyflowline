@@ -5,21 +5,23 @@ Tests verify:
 - Auto-discovery of extensions (.yaml, .yml, .json) and directories
 - Dual-format parity between YAML and JSON
 - Inline basin specifications inside YAML case files
-- Safe key-value modification in YAML
+- Runtime parameter overrides in YAML and JSON
 - Exporting configurations to YAML and JSON
 """
+
+from __future__ import annotations
 
 import tempfile
 import unittest
 from pathlib import Path
 
-from pyflowline.configuration.change_config_key_value import change_config_key_value
-from pyflowline.configuration.config_manager import (
+from pyflowline.configuration import (
     BasinConfigManager,
     FlowlineConfigManager,
+    load_configuration,
     load_pyflowline_config,
+    pyflowline_read_configuration_file,
 )
-from pyflowline.configuration.read_configuration_file import pyflowline_read_configuration_file
 
 
 class TestYAMLConfiguration(unittest.TestCase):
@@ -213,8 +215,8 @@ basins:
             self.assertEqual(cfg_yaml["iFlag_simplification"], cfg_json["iFlag_simplification"])
             self.assertEqual(cfg_yaml["iFlag_intersect"], cfg_json["iFlag_intersect"])
 
-    def test_change_config_key_value_yaml(self):
-        """Test modifying keys in a YAML file using change_config_key_value."""
+    def test_runtime_parameter_overrides(self):
+        """Test overriding configuration parameters at runtime without modifying disk file."""
         yaml_content = """workflow:
   mesh_type: hexagon
   case_index: 1
@@ -227,15 +229,75 @@ paths:
   workspace_output: ./old_output
 """
         with tempfile.TemporaryDirectory() as tmpdir:
-            cfg_path = Path(tmpdir) / "test_modify.yaml"
+            cfg_path = Path(tmpdir) / "test_override.yaml"
             cfg_path.write_text(yaml_content, encoding="utf-8")
 
-            change_config_key_value(cfg_path, "workspace_output", "./new_output")
-            change_config_key_value(cfg_path, "case_index", 5)
+            case = pyflowline_read_configuration_file(
+                cfg_path,
+                iCase_index_in=5,
+                sWorkspace_output_in="./new_output",
+                dResolution_meter_in=25000.0,
+                iFlag_create_directory_in=0,
+            )
+            self.assertIsNotNone(case)
+            self.assertEqual(case.iCase_index, 5)
+            self.assertEqual(case.dResolution_meter, 25000.0)
+            self.assertIn("new_output", case.sWorkspace_output)
 
-            reloaded = load_pyflowline_config(cfg_path)
-            self.assertEqual(reloaded["iCase_index"], 5)
-            self.assertTrue(reloaded["sWorkspace_output"].endswith("new_output"))
+    def test_two_file_workflow_with_multiple_basins(self):
+        """Test two-file workflow: case YAML referencing a separate basin YAML with multiple basins."""
+        basin_yaml_content = """# Two basins in separate basin YAML
+- id: 1
+  outlet:
+    longitude: 119.1729
+    latitude: 37.7687
+  accumulation_threshold: 100000.0
+- id: 2
+  outlet:
+    longitude: 118.5000
+    latitude: 36.8000
+  accumulation_threshold: 50000.0
+"""
+        case_yaml_content = """workflow:
+  mesh_type: mpas
+  case_index: 1
+  date: "20261101"
+
+resolutions:
+  meter: 3000.0
+
+region:
+  bbox:
+    left: 95.0
+    right: 120.0
+    bottom: 32.0
+    top: 42.0
+
+paths:
+  workspace_output: ./test_output
+  basins: ./external_basins.yaml
+"""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmp_path = Path(tmpdir)
+            basin_path = tmp_path / "external_basins.yaml"
+            basin_path.write_text(basin_yaml_content, encoding="utf-8")
+
+            case_path = tmp_path / "case_workflow.yaml"
+            case_path.write_text(case_yaml_content, encoding="utf-8")
+
+            # Test load_pyflowline_config detects multiple basins from external file
+            cfg = load_pyflowline_config(case_path)
+            self.assertEqual(cfg["nOutlet"], 2)
+            self.assertEqual(cfg["iFlag_multiple_outlet"], 1)
+
+            # Test flowlinecase instantiation loads both basins
+            case = pyflowline_read_configuration_file(case_path, iFlag_create_directory_in=0)
+            self.assertEqual(case.nOutlet, 2)
+            self.assertEqual(len(case.aBasin), 2)
+            self.assertEqual(case.aBasin[0].lBasinID, 1)
+            self.assertEqual(case.aBasin[1].lBasinID, 2)
+            self.assertAlmostEqual(case.aBasin[0].dLongitude_outlet_degree, 119.1729)
+            self.assertAlmostEqual(case.aBasin[1].dLongitude_outlet_degree, 118.5000)
 
     def test_case_and_basin_yaml_export(self):
         """Test exporting case and basin objects to YAML and reloading."""
@@ -280,6 +342,39 @@ paths:
 
             oCase.pyflowline_export_basin_config_to_yaml(basin_export_file)
             self.assertTrue(basin_export_file.is_file())
+
+    def test_unified_config_manager_and_aliases(self):
+        """Test unified config_manager, path_manager namespace, and cross-project pyflowline.config alias."""
+        # 1. Test pyflowline.config alias
+        import pyflowline.config as pyflowline_config
+
+        self.assertTrue(hasattr(pyflowline_config, "load_configuration"))
+        self.assertTrue(hasattr(pyflowline_config, "create_workflow"))
+        self.assertTrue(hasattr(pyflowline_config, "load_workflow_config"))
+
+        # 2. Test path resolution utilities
+        from pyflowline.configuration import (
+            path_manager,
+            pyflowline_package_root,
+            pyflowline_project_root,
+        )
+
+        root = pyflowline_project_root()
+        self.assertTrue(root.is_dir())
+        self.assertTrue((root / "setup.py").exists() or (root / "pyproject.toml").exists())
+        self.assertEqual(path_manager.pyflowline_project_root(), root)
+        pkg_root = pyflowline_package_root()
+        self.assertTrue(pkg_root.is_dir())
+
+        # 3. Test legacy submodule import compatibility shims
+        import pyflowline.configuration.path_manager as pm_mod
+
+        self.assertEqual(pm_mod.pyflowline_project_root(), root)
+        from pyflowline.configuration.read_configuration_file import (
+            pyflowline_read_configuration_file as read_fn,
+        )
+
+        self.assertTrue(callable(read_fn))
 
 
 if __name__ == "__main__":

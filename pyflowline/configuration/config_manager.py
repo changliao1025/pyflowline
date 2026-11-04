@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 import datetime
+import importlib.resources as importlib_resources
 import json
 import os
 import platform
@@ -11,6 +14,78 @@ try:
     HAVE_YAML = True
 except ImportError:
     HAVE_YAML = False
+
+# ==============================================================================
+# Project & Package Path Resolution (formerly path_manager)
+# ==============================================================================
+
+
+def pyflowline_package_root(package_name: str = "pyflowline") -> Path:
+    """Get the installation root directory of the package."""
+    try:
+        return Path(str(importlib_resources.files(package_name))).resolve()
+    except Exception:
+        return Path(__file__).resolve().parents[1]
+
+
+def root_path_from_setup_file() -> Path:
+    """Return the top-level (root) path of the pyflowline project.
+
+    Navigates upwards from this file's path until finding a directory
+    containing setup.py or pyproject.toml.
+    """
+    this_path = Path(__file__).resolve()
+    for parent in this_path.parents:
+        if (parent / "setup.py").exists() or (parent / "pyproject.toml").exists():
+            return parent
+    raise FileNotFoundError("Project root marker (setup.py or pyproject.toml) not found.")
+
+
+def root_path_from_pyflowline_package_root() -> Path:
+    """Get the parent directory of the pyflowline package root."""
+    return pyflowline_package_root().parent
+
+
+def root_path_from_path_manager_location() -> Path:
+    """Return the top-level root path assuming fixed directory layout:
+    root_path/pyflowline/configuration/config_manager.py
+    """
+    return Path(__file__).resolve().parents[2]
+
+
+def pyflowline_project_root() -> Path:
+    """Find the root path of the project.
+
+    Searches upward for a project marker (setup.py, pyproject.toml),
+    falling back to package root parent.
+    """
+    try:
+        return root_path_from_setup_file()
+    except FileNotFoundError:
+        return root_path_from_pyflowline_package_root()
+    except Exception as exc:
+        raise RuntimeError(
+            f"An unexpected error occurred while locating the project root: {exc}"
+        ) from exc
+
+
+def join_project_path(*args: str) -> Path:
+    """Join components of a path relative to the project root."""
+    return pyflowline_project_root().joinpath(*args)
+
+
+class _PathManagerNamespace:
+    """Backwards-compatible path_manager namespace object."""
+
+    pyflowline_project_root = staticmethod(pyflowline_project_root)
+    pyflowline_package_root = staticmethod(pyflowline_package_root)
+    join_project_path = staticmethod(join_project_path)
+    root_path_from_setup_file = staticmethod(root_path_from_setup_file)
+    root_path_from_pyflowline_package_root = staticmethod(root_path_from_pyflowline_package_root)
+    root_path_from_path_manager_location = staticmethod(root_path_from_path_manager_location)
+
+
+path_manager = _PathManagerNamespace()
 
 # ==============================================================================
 # PyFlowline Workflow Configuration Manager
@@ -316,7 +391,7 @@ class WorkflowSpec:
         self.jigsaw = dict(jigsaw or {})
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any]) -> "WorkflowSpec":
+    def from_dict(cls, data: dict[str, Any]) -> WorkflowSpec:
         workflow = data.get("workflow", {}) or {}
         return cls(
             mesh_type=workflow.get("mesh_type", data.get("sMesh_type", "hexagon")),
@@ -484,6 +559,9 @@ def compile_workflow(spec_or_config: dict[str, Any] | WorkflowSpec) -> dict[str,
             "disconnected": "iFlag_disconnected",
             "land_ocean_mask": "iFlag_land_ocean_mask",
             "standalone": "iFlag_standalone",
+            "mesh_boundary": "iFlag_mesh_boundary",
+            "simulation": "iFlag_simulation",
+            "visualization": "iFlag_visualization",
         }
         for flag_k, native_k in flag_map.items():
             if flag_k in flags and flags[flag_k] is not None:
@@ -522,14 +600,17 @@ def compile_workflow(spec_or_config: dict[str, Any] | WorkflowSpec) -> dict[str,
             if k.startswith("sFilename_") or k.startswith("sWorkspace_"):
                 native[k] = _select_platform_path(v)
 
-    # Section 6: basins (inline list of basin specifications)
+    # Section 6: basins (inline list or single dict of basin specifications)
     basins = raw.get("basins") or raw.get("aBasin")
-    if isinstance(basins, list) and basins:
-        compiled_basins = [_normalize_basin_dict(b) for b in basins if isinstance(b, dict)]
-        native["aBasin"] = compiled_basins
-        native["nOutlet"] = len(compiled_basins)
-        if len(compiled_basins) > 1:
-            native["iFlag_multiple_outlet"] = 1
+    if basins:
+        if isinstance(basins, dict):
+            basins = [basins]
+        if isinstance(basins, list):
+            compiled_basins = [_normalize_basin_dict(b) for b in basins if isinstance(b, dict)]
+            native["aBasin"] = compiled_basins
+            native["nOutlet"] = len(compiled_basins)
+            if len(compiled_basins) > 1:
+                native["iFlag_multiple_outlet"] = 1
 
     # Section 7: jigsaw
     jigsaw = raw.get("jigsaw")
@@ -615,6 +696,26 @@ def load_pyflowline_config(filename: str | Path) -> dict[str, Any]:
                     if b_val and isinstance(b_val, str) and not os.path.isabs(b_val):
                         b[bk] = str((base_dir / b_val).resolve())
 
+    # If external basins file is referenced and nOutlet wasn't explicitly configured, inspect basin count
+    workflow_raw = (
+        raw_dict.get("workflow", {}) if isinstance(raw_dict.get("workflow"), dict) else {}
+    )
+    if (
+        config.get("sFilename_basins")
+        and not workflow_raw.get("outlets")
+        and not workflow_raw.get("nOutlet")
+    ):
+        try:
+            basin_file = Path(config["sFilename_basins"])
+            if basin_file.is_file():
+                basin_records = BasinConfigManager.load_config(basin_file)
+                if isinstance(basin_records, list) and len(basin_records) > 0:
+                    config["nOutlet"] = len(basin_records)
+                    if len(basin_records) > 1:
+                        config["iFlag_multiple_outlet"] = 1
+        except Exception:
+            pass
+
     return config
 
 
@@ -635,12 +736,120 @@ def dump_pyflowline_config(
 dump_workflow_config = dump_pyflowline_config
 
 
+# ==============================================================================
+# Model Loading & Workflow Factory (formerly read_configuration_file)
+# ==============================================================================
+
+
+def pyflowline_read_configuration_file(
+    sFilename_configuration_in: str | Path,
+    iFlag_standalone_in: int | None = 1,
+    iFlag_create_directory_in: int | None = None,
+    iFlag_use_mesh_dem_in: int | None = None,
+    iCase_index_in: int | None = None,
+    iResolution_index_in: int | None = None,
+    dResolution_degree_in: float | None = None,
+    dResolution_meter_in: float | None = None,
+    sMesh_type_in: str | None = None,
+    sModel_in: str | None = "pyflowline",
+    sDate_in: str | None = None,
+    sDggrid_type_in: str | None = None,
+    sWorkspace_output_in: str | Path | None = None,
+):
+    """Read a PyFlowline model configuration from YAML or JSON.
+
+    Supports:
+        - YAML (.yaml / .yml) with comments (#)
+        - JSON (.json) for backward compatibility
+        - Extensionless file paths and directory paths
+        - Two-tier sectioned specification or legacy flat dictionary
+        - Runtime parameter overrides
+
+    Args:
+        sFilename_configuration_in (str or Path): Path to configuration file or directory
+        iFlag_standalone_in (int, optional): Standalone mode flag. Defaults to 1.
+        iFlag_create_directory_in (int, optional): Directory creation flag.
+        iFlag_use_mesh_dem_in (int, optional): Use mesh DEM flag.
+        iCase_index_in (int, optional): Case index override.
+        iResolution_index_in (int, optional): Resolution index override.
+        dResolution_degree_in (float, optional): Resolution in degrees override.
+        dResolution_meter_in (float, optional): Resolution in meters override.
+        sMesh_type_in (str, optional): Mesh type override.
+        sModel_in (str, optional): Model name override.
+        sDate_in (str, optional): Simulation date override.
+        sDggrid_type_in (str, optional): DGGRID type override.
+        sWorkspace_output_in (str or Path, optional): Output workspace override.
+
+    Returns:
+        flowlinecase | None: Configured flowlinecase object ready for simulation.
+    """
+    from pyflowline.classes.pycase import flowlinecase
+
+    resolved_path = _resolve_config_path(sFilename_configuration_in)
+
+    if not resolved_path.is_file():
+        print(f"{sFilename_configuration_in} does not exist")
+        return None
+
+    # Load configuration (handles YAML comments, relative paths, platform paths)
+    aConfig: dict[str, Any] = load_pyflowline_config(resolved_path)
+
+    # Apply runtime argument overrides
+    if iCase_index_in is not None:
+        aConfig["iCase_index"] = int(iCase_index_in)
+
+    if iResolution_index_in is not None:
+        aConfig["iResolution_index"] = int(iResolution_index_in)
+
+    if iFlag_standalone_in is not None:
+        aConfig["iFlag_standalone"] = int(iFlag_standalone_in)
+
+    if iFlag_use_mesh_dem_in is not None:
+        aConfig["iFlag_use_mesh_dem"] = int(iFlag_use_mesh_dem_in)
+
+    if sMesh_type_in is not None:
+        aConfig["sMesh_type"] = str(sMesh_type_in).lower()
+
+    if sDggrid_type_in is not None:
+        aConfig["sDggrid_type"] = str(sDggrid_type_in)
+
+    if sModel_in is not None:
+        aConfig["sModel"] = str(sModel_in)
+
+    if sDate_in is not None:
+        aConfig["sDate"] = str(sDate_in)
+
+    if dResolution_degree_in is not None:
+        aConfig["dResolution_degree"] = float(dResolution_degree_in)
+
+    if dResolution_meter_in is not None:
+        aConfig["dResolution_meter"] = float(dResolution_meter_in)
+
+    if sWorkspace_output_in is not None:
+        aConfig["sWorkspace_output"] = str(sWorkspace_output_in)
+
+    sWorkspace_output = aConfig.get("sWorkspace_output", "./output")
+    try:
+        Path(sWorkspace_output).mkdir(parents=True, exist_ok=True)
+    except Exception as exc:
+        print(f"Warning: Could not create output workspace {sWorkspace_output}: {exc}")
+
+    aConfig["sFilename_model_configuration"] = str(resolved_path)
+
+    oPyflowline = flowlinecase(aConfig, iFlag_create_directory_in=iFlag_create_directory_in)
+    return oPyflowline
+
+
+# Alias for cross-project consistency with mpas_land_mesh / pyearthmesh
+load_configuration = pyflowline_read_configuration_file
+
+
 def create_workflow(config_or_path: str | Path | dict[str, Any], **kwargs):
     """Factory function: load configuration and return an instantiated flowlinecase."""
     from pyflowline.classes.pycase import flowlinecase
 
     if isinstance(config_or_path, (str, Path)):
-        config = load_pyflowline_config(config_or_path)
+        return load_configuration(config_or_path, **kwargs)
     elif isinstance(config_or_path, dict):
         if "workflow" in config_or_path or "resolutions" in config_or_path:
             config = compile_workflow(config_or_path)
@@ -925,3 +1134,42 @@ def create_pyflowline_template_configuration_file(sFilename_config, **kwargs):
 def create_jigsaw_template_configuration_file(sFilename_config, **kwargs):
     """Generate JIGSAW config template file using parameter keywords."""
     return JigsawConfigManager.create_template_config(sFilename_config, custom_values=kwargs)
+
+
+# Backwards-compatibility stubs for legacy scripts
+def change_config_key_value(*args: Any, **kwargs: Any) -> None:
+    """Deprecated legacy stub. Modify configuration in memory instead."""
+    pass
+
+
+change_json_key_value = change_config_key_value
+change_config_keys_values = change_config_key_value
+change_json_keys_values = change_config_key_value
+
+
+__all__ = [
+    "DEFAULT_BASIN_CONFIG",
+    "DEFAULT_FLOWLINE_CONFIG",
+    "BasinConfigManager",
+    "FlowlineConfigManager",
+    "JigsawConfigManager",
+    "WorkflowSpec",
+    "compile_workflow",
+    "create_basin_template_configuration_file",
+    "create_jigsaw_template_configuration_file",
+    "create_pyflowline_template_configuration_file",
+    "create_workflow",
+    "dump_pyflowline_config",
+    "dump_workflow_config",
+    "join_project_path",
+    "load_configuration",
+    "load_pyflowline_config",
+    "load_workflow_config",
+    "path_manager",
+    "pyflowline_package_root",
+    "pyflowline_project_root",
+    "pyflowline_read_configuration_file",
+    "root_path_from_path_manager_location",
+    "root_path_from_pyflowline_package_root",
+    "root_path_from_setup_file",
+]

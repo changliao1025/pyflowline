@@ -23,6 +23,8 @@ region:
     top: 42.8                                   # Northern bounding latitude
 
 flags:
+  simulation: false                             # Run simulation steps
+  visualization: false                          # Generate visualization plots
   create_mesh: true                             # Generate mesh geometry
   save_mesh: true                               # Export mesh to disk
   simplification: true                          # Simplify river geometry

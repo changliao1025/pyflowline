@@ -1,54 +1,95 @@
-import os
+#!/usr/bin/env python3
+"""Susquehanna regular lat-lon mesh PyFlowline simulation workflow.
+
+This example demonstrates loading the YAML configuration using load_configuration
+and orchestrating PyFlowline model execution (setup, simplification, mesh generation,
+and topological reconstruction).
+"""
+
+import argparse
+import logging
 import sys
-from os.path import realpath
 from pathlib import Path
 
-# %% set up workspace path
-sPath_parent = str(Path(__file__).parents[2])  # data is located two dir's up
-sPath_parent = str(Path(__file__).parents[2])  # data is located two dir's up
-import sys
+from pyflowline.configuration import load_configuration, path_manager
 
-sys.path.append(sPath_parent)
-
-from pyflowline.configuration.pyflowline_read_configuration_file import (
-    pyflowline_read_configuration_file,
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
 )
-
-sPath_data = realpath(sPath_parent + "/data/susquehanna")
-sWorkspace_input = str(Path(sPath_data) / "input")
-sWorkspace_output = str(Path(sPath_data) / "output")
-
-# %% you need to update this file based on your own case study
-sFilename_configuration_in = realpath(
-    sPath_parent + "//data/susquehanna/input//pyflowline_susquehanna_latlon.json"
-)
-if os.path.isfile(sFilename_configuration_in):
-    pass
-else:
-    print("This configuration does not exist: ", sFilename_configuration_in)
-
-# %% setup case information
-iCase_index = 3
-dResolution_meter = 50000
-
-sMesh = "latlon"
-sDate = "20230101"
-
-oPyflowline = pyflowline_read_configuration_file(
-    sFilename_configuration_in,
-    iCase_index_in=iCase_index,
-    dResolution_meter_in=dResolution_meter,
-    sDate_in=sDate,
-)
-
-# %%
-oPyflowline.aBasin[0].dLatitude_outlet_degree = 39.462000
-oPyflowline.aBasin[0].dLongitude_outlet_degree = -76.009300
-oPyflowline.setup()
-oPyflowline.flowline_simplification()
-aCell = oPyflowline.mesh_generation()
-oPyflowline.reconstruct_topological_relationship(aCell)
-oPyflowline.export()
+logger = logging.getLogger(__name__)
 
 
-print("Finished")
+def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--config",
+        "-c",
+        default=None,
+        help="Path to workflow YAML configuration file (default: pyflowline_susquehanna_latlon.yaml)",
+    )
+    parser.add_argument(
+        "--simulate",
+        action="store_true",
+        help="Run simulation pipeline (simplification, mesh generation, topological reconstruction)",
+    )
+    parser.add_argument(
+        "--visualize",
+        action="store_true",
+        help="Generate flowline visualization map",
+    )
+    args = parser.parse_args()
+
+    # ── Step 1: Resolve configuration path ────────────────────────────────────
+    if args.config:
+        sFilename_workflow = Path(args.config).expanduser().resolve()
+    else:
+        oPath_root = path_manager.pyflowline_project_root()
+        sFilename_workflow = oPath_root.joinpath(
+            "data", "susquehanna", "input", "pyflowline_susquehanna_latlon.yaml"
+        )
+        if not sFilename_workflow.exists():
+            sFilename_workflow = Path(__file__).with_name("pyflowline_susquehanna_latlon.yaml")
+
+    logger.info("Step 1: Loading configuration from: %s", sFilename_workflow)
+    case = load_configuration(sFilename_workflow)
+    if case is None:
+        logger.error("Failed to load configuration from: %s", sFilename_workflow)
+        sys.exit(1)
+
+    logger.info("   * Region: %s", case.sRegion)
+    logger.info("   * Mesh type: %s", case.sMesh_type)
+    logger.info("   * Case ID: %s", case.sCase)
+    logger.info("   * Output workspace: %s", case.sWorkspace_output)
+    if case.sFilename_mesh_boundary:
+        logger.info("   * Mesh boundary: %s", case.sFilename_mesh_boundary)
+
+    # ── Step 2: Model setup ───────────────────────────────────────────────────
+    logger.info("Step 2: Setting up PyFlowline model...")
+    case.setup()
+
+    # ── Step 3: Visualization ─────────────────────────────────────────────────
+    if args.visualize or getattr(case, "iFlag_visualization", 0) == 1:
+        logger.info("Step 3: Generating initial filtered flowline visualization...")
+        case.plot(sVariable_in="flowline_filter", sFilename_output_in="filter_flowline.png")
+
+    # ── Step 4: Simulation Execution ──────────────────────────────────────────
+    if args.simulate or getattr(case, "iFlag_simulation", 0) == 1:
+        logger.info("Step 4: Running flowline simplification...")
+        case.flowline_simplification()
+
+        logger.info("Step 5: Generating mesh...")
+        aCell = case.mesh_generation()
+
+        logger.info("Step 6: Reconstructing topological relationships...")
+        case.reconstruct_topological_relationship(aCell)
+
+        logger.info("Step 7: Exporting simulation results...")
+        case.export()
+
+    logger.info("Done.")
+
+
+if __name__ == "__main__":
+    main()

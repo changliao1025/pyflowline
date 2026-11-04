@@ -371,7 +371,11 @@ def _intersect_cached_mesh_rtree_method(
                             )
                             pCell.lCellID = lCellID
                             pCell.dArea = data["area"]
-                            pCell.dLength = pCell.calculate_edge_length()
+                            pCell.dLength = (
+                                pCell.calculate_edge_length()
+                                if hasattr(pCell, "calculate_edge_length")
+                                else pCell.calculate_effective_length()
+                            )
                             pCell.dLength_flowline = pCell.dLength
                             pCell.aFlowline = list()
                             pCell.nFlowline = 0

@@ -1,0 +1,63 @@
+# ==============================================================================
+# PyFlowline Case Specification: Yellow River (Huanghe) MPAS Mesh (YAML)
+# ==============================================================================
+# Regional variable-resolution MPAS Voronoi mesh configuration for the
+# Yellow River (Huanghe) basin.
+# ==============================================================================
+
+workflow:
+  date: "20261101"                              # Simulation date (YYYYMMDD)
+  mesh_type: mpas                               # Target mesh: mpas
+  case_index: 2                                 # Simulation run index
+  model: pyflowline                             # Model engine
+  job: hex                                      # Job name
+  region: huanghe                               # Study region
+  standalone: true                              # Standalone case execution
+  debug: false                                  # Diagnostic logging
+
+resolutions:
+  degree: 0.05                                  # Resolution in degrees (~5 km)
+  meter: 3000.0                                 # High resolution corridor spacing (3 km)
+  accumulation_threshold: 100000.0              # Upstream drainage accumulation threshold
+  small_river_threshold: 10000.0                # Small river pruning threshold
+
+region:
+  bbox:
+    left: 95.9083                               # Western bounding longitude
+    right: 119.1798                             # Eastern bounding longitude
+    bottom: 32.1583                             # Southern bounding latitude
+    top: 41.8379                                # Northern bounding latitude
+  outlet:
+    longitude: 119.1729                         # Main basin outlet longitude (Bohai Sea mouth)
+    latitude: 37.7687                           # Main basin outlet latitude
+
+flags:
+  simulation: true                              # Enable simulation execution pipeline
+  visualization: false                          # Enable map visualization output
+  create_mesh: true                             # Generate mesh geometry
+  save_mesh: true                               # Export mesh to GeoJSON/disk
+  mesh_boundary: true                           # Crop global mesh using vector basin boundary
+  simplification: true                          # Simplify river geometry
+  intersect: true                               # Intersect river reaches with mesh cells
+  flowline: true                                # Enable river flowline processing
+  use_mesh_dem: false                            # Sample elevation directly from mesh DEM
+  rotation: false                               # Grid orientation rotation
+
+paths:
+  workspace_input:
+    Darwin: /Users/changliao/data/hexwatershed/huanghe
+    Linux: /public/home/liaochang/data/hexwatershed/huanghe
+    default: ./input
+  workspace_output:
+    Darwin: /Users/changliao/scratch/pyflowline/huanghe
+    Linux: /data2/share/liaochang/04model/jigsaw/huanghe
+    default: ./output
+  mesh_boundary:
+    Darwin: /Users/changliao/data/hexwatershed/huanghe/vector/basin_boundary/merged.geojson
+    Linux: /public/home/liaochang/data/hexwatershed/huanghe/vector/basin_boundary/merged.geojson
+    default: ./merged.geojson
+  mesh_netcdf:
+    Darwin: /Users/changliao/scratch/earthmesh/huanghe/mpas20261101002/out/invert_mesh.nc
+    Linux: /data2/share/liaochang/04model/jigsaw/huanghe/mpas20261101002/out/invert_mesh.nc
+    default: ./invert_mesh.nc
+  basins: ./pyflowline_huanghe_basins.yaml       # Child basin specification file

@@ -16,7 +16,7 @@ def export_flowline_to_geojson(
     aAttribute_dtype=None,
 ):
     """
-    convert a flowlist object list to json format.
+    convert a flowline object list to json format.
     This function should be used for stream flowline only.
     """
 
@@ -52,18 +52,6 @@ def export_flowline_to_geojson(
     pLayer_json.CreateField(
         ogr.FieldDefn("lineid", ogr.OFTInteger64)
     )  # long type for high resolution
-
-    # add the other fields
-    # if iFlag_attribute ==1:
-    #    for i in range(nAttribute1):
-    #        sField = aAttribute_field[i]
-    #        dtype = aAttribute_dtype[i]
-    #        if dtype == 'int':
-    #            pLayer_json.CreateField(ogr.FieldDefn(sField, ogr.OFTInteger64))
-    #            pass
-    #        else:
-    #            pLayer_json.CreateField(ogr.FieldDefn(sField, ogr.OFTReal))
-    #            pass
 
     dtype_to_ogr = {"int": ogr.OFTInteger64, "float": ogr.OFTReal}
     if iFlag_attribute:
@@ -111,7 +99,7 @@ def export_flowline_to_shapefile(
     aAttribute_dtype=None,
 ):
     """
-    convert a shpefile to json format.
+    convert a shapefile to json format.
     This function should be used for stream flowline only.
     """
 

@@ -20,7 +20,7 @@ from pyearth.gis.gdal.read.vector.gdal_get_vector_boundary import gdal_get_vecto
 from pyearth.gis.gdal.read.vector.gdal_get_vector_spatial_reference import (
     gdal_get_vector_spatial_reference_wkt,
 )
-from pyearth.gis.spatialref.convert_between_degree_and_meter import degree_to_meter, meter_to_degree
+from pyearth.gis.spatialref.convert_between_degree_and_meter import meter_to_degree
 from pyearth.gis.spatialref.reproject_coordinates import reproject_coordinates
 from pyearth.toolbox.conversion.convert_vector_format import convert_vector_format
 from pyearthmesh.classes.dggrid import pydggrid
@@ -29,19 +29,9 @@ from pyearthmesh.classes.latlon import pylatlon
 from pyearthmesh.classes.mpas import pympas
 from pyearthmesh.classes.square import pysquare
 from pyearthmesh.classes.tin import pytin
-from pyearthmesh.meshes.structured.cubicsphere.create_cubicsphere_mesh import (
-    create_cubicsphere_mesh,
-)
 from pyearthmesh.meshes.structured.dggs.dggrid.create_dggrid_mesh import (
-    create_dggrid_mesh,
     dggrid_find_resolution_by_index,
 )
-from pyearthmesh.meshes.structured.hexagon.create_hexagon_mesh import create_hexagon_mesh
-from pyearthmesh.meshes.structured.latlon.create_latlon_mesh import create_latlon_mesh
-from pyearthmesh.meshes.structured.square.create_square_mesh import create_square_mesh
-from pyearthmesh.meshes.structured.triangular.create_triangular_mesh import create_triangular_mesh
-from pyearthmesh.meshes.unstructured.mpas.create_mpas_mesh import create_mpas_mesh
-from pyearthmesh.meshes.unstructured.tin.create_tin_mesh import create_tin_mesh
 from pyearthriver.classes.edge import pyedge
 from pyearthriver.classes.flowline import pyflowline
 from pyearthriver.classes.vertex import pyvertex
@@ -267,6 +257,16 @@ class flowlinecase:
         else:
             self.iFlag_mesh_boundary = 0
 
+        if "iFlag_simulation" in aConfig_in:
+            self.iFlag_simulation = int(aConfig_in["iFlag_simulation"])
+        else:
+            self.iFlag_simulation = 0
+
+        if "iFlag_visualization" in aConfig_in:
+            self.iFlag_visualization = int(aConfig_in["iFlag_visualization"])
+        else:
+            self.iFlag_visualization = 0
+
         if "iFlag_multiple_outlet" in aConfig_in:
             self.iFlag_multiple_outlet = int(aConfig_in["iFlag_multiple_outlet"])
 
@@ -399,8 +399,10 @@ class flowlinecase:
         if "sFilename_dem" in aConfig_in:
             self.sFilename_dem = aConfig_in["sFilename_dem"]
 
-        if "sFilename_mpas_mesh_netcdf" in aConfig_in:
+        if "sFilename_mpas_mesh_netcdf" in aConfig_in and aConfig_in["sFilename_mpas_mesh_netcdf"]:
             self.sFilename_mpas_mesh_netcdf = aConfig_in["sFilename_mpas_mesh_netcdf"]
+        elif "sFilename_mesh_netcdf" in aConfig_in and aConfig_in["sFilename_mesh_netcdf"]:
+            self.sFilename_mpas_mesh_netcdf = aConfig_in["sFilename_mesh_netcdf"]
 
         if "sFilename_jigsaw_mesh_netcdf" in aConfig_in:
             self.sFilename_jigsaw_mesh_netcdf = aConfig_in["sFilename_jigsaw_mesh_netcdf"]
@@ -540,12 +542,31 @@ class flowlinecase:
                     dummy_data = BasinConfigManager.load_config(resolved_basin_file)
                     if isinstance(dummy_data, dict):
                         dummy_data = [dummy_data]
-                    n_basins = (
-                        min(len(dummy_data), self.nOutlet) if self.nOutlet > 0 else len(dummy_data)
-                    )
+                    if len(dummy_data) > 0:
+                        if self.nOutlet <= 1 and len(dummy_data) > 1:
+                            self.nOutlet = len(dummy_data)
+                            self.iFlag_multiple_outlet = 1
+                        n_basins = (
+                            min(len(dummy_data), self.nOutlet)
+                            if self.nOutlet > 0
+                            else len(dummy_data)
+                        )
+                    else:
+                        n_basins = 0
+                    basin_base_dir = resolved_basin_file.parent
+                    basin_path_keys = [
+                        "sFilename_dam",
+                        "sFilename_flowline_filter",
+                        "sFilename_flowline_raw",
+                        "sFilename_flowline_topo",
+                    ]
                     for i in range(n_basins):
                         sBasin = f"{i + 1:08d}"
                         dummy_basin = dummy_data[i]
+                        for bk in basin_path_keys:
+                            b_val = dummy_basin.get(bk)
+                            if b_val and isinstance(b_val, str) and not os.path.isabs(b_val):
+                                dummy_basin[bk] = str((basin_base_dir / b_val).resolve())
                         if not dummy_basin.get("sWorkspace_output_basin"):
                             dummy_basin["sWorkspace_output_basin"] = str(
                                 Path(self.sWorkspace_output) / sBasin
@@ -1138,442 +1159,17 @@ class flowlinecase:
             iFlag_arctic = iFlag_arctic_in
 
         if self.iFlag_create_mesh == 1:
-            iFlag_global = self.iFlag_global
-            iMesh_type = self.iMesh_type
-            iFlag_save_mesh = self.iFlag_save_mesh
-            iFlag_rotation = self.iFlag_rotation
-            iFlag_mesh_boundary = self.iFlag_mesh_boundary
-            dLatitude_mean = self.dLatitude_mean
-            dResolution_degree = self.dResolution_degree
-            dResolution_meter = self.dResolution_meter
-            dLongitude_left = self.dLongitude_left
-            dLongitude_right = self.dLongitude_right
-            dLatitude_bot = self.dLatitude_bot
-            dLatitude_top = self.dLatitude_top
-            sFilename_mesh = self.sFilename_mesh
-            if iMesh_type == 1:  # hexagon
-                # hexagon edge
-                dResolution_meter = degree_to_meter(dResolution_degree, dLatitude_mean)
-                dArea = np.power(dResolution_meter, 2.0)
-                dLength_edge = np.sqrt(2.0 * dArea / (3.0 * np.sqrt(3.0)))
-                if iFlag_rotation == 0:
-                    dX_spacing = dLength_edge * np.sqrt(3.0)
-                    dY_spacing = dLength_edge * 1.5
-                    ncolumn = int((self.dX_lowerright - self.dX_lowerleft) / dX_spacing)
-                    nrow = int((self.dY_upperleft - self.dY_lowerleft) / dY_spacing)
-                else:
-                    dX_spacing = dLength_edge * 1.5
-                    dY_spacing = dLength_edge * np.sqrt(3.0)
-                    ncolumn = int((self.dX_lowerright - self.dX_lowerleft) / dX_spacing) + 1
-                    nrow = int((self.dY_upperleft - self.dY_lowerleft) / dY_spacing)
+            from pyearthmesh.meshes.generate_mesh import generate_mesh
 
-                if iFlag_mesh_boundary == 1:
-                    pBoundary_wkt, aExtent = gdal_get_vector_boundary(
-                        self.sFilename_mesh_boundary_geojson
-                    )
-                    aHexagon = create_hexagon_mesh(
-                        iFlag_rotation,
-                        self.dX_lowerleft,
-                        self.dY_lowerleft,
-                        dResolution_meter,
-                        ncolumn,
-                        nrow,
-                        sFilename_mesh,
-                        self.pProjection_reference,
-                        pBoundary_wkt,
-                    )
-                    pass
-                else:
-                    pRing = ogr.Geometry(ogr.wkbLinearRing)
-                    pRing.AddPoint(dLongitude_left, dLatitude_top)
-                    pRing.AddPoint(dLongitude_right, dLatitude_top)
-                    pRing.AddPoint(dLongitude_right, dLatitude_bot)
-                    pRing.AddPoint(dLongitude_left, dLatitude_bot)
-                    pRing.AddPoint(dLongitude_left, dLatitude_top)
-                    pBoundary = ogr.Geometry(ogr.wkbPolygon)
-                    pBoundary.AddGeometry(pRing)
-                    pBoundary_wkt = pBoundary.ExportToWkt()  # wkt format
-                    aHexagon = create_hexagon_mesh(
-                        iFlag_rotation,
-                        self.dX_lowerleft,
-                        self.dY_lowerleft,
-                        dResolution_meter,
-                        ncolumn,
-                        nrow,
-                        sFilename_mesh,
-                        self.pProjection_reference,
-                        pBoundary_wkt,
-                    )
-                    pass
-                self.aCell = aHexagon
-            else:
-                if iMesh_type == 2:  # square
-                    ncolumn = int((self.dX_lowerright - self.dX_lowerleft) / dResolution_meter)
-                    nrow = int((self.dY_upperleft - self.dY_lowerleft) / dResolution_meter)
-                    if iFlag_mesh_boundary == 1:
-                        pBoundary_wkt, aExtent = gdal_get_vector_boundary(
-                            self.sFilename_mesh_boundary_geojson
-                        )
-                        aSquare = create_square_mesh(
-                            self.dX_lowerleft,
-                            self.dY_lowerleft,
-                            dResolution_meter,
-                            ncolumn,
-                            nrow,
-                            sFilename_mesh,
-                            self.pProjection_reference,
-                            pBoundary_wkt,
-                        )
-                        pass
-                    else:
-                        pRing = ogr.Geometry(ogr.wkbLinearRing)
-                        pRing.AddPoint(dLongitude_left, dLatitude_top)
-                        pRing.AddPoint(dLongitude_right, dLatitude_top)
-                        pRing.AddPoint(dLongitude_right, dLatitude_bot)
-                        pRing.AddPoint(dLongitude_left, dLatitude_bot)
-                        pRing.AddPoint(dLongitude_left, dLatitude_top)
-                        pBoundary = ogr.Geometry(ogr.wkbPolygon)
-                        pBoundary.AddGeometry(pRing)
-                        pBoundary_wkt = pBoundary.ExportToWkt()
-                        aSquare = create_square_mesh(
-                            self.dX_lowerleft,
-                            self.dY_lowerleft,
-                            dResolution_meter,
-                            ncolumn,
-                            nrow,
-                            sFilename_mesh,
-                            self.pProjection_reference,
-                            pBoundary_wkt,
-                        )
-                        pass
-
-                    self.aCell = aSquare
-                else:
-                    if iMesh_type == 3:  # latlon
-                        dResolution_meter = degree_to_meter(dResolution_degree, self.dLatitude_mean)
-                        dArea = np.power(dResolution_meter, 2.0)
-                        ncolumn = int((dLongitude_right - dLongitude_left) / dResolution_degree)
-                        nrow = int((dLatitude_top - dLatitude_bot) / dResolution_degree)
-                        if iFlag_mesh_boundary == 1:
-                            # create a polygon based on real boundary
-                            # already produced
-                            pBoundary_wkt, aExtent = gdal_get_vector_boundary(
-                                self.sFilename_mesh_boundary_geojson
-                            )
-                            aLatlon = create_latlon_mesh(
-                                dLongitude_left,
-                                dLatitude_bot,
-                                dResolution_degree,
-                                ncolumn,
-                                nrow,
-                                sFilename_mesh,
-                                pBoundary_wkt,
-                            )
-                            pass
-                        else:
-                            pRing = ogr.Geometry(ogr.wkbLinearRing)
-                            pRing.AddPoint(dLongitude_left, dLatitude_top)
-                            pRing.AddPoint(dLongitude_right, dLatitude_top)
-                            pRing.AddPoint(dLongitude_right, dLatitude_bot)
-                            pRing.AddPoint(dLongitude_left, dLatitude_bot)
-                            pRing.AddPoint(dLongitude_left, dLatitude_top)
-                            pBoundary = ogr.Geometry(ogr.wkbPolygon)
-                            pBoundary.AddGeometry(pRing)
-                            pBoundary_wkt = pBoundary.ExportToWkt()
-                            aLatlon = create_latlon_mesh(
-                                dLongitude_left,
-                                dLatitude_bot,
-                                dResolution_degree,
-                                ncolumn,
-                                nrow,
-                                sFilename_mesh,
-                                pBoundary_wkt,
-                            )
-
-                        self.aCell = aLatlon
-                    else:
-                        if iMesh_type == 4:  # mpas
-                            sFilename_mpas_mesh_netcdf = self.sFilename_mpas_mesh_netcdf
-                            sFilename_jigsaw_mesh_netcdf = self.sFilename_jigsaw_mesh_netcdf
-                            iFlag_use_mesh_dem = self.iFlag_use_mesh_dem
-                            dLatitude_top = self.dLatitude_top
-                            dLatitude_bot = self.dLatitude_bot
-                            dLongitude_left = self.dLongitude_left
-                            dLongitude_right = self.dLongitude_right
-                            if iFlag_antarctic == 1 or iFlag_arctic == 1:
-                                aMpas = create_mpas_mesh(
-                                    sFilename_mesh,
-                                    iFlag_global_in=iFlag_global,
-                                    iFlag_use_mesh_dem_in=iFlag_use_mesh_dem,
-                                    iFlag_save_mesh_in=iFlag_save_mesh,
-                                    sFilename_mpas_mesh_netcdf_in=sFilename_mpas_mesh_netcdf,
-                                    iFlag_run_jigsaw_in=self.iFlag_run_jigsaw,
-                                    iFlag_antarctic_in=iFlag_antarctic,
-                                    iFlag_arctic_in=iFlag_arctic,
-                                    aConfig_jigsaw_in=self.aConfig_jigsaw,
-                                    sWorkspace_jigsaw_in=self.sWorkspace_jigsaw,
-                                )
-                                pass
-                            else:
-                                # if user wants to use the coastal boundary, then we can replace the default land ocean mask
-                                if self.iFlag_land_ocean_mask == 1:
-                                    sFilename_land_ocean_mask_in = (
-                                        self.sFilename_coastline_boundary_geojson
-                                    )
-                                else:
-                                    sFilename_land_ocean_mask_in = None
-                                    pass
-                                if iFlag_mesh_boundary == 1:
-                                    # create a polygon based on
-                                    pBoundary_wkt, aExtent = gdal_get_vector_boundary(
-                                        self.sFilename_mesh_boundary_geojson
-                                    )
-                                    aMpas = create_mpas_mesh(
-                                        sFilename_mesh,
-                                        iFlag_global_in=iFlag_global,
-                                        iFlag_use_mesh_dem_in=iFlag_use_mesh_dem,
-                                        iFlag_save_mesh_in=iFlag_save_mesh,
-                                        iFlag_run_jigsaw_in=self.iFlag_run_jigsaw,
-                                        iFlag_antarctic_in=iFlag_antarctic_in,
-                                        iFlag_arctic_in=iFlag_arctic_in,
-                                        sWorkspace_jigsaw_in=self.sWorkspace_jigsaw,
-                                        sFilename_mpas_mesh_netcdf_in=sFilename_mpas_mesh_netcdf,
-                                        sFilename_jigsaw_mesh_netcdf_in=sFilename_jigsaw_mesh_netcdf,
-                                        sFilename_land_ocean_mask_in=sFilename_land_ocean_mask_in,
-                                        aConfig_jigsaw_in=self.aConfig_jigsaw,
-                                        pBoundary_in=pBoundary_wkt,
-                                    )
-
-                                else:
-                                    pRing = ogr.Geometry(ogr.wkbLinearRing)
-                                    pRing.AddPoint(dLongitude_left, dLatitude_top)
-                                    pRing.AddPoint(dLongitude_right, dLatitude_top)
-                                    pRing.AddPoint(dLongitude_right, dLatitude_bot)
-                                    pRing.AddPoint(dLongitude_left, dLatitude_bot)
-                                    pRing.AddPoint(dLongitude_left, dLatitude_top)
-                                    pBoundary = ogr.Geometry(ogr.wkbPolygon)
-                                    pBoundary.AddGeometry(pRing)
-                                    pBoundary_wkt = pBoundary.ExportToWkt()
-                                    # new method using polygon object
-                                    aMpas = create_mpas_mesh(
-                                        sFilename_mesh,
-                                        iFlag_global_in=iFlag_global,
-                                        iFlag_use_mesh_dem_in=iFlag_use_mesh_dem,
-                                        iFlag_save_mesh_in=iFlag_save_mesh,
-                                        iFlag_run_jigsaw_in=self.iFlag_run_jigsaw,
-                                        iFlag_antarctic_in=iFlag_antarctic_in,
-                                        iFlag_arctic_in=iFlag_arctic_in,
-                                        sWorkspace_jigsaw_in=self.sWorkspace_jigsaw,
-                                        sFilename_mpas_mesh_netcdf_in=sFilename_mpas_mesh_netcdf,
-                                        sFilename_jigsaw_mesh_netcdf_in=sFilename_jigsaw_mesh_netcdf,
-                                        sFilename_land_ocean_mask_in=sFilename_land_ocean_mask_in,
-                                        aConfig_jigsaw_in=self.aConfig_jigsaw,
-                                        pBoundary_in=pBoundary_wkt,
-                                    )
-                                    pass
-
-                            self.aCell = aMpas
-                        else:
-                            if iMesh_type == 5:  # dggrid
-                                dLatitude_top = self.dLatitude_top
-                                dLatitude_bot = self.dLatitude_bot
-                                dLongitude_left = self.dLongitude_left
-                                dLongitude_right = self.dLongitude_right
-                                if self.iFlag_standalone == 1:
-                                    sWorkspace_output = os.path.join(
-                                        self.sWorkspace_output, "dggrid"
-                                    )
-                                    pass
-                                else:
-                                    sWorkspace_output = os.path.join(
-                                        self.sWorkspace_output, "..", "dggrid"
-                                    )
-                                    sWorkspace_output = os.path.abspath(sWorkspace_output)
-                                    pass
-
-                                if not os.path.exists(sWorkspace_output):
-                                    os.makedirs(sWorkspace_output)
-
-                                if iFlag_mesh_boundary == 1:
-                                    # create a polygon based on
-                                    aDggrid = create_dggrid_mesh(
-                                        iFlag_global,
-                                        iFlag_save_mesh,
-                                        sFilename_mesh,
-                                        sWorkspace_output,
-                                        iResolution_index_in=self.iResolution_index,
-                                        iFlag_antarctic_in=iFlag_antarctic_in,
-                                        iFlag_arctic_in=iFlag_arctic_in,
-                                        sDggrid_type_in=self.sDggrid_type,
-                                        sFilename_boundary_in=self.sFilename_mesh_boundary_geojson,
-                                    )
-
-                                    pass
-                                else:
-                                    aDggrid = create_dggrid_mesh(
-                                        iFlag_global,
-                                        iFlag_save_mesh,
-                                        sFilename_mesh,
-                                        sWorkspace_output,
-                                        iResolution_index_in=self.iResolution_index,
-                                        sDggrid_type_in=self.sDggrid_type,
-                                    )
-
-                                    pass
-
-                                self.aCell = aDggrid
-                            else:
-                                if (
-                                    iMesh_type == 6
-                                ):  # structured tin this one need to be updated because central location issue?
-                                    # tin edge
-                                    dArea = np.power(dResolution_meter, 2.0)
-                                    dLength_edge = np.sqrt(4.0 * dArea / np.sqrt(3.0))
-                                    dX_shift = 0.5 * dLength_edge
-                                    dY_shift = 0.5 * dLength_edge * np.sqrt(3.0)
-                                    dX_spacing = dX_shift * 2
-                                    dY_spacing = dY_shift
-                                    ncolumn = int(
-                                        (self.dX_lowerright - self.dX_lowerleft) / dX_shift
-                                    )
-                                    nrow = int((self.dY_upperleft - self.dY_lowerleft) / dY_spacing)
-                                    aTriangular = create_triangular_mesh(
-                                        self.dX_lowerleft,
-                                        self.dY_lowerleft,
-                                        dResolution_meter,
-                                        ncolumn,
-                                        nrow,
-                                        sFilename_mesh,
-                                        self.pProjection_reference,
-                                    )
-                                    self.aCell = aTriangular
-                                else:
-                                    if (
-                                        iMesh_type == 7
-                                    ):  # tin this one need to be updated to use the jigsaw mesh method
-                                        sFilename_jigsaw_mesh_netcdf = (
-                                            self.sFilename_jigsaw_mesh_netcdf
-                                        )
-                                        iFlag_use_mesh_dem = self.iFlag_use_mesh_dem
-                                        dLatitude_top = self.dLatitude_top
-                                        dLatitude_bot = self.dLatitude_bot
-                                        dLongitude_left = self.dLongitude_left
-                                        dLongitude_right = self.dLongitude_right
-                                        if iFlag_antarctic == 1 or iFlag_arctic == 1:
-                                            aMpas = create_tin_mesh(
-                                                iFlag_global,
-                                                iFlag_use_mesh_dem,
-                                                iFlag_save_mesh,
-                                                sFilename_jigsaw_mesh_netcdf,
-                                                sFilename_mesh,
-                                                iFlag_run_jigsaw_in=self.iFlag_run_jigsaw,
-                                                iFlag_antarctic_in=iFlag_antarctic,
-                                                iFlag_arctic_in=iFlag_arctic,
-                                                sWorkspace_jigsaw_in=self.sWorkspace_jigsaw,
-                                            )
-                                            pass
-                                        else:
-                                            if iFlag_mesh_boundary == 1:
-                                                # create a polygon based on
-                                                # read boundary
-                                                pBoundary_wkt, aExtent = gdal_get_vector_boundary(
-                                                    self.sFilename_mesh_boundary_geojson
-                                                )
-                                                print(sFilename_jigsaw_mesh_netcdf)
-                                                aMpas = create_tin_mesh(
-                                                    iFlag_global,
-                                                    iFlag_use_mesh_dem,
-                                                    iFlag_save_mesh,
-                                                    sFilename_jigsaw_mesh_netcdf,
-                                                    sFilename_mesh,
-                                                    iFlag_run_jigsaw_in=self.iFlag_run_jigsaw,
-                                                    iFlag_antarctic_in=iFlag_antarctic_in,
-                                                    iFlag_arctic_in=iFlag_arctic_in,
-                                                    sWorkspace_jigsaw_in=self.sWorkspace_jigsaw,
-                                                    pBoundary_in=pBoundary_wkt,
-                                                )
-                                                pass
-                                            else:
-                                                pRing = ogr.Geometry(ogr.wkbLinearRing)
-                                                pRing.AddPoint(dLongitude_left, dLatitude_top)
-                                                pRing.AddPoint(dLongitude_right, dLatitude_top)
-                                                pRing.AddPoint(dLongitude_right, dLatitude_bot)
-                                                pRing.AddPoint(dLongitude_left, dLatitude_bot)
-                                                pRing.AddPoint(dLongitude_left, dLatitude_top)
-                                                pBoundary = ogr.Geometry(ogr.wkbPolygon)
-                                                pBoundary.AddGeometry(pRing)
-                                                pBoundary_wkt = pBoundary.ExportToWkt()
-                                                # new method using polygon object
-                                                aMpas = create_tin_mesh(
-                                                    iFlag_global,
-                                                    iFlag_use_mesh_dem,
-                                                    iFlag_save_mesh,
-                                                    sFilename_jigsaw_mesh_netcdf,
-                                                    sFilename_mesh,
-                                                    iFlag_run_jigsaw_in=self.iFlag_run_jigsaw,
-                                                    iFlag_antarctic_in=iFlag_antarctic_in,
-                                                    iFlag_arctic_in=iFlag_arctic_in,
-                                                    sWorkspace_jigsaw_in=self.sWorkspace_jigsaw,
-                                                    pBoundary_in=pBoundary_wkt,
-                                                )
-                                                pass
-
-                                        self.aCell = aMpas
-                                    else:
-                                        if iMesh_type == 8:  # cubic sphere mesh
-                                            dLatitude_top = self.dLatitude_top
-                                            dLatitude_bot = self.dLatitude_bot
-                                            dLongitude_left = self.dLongitude_left
-                                            dLongitude_right = self.dLongitude_right
-                                            if self.iFlag_standalone == 1:
-                                                sWorkspace_output = self.sWorkspace_output
-                                                pass
-                                            else:
-                                                sWorkspace_output = os.path.join(
-                                                    self.sWorkspace_output,
-                                                    "..",
-                                                    "tempestremap",
-                                                )
-                                                sWorkspace_output = os.path.abspath(
-                                                    sWorkspace_output
-                                                )
-                                                pass
-
-                                            if not os.path.exists(sWorkspace_output):
-                                                os.makedirs(sWorkspace_output)
-
-                                            if iFlag_mesh_boundary == 1:
-                                                # create a polygon based on
-                                                aCubicsphere = create_cubicsphere_mesh(
-                                                    iFlag_global,
-                                                    iFlag_save_mesh,
-                                                    dResolution_meter,
-                                                    sFilename_mesh,
-                                                    sWorkspace_output,
-                                                    iFlag_antarctic_in=iFlag_antarctic_in,
-                                                    iFlag_arctic_in=iFlag_arctic_in,
-                                                    sFilename_boundary_in=self.sFilename_mesh_boundary_geojson,
-                                                )
-
-                                                pass
-                                            else:
-                                                aCubicsphere = create_cubicsphere_mesh(
-                                                    iFlag_global,
-                                                    iFlag_save_mesh,
-                                                    dResolution_meter,
-                                                    sFilename_mesh,
-                                                    sWorkspace_output,
-                                                )
-
-                                                pass
-                                            pass
-                                        else:
-
-                                            print("Unsupported mesh type?")
-                                return
+            self.aCell = generate_mesh(
+                self,
+                iFlag_antarctic_in=iFlag_antarctic,
+                iFlag_arctic_in=iFlag_arctic,
+            )
 
             # no matter what type of mesh, we will convert it to geoparquet for easy visualization
-            convert_vector_format(sFilename_mesh, self.sFilename_mesh_parquet)
+            if self.sFilename_mesh_parquet and os.path.isfile(self.sFilename_mesh):
+                convert_vector_format(self.sFilename_mesh, self.sFilename_mesh_parquet)
         else:
             # this means the mesh is already generated, we need a function that can read an existing pyflowline compatible mesh
             pass
@@ -1587,17 +1183,19 @@ class flowlinecase:
         print("Finish mesh generation.")
         return self.aCell
 
-    def pyflowline_reconstruct_topological_relationship(self):
+    def pyflowline_reconstruct_topological_relationship(self, aCell_raw=None):
         """
         The topological relationship reconstruction operation
 
         Args:
-            aCell_raw (list [pycell]): A list of intersected cell objects
+            aCell_raw (list [pycell], optional): A list of intersected cell objects
 
         Returns:
             tuple [list [pycell], list [pyflowline], list [long]]: A list of cells, flowlines, and outlet cell IDs.
         """
         print("Start topology reconstruction.")
+        if aCell_raw is not None and not getattr(self, "aCell", None):
+            self.aCell = aCell_raw
         iFlag_intersect = self.iFlag_intersect
         if iFlag_intersect == 1:
             iMesh_type = self.iMesh_type
@@ -1985,3 +1583,12 @@ class flowlinecase:
         clear_mesh_cache()
         print("Mesh R-tree cache cleared")
         return
+
+    # Method aliases for intuitive OOP workflow
+    setup = pyflowline_setup
+    flowline_simplification = pyflowline_flowline_simplification
+    mesh_generation = pyflowline_mesh_generation
+    reconstruct_topological_relationship = pyflowline_reconstruct_topological_relationship
+    export = pyflowline_export
+    run = pyflowline_run
+    change_model_parameter = pyflowline_change_model_parameter

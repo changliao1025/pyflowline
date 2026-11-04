@@ -301,7 +301,6 @@ def _plot_polyline_variable(
         pass
 
     map_vector_polyline_file(
-        1,
         sFilename_json,
         iFlag_thickness_in=iFlag_thickness,
         iFlag_color_in=iFlag_color,
@@ -550,7 +549,6 @@ def _plot_polygon_variable(
     else:
 
         map_vector_polygon_file(
-            iFiletype,
             sFilename,
             iFlag_color_in=iFlag_color,
             iFlag_colorbar_in=iFlag_colorbar_in,

@@ -1,165 +1,97 @@
-import os
+#!/usr/bin/env python3
+"""Susquehanna MPAS mesh PyFlowline simulation workflow.
+
+This example demonstrates loading the YAML configuration using load_configuration
+and orchestrating PyFlowline model execution (setup, simplification, mesh generation,
+and topological reconstruction).
+"""
+
+import argparse
+import logging
 import sys
 from pathlib import Path
 
-from pyflowline.configuration import path_manager as pyflowline_path_manager
-from pyflowline.configuration.change_config_key_value import change_config_key_value
-from pyflowline.configuration.read_configuration_file import pyflowline_read_configuration_file
+from pyflowline.configuration import load_configuration, path_manager
 
-# %% Define the case information (configuration file parameters)
-sRegion = "susquehanna"
-iCase_index = 1
-iFlag_simulation = 0
-iFlag_visualization = 1
-sMesh = "mpas"
-sDate = "20230701"
-
-# %% Define workspace paths and configuration file path parameters
-oPath_parent = pyflowline_path_manager.pyflowline_project_root()
-sys.path.append(str(oPath_parent))
-
-# Define the full path to the input and output folders.
-oFolder_input = oPath_parent.joinpath("data", sRegion, "input")
-oFolder_output = oPath_parent.joinpath("data", sRegion, "output")
-
-# Define the full path to the domain ("parent") configuration file.
-oFilename_domain_config = oFolder_input.joinpath("pyflowline_susquehanna_mpas.json")
-
-# Define the full path to the individual basin ("child") configuration file.
-oFilename_basins_config = oFolder_input.joinpath("pyflowline_susquehanna_basins.json")
-
-# Define the full path to the MPAS mesh file
-oFilename_mesh_netcdf = oFolder_input.joinpath("lnd_cull_mesh.nc")
-
-# Define the full path to the input flowline file.
-oFilename_flowline = oFolder_input.joinpath("flowline.geojson")
-
-# Define the full path to the boundary file used to clip the mesh.
-oFilename_mesh_boundary = oFolder_input.joinpath("boundary_wgs.geojson")
-
-# Confirm that the domain configuration file exists.
-if os.path.isfile(oFilename_domain_config):
-    pass
-else:
-    print("The domain configuration file does not exist: ", oFilename_domain_config)
-
-# %% Update the domain (parent) configuration file
-
-# The following parameters need to be set in the configuration file:
-#   sWorkspace_output: full/path/to/output
-#   sFilename_mesh_netcdf: full/path/to/lnd_cull_mesh.nc
-#   sFilename_mesh_boundary: full/path/to/boundary_wgs.geojson
-# 	sFilename_basins: full/path/to/pyflowline_susquehanna_basins.json.
-
-# The json file will be overwritten, you may want to make a copy of it first.
-
-# Set the path to the output folder
-# Pass the configuration filename followed by a single key-value pair.
-change_config_key_value(oFilename_domain_config, "sWorkspace_output", str(oFolder_output))
-
-# Set the path to the mpas mesh file
-change_config_key_value(
-    oFilename_domain_config, "sFilename_mesh_netcdf", str(oFilename_mesh_netcdf)
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
 )
+logger = logging.getLogger(__name__)
 
-# Set the path to the boundary file used to clip the mesh
-change_config_key_value(
-    oFilename_domain_config, "sFilename_mesh_boundary", str(oFilename_mesh_boundary)
-)
 
-# Set the path to the basin ("child") configuration file
-change_config_key_value(oFilename_domain_config, "sFilename_basins", str(oFilename_basins_config))
+def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--config",
+        "-c",
+        default=None,
+        help="Path to workflow YAML configuration file (default: pyflowline_susquehanna_mpas.yaml)",
+    )
+    parser.add_argument(
+        "--simulate",
+        action="store_true",
+        help="Run simulation pipeline (simplification, mesh generation, topological reconstruction)",
+    )
+    parser.add_argument(
+        "--visualize",
+        action="store_true",
+        help="Generate flowline visualization map",
+    )
+    args = parser.parse_args()
 
-# These parameters are not strictly necessary, but will reduce the potential for errors or confusion.
-change_config_key_value(
-    oFilename_domain_config,
-    "sFilename_model_configuration",
-    str(oFilename_domain_config),
-)
+    # ── Step 1: Resolve configuration path ────────────────────────────────────
+    if args.config:
+        sFilename_workflow = Path(args.config).expanduser().resolve()
+    else:
+        oPath_root = path_manager.pyflowline_project_root()
+        sFilename_workflow = oPath_root.joinpath(
+            "data", "susquehanna", "input", "pyflowline_susquehanna_mpas.yaml"
+        )
+        if not sFilename_workflow.exists():
+            sFilename_workflow = Path(__file__).with_name("pyflowline_susquehanna_mpas.yaml")
 
-change_config_key_value(
-    oFilename_domain_config, "sWorkspace_data", str(oPath_parent.joinpath("data"))
-)
+    logger.info("Step 1: Loading configuration from: %s", sFilename_workflow)
+    case = load_configuration(sFilename_workflow)
+    if case is None:
+        logger.error("Failed to load configuration from: %s", sFilename_workflow)
+        sys.exit(1)
 
-# %% Update the basin ("child") configuration file
+    logger.info("   * Region: %s", case.sRegion)
+    logger.info("   * Mesh type: %s", case.sMesh_type)
+    logger.info("   * Case ID: %s", case.sCase)
+    logger.info("   * Output workspace: %s", case.sWorkspace_output)
+    if case.sFilename_mpas_mesh_netcdf:
+        logger.info("   * MPAS mesh NetCDF: %s", case.sFilename_mpas_mesh_netcdf)
+    if case.sFilename_mesh_boundary:
+        logger.info("   * Mesh boundary: %s", case.sFilename_mesh_boundary)
 
-# Set the path to the flowline file.
-change_config_key_value(
-    oFilename_basins_config,
-    "sFilename_flowline_filter",
-    str(oFilename_flowline),
-    iFlag_basin_in=1,
-)  # Set iFlag_basin_in=1 when changing the basin configuration file.
+    # ── Step 2: Model setup ───────────────────────────────────────────────────
+    logger.info("Step 2: Setting up PyFlowline model...")
+    case.setup()
 
-# %% Read the configuration file
-oPyflowline = pyflowline_read_configuration_file(
-    oFilename_domain_config, iCase_index_in=iCase_index, sDate_in=sDate
-)
+    # ── Step 3: Visualization ─────────────────────────────────────────────────
+    if args.visualize or getattr(case, "iFlag_visualization", 0) == 1:
+        logger.info("Step 3: Generating initial filtered flowline visualization...")
+        case.plot(sVariable_in="flowline_filter", sFilename_output_in="filter_flowline.png")
 
-# %% Check the model parameters
-oPyflowline.pyflowline_print()
+    # ── Step 4: Simulation Execution ──────────────────────────────────────────
+    if args.simulate or getattr(case, "iFlag_simulation", 0) == 1:
+        logger.info("Step 4: Running flowline simplification...")
+        case.flowline_simplification()
 
-# %% Now we can change some model parameters
+        logger.info("Step 5: Generating mesh...")
+        aCell = case.mesh_generation()
 
-# There are two ways to change the model parameters: 1) use a function, or 2) assign a value directly. Use the function:
-oPyflowline.pyflowline_change_model_parameter("sWorkspace_output", str(oFolder_output))
+        logger.info("Step 6: Reconstructing topological relationships...")
+        case.reconstruct_topological_relationship(aCell)
 
-# To change a parameter for a basin instead of the whole model domain, use the iFlag_basin_in option, this will change the value for all of the basins in the basin configuration file.
-oPyflowline.pyflowline_change_model_parameter(
-    "dLatitude_outlet_degree", 39.462000, iFlag_basin_in=1
-)
+        logger.info("Step 7: Exporting simulation results...")
+        case.export()
 
-oPyflowline.pyflowline_change_model_parameter(
-    "dLongitude_outlet_degree", -76.009300, iFlag_basin_in=1
-)
+    logger.info("Done.")
 
-# The second way is to assign a value directly
-oPyflowline.aBasin[0].dLatitude_outlet_degree = 39.462000
-oPyflowline.aBasin[0].dLongitude_outlet_degree = -76.009300
 
-# %%
-oPyflowline.pyflowline_setup()
-
-# %%
-if iFlag_visualization == 1:
-    oPyflowline.plot(sVariable_in="flowline_filter", sFilename_output_in="filter_flowline.png")
-    pass
-
-# %%
-if iFlag_simulation == 1:
-    oPyflowline.pyflowline_flowline_simplification()
-    pass
-
-# %%
-if iFlag_visualization == 1:
-
-    aExtent_meander = [-76.5, -76.2, 41.6, 41.9]
-    # oPyflowline.plot(sVariable_in='flowline_simplified', sFilename_output_in='flowline_simplified.png')
-    # oPyflowline.plot(sVariable_in='flowline_simplified',
-    #                  sFilename_output_in='flowline_simplified_zoom.png',
-    #                  aExtent_in=aExtent_meander)
-    pass
-
-# %%
-if iFlag_simulation == 1:
-    aCell = oPyflowline.pyflowline_mesh_generation()
-
-# %%
-if iFlag_visualization == 1:
-    # This will fail unless iFlag_simulation is true or has been run
-    # oPyflowline.plot(sVariable_in='mesh', sFilename_output_in='mesh.png' )
-    pass
-# %%
-if iFlag_simulation == 1:
-    oPyflowline.pyflowline_reconstruct_topological_relationship(aCell)
-
-# %%
-if iFlag_visualization == 1:
-    # oPyflowline.plot(sVariable_in='overlap', sFilename_output_in='mesh_w_flowline.png')
-    pass
-
-# oPyflowline.pyflowline_export()
-
-print("Finished")
-
-# %%
+if __name__ == "__main__":
+    main()

@@ -351,6 +351,8 @@ def _normalize_basin_dict(basin: dict[str, Any]) -> dict[str, Any]:
             res["sFilename_flowline_raw"] = _select_platform_path(paths["flowline_raw"])
         if "flowline_topo" in paths:
             res["sFilename_flowline_topo"] = _select_platform_path(paths["flowline_topo"])
+        if "watershed_boundary" in paths:
+            res["sFilename_watershed_boundary"] = _select_platform_path(paths["watershed_boundary"])
         if "output_basin" in paths:
             res["sWorkspace_output_basin"] = _select_platform_path(paths["output_basin"])
 

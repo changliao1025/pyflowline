@@ -5,6 +5,7 @@ import os
 import platform
 import shutil
 import stat
+import sys
 from json import JSONEncoder
 from pathlib import Path
 from shutil import copy2
@@ -620,8 +621,12 @@ class flowlinecase:
             elif "jigsaw" in aConfig_in and isinstance(aConfig_in["jigsaw"], dict):
                 self.aConfig_jigsaw = aConfig_in["jigsaw"]
             else:
-                print("Please provide the jigsaw binary file!")
-                return
+                try:
+                    from pyflowline.configuration.config_manager import JigsawConfigManager
+
+                    self.aConfig_jigsaw = JigsawConfigManager.get_default_config()
+                except Exception:
+                    self.aConfig_jigsaw = {}
 
         # converted geojson files
         self.sFilename_watershed_boundary_geojson = os.path.join(
@@ -750,15 +755,16 @@ class flowlinecase:
             self.sWorkspace_jigsaw = sWorkspace_output
             # then copy the binary file to the folder
             # copy execulate
-            if self.iFlag_user_provided_binary == 1:
+            if (
+                self.iFlag_user_provided_binary == 1
+                and hasattr(self, "sFilename_jigsaw_bin")
+                and self.sFilename_jigsaw_bin
+                and os.path.isfile(self.sFilename_jigsaw_bin)
+            ):
                 sFilename_new = os.path.join(sWorkspace_output, "jigsaw")
-                copy2(self.sFilename_dggrid, sFilename_new)
+                copy2(self.sFilename_jigsaw_bin, sFilename_new)
                 os.chmod(sFilename_new, stat.S_IREAD | stat.S_IWRITE | stat.S_IXUSR)
-                # make this binary as the default one and overwrite other binaries
-                # Add the destination directory ahead of the system PATH
                 os.environ["PATH"] = sWorkspace_output + os.pathsep + os.environ["PATH"]
-                # Verify that the binary is in the PATH and is the default
-                pass
             else:
                 if system == "Windows":
                     print("Windows system is not supported for jigsaw mesh generation!")
@@ -767,7 +773,11 @@ class flowlinecase:
                     sFilename_executable = "jigsaw"
                 # search for system wide binary in the system path
                 iFlag_found_binary = 0
-                for folder in os.environ["PATH"].split(os.pathsep):
+                search_paths = list(os.environ["PATH"].split(os.pathsep))
+                sys_bin = os.path.join(sys.prefix, "bin")
+                if sys_bin not in search_paths:
+                    search_paths.append(sys_bin)
+                for folder in search_paths:
                     sFilename_jigsaw_bin = os.path.join(folder, sFilename_executable)
                     if os.path.isfile(sFilename_jigsaw_bin):
                         print("Found binary at:", sFilename_jigsaw_bin)

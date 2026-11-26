@@ -584,7 +584,7 @@ class flowlinecase:
                 pass
 
         if self.iFlag_run_jigsaw == 1:
-            if "sFilename_jigsaw_configuration" in aConfig_in:
+            if aConfig_in.get("sFilename_jigsaw_configuration"):
                 self.sFilename_jigsaw_configuration = aConfig_in["sFilename_jigsaw_configuration"]
                 from pyflowline.configuration.config_manager import (
                     JigsawConfigManager,
@@ -618,15 +618,20 @@ class flowlinecase:
                         self.aConfig_jigsaw = JigsawConfigManager.load_config(
                             self.sFilename_jigsaw_configuration
                         )
-            elif "jigsaw" in aConfig_in and isinstance(aConfig_in["jigsaw"], dict):
-                self.aConfig_jigsaw = aConfig_in["jigsaw"]
-            else:
-                try:
-                    from pyflowline.configuration.config_manager import JigsawConfigManager
+            if self.aConfig_jigsaw is None:
+                if "aConfig_jigsaw" in aConfig_in and isinstance(
+                    aConfig_in["aConfig_jigsaw"], dict
+                ):
+                    self.aConfig_jigsaw = aConfig_in["aConfig_jigsaw"]
+                elif "jigsaw" in aConfig_in and isinstance(aConfig_in["jigsaw"], dict):
+                    self.aConfig_jigsaw = aConfig_in["jigsaw"]
+                else:
+                    try:
+                        from pyflowline.configuration.config_manager import JigsawConfigManager
 
-                    self.aConfig_jigsaw = JigsawConfigManager.get_default_config()
-                except Exception:
-                    self.aConfig_jigsaw = {}
+                        self.aConfig_jigsaw = JigsawConfigManager.get_default_config()
+                    except Exception:
+                        self.aConfig_jigsaw = {}
 
         # converted geojson files
         self.sFilename_watershed_boundary_geojson = os.path.join(
@@ -789,6 +794,7 @@ class flowlinecase:
                     sFilename_new = os.path.join(sWorkspace_output, "jigsaw")
                     copy2(sFilename_jigsaw_bin, sFilename_new)
                     os.chmod(sFilename_new, stat.S_IREAD | stat.S_IWRITE | stat.S_IXUSR)
+                    os.environ["PATH"] = sWorkspace_output + os.pathsep + os.environ.get("PATH", "")
                 else:
                     print("Binary not found.")
                     return
